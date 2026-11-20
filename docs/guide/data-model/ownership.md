@@ -7,7 +7,7 @@ title: Native container access and ownership
 The native `Aerosol(particles=..., gas=..., environment=...)` aggregate
 retains three supplied containers by identity.
 The [construction guide](construction.md) covers initializers and builders;
-[the executable access example](https://github.com/uncscode/particula/blob/main/docs/examples/fundamentals/native_state_access.py)
+[the executable access example](https://github.com/uncscode/particula/blob/main/docs/studies/tutorials/building-an-aerosol/native_state_access.py)
 covers access, replacement and a subsequent mapped process.
 
 ## Raw fields and derived quantities
@@ -55,14 +55,18 @@ sum PDF nodes. Discrete/PDF volume is exactly 1 m³. See
 Run from the selected native checkout:
 
 ```bash
-python docs/examples/fundamentals/native_state_access.py
+python docs/studies/tutorials/building-an-aerosol/native_state_access.py
 pytest examples_tests/native_state_access_example_test.py -q --no-cov
 ```
 
 The following excerpt uses that maintained example's native constructors:
 
 ```python
-from docs.examples.fundamentals.native_state_access import build_aerosol, replacement_layout
+from runpy import run_path
+
+example = run_path("docs/studies/tutorials/building-an-aerosol/native_state_access.py")
+build_aerosol = example["build_aerosol"]
+replacement_layout = example["replacement_layout"]
 
 aerosol = build_aerosol()
 held = aerosol.particles

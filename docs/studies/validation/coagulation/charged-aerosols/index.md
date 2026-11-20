@@ -28,7 +28,7 @@ and capacity checks are saved in
 `docs/data/gpu/charged-survival-corrected-qualification.json`.
 
 The current package regression and environmental qualification are recorded in
-[environmental validation](../../../../contribute/validation/gpu/environment-sweep.md). Concurrent CUDA jobs mean
+[environmental validation](../../../examples/coupled-populations/environment/index.md). Concurrent CUDA jobs mean
 campaign timings are not standalone performance measurements.
 
 ## Completed corrected-model publication

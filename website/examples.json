@@ -28,7 +28,7 @@
     "full_canvas": true
   },
   "theory-dns-fluid-and-particle-properties-comparison": {
-    "title": "Dns Fluid And Particle Properties Comparison",
+    "title": "Fluid and particle properties in the DNS comparison",
     "source": "docs/studies/validation/cloud-droplet-collisions/dns-fluid-and-particle-properties-comparison.py",
     "policy": "cpu",
     "device": "cpu",
@@ -37,7 +37,7 @@
     "full_canvas": true
   },
   "theory-dns-horizontal-velocity-comparison": {
-    "title": "Dns Horizontal Velocity Comparison",
+    "title": "Horizontal droplet velocities in turbulence",
     "source": "docs/studies/validation/cloud-droplet-collisions/dns-horizontal-velocity-comparison.py",
     "policy": "cpu",
     "device": "cpu",
@@ -46,7 +46,7 @@
     "full_canvas": true
   },
   "theory-dns-kernel-comparison": {
-    "title": "Dns Kernel Comparison",
+    "title": "Cloud-droplet collision kernel against DNS",
     "source": "docs/studies/validation/cloud-droplet-collisions/dns-kernel-comparison.py",
     "policy": "cpu",
     "device": "cpu",
@@ -55,7 +55,7 @@
     "full_canvas": true
   },
   "theory-dns-radial-distribution-comparison": {
-    "title": "Dns Radial Distribution Comparison",
+    "title": "Radial distribution of droplet pairs",
     "source": "docs/studies/validation/cloud-droplet-collisions/dns-radial-distribution-comparison.py",
     "policy": "cpu",
     "device": "cpu",
@@ -64,7 +64,7 @@
     "full_canvas": true
   },
   "theory-dns-radial-relative-velocity-comparison": {
-    "title": "Dns Radial Relative Velocity Comparison",
+    "title": "Radial relative velocity of droplet pairs",
     "source": "docs/studies/validation/cloud-droplet-collisions/dns-radial-relative-velocity-comparison.py",
     "policy": "cpu",
     "device": "cpu",
@@ -73,7 +73,7 @@
     "full_canvas": true
   },
   "theory-ionparticle-coagulation": {
-    "title": "Ionparticle Coagulation",
+    "title": "Ion–particle collision kernels",
     "source": "docs/studies/examples/particle-processes/coagulation/charged-particles/ionparticle-coagulation.py",
     "policy": "cpu",
     "device": "cpu",

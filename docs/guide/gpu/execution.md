@@ -163,9 +163,9 @@ completed earlier substeps remain committed and documented vapor-pressure/work
 sidecars may already be written. Callers needing retry semantics must use their
 own snapshot/restore.
 
-The [direct-kernel quick start](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py)
+The [direct-kernel quick start](https://github.com/uncscode/particula/blob/main/docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_direct_kernels_quick_start.py)
 is the supported explicit-transfer path. It is separate from the bounded
-[GPU-resident session example](https://github.com/Gorkowski/particula/blob/main/docs/examples/gpu/resident/gpu_resident_session.py), which
+[GPU-resident session example](https://github.com/Gorkowski/particula/blob/main/docs/studies/tutorials/working-with-gpu/resident/gpu_resident_session.py), which
 documents lifecycle ownership rather than process execution.
 
 ### GPU-resident session lifecycle
@@ -429,7 +429,7 @@ documented in [GPU resident checkpoints](resident/checkpoints.md).
 ### Resident support validation matrix (2026-08-11)
 
 The supported resident example is the repository-relative
-[multi-timestep resident source](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/resident/gpu_resident_multi_timestep.py).
+[multi-timestep resident source](https://github.com/uncscode/particula/blob/main/docs/studies/tutorials/working-with-gpu/resident/gpu_resident_multi_timestep.py).
 This closeout is scoped to [issue #1451](https://github.com/Gorkowski/particula/issues/1451).
 
 **Status: closeout validation pending.** The historical four-module evidence
@@ -516,7 +516,7 @@ cross-backend exact RNG replay remain deferred.
 
 ### Complete direct-process illustration
 
-The [complete direct-process source](https://github.com/Gorkowski/particula/blob/main/docs/examples/gpu/direct/gpu_complete_process_sequence.py)
+The [complete direct-process source](https://github.com/Gorkowski/particula/blob/main/docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_complete_process_sequence.py)
 is an illustrative explicit-transfer five-call sequence, not a resident
 scheduler or coordinator example. It imports the five direct
 boundaries from `particula.gpu.kernels` in order: `condensation_step_gpu`,

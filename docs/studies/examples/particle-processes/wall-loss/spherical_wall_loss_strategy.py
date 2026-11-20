@@ -241,9 +241,8 @@ wall_loss = par.dynamics.SphericalWallLossStrategy(
 )
 
 # Condensation uses native gas/environment data and explicit process
-# configuration. For a complete
-# example that includes gas-particle condensation, see the condensation
-# tutorials in docs/examples/Dynamics/.
+# configuration. For a complete gas-particle calculation, see the
+# condensation sequence under docs/studies/tutorials/condensation/.
 
 for _ in range(10):
     # Apply wall loss to the particle distribution

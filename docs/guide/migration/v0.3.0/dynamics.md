@@ -14,10 +14,14 @@ Runnable rates retain the box axis, including B=1: use `rates[0]` when
 passing one box to existing plotting or single-box numerical utilities.
 
 Run this excerpt from the selected native checkout. Its maintained constructors
-are in `docs/examples/fundamentals/native_state_access.py`:
+are in `docs/studies/tutorials/building-an-aerosol/native_state_access.py`:
 
 ```python
-from docs.examples.fundamentals.native_state_access import build_aerosol, build_condensation
+from runpy import run_path
+
+example = run_path("docs/studies/tutorials/building-an-aerosol/native_state_access.py")
+build_aerosol = example["build_aerosol"]
+build_condensation = example["build_condensation"]
 
 aerosol = build_aerosol()
 condensation = build_condensation(aerosol.gas)
@@ -60,8 +64,8 @@ there is no blanket whole-sequence rollback guarantee.
 Import steps from `particula.gpu.kernels`. Conversion helpers remain under
 `particula.gpu`; maps, scratch and resident configuration remain at their concrete
 modules. See the maintained
-[direct quick start](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py)
-and [five-process sequence](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/direct/gpu_complete_process_sequence.py).
+[direct quick start](https://github.com/uncscode/particula/blob/main/docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_direct_kernels_quick_start.py)
+and [five-process sequence](https://github.com/uncscode/particula/blob/main/docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_complete_process_sequence.py).
 
 Explicitly convert native discrete/resolved data; radius PDFs cannot be
 uploaded. Raw resolved concentration stays counts. Condensation couples gas
@@ -95,7 +99,7 @@ Existing direct calls remain explicit, and CPU execution semantics are unchanged
 
 ## Resident and capture paths
 
-The [resident multi-timestep example](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/resident/gpu_resident_multi_timestep.py)
+The [resident multi-timestep example](https://github.com/uncscode/particula/blob/main/docs/studies/tutorials/working-with-gpu/resident/gpu_resident_multi_timestep.py)
 prepares exact session/registry/guard ownership and process mappings, then runs
 the maintained twelve-node composition. After explicit same-device restart it
 prepares new mappings against fresh carriers. Its prescribed gas and wall loss
@@ -103,7 +107,7 @@ make it an open system: zero-ledger residuals report net inventory change,
 not zero closed-system drift.
 
 Uncaptured examples use Warp CPU when installed. The
-[native capture example](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/resident/gpu_resident_graph_capture.py)
+[native capture example](https://github.com/uncscode/particula/blob/main/docs/studies/tutorials/working-with-gpu/resident/gpu_resident_graph_capture.py)
 requires CUDA and never substitutes CPU or Warp CPU. Optional CUDA absence is
 not performance evidence. See [container foundations](../../data-model/index.md)
 for transfers and [resident checkpoints](../../gpu/resident/checkpoints.md) for

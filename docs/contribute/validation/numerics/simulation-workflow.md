@@ -3,7 +3,7 @@
 This record qualifies the development recording/restart workflow against native
 CPU, Warp CPU and RTX 5060 CUDA execution. It accompanies the
 [usage guide](../../../guide/getting-started/recording-restart.md) and
-[adaptive-method assessment](adaptive-methods.md). It establishes implementation
+[adaptive-method assessment](../../../studies/validation/condensation/adaptive/index.md). It establishes implementation
 and numerical behavior for the profiles below, not experimental validity or a
 GPU performance claim.
 
@@ -211,46 +211,8 @@ and the outstanding full example publications remain required.
 
 ## Full CUDA forcing publication
 
-The complete `gpu-prepared-forcing` publication subsequently passed on the
-RTX 5060 from pinned revision `480ecf2c1aa95da42985098c53e4ecdc66133d7b`.
-Its package source hash is
-`bbe6cb05017e86b19f7dc166c18cac96c0d762b5300c03990d91cd1a4e08ce8b`.
-The guarded run took **3,139.79 s**, retaining all sixteen boxes, 4,096 slots
-per box, 49,152 initially active particles, four materials and five gas lanes.
-The coarse run used 6,000 one-microsecond cycles; the fine run used 12,000
-half-microsecond cycles and `rtol=1e-7` rather than `1e-5`. Both retained the
-same physical duration and 120 forcing control times.
+[Full CUDA forcing publication in the study](../../../studies/examples/coupled-populations/forcing/forcing-refinement.md#full-cuda-forcing-publication)
 
-- Maximum final per-particle total-mass relative difference: **2.32234e-7**
-  against the predeclared 1% threshold.
-- Maximum final water-vapor relative difference: **8.85905e-9** against 0.1%.
-- Maximum per-box/species inventory residual: **1.15463e-14** coarse and
-  **2.93099e-14** fine, with external vapor changes and dilution accounted for.
-- Coarse adaptive work: 9,682 accepted and 1,711 rejected trials; fine work:
-  17,281 accepted and 2,797 rejected trials. Both had zero domain rejections.
-- Coarse coupling used 12,000 full downloads and 12,000 full uploads; the fine
-  run used 24,000 of each. These measured costs preclude claiming fully resident
-  execution or inferring a GPU speedup from this correctness comparison.
-
-All saved-file hashes and scientific inputs were verified. The retained compact
-report contains thirteen frames and numerical refinement/work summaries, without
-full particle states. Figures were inspected before and after CPU-only replot;
-the replot preserves the original CUDA execution revision, device and timestamp.
-Its invocation now explicitly shows the figure, avoiding duplicate notebook
-display of the helper's returned figure. The extracted download's source and
-helpers matched byte-for-byte, imported from its own directory, and rendered the
-saved data with GPU calls disabled and no data mutation. That download check
-tested import/rendering, not a second execution of the full scientific workload.
-
-The sparse displayed history records the supplied initial state before the first
-control update, then complete cycles before the next control update. It does not
-resolve all control changes or pulse peaks. The final-state refinement test is
-numerical consistency evidence for the declared case, not an independent
-experimental reference or an error bound at every intermediate time. The full
-cyclic chamber and the remaining CPU scientific studies are still required.
-The imported bundle passed the 563-page website build and rendered verification
-with zero errors; see `.artifacts/coupled-forcing-website.log`. The final ZIP's
-executable source and all helper bytes match the independently tested download.
 
 
 ## CUDA-resident material solvers and respiratory refinement
@@ -264,79 +226,15 @@ RTX 5060. Full Ruff/format checks and Mypy (696 sources) passed. Focused
 independent reservoir and dense-solve oracles passed 38 tests, including
 12-material and larger-than-one-reduction-lane-group cases.
 
-The complete 1,000-particle, twelve-material respiratory example ran to 20 s
-on that revision in **286.82 s**. Its separate coarse/fine assessment completed
-all **201 observations** in **1,229.39 s**, retaining the original inventory
-assertions. The fine run used 100-fold tighter relative and absolute tolerances,
-half the maximum step and half the observation interval. Both prospective
-0.1% consistency targets passed:
+[Read this evidence in the study.](../../../studies/examples/coupled-populations/emissions/respiratory-refinement.md#cuda-resident-material-solvers-and-respiratory-refinement)
 
-- Maximum per-particle relative radius difference: **3.92121347e-6**.
-- Maximum per-species phase-inventory difference: **3.22563458e-8** of that
-  species' initial total inventory.
-- Coarse: **8,921 accepted**, one rejected step; fine: **41,841 accepted**,
-  one rejected step. Neither run had domain rejections.
-
-The complete repository report at
-`docs/data/numerics/resident-respiratory-refinement.json` retains every
-observation, material identity, controls, source hashes and work counts. These
-elapsed times include concurrent GPU work and are not isolated performance
-benchmarks. This is same-method numerical consistency evidence;
-it does not independently validate the chemistry or correct the example's
-previously documented chemical-name matches. The refreshed publication records
-CUDA execution, fixed revision and source hashes. The cyclic chamber has
-completed its 600 s trajectory and exact checkpoint continuation; the first
-publication failed during plot-data serialization, as recorded below.
 
 
 ### Full resident biomass publication
 
-The 10,000-particle, three-material biomass workload completed on the same
-revision and RTX 5060 in **4,148.09 s** with concurrent GPU work. It retained
-0.01 s initial adjustment, 600 s preparation and all four independent 3,600 s
-branches, each with 10,000 outer intervals of 0.36 s. The user-authorized model
-change replaces AO2008/DNS with **ST1956 turbulent shear**, retaining
-`epsilon = 0.1 m²/s³` and fluid density `1.225 kg/m³`. This is a changed collision
-model, not a CUDA implementation or validation of AO2008.
+<a id="biomass-rerun-with-adaptive-gpu-coagulation"></a>
+[Full resident biomass publication in the study](../../../studies/examples/coupled-populations/emissions/biomass-evidence.md#full-resident-biomass-publication)
 
-All four branches passed the unchanged per-species inventory assertion
-(`rtol=1e-12`, `atol=1e-30`). Each coupled branch asserted zero physical-state
-uploads and downloads between process stages. Adaptive decisions remained in
-native CUDA conditional graphs. Physical-state downloads were limited to
-declared observations; control metadata was read at completed outer intervals.
-
-| Coupled branch | Accepted condensation steps | Rejected steps | Domain rejections |
-| --- | ---: | ---: | ---: |
-| Brownian | 31,450 | 7,221 | 0 |
-| Brownian + SP2016 settling | 21,902 | 3,612 | 0 |
-| ST1956 turbulent shear | 27,602 | 6,101 | 0 |
-
-The refreshed biomass bundle retains the executed source, package hash,
-revision, device identity, scientific stdout and all four figures. The final
-size-distribution and mixing-state figures explicitly identify turbulent shear.
-These are completion and conservation checks for this illustration, not a
-collision-model convergence study or experimental validation.
-
-
-### Biomass rerun with adaptive GPU coagulation
-
-The current [biomass example](../../../examples/simulations/biomass_burning_cloud_interactions.py)
-completed the same 600 s preparation and four one-hour branches on the RTX 5060.
-The original seeds, population of 10,000, event order, condensation tolerances
-and 0.36 s outer interval were retained. The sampler can subdivide just the
-collision stage when a full interval needs more disjoint pairs than the active
-population permits. It recomputes the rate bound after each admitted pass.
-
-The run used revision `d1bdf025f1` and took 2,131 s. The preceding scientific reference used `9c548d9d61`. The table compares final gas-water saturation ratios for one seeded realization.
-
-| Branch | Split intervals out of 10,000 | Most passes in one interval | Mergers | Final saturation ratio | Archived ratio |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| Condensation alone | — | — | — | 1.000102995 | 1.000102995 |
-| Brownian | 0 | 1 | 240 | 1.000102961 | 1.000102961 |
-| Brownian + settling | 179 | 2 | 9,319 | 1.000038092 | 1.000025847 |
-| ST1956 shear | 0 | 1 | 448 | 1.000102017 | 1.000102017 |
-
-All four branches passed the per-species gas-plus-particle inventory check (relative tolerance 10⁻¹², absolute tolerance 10⁻³⁰ kg). In each collision branch, the loss of occupied particle slots equaled the number of accepted mergers, and the GPU passed particle and gas state directly between stages. The comparison covers one stochastic realization.
 
 ### Publication runner timeout correction
 
@@ -354,37 +252,8 @@ The already-running chamber retained its original loaded runner.
 
 ### Full resident cyclic trajectory and output recovery
 
-The first complete resident cyclic run at `9c548d9d61` passed all 600 one-second
-cycles on the RTX 5060, with 32 boxes, 8,192 slots per box, 196,608 initially
-active particles and twelve prescribed source pulses. It finished with 37,064
-active particles. The maximum observed box/species inventory relative residual
-was **1.19682042e-13**, below the unchanged `rtol=2e-12` gate. Charge, unit
-counts and finite-state checks passed at all thirty observation times.
+[Full resident cyclic trajectory and output recovery in the study](../../../studies/examples/coupled-populations/chambers/cyclic-chamber-evidence.md#full-resident-cyclic-trajectory-and-output-recovery)
 
-The 300-second checkpoint reproduced the complete second half with byte-exact
-final state and random continuation. The original trajectory used **620,558
-accepted** and **378 rejected** condensation steps, with zero domain rejections,
-1,200 control readbacks and **zero physical-state coupling uploads/downloads**.
-These results are retained in the captured completion stdout; the first attempt
-did not publish a result bundle. Its subsequent plot-data writer rejected NumPy
-arrays, and kernel cleanup released the in-memory observations. No missing
-trajectory data have been reconstructed or substituted.
-
-The observation boundary now converts detached arrays to plain lists. This
-changes output representation only. A regression using the actual observation,
-JSON writer and CPU-only plotting path reproduces the failure before the fix
-and passes after it. Together with the publisher tests, **24 tests passed with
-warnings treated as errors**. The timeout is now 14,400 seconds to accommodate
-the measured full workload with enforced deadlines. The fresh full publication
-from `3d3753d2b` completed in **6,307.33 s**, using identical library bytes and
-scientific settings. It reproduced all work counts and accounting results above,
-including exact same-device restart and zero stage transfers. The retained
-**659,430-byte** data bundle contains all **31 frames** from 0 through 600 s.
-The four-panel figure was inspected before and after CPU-only replot. Replot
-preserved the data hash and original CUDA execution provenance; no simulation
-was rerun for rendering. The initial displayed point precedes the first forcing
-update, and the 20-second observations do not resolve every jump or peak. This
-completion time is not an isolated performance benchmark.
 
 
 The corrected runner also validated all **59 CPU-policy registry examples**

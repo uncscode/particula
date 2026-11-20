@@ -180,7 +180,7 @@ ceiling, or combine these changes. The new owner records the change in
 steps use the same bounded device decisions as ordinary steps. Once a step
 finishes, unused passes skip physics and RNG. A recoverable rejection keeps
 the existing owner's graph valid. The worked example follows two cloud boxes
-through exhaustion and retry. [Adaptive cloud coagulation](../../examples/gpu/prepared/adaptive_coagulation.py)
+through exhaustion and retry. [Adaptive cloud coagulation](../../studies/validation/coagulation/adaptive/adaptive_coagulation.py)
 
 ## Atmospheric ion collisions
 
@@ -485,7 +485,7 @@ work remains quadratic in particles per box. Large aggregate populations spread
 across many independent boxes can therefore be more practical than one very
 large coagulating box. Condensation and dilution have different scaling.
 
-The [GPU examples](../../examples/gpu/index.md) show heterogeneous boxes,
+The [GPU examples](../../studies/tutorials/working-with-gpu/index.md) show heterogeneous boxes,
 time-varying forcing, stochastic ensembles, repeated source pulses and a
 million-particle lifecycle. Their saved CUDA figures are deliberately refreshed;
 site builds do not run these experiments.
@@ -506,7 +506,7 @@ reports separate preparation and transfer costs. Nsight Systems supplies
 kernel-level attribution; profiling runs are separate from timing repetitions.
 See [Warp profiling guidance](https://nvidia.github.io/warp/v1.11/deep_dive/profiling.html).
 
-The [two-million-particle environmental sweep](../../examples/gpu/prepared/gpu_environment_sweep.py)
+The [two-million-particle environmental sweep](../../studies/examples/coupled-populations/environment/gpu_environment_sweep.py)
 combines charged Brownian coagulation with closed water condensation across
 sixteen temperature, pressure and initial-humidity conditions. It keeps all
 2,097,152 initial particles resident together and documents its constant
@@ -552,7 +552,7 @@ for the transition scaling and Coulomb limits;
 low-field mobility relation. Constant cross section and fixed ion composition
 are assumptions of this implementation.
 
-See [custom processes across CPU and CUDA](../../examples/gpu/prepared/custom_process_backends.py)
+See [custom processes across CPU and CUDA](../../studies/examples/custom-processes/custom_process_backends.py)
 for equivalent NumPy/Warp updates, explicit CPU transfers, a registered field,
 absolute-time capture, detached snapshots and exact restart checks.
 
@@ -572,4 +572,4 @@ on a particle-resolved population. Preparation freezes the Hamaker constant,
 static dielectric constant and geometry table version in the restart identity.
 Graph replay evaluates live radii, environment and signed charges, including
 charges produced by earlier merges. The existing equal-count and work-admission
-rules apply to all boxes. [CUDA restart example](../../examples/gpu/prepared/van_der_waals.py)
+rules apply to all boxes. [CUDA restart example](../../studies/validation/coagulation/dispersion/gpu_van_der_waals.py)

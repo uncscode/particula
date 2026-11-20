@@ -24,7 +24,7 @@ Integration with equilibria calculations is provided through `particula.equilibr
 
 Pass `ActivityBAT(molar_mass=0.2, oxygen2carbon=0.5, density=1243.493333)` as the condensation strategy's `activity_strategy` for the miscible reference organic. The molar mass is in kg/mol and the density in kg/m³. Particle materials must be ordered as water then organic. The gas species map can put either vapor in a different lane or leave a material involatile. At each rate evaluation the current particle masses determine the two activities. Kelvin curvature and the pure-species vapor pressures then determine the surface pressures that drive kinetic transfer.
 
-Use this profile for a single homogeneous liquid. The model supplies a constrained liquid curve even at descriptors that permit demixing. A phase-separated droplet needs phase amounts and a choice of surface composition. The CPU evaluates the binary function directly and the GPU uses a prepared one-dimensional table. [Matched CPU and CUDA humidity change](../../examples/thermodynamics/activity/bat_humidity_pulse.py) · [Reference curves and supported phase assumptions](../../contribute/validation/thermodynamics/bat-activity.md)
+Use this profile for a single homogeneous liquid. The model supplies a constrained liquid curve even at descriptors that permit demixing. A phase-separated droplet needs phase amounts and a choice of surface composition. The CPU evaluates the binary function directly and the GPU uses a prepared one-dimensional table. [Matched CPU and CUDA humidity change](../../studies/benchmarks/bat-humidity-pulse/bat_humidity_pulse.py) · [Reference curves and supported phase assumptions](../../studies/validation/material-properties/binary-bat.md)
 
 ## Key Benefits
 
@@ -389,8 +389,8 @@ result = partitioning.solve(
 
 - **Theory**: [Activity Theory](../../theory/thermodynamics/activity-theory.md) - Mathematical foundations
 - **Theory**: [Equilibria Theory](../../theory/thermodynamics/equilibria-theory.md) - Partitioning equations
-- **Examples**: [Activity Examples](../../examples/thermodynamics/activity/index.md) - Working code examples
-- **Tutorial**: [Activity Tutorial](../../examples/thermodynamics/particle-properties/activity_tutorial.py) - Interactive notebook
+- [Water activity calculations](../../studies/examples/thermodynamics/activity/index.md) compare ideal mixing, κ, and BAT assumptions.
+- [Construct an activity model](../../studies/examples/thermodynamics/particle-properties/activity_tutorial.py) using strategies, builders, and factories in Python.
 
 ## FAQ
 
@@ -415,6 +415,6 @@ Activity determines the effective concentration that drives phase equilibrium. T
 ## See Also
 
 - [Designing a size-resolved CCN experiment](ccn-retrieval.md)
-- [Equilibria Examples](../../examples/thermodynamics/equilibria/index.md)
-- [Particle Phase Tutorial](../../examples/fundamentals/particles/index.md)
+- [Equilibria Examples](../../studies/examples/thermodynamics/equilibria/index.md)
+- [Particle Phase Tutorial](../../studies/tutorials/building-an-aerosol/particles/index.md)
 - [Wall Loss Strategy System](wall-loss.md)

@@ -1,40 +1,25 @@
-# Validation records
+# Validation and release records
 
-These records explain what evidence supports a scientific or release claim and
-what remains unqualified. They are not tutorials or implementation roadmaps.
-Results are specific to their recorded revision, workload, and device.
+<a id="validation-records"></a>
 
-| Question | Record |
-| --- | --- |
-| Can final size constrain initial radius? | [Closed-box size inversion](numerics/initial-size-inversion.md) |
-| Can humidity constrained by haze reproduce Π Chamber cloud counts? | [Chamber spectra and startup sensitivity](../../studies/literature/pi-chamber/haze-and-cloud/index.md) |
-| How do salt type and organic vapor change wet size? | [Π Chamber seed chemistry and BAT vapor transfer](../../studies/literature/pi-chamber/seed-chemistry.md) |
-| Does CUDA wall loss reproduce spherical deposition theory? | [Theory comparison and evidence limits](../../studies/validation/wall-loss/index.md) |
-| Can bipolar charge and mobility selection explain NaCl capture rates? | [NaCl chamber scavenging](coagulation/nacl-scavenging.md) |
-| How accurately does the slip law recover a dry PSL diameter? | [Mobility sizing against 49 published measurements](../../studies/literature/dry-psl-mobility/index.md) |
-| How well does direct BAT reproduce the published activity curves? | [Binary BAT reference checks](thermodynamics/bat-activity.md) |
-| How well does BAT reproduce measured citric acid water activity? | [Citric acid droplet hygroscopicity](../../studies/literature/particle-water-uptake/citric-acid/index.md) |
-| How well does a CCN-derived κ transfer across sizes and humidities? | [Size-resolved CCN retrieval study](../../studies/literature/particle-water-uptake/ccn-retrieval/index.md) |
-| How does CPU/CUDA cost scale for a humidity sensitivity study? | [BAT humidity-pulse ensemble](gpu/bat-humidity-pulse.md) |
-| What supports the scientific baseline? | [Scientific correctness](numerics/scientific-correctness.md) |
-| Which adaptive method and splitting choices are qualified? | [Adaptive integration assessment](numerics/adaptive-methods.md) |
-| What supports recording and exact continuation? | [Simulation workflow](numerics/simulation-workflow.md) |
-| What supports independent CPU/CUDA optics? | [Reference corpus](optics/reference-corpus.md) and [CUDA qualification](optics/cuda.md) |
-| Is the native migration approved for release? | [v0.3.0 gates](releases/v0.3.0.md): maintainer/release approval remains pending |
-| What supports the mass representation? | [Mass precision](numerics/mass-precision.md) |
-| What supports the fixed-four-substep condensation method? | [Stiffness study](numerics/condensation-stiffness.md) and [direct parity](gpu/condensation-parity.md) |
-| What supports the two-million-particle environmental example? | [Environmental sweep](gpu/environment-sweep.md) |
-| Which direct coagulation mechanisms were validated? | [Coagulation physics](gpu/coagulation.md) |
-| How closely do published BAT predictions match 30 measured CCN hygroscopicities? | [Cloud activation comparison](../../studies/literature/particle-water-uptake/bat-ccn.md) |
-| What do historical one-thread-per-box timings show? | [Dated coagulation benchmarks](../../studies/benchmarks/historical-coagulation/index.md) and [legacy viewer](../../studies/benchmarks/historical-coagulation/gpu_benchmarks.py) |
-| Is resident capture performance qualified? | [Qualification gates](gpu/graph-capture-qualification.md): UNSHIPPED/BLOCKED |
-| How must resident timing and memory be measured? | [Benchmark/memory record](gpu/resident-benchmarks.md) |
-| How must capture profiling be collected? | [Profiling record](gpu/graph-capture-profiling.md) |
-| What qualifies custom processes and registered fields? | [Extension qualification](gpu/process-field-extensions.md) |
+Use [Validation studies](../../studies/validation/index.md) for numerical checks, [Literature analyses](../../studies/literature/index.md) for published comparisons, and [Benchmarks](../../studies/benchmarks/index.md) for measured costs. Each result identifies its workload, revision, and reference.
 
-Missing reviewed artifacts are unavailable and unmeasured. A passing source
-test or closed implementation plan cannot populate a missing measurement row.
+## Contributor procedures and decisions
 
-[Dispersion and dielectric capture](coagulation/van-der-waals.md) compares
-CPU and CUDA pair kernels with orbit integrals, independent Langevin
-trajectories, and neutral and charged chamber measurements.
+- [GPU Coagulation Validation Record](gpu/coagulation.md)
+- [Condensation Parity Walkthrough Ownership Record](gpu/condensation-parity.md)
+- [GPU graph-capture profiling record](gpu/graph-capture-profiling.md)
+- [Graph-capture qualification gates](gpu/graph-capture-qualification.md)
+- [Prepared simulations: RTX 5060 qualification](gpu/prepared-rtx5060.md)
+- [Custom processes and fields: qualification](gpu/process-field-extensions.md)
+- [Resident benchmark and memory-budget record](gpu/resident-benchmarks.md)
+- [Mass Precision Recommendation Report](numerics/mass-precision.md)
+- [Native API migration validation and release gates](releases/v0.3.0.md)
+- [Scientific correctness reference baseline](numerics/scientific-correctness.md)
+- [Simulation workflow qualification](numerics/simulation-workflow.md)
+
+Missing reviewed artifacts are unavailable and unmeasured.
+
+- [CUDA optics delivery qualification](optics/delivery.md)
+- [Direct condensation method decision and downstream gates](numerics/direct-condensation-decision.md)
+- [Adaptive integration method decisions](numerics/adaptive-method-decision.md)

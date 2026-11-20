@@ -6,7 +6,7 @@ contracts below retain their own, sometimes broader, capabilities.
 
 ## Complete direct-process context
 
-The direct wall-loss call appears in the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/examples/gpu/direct/gpu_complete_process_sequence.py), with [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and a [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py). Caller-owned persistent RNG and sidecars remain explicit; this is not a `Runnable`, backend selector, scheduler, or CPU fallback.
+The direct wall-loss call appears in the illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_complete_process_sequence.py), with [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and a [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py). Caller-owned persistent RNG and sidecars remain explicit; this is not a `Runnable`, backend selector, scheduler, or CPU fallback.
 
 > Strategy-based wall loss for chamber simulations that plugs directly into particula's dynamics workflow.
 
@@ -270,7 +270,7 @@ For persistent replay, supply initialized caller-owned RNG state and prepare
 with `initialize_rng=False`. Zero-time and wholly inactive calls do not advance
 or reset supplied words. Native resident dispatch uses explicit resolved
 metadata and session-owned continuation streams; see the
-[resident walkthrough](https://github.com/uncscode/particula/blob/main/docs/examples/gpu/resident/gpu_resident_multi_timestep.py). Direct
+[resident walkthrough](https://github.com/uncscode/particula/blob/main/docs/studies/tutorials/working-with-gpu/resident/gpu_resident_multi_timestep.py). Direct
 caller-owned RNG and resident lifecycle ownership are distinct boundaries.
 
 Warp CPU is the baseline when Warp is installed. CUDA is optional and the
@@ -502,8 +502,8 @@ This pattern matches how other dynamics strategies are combined in chamber simul
 
 ## Related Documentation
 
-- **Hands-on guide**: [Wall loss tutorial](../../examples/processes/wall-loss/wall_loss_tutorial.py)
-- **Notebooks**: [Spherical wall loss strategy](../../examples/processes/wall-loss/spherical_wall_loss_strategy.py)
+- **Hands-on guide**: [Wall loss tutorial](../../studies/examples/particle-processes/wall-loss/wall_loss_tutorial.py)
+- **Notebooks**: [Spherical wall loss strategy](../../studies/examples/particle-processes/wall-loss/spherical_wall_loss_strategy.py)
 - **Dynamics overview**:
   [Wall loss strategies](index.md#scientific-processes)
 
@@ -519,5 +519,5 @@ Subclass `WallLossStrategy` in your own code or contribute a new strategy to par
 
 ## See Also
 
-- [Condensation strategies](../../examples/simulations/index.md)
-- [Particle phase examples](../../examples/fundamentals/particles/index.md)
+- [Condensation strategies](../../studies/examples/coupled-populations/index.md)
+- [Particle phase examples](../../studies/tutorials/building-an-aerosol/particles/index.md)

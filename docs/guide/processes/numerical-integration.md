@@ -27,7 +27,7 @@ choice. ROS2 and ROS3 are explicit CPU options for stiff continuous problems
 with a suitable Jacobian. ROS3 uses a third-order solution and second-order
 embedded estimator; it substantially reduces accepted steps in the measured
 wet–dry relaxation case at the same tolerances. ROS2's lower-order estimator
-can be expensive. The [method assessment](../../contribute/validation/numerics/adaptive-methods.md)
+can be expensive. The [method assessment](../../studies/validation/condensation/adaptive/index.md)
 reports both accuracy and cost, including settings that failed the observable
 accuracy target. A local tolerance is not a guarantee on global radius or vapor
 error. Always refine tolerances and the outer split step for your own case.
@@ -110,12 +110,12 @@ cores, so an initially wet scale does not distort derivatives after evaporation.
 This reduces derivative work and storage for large populations; it does not
 change the chosen method's error estimator or remove its accuracy cost.
 
-The [wet–dry relaxation example](../../examples/simulations/adaptive_cloud_relaxation.py)
+The [wet–dry relaxation example](../../studies/validation/condensation/adaptive/adaptive_cloud_relaxation.py)
 compares stiff evaporation with independent Radau/BDF references. The
-[CUDA wet–dry example](../../examples/simulations/adaptive_cloud_relaxation_cuda.py)
+[CUDA wet–dry example](../../studies/validation/condensation/adaptive/adaptive_cloud_relaxation_cuda.py)
 qualifies device ROS3 against the same references and explicit humidity reset. The
-[finite-reservoir example](../../examples/simulations/adaptive_reservoir_depletion.py)
-and its [CUDA companion](../../examples/simulations/adaptive_reservoir_depletion_cuda.py)
+[finite-reservoir example](../../studies/validation/condensation/adaptive/adaptive_reservoir_depletion.py)
+and its [CUDA companion](../../studies/validation/condensation/adaptive/adaptive_reservoir_depletion_cuda.py)
 compare radius and vapor errors during depletion. Both distinguish mass closure
 from trajectory accuracy; the small CUDA case is not an acceleration benchmark.
 
@@ -301,7 +301,7 @@ and merger counts for that interval. If a coupled cycle fails, resume a
 checkpoint saved before the failed cycle. The biomass example records how
 often each collision model requires multiple passes.
 [Adaptive work limits](../gpu/prepared.md#adaptive-coagulation-intervals) ·
-[Biomass simulation](../../examples/simulations/biomass_burning_cloud_interactions.py)
+[Biomass simulation](../../studies/examples/coupled-populations/emissions/biomass_burning_cloud_interactions.py)
 
 Each cycle retains the event owner's buffers and random streams. With
 `resident=True`, a persistent `GPUResidentCondensation` owner imports event
@@ -322,9 +322,9 @@ sequence; the resident adaptive owner separately captures its conditional loop.
 The whole Python cycle, observations and checkpoint serialization remain outside
 CUDA capture.
 
-The [cyclic chamber](../../examples/gpu/prepared/gpu_prepared_cyclic_chamber.py)
+The [cyclic chamber](../../studies/examples/coupled-populations/chambers/gpu_prepared_cyclic_chamber.py)
 selects resident execution. The older
-[forcing study](../../examples/gpu/prepared/gpu_prepared_forcing.py) retains its
+[forcing study](../../studies/examples/coupled-populations/forcing/gpu_prepared_forcing.py) retains its
 explicit-transfer policy. Their scientific schedules and stochastic errors are
 separate from condensation's local error control.
 

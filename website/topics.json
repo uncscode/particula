@@ -1153,20 +1153,42 @@
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/gpu/bat-humidity-pulse.md",
+      "source": "docs/studies/benchmarks/bat-humidity-pulse/index.md",
       "title": "BAT humidity-pulse ensemble on CPU and CUDA",
       "topic": "verification-performance",
       "also": [
-        "verification-qualification"
+        "verification-qualification",
+        "activity-nonideal",
+        "condensation-reservoirs"
       ],
-      "role": "Contribute",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "bat-humidity-pulse",
+        "runs": [
+          "bat-humidity-pulse"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/activity.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/guide/gpu/prepared.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
       "source": "docs/studies/validation/coagulation/charged-aerosols/index.md",
       "title": "Charged coagulation and atmospheric ion validation",
       "topic": "verification-scientific",
-      "also": [],
+      "also": [
+        "charged",
+        "gpu"
+      ],
       "role": "Studies",
       "start_here": true,
       "study": {
@@ -1186,7 +1208,7 @@
     },
     {
       "source": "docs/studies/benchmarks/historical-coagulation/index.md",
-      "title": "Historical coagulation benchmark evidence",
+      "title": "Historical coagulation benchmarks",
       "topic": "verification-performance",
       "also": [],
       "role": "Studies",
@@ -1222,12 +1244,30 @@
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/gpu/environment-sweep.md",
-      "title": "Environmental dynamics: dry aerosols and humid air with ions",
+      "source": "docs/studies/examples/coupled-populations/environment/index.md",
+      "title": "Dry aerosols and humid air with ions",
       "topic": "verification-scientific",
-      "also": [],
-      "role": "Contribute",
-      "start_here": false
+      "also": [
+        "atmosphere",
+        "gpu",
+        "charged"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "environment-sweep",
+        "runs": [
+          "gpu-environment-sweep",
+          "gpu-dry-environment-sweep"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/gpu/prepared.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
       "source": "docs/contribute/validation/gpu/graph-capture-profiling.md",
@@ -1286,12 +1326,27 @@
       "start_here": true
     },
     {
-      "source": "docs/contribute/validation/numerics/condensation-stiffness.md",
-      "title": "Condensation Stiffness Study and Recommendation Record",
+      "source": "docs/studies/validation/condensation/stiffness.md",
+      "title": "Condensation error across a measured timestep grid",
       "topic": "verification-scientific",
       "also": [],
-      "role": "Contribute",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "condensation-stiffness",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/numerical-integration.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/contribute/validation/numerics/direct-condensation-decision.md",
+            "label": "Contributor decision and qualification"
+          }
+        ]
+      }
     },
     {
       "source": "docs/contribute/validation/numerics/mass-precision.md",
@@ -1302,22 +1357,52 @@
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/optics/cuda.md",
+      "source": "docs/studies/validation/material-properties/cuda-optics/index.md",
       "title": "CUDA optics qualification",
       "topic": "optics",
       "also": [
         "gpu"
       ],
-      "role": "Contribute",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "cuda-optics",
+        "runs": [
+          "cuda-optics"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/optics/index.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/contribute/validation/optics/delivery.md",
+            "label": "Contributor decision and qualification"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/contribute/validation/optics/reference-corpus.md",
+      "source": "docs/studies/validation/material-properties/sphere-optics/index.md",
       "title": "PyMieScatt reference corpus",
       "topic": "optics",
       "also": [],
-      "role": "Contribute",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "sphere-optics",
+        "runs": [
+          "sphere-optics"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/optics/index.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
       "source": "docs/contribute/validation/releases/v0.3.0.md",
@@ -1328,164 +1413,385 @@
       "start_here": false
     },
     {
-      "source": "docs/examples/fundamentals/data-containers.md",
+      "source": "docs/studies/tutorials/building-an-aerosol/containers/data-containers.md",
       "title": "Data Containers",
       "topic": "representations-ownership",
       "also": [],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/fundamentals/data_containers.py",
+      "source": "docs/studies/tutorials/building-an-aerosol/containers/data_containers.py",
       "title": "What survives a data transfer?",
       "topic": "representations-ownership",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-fundamentals-data-containers",
+        "runs": [
+          "examples-fundamentals-data-containers"
+        ],
+        "companions": [
+          "docs/studies/tutorials/building-an-aerosol/containers/data-containers.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/data-model/index.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 2
+      }
     },
     {
-      "source": "docs/examples/fundamentals/gas/environment_data.py",
+      "source": "docs/studies/tutorials/building-an-aerosol/gas/environment_data.py",
       "title": "Cooling a gas: saturation without a parcel model",
       "topic": "gas",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-fundamentals-gas-environment-data",
+        "runs": [
+          "examples-fundamentals-gas-environment-data"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/data-model/construction.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 5
+      }
     },
     {
-      "source": "docs/examples/fundamentals/gas/gas_data.py",
+      "source": "docs/studies/tutorials/building-an-aerosol/gas/gas_data.py",
       "title": "From stored vapor mass to saturation",
       "topic": "gas",
       "also": [],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "examples-fundamentals-gas-gas-data",
+        "runs": [
+          "examples-fundamentals-gas-gas-data"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/data-model/construction.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 6
+      }
     },
     {
-      "source": "docs/examples/fundamentals/gas/index.md",
-      "title": "Gas properties and environmental forcing",
+      "source": "docs/studies/tutorials/building-an-aerosol/gas/index.md",
+      "title": "Gas and environment",
       "topic": "gas",
       "also": [],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/fundamentals/gas/vapor_pressure.py",
+      "source": "docs/studies/tutorials/building-an-aerosol/gas/vapor_pressure.py",
       "title": "Does heating make a fixed vapor inventory less saturated?",
       "topic": "vapor",
       "also": [],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "examples-fundamentals-gas-vapor-pressure",
+        "runs": [
+          "examples-fundamentals-gas-vapor-pressure"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/data-model/construction.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 7
+      }
     },
     {
-      "source": "docs/examples/fundamentals/index.md",
-      "title": "Build a meaningful initial state",
+      "source": "docs/studies/tutorials/building-an-aerosol/index.md",
+      "title": "Building an aerosol",
       "topic": "representations",
       "also": [],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/fundamentals/native_aerosol.py",
+      "source": "docs/studies/tutorials/building-an-aerosol/native_aerosol.py",
       "title": "From a population to an evolving aerosol",
       "topic": "representations-construction",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-fundamentals-native-aerosol",
+        "runs": [
+          "examples-fundamentals-native-aerosol"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/data-model/ownership.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 3
+      }
     },
     {
-      "source": "docs/examples/fundamentals/native_state_access.py",
+      "source": "docs/studies/tutorials/building-an-aerosol/native_state_access.py",
       "title": "Change a model state without losing its meaning",
       "topic": "representations-ownership",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-fundamentals-native-state-access",
+        "runs": [
+          "examples-fundamentals-native-state-access"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/data-model/ownership.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 4
+      }
     },
     {
-      "source": "docs/examples/fundamentals/particles/aerosol_distributions.py",
+      "source": "docs/studies/tutorials/building-an-aerosol/particles/aerosol_distributions.py",
       "title": "Aerosol size distributions",
       "topic": "size",
       "also": [],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "distributions",
+        "runs": [
+          "distributions"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/data-model/construction.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 8
+      }
     },
     {
-      "source": "docs/examples/fundamentals/particles/distribution_tutorial.py",
+      "source": "docs/studies/tutorials/building-an-aerosol/particles/distribution_tutorial.py",
       "title": "Separate particle properties from population weights",
       "topic": "representations-measures",
       "also": [],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "examples-fundamentals-particles-distribution-tutorial",
+        "runs": [
+          "examples-fundamentals-particles-distribution-tutorial"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/data-model/construction.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 10
+      }
     },
     {
-      "source": "docs/examples/fundamentals/particles/index.md",
-      "title": "Describe a particle population",
+      "source": "docs/studies/tutorials/building-an-aerosol/particles/index.md",
+      "title": "Particle populations",
       "topic": "size",
       "also": [],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/fundamentals/particles/particle_data.py",
+      "source": "docs/studies/tutorials/building-an-aerosol/particles/particle_data.py",
       "title": "Turn measurements into particle state",
       "topic": "representations-construction",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-fundamentals-particles-particle-data",
+        "runs": [
+          "examples-fundamentals-particles-particle-data"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/data-model/construction.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 9
+      }
     },
     {
-      "source": "docs/examples/gpu/direct/gpu_coagulation_direct.py",
+      "source": "docs/studies/validation/coagulation/direct-coagulation/gpu_coagulation_direct.py",
       "title": "Direct Brownian coagulation on CUDA",
       "topic": "gpu-direct",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "gpu-coagulation",
+        "runs": [
+          "gpu-coagulation"
+        ],
+        "companions": [
+          "docs/studies/validation/coagulation/direct-coagulation/reference.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/gpu/direct/coagulation.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/contribute/validation/gpu/coagulation.md",
+            "label": "Qualification record"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/gpu/direct/gpu_complete_process_sequence.py",
+      "source": "docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_complete_process_sequence.py",
       "title": "Five direct CUDA process boundaries",
       "topic": "gpu-direct",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-gpu-direct-gpu-complete-process-sequence",
+        "runs": [
+          "examples-gpu-direct-gpu-complete-process-sequence"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/gpu/execution.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 22
+      }
     },
     {
-      "source": "docs/examples/gpu/direct/gpu_condensation_parity_walkthrough.py",
+      "source": "docs/studies/validation/condensation/direct-kernel/gpu_condensation_parity_walkthrough.py",
       "title": "Check CUDA condensation against independent equations",
       "topic": "gpu-direct",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-gpu-direct-gpu-condensation-parity-walkthrough",
+        "runs": [
+          "examples-gpu-direct-gpu-condensation-parity-walkthrough"
+        ],
+        "companions": [
+          "docs/studies/validation/condensation/direct-kernel/reference.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/gpu/direct/condensation.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/contribute/validation/gpu/condensation-parity.md",
+            "label": "Qualification record"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/gpu/direct/gpu_direct_kernels_quick_start.py",
+      "source": "docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_direct_kernels_quick_start.py",
       "title": "Direct CUDA condensation: upload, calculate, download",
       "topic": "gpu-direct",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-gpu-direct-gpu-direct-kernels-quick-start",
+        "runs": [
+          "examples-gpu-direct-gpu-direct-kernels-quick-start"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/gpu/execution.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 20
+      }
     },
     {
-      "source": "docs/examples/gpu/direct/gpu_direct_nucleation.py",
+      "source": "docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_direct_nucleation.py",
       "title": "Direct CUDA nucleation with explicit species mapping",
       "topic": "gpu-direct",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-gpu-direct-gpu-direct-nucleation",
+        "runs": [
+          "examples-gpu-direct-gpu-direct-nucleation"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/gpu/execution.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 21
+      }
     },
     {
-      "source": "docs/examples/gpu/index.md",
-      "title": "GPU examples",
+      "source": "docs/studies/tutorials/working-with-gpu/index.md",
+      "title": "Working with a GPU",
       "topic": "gpu",
       "also": [],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/gpu/prepared/custom_process_backends.py",
+      "source": "docs/studies/examples/custom-processes/custom_process_backends.py",
       "title": "Extend a process on CPU and CUDA",
       "topic": "custom",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "custom-process-backends",
+        "runs": [
+          "custom-process-backends"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/index.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
       "source": "docs/studies/validation/coagulation/charged-aerosols/gpu_charged_models.py",
@@ -1498,25 +1804,25 @@
       "start_here": false
     },
     {
-      "source": "docs/examples/gpu/prepared/gpu_dry_environment_sweep.py",
+      "source": "docs/studies/examples/coupled-populations/environment/gpu_dry_environment_sweep.py",
       "title": "Dry charged aerosols: ground level, mesopause and pressurized chambers",
       "topic": "atmosphere",
       "also": [
         "gpu",
         "charged"
       ],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/gpu/prepared/gpu_environment_sweep.py",
+      "source": "docs/studies/examples/coupled-populations/environment/gpu_environment_sweep.py",
       "title": "Charged aerosols and ions across sixteen humid environments",
       "topic": "atmosphere",
       "also": [
         "gpu",
         "charged"
       ],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": true
     },
     {
@@ -1554,39 +1860,103 @@
       }
     },
     {
-      "source": "docs/examples/gpu/prepared/gpu_prepared_cyclic_chamber.py",
+      "source": "docs/studies/examples/coupled-populations/chambers/gpu_prepared_cyclic_chamber.py",
       "title": "Repeated source pulses in a cooling and warming aerosol",
       "topic": "chambers",
       "also": [
         "condensation",
         "losses"
       ],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "gpu-prepared-cyclic-chamber",
+        "runs": [
+          "gpu-prepared-cyclic-chamber"
+        ],
+        "companions": [
+          "docs/studies/examples/coupled-populations/chambers/cyclic-chamber-evidence.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/processes/index.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/contribute/validation/numerics/simulation-workflow.md",
+            "label": "Workflow qualification"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/gpu/prepared/gpu_prepared_forcing.py",
+      "source": "docs/studies/examples/coupled-populations/forcing/gpu_prepared_forcing.py",
       "title": "Cooling, heating and vapor pulses across sixteen boxes",
       "topic": "gpu-prepared",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "gpu-prepared-forcing",
+        "runs": [
+          "gpu-prepared-forcing"
+        ],
+        "companions": [
+          "docs/studies/examples/coupled-populations/forcing/forcing-refinement.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/gpu/prepared.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/contribute/validation/numerics/simulation-workflow.md",
+            "label": "Workflow qualification"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/gpu/prepared/gpu_prepared_lifecycle.py",
+      "source": "docs/studies/examples/coupled-populations/forcing/gpu_prepared_lifecycle.py",
       "title": "A million-particle source, collision and loss lifecycle",
       "topic": "gpu-prepared",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "gpu-prepared-lifecycle",
+        "runs": [
+          "gpu-prepared-lifecycle"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/gpu/prepared.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/gpu/prepared/gpu_prepared_multibox.py",
+      "source": "docs/studies/examples/coupled-populations/forcing/gpu_prepared_multibox.py",
       "title": "Sixty-four heterogeneous aerosol boxes on one GPU",
       "topic": "gpu-prepared",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "gpu-prepared-multibox",
+        "runs": [
+          "gpu-prepared-multibox"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/gpu/prepared.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
       "source": "docs/studies/tutorials/working-with-gpu/gpu_prepared_quick_start.py",
@@ -1632,327 +2002,779 @@
       }
     },
     {
-      "source": "docs/examples/gpu/prepared/gpu_scaling_results.py",
+      "source": "docs/studies/benchmarks/prepared-scaling/gpu_scaling_results.py",
       "title": "Measured CUDA scaling on an RTX 5060",
       "topic": "gpu-prepared",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "gpu-scaling-results",
+        "runs": [
+          "gpu-scaling-results"
+        ],
+        "companions": [
+          "docs/studies/benchmarks/prepared-scaling/campaign.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/gpu/prepared.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/contribute/validation/gpu/prepared-rtx5060.md",
+            "label": "Qualification record"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/gpu/resident/gpu_resident_graph_capture.py",
+      "source": "docs/studies/tutorials/working-with-gpu/resident/gpu_resident_graph_capture.py",
       "title": "Capture and replay a native CUDA schedule",
       "topic": "gpu-resident",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-gpu-resident-gpu-resident-graph-capture",
+        "runs": [
+          "examples-gpu-resident-gpu-resident-graph-capture"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/gpu/resident/checkpoints.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 25
+      }
     },
     {
-      "source": "docs/examples/gpu/resident/gpu_resident_multi_timestep.py",
+      "source": "docs/studies/tutorials/working-with-gpu/resident/gpu_resident_multi_timestep.py",
       "title": "Multibox resident timesteps and continuation",
       "topic": "gpu-resident",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-gpu-resident-gpu-resident-multi-timestep",
+        "runs": [
+          "examples-gpu-resident-gpu-resident-multi-timestep"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/gpu/resident/checkpoints.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 24
+      }
     },
     {
-      "source": "docs/examples/gpu/resident/gpu_resident_session.py",
+      "source": "docs/studies/tutorials/working-with-gpu/resident/gpu_resident_session.py",
       "title": "CUDA resident ownership and checkpoint restart",
       "topic": "gpu-resident",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-gpu-resident-gpu-resident-session",
+        "runs": [
+          "examples-gpu-resident-gpu-resident-session"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/gpu/resident/checkpoints.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 23
+      }
     },
     {
-      "source": "docs/examples/index.md",
-      "title": "Examples",
+      "source": "docs/studies/index.md",
+      "title": "Studies",
       "topic": "aerosols",
       "also": [],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/optics/cuda_optics.py",
+      "source": "docs/studies/validation/material-properties/cuda-optics/cuda_optics.py",
       "title": "Qualify CUDA optics before interpreting a cloud spectrum",
       "topic": "optics",
       "also": [
         "gpu"
       ],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/optics/sphere_optics.py",
+      "source": "docs/studies/validation/material-properties/sphere-optics/sphere_optics.py",
       "title": "From one sphere to a cloud's optical signal",
       "topic": "optics",
       "also": [],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/processes/coagulation/charge/coagulation_with_charge_functional.py",
+      "source": "docs/studies/examples/particle-processes/coagulation/charged-particles/coagulation_with_charge_functional.py",
       "title": "Map charged collision rates with a factory",
       "topic": "charged",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-processes-coagulation-charge-coagulation-with-charge-functional",
+        "runs": [
+          "examples-processes-coagulation-charge-coagulation-with-charge-functional"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/coagulation.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/processes/coagulation/charge/coagulation_with_charge_objects.py",
+      "source": "docs/studies/examples/particle-processes/coagulation/charged-particles/coagulation_with_charge_objects.py",
       "title": "Map charged collision rates with a builder",
       "topic": "charged",
       "also": [],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "examples-processes-coagulation-charge-coagulation-with-charge-objects",
+        "runs": [
+          "examples-processes-coagulation-charge-coagulation-with-charge-objects"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/coagulation.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/processes/coagulation/coagulation_1_pmf_pattern.py",
+      "source": "docs/studies/tutorials/coagulation-populations/coagulation_1_pmf_pattern.py",
       "title": "Brownian coagulation in a PMF population",
       "topic": "brownian-binned",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-processes-coagulation-coagulation-1-pmf-pattern",
+        "runs": [
+          "examples-processes-coagulation-coagulation-1-pmf-pattern"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/coagulation.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 11
+      }
     },
     {
-      "source": "docs/examples/processes/coagulation/coagulation_2_pdf_pattern.py",
+      "source": "docs/studies/tutorials/coagulation-populations/coagulation_2_pdf_pattern.py",
       "title": "Brownian coagulation in a PDF population",
       "topic": "brownian-binned",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-processes-coagulation-coagulation-2-pdf-pattern",
+        "runs": [
+          "examples-processes-coagulation-coagulation-2-pdf-pattern"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/coagulation.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 12
+      }
     },
     {
-      "source": "docs/examples/processes/coagulation/coagulation_3_particle_resolved_pattern.py",
+      "source": "docs/studies/tutorials/coagulation-populations/coagulation_3_particle_resolved_pattern.py",
       "title": "Follow collisions through individual particles",
       "topic": "brownian-resolved",
       "also": [],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "examples-processes-coagulation-coagulation-3-particle-resolved-pattern",
+        "runs": [
+          "examples-processes-coagulation-coagulation-3-particle-resolved-pattern"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/coagulation.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 13
+      }
     },
     {
-      "source": "docs/examples/processes/coagulation/coagulation_4_compared.py",
+      "source": "docs/studies/tutorials/coagulation-populations/coagulation_4_compared.py",
       "title": "Compare coagulation after matching distribution units",
       "topic": "brownian-comparison",
       "also": [],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "examples-processes-coagulation-coagulation-4-compared",
+        "runs": [
+          "examples-processes-coagulation-coagulation-4-compared"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/coagulation.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 14
+      }
     },
     {
-      "source": "docs/examples/processes/coagulation/coagulation_5_time_evolution.py",
+      "source": "docs/studies/tutorials/coagulation-populations/coagulation_5_time_evolution.py",
       "title": "Does particle-number decay depend on representation?",
       "topic": "brownian-comparison",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-processes-coagulation-coagulation-5-time-evolution",
+        "runs": [
+          "examples-processes-coagulation-coagulation-5-time-evolution"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/coagulation.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 15
+      }
     },
     {
-      "source": "docs/examples/processes/coagulation/functional/coagulation_basic_1_pmf.py",
+      "source": "docs/studies/examples/particle-processes/coagulation/kernel-functions/coagulation_basic_1_pmf.py",
       "title": "A compact PMF coagulation calculation",
       "topic": "brownian-binned",
       "also": [
         "brownian"
       ],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "examples-processes-coagulation-functional-coagulation-basic-1-pmf",
+        "runs": [
+          "examples-processes-coagulation-functional-coagulation-basic-1-pmf"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/coagulation.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/processes/coagulation/functional/coagulation_basic_2_pdf.py",
+      "source": "docs/studies/examples/particle-processes/coagulation/kernel-functions/coagulation_basic_2_pdf.py",
       "title": "A compact PDF coagulation calculation",
       "topic": "brownian-binned",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-processes-coagulation-functional-coagulation-basic-2-pdf",
+        "runs": [
+          "examples-processes-coagulation-functional-coagulation-basic-2-pdf"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/coagulation.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/processes/coagulation/functional/coagulation_basic_3_compared.py",
+      "source": "docs/studies/examples/particle-processes/coagulation/kernel-functions/coagulation_basic_3_compared.py",
       "title": "A compact comparison of bin totals and radius densities",
       "topic": "brownian-comparison",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-processes-coagulation-functional-coagulation-basic-3-compared",
+        "runs": [
+          "examples-processes-coagulation-functional-coagulation-basic-3-compared"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/coagulation.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/processes/coagulation/functional/coagulation_basic_4_particleresolved.py",
+      "source": "docs/studies/examples/particle-processes/coagulation/kernel-functions/coagulation_basic_4_particleresolved.py",
       "title": "A compact particle-resolved collision calculation",
       "topic": "brownian-resolved",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-processes-coagulation-functional-coagulation-basic-4-particleresolved",
+        "runs": [
+          "examples-processes-coagulation-functional-coagulation-basic-4-particleresolved"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/coagulation.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/processes/condensation/condensation_1_bin.py",
+      "source": "docs/studies/tutorials/condensation/condensation_1_bin.py",
       "title": "Condensation in radius bins",
       "topic": "condensation-reservoirs",
       "also": [
         "condensation"
       ],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "condensation",
+        "runs": [
+          "condensation"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/condensation.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 16
+      }
     },
     {
-      "source": "docs/examples/processes/condensation/condensation_2_massbin.py",
+      "source": "docs/studies/tutorials/condensation/condensation_2_massbin.py",
       "title": "Water uptake from a maintained vapor reservoir",
       "topic": "condensation-reservoirs",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-processes-condensation-condensation-2-massbin",
+        "runs": [
+          "examples-processes-condensation-condensation-2-massbin"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/condensation.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 17
+      }
     },
     {
-      "source": "docs/examples/processes/condensation/condensation_3_massresolved.py",
+      "source": "docs/studies/tutorials/condensation/condensation_3_massresolved.py",
       "title": "Competition for a finite water-vapor reservoir",
       "topic": "condensation-reservoirs",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-processes-condensation-condensation-3-massresolved",
+        "runs": [
+          "examples-processes-condensation-condensation-3-massresolved"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/condensation.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 18
+      }
     },
     {
-      "source": "docs/examples/processes/condensation/condensation_latent_heat.py",
+      "source": "docs/studies/examples/particle-processes/condensation/condensation_latent_heat.py",
       "title": "How much energy accompanies a condensation step?",
       "topic": "condensation-energy",
       "also": [],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "examples-processes-condensation-condensation-latent-heat",
+        "runs": [
+          "examples-processes-condensation-condensation-latent-heat"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/condensation.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/processes/condensation/staggered_condensation_example.py",
+      "source": "docs/studies/examples/particle-processes/condensation/staggered_condensation_example.py",
       "title": "Does update ordering change a condensation calculation?",
       "topic": "numerics",
       "also": [],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "examples-processes-condensation-staggered-condensation-example",
+        "runs": [
+          "examples-processes-condensation-staggered-condensation-example"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/condensation.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/processes/customization/adding_particles_during_simulation.py",
+      "source": "docs/studies/examples/particle-processes/sources-and-dilution/adding_particles_during_simulation.py",
       "title": "Add an external population without changing existing particles",
       "topic": "custom",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-processes-customization-adding-particles-during-simulation",
+        "runs": [
+          "examples-processes-customization-adding-particles-during-simulation"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/index.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/processes/customization/particle_tracers.py",
+      "source": "docs/studies/examples/custom-processes/particle_tracers.py",
       "title": "Follow a source marker through collisions and removal",
       "topic": "custom",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "particle-tracers",
+        "runs": [
+          "particle-tracers"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/index.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/processes/customization/timed_box_chemistry.py",
+      "source": "docs/studies/examples/custom-processes/timed_box_chemistry.py",
       "title": "Distinguish chemical conversion from a timed emission and dilution",
       "topic": "custom",
       "also": [],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "timed-box-chemistry",
+        "runs": [
+          "timed-box-chemistry"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/index.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/processes/dilution/cpu_dilution.py",
+      "source": "docs/studies/examples/particle-processes/sources-and-dilution/cpu_dilution.py",
       "title": "Dilution changes abundance without shrinking particles",
       "topic": "losses-dilution",
       "also": [
         "losses"
       ],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "examples-processes-dilution-cpu-dilution",
+        "runs": [
+          "examples-processes-dilution-cpu-dilution"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/index.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/processes/index.md",
-      "title": "Processes: connect a mechanism to an observable change",
+      "source": "docs/studies/examples/particle-processes/index.md",
+      "title": "Particle processes",
       "topic": "processes",
       "also": [],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/processes/nucleation/cpu_nucleation.py",
+      "source": "docs/studies/examples/particle-processes/sources-and-dilution/cpu_nucleation.py",
       "title": "Create particles by transferring a bounded precursor source",
       "topic": "nucleation",
       "also": [],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "examples-processes-nucleation-cpu-nucleation",
+        "runs": [
+          "examples-processes-nucleation-cpu-nucleation"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/index.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/processes/nucleation/custom_nucleation_single_species.py",
+      "source": "docs/studies/examples/particle-processes/sources-and-dilution/custom_nucleation_single_species.py",
       "title": "Couple an illustrative particle source to growth and collisions",
       "topic": "nucleation",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-processes-nucleation-custom-nucleation-single-species",
+        "runs": [
+          "examples-processes-nucleation-custom-nucleation-single-species"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/index.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/processes/nucleation/index.md",
-      "title": "Nucleation: connect formation rates to material and particle counts",
+      "source": "docs/studies/examples/particle-processes/sources-and-dilution/index.md",
+      "title": "Sources and dilution",
       "topic": "nucleation",
       "also": [],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/processes/wall-loss/chamber_forward_simulation.py",
+      "source": "docs/studies/examples/particle-processes/wall-loss/chamber_forward_simulation.py",
       "title": "Explain a chamber spectrum using separate rate contributions",
       "topic": "losses-deposition",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-processes-wall-loss-chamber-forward-simulation",
+        "runs": [
+          "examples-processes-wall-loss-chamber-forward-simulation"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/wall-loss.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/processes/wall-loss/index.md",
-      "title": "Wall loss: distinguish removal, redistribution, and geometry",
+      "source": "docs/studies/examples/particle-processes/wall-loss/index.md",
+      "title": "Chamber wall loss",
       "topic": "losses",
       "also": [],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/processes/wall-loss/rectangular_wall_loss_strategy.py",
+      "source": "docs/studies/examples/particle-processes/wall-loss/rectangular_wall_loss_strategy.py",
       "title": "Track removal in a rectangular chamber",
       "topic": "losses-deposition",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-processes-wall-loss-rectangular-wall-loss-strategy",
+        "runs": [
+          "examples-processes-wall-loss-rectangular-wall-loss-strategy"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/wall-loss.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/processes/wall-loss/spherical_wall_loss_strategy.py",
+      "source": "docs/studies/examples/particle-processes/wall-loss/spherical_wall_loss_strategy.py",
       "title": "Separate size-selective removal from particle growth",
       "topic": "losses-deposition",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-processes-wall-loss-spherical-wall-loss-strategy",
+        "runs": [
+          "examples-processes-wall-loss-spherical-wall-loss-strategy"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/wall-loss.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/processes/wall-loss/wall_loss_builders_factory.py",
+      "source": "docs/studies/examples/particle-processes/wall-loss/wall_loss_builders_factory.py",
       "title": "Configure chamber loss without a unit mismatch",
       "topic": "losses-deposition",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-processes-wall-loss-wall-loss-builders-factory",
+        "runs": [
+          "examples-processes-wall-loss-wall-loss-builders-factory"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/wall-loss.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/processes/wall-loss/wall_loss_tutorial.py",
+      "source": "docs/studies/examples/particle-processes/wall-loss/wall_loss_tutorial.py",
       "title": "Compare chamber geometry and competing particle processes",
       "topic": "losses-deposition",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-processes-wall-loss-wall-loss-tutorial",
+        "runs": [
+          "examples-processes-wall-loss-wall-loss-tutorial"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/wall-loss.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/simulations/biomass_burning_cloud_interactions.py",
+      "source": "docs/studies/examples/coupled-populations/emissions/biomass_burning_cloud_interactions.py",
       "title": "How do collision models change a water-grown mixed aerosol?",
       "topic": "emissions",
       "also": [],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "examples-simulations-biomass-burning-cloud-interactions",
+        "runs": [
+          "examples-simulations-biomass-burning-cloud-interactions"
+        ],
+        "companions": [
+          "docs/studies/examples/coupled-populations/emissions/biomass-evidence.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/processes/index.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/contribute/validation/numerics/simulation-workflow.md",
+            "label": "Workflow qualification"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/simulations/cloud_chamber_multi_cycle.py",
+      "source": "docs/studies/examples/coupled-populations/chambers/cloud_chamber_multi_cycle.py",
       "title": "Separate water cycling from seed loss in a chamber",
       "topic": "chambers",
       "also": [
         "condensation",
         "losses"
       ],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-simulations-cloud-chamber-multi-cycle",
+        "runs": [
+          "examples-simulations-cloud-chamber-multi-cycle"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/index.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
       "source": "docs/studies/literature/pi-chamber/haze-and-cloud/pi_chamber_spectra.py",
@@ -1971,7 +2793,8 @@
       "topic": "chambers",
       "also": [
         "condensation",
-        "condensation-reservoirs"
+        "condensation-reservoirs",
+        "activity-kappa"
       ],
       "role": "Studies",
       "start_here": false,
@@ -1992,7 +2815,10 @@
       "title": "Haze and cloud partitioning in the Π Chamber",
       "topic": "chambers",
       "also": [
-        "verification-scientific"
+        "verification-scientific",
+        "activity-kappa",
+        "condensation",
+        "losses-deposition"
       ],
       "role": "Studies",
       "start_here": false,
@@ -2011,63 +2837,155 @@
       }
     },
     {
-      "source": "docs/examples/simulations/cloud_chamber_single_cycle.py",
+      "source": "docs/studies/examples/coupled-populations/chambers/cloud_chamber_single_cycle.py",
       "title": "Follow droplets through one wet–dry chamber cycle",
       "topic": "chambers",
       "also": [
         "condensation",
         "losses"
       ],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "examples-simulations-cloud-chamber-single-cycle",
+        "runs": [
+          "examples-simulations-cloud-chamber-single-cycle"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/index.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/simulations/cough_droplets_partitioning.py",
+      "source": "docs/studies/examples/coupled-populations/emissions/cough_droplets_partitioning.py",
       "title": "Audit a respiratory-droplet illustration before using its predictions",
       "topic": "emissions",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-simulations-cough-droplets-partitioning",
+        "runs": [
+          "examples-simulations-cough-droplets-partitioning"
+        ],
+        "companions": [
+          "docs/studies/examples/coupled-populations/emissions/respiratory-refinement.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/processes/index.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/contribute/validation/numerics/simulation-workflow.md",
+            "label": "Workflow qualification"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/simulations/index.md",
-      "title": "Connect processes to a research question",
+      "source": "docs/studies/examples/coupled-populations/index.md",
+      "title": "Coupled populations",
       "topic": "applications",
       "also": [],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": true
     },
     {
-      "source": "docs/examples/simulations/organic_partitioning_and_coagulation.py",
+      "source": "docs/studies/examples/coupled-populations/emissions/organic_partitioning_and_coagulation.py",
       "title": "When a size-distribution plot hides a composition error",
       "topic": "partitioning",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-simulations-organic-partitioning-and-coagulation",
+        "runs": [
+          "examples-simulations-organic-partitioning-and-coagulation"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/index.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/simulations/soot_formation_in_flames.py",
+      "source": "docs/studies/examples/coupled-populations/emissions/soot_formation_in_flames.py",
       "title": "Follow organic uptake onto seeds during imposed cooling",
       "topic": "emissions",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-simulations-soot-formation-in-flames",
+        "runs": [
+          "examples-simulations-soot-formation-in-flames"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/index.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/thermodynamics/activity/activity_tutorial.py",
+      "source": "docs/studies/examples/thermodynamics/activity/activity_tutorial.py",
       "title": "Choose an activity model by the comparison it enables",
       "topic": "activity",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-thermodynamics-activity-activity-tutorial",
+        "runs": [
+          "examples-thermodynamics-activity-activity-tutorial"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/activity.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/theory/thermodynamics/activity-theory.md",
+            "label": "Underlying theory"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/thermodynamics/activity/bat_activity_example.py",
+      "source": "docs/studies/examples/thermodynamics/activity/bat_activity_example.py",
       "title": "Compare ideal and nonideal organic activity",
       "topic": "activity-nonideal",
       "also": [],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "examples-thermodynamics-activity-bat-activity-example",
+        "runs": [
+          "examples-thermodynamics-activity-bat-activity-example"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/activity.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/theory/thermodynamics/activity-theory.md",
+            "label": "Underlying theory"
+          }
+        ]
+      }
     },
     {
       "source": "docs/studies/literature/particle-water-uptake/citric-acid/citric_acid_hygroscopicity.py",
@@ -2078,104 +2996,216 @@
       "start_here": true
     },
     {
-      "source": "docs/examples/thermodynamics/activity/bat_humidity_pulse.py",
+      "source": "docs/studies/benchmarks/bat-humidity-pulse/bat_humidity_pulse.py",
       "title": "Water uptake and evaporation after a humidity pulse",
       "topic": "activity-nonideal",
       "also": [
         "condensation-reservoirs"
       ],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/thermodynamics/activity/equilibria_example.py",
+      "source": "docs/studies/examples/thermodynamics/equilibria/equilibria_example.py",
       "title": "Separate water uptake from organic partitioning",
       "topic": "partitioning",
       "also": [],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "examples-thermodynamics-activity-equilibria-example",
+        "runs": [
+          "examples-thermodynamics-activity-equilibria-example"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/thermodynamics/equilibria-theory.md",
+            "label": "Underlying theory"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/thermodynamics/activity/ideal_activity_example.py",
+      "source": "docs/studies/examples/thermodynamics/activity/ideal_activity_example.py",
       "title": "Equal mass does not mean equal activity",
       "topic": "activity-ideal",
       "also": [
         "activity"
       ],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "examples-thermodynamics-activity-ideal-activity-example",
+        "runs": [
+          "examples-thermodynamics-activity-ideal-activity-example"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/activity.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/theory/thermodynamics/activity-theory.md",
+            "label": "Underlying theory"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/thermodynamics/activity/index.md",
-      "title": "Activity and partitioning examples",
+      "source": "docs/studies/examples/thermodynamics/activity/index.md",
+      "title": "Water activity",
       "topic": "activity",
       "also": [],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/thermodynamics/activity/kappa_activity_example.py",
+      "source": "docs/studies/examples/thermodynamics/activity/kappa_activity_example.py",
       "title": "Connect water content to hygroscopicity",
       "topic": "activity-kappa",
       "also": [],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "examples-thermodynamics-activity-kappa-activity-example",
+        "runs": [
+          "examples-thermodynamics-activity-kappa-activity-example"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/activity.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/theory/thermodynamics/activity-theory.md",
+            "label": "Underlying theory"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/thermodynamics/equilibria/activity_part1.py",
+      "source": "docs/studies/examples/thermodynamics/equilibria/activity_part1.py",
       "title": "Follow water–organic mixing from composition to water activity",
       "topic": "partitioning",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-thermodynamics-equilibria-activity-part1",
+        "runs": [
+          "examples-thermodynamics-equilibria-activity-part1"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/thermodynamics/equilibria-theory.md",
+            "label": "Underlying theory"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/thermodynamics/equilibria/equilibria_part1.py",
+      "source": "docs/studies/examples/thermodynamics/equilibria/equilibria_part1.py",
       "title": "How does water uptake change organic aerosol partitioning?",
       "topic": "partitioning",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-thermodynamics-equilibria-equilibria-part1",
+        "runs": [
+          "examples-thermodynamics-equilibria-equilibria-part1"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/thermodynamics/equilibria-theory.md",
+            "label": "Underlying theory"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/thermodynamics/equilibria/index.md",
-      "title": "From phase properties to equilibrium aerosol mass",
+      "source": "docs/studies/examples/thermodynamics/equilibria/index.md",
+      "title": "Phase equilibria",
       "topic": "partitioning",
       "also": [],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/thermodynamics/index.md",
-      "title": "Thermodynamics examples",
+      "source": "docs/studies/examples/thermodynamics/index.md",
+      "title": "Thermodynamics",
       "topic": "activity",
       "also": [],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/thermodynamics/particle-properties/activity_functions.py",
+      "source": "docs/studies/examples/thermodynamics/particle-properties/activity_functions.py",
       "title": "Compare activity rules along a composition path",
       "topic": "activity",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-thermodynamics-particle-properties-activity-functions",
+        "runs": [
+          "examples-thermodynamics-particle-properties-activity-functions"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/thermodynamics/activity-theory.md",
+            "label": "Underlying theory"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/thermodynamics/particle-properties/activity_tutorial.py",
+      "source": "docs/studies/examples/thermodynamics/particle-properties/activity_tutorial.py",
       "title": "Which composition rule controls equilibrium pressure?",
       "topic": "activity",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "examples-thermodynamics-particle-properties-activity-tutorial",
+        "runs": [
+          "examples-thermodynamics-particle-properties-activity-tutorial"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/thermodynamics/activity-theory.md",
+            "label": "Underlying theory"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/thermodynamics/particle-properties/particle_surface_tutorial.py",
+      "source": "docs/studies/examples/thermodynamics/particle-properties/particle_surface_tutorial.py",
       "title": "How strongly does curvature raise equilibrium vapor pressure?",
       "topic": "surface",
       "also": [],
-      "role": "Examples",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "examples-thermodynamics-particle-properties-particle-surface-tutorial",
+        "runs": [
+          "examples-thermodynamics-particle-properties-particle-surface-tutorial"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/thermodynamics/activity-theory.md",
+            "label": "Underlying theory"
+          }
+        ]
+      }
     },
     {
       "source": "docs/guide/data-model/construction.md",
@@ -2403,6 +3433,10 @@
           {
             "target": "docs/guide/processes/psl-mobility.md",
             "label": "How to use this"
+          },
+          {
+            "target": "api:particula.particles.properties.slip_correction_module.get_cunningham_slip_correction",
+            "label": "Slip correction used in the fit"
           }
         ]
       }
@@ -2430,10 +3464,11 @@
     },
     {
       "source": "docs/studies/literature/particle-water-uptake/ccn-retrieval/index.md",
-      "title": "CCN retrieval study",
-      "topic": "verification-scientific",
+      "title": "Retrieving hygroscopicity from size-resolved CCN measurements",
+      "topic": "activity-kappa",
       "also": [
-        "activity-kappa"
+        "verification-scientific",
+        "activity-nonideal"
       ],
       "role": "Studies",
       "start_here": false,
@@ -2516,24 +3551,52 @@
       "start_here": false
     },
     {
-      "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-fluid-and-particle-properties-comparison.py",
-      "title": "Dns Fluid And Particle Properties Comparison",
+      "source": "docs/studies/validation/cloud-droplet-collisions/dns-fluid-and-particle-properties-comparison.py",
+      "title": "Fluid and particle properties in the DNS comparison",
       "topic": "turbulent",
       "also": [],
-      "role": "Theory",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "theory-dns-fluid-and-particle-properties-comparison",
+        "runs": [
+          "theory-dns-fluid-and-particle-properties-comparison"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/dynamics/cloud-droplet-coagulation/droplet-coagulation-kernel-ayala2008.md",
+            "label": "Underlying theory",
+            "fragment": "fluid-and-particle-timescales"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-horizontal-velocity-comparison.py",
-      "title": "Dns Horizontal Velocity Comparison",
+      "source": "docs/studies/validation/cloud-droplet-collisions/dns-horizontal-velocity-comparison.py",
+      "title": "Horizontal droplet velocities in turbulence",
       "topic": "turbulent",
       "also": [],
-      "role": "Theory",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "theory-dns-horizontal-velocity-comparison",
+        "runs": [
+          "theory-dns-horizontal-velocity-comparison"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/dynamics/cloud-droplet-coagulation/droplet-coagulation-kernel-ayala2008.md",
+            "label": "Underlying theory",
+            "fragment": "horizontal-velocity-correlation"
+          }
+        ]
+      }
     },
     {
       "source": "docs/studies/validation/cloud-droplet-collisions/dns-kernel-comparison.py",
-      "title": "Dns Kernel Comparison",
+      "title": "Cloud-droplet collision kernel against DNS",
       "topic": "turbulent",
       "also": [],
       "role": "Studies",
@@ -2554,20 +3617,48 @@
       }
     },
     {
-      "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-distribution-comparison.py",
-      "title": "Dns Radial Distribution Comparison",
+      "source": "docs/studies/validation/cloud-droplet-collisions/dns-radial-distribution-comparison.py",
+      "title": "Radial distribution of droplet pairs",
       "topic": "turbulent",
       "also": [],
-      "role": "Theory",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "theory-dns-radial-distribution-comparison",
+        "runs": [
+          "theory-dns-radial-distribution-comparison"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/dynamics/cloud-droplet-coagulation/droplet-coagulation-kernel-ayala2008.md",
+            "label": "Underlying theory",
+            "fragment": "radial-distribution-function"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/theory/dynamics/cloud-droplet-coagulation/dns-radial-relative-velocity-comparison.py",
-      "title": "Dns Radial Relative Velocity Comparison",
+      "source": "docs/studies/validation/cloud-droplet-collisions/dns-radial-relative-velocity-comparison.py",
+      "title": "Radial relative velocity of droplet pairs",
       "topic": "turbulent",
       "also": [],
-      "role": "Theory",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "theory-dns-radial-relative-velocity-comparison",
+        "runs": [
+          "theory-dns-radial-relative-velocity-comparison"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/dynamics/cloud-droplet-coagulation/droplet-coagulation-kernel-ayala2008.md",
+            "label": "Underlying theory",
+            "fragment": "radial-relative-velocity"
+          }
+        ]
+      }
     },
     {
       "source": "docs/theory/dynamics/cloud-droplet-coagulation/droplet-coagulation-kernel-ayala2008.md",
@@ -2594,12 +3685,30 @@
       "start_here": false
     },
     {
-      "source": "docs/theory/dynamics/ionparticle-coagulation.py",
-      "title": "Ionparticle Coagulation",
+      "source": "docs/studies/examples/particle-processes/coagulation/charged-particles/ionparticle-coagulation.py",
+      "title": "Ion–particle collision kernels",
       "topic": "charged",
       "also": [],
-      "role": "Theory",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "theory-ionparticle-coagulation",
+        "runs": [
+          "theory-ionparticle-coagulation"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/coagulation.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/theory/dynamics/ion-particle-encounters.md",
+            "label": "Underlying theory",
+            "fragment": "dimensional-collision-kernel"
+          }
+        ]
+      }
     },
     {
       "source": "docs/theory/dynamics/nucleation-equations.md",
@@ -2618,20 +3727,56 @@
       "start_here": false
     },
     {
-      "source": "docs/theory/properties/dynamic-viscosity.py",
+      "source": "docs/studies/examples/gas-transport/dynamic-viscosity.py",
       "title": "Dynamic Viscosity",
       "topic": "transport",
       "also": [],
-      "role": "Theory",
-      "start_here": true
+      "role": "Studies",
+      "start_here": true,
+      "study": {
+        "id": "theory-dynamic-viscosity",
+        "runs": [
+          "theory-dynamic-viscosity"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/properties/air-transport.md",
+            "label": "Underlying theory",
+            "fragment": "air-viscosity"
+          },
+          {
+            "target": "api:particula.gas.get_dynamic_viscosity",
+            "label": "Viscosity calculation"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/theory/properties/mean-free-path.py",
+      "source": "docs/studies/examples/gas-transport/mean-free-path.py",
       "title": "Mean Free Path",
       "topic": "transport",
       "also": [],
-      "role": "Theory",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "theory-mean-free-path",
+        "runs": [
+          "theory-mean-free-path"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/properties/air-transport.md",
+            "label": "Underlying theory",
+            "fragment": "molecular-mean-free-path"
+          },
+          {
+            "target": "api:particula.gas.get_molecule_mean_free_path",
+            "label": "Mean free path calculation"
+          }
+        ]
+      }
     },
     {
       "source": "docs/theory/thermodynamics/activity-theory.md",
@@ -2666,21 +3811,32 @@
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/thermodynamics/bat-activity.md",
+      "source": "docs/studies/validation/material-properties/binary-bat.md",
       "title": "Binary BAT reference checks",
       "topic": "verification-scientific",
       "also": [
         "activity-nonideal"
       ],
-      "role": "Contribute",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "bat-activity",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/activity.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
       "source": "docs/studies/literature/particle-water-uptake/citric-acid/index.md",
       "title": "Citric acid droplet hygroscopicity",
-      "topic": "verification-scientific",
+      "topic": "activity-nonideal",
       "also": [
-        "activity-nonideal"
+        "verification-scientific"
       ],
       "role": "Studies",
       "start_here": false,
@@ -2717,20 +3873,58 @@
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/numerics/adaptive-methods.md",
+      "source": "docs/studies/validation/condensation/adaptive/index.md",
       "title": "Adaptive integration and splitting assessment",
       "topic": "verification-scientific",
-      "also": [],
-      "role": "Contribute",
-      "start_here": false
+      "also": [
+        "condensation-adaptive",
+        "chambers",
+        "gpu"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "adaptive-integration",
+        "runs": [
+          "adaptive-cloud-relaxation",
+          "adaptive-reservoir-depletion",
+          "adaptive-reservoir-depletion-cuda",
+          "adaptive-cloud-relaxation-cuda"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/numerical-integration.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/contribute/validation/numerics/adaptive-method-decision.md",
+            "label": "Contributor decision and qualification"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/fundamentals/figure_styles.py",
+      "source": "docs/studies/tutorials/figure_styles.py",
       "title": "Figure styles and paper layouts",
       "topic": "methods",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "figure-styles",
+        "runs": [
+          "figure-styles"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/getting-started/figure-styles.md",
+            "label": "How to use this"
+          }
+        ],
+        "order": 26
+      }
     },
     {
       "source": "docs/guide/getting-started/figure-styles.md",
@@ -2787,67 +3981,107 @@
       "start_here": false
     },
     {
-      "source": "docs/examples/simulations/adaptive_cloud_relaxation.py",
+      "source": "docs/studies/validation/condensation/adaptive/adaptive_cloud_relaxation.py",
       "title": "Distinguish dry-phase oscillation from physical droplet relaxation",
       "topic": "condensation-adaptive",
       "also": [
         "chambers"
       ],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": true
     },
     {
-      "source": "docs/examples/simulations/adaptive_reservoir_depletion.py",
+      "source": "docs/studies/validation/condensation/adaptive/adaptive_reservoir_depletion.py",
       "title": "Resolve growth as a finite vapor reservoir is depleted",
       "topic": "condensation-adaptive",
       "also": [],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/simulations/adaptive_reservoir_depletion_cuda.py",
+      "source": "docs/studies/validation/condensation/adaptive/adaptive_reservoir_depletion_cuda.py",
       "title": "Check adaptive CUDA growth against an independent depletion reference",
       "topic": "condensation-adaptive",
       "also": [
         "gpu"
       ],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/simulations/adaptive_cloud_relaxation_cuda.py",
+      "source": "docs/studies/validation/condensation/adaptive/adaptive_cloud_relaxation_cuda.py",
       "title": "Resolve stiff wet–dry droplet relaxation on CUDA",
       "topic": "condensation-adaptive",
       "also": [
         "gpu",
         "chambers"
       ],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/gpu/prepared/adaptive_coagulation.py",
+      "source": "docs/studies/validation/coagulation/adaptive/adaptive_coagulation.py",
       "title": "Adaptive cloud coagulation on CUDA",
       "topic": "gpu-prepared",
       "also": [
         "gpu-direct"
       ],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "adaptive-coagulation",
+        "runs": [
+          "adaptive-coagulation"
+        ],
+        "companions": [
+          "docs/studies/validation/coagulation/adaptive/trajectories.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/gpu/prepared.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/contribute/validation/gpu/coagulation.md",
+            "label": "Qualification record"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/gpu/direct/scalable_coagulation.py",
+      "source": "docs/studies/validation/coagulation/native-sampling/scalable_coagulation.py",
       "title": "Native coagulation work budgets",
       "topic": "gpu-direct",
       "also": [],
-      "role": "Examples",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "scalable-coagulation",
+        "runs": [
+          "scalable-coagulation"
+        ],
+        "companions": [
+          "docs/studies/validation/coagulation/native-sampling/convergence.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/gpu/direct/coagulation.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/contribute/validation/numerics/scientific-correctness.md",
+            "label": "Qualification record"
+          }
+        ]
+      }
     },
     {
       "source": "docs/studies/literature/particle-water-uptake/bat-ccn.md",
       "title": "Cloud activation in the BAT publication",
-      "topic": "verification-scientific",
-      "also": [],
+      "topic": "activity-kappa",
+      "also": [
+        "verification-scientific"
+      ],
       "role": "Studies",
       "start_here": false,
       "study": {
@@ -2874,59 +4108,94 @@
       "start_here": true
     },
     {
-      "source": "docs/examples/processes/coagulation/van_der_waals.py",
+      "source": "docs/studies/validation/coagulation/dispersion/van_der_waals.py",
       "title": "Compare kernels with measured droplet and salt rates",
       "topic": "interparticle-forces",
       "also": [
         "brownian",
         "charged"
       ],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/examples/gpu/prepared/van_der_waals.py",
+      "source": "docs/studies/validation/coagulation/dispersion/gpu_van_der_waals.py",
       "title": "Follow bipolar coagulation through a CUDA restart",
       "topic": "interparticle-forces",
       "also": [
         "charged",
         "brownian-resolved"
       ],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/coagulation/van-der-waals.md",
+      "source": "docs/studies/validation/coagulation/dispersion/index.md",
       "title": "Dispersion and dielectric capture validation",
       "topic": "interparticle-forces",
       "also": [
-        "verification"
+        "verification",
+        "brownian",
+        "charged",
+        "brownian-resolved"
       ],
-      "role": "Contribute",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "van-der-waals",
+        "runs": [
+          "van-der-waals",
+          "gpu-van-der-waals"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/dynamics/interparticle-forces.md",
+            "label": "Underlying theory"
+          },
+          {
+            "target": "docs/guide/processes/coagulation.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
-      "source": "docs/examples/processes/coagulation/charge/nacl_scavenging.py",
+      "source": "docs/studies/literature/nacl-scavenging/nacl_scavenging.py",
       "title": "Estimate bipolar charges and multiply charged diameters",
       "topic": "charged",
       "also": [
         "interparticle-forces",
         "brownian"
       ],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/coagulation/nacl-scavenging.md",
+      "source": "docs/studies/literature/nacl-scavenging/index.md",
       "title": "NaCl nanoparticle scavenging in a chamber",
-      "topic": "verification-scientific",
+      "topic": "charged",
       "also": [
         "interparticle-forces",
-        "charged",
-        "brownian"
+        "brownian",
+        "chambers",
+        "verification-scientific"
       ],
-      "role": "Contribute",
-      "start_here": false
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "nacl-scavenging",
+        "runs": [
+          "nacl-scavenging"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/coagulation.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     },
     {
       "source": "docs/studies/validation/wall-loss/spherical_wall_loss_theory.py",
@@ -2969,22 +4238,190 @@
       }
     },
     {
-      "source": "docs/examples/processes/condensation/infer_initial_radius.py",
+      "source": "docs/studies/validation/condensation/initial-size/infer_initial_radius.py",
       "title": "Recovering initial particle sizes after condensation",
       "topic": "condensation-reservoirs",
       "also": [
         "condensation"
       ],
-      "role": "Examples",
+      "role": "Studies",
       "start_here": false
     },
     {
-      "source": "docs/contribute/validation/numerics/initial-size-inversion.md",
+      "source": "docs/studies/validation/condensation/initial-size/index.md",
       "title": "Recovering initial size after closed-box condensation",
       "topic": "verification-scientific",
       "also": [
-        "condensation-reservoirs"
+        "condensation-reservoirs",
+        "condensation"
       ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "infer-initial-radius",
+        "runs": [
+          "infer-initial-radius"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/condensation.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/guide/processes/numerical-integration.md",
+            "label": "How to use this"
+          }
+        ]
+      }
+    },
+    {
+      "source": "docs/studies/benchmarks/prepared-scaling/campaign.md",
+      "title": "Measured cost and accuracy of prepared simulations",
+      "topic": "verification-scientific",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/validation/condensation/direct-kernel/reference.md",
+      "title": "Fixed-four-substep condensation reference",
+      "topic": "verification-scientific",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/validation/coagulation/direct-coagulation/reference.md",
+      "title": "Deterministic, conservation and stochastic coagulation checks",
+      "topic": "verification-scientific",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/validation/coagulation/adaptive/trajectories.md",
+      "title": "Adaptive CUDA coagulation trajectories",
+      "topic": "verification-scientific",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/validation/coagulation/native-sampling/convergence.md",
+      "title": "Coagulation convergence against a Gillespie reference",
+      "topic": "verification-scientific",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/validation/material-properties/process-references.md",
+      "title": "Independent process reference equations",
+      "topic": "verification-scientific",
+      "also": [],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "process-references",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/contribute/validation/numerics/scientific-correctness.md",
+            "label": "Qualification record"
+          }
+        ]
+      }
+    },
+    {
+      "source": "docs/studies/validation/material-properties/mass-precision.md",
+      "title": "Particle mass precision across four size scales",
+      "topic": "verification-scientific",
+      "also": [],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "mass-precision",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/contribute/validation/numerics/mass-precision.md",
+            "label": "Qualification record"
+          }
+        ]
+      }
+    },
+    {
+      "source": "docs/studies/examples/coupled-populations/forcing/forcing-refinement.md",
+      "title": "Full CUDA forcing publication",
+      "topic": "verification-scientific",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/examples/coupled-populations/emissions/respiratory-refinement.md",
+      "title": "CUDA-resident material solvers and respiratory refinement",
+      "topic": "verification-scientific",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/examples/coupled-populations/emissions/biomass-evidence.md",
+      "title": "Full resident biomass publication",
+      "topic": "verification-scientific",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/examples/coupled-populations/chambers/cyclic-chamber-evidence.md",
+      "title": "Full resident cyclic trajectory and output recovery",
+      "topic": "verification-scientific",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/theory/properties/air-transport.md",
+      "title": "Air viscosity and molecular mean free path",
+      "topic": "transport",
+      "also": [],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "docs/theory/dynamics/ion-particle-encounters.md",
+      "title": "Ion–particle encounters",
+      "topic": "charged",
+      "also": [],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/optics/delivery.md",
+      "title": "CUDA optics delivery qualification",
+      "topic": "verification-qualification",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/numerics/direct-condensation-decision.md",
+      "title": "Direct condensation method decision and downstream gates",
+      "topic": "verification-qualification",
+      "also": [],
+      "role": "Contribute",
+      "start_here": false
+    },
+    {
+      "source": "docs/contribute/validation/numerics/adaptive-method-decision.md",
+      "title": "Adaptive integration method decisions",
+      "topic": "verification-qualification",
+      "also": [],
       "role": "Contribute",
       "start_here": false
     }
@@ -3135,27 +4572,23 @@
       "reason": "Frozen inputs and acceptance criteria supporting the spherical wall-loss validation record."
     },
     {
-      "source": "docs/studies/examples/index.md",
+      "source": "docs/studies/examples/gas-transport/index.md",
       "reason": "Browsing directory for the published studies."
     },
     {
-      "source": "docs/studies/literature/particle-water-uptake/index.md",
+      "source": "docs/studies/examples/custom-processes/index.md",
       "reason": "Browsing directory for the published studies."
     },
     {
-      "source": "docs/studies/literature/pi-chamber/index.md",
+      "source": "docs/studies/examples/particle-processes/coagulation/charged-particles/index.md",
       "reason": "Browsing directory for the published studies."
     },
     {
-      "source": "docs/studies/validation/cloud-droplet-collisions/index.md",
+      "source": "docs/studies/benchmarks/index.md",
       "reason": "Browsing directory for the published studies."
     },
     {
-      "source": "docs/studies/index.md",
-      "reason": "Browsing directory for the published studies."
-    },
-    {
-      "source": "docs/studies/examples/coupled-populations/index.md",
+      "source": "docs/studies/examples/particle-processes/coagulation/index.md",
       "reason": "Browsing directory for the published studies."
     },
     {
@@ -3167,7 +4600,23 @@
       "reason": "Browsing directory for the published studies."
     },
     {
-      "source": "docs/studies/examples/coupled-populations/charged-aerosols/index.md",
+      "source": "docs/studies/literature/pi-chamber/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/examples/thermodynamics/particle-properties/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/validation/material-properties/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/examples/particle-processes/condensation/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/examples/coupled-populations/chambers/index.md",
       "reason": "Browsing directory for the published studies."
     },
     {
@@ -3175,19 +4624,59 @@
       "reason": "Browsing directory for the published studies."
     },
     {
-      "source": "docs/studies/validation/coagulation/index.md",
-      "reason": "Browsing directory for the published studies."
-    },
-    {
-      "source": "docs/studies/tutorials/working-with-gpu/index.md",
-      "reason": "Browsing directory for the published studies."
-    },
-    {
       "source": "docs/studies/tutorials/index.md",
       "reason": "Browsing directory for the published studies."
     },
     {
-      "source": "docs/studies/benchmarks/index.md",
+      "source": "docs/studies/tutorials/condensation/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/validation/condensation/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/validation/coagulation/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/validation/cloud-droplet-collisions/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/tutorials/working-with-gpu/direct-kernels/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/examples/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/literature/particle-water-uptake/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/examples/coupled-populations/forcing/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/examples/particle-processes/coagulation/kernel-functions/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/tutorials/working-with-gpu/resident/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/examples/coupled-populations/charged-aerosols/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/tutorials/coagulation-populations/index.md",
+      "reason": "Browsing directory for the published studies."
+    },
+    {
+      "source": "docs/studies/examples/coupled-populations/emissions/index.md",
       "reason": "Browsing directory for the published studies."
     }
   ]

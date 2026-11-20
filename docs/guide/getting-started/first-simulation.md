@@ -75,7 +75,7 @@ real organic aerosol or an independent numerical reference.
 ## Resume the five-minute checkpoint
 
 Place the downloaded example beside your script so its explicit physics setup
-can be imported. From a checkout, add `docs/examples/fundamentals` to the Python
+can be imported. From a checkout, add `docs/studies/tutorials` to the Python
 module search path, or run this beside that source file with an absolute result
 path. Keep the same physical configuration and subsequent output boundaries:
 

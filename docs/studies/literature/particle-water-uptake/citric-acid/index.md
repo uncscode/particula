@@ -32,7 +32,13 @@ python docs/studies/literature/particle-water-uptake/citric-acid/citric_acid_hyg
 On a headless machine, save the figure from the repository root:
 
 ```bash
-MPLBACKEND=Agg python -c 'from docs.examples.thermodynamics.activity.citric_acid_hygroscopicity import plot_results, simulate; plot_results(simulate()).savefig("citric-acid.png", dpi=150)'
+MPLBACKEND=Agg python - <<'PYTHON'
+from runpy import run_path
+
+example = run_path("docs/studies/literature/particle-water-uptake/citric-acid/citric_acid_hygroscopicity.py")
+figure = example["plot_results"](example["simulate"]())
+figure.savefig("citric-acid.png", dpi=150)
+PYTHON
 ```
 
 A maintainer-side clean installation of revision `01755e91ce` reproduced the two-panel figure and the reported bias and RMS error using Python 3.14.8, NumPy 2.5.5, SciPy 1.18.1, Warp 1.19.0 and Matplotlib 3.11.2. Only the editable Particula checkout and Matplotlib were requested from pip.

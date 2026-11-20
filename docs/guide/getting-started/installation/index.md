@@ -94,7 +94,7 @@ uncompressed source size, and manifest path. `bundle-manifest.json` records
 SHA-256 hashes and byte sizes for every bundled source file.
 
 The bundle contains `docs/index.md` and the `guide/`, `theory/`, `contribute/`,
-`examples/`, `data/`, and `images/` trees, preserving source bytes, directory
+`studies/`, `data/`, and `images/` trees, preserving source bytes, directory
 structure, and relative links between included files. Python examples remain
 readable source; running them may require optional dependencies and hardware.
 Generated API pages, caches, website builds/saved website results, and `.trash/`

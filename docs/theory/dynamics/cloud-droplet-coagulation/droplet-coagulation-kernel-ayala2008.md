@@ -29,9 +29,13 @@ This is valid under the conditions when a_k ≪ η, ρ_w ≫ ρ, and Sv > 1, the
 
 [Run the kernel comparison](../../../studies/validation/cloud-droplet-collisions/dns-kernel-comparison.py)
 
+<a id="radial-relative-velocity"></a>
+
 ## ⟨|wᵣ|⟩: Radial Relative Velocity
 
 There are two options for calculating the radial relative velocity:
+
+[Compare radial relative velocity](../../../studies/validation/cloud-droplet-collisions/dns-radial-relative-velocity-comparison.py)
 
 ### ⟨|wᵣ|⟩ Dodin 2002:
 
@@ -59,7 +63,11 @@ Here both particle inertia and gravitational effects are accounted for in the re
 
 The term ⟨(v′^(2))²⟩ is the square of the RMS fluctuation velocity of droplet 2, and ⟨v′^(1) v′^(2)⟩ is the cross-correlation of the fluctuating velocities of droplets 1 and 2.
 
+<a id="horizontal-velocity-correlation"></a>
+
 The square of the RMS fluctuation velocity is given by, for k-th droplet:
+
+[Compare horizontal velocity with DNS](../../../studies/validation/cloud-droplet-collisions/dns-horizontal-velocity-comparison.py)
 
 ⟨(v′^(k))²⟩ = [u′² ⁄ τₚₖ] × [b₁ d₁ Ψ(c₁, e₁) − b₁ d₂ Ψ(c₁, e₂) − b₂ d₁ Ψ(c₂, e₁) + b₂ d₂ Ψ(c₂, e₂)],
 
@@ -128,9 +136,13 @@ For the case when taking for the k-th droplet:
 Ψ(α, φ) = 1 / ( (1/τₚₖ) + (1/α) + (vₚₖ/φ) ) − 
  (vₚₖ) / (2φ ((1/τₚₖ) + (1/α) + (vₚₖ/φ))²)
 
+<a id="radial-distribution-function"></a>
+
 #### g₁₂: Radial Distribution Function
 
 The radial distribution function is given by:
+
+[Compare the radial distribution function](../../../studies/validation/cloud-droplet-collisions/dns-radial-distribution-comparison.py)
 
 g₁₂ = ( (η² + r_c²) / (R² + r_c²) )^(C₁/2)
 
@@ -166,9 +178,13 @@ F(aₒ, R_λ) = 20.115 (aₒ / R_λ)^(1/2)
 
 ---
 
+<a id="fluid-and-particle-timescales"></a>
+
 ## Derived Parameters
 
 ### τ_k: Kolmogorov Time
+
+[Compare fluid and particle properties](../../../studies/validation/cloud-droplet-collisions/dns-fluid-and-particle-properties-comparison.py)
 
 The smallest timescale in turbulence where viscous forces dominate:
 

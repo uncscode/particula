@@ -10,7 +10,7 @@ to connect a research question with explanations, examples, and model choices.
 3. Learn [container construction](data-model/construction.md)
    and [state access and ownership](data-model/ownership.md).
 4. Choose a [scientific process](processes/index.md)
-   and a related [example](../examples/index.md).
+   and a related [example](../studies/index.md).
 
 ## Choose a path
 

@@ -46,10 +46,6 @@
             "slug": "guide/getting-started/figure-styles"
           },
           {
-            "label": "Figure gallery",
-            "slug": "examples/fundamentals/figure_styles"
-          },
-          {
             "label": "Record, save and restart",
             "slug": "guide/getting-started/recording-restart"
           },
@@ -329,10 +325,6 @@
             "slug": "theory/dynamics/condensation-equations"
           },
           {
-            "label": "Ion–Particle Coagulation",
-            "slug": "theory/dynamics/ionparticle-coagulation"
-          },
-          {
             "label": "Dispersion and dielectric polarization",
             "slug": "theory/dynamics/interparticle-forces"
           },
@@ -349,22 +341,6 @@
                 "slug": "theory/dynamics/cloud-droplet-coagulation"
               },
               {
-                "label": "Fluid and Particle Properties for Cloud Droplet Coagulation",
-                "slug": "theory/dynamics/cloud-droplet-coagulation/dns-fluid-and-particle-properties-comparison"
-              },
-              {
-                "label": "Horizontal Velocity Comparison",
-                "slug": "theory/dynamics/cloud-droplet-coagulation/dns-horizontal-velocity-comparison"
-              },
-              {
-                "label": "Radial Distribution Function Comparison",
-                "slug": "theory/dynamics/cloud-droplet-coagulation/dns-radial-distribution-comparison"
-              },
-              {
-                "label": "Radial Relative Velocity Comparison",
-                "slug": "theory/dynamics/cloud-droplet-coagulation/dns-radial-relative-velocity-comparison"
-              },
-              {
                 "label": "Droplet Coagulation Kernel Ayala 2008",
                 "slug": "theory/dynamics/cloud-droplet-coagulation/droplet-coagulation-kernel-ayala2008"
               }
@@ -373,18 +349,12 @@
         ]
       },
       {
-        "label": "Properties",
-        "collapsed": true,
-        "items": [
-          {
-            "label": "Dynamic Viscosity",
-            "slug": "theory/properties/dynamic-viscosity"
-          },
-          {
-            "label": "Mean Free Path",
-            "slug": "theory/properties/mean-free-path"
-          }
-        ]
+        "label": "Air viscosity and molecular mean free path",
+        "slug": "theory/properties/air-transport"
+      },
+      {
+        "label": "Ion–particle encounters",
+        "slug": "theory/dynamics/ion-particle-encounters"
       }
     ]
   },
@@ -554,17 +524,9 @@
             "slug": "contribute/validation"
           },
           {
-            "label": "Dispersion and dielectric capture",
-            "slug": "contribute/validation/coagulation/van-der-waals"
-          },
-          {
             "label": "GPU",
             "collapsed": true,
             "items": [
-              {
-                "label": "BAT humidity-pulse ensemble",
-                "slug": "contribute/validation/gpu/bat-humidity-pulse"
-              },
               {
                 "label": "Prepared simulations: RTX 5060",
                 "slug": "contribute/validation/gpu/prepared-rtx5060"
@@ -596,25 +558,9 @@
             ]
           },
           {
-            "label": "NaCl chamber scavenging",
-            "slug": "contribute/validation/coagulation/nacl-scavenging"
-          },
-          {
             "label": "Numerical methods",
             "collapsed": true,
             "items": [
-              {
-                "label": "Condensation Stiffness Study and Recommendation Record",
-                "slug": "contribute/validation/numerics/condensation-stiffness"
-              },
-              {
-                "label": "Initial-size inversion",
-                "slug": "contribute/validation/numerics/initial-size-inversion"
-              },
-              {
-                "label": "Adaptive integration assessment",
-                "slug": "contribute/validation/numerics/adaptive-methods"
-              },
               {
                 "label": "Simulation workflow qualification",
                 "slug": "contribute/validation/numerics/simulation-workflow"
@@ -622,10 +568,6 @@
               {
                 "label": "Mass Precision Recommendation Report",
                 "slug": "contribute/validation/numerics/mass-precision"
-              },
-              {
-                "label": "Binary BAT reference checks",
-                "slug": "contribute/validation/thermodynamics/bat-activity"
               },
               {
                 "label": "Scientific correctness reference baseline",
@@ -642,12 +584,26 @@
                 "slug": "contribute/validation/releases/v0.3.0"
               }
             ]
+          },
+          {
+            "label": "Method and delivery decisions",
+            "collapsed": true,
+            "items": [
+              {
+                "label": "CUDA optics delivery qualification",
+                "slug": "contribute/validation/optics/delivery"
+              },
+              {
+                "label": "Direct condensation method decision and downstream gates",
+                "slug": "contribute/validation/numerics/direct-condensation-decision"
+              },
+              {
+                "label": "Adaptive integration method decisions",
+                "slug": "contribute/validation/numerics/adaptive-method-decision"
+              }
+            ]
           }
         ]
-      },
-      {
-        "label": "CUDA optics qualification",
-        "slug": "contribute/validation/optics/cuda"
       }
     ]
   }

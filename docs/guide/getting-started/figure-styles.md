@@ -2,11 +2,11 @@
 
 Use Particula's Matplotlib style to give a size distribution, time series, or
 contour map the same type sizes and color conventions. The
-[executable gallery](../../examples/fundamentals/figure_styles.py) includes
+[executable gallery](../../studies/tutorials/figure_styles.py) includes
 five rendered examples and a downloadable Python script. The curves and fields
 in that gallery are illustrative.
 
-For examples with scientific data, compare the [neutralizer and chamber measurements](../../examples/processes/coagulation/charge/nacl_scavenging.py), the [GPU convergence panels](../../contribute/validation/numerics/scientific-correctness.md), and the [CCN retrieval contour maps](../processes/ccn-retrieval.md).
+For examples with scientific data, compare the [neutralizer and chamber measurements](../../studies/literature/nacl-scavenging/nacl_scavenging.py), the [GPU convergence panels](../../contribute/validation/numerics/scientific-correctness.md), and the [CCN retrieval contour maps](../processes/ccn-retrieval.md).
 
 ## Start with a paper-sized panel
 
