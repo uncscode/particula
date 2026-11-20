@@ -23,6 +23,7 @@ selected checkout, not on their cached installation directory.
 | Implement/refactor library or GPU code | [particula-develop](plugins/particula-helper/skills/particula-develop/SKILL.md) |
 | Write/run tests, lint or release validation | [particula-test](plugins/particula-helper/skills/particula-test/SKILL.md) |
 | Edit docstrings, guides, theory or topic navigation | [particula-docs](plugins/particula-helper/skills/particula-docs/SKILL.md) |
+| Design a table-of-contents figure for a study | [particula-toc](plugins/particula-helper/skills/particula-toc/SKILL.md) |
 | Create/edit published examples with visuals and topic links | [particula-examples](plugins/particula-helper/skills/particula-examples/SKILL.md) |
 | Review changes or prepare requested commits/PRs | [particula-review](plugins/particula-helper/skills/particula-review/SKILL.md) |
 

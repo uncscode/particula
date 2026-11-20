@@ -23,6 +23,8 @@ Write the headline as the answer you would give a researcher. Lead with a surpri
 
 Use section headings to carry that argument from the evidence to its limits and the next test. For an approved runnable example in the Particula repository, use `../particula-examples/SKILL.md`.
 
+When a study needs a graphical abstract for its contents listing, use `../particula-toc/SKILL.md` with the final title and comparison.
+
 ## Shared operating rules
 Use the selected interpreter’s `python -m particula_docs --json` to locate and search version-matched installed docs before relying on the live site; see `../../references/sources.md` for commands and older-version fallback.
 Read `../../references/compatibility.md` for tested versions and known numerical limitations.

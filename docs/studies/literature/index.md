@@ -2,7 +2,8 @@
 
 Follow comparisons with published measurements, reference calculations and datasets. Each report identifies the observable, experimental or model conditions, and the limits of the comparison.
 
-[![CLOUD humid ion balance and proposed clearing test](../../images/cloud-ion-humidity/graphical-abstract.svg)](cloud-ion-humidity/index.md)
+[![Two traces start together. Inside a humidity droplet, the measured ion concentration rises farther than the model prediction.](../../images/cloud-ion-humidity/graphical-abstract.svg)\
+Particula predicts half the rise in ion concentration CLOUD measured from 7% to 70% humidity](cloud-ion-humidity/index.md)
 
 <!-- STUDY_LIST_START -->
 - [Dry PSL mobility sizing against 49 measured slip factors](dry-psl-mobility/index.md)
