@@ -38,6 +38,46 @@ def _resolve_species(mechanism, gas, overrides):
     return names, species, indices, masses
 
 
+def _compile_network(mechanism, species, masses):
+    stoichiometry, orders, parameters = [], [], []
+    for reaction in mechanism.reactions:
+        lhs, rhs = dict(reaction.reactants), dict(reaction.products)
+        coeffs = tuple(rhs.get(n, 0) - lhs.get(n, 0) for n in species)
+        # A large catalyst present on both sides must not mask an
+        # imbalance in the species actually consumed and produced.
+        mass_in = sum(
+            m * -v for m, v in zip(masses, coeffs, strict=True) if v < 0
+        )
+        mass_out = sum(
+            m * v for m, v in zip(masses, coeffs, strict=True) if v > 0
+        )
+        if not np.isclose(mass_in, mass_out, rtol=1e-12, atol=0):
+            raise ValueError(
+                f"reaction {reaction.name}: molar masses do not balance"
+            )
+        participants = lhs.keys() | rhs.keys()
+        if all(species[n] for n in participants):
+            atoms: dict[str, int] = {}
+            for n, coefficient in zip(species, coeffs, strict=True):
+                for element, count in species[n]:
+                    atoms[element] = atoms.get(element, 0) + coefficient * count
+            if any(atoms.values()):
+                raise ValueError(
+                    f"reaction {reaction.name}: elemental imbalance"
+                )
+        stoichiometry.append(coeffs)
+        orders.append(tuple(dict(reaction.orders).get(n, 0) for n in species))
+        parameters.append(
+            (
+                reaction.coefficient,
+                reaction.exponent,
+                reaction.energy,
+                reaction.reference_temperature,
+            )
+        )
+    return tuple(stoichiometry), tuple(orders), tuple(parameters)
+
+
 @dataclass(frozen=True)
 class BoundMechanism:
     """Immutable layout and mechanism shared by CPU and device preparation.
@@ -60,46 +100,9 @@ class BoundMechanism:
         names, species, indices, masses = _resolve_species(
             mechanism, gas, overrides
         )
-        stoichiometry, orders, parameters = [], [], []
-        for reaction in mechanism.reactions:
-            lhs, rhs = dict(reaction.reactants), dict(reaction.products)
-            coeffs = tuple(rhs.get(n, 0) - lhs.get(n, 0) for n in species)
-            # A large catalyst present on both sides must not mask an
-            # imbalance in the species actually consumed and produced.
-            mass_in = sum(
-                m * -v for m, v in zip(masses, coeffs, strict=True) if v < 0
-            )
-            mass_out = sum(
-                m * v for m, v in zip(masses, coeffs, strict=True) if v > 0
-            )
-            if not np.isclose(mass_in, mass_out, rtol=1e-12, atol=0):
-                raise ValueError(
-                    f"reaction {reaction.name}: molar masses do not balance"
-                )
-            participants = lhs.keys() | rhs.keys()
-            if all(species[n] for n in participants):
-                atoms: dict[str, int] = {}
-                for n, coefficient in zip(species, coeffs, strict=True):
-                    for element, count in species[n]:
-                        atoms[element] = (
-                            atoms.get(element, 0) + coefficient * count
-                        )
-                if any(atoms.values()):
-                    raise ValueError(
-                        f"reaction {reaction.name}: elemental imbalance"
-                    )
-            stoichiometry.append(coeffs)
-            orders.append(
-                tuple(dict(reaction.orders).get(n, 0) for n in species)
-            )
-            parameters.append(
-                (
-                    reaction.coefficient,
-                    reaction.exponent,
-                    reaction.energy,
-                    reaction.reference_temperature,
-                )
-            )
+        stoichiometry, orders, parameters = _compile_network(
+            mechanism, species, masses
+        )
         return cls(
             mechanism,
             names,

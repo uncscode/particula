@@ -118,6 +118,11 @@ class Reaction:
         if law == "constant":
             _fields(rate, ("type", "k", "units"))
             coefficient = _number(rate["k"], "k")
+        elif law == "reactive_uptake":
+            _fields(rate, ("type", "gamma"))
+            coefficient = _number(rate["gamma"], "gamma")
+            if not 0 < coefficient <= 1:
+                raise ValueError("gamma must be in (0, 1]")
         elif law == "arrhenius":
             _fields(
                 rate, ("type", "A", "b", "Ea_J_per_mol", "T_ref_K", "units")
@@ -133,7 +138,7 @@ class Reaction:
                 "rate coefficient must be nonnegative and T_ref_K positive"
             )
         expected = _units(sum(orders.values()))
-        if rate["units"] != expected:
+        if law != "reactive_uptake" and rate["units"] != expected:
             raise ValueError(f"rate units must be {expected!r}")
         return cls(
             name,
@@ -153,7 +158,9 @@ class Reaction:
             "type": self.law,
             "units": _units(sum(v for _, v in self.orders)),
         }
-        if self.law == "constant":
+        if self.law == "reactive_uptake":
+            rate = {"type": self.law, "gamma": self.coefficient}
+        elif self.law == "constant":
             rate["k"] = self.coefficient
         else:
             rate.update(
@@ -171,17 +178,47 @@ class Reaction:
         }
 
 
-def _catalog(catalog):
+def _check_phases(reaction):
+    """Restrict the kinetic collision law to one gas and particle products."""
+    if reaction.law == "reactive_uptake":
+        if (
+            len(reaction.reactants) != 1
+            or not reaction.reactants[0][0].startswith("gas:")
+            or reaction.reactants[0][1] != 1
+            or reaction.orders != reaction.reactants
+            or not all(
+                name.startswith("particle:") for name, _ in reaction.products
+            )
+        ):
+            raise ValueError(
+                "reactive_uptake consumes one gas and forms particle products"
+            )
+    else:
+        phases = {
+            name.split(":", 1)[0]
+            for name, _ in (
+                *reaction.reactants,
+                *reaction.products,
+                *reaction.orders,
+            )
+        }
+        if len(phases) != 1:
+            raise ValueError(
+                "mass action requires a single concentration phase"
+            )
+
+
+def _catalog(catalog, phases):
     if not isinstance(catalog, dict) or not catalog:
         raise ValueError("species must be a nonempty mapping")
     species = []
     for name, meta in catalog.items():
         if (
             not isinstance(name, str)
-            or not name.startswith("gas:")
-            or not name[4:].strip()
+            or name.partition(":")[0] not in phases
+            or not name.partition(":")[2].strip()
         ):
-            raise ValueError(f"invalid gas species {name!r}")
+            raise ValueError(f"invalid {'/'.join(phases)} species {name!r}")
         _fields(meta, (), ("elements", "molar_mass_kg_per_mol"))
         elements = meta.get("elements", {})
         if not isinstance(elements, dict) or any(
@@ -196,37 +233,46 @@ def _catalog(catalog):
     return species
 
 
+def _declared_masses(catalog):
+    declared_masses = []
+    for name, meta in catalog.items():
+        if name.startswith("particle:") and "molar_mass_kg_per_mol" not in meta:
+            raise ValueError(f"{name} requires molar_mass_kg_per_mol")
+        if "molar_mass_kg_per_mol" in meta:
+            mass = _number(meta["molar_mass_kg_per_mol"], f"{name} molar mass")
+            if mass <= 0:
+                raise ValueError(f"{name} molar mass must be positive")
+            declared_masses.append((name, mass))
+    return tuple(sorted(declared_masses))
+
+
 @dataclass(frozen=True, init=False)
 class ReactionMechanism:
-    """Closed gas mechanism, independent of storage order and solver.
+    """Closed reaction mechanism, independent of storage order and solver.
 
     Construct with a version-1 Python mapping or load its JSON/YAML equivalent.
-    Species IDs use the gas: prefix. Concentrations are mol/m³ of air.
+    Version 2 admits explicit particle materials and reactive gas uptake.
     """
 
     species: tuple
     reactions: tuple[Reaction, ...]
     declared_masses: tuple
+    version: int
 
     def __init__(self, record: dict):
-        """Validate the v1 fields and copy the reaction definitions."""
+        """Validate the versioned fields and copy the reaction definitions."""
         _fields(record, ("version", "basis", "species", "reactions"))
-        if type(record["version"]) is not int or record["version"] != 1:
+        version = record["version"]
+        if type(version) is not int or version not in (1, 2):
             raise ValueError("unsupported native mechanism version")
-        if record["basis"] != "mol/m^3-air":
-            raise ValueError("basis must be mol/m^3-air")
-        species = _catalog(record["species"])
-        declared_masses = []
-        for name, meta in record["species"].items():
-            if "molar_mass_kg_per_mol" in meta:
-                mass = _number(
-                    meta["molar_mass_kg_per_mol"], f"{name} molar mass"
-                )
-                if mass <= 0:
-                    raise ValueError(f"{name} molar mass must be positive")
-                declared_masses.append((name, mass))
+        basis = "mol/m^3-air" if version == 1 else "mol/m^3-phase"
+        if record["basis"] != basis:
+            raise ValueError(f"version {version} basis must be {basis}")
+        object.__setattr__(self, "version", version)
+        phases = ("gas",) if version == 1 else ("gas", "particle")
+        species = _catalog(record["species"], phases)
         object.__setattr__(
-            self, "declared_masses", tuple(sorted(declared_masses))
+            self, "declared_masses", _declared_masses(record["species"])
         )
         catalog = dict(species)
         if not isinstance(record["reactions"], list) or not record["reactions"]:
@@ -236,6 +282,10 @@ class ReactionMechanism:
         for idx, item in enumerate(record["reactions"]):
             try:
                 reaction = Reaction.parse(item, catalog)
+                if version == 2:
+                    _check_phases(reaction)
+                elif reaction.law == "reactive_uptake":
+                    raise ValueError("reactive_uptake requires version 2")
                 if reaction.name in seen:
                     raise ValueError(f"duplicate reaction id {reaction.name!r}")
             except ValueError as exc:
@@ -260,8 +310,8 @@ class ReactionMechanism:
         for name, mass in self.declared_masses:
             catalog[name]["molar_mass_kg_per_mol"] = mass
         return {
-            "version": 1,
-            "basis": "mol/m^3-air",
+            "version": self.version,
+            "basis": "mol/m^3-air" if self.version == 1 else "mol/m^3-phase",
             "species": catalog,
             "reactions": [r.to_dict() for r in self.reactions],
         }
@@ -286,4 +336,18 @@ class ReactionMechanism:
         """Resolve gas identities using exact names and explicit overrides."""
         from particula.dynamics.chemistry.binding import BoundMechanism
 
+        if self.version != 1:
+            raise ValueError("use bind_resolved for a version 2 mechanism")
         return BoundMechanism.from_gas(self, gas, overrides)
+
+    def bind_resolved(self, aerosol, particle_columns, gas_overrides=None):
+        """Bind explicit material columns and gas names in resolved state."""
+        from particula.dynamics.chemistry.resolved_binding import (
+            ResolvedBinding,
+        )
+
+        if self.version != 2:
+            raise ValueError("resolved chemistry requires version 2")
+        return ResolvedBinding.create(
+            self, aerosol, particle_columns, gas_overrides
+        )
