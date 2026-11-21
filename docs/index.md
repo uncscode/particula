@@ -4,22 +4,13 @@ import { CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 <a id="particula"></a>
 
-## Start your investigation
+<StudyCarousel featured={["cloud-ion-humidity", "examples-simulations-cloud-chamber-multi-cycle", "pendant-drop-evaporation", "nacl-scavenging", "pi-chamber-spectra"]} label="Featured studies" />
 
-Follow a question through the [topic explorer](guide/topics/index.md), start
-with a small CPU simulation, or bring Particula's scientific workflows into
-your coding agent.
+## Dig deeper into the science
 
 <CardGrid>
   <LinkCard title="Run your first simulation" description="A native aerosol and a small CPU condensation step." href="/particula/guide/getting-started/first-simulation/" />
   <LinkCard title="Agent plugins" description="Set up Particula Helper in Codex, Claude, or OpenCode to design simulations, analyze results, and develop models." href="/particula/guide/agent-plugins/" />
-</CardGrid>
-
-## Dig deeper into the science
-
-<StudyCarousel featured={["cloud-ion-humidity", "examples-simulations-cloud-chamber-multi-cycle", "pendant-drop-evaporation", "nacl-scavenging", "pi-chamber-spectra"]} label="Featured studies" />
-
-<CardGrid>
   <LinkCard title="Guide" description="Construction, ownership, and the CPU/GPU support boundary." href="/particula/guide/" />
   <LinkCard title="Studies" description="Find runnable Python scripts, literature comparisons, validation evidence and benchmarks." href="/particula/studies/" />
   <LinkCard title="Theory" description="Equations and assumptions behind the processes." href="/particula/theory/" />
