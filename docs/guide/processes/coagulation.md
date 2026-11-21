@@ -277,6 +277,8 @@ charged = (
 
 ### Turbulent shear coagulation
 
+At fixed dissipation and air viscosity, the pair kernel grows with the cube of the sum of the current radii. The resulting preference for larger drops can be tested against Saffman and Turner’s evolving mass spectrum. [Literature comparison](../../studies/literature/shear-drop-spectrum/index.md)
+
 `TurbulentShearCoagulationStrategy` uses the Saffman–Turner (1956) shear kernel. Requires turbulent dissipation [m^2/s^3] and fluid density [kg/m^3]:
 
 ```python

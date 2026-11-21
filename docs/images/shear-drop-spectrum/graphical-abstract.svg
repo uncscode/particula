@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Drops at eight times their starting mass</title>
+  <desc id="desc">Three bars share a linear scale and zero baseline. The published shear equations predict 614 drops per million, Particula predicts 610, and a constant rate fitted to mean mass predicts 102. A small sphere and one with twice its radius show the mass change.</desc>
+  <rect width="300" height="300" rx="12" fill="#f6f5ee"/>
+  <g fill="#1c6373"><circle cx="220" cy="38" r="8"/><circle cx="265" cy="38" r="16"/></g>
+  <path d="M234 38h9m-4-4 4 4-4 4" fill="none" stroke="#596568" stroke-width="2"/>
+  <g font-family="sans-serif" text-anchor="middle">
+    <path d="M28 236h244" stroke="#536366" stroke-width="2"/>
+    <rect x="38" y="82.5" width="48" height="153.5" fill="#e4eff0" stroke="#245563" stroke-width="2"/>
+    <rect x="126" y="83.5" width="48" height="152.5" fill="#236d80"/>
+    <rect x="214" y="210.5" width="48" height="25.5" fill="#bc711f"/>
+    <g fill="#20373d" font-weight="bold" font-size="18"><text x="62" y="73">614</text><text x="150" y="74">610</text><text x="238" y="201">102</text></g>
+    <g fill="#20373d" font-size="15"><text x="62" y="259">Theory</text><text x="150" y="259">Particula</text><text x="238" y="259">Constant</text></g>
+  </g>
+</svg>
