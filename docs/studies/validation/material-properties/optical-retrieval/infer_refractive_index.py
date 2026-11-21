@@ -339,9 +339,9 @@ def plot_results(report):
     index, growth, field = (report[key] for key in ("index", "growth", "field"))
     fig, axes = plotting.subplots(2, 2)
     ax = axes[0, 0]
-    for name, color in (
-        ("extinction_cost", "tab:blue"),
-        ("joint_cost", "tab:orange"),
+    for name, label, color, linestyle in (
+        ("extinction_cost", "Extinction only", "tab:blue", "-"),
+        ("joint_cost", "Extinction + absorption", "tab:orange", "--"),
     ):
         cost = np.asarray(index[name])
         ax.contour(
@@ -350,16 +350,15 @@ def plot_results(report):
             cost,
             levels=[5.991],
             colors=[color],
+            linestyles=[linestyle],
         )
-    ax.plot([], [], color="tab:blue", label="Extinction")
-    ax.plot([], [], color="tab:orange", label="Extinction + absorption")
+        ax.plot([], [], color=color, linestyle=linestyle, label=label)
     ax.plot(*index["truth"], "k+", label="Prescribed truth")
     ax.set(
         xlabel="Real index n",
         ylabel="Imaginary index k",
         title="One wavelength",
     )
-    ax.legend()
     ax = axes[0, 1]
     for key, label in (
         ("cost_weak", "One humidified RH"),
@@ -374,7 +373,6 @@ def plot_results(report):
         ylim=(-0.1, 20),
         title="Growth uncertainty",
     )
-    ax.legend()
     for ax, case in zip(axes[1], field, strict=True):
         y = np.array(case["outcomes"][0]["predicted_scattering_Mm_inverse"])
         x = np.array(case["measured_scattering_Mm_inverse"])
@@ -388,7 +386,14 @@ def plot_results(report):
             ylabel="Predicted scattering (Mm⁻¹)",
             title=case["start_utc"][:10],
         )
-        ax.legend()
+    for ax in axes[0]:
+        ax.legend(
+            loc="upper center",
+            bbox_to_anchor=(0.5, -0.21),
+            borderaxespad=0,
+        )
+    handles, labels = axes[1, 0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="outside lower center", ncols=2)
     plotting.fit(fig)
     return fig
 
