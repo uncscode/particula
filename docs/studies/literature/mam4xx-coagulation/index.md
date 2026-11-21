@@ -1,54 +1,20 @@
-# Particle-resolved coagulation leaves 6.7% fewer particles for nearby modes but agrees in number for widely separated modes
+# After 24 hours in simulated polluted air, attraction cuts sub-100 nm counts by 28% with fixed mode widths and 39% with evolving sizes
 
-![At number ratio four, Particula retains 93.3% of modal number at 60 nm and 100.0% at 220 nm after one hour.](../../../images/mam4xx-coagulation/graphical-abstract.svg)
+![After 24 hours, neutral attraction reduces the number of particles below 100 nm by 28% in corrected MAM4xx and 39% in evolving size sections, each relative to its own hard-sphere calculation.](../../../images/mam4xx-coagulation/graphical-abstract.svg)
 
-MAM4xx represents aerosol sizes with fixed-width modes. How well does its total particle count reveal differences from a model in which individual particles merge? Starting with four 26 nm Aitken particles per accumulation particle, Particula retains **6.7% fewer particles after one hour** when the accumulation mode starts at 60 nm. At 220 nm the two totals agree within sampling variability, even though their size spectra differ. A second test follows particles below 100 nm for 24 hours. For the polluted-air size distribution, adding neutral attraction reduces that count by **28%** in the corrected MAM4xx calculation and **39%** when size sections evolve from the same initial widths. In the clean marine case those responses are much closer. The size band and the width allowed during aging both matter when interpreting agreement in total number. [One-hour trajectories](mam4xx_coagulation.py) · [24-hour attraction comparisons](mode_attraction.py)
+In a dry box initialized with a polluted-air size distribution, how much does attraction between neutral particles change the number still smaller than 100 nm after a day? Adding attraction to the archived MAM4xx coagulation rates gives **28% fewer** such particles than its hard-sphere calculation. With the same starting sizes and widths, a model that follows the evolving size distribution in sections gives **39% fewer** than its own hard-sphere calculation. Replacing the archived rates with independently integrated rates while keeping the widths fixed still gives 28%. That leaves an **11-percentage-point gap** and points to the evolving size distribution as the next feature to test. The clean marine case shows how strongly this result depends on the starting aerosol. There the two predicted reductions are only 3.3% and 3.7%. [24-hour comparison](mode_attraction.py)
+
+<a id="particle-resolved-coagulation-leaves-67-fewer-particles-for-nearby-modes-but-agrees-in-number-for-widely-separated-modes"></a>
 
 <a id="independent-model-and-inputs"></a>
 
 ## What Fast et al.’s archived model lets us compare
 
-Fast et al. describe the four-mode aerosol module MAM4xx and provide the EAMxx source for a regional simulation. Within each aerosol mode, the model carries particle number and material mass and prescribes a lognormal width. Coagulation can change the number and median diameter while that width stays fixed. The archived single-subarea calculation lets us isolate this process in a dry box. We initialize a particle-resolved model with the same number and dry volume, then compare their counts and size distributions. The published air-mass spectra used for the second test specify starting conditions. Its endpoints are model predictions. [Fast et al.](https://doi.org/10.5194/gmd-19-11103-2026) · [Archived setup](https://doi.org/10.5281/zenodo.19140449) · [Pinned MAM4xx source](https://github.com/eagles-project/mam4xx/blob/0f51633242168c90018f6e296d02776f86dc9be6/src/mam4xx/coagulation.hpp)
-
-## When can one-hour number agreement hide a different size spectrum?
-
-The dry Aitken number-median diameter is 26 nm. Accumulation diameters of 60, 110 and 220 nm describe progressively separated modes. Their geometric standard deviations are 1.6 and 1.8. The synthetic boxes contain 200,000 particles cm⁻³ at 298.15 K and 101325 Pa, with uniform dry density 1770 kg m⁻³. The high number concentration makes coagulation measurable over one hour. Varying the initial Aitken-to-accumulation number ratio (0.25, 1, 4) changes the relative importance of intra- and intermodal collisions. The coarse and primary-carbon modes start empty.
-
-### Mode separation changes the number discrepancy
-
-The table gives the high-resolution Particula mean minus MAM4xx at one hour, as a percentage of the modal number. Values after ± are 95% sampling half-widths for the mean of 12 seeds. They exclude model and input uncertainty.
-
-| Initial accumulation diameter | Aitken/accumulation 0.25 | Ratio 1 | Ratio 4 |
-| --- | ---: | ---: | ---: |
-| 60 nm | −2.03 ± 0.51% | −3.20 ± 0.56% | −6.73 ± 0.81% |
-| 110 nm | −0.62 ± 0.70% | −1.00 ± 0.67% | −3.75 ± 0.99% |
-| 220 nm | −0.20 ± 0.71% | +0.36 ± 0.69% | −0.04 ± 0.80% |
-
-With 220 nm accumulation particles, the MAM4xx endpoint is inside all three Particula sampling intervals. Normalizing each final spectrum by its own number still gives total-variation distances of 0.045–0.070 across these cases. The metric is half the sum of absolute differences in bin fractions. At equal initial counts, it falls from 0.094 for the 60 nm mode to 0.045 for the 220 nm mode. Size-resolved output can therefore distinguish predictions that a total particle counter would struggle to separate.
-
-### Matching the thermal kernel changes the interpretation of the 220 nm benchmark
-
-At 220 nm the original agreement in total number concealed two effects of opposite sign. In the 4:1 benchmark, MAM4xx leaves 64,570 particles cm⁻³ after one hour. Integrating Particula’s Brownian kernel over the same evolving fixed-width modes gives 58,642. Allowing the individual particles to merge gives 64,544 ± 515 cm⁻³. At 60 nm the corresponding results are 100,272, 90,736 and 93,520 ± 812 cm⁻³. Intervals are 95% Monte Carlo intervals for 12 native CUDA replicates at fixed input. The matched closure updates number and dry volume separately and assigns the small particle’s entire volume to the receiving mode in every unlike-mode collision. [Runnable benchmark and atmospheric comparisons](regimes.py)
-
-The matched initial number losses are 67.85 and 157.21 cm⁻³ s⁻¹ for 60 and 220 nm, compared with 55.46 and 127.94 in the archive. Over the first hour the archive transfers 3.977% and 0.153% of all dry volume from Aitken to accumulation, compared with 4.506% and 0.163% under matched Brownian integration. The initial donor-to-receiver dry-volume rates are 4.298 × 10⁻¹⁶ and 9.688 × 10⁻¹⁶ m³ m⁻³ s⁻¹. A separate calculation with a volume-weighted donor lognormal verifies the transfer moment. Direct number quadrature verifies the loss moment. Using 24 versus 32 quadrature nodes per mode changes the number trajectories by less than two parts in ten million.
-
-The original model pair nearly agrees at 220 nm because changing the rate integral lowers the modal count and allowing the distribution to reshape raises it again. A total counter at one hour would miss that cancellation. The initial loss-rate comparison and the final size spectra expose it.
-
-### Matched moments and size spectra
-
-For each mode, Particula places unit-count particles at midpoint lognormal quantiles and rescales their volumes to match the analytical dry mass. MAM4xx updates its modal number and component mass with the published scalar coagulation routines. After each step the driver reconstructs number-median diameter from the third and zeroth moments at the prescribed width. Particula lets the individual dry particles merge. All 49 interior bin edges are common to both models and number closure includes particles outside the plotted range. [Runnable example and spectra](mam4xx_coagulation.py)
-
-Each of nine mixtures uses 480, 1,920 and 3,840 initial particles and 12 independently seeded runs per resolution. Three mixtures also use half the 60 s outer step with 12 fresh seeds. The modal reference steps at 10, 30 and 60 s with the 10 s result used for the trajectory comparison. Independent CPU Gauss–Hermite quadrature integrates the initial Particula collision kernel over both distributions. These calculations distinguish an initial difference in collision rates from subsequent changes in distribution shape.
-
-### Numerical checks and interpretation
-
-Halving the particle outer timestep from 60 to 30 s changes the endpoint mean by 0.23–0.47 percentage points of modal number across three checks, including sampling variability. Increasing from 1,920 to 3,840 particles shifts the mean by at most 1.04 percentage points across the nine mixtures. Changing the modal step from 10 to 60 s changes reference number by at most 0.27% at the observation times. The largest Particula relative dry-mass drift is below 1e-12. The reference generator checks its header checksum and the analysis verifies mass conservation across all modal timesteps. A separate replay of the authors’ archived E3SM one-subarea test case reproduced four final modal numbers within 2.0e-10 relative error and all 28 material-by-mode outputs within 7.8e-10 for nonzero values, with exact agreement at zero. [E3SM validation case](https://github.com/eagles-project/mam_x_validation/blob/3eb380561d71f7fdbbef902f8ea36850704a4e69/coagulation/mam_coag_1subarea.py)
-
-Integrating the Particula kernel over the initial continuous lognormals gives a **19–23% higher initial number-loss rate across all nine mixtures**. Those rates characterize the instant before the spectra evolve. The one-hour counts also depend on how each model redistributes dry volume during mergers. [Initial rate checks and final spectra](mam4xx_coagulation.py)
+Fast et al. describe the four-mode aerosol module MAM4xx and provide the EAMxx source for a regional simulation. Within each aerosol mode, the model carries particle number and material mass and prescribes a lognormal width. Coagulation can change the number and median diameter while that width stays fixed. The archived single-subarea calculation lets us isolate this process in a dry box. We initialize a particle-resolved model with the same number and dry volume, then compare their counts and size distributions. Published air-mass spectra specify the starting conditions for the 24-hour comparison. Its endpoints are model predictions. [Fast et al.](https://doi.org/10.5194/gmd-19-11103-2026) · [Archived setup](https://doi.org/10.5281/zenodo.19140449) · [Pinned MAM4xx source](https://github.com/eagles-project/mam4xx/blob/0f51633242168c90018f6e296d02776f86dc9be6/src/mam4xx/coagulation.hpp)
 
 ## How much of the 24-hour attraction response survives a fixed-width treatment?
 
-The second comparison starts from size distributions representative of polluted, clean marine and continental air. First compare the corrected archived model, fixed-width integration, evolving sections and particles at the same starting widths. Then use the process rankings below to place attraction alongside coarse-particle collection, charge and mechanical encounters. Throughout this comparison, sub-100 nm number means the concentration currently below 100 nm, including newly merged particles that still fall in this interval. [Published initial distributions, Table 1](https://doi.org/10.1029/2004JD004596)
+The 24-hour comparison starts from size distributions representative of polluted, clean marine and continental air. First compare the corrected archived model, fixed-width integration, evolving sections and particles at the same starting widths. Then use the process rankings below to place attraction alongside coarse-particle collection, charge and mechanical encounters. Throughout this comparison, sub-100 nm number means the concentration currently below 100 nm, including newly merged particles that still fall in this interval. [Published initial distributions, Table 1](https://doi.org/10.1029/2004JD004596)
 
 ### The host correction captures a smaller polluted-air response than freely evolving particles
 
@@ -205,9 +171,45 @@ The neutral dispersion calculation reproduces the full charge-averaged interacti
 
 The CSV tables contain [ranked retention effects](../../../../website/public/study-data/mam4xx/priorities.csv) and [time-resolved paired number and dry-volume differences](../../../../website/public/study-data/mam4xx/paired-effects.csv).
 
+## When can one-hour number agreement hide a different size spectrum?
+
+The dry Aitken number-median diameter is 26 nm. Accumulation diameters of 60, 110 and 220 nm describe progressively separated modes. Their geometric standard deviations are 1.6 and 1.8. The synthetic boxes contain 200,000 particles cm⁻³ at 298.15 K and 101325 Pa, with uniform dry density 1770 kg m⁻³. The high number concentration makes coagulation measurable over one hour. Varying the initial Aitken-to-accumulation number ratio (0.25, 1, 4) changes the relative importance of intra- and intermodal collisions. The coarse and primary-carbon modes start empty.
+
+### Mode separation changes the number discrepancy
+
+The table gives the high-resolution Particula mean minus MAM4xx at one hour, as a percentage of the modal number. Values after ± are 95% sampling half-widths for the mean of 12 seeds. They exclude model and input uncertainty.
+
+| Initial accumulation diameter | Aitken/accumulation 0.25 | Ratio 1 | Ratio 4 |
+| --- | ---: | ---: | ---: |
+| 60 nm | −2.03 ± 0.51% | −3.20 ± 0.56% | −6.73 ± 0.81% |
+| 110 nm | −0.62 ± 0.70% | −1.00 ± 0.67% | −3.75 ± 0.99% |
+| 220 nm | −0.20 ± 0.71% | +0.36 ± 0.69% | −0.04 ± 0.80% |
+
+With 220 nm accumulation particles, the MAM4xx endpoint is inside all three Particula sampling intervals. Normalizing each final spectrum by its own number still gives total-variation distances of 0.045–0.070 across these cases. The metric is half the sum of absolute differences in bin fractions. At equal initial counts, it falls from 0.094 for the 60 nm mode to 0.045 for the 220 nm mode. Size-resolved output can therefore distinguish predictions that a total particle counter would struggle to separate.
+
+### Matching the thermal kernel changes the interpretation of the 220 nm benchmark
+
+At 220 nm the original agreement in total number concealed two effects of opposite sign. In the 4:1 benchmark, MAM4xx leaves 64,570 particles cm⁻³ after one hour. Integrating Particula’s Brownian kernel over the same evolving fixed-width modes gives 58,642. Allowing the individual particles to merge gives 64,544 ± 515 cm⁻³. At 60 nm the corresponding results are 100,272, 90,736 and 93,520 ± 812 cm⁻³. Intervals are 95% Monte Carlo intervals for 12 native CUDA replicates at fixed input. The matched closure updates number and dry volume separately and assigns the small particle’s entire volume to the receiving mode in every unlike-mode collision. [Runnable benchmark and atmospheric comparisons](regimes.py)
+
+The matched initial number losses are 67.85 and 157.21 cm⁻³ s⁻¹ for 60 and 220 nm, compared with 55.46 and 127.94 in the archive. Over the first hour the archive transfers 3.977% and 0.153% of all dry volume from Aitken to accumulation, compared with 4.506% and 0.163% under matched Brownian integration. The initial donor-to-receiver dry-volume rates are 4.298 × 10⁻¹⁶ and 9.688 × 10⁻¹⁶ m³ m⁻³ s⁻¹. A separate calculation with a volume-weighted donor lognormal verifies the transfer moment. Direct number quadrature verifies the loss moment. Using 24 versus 32 quadrature nodes per mode changes the number trajectories by less than two parts in ten million.
+
+The original model pair nearly agrees at 220 nm because changing the rate integral lowers the modal count and allowing the distribution to reshape raises it again. A total counter at one hour would miss that cancellation. The initial loss-rate comparison and the final size spectra expose it.
+
+### Matched moments and size spectra
+
+For each mode, Particula places unit-count particles at midpoint lognormal quantiles and rescales their volumes to match the analytical dry mass. MAM4xx updates its modal number and component mass with the published scalar coagulation routines. After each step the driver reconstructs number-median diameter from the third and zeroth moments at the prescribed width. Particula lets the individual dry particles merge. All 49 interior bin edges are common to both models and number closure includes particles outside the plotted range. [Runnable example and spectra](mam4xx_coagulation.py)
+
+Each of nine mixtures uses 480, 1,920 and 3,840 initial particles and 12 independently seeded runs per resolution. Three mixtures also use half the 60 s outer step with 12 fresh seeds. The modal reference steps at 10, 30 and 60 s with the 10 s result used for the trajectory comparison. Independent CPU Gauss–Hermite quadrature integrates the initial Particula collision kernel over both distributions. These calculations distinguish an initial difference in collision rates from subsequent changes in distribution shape.
+
+### Numerical checks and interpretation
+
+Halving the particle outer timestep from 60 to 30 s changes the endpoint mean by 0.23–0.47 percentage points of modal number across three checks, including sampling variability. Increasing from 1,920 to 3,840 particles shifts the mean by at most 1.04 percentage points across the nine mixtures. Changing the modal step from 10 to 60 s changes reference number by at most 0.27% at the observation times. The largest Particula relative dry-mass drift is below 1e-12. The reference generator checks its header checksum and the analysis verifies mass conservation across all modal timesteps. A separate replay of the authors’ archived E3SM one-subarea test case reproduced four final modal numbers within 2.0e-10 relative error and all 28 material-by-mode outputs within 7.8e-10 for nonzero values, with exact agreement at zero. [E3SM validation case](https://github.com/eagles-project/mam_x_validation/blob/3eb380561d71f7fdbbef902f8ea36850704a4e69/coagulation/mam_coag_1subarea.py)
+
+Integrating the Particula kernel over the initial continuous lognormals gives a **19–23% higher initial number-loss rate across all nine mixtures**. Those rates characterize the instant before the spectra evolve. The one-hour counts also depend on how each model redistributes dry volume during mergers. [Initial rate checks and final spectra](mam4xx_coagulation.py)
+
 ## Test an evolving fine-mode width against the 31.6–100 nm excess
 
-Agreement in total number at 220 nm hid different collision rates in the one-hour benchmark. In the 24-hour polluted box, applying the same attraction physics still leaves most of the fixed-width excess between 31.6 and 100 nm. A model that lets the fine-mode width evolve can be tested against the particle prediction in that interval while holding the initial moments and material properties fixed. A reduction in both the excess there and the error in sub-100 nm response would support that change. For clean marine aerosol, the comparison instead points to the measured coarse-mode spectrum as the condition that must accompany a test of coarse collection. Field tests in either regime would require contemporaneous size spectra and material properties.
+In the polluted box, replacing the archived collision rates while holding the modal widths fixed leaves the predicted attraction response near 28%. The evolving sections give 39%, and the particle calculation independently gives the same rounded response. The 31.6–100 nm interval accounts for 94% of the fixed-width excess over the particle count below 100 nm in the attraction runs. That interval offers a sharper test of model improvements than total number, which agreed in the 220 nm benchmark despite different collision rates. A model that lets the fine-mode width evolve can be tested against the particle prediction in that interval while holding the initial moments and material properties fixed. A reduction in both the excess there and the error in sub-100 nm response would support that change. For clean marine aerosol, the comparison instead points to the measured coarse-mode spectrum as the condition that must accompany a test of coarse collection. Field tests in either regime would require contemporaneous size spectra and material properties.
 
 ## Reproduction
 

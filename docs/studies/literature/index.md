@@ -43,8 +43,8 @@ Two C₉H₁₄O₄ isomers reach half signal 21 minutes apart in chamber aeroso
 [![Schematic of the observed and larger predicted humidified particles above Mt. Hua.](../../images/mt-hua-salts/graphical-abstract.svg)\
 Neutral salt pairings overpredict growth for 72 of 79 Mt. Hua inorganic extracts](particle-water-uptake/mt-hua/index.md)
 
-[![At number ratio four, Particula retains 93.3% of modal number at 60 nm and 100.0% at 220 nm after one hour.](../../images/mam4xx-coagulation/graphical-abstract.svg)\
-Particle-resolved coagulation leaves 6.7% fewer particles for nearby modes but agrees in number for widely separated modes](mam4xx-coagulation/index.md)
+[![After 24 hours, neutral attraction reduces the number of particles below 100 nm by 28% in corrected MAM4xx and 39% in evolving size sections, each relative to its own hard-sphere calculation.](../../images/mam4xx-coagulation/graphical-abstract.svg)\
+After 24 hours in simulated polluted air, attraction cuts sub-100 nm counts by 28% with fixed mode widths and 39% with evolving sizes](mam4xx-coagulation/index.md)
 
 [![On March 22 the ship’s 12–25 nm count falls while the model with a shared incoming particle pulse rises.](../../images/sea2cloud-events/graphical-abstract.svg)\
 A pulse fitted to Sea2Cloud’s smallest particles misses the early 12–25 nm enhancement](sea2cloud-events/index.md)
@@ -56,9 +56,9 @@ At the inferred Π Chamber humidity, modeled sulfate haze falls below the optica
 
 <!-- STUDY_LIST_START -->
 - [A pulse fitted to Sea2Cloud’s smallest particles misses the early 12–25 nm enhancement](sea2cloud-events/index.md)
+- [After 24 hours in simulated polluted air, attraction cuts sub-100 nm counts by 28% with fixed mode widths and 39% with evolving sizes](mam4xx-coagulation/index.md)
 - [Evaporation and reactive uptake](evaporation-and-uptake/index.md)
 - [Particle water uptake and activation](particle-water-uptake/index.md)
-- [Particle-resolved coagulation leaves 6.7% fewer particles for nearby modes but agrees in number for widely separated modes](mam4xx-coagulation/index.md)
 - [Particula predicts about 60% of the NaCl capture rate measured at 4 nm](nacl-scavenging/index.md)
 - [Particula predicts half the rise in ion concentration CLOUD measured from 7% to 70% humidity](cloud-ion-humidity/index.md)
 - [Particula reproduces Saffman and Turner’s prediction for the number of large drops](shear-drop-spectrum/index.md)

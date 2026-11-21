@@ -7,6 +7,8 @@ description: Design or revise a square scientific table-of-contents (TOC) figure
 
 Design the title and TOC figure together so a browsing reader gets the gist in about three seconds. Let the title name the finding and the picture show the relationship behind it. Use the report text and quantitative figures for the magnitude, uncertainty and explanation.
 
+For an existing study, review the artwork again once the narrative is final. If a later analysis now leads the report, show its observable and reference case, and update the listing artwork and alt text together.
+
 ## Choose the image
 
 - Write a private sketch brief naming the subject, the comparison and the direction supported by the evidence. Identify what remains unknown before choosing arrows, geometry or motion that could imply a mechanism.

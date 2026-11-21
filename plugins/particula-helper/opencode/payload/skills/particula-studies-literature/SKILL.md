@@ -39,9 +39,11 @@ Let the reader see the contribution through a specific consequence, such as an a
 
 Write the headline as the answer you would give a researcher. Lead with a surprising, defensible comparison and name the observable, direction and decisive condition. A longer title earns its length when the added detail changes the interpretation. For example, “Particula predicts half the rise in ion concentration CLOUD measured from 7% to 70% humidity.” The counts establish a concentration discrepancy. Its cause could involve wall loss, production or sampling. When several explanations fit, the headline can say what the data constrain or which test would distinguish them.
 
+When revisiting a report with several findings, ask which comparison would most change a reader’s interpretation or next experiment. A later test can earn the lead if its controls and uncertainty support that inference. State the observable, time, reference case and regime that give the effect its meaning. Check whether the ranking holds in another tested regime. A large percentage alone is a poor reason to promote a result.
+
 Use section headings to carry that argument from the evidence to its limits and the next test. For an approved runnable example in the Particula repository, use `../particula-examples/SKILL.md`.
 
-When a study needs a graphical abstract for its contents listing, use `../particula-toc/SKILL.md` with the final title and comparison.
+After the narrative revision, read the final title, opening and conclusion beside the existing TOC figure. If the lead finding, comparator or interpretation changed, revise the figure and its alt text wherever the collection displays it. Keep artwork that still conveys the final comparison. For a new or revised graphical abstract, use `../particula-toc/SKILL.md` with the final title and comparison.
 
 ## Shared operating rules
 Use the selected interpreter’s `python -m particula_docs --json` to locate and search version-matched installed docs before relying on the live site; see `../../references/sources.md` for commands and older-version fallback.

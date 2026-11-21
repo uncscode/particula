@@ -4758,7 +4758,7 @@
     },
     {
       "source": "docs/studies/literature/mam4xx-coagulation/index.md",
-      "title": "Particle-resolved coagulation leaves 6.7% fewer particles for nearby modes but agrees in number for widely separated modes",
+      "title": "After 24 hours in simulated polluted air, attraction cuts sub-100 nm counts by 28% with fixed mode widths and 39% with evolving sizes",
       "topic": "brownian",
       "also": [
         "verification-scientific"
