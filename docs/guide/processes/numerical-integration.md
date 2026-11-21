@@ -42,7 +42,9 @@ estimate. It includes the changing ascent temperature in the time derivative
 and couples every droplet class through pressure and total water in each of
 its three linear solves. RK23 uses explicit stages with a droplet relaxation
 limit. Both methods control errors in pressure, class water, vapor and
-temperature. The `timestep` argument gives the observation
+temperature. [KPP ROS-3 coefficients](https://kpp.readthedocs.io/en/stable/num_methods/rosenbrock-methods.html#ros-3)
+
+The `timestep` argument gives the observation
 spacing in seconds. Each interval can contain multiple accepted steps and
 retries. Read `result.statistics` for the accepted and rejected counts and
 the shortest and longest accepted steps. Use `evaluated_trials` to count

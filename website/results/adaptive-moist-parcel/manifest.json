@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 82.59934649104252,
-  "package_source_sha256": "c05612f4303631f32f0c312169a8ce868467de3c9cbcdc72a7012d7034e95ee7",
-  "scientific_source_sha256": "4faac0f24cd7a66d858288161f8c4ff8eafaff6001f2cbd393c16b3248549272",
+  "elapsed_seconds": 420.75401475001127,
+  "package_source_sha256": "c4d232f44a8d5af6e73efde644c2f3813d62b3da1a55d0169edda55f0b6aa9a8",
+  "scientific_source_sha256": "866c0c5d2fe6b5c2a4d6d09e229ef68c46e81aaf10e2104c95222dbf23f9cebd",
   "input_sha256": {},
   "example": "adaptive-moist-parcel",
-  "fingerprint": "b188a42f340e8e3d0d6c4979a104cd5bf31dd948d4e56445dcd62d1df714182b",
+  "fingerprint": "fda7ca2eee202b824999240d35eaa43cb21808f87d50addc7a8c5e7dfd571b11",
   "source": "docs/studies/examples/thermodynamics/adaptive_moist_parcel.py",
-  "revision": "9dc244a6f02e5ead94fe4264cfbe54ff2a3e7c0e",
+  "revision": "fdd1d2d668de7d7ec16987f3740d28921c19854d",
   "package_dirty": false,
-  "executed_at": "2026-11-21T22:22:24.663873+00:00",
+  "executed_at": "2026-11-21T22:45:19.903997+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
@@ -29,22 +29,26 @@
     [],
     [],
     [],
+    [],
     [
       {
-        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     .artifacts/example-warp\nModule particula.gpu.kernels.parcel_rk23 c2a85ba load on device 'cuda:0' took 0.88 ms  (cached)\nModule particula.execution._condensation_ode_kernels b6cefee load on device 'cuda:0' took 0.53 ms  (cached)\n"
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     .artifacts/warp-cache\nModule particula.gpu.kernels.parcel_rk23 ece11e6 load on device 'cuda:0' took 0.83 ms  (cached)\nModule particula.execution._condensation_ode_kernels b6cefee load on device 'cuda:0' took 0.48 ms  (cached)\n"
       },
       {
-        "text": "Original \u2014 initial fastest-class restoring rate 1.00\u00d7 baseline. Radau peak 0.528220% at 61.5 m, activation at 50/100 s 75%/100%, energy residual 4.05e-06 J/kg dry air, water drift 1.81e-14 kg/kg, Radau slope 0.00021234375.\n  Loose (rtol 0.001): 11940 accepted, 8 rejected, 12029 evaluated; accepted steps 0.00195\u20130.5 s. Peak 0.528227% at 61.5 m, activation at 50/100 s 75%/100%.\n    Water drift 1.73e-18 kg/kg, energy residual 4.07e-06 J/kg dry air. Tape 0.00021234379, adaptive FD 0.0002123438. Relative slope errors: 7.81e-08 against adaptive FD and 1.61e-07 against Radau.\n  Tight (rtol 1e-05): 12034 accepted, 29 rejected, 12163 evaluated; accepted steps 0.00195\u20130.5 s. Peak 0.528221% at 61.5 m, activation at 50/100 s 75%/100%.\n    Water drift 1.73e-18 kg/kg, energy residual 4.04e-06 J/kg dry air. Tape 0.00021234373, adaptive FD 0.00021234374. Relative slope errors: 4.76e-08 against adaptive FD and 1.03e-07 against Radau.\nWider \u2014 initial fastest-class restoring rate 2.81\u00d7 baseline. Radau peak 0.536367% at 61.5 m, activation at 50/100 s 50%/100%, energy residual 4.08e-06 J/kg dry air, water drift 1.76e-14 kg/kg, Radau slope 0.00021239655.\n  Loose (rtol 0.001): 35714 accepted, 11 rejected, 35825 evaluated; accepted steps 0.000488\u20130.5 s. Peak 0.536379% at 61.5 m, activation at 50/100 s 50%/100%.\n    Water drift 1.73e-18 kg/kg, energy residual 4.08e-06 J/kg dry air. Tape 0.0002123975, adaptive FD 0.00021239656. Relative slope errors: 4.45e-06 against adaptive FD and 4.48e-06 against Radau.\n  Tight (rtol 1e-05): 35814 accepted, 11 rejected, 35933 evaluated; accepted steps 0.000488\u20130.5 s. Peak 0.536369% at 61.5 m, activation at 50/100 s 50%/100%.\n    Water drift 1.73e-18 kg/kg, energy residual 4.06e-06 J/kg dry air. Tape 0.00021239665, adaptive FD 0.00021239615. Relative slope errors: 2.34e-06 against adaptive FD and 4.62e-07 against Radau.\nAt tight tolerance, widening the spectrum changes evaluated trials from 12,163 to 35,933 (2.95\u00d7). For the wider spectrum, tightening the tolerance changes the largest class wet-radius error from 0.571 to 0.0627 nm, and trial count from 35,825 to 35,933.\n"
+        "text": "Module particula.gpu.kernels.parcel_ros3 64f4e25 load on device 'cuda:0' took 0.77 ms  (cached)\nModule particula.execution._condensation_ros3_kernels d88df3a load on device 'cuda:0' took 0.74 ms  (cached)\n"
       },
       {
-        "image": "figure-6-1.png"
+        "text": "Original spectrum. Radau peak 0.528220% at 61.5 m. Activation at 50/100 s 75%/100%. Terminal updraft derivative 0.00021234375 (kg/kg)/(m/s).\n  Initial fastest-class restoring rate is 1.00\u00d7 the original spectrum's rate.\n  RK23 rtol=0.001 (accuracy only), 11,940 accepted, 8 rejected, 12,029 evaluated. Max radius error 0.2563 nm, peak error 6.62e-06 percentage points, max activation fraction error 0.\n    Water drift 1.73e-18 kg/kg, energy residual 4.07e-06 J/kg dry air. AD derivative 0.00021234379, re-adapted FD 0.0002123438. Relative errors 7.81e-08 against re-adapted FD and 1.61e-07 against Radau.\n  RK23 rtol=0.0001 (timed), 11,963 accepted, 12 rejected, 12,057 evaluated. Max radius error 0.07147 nm, peak error 2.71e-06 percentage points, max activation fraction error 0.\n    Water drift 1.73e-18 kg/kg, energy residual 4.05e-06 J/kg dry air. AD derivative 0.00021234376, re-adapted FD 0.00021234369. Relative errors 3.23e-07 against re-adapted FD and 1.79e-08 against Radau.\n  RK23 rtol=1e-05 (accuracy only), 12,034 accepted, 29 rejected, 12,163 evaluated. Max radius error 0.01705 nm, peak error 1.06e-06 percentage points, max activation fraction error 0.\n    Water drift 1.73e-18 kg/kg, energy residual 4.04e-06 J/kg dry air. AD derivative 0.00021234373, re-adapted FD 0.00021234374. Relative errors 4.76e-08 against re-adapted FD and 1.03e-07 against Radau.\n  ROS3 rtol=0.001 (accuracy only), 243 accepted, 4 rejected, 251 evaluated. Max radius error 0.1387 nm, peak error 8.32e-06 percentage points, max activation fraction error 0.\n    Water drift 1.73e-18 kg/kg, energy residual 4.05e-06 J/kg dry air. AD derivative 0.00021234376, re-adapted FD 0.00021234376. Relative errors 2.55e-08 against re-adapted FD and 1.21e-08 against Radau.\n  ROS3 rtol=0.0001 (timed), 410 accepted, 5 rejected, 422 evaluated. Max radius error 0.02512 nm, peak error 3.04e-06 percentage points, max activation fraction error 0.\n    Water drift 1.73e-18 kg/kg, energy residual 4.04e-06 J/kg dry air. AD derivative 0.00021234374, re-adapted FD 0.00021234376. Relative errors 8.14e-08 against re-adapted FD and 4.39e-08 against Radau.\n  ROS3 rtol=1e-05 (accuracy only), 1,038 accepted, 7 rejected, 1,151 evaluated. Max radius error 0.003708 nm, peak error 3.38e-07 percentage points, max activation fraction error 0.\n    Water drift 1.73e-18 kg/kg, energy residual 4.04e-06 J/kg dry air. AD derivative 0.00021234373, re-adapted FD 0.00021234375. Relative errors 7.87e-08 against re-adapted FD and 9.39e-08 against Radau.\n  forward: RK23 2.251 s, ROS3 0.435 s. RK23/ROS3 time ratio 5.18.\n  with_gradient: RK23 6.603 s, ROS3 0.709 s. RK23/ROS3 time ratio 9.32.\nWider spectrum. Radau peak 0.536367% at 61.5 m. Activation at 50/100 s 50%/100%. Terminal updraft derivative 0.00021239655 (kg/kg)/(m/s).\n  Initial fastest-class restoring rate is 2.81\u00d7 the original spectrum's rate.\n  RK23 rtol=0.001 (accuracy only), 35,714 accepted, 11 rejected, 35,825 evaluated. Max radius error 0.5708 nm, peak error 1.17e-05 percentage points, max activation fraction error 0.\n    Water drift 1.73e-18 kg/kg, energy residual 4.08e-06 J/kg dry air. AD derivative 0.0002123975, re-adapted FD 0.00021239656. Relative errors 4.45e-06 against re-adapted FD and 4.48e-06 against Radau.\n  RK23 rtol=0.0001 (accuracy only), 35,739 accepted, 11 rejected, 35,853 evaluated. Max radius error 0.2138 nm, peak error 5.32e-06 percentage points, max activation fraction error 0.\n    Water drift 1.73e-18 kg/kg, energy residual 4.07e-06 J/kg dry air. AD derivative 0.00021239697, re-adapted FD 0.00021239677. Relative errors 9.18e-07 against re-adapted FD and 1.95e-06 against Radau.\n  RK23 rtol=1e-05 (timed), 35,814 accepted, 11 rejected, 35,933 evaluated. Max radius error 0.06269 nm, peak error 1.4e-06 percentage points, max activation fraction error 0.\n    Water drift 1.73e-18 kg/kg, energy residual 4.06e-06 J/kg dry air. AD derivative 0.00021239665, re-adapted FD 0.00021239615. Relative errors 2.34e-06 against re-adapted FD and 4.62e-07 against Radau.\n  ROS3 rtol=0.001 (accuracy only), 270 accepted, 4 rejected, 293 evaluated. Max radius error 0.1733 nm, peak error 6.14e-06 percentage points, max activation fraction error 0.\n    Water drift 1.73e-18 kg/kg, energy residual 4.07e-06 J/kg dry air. AD derivative 0.00021239679, re-adapted FD 0.00021239656. Relative errors 1.08e-06 against re-adapted FD and 1.11e-06 against Radau.\n  ROS3 rtol=0.0001 (timed), 496 accepted, 7 rejected, 552 evaluated. Max radius error 0.0269 nm, peak error 1.69e-06 percentage points, max activation fraction error 0.\n    Water drift 1.73e-18 kg/kg, energy residual 4.07e-06 J/kg dry air. AD derivative 0.00021239655, re-adapted FD 0.00021239654. Relative errors 5.84e-08 against re-adapted FD and 1.55e-08 against Radau.\n  ROS3 rtol=1e-05 (accuracy only), 1,148 accepted, 10 rejected, 1,268 evaluated. Max radius error 0.00336 nm, peak error 1.73e-07 percentage points, max activation fraction error 0.\n    Water drift 1.73e-18 kg/kg, energy residual 4.07e-06 J/kg dry air. AD derivative 0.00021239653, re-adapted FD 0.00021239655. Relative errors 8.11e-08 against re-adapted FD and 1.02e-07 against Radau.\n  forward: RK23 9.264 s, ROS3 1.443 s. RK23/ROS3 time ratio 6.42.\n  with_gradient: RK23 39.118 s, ROS3 3.541 s. RK23/ROS3 time ratio 11.05.\n"
+      },
+      {
+        "image": "figure-7-1.png"
       }
     ]
   ],
   "files": {
-    "source.py": "e30f4258f8c3f946f189b385ee4740571c4a8df890e84b3a14d47dfde8c9b0ef",
-    "data.json": "0ad3882165d5da173702e25b5eda4067b1a0fa723a22e7aefe3946f0c7cbfa56",
-    "figure-6-1.png": "fa7d0384abdaeeb8114512f302737eb787ffde6a27b9bf3b90169a59635625c6"
+    "source.py": "b667bf6b565bef832519c65e8faea80e2f0425c964366c0b0545916446483255",
+    "data.json": "c0222db902c3ae99cb63d8dfd7b676d108cf34089249f0bcde31b328357d60f5",
+    "figure-7-1.png": "70d0c5f51610aec774ac0f7fe3eb35cbf4cff231e82a1adceb92525527f36314"
   },
-  "simulation_fingerprint": "9997073f27261d6f7f263ad4ad144aca34fcc8fe7c96bf373d34a85c8f2aaa3e"
+  "simulation_fingerprint": "6002ab4f46a77b9e93fbbc45caf90add8c01b22ff7ef95226430b0d7daf148e4"
 }

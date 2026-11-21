@@ -86,7 +86,6 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Horizontal droplet velocities in turbulence](validation/cloud-droplet-collisions/dns-horizontal-velocity-comparison.py)
 - [How do collision models change a water-grown mixed aerosol?](examples/coupled-populations/emissions/biomass_burning_cloud_interactions.py)
 - [How does a faster updraft change cloud water at a fixed time?](examples/thermodynamics/moist_parcel.py)
-- [How does a wider aerosol spectrum change adaptive parcel stepping?](examples/thermodynamics/adaptive_moist_parcel.py)
 - [How does attraction change a Brownian collision rate?](validation/coagulation/dispersion/van_der_waals.py)
 - [How does water uptake change organic aerosol partitioning?](examples/thermodynamics/equilibria/equilibria_part1.py)
 - [How illumination warms and evaporates a wet aerosol](validation/material-properties/optical-heating/illuminated_evaporation.py)
@@ -132,4 +131,5 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [When a size-distribution plot hides a composition error](examples/coupled-populations/emissions/organic_partitioning_and_coagulation.py)
 - [Which coagulation processes matter in three atmospheric regimes?](literature/mam4xx-coagulation/regimes.py)
 - [Which composition rule controls equilibrium pressure?](examples/thermodynamics/particle-properties/activity_tutorial.py)
+- [Which parcel solver reaches the same accuracy targets faster?](examples/thermodynamics/adaptive_moist_parcel.py)
 <!-- STUDY_LIST_END -->

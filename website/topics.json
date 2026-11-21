@@ -5072,7 +5072,7 @@
     },
     {
       "source": "docs/studies/examples/thermodynamics/adaptive_moist_parcel.py",
-      "title": "How does a wider aerosol spectrum change adaptive parcel stepping?",
+      "title": "Which parcel solver reaches the same accuracy targets faster?",
       "topic": "condensation-adaptive",
       "also": [
         "condensation-energy",

@@ -1,11 +1,12 @@
 # %% [markdown]
-# # How does a wider aerosol spectrum change adaptive parcel stepping?
+# # Which parcel solver reaches the same accuracy targets faster?
 #
 # In a rising parcel, small wet particles can return to equilibrium much
 # faster than the parcel cools. Compare two dry size spectra under the same
-# ascent. How much work does an explicit adaptive solver do to track each
-# spectrum, and does a tighter tolerance improve its predictions of
-# supersaturation, activation and the response of liquid water to the updraft?
+# ascent. Explicit RK23 resolves the fastest droplet relaxation directly.
+# Linearly implicit ROS3 solves for the coupled stage increments. Which takes
+# less elapsed time on one GPU when both must reproduce the cloud response
+# and its sensitivity to updraft?
 #
 # ## Hold the ascent and observation times fixed
 #
@@ -14,17 +15,19 @@
 # outer classes to 30 and 150 nm. Both have the same counts and hygroscopicity.
 # Changing both tails changes dry volume as well as the spread in sizes.
 # In this closed parcel, 1 kg of dry air rises for 100 s at 1 m/s. Only the
-# observation cadence is fixed. Each CUDA RK23 run chooses its own internal
+# observation cadence is fixed. Each CUDA solver chooses its own internal
 # steps. The controller tests the embedded pressure, class liquid volume,
 # vapor and temperature errors against the same relative tolerance. The
 # scale floors are 10⁻⁸ for normalized pressure and liquid/dry volume ratio,
-# and 10⁻¹² kg/kg dry air for vapor. A stability check also caps the step
-# duration times the estimated relaxation rate at two. Both runs use the default
+# and 10⁻¹² kg/kg dry air for vapor. For RK23, a stability check also caps the step
+# duration times the estimated relaxation rate at two. Both methods use the default
 # minimum retry step of 10⁻⁹ s and limit of 100,000 total trials.
 # SciPy's implicit Radau solver supplies an independent CPU trajectory
 # sampled at the same times. A CUDA-capable GPU is required to run this example.
 
 # %%
+from time import perf_counter
+
 import matplotlib.pyplot as plt
 import numpy as np
 import warp as wp
@@ -38,11 +41,24 @@ from particula.dynamics.parcel import (
     SIGMA,
     ParcelInitialState,
     ParcelRK23,
+    ParcelROS3,
     run_parcel,
 )
 
 SPECTRA = {"Original": [45, 70, 110], "Wider": [30, 70, 150]}
-TOLERANCES = {"Loose": 1e-3, "Tight": 1e-5}
+SOLVERS = {"RK23": ParcelRK23, "ROS3": ParcelROS3}
+TOLERANCES = (1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8)
+REPETITIONS = 4
+# Common observable limits for selecting the first qualifying tolerance.
+LIMITS = {
+    "max_radius_error_nm": 0.1,
+    "absolute_peak_error_percentage_points": 1e-5,
+    "max_activation_fraction_error": 0.0,
+    "gradient_relative_error_adaptive_fd": 1e-4,
+    "gradient_relative_error_radau": 1e-4,
+    "water_drift_kg_kg": 1e-14,
+    "energy_residual_j_kg": 1e-4,
+}
 OBSERVATION = 0.5  # s
 STEPS = 200
 UPDRAFT = 1.0  # m/s
@@ -83,7 +99,7 @@ def initial_parcel(dry_radius_nm):
 # and pressure, so the ratio of these slopes gives a relative relaxation
 # rate. Compare the parcel's sensible and latent energy changes with the
 # pressure work integrated from its volume and pressure at the saved times.
-# The same trapezoidal quadrature is applied to Radau and RK23.
+# The same trapezoidal quadrature is applied to all three integrators.
 
 
 # %%
@@ -137,8 +153,8 @@ def diagnostics(state, initial):
 # %% [markdown]
 # ## Perturb the updraft and let the controller choose steps again
 #
-# For each tolerance, differentiate terminal liquid water at 100 s with
-# the baseline accepted CUDA step sizes held fixed. Check the derivative by running the ascent again at 0.999 and
+# For each tolerance, differentiate terminal liquid water at 100 s along
+# the baseline accepted CUDA steps. Check it by running the ascent at 0.999 and
 # 1.001 m/s. Each perturbed forward calculation can accept and reject different
 # steps. Also compute a Radau finite difference, which uses an independent
 # time integrator. All three calculations are compared after the same 100 s.
@@ -169,54 +185,130 @@ def finite_difference(initial, device, adaptive=None):
     return float((endpoints[1] - endpoints[0]) / (2 * DELTA))
 
 
+def measure_accuracy(
+    initial, reference, activation, reference_peak, radau_fd, control
+):
+    """Compare all saved observations and the terminal updraft derivative."""
+    result = integrate(initial, "cuda:0", adaptive=control, gradient=True)
+    summary, active = diagnostics(result, initial)
+    adaptive_fd = finite_difference(initial, "cuda:0", control)
+    radii = 1e9 * np.max(
+        np.abs(result.wet_radius - reference.wet_radius), axis=1
+    )
+    stats = result.statistics
+    summary.update(
+        rtol=control.rtol,
+        accepted=stats.accepted_steps,
+        rejected=stats.rejected_steps,
+        evaluated=stats.evaluated_trials,
+        min_step_s=stats.minimum_step,
+        max_step_s=stats.maximum_step,
+        max_activation_fraction_error=float(
+            np.max(np.abs(active - activation))
+        ),
+        absolute_peak_error_percentage_points=abs(
+            summary["peak_percent"] - reference_peak
+        ),
+        max_radius_error_nm=float(np.max(radii)),
+        radius_error_nm=radii.tolist(),
+        gradient=result.updraft_gradient,
+        adaptive_fd=adaptive_fd,
+        gradient_relative_error_radau=abs(
+            result.updraft_gradient / radau_fd - 1
+        ),
+        gradient_relative_error_adaptive_fd=abs(
+            result.updraft_gradient / adaptive_fd - 1
+        ),
+    )
+    summary["qualified"] = all(
+        summary[key] <= limit for key, limit in LIMITS.items()
+    )
+    return summary
+
+
+# %% [markdown]
+# ## Time the solvers at a common accuracy
+#
+# Compare the sampled supersaturation peak within 0.00001 percentage points,
+# every class radius within 0.1 nm, and the number-weighted activated fraction
+# at all 201 times exactly.
+# Require the updraft derivative to agree within 0.01% with each finite
+# difference. Check water drift within 10⁻¹⁴ kg/kg dry air and the first-law
+# residual within 10⁻⁴ J/kg dry air. Test each decade from 10⁻³ through 10⁻⁵ to compare
+# convergence. Continue tightening if all three miss any of the limits.
+#
+# Time the first qualifying tolerance for each method and spectrum. The
+# preceding accuracy runs warm up both the forward and derivative paths.
+# Synchronize CUDA before and after each complete call, including allocations,
+# adaptive decisions and transfer of the observed trajectory back to the host.
+# For each use case, alternate solver order across four repetitions. Save
+# individual wall times and report their median. The derivative timing includes
+# the forward integration and the reverse pass.
+
+
+# %%
+def benchmark(initial, runs):
+    """Record synchronized whole-call elapsed times at qualifying tolerances."""
+    controls = {
+        method: SOLVERS[method](rtol=series["selected_rtol"])
+        for method, series in runs.items()
+    }
+    order = list(controls)
+    for gradient, mode in ((False, "forward"), (True, "with_gradient")):
+        for repetition in range(REPETITIONS):
+            for method in order if repetition % 2 == 0 else reversed(order):
+                wp.synchronize_device("cuda:0")
+                start = perf_counter()
+                integrate(
+                    initial,
+                    "cuda:0",
+                    adaptive=controls[method],
+                    gradient=gradient,
+                )
+                wp.synchronize_device("cuda:0")
+                runs[method]["elapsed_s"][mode].append(perf_counter() - start)
+
+
 def simulate():
-    """Compare accepted steps, trajectories, inventories and sensitivities."""
+    """Qualify both methods against Radau, then time their production calls."""
     cases = {}
     for name, dry in SPECTRA.items():
         initial = initial_parcel(dry)
         reference = integrate(initial, "cpu")
-        reference_diagnostics, activation = diagnostics(reference, initial)
+        ref, activation = diagnostics(reference, initial)
         radau_fd = finite_difference(initial, "cpu")
         runs = {}
-        for label, tolerance in TOLERANCES.items():
-            control = ParcelRK23(rtol=tolerance)
-            result = integrate(
-                initial, "cuda:0", adaptive=control, gradient=True
-            )
-            summary, active = diagnostics(result, initial)
-            adaptive_fd = finite_difference(initial, "cuda:0", control)
-            stats = result.statistics
-            summary.update(
-                rtol=tolerance,
-                accepted=stats.accepted_steps,
-                rejected=stats.rejected_steps,
-                evaluated=stats.evaluated_trials,
-                min_step_s=stats.minimum_step,
-                max_step_s=stats.maximum_step,
-                max_activation_fraction_error=float(
-                    np.max(np.abs(active - activation))
-                ),
-                peak_error_percentage_points=summary["peak_percent"]
-                - reference_diagnostics["peak_percent"],
-                radius_error_nm=(
-                    1e9
-                    * np.max(
-                        np.abs(result.wet_radius - reference.wet_radius), axis=1
+        for method, solver in SOLVERS.items():
+            accuracy = []
+            for tolerance in TOLERANCES:
+                accuracy.append(
+                    measure_accuracy(
+                        initial,
+                        reference,
+                        activation,
+                        ref["peak_percent"],
+                        radau_fd,
+                        solver(rtol=tolerance),
                     )
-                ).tolist(),
-                gradient=result.updraft_gradient,
-                adaptive_fd=adaptive_fd,
-                gradient_relative_error_radau=float(
-                    abs(result.updraft_gradient / radau_fd - 1)
-                ),
-                gradient_relative_error_adaptive_fd=float(
-                    abs(result.updraft_gradient / adaptive_fd - 1)
-                ),
-            )
-            runs[label] = summary
+                )
+                if tolerance <= 1e-5 and any(
+                    run["qualified"] for run in accuracy
+                ):
+                    break
+            selected = next((run for run in accuracy if run["qualified"]), None)
+            if selected is None:
+                raise RuntimeError(
+                    f"{method} missed parcel accuracy targets for {name}"
+                )
+            runs[method] = {
+                "accuracy": accuracy,
+                "selected_rtol": selected["rtol"],
+                "elapsed_s": {"forward": [], "with_gradient": []},
+            }
+        benchmark(initial, runs)
         cases[name] = {
             "dry_radius_nm": dry,
-            "reference": reference_diagnostics,
+            "reference": ref,
             "reference_gradient_fd": radau_fd,
             "runs": runs,
         }
@@ -227,129 +319,125 @@ def simulate():
         "observation_s": OBSERVATION,
         "updraft_m_s": UPDRAFT,
         "fd_half_width_m_s": DELTA,
+        "limits": LIMITS,
+        "repetitions": REPETITIONS,
         "cases": cases,
     }
 
 
 # %% [markdown]
-# ## Compare droplet-size error with the work of each run
+# ## Compare runtime and droplet growth
 #
-# At each observation the left panel shows the largest absolute wet-radius
-# difference from Radau across the three classes. The bars count accepted
-# steps, rejected trials and discarded speculative trials. The full bar
-# height shows all trial evaluations, including speculative work beyond a
-# rejected trial or an observation boundary, for the nominal forward ascent.
-# Reverse replay and the two perturbed runs add separate work. Compare bar heights and errors
-# to see what a tighter tolerance buys.
+# Each curve follows the largest absolute radius error across the three
+# classes for a timing-qualified run. The dotted horizontal line is the shared
+# 0.1 nm limit. The right panel shows the median and the full range of the
+# synchronized timings on a logarithmic scale. Compare methods within each
+# spectrum separately for a forward trajectory and a trajectory with a
+# terminal liquid-water derivative.
 
 
 # %%
 @mplstyle.context("particula.default")
 def plot_results(report):
-    """Show radius error and solver decisions on one common time grid."""
-    fig, (error, work) = plotting.subplots(1, 2)
-    labels, accepted, rejected, discarded = [], [], [], []
-    for (name, case), color in zip(
-        report["cases"].items(), ("#087f78", "#b44b24"), strict=True
-    ):
-        for label, run in case["runs"].items():
-            # The common initial condition has zero error.
+    """Show trajectory error and synchronized timings at qualifying accuracy."""
+    fig, (error, runtime) = plotting.subplots(1, 2)
+    colors = {"RK23": "#087f78", "ROS3": "#b44b24"}
+    for i, (name, case) in enumerate(report["cases"].items()):
+        for j, (method, run) in enumerate(case["runs"].items()):
+            selected = next(
+                r for r in run["accuracy"] if r["rtol"] == run["selected_rtol"]
+            )
             error.plot(
                 report["time_s"][1:],
-                np.ma.masked_equal(run["radius_error_nm"][1:], 0),
-                color=color,
-                linestyle="-" if label == "Tight" else "--",
-                label=f"{name}, {label.lower()}",
+                np.ma.masked_equal(selected["radius_error_nm"][1:], 0),
+                color=colors[method],
+                linestyle=("-", "--")[i],
+                label=f"{method}, {name.lower()}",
             )
-            labels.append(f"{name}\n{label.lower()}")
-            accepted.append(run["accepted"])
-            rejected.append(run["rejected"])
-            discarded.append(
-                run["evaluated"] - run["accepted"] - run["rejected"]
-            )
+            for k, mode in enumerate(("forward", "with_gradient")):
+                times = run["elapsed_s"][mode]
+                median = np.median(times)
+                runtime.errorbar(
+                    2 * i + k + (-0.11, 0.11)[j],
+                    median,
+                    yerr=[[median - min(times)], [max(times) - median]],
+                    color=colors[method],
+                    marker=("o", "s")[j],
+                    capsize=3,
+                    label=method if i == 0 and k == 0 else None,
+                )
+    error.axhline(
+        report["limits"]["max_radius_error_nm"], color="0.45", linestyle=":"
+    )
     error.set(
-        xlabel="Elapsed time (s)",
+        xlabel="Elapsed ascent time (s)",
         ylabel="Maximum wet-radius error (nm)",
         yscale="log",
     )
-    plotting.legend(error)
-    positions = np.arange(len(labels))
-    work.bar(positions, accepted, color="#087f78", label="Accepted")
-    work.bar(
-        positions,
-        rejected,
-        bottom=accepted,
-        color="#c59034",
-        hatch="//",
-        label="Rejected",
+    plotting.legend(error, placement="inside", fontsize=8)
+    runtime.set_xticks(
+        [0, 1, 2, 3],
+        ["Original\nfwd", "Original\n+ grad", "Wider\nfwd", "Wider\n+ grad"],
     )
-    work.bar(
-        positions,
-        discarded,
-        bottom=np.add(accepted, rejected),
-        color="#898a94",
-        hatch="..",
-        label="Discarded",
+    runtime.set(
+        xlim=(-0.5, 3.5), ylabel="Wall time per ascent (s)", yscale="log"
     )
-    work.set_xticks(positions, labels)
-    work.set_ylabel("Evaluated RK23 trials")
-    plotting.legend(work)
+    plotting.legend(runtime, placement="inside")
     plotting.fit(fig)
     return fig
 
 
 # %% [markdown]
-# The printed supersaturation peak is the largest value on the shared 0.5 s
-# observation grid. Use it and the activated fractions to assess cloud response.
-# Compare the tape derivative with both finite differences in
-# (kg liquid water/kg dry air)/(m/s). The budget residuals are maxima over
-# the saved times. The accepted/rejected counts describe controller decisions.
-# The evaluated count includes speculative trials discarded by the batch.
+# Read the peak and gradient errors alongside the timing ratios below.
+# Evaluated trials include any speculative trials that the controller
+# discarded. One ROS3 trial includes three coupled linear solves. The timed
+# ratios compare work at common observable limits on this GPU.
 
 
 # %%
 def run_example():
-    """Print the measured accuracy, adaptive work and gradient checks."""
+    """Print numerical qualification and elapsed times for the two ascents."""
     report = simulate()
-    baseline = report["cases"]["Original"]["reference"][
-        "max_restoring_slope_per_radius_m2"
-    ]
     for name, case in report["cases"].items():
         ref = case["reference"]
-        relative_rate = ref["max_restoring_slope_per_radius_m2"] / baseline
         print(
-            f"{name} — initial fastest-class restoring rate {relative_rate:.2f}× baseline. Radau peak {ref['peak_percent']:.6f}% at {ref['peak_height_m']:.1f} m, "
-            f"activation at 50/100 s {ref['fraction_at_50_s']:.0%}/{ref['fraction_at_100_s']:.0%}, "
-            f"energy residual {ref['energy_residual_j_kg']:.2e} J/kg dry air, "
-            f"water drift {ref['water_drift_kg_kg']:.2e} kg/kg, "
-            f"Radau slope {case['reference_gradient_fd']:.8g}."
+            f"{name} spectrum. Radau peak {ref['peak_percent']:.6f}% at {ref['peak_height_m']:.1f} m. "
+            f"Activation at 50/100 s {ref['fraction_at_50_s']:.0%}/{ref['fraction_at_100_s']:.0%}. "
+            f"Terminal updraft derivative {case['reference_gradient_fd']:.8g} (kg/kg)/(m/s)."
         )
-        for label, run in case["runs"].items():
+        restoring_ratio = (
+            ref["max_restoring_slope_per_radius_m2"]
+            / report["cases"]["Original"]["reference"][
+                "max_restoring_slope_per_radius_m2"
+            ]
+        )
+        print(
+            f"  Initial fastest-class restoring rate is {restoring_ratio:.2f}× the original spectrum's rate."
+        )
+        for method, series in case["runs"].items():
+            for run in series["accuracy"]:
+                print(
+                    f"  {method} rtol={run['rtol']:g} "
+                    f"({'timed' if run['rtol'] == series['selected_rtol'] else 'accuracy only'}), "
+                    f"{run['accepted']:,} accepted, "
+                    f"{run['rejected']:,} rejected, {run['evaluated']:,} evaluated. "
+                    f"Max radius error {run['max_radius_error_nm']:.4g} nm, "
+                    f"peak error {run['absolute_peak_error_percentage_points']:.3g} percentage points, "
+                    f"max activation fraction error {run['max_activation_fraction_error']:g}.\n"
+                    f"    Water drift {run['water_drift_kg_kg']:.2e} kg/kg, "
+                    f"energy residual {run['energy_residual_j_kg']:.2e} J/kg dry air. "
+                    f"AD derivative {run['gradient']:.8g}, re-adapted FD {run['adaptive_fd']:.8g}. "
+                    f"Relative errors {run['gradient_relative_error_adaptive_fd']:.2e} against "
+                    f"re-adapted FD and {run['gradient_relative_error_radau']:.2e} against Radau."
+                )
+        for mode in ("forward", "with_gradient"):
+            rk, ros = [
+                np.median(case["runs"][m]["elapsed_s"][mode])
+                for m in ("RK23", "ROS3")
+            ]
             print(
-                f"  {label} (rtol {run['rtol']:g}): {run['accepted']} accepted, "
-                f"{run['rejected']} rejected, {run['evaluated']} evaluated; accepted steps {run['min_step_s']:.3g}"
-                f"–{run['max_step_s']:.3g} s. Peak {run['peak_percent']:.6f}% "
-                f"at {run['peak_height_m']:.1f} m, activation at 50/100 s "
-                f"{run['fraction_at_50_s']:.0%}/{run['fraction_at_100_s']:.0%}.\n"
-                f"    Water drift {run['water_drift_kg_kg']:.2e} kg/kg, "
-                f"energy residual {run['energy_residual_j_kg']:.2e} J/kg dry air. "
-                f"Tape {run['gradient']:.8g}, adaptive FD {run['adaptive_fd']:.8g}. "
-                f"Relative slope errors: {run['gradient_relative_error_adaptive_fd']:.2e} "
-                f"against adaptive FD and {run['gradient_relative_error_radau']:.2e} against Radau."
+                f"  {mode}: RK23 {rk:.3f} s, ROS3 {ros:.3f} s. RK23/ROS3 time ratio {rk / ros:.2f}."
             )
-    original = report["cases"]["Original"]["runs"]["Tight"]
-    wide = report["cases"]["Wider"]["runs"]
-    original_trials = original["evaluated"]
-    loose_trials = wide["Loose"]["evaluated"]
-    tight_trials = wide["Tight"]["evaluated"]
-    print(
-        f"At tight tolerance, widening the spectrum changes evaluated trials from "
-        f"{original_trials:,} to {tight_trials:,} ({tight_trials / original_trials:.2f}×). "
-        f"For the wider spectrum, tightening the tolerance changes the largest "
-        f"class wet-radius error from {max(wide['Loose']['radius_error_nm']):.3g} to "
-        f"{max(wide['Tight']['radius_error_nm']):.3g} nm, and trial count from "
-        f"{loose_trials:,} to {tight_trials:,}."
-    )
     plot_results(report)
     plt.show()
     return report
@@ -359,16 +447,8 @@ if __name__ == "__main__":
     run_example()
 
 # %% [markdown]
-# Widening the spectrum increases the initial restoring rate of the fastest
-# class by a factor of 2.81. The wider spectrum has 50% of particles above their
-# critical radius at 50 s, compared with 75% in the original spectrum. Both
-# reach 100% by 100 s. RK23 gives the Radau activated fraction at every saved
-# time in these two cases.
-#
-# The evaluated trial counts measure how often RK23 computed a trial while
-# following the faster relaxation
-# explicitly. To test whether implicit stepping pays off for a wider spectrum,
-# give a linearly implicit Rosenbrock solver (ROS3)
-# the same initial states and observation schedule. Compare its linear solves
-# and runtime at matched peak, wet-radius and gradient errors. Trial counts
-# alone cannot establish which method would be faster.
+# The wider spectrum has 50% of particles above their critical radius at 50 s,
+# compared with 75% in the original spectrum. Both reach 100% by 100 s.
+# Use the measured time and gradient agreement to choose a solver for these
+# three-class ascents. A different spectrum or number of classes changes the
+# cost of both growth evaluation and coupled linear solves.
