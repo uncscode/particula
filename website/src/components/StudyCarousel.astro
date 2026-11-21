@@ -23,7 +23,7 @@ const slides = featured
   : illustrated.sort((a, b) => a.title.localeCompare(b.title, 'en'));
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
-{slides.length > 0 && <study-carousel role="region" aria-label={label} aria-roledescription={slides.length > 1 ? 'carousel' : undefined}>
+{slides.length > 0 && <study-carousel data-featured={featured ? true : undefined} role="region" aria-label={label} aria-roledescription={slides.length > 1 ? 'carousel' : undefined}>
   <div class="slides">
     {slides.map((r, i) => <a class="slide" href={resourcePath(r.source, base)} inert={i > 0} aria-hidden={i > 0 ? 'true' : undefined}>
       <img src={`${base}/images/${r.tocFigure}`} alt="" width="208" height="208" loading="lazy" decoding="async" />
@@ -56,15 +56,16 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 <style>
   study-carousel { display: block; margin-block: 1.5rem; }
+  study-carousel[data-featured] { margin-block-start: clamp(2.75rem, 5vw, 4rem); }
   .slides { display: grid; position: relative; overflow: clip; padding-block: .35rem; }
-  .slide { grid-area: 1 / 1; width: 66.6667%; min-width: 0; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: clamp(.8rem, 2vw, 1.25rem); text-align: center; text-decoration: none; color: var(--sl-color-white); }
+  .slide { grid-area: 1 / 1; width: 61%; min-width: 0; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: clamp(.8rem, 2vw, 1.25rem); text-align: center; text-decoration: none; color: var(--sl-color-white); }
   .slide[inert] { visibility: hidden; }
   .slide img, .peek img { display: block; width: 100%; height: auto; border-radius: .85rem; margin: 0; }
   .study-title { font-size: clamp(1.12rem, 2.6vw, 1.75rem); line-height: 1.22; font-weight: 600; text-wrap: balance; margin: 0; }
   /* Clip both neighboring squares at the viewport edges, leaving the center square unobstructed. */
-  .peek { position: absolute; top: .35rem; width: 58%; aspect-ratio: 1; margin: 4.333% 0 0; padding: 0; overflow: hidden; border: 1px solid var(--sl-color-gray-5); border-radius: .85rem; background: var(--sl-color-bg); cursor: pointer; }
-  .previous { left: -45%; }
-  .next { right: -45%; }
+  .peek { position: absolute; top: .35rem; width: 53%; aspect-ratio: 1; margin: 4% 0 0; padding: 0; overflow: hidden; border: 1px solid var(--sl-color-gray-5); border-radius: .85rem; background: var(--sl-color-bg); cursor: pointer; }
+  .previous { left: -37.5%; }
+  .next { right: -37.5%; }
   .peek img { opacity: .52; }
   .peek:hover img, .peek:focus-visible img { opacity: .85; }
   .slide:hover .study-title, .slide:focus-visible .study-title { text-decoration: underline; text-decoration-thickness: .08em; text-underline-offset: .16em; }
