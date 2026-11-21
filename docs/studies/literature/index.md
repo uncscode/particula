@@ -37,7 +37,7 @@ BAT reverses the measured ordering of pinic and phthalic acid hygroscopicity at 
 [![Change in organic mass per sulfate after dilution: the chamber measurement and growth-calibrated fit fall below their starting values. The reversible-pool model and its imidazole-producing variant (IC) both rise.](../../images/glyoxal-chamber/graphical-abstract.svg)\
 After glyoxal dilution, two models predict rising organic mass per sulfate as measurements fall](https://uncscode.github.io/particula/studies/literature/evaporation-and-uptake/glyoxal_chamber/)
 
-[![The observed gap between half-signals is 20.7 minutes. At an assumed 80 nm particle radius a common source predicts 0.1 minutes and a delayed cis-pinic source predicts 19.1 minutes.](../../images/pinic-isomers/graphical-abstract.svg)\
+[![A batch chamber holds aerosol formed during α-pinene oxidation. In sampled particles, cis-pinic acid reaches half its late signal 20.7 minutes after the unidentified isomer. The common-source and delayed-source models predict gaps of 0.11 and 19.11 minutes, respectively.](../../images/pinic-isomers/graphical-abstract.svg)\
 A delayed source predicts 19 minutes of the 21-minute gap between two chamber isomer signals](pinic-isomers/index.md)
 
 [![For the winter foothill extracts, mean predicted minus measured growth factor increases from +0.542 with AIOMFAC pure salts to +0.716 with the full AIOMFAC liquid mixture.](../../images/mt-hua-salts/graphical-abstract.svg)\
