@@ -1702,5 +1702,21 @@
     ],
     "plot_inputs": [],
     "full_canvas": true
+  },
+  "adaptive-moist-parcel": {
+    "title": "How does a wider aerosol spectrum change adaptive parcel stepping?",
+    "source": "docs/studies/examples/thermodynamics/adaptive_moist_parcel.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 2700,
+    "inputs": [],
+    "invoke": "report = run_example()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nplot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
   }
 }

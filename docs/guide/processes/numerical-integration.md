@@ -32,6 +32,27 @@ reports both accuracy and cost, including settings that failed the observable
 accuracy target. A local tolerance is not a guarantee on global radius or vapor
 error. Always refine tolerances and the outer split step for your own case.
 
+## A coupled parcel on CUDA
+
+For the warm single-box parcel, pass `adaptive=ParcelRK23(rtol=1e-5)` to
+`run_parcel` with `device="cuda:0"`. Import both from
+`particula.dynamics.parcel`. The `timestep` argument gives the observation
+spacing in seconds. Each interval can contain multiple accepted steps and
+retries. Read `result.statistics` for the accepted and rejected counts and
+the shortest and longest accepted steps. Use `evaluated_trials` to count
+all trial computations, including speculative work discarded after a rejected
+trial or when the output boundary is reached.
+
+With `gradient=True`, Warp differentiates terminal liquid water at fixed
+elapsed time using the baseline trajectory’s accepted step sizes. Perturb
+the updraft in two fresh adaptive runs to check how that local derivative
+compares with a controller that selects its steps again.
+
+The [adaptive moist parcel example](../../studies/examples/thermodynamics/adaptive_moist_parcel.py)
+compares CUDA RK23 at two tolerances against independent CPU Radau trajectories
+through cloud base. It records trial counts and checks the updraft sensitivity
+with finite differences that rerun the adaptive controller.
+
 ## Integrate continuous condensation
 
 Given a native `aerosol` and explicitly configured isothermal `strategy`:

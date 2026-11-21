@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 82.59934649104252,
+  "package_source_sha256": "c05612f4303631f32f0c312169a8ce868467de3c9cbcdc72a7012d7034e95ee7",
+  "scientific_source_sha256": "4faac0f24cd7a66d858288161f8c4ff8eafaff6001f2cbd393c16b3248549272",
+  "input_sha256": {},
+  "example": "adaptive-moist-parcel",
+  "fingerprint": "b188a42f340e8e3d0d6c4979a104cd5bf31dd948d4e56445dcd62d1df714182b",
+  "source": "docs/studies/examples/thermodynamics/adaptive_moist_parcel.py",
+  "revision": "9dc244a6f02e5ead94fe4264cfbe54ff2a3e7c0e",
+  "package_dirty": false,
+  "executed_at": "2026-11-21T22:22:24.663873+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     .artifacts/example-warp\nModule particula.gpu.kernels.parcel_rk23 c2a85ba load on device 'cuda:0' took 0.88 ms  (cached)\nModule particula.execution._condensation_ode_kernels b6cefee load on device 'cuda:0' took 0.53 ms  (cached)\n"
+      },
+      {
+        "text": "Original \u2014 initial fastest-class restoring rate 1.00\u00d7 baseline. Radau peak 0.528220% at 61.5 m, activation at 50/100 s 75%/100%, energy residual 4.05e-06 J/kg dry air, water drift 1.81e-14 kg/kg, Radau slope 0.00021234375.\n  Loose (rtol 0.001): 11940 accepted, 8 rejected, 12029 evaluated; accepted steps 0.00195\u20130.5 s. Peak 0.528227% at 61.5 m, activation at 50/100 s 75%/100%.\n    Water drift 1.73e-18 kg/kg, energy residual 4.07e-06 J/kg dry air. Tape 0.00021234379, adaptive FD 0.0002123438. Relative slope errors: 7.81e-08 against adaptive FD and 1.61e-07 against Radau.\n  Tight (rtol 1e-05): 12034 accepted, 29 rejected, 12163 evaluated; accepted steps 0.00195\u20130.5 s. Peak 0.528221% at 61.5 m, activation at 50/100 s 75%/100%.\n    Water drift 1.73e-18 kg/kg, energy residual 4.04e-06 J/kg dry air. Tape 0.00021234373, adaptive FD 0.00021234374. Relative slope errors: 4.76e-08 against adaptive FD and 1.03e-07 against Radau.\nWider \u2014 initial fastest-class restoring rate 2.81\u00d7 baseline. Radau peak 0.536367% at 61.5 m, activation at 50/100 s 50%/100%, energy residual 4.08e-06 J/kg dry air, water drift 1.76e-14 kg/kg, Radau slope 0.00021239655.\n  Loose (rtol 0.001): 35714 accepted, 11 rejected, 35825 evaluated; accepted steps 0.000488\u20130.5 s. Peak 0.536379% at 61.5 m, activation at 50/100 s 50%/100%.\n    Water drift 1.73e-18 kg/kg, energy residual 4.08e-06 J/kg dry air. Tape 0.0002123975, adaptive FD 0.00021239656. Relative slope errors: 4.45e-06 against adaptive FD and 4.48e-06 against Radau.\n  Tight (rtol 1e-05): 35814 accepted, 11 rejected, 35933 evaluated; accepted steps 0.000488\u20130.5 s. Peak 0.536369% at 61.5 m, activation at 50/100 s 50%/100%.\n    Water drift 1.73e-18 kg/kg, energy residual 4.06e-06 J/kg dry air. Tape 0.00021239665, adaptive FD 0.00021239615. Relative slope errors: 2.34e-06 against adaptive FD and 4.62e-07 against Radau.\nAt tight tolerance, widening the spectrum changes evaluated trials from 12,163 to 35,933 (2.95\u00d7). For the wider spectrum, tightening the tolerance changes the largest class wet-radius error from 0.571 to 0.0627 nm, and trial count from 35,825 to 35,933.\n"
+      },
+      {
+        "image": "figure-6-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "e30f4258f8c3f946f189b385ee4740571c4a8df890e84b3a14d47dfde8c9b0ef",
+    "data.json": "0ad3882165d5da173702e25b5eda4067b1a0fa723a22e7aefe3946f0c7cbfa56",
+    "figure-6-1.png": "fa7d0384abdaeeb8114512f302737eb787ffde6a27b9bf3b90169a59635625c6"
+  },
+  "simulation_fingerprint": "9997073f27261d6f7f263ad4ad144aca34fcc8fe7c96bf373d34a85c8f2aaa3e"
+}
