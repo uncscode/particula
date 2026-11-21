@@ -15,6 +15,8 @@
 # %% [markdown]
 # # Follow droplets through one wet–dry chamber cycle
 #
+# ![A surviving seed keeps its core while its water shell expands in humid air and contracts in dry air. The three drawings follow one illustrative trajectory.](../../../../images/coupled-populations/chamber-single-cycle.svg)
+#
 # What changes when hygroscopic seeds encounter a supersaturated vapor reservoir
 # and then a drier one? This example couples condensation, evaporation, and
 # rectangular-chamber wall removal, following individual particle sizes and the

@@ -2,7 +2,7 @@
 
 Follow comparisons with published measurements, reference calculations and datasets. Each report identifies the observable, experimental or model conditions, and the limits of the comparison.
 
-<div class="literature-figures">
+<div class="study-figures">
 
 [![The horizontal axis runs from dry to humid air, and ion concentration per polarity (ions/cm³) increases upward. The measured rise exceeds the model prediction. A beam produces positive and negative ions.](../../images/cloud-ion-humidity/graphical-abstract.svg)\
 Particula predicts half the rise in ion concentration CLOUD measured from 7% to 70% humidity](cloud-ion-humidity/index.md)

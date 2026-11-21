@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Follow organic uptake onto seeds during imposed cooling</title>
+  <desc id="desc">Cooling moves organic material from vapor onto pre-existing seeds. The schematic shows fewer vapor marks and a thicker organic coating around the same dark core.</desc>
+  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
+  <g font-family="sans-serif" font-weight="600">
+    <text x="76" y="63" text-anchor="middle" font-size="22" fill="#243e43">Warm</text>
+    <text x="226" y="63" text-anchor="middle" font-size="22" fill="#243e43">Cool</text>
+    <circle cx="29" cy="102" r="4.4" fill="#be6932" stroke="none" stroke-width="2"/>
+    <circle cx="75" cy="95" r="4.4" fill="#be6932" stroke="none" stroke-width="2"/>
+    <circle cx="117" cy="107" r="4.4" fill="#be6932" stroke="none" stroke-width="2"/>
+    <circle cx="44" cy="132" r="4.4" fill="#be6932" stroke="none" stroke-width="2"/>
+    <circle cx="105" cy="139" r="4.4" fill="#be6932" stroke="none" stroke-width="2"/>
+    <circle cx="26" cy="171" r="4.4" fill="#be6932" stroke="none" stroke-width="2"/>
+    <circle cx="116" cy="191" r="4.4" fill="#be6932" stroke="none" stroke-width="2"/>
+    <circle cx="51" cy="212" r="4.4" fill="#be6932" stroke="none" stroke-width="2"/>
+    <circle cx="87" cy="227" r="4.4" fill="#be6932" stroke="none" stroke-width="2"/>
+    <circle cx="203" cy="95" r="4.4" fill="#be6932" stroke="none" stroke-width="2"/>
+    <circle cx="263" cy="113" r="4.4" fill="#be6932" stroke="none" stroke-width="2"/>
+    <circle cx="273" cy="199" r="4.4" fill="#be6932" stroke="none" stroke-width="2"/>
+    <circle cx="73" cy="165" r="22" fill="#efd1a5" stroke="#be6932" stroke-width="3"/>
+    <circle cx="73" cy="165" r="16" fill="#333b40" stroke="#243e43" stroke-width="2"/>
+    <circle cx="224" cy="165" r="45" fill="#efd1a5" stroke="#be6932" stroke-width="3"/>
+    <circle cx="224" cy="165" r="16" fill="#333b40" stroke="#243e43" stroke-width="2"/>
+    <path d="M123 165H162" fill="none" stroke="#617679" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
+    <path d="M156 160l6 5-6 5" fill="none" stroke="#617679" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
+    <text x="150" y="266" text-anchor="middle" font-size="19" fill="#243e43">Organic uptake</text>
+  </g>
+</svg>

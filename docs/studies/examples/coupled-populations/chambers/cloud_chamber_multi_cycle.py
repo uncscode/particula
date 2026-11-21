@@ -15,6 +15,8 @@
 # %% [markdown]
 # # Separate water cycling from seed loss in a chamber
 #
+# ![Schematic of a wet, dry, then wet chamber. Water shells shrink and regrow around the same-sized seeds. Fewer seeds remain airborne as more reach the chamber wall.](../../../../images/coupled-populations/chamber-multiple-cycles.svg)
+#
 # After repeated wet–dry forcing, how much of a droplet's change comes from water
 # exchange and how much from removal of its dry seed? Extend the
 # [single-cycle example](cloud_chamber_single_cycle.py) to four cycles and three

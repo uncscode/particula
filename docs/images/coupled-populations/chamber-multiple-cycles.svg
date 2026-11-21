@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Separate water cycling from seed loss in a chamber</title>
+  <desc id="desc">Schematic of a wet, dry, then wet chamber. Water shells shrink and regrow around the same-sized seeds. Fewer seeds remain airborne as more reach the chamber wall.</desc>
+  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
+  <g font-family="sans-serif" font-weight="600">
+    <rect x="17" y="70" width="72" height="139" rx="12" fill="#fffaf1" stroke="#135963" stroke-width="3"/>
+    <path d="M25 194h56" fill="none" stroke="#617679" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+    <text x="53" y="246" text-anchor="middle" font-size="20" fill="#243e43">Wet</text>
+    <rect x="114" y="70" width="72" height="139" rx="12" fill="#fffaf1" stroke="#135963" stroke-width="3"/>
+    <path d="M122 194h56" fill="none" stroke="#617679" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+    <text x="150" y="246" text-anchor="middle" font-size="20" fill="#243e43">Dry</text>
+    <rect x="211" y="70" width="72" height="139" rx="12" fill="#fffaf1" stroke="#135963" stroke-width="3"/>
+    <path d="M219 194h56" fill="none" stroke="#617679" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+    <text x="247" y="246" text-anchor="middle" font-size="20" fill="#243e43">Wet</text>
+    <circle cx="39" cy="101" r="13" fill="#a6d4d9" stroke="#135963" stroke-width="2.8"/>
+    <circle cx="39" cy="101" r="4.6" fill="#efd1a5" stroke="#243e43" stroke-width="2"/>
+    <circle cx="67" cy="125" r="13" fill="#a6d4d9" stroke="#135963" stroke-width="2.8"/>
+    <circle cx="67" cy="125" r="4.6" fill="#efd1a5" stroke="#243e43" stroke-width="2"/>
+    <circle cx="39" cy="149" r="13" fill="#a6d4d9" stroke="#135963" stroke-width="2.8"/>
+    <circle cx="39" cy="149" r="4.6" fill="#efd1a5" stroke="#243e43" stroke-width="2"/>
+    <circle cx="64" cy="174" r="13" fill="#a6d4d9" stroke="#135963" stroke-width="2.8"/>
+    <circle cx="64" cy="174" r="4.6" fill="#efd1a5" stroke="#243e43" stroke-width="2"/>
+    <circle cx="140" cy="106" r="6" fill="#a6d4d9" stroke="#135963" stroke-width="2.8"/>
+    <circle cx="140" cy="106" r="4.6" fill="#efd1a5" stroke="#243e43" stroke-width="2"/>
+    <circle cx="161" cy="138" r="6" fill="#a6d4d9" stroke="#135963" stroke-width="2.8"/>
+    <circle cx="161" cy="138" r="4.6" fill="#efd1a5" stroke="#243e43" stroke-width="2"/>
+    <circle cx="139" cy="170" r="6" fill="#a6d4d9" stroke="#135963" stroke-width="2.8"/>
+    <circle cx="139" cy="170" r="4.6" fill="#efd1a5" stroke="#243e43" stroke-width="2"/>
+    <circle cx="248" cy="134" r="19" fill="#a6d4d9" stroke="#135963" stroke-width="2.8"/>
+    <circle cx="248" cy="134" r="4.6" fill="#efd1a5" stroke="#243e43" stroke-width="2"/>
+    <circle cx="152" cy="189" r="4.6" fill="#efd1a5" stroke="#243e43" stroke-width="1.7"/>
+    <circle cx="232" cy="189" r="4.6" fill="#efd1a5" stroke="#243e43" stroke-width="1.7"/>
+    <circle cx="248" cy="189" r="4.6" fill="#efd1a5" stroke="#243e43" stroke-width="1.7"/>
+    <circle cx="264" cy="189" r="4.6" fill="#efd1a5" stroke="#243e43" stroke-width="1.7"/>
+    <path d="M94 143H107" fill="none" stroke="#617679" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
+    <path d="M101 138l6 5-6 5" fill="none" stroke="#617679" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
+    <path d="M191 143H204" fill="none" stroke="#617679" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
+    <path d="M198 138l6 5-6 5" fill="none" stroke="#617679" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
+  </g>
+</svg>

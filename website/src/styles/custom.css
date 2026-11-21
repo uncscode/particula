@@ -127,10 +127,10 @@ pre.mermaid svg { display: block; margin: auto; max-width: 100%; }
 .study-path { font-size: var(--sl-text-sm); color: var(--sl-color-gray-2); }
 .study-path span { margin-inline: .25rem; }
 
-.literature-figures {
+.study-figures {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
   gap: 1.5rem;
 }
-.literature-figures > p { margin-block: 0; max-width: 3in; }
-.literature-figures img { width: 100%; height: auto; }
+.study-figures > p { margin-block: 0; max-width: 3in; }
+.study-figures img { width: 100%; height: auto; }
