@@ -68,6 +68,7 @@ Lazily resolve a supported public direct-kernel entry point.
 - `particula.gpu.kernels.ion_condensation`
 - `particula.gpu.kernels.ion_source`
 - `particula.gpu.kernels.nucleation`
+- `particula.gpu.kernels.parcel`
 - `particula.gpu.kernels.slot_management`
 - `particula.gpu.kernels.thermodynamics`
 - `particula.gpu.kernels.wall_loss`

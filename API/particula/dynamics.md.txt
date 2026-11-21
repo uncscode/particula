@@ -40,6 +40,7 @@ helpers remain concrete-only.
 - `particula.dynamics.nucleation`
 - `particula.dynamics.optical_heating`
 - `particula.dynamics.optical_heating_gpu`
+- `particula.dynamics.parcel`
 - `particula.dynamics.particle_process`
 - `particula.dynamics.properties`
 - `particula.dynamics.wall_loss`
