@@ -125,12 +125,13 @@ def _absorbed_power(
 
 @wp.func
 def _temperature_root(balance: _Balance, absorbed: wp.float64) -> wp.float64:
-    _, lo_terms = _terms(_MIN, balance)
-    _, hi_terms = _terms(_MAX, balance)
-    if _sum4(lo_terms) > absorbed or _sum4(hi_terms) < absorbed:
-        return wp.float64(-1.0)
+    # Warp 1.19 can leave bounds uninitialized if passed as constants.
     low = wp.float64(_MIN)
     high = wp.float64(_MAX)
+    _, lo_terms = _terms(low, balance)
+    _, hi_terms = _terms(high, balance)
+    if _sum4(lo_terms) > absorbed or _sum4(hi_terms) < absorbed:
+        return wp.float64(-1.0)
     for _iteration in range(54):
         middle = (low + high) / _TWO
         _, terms = _terms(middle, balance)

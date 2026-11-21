@@ -170,10 +170,9 @@ def mie_cross_section_sums_jacobian(
         psi = next_psi
         previous_chi = chi
         chi = next_chi
-    finite_ext = wp.isfinite(ext)  # type: ignore[call-overload]
-    finite_sca = wp.isfinite(sca)  # type: ignore[call-overload]
-    if not finite_ext or not finite_sca:
-        status[case] = 3
-        return
+    for component in range(3):
+        if not wp.isfinite(ext[component]) or not wp.isfinite(sca[component]):
+            status[case] = 3
+            return
     extinction[case] = ext
     scattering[case] = sca

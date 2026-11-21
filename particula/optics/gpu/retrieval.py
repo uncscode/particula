@@ -46,9 +46,12 @@ def _water_ratio_grad(
         - rh
         - (water * curvature * exponent * _THIRD / (_ONE + water))
     )
-    wp.adjoint[kappa] += adj * rh / dw
-    wp.adjoint[rh] += adj * (kappa + water) / dw
-    wp.adjoint[bend] -= adj * water * curvature * temperature_term / dw
+    # Warp resolves adjoint inside custom gradients without a Python export.
+    wp.adjoint[kappa] += adj * rh / dw  # type: ignore[attr-defined]
+    wp.adjoint[rh] += adj * (kappa + water) / dw  # type: ignore[attr-defined]
+    wp.adjoint[bend] -= (  # type: ignore[attr-defined]
+        adj * water * curvature * temperature_term / dw
+    )
 
 
 @wp.func
