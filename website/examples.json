@@ -1349,5 +1349,58 @@
       "scripts/mt_hua_salts/plots.py"
     ],
     "full_canvas": true
+  },
+  "mixture-activity": {
+    "title": "Water activity of Mt. Hua ion mixtures",
+    "source": "docs/studies/literature/particle-water-uptake/mt-hua/mixture_activity.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 7200,
+    "inputs": [
+      "scripts/mt_hua_salts/mixture_activity.py",
+      "scripts/mt_hua_salts/activity_plots.py",
+      "scripts/mt_hua_salts/study.py",
+      "scripts/mt_hua_salts/web_inputs.py",
+      "docs/data/mt-hua-salts/matched.csv",
+      "docs/data/mt-hua-salts/aiomfac/batch-00.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-01.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-02.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-03.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-04.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-05.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-06.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-07.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-08.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-09.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-10.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-11.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-12.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-13.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-14.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-15.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-16.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-17.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-18.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-19.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-20.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-21.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-22.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-23.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-24.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-25.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-26.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-27.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/nacl-control.txt",
+      "docs/data/mt-hua-salts/aiomfac/batch-28.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-29.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-30.json.gz",
+      "docs/data/mt-hua-salts/aiomfac/batch-31.json.gz"
+    ],
+    "data_expression": "report",
+    "render_functions": [],
+    "plot_inputs": [
+      "scripts/mt_hua_salts/activity_plots.py"
+    ],
+    "full_canvas": true
   }
 }

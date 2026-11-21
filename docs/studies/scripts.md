@@ -110,6 +110,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Track a gas reaction through a chamber pulse](examples/custom-processes/native_gas_chemistry.py)
 - [Track removal in a rectangular chamber](examples/particle-processes/wall-loss/rectangular_wall_loss_strategy.py)
 - [Turn measurements into particle state](tutorials/building-an-aerosol/particles/particle_data.py)
+- [Water activity of Mt. Hua ion mixtures](literature/particle-water-uptake/mt-hua/mixture_activity.py)
 - [Water uptake and evaporation after a humidity pulse](benchmarks/bat-humidity-pulse/bat_humidity_pulse.py)
 - [Water uptake from a maintained vapor reservoir](tutorials/condensation/condensation_2_massbin.py)
 - [What survives a data transfer?](tutorials/building-an-aerosol/containers/data_containers.py)
