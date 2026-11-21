@@ -1,22 +1,55 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
-  <title id="title">The humid CLOUD ion reading exceeds the steady loss ceiling</title>
-  <desc id="desc">At 70% relative humidity and a nominal source of 2.64 ion pairs per cubic centimetre per second, the weakest shared loss rate gives an upper limit of 394 ions per cubic centimetre per polarity. The open point shows the measured 1,768, with its scatter bar from 1,579 to 1,956. Both are on the same linear scale from zero.</desc>
-  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
-  <g font-family="sans-serif" fill="#243e43">
-    <path d="M40 14C36 25 23 36 23 46a17 17 0 0034 0c0-10-13-23-17-32Z" fill="#135963"/>
-    <path d="M30 47h8m-4-4v8m7-9h8" fill="none" stroke="#fbf2e3" stroke-width="2.4" stroke-linecap="round"/>
-    <text x="68" y="40" font-size="23" font-weight="bold">70% RH</text>
+  <title id="title">Ion concentrations diverge in humid air</title>
+  <desc id="desc">A narrow particle beam enters from the right, creating positive and negative ions in the chamber air. The vertical axis increases upward in ions per cubic centimetre per polarity. The horizontal axis runs from dry on the left to humid on the right. Both traces start at the dry condition. Inside a droplet representing higher humidity, the open circle for the CLOUD measurement rises farther than the diamond for the Particula prediction. The connecting strokes show the comparison between conditions.</desc>
+  <defs>
+    <path id="drop" d="M181 23 C163 62 96 119 90 174 C84 230 123 268 177 269 C232 270 271 230 269 178 C267 128 209 67 181 23Z"/>
+    <clipPath id="humid"><use href="#drop"/></clipPath>
+    <linearGradient id="beam" gradientUnits="userSpaceOnUse" x1="120" y1="0" x2="264" y2="0">
+      <stop stop-color="#d4d8ff" stop-opacity="0"/>
+      <stop offset=".42" stop-color="#d4d8ff" stop-opacity=".75"/>
+      <stop offset="1" stop-color="#dde1ff"/>
+    </linearGradient>
+    <path id="observed" d="M34 215 L211 109"/>
+    <path id="modeled" d="M34 215 L211 162"/>
+  </defs>
+  <rect width="300" height="300" rx="16" fill="#f7f2e7"/>
+  <!-- Qualitative axes: the two traces compare dry and humid endpoints. -->
+  <g fill="none" stroke="#53656a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M34 195V89m-4 6 4-6 4 6"/>
+    <path d="M57 282H175m-6-4 6 4-6 4"/>
   </g>
-  <!-- Linear vertical scale, zero at 250 and 0.09 SVG units per ion/cm³. -->
-  <rect x="31" y="214.54" width="242" height="35.46" fill="#cad9d2"/>
-  <path d="M31 214.54H273" stroke="#135963" stroke-width="3.5" stroke-dasharray="9 4"/>
-  <path d="M31 250H273" stroke="#617679" stroke-width="1.6"/>
-  <g fill="none" stroke="#243e43" stroke-width="3.2">
-    <path d="M108 73.96v33.93m-8-33.93h16m-16 33.93h16"/>
-    <circle cx="108" cy="90.88" r="7" fill="#fbf2e3"/>
+  <g font-family="sans-serif" font-size="17" font-weight="600" fill="#344d58">
+    <text transform="translate(25 146) rotate(-90)" text-anchor="middle">ions/cm³</text>
+    <text x="34" y="287" text-anchor="middle">Dry</text>
+    <text x="211" y="287" text-anchor="middle">Humid</text>
   </g>
-  <g font-family="sans-serif">
-    <text x="131" y="110" fill="#243e43" font-size="16">Measured</text>
-    <text x="40" y="204" fill="#135963" font-size="18" font-weight="bold">Model ceiling</text>
+  <use href="#drop" fill="#114d5a"/>
+  <!-- Beam port and one symbolic ion pair, below the concentration traces. -->
+  <path d="M120 219 H265" fill="none" stroke="url(#beam)" stroke-width="4"/>
+  <g fill="#62747d" stroke="#344d58" stroke-width="2" stroke-linejoin="round">
+    <path d="M264 214 H284 V224 H264 Z"/>
+    <rect x="260" y="209" width="6" height="20" rx="1.5"/>
+  </g>
+  <g fill="#c7dce3">
+    <circle cx="160" cy="203" r="12"/>
+    <circle cx="182" cy="237" r="12"/>
+  </g>
+  <path d="M154 203h12 M160 197v12 M176 237h12" fill="none"
+        stroke="#163e46" stroke-width="3.5" stroke-linecap="round"/>
+  <g fill="none" stroke-linecap="round" stroke-width="6">
+    <use href="#observed" stroke="#163e46"/>
+    <use href="#modeled" stroke="#a84625" stroke-dasharray="11 8"/>
+    <g clip-path="url(#humid)">
+      <use href="#observed" stroke="#fff6df"/>
+      <use href="#modeled" stroke="#ffaf71" stroke-dasharray="11 8"/>
+    </g>
+  </g>
+  <circle cx="34" cy="215" r="7.5" fill="#f7f2e7" stroke="#163e46" stroke-width="4.5"/>
+  <circle cx="211" cy="109" r="11" fill="#114d5a" stroke="#fff6df" stroke-width="6"/>
+  <path d="M211 150 L223 162 L211 174 L199 162Z" fill="#ffaf71"/>
+  <g font-family="sans-serif" font-size="17" font-weight="600">
+    <text x="184" y="91" text-anchor="middle" fill="#fff6df">CLOUD</text>
+    <text x="210" y="194" text-anchor="middle" fill="#ffcfac">Particula</text>
+    <text x="292" y="249" text-anchor="end" fill="#344d58">Beam</text>
   </g>
 </svg>

@@ -7,7 +7,7 @@ Follow comparisons with published measurements, reference calculations and datas
 [![Schematic eddies bring cloud droplets together above two bars. For drops of exactly twice the starting radius, size-dependent shear gives about six times the count from a constant rate fitted to the same mean mass.](../../images/shear-drop-spectrum/graphical-abstract.svg)\
 Fitting mean drop mass with a constant collision rate leaves a sixfold shortfall in counts at twice the starting radius](shear-drop-spectrum/index.md)
 
-[![At low ion production and 70% humidity, the wall-loss ceiling of 394 ions per cm³ per polarity lies well below the measured concentration of 1,768 and its scatter bar of 1,579–1,956.](../../images/cloud-ion-humidity/graphical-abstract.svg)\
+[![A beam produces positive and negative ions. At high ion production, CLOUD measured a larger rise in ion concentration from 7% to 70% relative humidity than Particula predicted.](../../images/cloud-ion-humidity/graphical-abstract.svg)\
 At low ion production, CLOUD’s 70% humidity measurement exceeds the ceiling set by the reported wall loss](cloud-ion-humidity/index.md)
 
 [![A small, positively charged tracer follows a dotted path toward a larger neutral NaCl cube. Polarization increases modeled capture by 35% for the 4 nm tracer and 100 nm collector pair and by 0.064% for the chamber scan.](../../images/nacl-scavenging/graphical-abstract.svg)\
