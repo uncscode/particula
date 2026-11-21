@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img">
+<title>Inorganic salt growth at Mt. Hua</title><desc>Schematic paired droplets above a mountain ridge. The salt reconstruction produces a larger wet particle than measured for most extracts.</desc>
+<rect width="300" height="300" fill="#f4f6ed"/>
+<path d="M0 260 57 201 87 221 161 124 189 175 208 157 300 246V300H0Z" fill="#9cb5a6"/>
+<path d="m0 278 71-62 37 29 57-53 42 37 37-21 56 42v50H0Z" fill="#42645e"/>
+<circle cx="82" cy="98" r="32" fill="#783b63"/><circle cx="209" cy="98" r="55" fill="none" stroke="#12676b" stroke-width="6"/>
+<circle cx="209" cy="98" r="36" fill="#12676b"/>
+<g fill="#203c39" font-family="sans-serif" font-size="17" text-anchor="middle"><text x="82" y="33">Measured</text><text x="209" y="33">Salt model</text></g></svg>

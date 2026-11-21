@@ -1331,5 +1331,23 @@
       "scripts/cloud_ion_humidity/plots.py"
     ],
     "full_canvas": true
+  },
+  "mt-hua-salts": {
+    "title": "Compare neutral salt pairings with Mt. Hua growth measurements",
+    "source": "docs/studies/literature/particle-water-uptake/mt-hua/mt_hua_salts.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 300,
+    "inputs": [
+      "scripts/mt_hua_salts/study.py",
+      "scripts/mt_hua_salts/plots.py",
+      "docs/data/mt-hua-salts/matched.csv"
+    ],
+    "data_expression": "report",
+    "render_functions": [],
+    "plot_inputs": [
+      "scripts/mt_hua_salts/plots.py"
+    ],
+    "full_canvas": true
   }
 }
