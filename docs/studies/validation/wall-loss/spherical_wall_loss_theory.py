@@ -1,5 +1,5 @@
 # %% [markdown]
-# # Does CUDA wall loss reproduce spherical deposition theory?
+# # CUDA reproduces coupled spherical wall loss within sampling uncertainty
 #
 # **Yes, for the tested conditions:** Particula's CUDA particle-removal
 # simulation agrees with the theoretical survival prediction within sampling
@@ -353,7 +353,9 @@ if __name__ == "__main__":
     plt.show()
 
 # %% [markdown]
-# ## Agreement with theory is established; agreement with measurements is open
+# <a id="agreement-with-theory-is-established-agreement-with-measurements-is-open"></a>
+#
+# ## The theory comparison leaves measured chamber decay as the next test
 #
 # The original 580-box study agreed with theory in all 36 ensemble comparisons.
 # At 1 µm and kₑ=3.6 s⁻¹, CUDA and theory differed by 0.132 percentage points,

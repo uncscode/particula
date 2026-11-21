@@ -1,8 +1,14 @@
-# Reproducing the size-resolved CCN retrieval study
+# A cloud activation fit predicts 49% more water than BAT at 95% humidity for one organic
+
+![Equal dry organic cores have different water shells at 95% relative humidity. The bars compare condensed water volume: the activation-fitted κ model holds about half again as much water as BAT.](../../../../images/ccn-kappa-retrieval/graphical-abstract.svg)
+
+For one modeled organic, a hygroscopicity parameter (κ) fitted to cloud activation at 100 nm reproduces BAT’s critical supersaturation across the other 50–200 nm sizes with 0.43% relative RMS error. At 95% relative humidity, that same fit predicts a 137.6 nm wet diameter for a 100 nm dry particle, against 127.7 nm from BAT. Subtracting the dry core gives **48.5% more condensed water by volume**. Both estimates assume fixed organic mass. [Water uptake at three humidities](https://github.com/uncscode/particula/blob/main/docs/data/thermodynamics/ccn-retrieval/bat-kappa-growth.csv)
 
 The [experiment guide](../../../../guide/processes/ccn-retrieval.md) uses synthetic counts to connect a CCN instrument's optical threshold to the critical supersaturation in a κ-Köhler inversion. Every result here is conditional on the initial aerosol and imposed exposure. The [CPU example](ccn_kappa_retrieval.py) reproduces the equilibrium fit independently of the kinetic scans.
 
-## From dry particles to counted droplets
+<a id="from-dry-particles-to-counted-droplets"></a>
+
+## An optical counter sees only droplets that reach its size threshold
 
 We used 298.15 K, 101325 Pa, water density 1000 kg/m³, constant surface tension 0.072 N/m and unit accommodation. Spherical particles start at 95% RH. At time zero the water saturation ratio steps to a constant value. Diffusion of water vapor and removal of latent heat limit growth. For each dry size we calculate both the critical wet diameter and the time to reach the 1 µm optical gate. Number weighting over a lognormal dry distribution then gives the fraction counted. Each supersaturation setting starts with a fresh population. A physical counter's axial vapor history and optical efficiency would require independent characterization. [CCN growth model context](https://doi.org/10.5194/acp-12-4227-2012)
 
@@ -10,13 +16,17 @@ The laboratory planner varies median diameter from 10 to 200 nm with geometric s
 
 ![Five-second ambient counts for individually composed particles, homogenized size bands and shortcut κ. A second panel shows the count differences.](../../../../images/thermodynamics/ccn-retrieval/ambient-cuda-reference.png)
 
-## Holding the organic mass fixed or allowing exchange
+<a id="holding-the-organic-mass-fixed-or-allowing-exchange"></a>
+
+## Organic vapor exchange changes the mass available for growth
 
 For a separate fully miscible binary organic–water liquid, direct BAT gives water and organic activities. The reference organic has molar mass 200 g/mol, O:C of 0.50 and density 1243.49 kg/m³. The ideal control uses mole fractions. Each species has its own Kelvin term. Condensed volumes are additive. For the exchange cases we assumed organic diffusivity of 6 × 10⁻⁶ m²/s and a flat-surface saturation concentration of 10 µg/m³. The imposed gas concentrations are sensitivity inputs. The four-component ambient calculation above uses volume-mixed κ and addresses a different population. [BAT model and Figure 9 reference organic](https://doi.org/10.5194/acp-19-13383-2019)
 
 The open-reservoir CUDA scan covers 48 median sizes, two widths, 53 water supersaturations, four exposure times and three organic treatments per activity model (fixed mass or gas maintained at 10 or 30 µg/m³). Its 6–550 nm dry-size grid resolves the transmitted distribution tails. Pure-organic particles evaporating below 2 nm wet diameter leave the calculation, with no subsequent nucleation. The omitted initial number tail is about 0.26% at a 10 nm median and GSD 1.20. The finite-reservoir CPU calculation couples gas and particle organic mass during the exposure. Both calculations prescribe the water forcing.
 
-## How far does the fit transfer?
+<a id="how-far-does-the-fit-transfer"></a>
+
+## The activation fit transfers across sizes but overpredicts subsaturated water uptake
 
 We maximize the direct BAT equilibrium curve with organic mass held fixed at each of 191 integer dry diameters. The full local fit matches that maximum with Eq. 6. The analytical inversion uses Eq. 10 at the same maximum. The relative difference between the resulting κ values measures the shortcut's effect on the fitted parameter. We then compare predicted and BAT critical supersaturations at *withheld* sizes, giving each withheld diameter equal weight. [Petters and Kreidenweis (2007)](https://doi.org/10.5194/acp-7-1961-2007)
 

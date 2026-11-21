@@ -16,14 +16,32 @@ Particula predicts about 60% of the NaCl capture rate measured at 4 nm](nacl-sca
 [![Warm air passes a fed pentane drop. A short heat-supply bar and a three-times-longer heat-demand bar share the same baseline.](../../images/pendant-evaporation/graphical-abstract.svg)\
 Modeled convection supplies only a third of the heat needed for the reported pentane drop evaporation rate](evaporation-and-uptake/pendant-drop/index.md)
 
+[![Equal dry organic cores have different water shells at 95% relative humidity. The bars compare condensed water volume: the activation-fitted κ model holds about half again as much water as BAT.](../../images/ccn-kappa-retrieval/graphical-abstract.svg)\
+A cloud activation fit predicts 49% more water than BAT at 95% humidity for one organic](particle-water-uptake/ccn-retrieval/index.md)
+
+[![Identical spherical chambers start with equal numbers of 1 µm particles. After an hour, coupled theory retains about 68% and the additive approximation retains about 58%. Starting from 50 in each chamber, 34 versus 29 dots remain after rounding. The extra row of five makes the difference visible; the dots are a tally.](../../images/spherical-wall-loss/graphical-abstract.svg)\
+Adding settling and diffusion losses predicts too few airborne particles in a spherical chamber](../validation/wall-loss/index.md)
+
+[![On an expanded diameter ruler, the 100.7 nm polystyrene latex standard lies to the left of the roughly 102 nm inferred from the two near-atmospheric mobility observations using the paper’s gas properties.](../../images/dry-psl-mobility/graphical-abstract.svg)\
+Particula sizes a 100.7 nm PSL standard at about 102 nm near atmospheric pressure](dry-psl-mobility/index.md)
+
+[![Water activity declines as citric acid mass fraction rises. The BAT line and AIOMFAC ticks sit close together and above all 12 measured points. The largest separation from the measurements occurs toward concentrated acid.](../../images/citric-acid-activity/graphical-abstract.svg)\
+BAT and AIOMFAC both overpredict water activity at all 12 measured citric acid concentrations](particle-water-uptake/citric-acid/index.md)
+
+[![Measured and BAT activation hygroscopicity share one scale. For pinic acid the BAT diamond is below the measured circle; for phthalic acid it is above. These opposite errors contribute to a small average bias.](../../images/bat-ccn/graphical-abstract.svg)\
+BAT puts pinic acid’s activation hygroscopicity too low and phthalic acid’s too high](particle-water-uptake/bat-ccn.md)
+
+[![Change in organic mass per sulfate after dilution: the chamber measurement and growth-calibrated fit fall below their starting values. The reversible-pool model and its imidazole-producing variant (IC) both rise.](../../images/glyoxal-chamber/graphical-abstract.svg)\
+After glyoxal dilution, two models predict rising organic mass per sulfate as measurements fall](https://uncscode.github.io/particula/studies/literature/evaporation-and-uptake/glyoxal_chamber/)
+
 </div>
 
 <!-- STUDY_LIST_START -->
-- [Dry PSL mobility sizing against 49 measured slip factors](dry-psl-mobility/index.md)
 - [Evaporation and reactive uptake](evaporation-and-uptake/index.md)
 - [Particle water uptake and activation](particle-water-uptake/index.md)
 - [Particula predicts about 60% of the NaCl capture rate measured at 4 nm](nacl-scavenging/index.md)
 - [Particula predicts half the rise in ion concentration CLOUD measured from 7% to 70% humidity](cloud-ion-humidity/index.md)
+- [Particula sizes a 100.7 nm PSL standard at about 102 nm near atmospheric pressure](dry-psl-mobility/index.md)
 - [Π Chamber experiments and modeling](pi-chamber/index.md)
-- [CUDA wall loss agrees with spherical deposition theory](../validation/wall-loss/index.md)
+- [Adding settling and diffusion losses predicts too few airborne particles in a spherical chamber](../validation/wall-loss/index.md)
 <!-- STUDY_LIST_END -->

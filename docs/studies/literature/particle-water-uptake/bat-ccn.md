@@ -1,8 +1,14 @@
-# Cloud activation in the BAT publication
+# BAT puts pinic acid’s activation hygroscopicity too low and phthalic acid’s too high
+
+![Measured and BAT activation hygroscopicity share one scale. For pinic acid the BAT diamond is below the measured circle; for phthalic acid it is above. These opposite errors contribute to a small average bias.](../../../images/bat-ccn/graphical-abstract.svg)
+
+Across 30 published organic aerosol records, BAT’s average error in activation hygroscopicity (κ) is only −0.009. For pinic acid, BAT gives **0.114** against **0.248** measured. For phthalic acid, BAT gives **0.155** against **0.051** measured. The figure shows both pairs on the same κ scale.
 
 Gorkowski, Preston and Zuend (2019) report the hygroscopicity parameter for cloud condensation nucleus activation (κCCN). Two extracts answer different questions. Figure 12 compares measured and modeled κ for individual organic aerosols. Figure 9 holds organic molar mass and dry diameter fixed and varies the organic O:C ratio in the model. [Paper, sections 5–6 and Figures 9 and 12](https://doi.org/10.5194/acp-19-13383-2019)
 
-## Figure 12 measurements
+<a id="figure-12-measurements"></a>
+
+## A small mean bias hides opposite errors for two organic acids
 
 [The measurement table](https://github.com/Gorkowski/particula/blob/0accbb62575869858c20446a33f174275ed94813/docs/data/thermodynamics/bat-ccn/figure12-measurements.csv) contains all 30 rows from the publisher workbook sheet `Fig12 TableS6`, cells A2:P31. The CSV retains all source columns, including the original study citations, duplicate chemical names, authors’ validation flags, available AIOMFAC results and asymmetric experimental errors. Column names have been normalized and surrounding whitespace removed. Blank cells represent missing entries. Both error magnitudes are available for 18 records. The printed table rounds values, so use the workbook for numerical reproduction. [Publisher supplement, CC BY 4.0](https://acp.copernicus.org/articles/19/13383/2019/acp-19-13383-2019-supplement.zip)
 
@@ -15,13 +21,17 @@ Pinic acid has the largest absolute discrepancy (BAT 0.1141, measured 0.2480). F
 
 ![Published BAT and measured CCN hygroscopicities. Horizontal bars show reported measurement errors where available.](../../../images/thermodynamics/bat-ccn-figure12.png)
 
-## Figure 9 modeled activation
+<a id="figure-9-modeled-activation"></a>
+
+## Reducing the oxygen-to-carbon ratio raises the modeled activation threshold
 
 [The activation table](https://github.com/Gorkowski/particula/blob/0accbb62575869858c20446a33f174275ed94813/docs/data/thermodynamics/bat-ccn/figure9-activation.csv) contains the stored critical saturation ratio, wet diameter and κ for three generic 200 g/mol organics at 100 nm dry diameter. For the primary solutions, reducing O:C from 0.50 to 0.25 to zero raises critical supersaturation from 0.3533% to 0.3858% to 0.5157%; critical wet diameter falls from 404 to 364 to 192 nm. These results describe equilibrium Köhler curves. They do not supply kinetic activation times.
 
 The table also retains the authors’ two alternate β-branch extrema. The O:C 0.25 alternate has saturation ratio 0.999016 (below saturation) and must be distinguished from the primary CCN activation threshold. For traceability, temperature is the archived 293 K. The caption specifies 298.15 K. The conversion from saturation ratio to percent supersaturation is 100(S − 1). Diameters are converted from meters to nanometers. [Authors’ pinned figure archive](https://github.com/Gorkowski/Binary_Activity_Thermodynamics_Model/tree/6e0d5a4d1a9af4571358f0539682cbc0cc1e0257/Matlab_source_code/paper_figures/SI_figures) · [Archive license](https://github.com/Gorkowski/particula/blob/0accbb62575869858c20446a33f174275ed94813/docs/data/thermodynamics/bat-ccn/LICENSE-figure9.txt)
 
-## Reproduce
+<a id="reproduce"></a>
+
+## Reproduce the comparison from the published tables
 
 Run `python scripts/bat_ccn/compare.py` from the repository root with NumPy and Matplotlib installed to regenerate the chart and metrics directly from the CSV. For a fresh extraction, download the publisher ZIP and the three MATLAB files named `DATA for figure kappaCCN {mid,lower,zero} O2C.mat` from the linked archive. Keep their filenames and pass their directory as the second argument:
 

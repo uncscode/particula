@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">A cloud activation fit predicts 49% more water than BAT at 95% humidity for one organic</title>
+  <desc id="desc">Equal dry organic cores have different water shells at 95% relative humidity. The bars compare condensed water volume: the activation-fitted κ model holds about half again as much water as BAT.</desc>
+  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
+  <g font-family="sans-serif" font-weight="600">
+    <text x="150" y="42" font-size="24" text-anchor="middle" fill="#233e41">Water uptake</text>
+    <circle cx="78.00" cy="120.00" r="53.62" fill="#badbdf" stroke="#135963" stroke-width="3"/>
+    <circle cx="78.00" cy="120.00" r="42.00" fill="#d4c5a3" stroke="#233e41" stroke-width="2.5"/>
+    <text x="78" y="207" font-size="21" text-anchor="middle" fill="#233e41">BAT</text>
+    <circle cx="222.00" cy="120.00" r="57.79" fill="#badbdf" stroke="#135963" stroke-width="3"/>
+    <circle cx="222.00" cy="120.00" r="42.00" fill="#d4c5a3" stroke="#233e41" stroke-width="2.5"/>
+    <text x="222" y="207" font-size="21" text-anchor="middle" fill="#233e41">Fitted κ</text>
+    <line x1="42.00" y1="230.00" x2="114.00" y2="230.00" stroke="#135963" stroke-width="12" />
+    <line x1="168.53" y1="230.00" x2="275.47" y2="230.00" stroke="#135963" stroke-width="12" />
+  </g>
+</svg>

@@ -1,6 +1,12 @@
-# Citric acid droplet hygroscopicity
+# BAT and AIOMFAC both overpredict water activity at all 12 measured citric acid concentrations
 
-## Comparison specification
+![Water activity declines as citric acid mass fraction rises. The BAT line and AIOMFAC ticks sit close together and above all 12 measured points. The largest separation from the measurements occurs toward concentrated acid.](../../../../images/citric-acid-activity/graphical-abstract.svg)
+
+For aqueous citric acid at 293.15 K, BAT and AIOMFAC predict almost the same water activity. Both sit above all 12 measurements by Marsh et al. At the most concentrated measured composition, the experiment gives **0.539**, BAT **0.645**, and AIOMFAC **0.647**. The two models agree much more closely with each other than with the droplet measurement at that composition.
+
+<a id="comparison-specification"></a>
+
+## Twelve measurements constrain water activity at known compositions
 
 Use all 12 measured points for aqueous citric acid at 293.15 K in Marsh et al. (2017), Figure S9.1 and Table S9.2. The authors report water activity, positive and negative activity errors, solute mass fraction (MFS) and MFS error. The plotted UNIFAC curve is a model prediction. Retain the measured points and their published error columns. [Primary paper](https://doi.org/10.5194/acp-17-5583-2017) · [Supplement, p. 11](https://acp.copernicus.org/articles/17/5583/2017/acp-17-5583-2017-supplement.pdf) · [Data archive](https://doi.org/10.5523/bris.3eoilb28zwoqr2jifjxj7cntex)
 
@@ -10,7 +16,9 @@ Freeze the primary model inputs at the values used for the published citric acid
 
 As a kinetic cross-check, hold dry citric acid mass fixed and let water exchange with a prescribed vapor reservoir until the flux vanishes. For bulk activity comparisons take the flat-surface limit. Use distinct initial water contents and refine solver and final-time settings until the recovered activity varies by less than 0.0001. Report water exchange with the reservoir and any remaining mismatch to the standalone root. These data quantify hygroscopicity, so do not infer relaxation times from Figure S9.1.
 
-## Direct activity comparison
+<a id="direct-activity-comparison"></a>
+
+## BAT lies outside every measured uncertainty interval
 
 Using all 12 Table S9.2 rows in the downloadable study bundle, the signed bias (predicted minus measured) was +0.05096 in water activity, RMS error 0.06160, and maximum absolute error 0.10645. None of the 12 predicted intervals overlapped the corresponding measured interval under the two-axis rule above. Using the measured melt-density estimate increased the RMS error to 0.06727. An inverse composition root reproduced the prescribed activities to within 1.5 × 10⁻¹³ for both densities.
 
@@ -45,7 +53,9 @@ A maintainer-side clean installation of revision `01755e91ce` reproduced the two
 
 To rebuild the saved figure and data in the documentation development environment, run `python scripts/docs_examples.py refresh citric-acid-hygroscopicity`. The downloadable example includes the measurement CSV.
 
-## AIOMFAC binary curve
+<a id="aiomfac-binary-curve"></a>
+
+## AIOMFAC closely follows BAT across the measured compositions
 
 McGill's AIOMFAC-web 3.15 evaluated a single liquid phase at 293.15 K with water and predefined neutral Citric_acid (component 505). Select mass fractions and enter the temperature and citric acid mass fraction from each row of the [52-point curve](https://github.com/Gorkowski/particula/blob/codex/stage-03b-scientific-comparisons/docs/data/thermodynamics/aiomfac-web315-citric-acid.csv). The grid spans 0 to 0.975 in steps of 0.025 and includes the 12 exact experimental compositions. The output water activity is the water mole-fraction activity `a_x(01)`. All component flags were zero. [McGill calculator](https://aiomfac.lab.mcgill.ca/model.html) · [AIOMFAC parameterization](https://doi.org/10.5194/acp-11-9155-2011)
 
@@ -60,6 +70,8 @@ Both models overpredict particle-phase water activity at all 12 central composit
 Data attribution: Marsh et al. (2017), Table S9.2 in the article supplement, reproduced under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) with column headings normalized to machine-readable names. Numeric values are as published.
 
 
-## Handoff
+<a id="handoff"></a>
+
+## Independent composition data could test a revised fit
 
 The quantitative observable for a future inference study is water activity at a measured citric acid mass fraction and 293.15 K. The present comparison fitted no parameters. A future fit would require a separate validation dataset. The two-species humidity pulse in Stage 3A supplies a matched CPU/CUDA forward configuration for Stage 4. This 12-point study establishes experimental residuals and makes no speedup claim.
