@@ -19,7 +19,7 @@ Modeled convection supplies only a third of the heat needed for the reported pen
 [![Equal dry organic cores have different water shells at 95% relative humidity. The bars compare condensed water volume: the activation-fitted κ model holds about half again as much water as BAT.](../../images/ccn-kappa-retrieval/graphical-abstract.svg)\
 A cloud activation fit predicts 49% more water than BAT at 95% humidity for one organic](particle-water-uptake/ccn-retrieval/index.md)
 
-[![Identical spherical chambers start with equal numbers of 1 µm particles. After an hour, coupled theory retains about 68% and the additive approximation retains about 58%. Starting from 50 in each chamber, 34 versus 29 dots remain after rounding. The extra row of five makes the difference visible; the dots are a tally.](../../images/spherical-wall-loss/graphical-abstract.svg)\
+[![Two equal spherical chambers show a fuller airborne particle cloud for coupled wall loss and a sparser cloud for additive wall loss. The schematic exaggerates the density difference to show its direction.](../../images/spherical-wall-loss/graphical-abstract.svg)\
 Adding settling and diffusion losses predicts too few airborne particles in a spherical chamber](../validation/wall-loss/index.md)
 
 [![On an expanded diameter ruler, the 100.7 nm polystyrene latex standard lies to the left of the roughly 102 nm inferred from the two near-atmospheric mobility observations using the paper’s gas properties.](../../images/dry-psl-mobility/graphical-abstract.svg)\
