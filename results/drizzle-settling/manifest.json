@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 6.722002236172557,
+  "package_source_sha256": "6471e7faf0c8383cdb851f92580e6ca17478567c647efe39d4a80039e8a5424b",
+  "scientific_source_sha256": "24520438eb500d0b0a03e4b30a11f8a1c738ae12bb21267b4d0cf3d77ba2e4d5",
+  "input_sha256": {
+    "docs/data/drizzle-settling/reference.csv": "2c3b4c8b1c88de09c7daef71afb5c0e9ca0b7e3da5836004b365cd7d5895942d"
+  },
+  "example": "drizzle-settling",
+  "fingerprint": "c216bbc229a0e98db51426e8a81fd67be7466ff2cef8f2d361d06daed37fd7a8",
+  "source": "docs/studies/literature/drizzle-settling/drizzle_settling.py",
+  "revision": "75ea3a3aff85251f25ac2060593257124d7d95d9",
+  "package_dirty": false,
+  "executed_at": "2026-11-21T20:30:53.249638+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Particula sphere drag differs from the table by at most 4.18% at the 9 sizes from 0.20 to 1.00 mm.\nCUDA evaporation device: NVIDIA GeForce RTX 5060\n0.20 mm at 50% RH after 1 s: 0.1980 mm, assigned 0.711 m/s, 1.24% decrease (surface heat balance 1.45%).\n1.00 mm at 50% RH after 1 s: 0.9987 mm, assigned 4.025 m/s, 0.11% decrease (surface heat balance 0.13%).\nLargest time-step effect on assigned-speed decrease: 2.66e-05 percentage points.\n"
+      },
+      {
+        "image": "figure-7-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-7-1.png": "8900cf9915cd37c44db8349676b6602ebd0f39ba5bc2bbbe376311acec712de4",
+    "executed_source.py": "158c4ddd0113ef32ccf349a9b27ad6a72d30e613c3d29010ee201aee164e971a",
+    "data.json": "fe6c19749b6cdac6db9ae01b51e77f084d51724437f599e4760bebca9b4a6580",
+    "source.py": "158c4ddd0113ef32ccf349a9b27ad6a72d30e613c3d29010ee201aee164e971a"
+  },
+  "simulation_fingerprint": "c4111c5e97a345e40c9211b0a16aa3e24acbaf3f2f0030beac492c08b0588e05",
+  "render_versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {
+    "docs/data/drizzle-settling/reference.csv": "2c3b4c8b1c88de09c7daef71afb5c0e9ca0b7e3da5836004b365cd7d5895942d"
+  },
+  "rendered_at": "2026-11-21T20:30:58.295759+00:00",
+  "render_revision": "75ea3a3aff85251f25ac2060593257124d7d95d9",
+  "render_elapsed_seconds": 3.6217034820001572
+}
