@@ -34,9 +34,15 @@ error. Always refine tolerances and the outer split step for your own case.
 
 ## A coupled parcel on CUDA
 
-For the warm single-box parcel, pass `adaptive=ParcelRK23(rtol=1e-5)` to
-`run_parcel` with `device="cuda:0"`. Import both from
-`particula.dynamics.parcel`. The `timestep` argument gives the observation
+For the warm single-box parcel, pass `adaptive=ParcelROS3(rtol=1e-5)` or
+`adaptive=ParcelRK23(rtol=1e-5)` to `run_parcel` with `device="cuda:0"`.
+Import the runner and controls from `particula.dynamics.parcel`. ROS3 is a
+linearly implicit third-order Rosenbrock method with a second-order error
+estimate. It includes the changing ascent temperature in the time derivative
+and couples every droplet class through pressure and total water in each of
+its three linear solves. RK23 uses explicit stages with a droplet relaxation
+limit. Both methods control errors in pressure, class water, vapor and
+temperature. The `timestep` argument gives the observation
 spacing in seconds. Each interval can contain multiple accepted steps and
 retries. Read `result.statistics` for the accepted and rejected counts and
 the shortest and longest accepted steps. Use `evaluated_trials` to count
@@ -49,9 +55,10 @@ the updraft in two fresh adaptive runs to check how that local derivative
 compares with a controller that selects its steps again.
 
 The [adaptive moist parcel example](../../studies/examples/thermodynamics/adaptive_moist_parcel.py)
-compares CUDA RK23 at two tolerances against independent CPU Radau trajectories
-through cloud base. It records trial counts and checks the updraft sensitivity
-with finite differences that rerun the adaptive controller.
+compares CUDA runtimes for RK23 and ROS3 on two spectra through cloud base.
+It checks radii, peak supersaturation, activation and conservation against
+independent CPU Radau trajectories, and compares gradients to centered
+updraft perturbations that each select their own steps.
 
 ## Integrate continuous condensation
 

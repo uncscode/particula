@@ -66,16 +66,8 @@ class ParcelInitialState:
 
 
 @dataclass(frozen=True)
-class ParcelRK23:
-    """Adaptive Warp controls for the embedded Bogacki–Shampine 3(2) pair.
-
-    rtol controls pressure, each class's liquid volume, vapor and temperature.
-    The relative scales include floors of 1e-8 in normalized pressure and
-    liquid/dry class volume, and 1e-12 kg/kg dry air for vapor.
-    min_step is the smallest permitted retry in seconds. max_trials bounds
-    all evaluated trials, including unused speculative Warp trials. A linearized
-    droplet relaxation limit also protects sensitivities near equilibrium.
-    """
+class _ParcelAdaptiveControls:
+    """Shared local error tolerance and adaptive trial limits."""
 
     rtol: float = 1e-5
     min_step: float = 1e-9
@@ -93,6 +85,28 @@ class ParcelRK23:
             or self.max_trials < 1
         ):
             raise ValueError("parcel max_trials must be a positive integer")
+
+
+@dataclass(frozen=True)
+class ParcelRK23(_ParcelAdaptiveControls):
+    """Adaptive Warp controls for the embedded Bogacki–Shampine 3(2) pair.
+
+    rtol controls pressure, each class's liquid volume, vapor and temperature.
+    The relative scales include floors of 1e-8 in normalized pressure and
+    liquid/dry class volume, and 1e-12 kg/kg dry air for vapor.
+    min_step is the smallest permitted retry in seconds. max_trials bounds
+    all evaluated trials, including unused speculative Warp trials. A linearized
+    droplet relaxation limit also protects sensitivities near equilibrium.
+    """
+
+
+@dataclass(frozen=True)
+class ParcelROS3(_ParcelAdaptiveControls):
+    """Adaptive third-order Rosenbrock solver with a second-order estimator.
+
+    Uses the coupled parcel Jacobian and explicit time derivative at each
+    trial. rtol, min_step (s) and max_trials use the ParcelRK23 scales.
+    """
 
 
 @dataclass(frozen=True)
@@ -323,7 +337,7 @@ def run_parcel(
     device: str = "cpu",
     gradient: bool = False,
     phase_exchange: bool = True,
-    adaptive: ParcelRK23 | None = None,
+    adaptive: ParcelRK23 | ParcelROS3 | None = None,
 ) -> ParcelTrajectory:
     """Advance a single parcel under constant signed vertical velocity.
 
@@ -337,8 +351,9 @@ def run_parcel(
         gradient: Use Warp reverse mode for terminal liquid versus updraft.
         phase_exchange: Enable signed condensation and latent feedback.
             A passive run retains the initial equilibrium water on each class.
-        adaptive: Optional Warp RK23 controls. Internal steps end exactly at
-            output times. The gradient follows the accepted discrete schedule.
+        adaptive: Optional Warp RK23 or ROS3 controls. Internal steps end at
+            the requested output times. The gradient follows the accepted
+            discrete schedule.
 
     Returns:
         State histories and the requested Warp derivative.
@@ -365,11 +380,15 @@ def run_parcel(
     initial.number.setflags(write=False)
     wet = _initial_radii(initial)
     time = np.arange(steps + 1, dtype=np.float64) * timestep
-    if adaptive is not None and not isinstance(adaptive, ParcelRK23):
-        raise TypeError("adaptive must be ParcelRK23 or None")
+    if adaptive is not None and not isinstance(
+        adaptive, (ParcelRK23, ParcelROS3)
+    ):
+        raise TypeError("adaptive must be ParcelRK23, ParcelROS3 or None")
     if device == "cpu":
         if adaptive is not None:
-            raise ValueError("ParcelRK23 requires a Warp device")
+            raise ValueError(
+                f"{type(adaptive).__name__} requires a Warp device"
+            )
         if gradient:
             raise ValueError("the gradient requires a Warp device")
         result = _cpu_reference(initial, wet, time, updraft, phase_exchange)

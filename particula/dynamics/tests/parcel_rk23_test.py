@@ -1,4 +1,4 @@
-"""Independent physical, controller and derivative checks for parcel RK23."""
+"""Independent physical, controller and derivative checks for adaptive parcels."""
 
 from dataclasses import replace
 
@@ -10,6 +10,7 @@ from particula.dynamics.parcel import (
     RD,
     ParcelInitialState,
     ParcelRK23,
+    ParcelROS3,
     run_parcel,
 )
 
@@ -37,7 +38,8 @@ def parcel():
     )
 
 
-def test_adaptive_ascent_and_reverse(parcel, device):
+@pytest.mark.parametrize("method", [ParcelRK23, ParcelROS3])
+def test_adaptive_ascent_and_reverse(parcel, device, method):
     """Refinement and independently adapted perturbations at fixed time."""
     options = dict(timestep=0.5, steps=200)
 
@@ -48,7 +50,7 @@ def test_adaptive_ascent_and_reverse(parcel, device):
             device=device,
             **options,
             gradient=gradient,
-            adaptive=ParcelRK23(rtol=tolerance),
+            adaptive=method(rtol=tolerance),
         )
 
     ref = run_parcel(parcel, updraft=1.0, **options)
@@ -106,14 +108,15 @@ def test_adaptive_ascent_and_reverse(parcel, device):
         np.testing.assert_allclose(tight.updraft_gradient, fd, rtol=2e-5)
 
 
-def test_passive_dry_parcel_on_decimal_observation_grid(parcel, device):
+@pytest.mark.parametrize("method", [ParcelRK23, ParcelROS3])
+def test_passive_dry_parcel_on_decimal_observation_grid(parcel, device, method):
     """No derivative or artificial short tail on the dry, passive trajectory."""
     result = run_parcel(
         replace(parcel, vapor=0.0),
         timestep=0.1,
         steps=33,
         updraft=1.0,
-        adaptive=ParcelRK23(),
+        adaptive=method(),
         device=device,
         gradient=True,
         phase_exchange=False,
@@ -130,15 +133,19 @@ def test_passive_dry_parcel_on_decimal_observation_grid(parcel, device):
     assert result.updraft_gradient == 0.0
 
 
-def test_stationary_moist_parcel_sensitivity(parcel, device):
+@pytest.mark.parametrize("method", [ParcelRK23, ParcelROS3])
+def test_stationary_moist_parcel_sensitivity(parcel, device, method):
     """An equilibrated forward state still has a fast tangent relaxation."""
     cadence = dict(timestep=0.5, steps=4)
-    controls = dict(device=device, adaptive=ParcelRK23())
+    controls = dict(device=device, adaptive=method())
     rest = run_parcel(parcel, updraft=0.0, gradient=True, **cadence, **controls)
     np.testing.assert_allclose(
         rest.liquid, rest.liquid[0], rtol=2e-13, atol=0.0
     )
-    assert rest.statistics.maximum_step < cadence["timestep"]
+    if method is ParcelRK23:
+        assert rest.statistics.maximum_step < cadence["timestep"]
+    else:
+        assert rest.statistics.accepted_steps == cadence["steps"]
     delta = 0.001
     for backend in (controls, {"device": "cpu"}):
         plus = run_parcel(parcel, updraft=delta, **cadence, **backend)
@@ -150,12 +157,13 @@ def test_stationary_moist_parcel_sensitivity(parcel, device):
         )
 
 
-def test_trial_failures_are_bounded(parcel, device):
+@pytest.mark.parametrize("method", [ParcelRK23, ParcelROS3])
+def test_trial_failures_are_bounded(parcel, device, method):
     """An unusable step raises at the floor or cap without changing inputs."""
     initial = parcel.number.copy()
     for controls, message in [
-        (ParcelRK23(max_trials=1), "max_trials"),
-        (ParcelRK23(min_step=1.0), "tolerance"),
+        (method(max_trials=1), "max_trials"),
+        (method(min_step=1.0, rtol=1e-12), "tolerance"),
     ]:
         with pytest.raises(ValueError, match=message):
             run_parcel(
@@ -173,7 +181,7 @@ def test_trial_failures_are_bounded(parcel, device):
         steps=12,
         updraft=-1.0,
         device=device,
-        adaptive=ParcelRK23(),
+        adaptive=method(),
     )
     assert descending.liquid[-1] < descending.liquid[0]
     assert descending.vapor[-1] > descending.vapor[0]
@@ -250,4 +258,54 @@ def test_batched_trials_keep_the_serial_mesh(parcel, device, monkeypatch):
         )
     np.testing.assert_allclose(
         batched.updraft_gradient, serial.updraft_gradient, rtol=1e-13, atol=0.0
+    )
+
+
+def test_ros3_stage_solve_and_forcing_derivative(parcel, device):
+    """Compare a coupled ROS3 solve to a dense numerical rate Jacobian."""
+    from particula.dynamics.parcel import _initial_radii
+    from particula.execution._ros3_coefficients import GAMMA
+    from particula.gpu.kernels.parcel_ros3 import (
+        _back_substitute,
+        _ROS3Stepper,
+        _water_increment,
+    )
+
+    # Unequal loadings and a zero-count tracer exercise both directions of
+    # coupling. Move off equilibrium to include derivatives of resistance.
+    parcel = replace(parcel, number=np.array([2e9, 0.0, 5e8]))
+    backend = "cpu" if device == "warp:cpu" else device
+    stepper = _ROS3Stepper(
+        parcel, _initial_radii(parcel), 1.3, backend, False, True
+    )
+    y = stepper.initial_state.numpy() * np.array([0.998, 1.4, 0.6, 2.0])
+    t, h = 13.0, 0.09
+    stages = stepper.scratch()
+    state = stepper.array(y)
+    stepper.advance(state, t, h, stepper.empty(4), stages)
+
+    def rate(values, time):
+        result = stepper.empty(4)
+        stepper.rate(stepper.array(values), time, result, stepper.empty(1))
+        return result.numpy()
+
+    columns = []
+    for axis, value in enumerate(y):
+        shift = np.zeros_like(y)
+        shift[axis] = 2e-5 * value
+        columns.append(
+            (rate(y + shift, t) - rate(y - shift, t)) / (2 * shift[axis])
+        )
+    jacobian = np.column_stack(columns)
+    rhs = np.array([0.1, 2.0, 3.0, -0.8])
+    expected = np.linalg.solve(np.eye(4) / (float(GAMMA) * h) - jacobian, rhs)
+    factors = [stepper.array(rhs), stages.inverse, stages.dp, stages.dl]
+    sums = stepper.empty(2)
+    result = stepper.empty(4)
+    stepper.launch(_water_increment, 1, [*factors, stepper.weights], sums)
+    stepper.launch(_back_substitute, 4, [*factors, sums], result)
+    np.testing.assert_allclose(result.numpy(), expected, rtol=1e-6, atol=1e-12)
+    fd_time = (rate(y, t + 0.01) - rate(y, t - 0.01)) / 0.02
+    np.testing.assert_allclose(
+        stages.ft.numpy(), fd_time, rtol=2e-7, atol=1e-14
     )

@@ -1,9 +1,9 @@
-"""Adaptive, conservative warm-parcel RK3(2) on Warp CPU or CUDA.
+"""Shared adaptive warm-parcel integration and explicit RK3(2) stages.
 
 The independent coordinates are p/p0 and liquid volume / dry volume per
 class. At every stage total water and the parcel first law determine vapor
 and temperature. Only scalar trial errors cross to the host during integration.
-The accepted trajectory uses the same third-order tableau on replay.
+The accepted trajectory uses the selected third-order method on replay.
 """
 
 from dataclasses import dataclass
@@ -15,6 +15,7 @@ from particula.dynamics.parcel import (
     CP,
     LATENT,
     WATER_FACTOR,
+    ParcelROS3,
     ParcelStepStatistics,
     ParcelTrajectory,
 )
@@ -267,8 +268,8 @@ class _Stages:
     q3: FloatVector
 
 
-class _Stepper:
-    """Shared rates and RK stages for forward trials and accepted-step VJPs."""
+class _ParcelStepper:
+    """Shared physical rates and accepted-step reverse replay."""
 
     def __init__(self, initial, wet, speed, device, gradient, exchange):
         self.device = device
@@ -316,28 +317,11 @@ class _Stepper:
             derivative,
         )
 
-    def advance(self, state, t, h, out, work, *, reuse_first=False):
-        """Write third-order result, retaining distinct stage values for AD."""
-        k1, k2, k3 = work.k1, work.k2, work.k3
-        if not reuse_first:
-            self.rate(state, t, k1, work.q1)
-        self.launch(
-            stage, self.width, [state, k1, k1, k1, h, 0.5, 0.0, 0.0], work.s2
-        )
-        self.rate(work.s2, t + 0.5 * h, k2, work.q2)
-        self.launch(
-            stage, self.width, [state, k2, k2, k2, h, 0.75, 0.0, 0.0], work.s3
-        )
-        self.rate(work.s3, t + 0.75 * h, k3, work.q3)
-        self.launch(
-            stage, self.width, [state, k1, k2, k3, h, 2 / 9, 1 / 3, 4 / 9], out
-        )
+    def advance(self, state, t, h, out, work):
+        raise NotImplementedError
 
     def scratch(self, grad=False):
-        return _Stages(
-            *(self.empty(self.width, grad) for _ in range(5)),
-            *(self.empty(1, grad) for _ in range(3)),
-        )
+        raise NotImplementedError
 
     @staticmethod
     def record_step(checkpoints, accepted, start, t, h):
@@ -361,6 +345,31 @@ class _Stepper:
         return float(self.speed.grad.numpy()[0])
 
 
+class _RK23Stepper(_ParcelStepper):
+    def advance(self, state, t, h, out, work, *, reuse_first=False):
+        """Write third-order result, retaining distinct stage values for AD."""
+        k1, k2, k3 = work.k1, work.k2, work.k3
+        if not reuse_first:
+            self.rate(state, t, k1, work.q1)
+        self.launch(
+            stage, self.width, [state, k1, k1, k1, h, 0.5, 0.0, 0.0], work.s2
+        )
+        self.rate(work.s2, t + 0.5 * h, k2, work.q2)
+        self.launch(
+            stage, self.width, [state, k2, k2, k2, h, 0.75, 0.0, 0.0], work.s3
+        )
+        self.rate(work.s3, t + 0.75 * h, k3, work.q3)
+        self.launch(
+            stage, self.width, [state, k1, k2, k3, h, 2 / 9, 1 / 3, 4 / 9], out
+        )
+
+    def scratch(self, grad=False):
+        return _Stages(
+            *(self.empty(self.width, grad) for _ in range(5)),
+            *(self.empty(1, grad) for _ in range(3)),
+        )
+
+
 class _TrialBatch:
     """Stage speculative candidates in disjoint rows until the next decision."""
 
@@ -372,20 +381,16 @@ class _TrialBatch:
         self.capacity = _BATCH_CAPACITY
         self.states = [solver.empty(solver.width) for _ in range(self.capacity)]
         self.errors = solver.empty((self.capacity, 1))
-        self.rtol = solver.array(np.full(solver.width, tolerance))
-        self.atol = solver.array(np.full(solver.width, tolerance * 1e-8))
-        self.work = solver.scratch()
-        self.k4 = solver.empty(solver.width)
-        self.ql = solver.empty(1)
 
     def evaluate(self, initial, start, target, proposed, count):
         if count <= 0:
-            raise ValueError(f"parcel RK23 max_trials exhausted at {start:g} s")
-        solver, work = self.solver, self.work
+            raise ValueError(
+                f"adaptive parcel max_trials exhausted at {start:g} s"
+            )
         t, state = start, initial
         steps = []
         self.errors.zero_()
-        solver.rate(state, t, work.k1, work.q1)
+        self.start(state, t)
         for j in range(count):
             remaining = target - t
             # Snap a roundoff-sized remainder to the requested observation.
@@ -395,52 +400,96 @@ class _TrialBatch:
                 else proposed
             )
             if t + h <= t:
-                raise ValueError(f"parcel RK23 cannot advance time at {t:g} s")
+                raise ValueError(
+                    f"adaptive parcel cannot advance time at {t:g} s"
+                )
             out, error = self.states[j], self.errors[j]
-            solver.advance(state, t, h, out, work, reuse_first=True)
-            solver.rate(out, t + h, self.k4, self.ql)
-            rates = [work.k1, work.k2, work.k3, self.k4]
-            solver.launch(
-                error_norm,
-                solver.width,
-                [state, out, *rates, self.atol, self.rtol, h],
-                error,
-            )
-            solver.launch(
-                _reservoir_error,
-                1,
-                [
-                    state,
-                    solver.dry,
-                    solver.weights,
-                    *rates,
-                    work.q1,
-                    self.ql,
-                    solver.speed,
-                    solver.parcel,
-                    t,
-                    h,
-                    self.tolerance,
-                ],
-                error,
-            )
+            self.trial(state, t, h, out, error)
             steps.append(h)
             if h == remaining:
                 break
-            # The last slope of a trial is the first slope of its successor.
-            work.k1, self.k4 = self.k4, work.k1
-            work.q1, self.ql = self.ql, work.q1
+            self.reuse_endpoint()
             t, state = t + h, out
         return steps, self.errors.numpy()[: len(steps), 0]
+
+    def start(self, state, t):
+        """Prepare any reusable first-stage derivative."""
+
+    def trial(self, state, t, h, out, error):
+        raise NotImplementedError
+
+    def reuse_endpoint(self):
+        """Carry endpoint derivatives into the next candidate if available."""
+
+
+class _RK23Trials(_TrialBatch):
+    def __init__(self, solver, tolerance):
+        super().__init__(solver, tolerance)
+        self.rtol = solver.array(np.full(solver.width, tolerance))
+        self.atol = solver.array(np.full(solver.width, tolerance * 1e-8))
+        self.work = solver.scratch()
+        self.k4 = solver.empty(solver.width)
+        self.ql = solver.empty(1)
+
+    def start(self, state, t):
+        self.solver.rate(state, t, self.work.k1, self.work.q1)
+
+    def trial(self, state, t, h, out, error):
+        solver, work = self.solver, self.work
+        solver.advance(state, t, h, out, work, reuse_first=True)
+        solver.rate(out, t + h, self.k4, self.ql)
+        rates = [work.k1, work.k2, work.k3, self.k4]
+        solver.launch(
+            error_norm,
+            solver.width,
+            [state, out, *rates, self.atol, self.rtol, h],
+            error,
+        )
+        solver.launch(
+            _reservoir_error,
+            1,
+            [
+                state,
+                solver.dry,
+                solver.weights,
+                *rates,
+                work.q1,
+                self.ql,
+                solver.speed,
+                solver.parcel,
+                t,
+                h,
+                self.tolerance,
+            ],
+            error,
+        )
+
+    def reuse_endpoint(self):
+        work = self.work
+        # The last slope of a trial is the first slope of its successor.
+        work.k1, self.k4 = self.k4, work.k1
+        work.q1, self.ql = self.ql, work.q1
+
+
+def _adaptive_method(controls):
+    """Select the concrete Warp stepper and its error estimate."""
+    if isinstance(controls, ParcelROS3):
+        from particula.gpu.kernels.parcel_ros3 import _ROS3Stepper, _ROS3Trials
+
+        return _ROS3Stepper, _ROS3Trials
+    return _RK23Stepper, _RK23Trials
 
 
 def run_adaptive_parcel(
     initial, wet, time, updraft, device, gradient, phase_exchange, controls
 ):
     """Integrate to fixed observations with an embedded componentwise error."""
-    solver = _Stepper(initial, wet, updraft, device, gradient, phase_exchange)
+    solver_type, trial_type = _adaptive_method(controls)
+    solver = solver_type(
+        initial, wet, updraft, device, gradient, phase_exchange
+    )
     state = solver.initial_state
-    trials = _TrialBatch(solver, controls.rtol)
+    trials = trial_type(solver, controls.rtol)
     liquid = solver.empty(1)
     air = solver.empty((len(time), 7))
     radii = solver.empty((len(time), len(wet)))
@@ -463,7 +512,7 @@ def run_adaptive_parcel(
                     rejected += 1
                     if h <= controls.min_step:
                         raise ValueError(
-                            f"parcel RK23 cannot meet tolerance at {t:g} s"
+                            f"adaptive parcel cannot meet tolerance at {t:g} s"
                         )
                     proposed = max(controls.min_step, h / 2)
                     batch_size = 1
