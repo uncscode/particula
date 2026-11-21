@@ -2,6 +2,8 @@
 
 ![Measured cloud droplets per cm³ rise from fresh water to salt water (solid line, dense blue cluster). Separate haze fits predict a decline (dashed line, sparse outlined cluster).](../../../../images/pi-chamber/graphical-abstract.svg)
 
+Π Chamber emblem from the [Richter Lab’s chamber project](https://richterlab.nd.edu/research/cloud-physics-in-the-pi-chamber/).
+
 When Prabhakaran et al. switched from the fresh-water to the salt-water floor and raised the plate temperature difference, measured cloud number rose from **771 to 1,038 droplets/cm³**. Fitting interior humidity separately to the haze in each experiment brought both modeled haze counts within 5% of the observations, but cloud number fell from **734 to 462 droplets/cm³**. Cloud counts were held out of the fit.
 
 Both Michigan Tech Π Chamber experiments used nearly monodisperse 130 nm NaCl seeds at the same injection rate. The plate temperature difference was 6 K with fresh water and 7 K with salt water. The accompanying CUDA example follows the full size distribution from two initial states. [Experiment, Table 1 and Figure 2C](https://doi.org/10.1073/pnas.2006426117) · [Time-resolved example](pi_chamber_spectra.py)
