@@ -1,24 +1,15 @@
-# Particula CUDA wall loss agrees with the spherical deposition theory
+# Adding settling and diffusion losses predicts too few airborne particles in a spherical chamber
 
-**The main result is agreement between Particula's CUDA wall-loss simulation
-and the paper's theoretical prediction, not agreement with measurements.**
-At 1 µm and kₑ=3.6 s⁻¹, theory predicts 68.414% survival and CUDA gives
-68.546% ± 0.266 percentage points (95% Monte Carlo interval). The wall-loss
-removal kernels ran on the GPU; setup, step scheduling and analysis ran on CPU.
-The independent surface integral reused Particula's diffusion and settling
-properties, so this comparison does not independently validate those inputs.
+![Identical spherical chambers start with equal numbers of 1 µm particles. After an hour, coupled theory retains about 68% and the additive approximation retains about 58%. Starting from 50 in each chamber, 34 versus 29 dots remain after rounding. The extra row of five makes the difference visible; the dots are a tally.](../../../images/spherical-wall-loss/graphical-abstract.svg)
 
-Crump and Seinfeld derived how diffusion and settling jointly remove aerosol
-in a mixed vessel. This independent automated Particula analysis compares their
-spherical treatment with the sum of the two limiting loss rates. For neutral,
-fixed-size, water-density spheres in a 0.30 m radius chamber at 298.15 K and
-101325 Pa, with wall mixing coefficient 3.6 s⁻¹, the coupled model predicts
-68.414% survival after one hour; the additive approximation predicts 58.242%.
-That is **10.172 percentage points less survival**, or 14.87% below the coupled
-reference. A chamber analysis using the additive correction could therefore
+For 1 µm particles in the reference chamber, the additive approximation leaves **58.2%** airborne after one hour. Coupled spherical deposition theory leaves **68.4%**. Particula’s CUDA wall removal simulation gives **68.55% ± 0.27 percentage points** (95% Monte Carlo interval). This tests agreement with theory under shared diffusion and settling inputs. Independent chamber decay measurements would test the transport assumptions.
+
+Crump and Seinfeld derived how diffusion and settling jointly remove aerosol in a mixed vessel. The reference case uses neutral water-density spheres of fixed size, a chamber radius of 0.30 m, 298.15 K, 101325 Pa and a wall mixing coefficient of 3.6 s⁻¹. A chamber analysis using the additive correction could therefore
 assign too much disappearance to wall deposition under these assumptions.
 
-## The comparison tests a published coupling, not measured chamber decay
+<a id="the-comparison-tests-a-published-coupling-not-measured-chamber-decay"></a>
+
+## Diffusion and settling share a size-dependent wall loss rate
 
 The authors' [Eq. 13 and Eq. 17, PDF page 39](https://thesis.caltech.edu/3500/3/crump-jg_1983.pdf#page=39)
 provide the surface integral and its Debye-function form. For settling speed

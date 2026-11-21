@@ -2993,7 +2993,7 @@
     },
     {
       "source": "docs/studies/literature/particle-water-uptake/citric-acid/citric_acid_hygroscopicity.py",
-      "title": "Citric acid droplet hygroscopicity",
+      "title": "Equilibrated citric acid droplets reproduce BAT’s prediction above the measured water activity",
       "topic": "activity-nonideal",
       "also": [],
       "role": "Studies",
@@ -3409,7 +3409,7 @@
     },
     {
       "source": "docs/studies/literature/dry-psl-mobility/psl_mobility.py",
-      "title": "Diameter from measured PSL mobility",
+      "title": "Particula infers 102 nm from the mobility of a 100.7 nm PSL standard",
       "topic": "size",
       "also": [
         "transport"
@@ -3419,7 +3419,7 @@
     },
     {
       "source": "docs/studies/literature/dry-psl-mobility/index.md",
-      "title": "Dry PSL mobility sizing against 49 measured slip factors",
+      "title": "Particula sizes a 100.7 nm PSL standard at about 102 nm near atmospheric pressure",
       "topic": "size",
       "also": [
         "transport",
@@ -3458,7 +3458,7 @@
     },
     {
       "source": "docs/studies/literature/particle-water-uptake/ccn-retrieval/ccn_kappa_retrieval.py",
-      "title": "Fit hygroscopicity to an activation measurement",
+      "title": "A single activation fit tracks BAT thresholds from 50 to 200 nm for one organic",
       "topic": "activity-kappa",
       "also": [
         "activity-nonideal"
@@ -3468,7 +3468,7 @@
     },
     {
       "source": "docs/studies/literature/particle-water-uptake/ccn-retrieval/index.md",
-      "title": "Retrieving hygroscopicity from size-resolved CCN measurements",
+      "title": "A cloud activation fit predicts 49% more water than BAT at 95% humidity for one organic",
       "topic": "activity-kappa",
       "also": [
         "verification-scientific",
@@ -3837,7 +3837,7 @@
     },
     {
       "source": "docs/studies/literature/particle-water-uptake/citric-acid/index.md",
-      "title": "Citric acid droplet hygroscopicity",
+      "title": "BAT and AIOMFAC both overpredict water activity at all 12 measured citric acid concentrations",
       "topic": "activity-nonideal",
       "also": [
         "verification-scientific"
@@ -4092,7 +4092,7 @@
     },
     {
       "source": "docs/studies/literature/particle-water-uptake/bat-ccn.md",
-      "title": "Cloud activation in the BAT publication",
+      "title": "BAT puts pinic acid’s activation hygroscopicity too low and phthalic acid’s too high",
       "topic": "activity-kappa",
       "also": [
         "verification-scientific"
@@ -4214,7 +4214,7 @@
     },
     {
       "source": "docs/studies/validation/wall-loss/spherical_wall_loss_theory.py",
-      "title": "CUDA wall loss agrees with spherical deposition theory",
+      "title": "CUDA reproduces coupled spherical wall loss within sampling uncertainty",
       "topic": "losses-deposition",
       "also": [
         "verification"
@@ -4224,7 +4224,7 @@
     },
     {
       "source": "docs/studies/validation/wall-loss/index.md",
-      "title": "CUDA wall loss agrees with spherical deposition theory",
+      "title": "Adding settling and diffusion losses predicts too few airborne particles in a spherical chamber",
       "topic": "losses-deposition",
       "also": [
         "verification"
@@ -4593,7 +4593,7 @@
     },
     {
       "source": "docs/studies/literature/evaporation-and-uptake/glyoxal_chamber.py",
-      "title": "Glyoxal uptake and imidazole formation in wet aerosol",
+      "title": "After glyoxal dilution, two models predict rising organic mass per sulfate as measurements fall",
       "topic": "custom",
       "also": [
         "condensation"

@@ -1,5 +1,5 @@
 # %% [markdown]
-# # How accurately does BAT predict citric-acid droplet water activity?
+# # Equilibrated citric acid droplets reproduce BAT’s prediction above the measured water activity
 #
 # Marsh et al. inferred water activity and solute mass fraction for aqueous
 # citric acid droplets at 293.15 K. We compare all 12 points in their
@@ -257,7 +257,9 @@ def simulate():
 
 
 # %% [markdown]
-# ## Interpret the residual
+# <a id="interpret-the-residual"></a>
+#
+# ## Converged water exchange leaves the experimental discrepancy intact
 #
 # The left panel compares the observed and calculated activities. The right
 # panel subtracts the observed value at each composition. Vertical and

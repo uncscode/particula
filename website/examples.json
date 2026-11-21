@@ -1067,7 +1067,7 @@
     "full_canvas": true
   },
   "citric-acid-hygroscopicity": {
-    "title": "Citric acid droplet hygroscopicity",
+    "title": "Equilibrated citric acid droplets reproduce BAT’s prediction above the measured water activity",
     "source": "docs/studies/literature/particle-water-uptake/citric-acid/citric_acid_hygroscopicity.py",
     "policy": "cpu",
     "device": "cpu",
@@ -1085,7 +1085,7 @@
     "full_canvas": true
   },
   "ccn-kappa-retrieval": {
-    "title": "Fit hygroscopicity to an activation measurement",
+    "title": "A single activation fit tracks BAT thresholds from 50 to 200 nm for one organic",
     "source": "docs/studies/literature/particle-water-uptake/ccn-retrieval/ccn_kappa_retrieval.py",
     "policy": "cpu",
     "device": "cpu",
@@ -1101,7 +1101,7 @@
     "full_canvas": true
   },
   "psl-mobility": {
-    "title": "Dry PSL mobility sizing",
+    "title": "Particula infers 102 nm from the mobility of a 100.7 nm PSL standard",
     "source": "docs/studies/literature/dry-psl-mobility/psl_mobility.py",
     "policy": "cpu",
     "device": "cpu",
@@ -1170,7 +1170,7 @@
     "full_canvas": true
   },
   "spherical-wall-loss-theory": {
-    "title": "CUDA wall loss agrees with spherical deposition theory",
+    "title": "CUDA reproduces coupled spherical wall loss within sampling uncertainty",
     "source": "docs/studies/validation/wall-loss/spherical_wall_loss_theory.py",
     "policy": "cuda",
     "device": "cuda",
@@ -1292,7 +1292,7 @@
     "full_canvas": true
   },
   "glyoxal-chamber": {
-    "title": "Glyoxal uptake and imidazole formation in wet aerosol",
+    "title": "After glyoxal dilution, two models predict rising organic mass per sulfate as measurements fall",
     "source": "docs/studies/literature/evaporation-and-uptake/glyoxal_chamber.py",
     "policy": "cuda",
     "device": "cuda",

@@ -1,5 +1,5 @@
 # %% [markdown]
-# # A dry PSL standard checks the diameter assigned by a mobility analyzer
+# # Particula infers 102 nm from the mobility of a 100.7 nm PSL standard
 #
 # Kim et al. (2005) measured the electrical mobility of dry polystyrene
 # latex (PSL) spheres as they varied the air pressure. Here we reconstruct
@@ -158,7 +158,9 @@ def simulate():
 
 
 # %% [markdown]
-# ## Read the two panels at different levels
+# <a id="read-the-two-panels-at-different-levels"></a>
+#
+# ## The measurements test sizing and the synthetic scan tests calibration transfer
 #
 # Each point on the left compares one published observation with Particula.
 # On the right the calibration curve crosses zero by construction at 100 nm.

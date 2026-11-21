@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Adding settling and diffusion losses predicts too few airborne particles in a spherical chamber</title>
+  <desc id="desc">Identical spherical chambers start with equal numbers of 1 µm particles. After an hour, coupled theory retains about 68% and the additive approximation retains about 58%. Starting from 50 in each chamber, 34 versus 29 dots remain after rounding. The extra row of five makes the difference visible; the dots are a tally.</desc>
+  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
+  <g font-family="sans-serif" font-weight="600">
+    <text x="150" y="43" font-size="23" text-anchor="middle" fill="#233e41">Airborne after 1 h</text>
+    <!-- Equal symbols tally survivors out of 50. Rows indicate counts, not positions in the chamber. -->
+    <circle cx="80" cy="130" r="64" fill="#f4f5ed" stroke="#135963" stroke-width="4"/>
+    <g fill="#233e41">
+      <circle cx="52" cy="91" r="4.8"/>
+      <circle cx="66" cy="91" r="4.8"/>
+      <circle cx="80" cy="91" r="4.8"/>
+      <circle cx="94" cy="91" r="4.8"/>
+      <circle cx="108" cy="91" r="4.8"/>
+    </g>
+    <g fill="#233e41">
+      <circle cx="45" cy="107" r="4.8"/>
+      <circle cx="59" cy="107" r="4.8"/>
+      <circle cx="73" cy="107" r="4.8"/>
+      <circle cx="87" cy="107" r="4.8"/>
+      <circle cx="101" cy="107" r="4.8"/>
+      <circle cx="115" cy="107" r="4.8"/>
+    </g>
+    <g fill="#233e41">
+      <circle cx="38" cy="123" r="4.8"/>
+      <circle cx="52" cy="123" r="4.8"/>
+      <circle cx="66" cy="123" r="4.8"/>
+      <circle cx="80" cy="123" r="4.8"/>
+      <circle cx="94" cy="123" r="4.8"/>
+      <circle cx="108" cy="123" r="4.8"/>
+      <circle cx="122" cy="123" r="4.8"/>
+    </g>
+    <g fill="#233e41">
+      <circle cx="45" cy="139" r="4.8"/>
+      <circle cx="59" cy="139" r="4.8"/>
+      <circle cx="73" cy="139" r="4.8"/>
+      <circle cx="87" cy="139" r="4.8"/>
+      <circle cx="101" cy="139" r="4.8"/>
+      <circle cx="115" cy="139" r="4.8"/>
+    </g>
+    <g fill="#233e41">
+      <circle cx="52" cy="155" r="4.8"/>
+      <circle cx="66" cy="155" r="4.8"/>
+      <circle cx="80" cy="155" r="4.8"/>
+      <circle cx="94" cy="155" r="4.8"/>
+      <circle cx="108" cy="155" r="4.8"/>
+    </g>
+    <g fill="#a44d21">
+      <circle cx="52" cy="171" r="4.8"/>
+      <circle cx="66" cy="171" r="4.8"/>
+      <circle cx="80" cy="171" r="4.8"/>
+      <circle cx="94" cy="171" r="4.8"/>
+      <circle cx="108" cy="171" r="4.8"/>
+    </g>
+    <text x="80" y="224" font-size="19" text-anchor="middle" fill="#233e41">Coupled</text>
+    <text x="80" y="260" font-size="26" text-anchor="middle" fill="#135963">68%</text>
+    <circle cx="220" cy="130" r="64" fill="#f4f5ed" stroke="#135963" stroke-width="4"/>
+    <g fill="#233e41">
+      <circle cx="192" cy="91" r="4.8"/>
+      <circle cx="206" cy="91" r="4.8"/>
+      <circle cx="220" cy="91" r="4.8"/>
+      <circle cx="234" cy="91" r="4.8"/>
+      <circle cx="248" cy="91" r="4.8"/>
+    </g>
+    <g fill="#233e41">
+      <circle cx="185" cy="107" r="4.8"/>
+      <circle cx="199" cy="107" r="4.8"/>
+      <circle cx="213" cy="107" r="4.8"/>
+      <circle cx="227" cy="107" r="4.8"/>
+      <circle cx="241" cy="107" r="4.8"/>
+      <circle cx="255" cy="107" r="4.8"/>
+    </g>
+    <g fill="#233e41">
+      <circle cx="178" cy="123" r="4.8"/>
+      <circle cx="192" cy="123" r="4.8"/>
+      <circle cx="206" cy="123" r="4.8"/>
+      <circle cx="220" cy="123" r="4.8"/>
+      <circle cx="234" cy="123" r="4.8"/>
+      <circle cx="248" cy="123" r="4.8"/>
+      <circle cx="262" cy="123" r="4.8"/>
+    </g>
+    <g fill="#233e41">
+      <circle cx="185" cy="139" r="4.8"/>
+      <circle cx="199" cy="139" r="4.8"/>
+      <circle cx="213" cy="139" r="4.8"/>
+      <circle cx="227" cy="139" r="4.8"/>
+      <circle cx="241" cy="139" r="4.8"/>
+      <circle cx="255" cy="139" r="4.8"/>
+    </g>
+    <g fill="#233e41">
+      <circle cx="192" cy="155" r="4.8"/>
+      <circle cx="206" cy="155" r="4.8"/>
+      <circle cx="220" cy="155" r="4.8"/>
+      <circle cx="234" cy="155" r="4.8"/>
+      <circle cx="248" cy="155" r="4.8"/>
+    </g>
+    <text x="220" y="224" font-size="19" text-anchor="middle" fill="#233e41">Additive</text>
+    <text x="220" y="260" font-size="26" text-anchor="middle" fill="#135963">58%</text>
+  </g>
+</svg>

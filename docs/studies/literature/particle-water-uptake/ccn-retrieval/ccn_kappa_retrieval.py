@@ -1,5 +1,5 @@
 # %% [markdown]
-# # Fit hygroscopicity to an activation measurement
+# # A single activation fit tracks BAT thresholds from 50 to 200 nm for one organic
 #
 # Pair a mobility-selected dry diameter with a critical supersaturation
 # inferred from a CCN scan. What can that pair tell us about other sizes?
@@ -126,7 +126,9 @@ def simulate():
 
 
 # %% [markdown]
-# ## Inspect the two errors
+# <a id="inspect-the-two-errors"></a>
+#
+# ## Matching activation across sizes leaves water uptake weakly constrained
 #
 # The left panel asks how the **retrieved coefficient** changes if we fit
 # each diameter separately. The right panel asks how well **supersaturation**
