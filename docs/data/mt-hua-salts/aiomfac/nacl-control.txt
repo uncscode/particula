@@ -1,0 +1,81 @@
+===========================================================================================================
+AIOMFAC-web, version 3.15
+===========================================================================================================
+ 
+Mixture name:  'Water + (Na+) + (Cl-)'
+Number of independent input components: 02
+Number of different neutral components: 01
+Number of different inorganic ions    : 02
+ 
+The AIOMFAC output is tabulated for each component/species individually below.
+ 
+---  Table key  -------------------------------------------------------------------------------------------
+no.              : composition point number;                                                        
+T [K]            : absolute temperature;                                                            
+RH [%]           : relative humidity in equilibrium with the liquid mixture (bulk conditions);      
+w(j) [-]         : weight fraction (mass fraction) of species "j";                                  
+x_i(j) [-]       : mole fraction of species "j", calculated on the basis of assuming completely     
+                   dissociated inorganic ions; exception: the partial dissociation of bisulfate     
+                   (HSO4- <--> H+ + SO4--) and bicarbonate (HCO3- <--> H+ + CO3--) is explicitly    
+                   considered when these species are present in the mixture;                        
+m_i(j) [mol/kg]  : molality of species "j" [mol(j)/(kg solvent mixture)], where "solvent mixture"   
+                   refers to the electrolyte-free mixture (water + organics);                       
+a_coeff_x(j) [-] : activity coefficient of "j", defined on mole fraction basis (used for non-ionic  
+                   components) with pure (liquid) component "j" reference state;                    
+a_coeff_m(j) [-] : activity coefficient of "j", defined on molality basis (used for inorg. ions)    
+                   with reference state of infinite dilution of "j" in pure water;                  
+a_x(j) [-]       : activity of "j", defined on mole fraction basis (pure component reference state);
+a_m(j) [-]       : activity of "j", defined on molality basis (used for inorg. ions) with reference 
+                   state of infinite dilution of "j" in pure water;                                 
+log10(eta/[Pa.s]): base-10 log of the predicted dynamic viscosity of the mixture;                   
++/-log10(eta sens./[Pa.s]): base-10 log of the estimated sensitivity/uncertainty of the dynamic     
+                   viscosity; see details on the "Hints & Examples" webpage;                        
+flag             : error/warning flag, a non-zero value (error/warning number) indicates that a     
+                   numerical issue or a warning occurred at this data point, suggesting evaluation  
+                   with caution (warnings) or exclusion (errors) of this data point.                
+-----------------------------------------------------------------------------------------------------------
+ 
+ 
+Properties of this phase: mixture viscosity
+-----------------------------------------------------------------------------------------------------------                                           
+  no.   T_[K]     RH_[%]   log10(eta/[Pa.s])   +/-log10(eta sens./[Pa.s])     flag 
+-----------------------------------------------------------------------------------------------------------                                           
+  001   298.15    89.13   -2.91850E+00           1.59491E-04                    0
+-----------------------------------------------------------------------------------------------------------                                           
+ 
+ 
+Mixture's component # : 01
+Component's name      : 'Water'
+Component's subgroups : '(H2O)'
+Subgroups, TeX format : '(H$_2$O)'
+-----------------------------------------------------------------------------------------------------------
+  no.   T_[K]     RH_[%]   w(01)          x_i(01)        m_i(01)        a_coeff_x(01)   a_x(01)        flag
+-----------------------------------------------------------------------------------------------------------                                           
+  001   298.15    89.13    8.50000E-01    9.01880E-01    5.55084E+01    9.88303E-01    8.91330E-01       0
+-----------------------------------------------------------------------------------------------------------
+ 
+ 
+Mixture's species, #  : 02
+Cation's name         : 'Na+'
+Cation's subgroups    : '(Na+)'
+Subgroups, TeX format : '(Na$^+$)'
+-----------------------------------------------------------------------------------------------------------
+  no.   T_[K]     RH_[%]   w(02)          x_i(02)        m_i(02)        a_coeff_m(02)   a_m(02)        flag
+-----------------------------------------------------------------------------------------------------------                                           
+  001   298.15    89.13    5.90062E-02    4.90602E-02    3.01953E+00    7.47119E-01    2.25595E+00       0
+-----------------------------------------------------------------------------------------------------------
+ 
+ 
+Mixture's species, #  : 03
+Anion's name          : 'Cl-'
+Anion's subgroups     : '(Cl-)'
+Subgroups, TeX format : '(Cl$^-$)'
+-----------------------------------------------------------------------------------------------------------
+  no.   T_[K]     RH_[%]   w(03)          x_i(03)        m_i(03)        a_coeff_m(03)   a_m(03)        flag
+-----------------------------------------------------------------------------------------------------------                                           
+  001   298.15    89.13    9.09938E-02    4.90602E-02    3.01953E+00    7.00516E-01    2.11523E+00       0
+-----------------------------------------------------------------------------------------------------------
+ 
+ 
+ 
+===========================================================================================================
