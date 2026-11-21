@@ -4726,7 +4726,8 @@
       "study": {
         "id": "mam4xx-coagulation",
         "runs": [
-          "mam4xx-coagulation"
+          "mam4xx-coagulation",
+          "regimes"
         ],
         "companions": [],
         "relations": [
@@ -4737,6 +4738,14 @@
         ]
       },
       "tocFigure": "mam4xx-coagulation/graphical-abstract.svg"
+    },
+    {
+      "source": "docs/studies/literature/mam4xx-coagulation/regimes.py",
+      "title": "Which coagulation processes matter in three atmospheric regimes?",
+      "topic": "brownian",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
     }
   ],
   "supporting": [

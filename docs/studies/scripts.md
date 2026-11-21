@@ -114,5 +114,6 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Water uptake from a maintained vapor reservoir](tutorials/condensation/condensation_2_massbin.py)
 - [What survives a data transfer?](tutorials/building-an-aerosol/containers/data_containers.py)
 - [When a size-distribution plot hides a composition error](examples/coupled-populations/emissions/organic_partitioning_and_coagulation.py)
+- [Which coagulation processes matter in three atmospheric regimes?](literature/mam4xx-coagulation/regimes.py)
 - [Which composition rule controls equilibrium pressure?](examples/thermodynamics/particle-properties/activity_tutorial.py)
 <!-- STUDY_LIST_END -->

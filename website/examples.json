@@ -1353,5 +1353,34 @@
       "scripts/mam4xx_coagulation/plots.py"
     ],
     "full_canvas": true
+  },
+  "regimes": {
+    "title": "Which coagulation processes matter in three atmospheric regimes?",
+    "source": "docs/studies/literature/mam4xx-coagulation/regimes.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 7200,
+    "inputs": [
+      "scripts/mam4xx_coagulation/regimes.py",
+      "scripts/mam4xx_coagulation/regime_plots.py",
+      "scripts/mam4xx_coagulation/regime_rates.py",
+      "scripts/mam4xx_coagulation/regime_box.py",
+      "scripts/mam4xx_coagulation/matched.py",
+      "scripts/mam4xx_coagulation/campaign.py",
+      "scripts/mam4xx_coagulation/particles.py",
+      "docs/data/mam4xx-coagulation/modal.csv",
+      "scripts/mam4xx_coagulation/native_regimes.py",
+      "scripts/mam4xx_coagulation/regime_driver.cpp",
+      "scripts/mam4xx_coagulation/regime_reference.py",
+      "scripts/mam4xx_coagulation/reference_driver.cpp",
+      "scripts/mam4xx_coagulation/build_reference.py",
+      "docs/data/mam4xx-coagulation/regional-modal.csv"
+    ],
+    "data_expression": "report",
+    "render_functions": [],
+    "plot_inputs": [
+      "scripts/mam4xx_coagulation/regime_plots.py"
+    ],
+    "full_canvas": true
   }
 }
