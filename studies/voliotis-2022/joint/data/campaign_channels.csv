@@ -1,0 +1,38 @@
+run,file,edf_column,variable,edf_units,edf_time_units,edf_description,retained_n,missing_value_n,missing_time_n,first_s,last_s
+7,20190716_UMAN_AMS.edf,SOA_mass_conc,soa_ug_m3,ug/m3,seconds since 2019-07-16 12:35:00 GMT,-ortho-cresol 400ppb,101,0,0,0.0,21600.0
+8,20190412_UMAN_AMS.edf,SOA_mass_conc,soa_ug_m3,ug/m3,seconds since 2019-04-12 13:00:00 GMT,-Ortho-cresol 400 ppb,101,0,0,0.0,21600.0
+8,20190412_UMAN_VOC.edf,VOC,o_cresol_fraction,-,seconds since 2019-04-12 13:00:00 GMT,O-CRESOL,320,0,0,0.0,19140.01200008392
+10,20190419_UMAN_AMS.edf,SOA_mass_conc,soa_ug_m3,ug/m3,seconds since 2019-04-19 12:33:00 GMT,-isoprene 164 ppb,82,0,0,0.0,17496.0
+10,20190419_UMAN_VOC.edf,half_cresol,o_cresol_fraction,-,seconds since 1904-1-1 00:00:00 GMT,half OCRESOL,320,0,0,0.0,19140.0
+11,20190402_UMAN_AMS.edf,SOA_mass_conc,soa_ug_m3,ug/m3,seconds since 2019-04-02 12:33:59 GMT,-isoprene 164 ppb,99,0,0,0.0,21168.0
+12,20190410_UMAN_AMS.edf,SOA_mass_conc,soa_ug_m3,ug/m3,seconds since 2019-04-10 12:17:00 GMT,-isoprene 164 ppb,101,0,0,0.0,21600.0
+12,20190410_UMAN_VOC.edf,VOC,isoprene_fraction,-,seconds since 2019-04-10 12:17:00 GMT,O-CRESOL/ISOPRNE,305,0,0,0.0,18240.01200008392
+13,20190714_UMAN_AMS.edf,SOA_mass_conc,soa_ug_m3,ug/m3,seconds since 2019-07-14 12:09:00 GMT,isoprene 55 ppb,101,0,0,0.0,21600.0
+13,20190714_UMAN_VOC.edf,voc,isoprene_fraction,-,seconds,isoprene,305,0,0,0.0,18240.0
+14,20190418_UMAN_AMS.edf,SOA_mass_conc,soa_ug_m3,ug/m3,seconds since 2019-04-18 12:27:59 GMT,"-ortho-cresol 200 ppb, isoprene 84 ppb",101,0,0,0.0,21600.0
+14,20190418_UMAN_VOC.edf,isoprene,isoprene_fraction,-,seconds since 2019-04-18 12:27:59 GMT,o-cresol/iSOPRNE,305,15,0,0.0,18240.01200008392
+14,20190418_UMAN_VOC.edf,cresol,o_cresol_fraction,-,seconds since 2019-04-18 12:27:59 GMT,o-cresol/iSOPRNE,320,0,0,0.0,19140.01200008392
+15,20190424_UMAN_AMS.edf,SOA_mass_conc,soa_ug_m3,ug/m3,seconds since 2019-04-24 13:00:00 GMT,"-ortho-cresol 200 ppb, isoprene 84 ppb",101,0,0,0.0,21600.0
+15,20190424_UMAN_VOC.edf,isoprene,isoprene_fraction,-,seconds since 2019-04-24 13:00:00 GMT,o-cresol/pinene,305,15,0,0.0,18240.01200008392
+15,20190424_UMAN_VOC.edf,cresol,o_cresol_fraction,-,seconds since 2019-04-24 13:00:00 GMT,o-cresol/pinene,320,0,0,0.0,19140.01200008392
+16,20190709_UMAN_AMS.edf,SOA_mass_conc,soa_ug_m3,ug/m3,seconds since 2019-07-09 12:22:00 GMT,"-alpha-pinene 155ppb, isoprene 82 ppb",101,0,0,0.0,21600.0
+16,20190709_UMAN_VOC.edf,pinene,alpha_pinene_fraction,-,seconds since 1904-1-1 00:00:00 GMT,pinene/cresol,301,19,0,0.0,18000.0
+16,20190709_UMAN_VOC.edf,cresol,o_cresol_fraction,-,seconds since 1904-1-1 00:00:00 GMT,pinene/cresol,320,0,0,0.0,19140.0
+18,20190423_UMAN_AMS.edf,SOA_mass_conc,soa_ug_m3,-,seconds since 2019-04-23 12:40:00 GMT,"-alpha-pinene 155 ppb, isoprene 84 ppb",101,0,0,0.0,21600.0
+18,20190423_UMAN_VOC.edf,pinene,alpha_pinene_fraction,-,seconds since 2019-04-23 12:40:00 GMT,o-cresol/pinene,301,19,0,0.0,18000.0
+18,20190423_UMAN_VOC.edf,cresol,o_cresol_fraction,-,seconds since 2019-04-23 12:40:00 GMT,o-cresol/pinene,320,0,0,0.0,19140.01200008392
+19,20190403_UMAN_AMS.edf,SOA_mass_conc,soa_ug_m3,ug/m3,seconds since 2019-04-03 12:17:00 GMT,"-alpha-pinene 155 ppb, isoprene 84 ppb",99,0,0,0.0,21168.0
+19,20190403_UMAN_VOC.edf,pinene,alpha_pinene_fraction,-,seconds since 2019-04-03 12:17:00 GMT,pinene/pinene,301,19,0,0.0,18000.0
+19,20190403_UMAN_VOC.edf,isoprene,isoprene_fraction,-,seconds since 2019-04-03 12:17:00 GMT,pinene/pinene,305,15,0,0.0,18240.0
+20,20190405_UMAN_AMS.edf,SOA_mass_conc,soa_ug_m3,ug/m3,seconds since 2019-04-05 12:06:59 GMT,"-alpha-pinene 155 ppb, isoprene 84 ppb",101,0,0,0.0,21600.0
+21,20190408_UMAN_AMS.edf,SOA_mass_conc,soa_ug_m3,ug/m3,seconds since 2019-04-08 12:38:00 GMT,"-alpha-pinene 155 ppb, isoprene 84 ppb",100,0,0,0.0,21384.0
+21,20190408_UMAN_VOC.edf,pinene,alpha_pinene_fraction,-,seconds since 2019-04-08 12:38:00 GMT,pineneI/SOPRNE,301,4,0,0.0,18000.0
+21,20190408_UMAN_VOC.edf,isoprene,isoprene_fraction,-,seconds since 2019-04-08 12:38:00 GMT,pineneI/SOPRNE,305,0,0,0.0,18240.0
+22,20190715_UMAN_VOC.edf,pinene,alpha_pinene_fraction,-,seconds since 2019-07-15 12:00:00 GMT,Ternary,301,19,0,0.0,18000.0
+22,20190715_UMAN_VOC.edf,isoprene,isoprene_fraction,-,seconds since 2019-07-15 12:00:00 GMT,Ternary,305,15,0,0.0,18240.0
+22,20190715_UMAN_VOC.edf,cresol,o_cresol_fraction,-,seconds since 2019-07-15 12:00:00 GMT,Ternary,305,0,15,0.0,18240.0
+23,20190719_UMAN_AMS.edf,SOA_mass_conc,soa_ug_m3,ug/m3,seconds since 2019-07-19 12:00:00 GMT,"-alpha-pinene 103ppb, isoprene 55 ppb, ortho-cresol 133ppb",101,0,0,0.0,21600.0
+24,20190730_UMAN_AMS.edf,SOA_mass_conc,soa_ug_m3,ug/m3,seconds since 2019-07-30 12:04:00 GMT,"-alpha-pinene 103ppb, isoprene 55 ppb, ortho-cresol 133ppb",101,0,0,0.0,21600.0
+24,20190730_UMAN_VOC.edf,pinene,alpha_pinene_fraction,-,seconds since 2019-07-30 12:04:00 GMT,Ternary,301,19,0,0.0,18000.0
+24,20190730_UMAN_VOC.edf,isoprene,isoprene_fraction,-,seconds since 2019-07-30 12:04:00 GMT,Ternary,305,15,0,0.0,18240.0
+24,20190730_UMAN_VOC.edf,cresol,o_cresol_fraction,-,seconds since 2019-07-30 12:04:00 GMT,Ternary,320,0,0,0.0,19140.0
