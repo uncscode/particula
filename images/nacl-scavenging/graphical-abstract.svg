@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">NaCl capture in the recorded 4 nm scan</title>
+  <desc id="desc">A small salt particle approaches a larger collector. Bars from a common zero compare the native model's apparent capture coefficient with the measurement. The modeled bar reaches about three fifths of the measured bar.</desc>
+  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
+  <!-- Schematic of one tracer approaching a collector, independent of the bar scale. -->
+  <path d="M38 84q24-22 43-5t32-3" fill="none" stroke="#9d6441" stroke-width="3" stroke-linecap="round" stroke-dasharray="3 6"/>
+  <path d="m120 68 9-5 10 5v12l-10 5-9-5z" fill="#b86332" stroke="#773817" stroke-width="2"/>
+  <g stroke="#164e56" stroke-width="2.5" stroke-linejoin="round">
+    <path d="m163 50 44-22 43 22-43 23z" fill="#c1d9ce"/>
+    <path d="m163 50 44 23v48l-44-24z" fill="#659b96"/>
+    <path d="m207 73 43-23v47l-43 24z" fill="#347477"/>
+  </g>
+  <g font-family="sans-serif" fill="#233e41">
+    <text x="30" y="157" font-size="19" font-weight="bold">Capture (cm³/s)</text>
+    <text x="30" y="194" font-size="17">Measured</text>
+    <text x="30" y="247" font-size="17">Modeled</text>
+  </g>
+  <!-- The recorded-scan coefficients are 1.760 and 1.066 in units of 10⁻⁷ cm³/s. -->
+  <rect x="30" y="202" width="232" height="14" rx="3" fill="#135963"/>
+  <rect x="30" y="255" width="140.5" height="14" rx="3" fill="#ae561d"/>
+</svg>

@@ -1,5 +1,5 @@
 # %% [markdown]
-# # When do two Π Chamber size distributions converge?
+# # Dry and wet starts give Π Chamber model spectra within 1% by 32 seconds
 #
 # Prabhakaran and colleagues injected 130 nm sodium chloride seeds at
 # 33 cm⁻³ min⁻¹ into a turbulent chamber. The fresh-water and salt-water

@@ -1,5 +1,5 @@
 # %% [markdown]
-# # What passes through a 100 nm mobility channel?
+# # A 100 nm mobility channel also admits larger, multiply charged NaCl collectors
 #
 # In the NaCl chamber experiment of [Cai et al. (2022)](https://doi.org/10.5194/acp-22-11529-2022),
 # the collectors were size-selected before they passed through a ⁶³Ni bipolar
@@ -111,7 +111,9 @@ plotting.fit(fig)
 plt.show()
 
 # %% [markdown]
-# ## Which particle carries the charge?
+# <a id="which-particle-carries-the-charge"></a>
+#
+# ## A charged tracer polarizes a neutral collector more strongly than the reverse
 #
 # Consider one 4 nm tracer and one 100 nm collector at the same temperature,
 # pressure and material density. The left panel holds dispersion fixed and
@@ -188,7 +190,9 @@ plt.show()
 # contribution from the large collectors outside the qualified size range.
 
 # %% [markdown]
-# ## How large a rate could settling and shear add?
+# <a id="how-large-a-rate-could-settling-and-shear-add"></a>
+#
+# ## Settling and shear add little to thermal capture
 #
 # Compare each increment with the difference between the measurement and the
 # full dispersion and polarization model. Use a logarithmic vertical scale
@@ -241,7 +245,9 @@ plt.show()
 # reports both controls along with the cloud-turbulence extrapolation.
 
 # %% [markdown]
-# ## What do individual particles do under the recorded SMPS settings?
+# <a id="what-do-individual-particles-do-under-the-recorded-smps-settings"></a>
+#
+# ## Matching the recorded scan lowers the pulse capture coefficient
 #
 # Compare the seven measured channel fractions with the simulated signals
 # at injection. The second tracer distribution adjusts one size parameter

@@ -15,6 +15,8 @@
 # %% [markdown]
 # # How do collision models change a water-grown mixed aerosol?
 #
+# ![One water-grown organic and soot population supplies four copies: condensation alone, or continued condensation with Brownian collisions, Brownian plus differential settling, or turbulent shear. Branches depict the comparison design.](../../../../images/coupled-populations/biomass-collision-branches.svg)
+#
 # A mixed aerosol can change size through water exchange and through collisions.
 # How can we compare collision assumptions without confusing them with different
 # starting populations? This example gives four scenarios copies of the same

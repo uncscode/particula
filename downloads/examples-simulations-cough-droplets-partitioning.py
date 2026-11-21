@@ -15,6 +15,8 @@
 # %% [markdown]
 # # Audit a respiratory-droplet illustration before using its predictions
 #
+# ![The balance is level in the mass audit. The identity check fails: the retained lookup assigned hexachlorophene to the requested lysozyme. The illustration conveys a limitation in material assignment.](../../../../images/coupled-populations/respiratory-material-identity.svg)
+#
 # An evaporation calculation can conserve mass and still represent the wrong
 # materials. This example follows a multicomponent droplet population in initially
 # 30% RH air, while exposing a necessary earlier step: checking that requested

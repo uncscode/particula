@@ -15,6 +15,8 @@
 # %% [markdown]
 # # Follow organic uptake onto seeds during imposed cooling
 #
+# ![Cooling moves organic material from vapor onto pre-existing seeds. The schematic shows fewer vapor marks and a thicker organic coating around the same dark core.](../../../../images/coupled-populations/cooling-organic-uptake.svg)
+#
 # How can cooling alter gas–particle partitioning while collisions change particle
 # size? This example follows 24 organic species around a supplied seed population,
 # applying condensation and Brownian coagulation under a prescribed temperature

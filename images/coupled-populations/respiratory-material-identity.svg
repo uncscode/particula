@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Audit a respiratory-droplet illustration before using its predictions</title>
+  <desc id="desc">The balance is level in the mass audit. The identity check fails: the retained lookup assigned hexachlorophene to the requested lysozyme. The illustration conveys a limitation in material assignment.</desc>
+  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
+  <g font-family="sans-serif" font-weight="600">
+    <text x="150" y="41" text-anchor="middle" font-size="22" fill="#243e43">Mass</text>
+    <path d="M85 92h130M150 85v54m-18 0h36" fill="none" stroke="#243e43" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" />
+    <path d="M91 92l-18 30h36Z" fill="none" stroke="#135963" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+    <path d="M73 122q18 21 36 0Z" fill="#a6d4d9" stroke="#135963" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+    <path d="M209 92l-18 30h36Z" fill="none" stroke="#135963" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+    <path d="M191 122q18 21 36 0Z" fill="#a6d4d9" stroke="#135963" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+    <circle cx="246" cy="66" r="13" fill="#135963" stroke="none" stroke-width="2"/>
+    <path d="m240 66 4 4 8-10" fill="none" stroke="#fffaf1" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
+    <path d="M33 166h234" fill="none" stroke="#bfbbac" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" />
+    <text x="150" y="198" text-anchor="middle" font-size="21" fill="#243e43">Identity</text>
+    <text x="150" y="233" text-anchor="middle" font-size="18" fill="#243e43">Lysozyme</text>
+    <text x="150" y="265" text-anchor="middle" font-size="18" fill="#be6932">≠ hexachlorophene</text>
+  </g>
+</svg>

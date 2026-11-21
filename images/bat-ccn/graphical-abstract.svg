@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">BAT puts pinic acid’s activation hygroscopicity too low and phthalic acid’s too high</title>
+  <desc id="desc">Measured and BAT activation hygroscopicity share one scale. For pinic acid the BAT diamond is below the measured circle; for phthalic acid it is above. These opposite errors contribute to a small average bias.</desc>
+  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
+  <g font-family="sans-serif" font-weight="600">
+    <text x="20" y="41" fill="#233e41" font-size="22">κ<tspan baseline-shift="sub" font-size="12">CCN</tspan></text>
+    <circle cx="96.00" cy="35.00" r="5.50" fill="#fbf2e3" stroke="#233e41" stroke-width="2"/>
+    <text x="108" y="41" font-size="16" text-anchor="start" fill="#233e41">Measured</text>
+    <path d="M216 29l6 6-6 6-6-6z" fill="#135963" stroke="#135963" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"/>
+    <text x="228" y="41" font-size="17" text-anchor="start" fill="#233e41">BAT</text>
+    <line x1="86.00" y1="81.20" x2="86.00" y2="161.54" stroke="#627579" stroke-width="3" />
+    <circle cx="86.00" cy="81.20" r="8.00" fill="#fbf2e3" stroke="#233e41" stroke-width="3"/>
+    <path d="M86 153.54000000000002l8 8-8 8-8-8z" fill="#135963" stroke="#135963" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <text x="86" y="265" font-size="17" text-anchor="middle" fill="#233e41">Pinic acid</text>
+    <line x1="214.00" y1="199.40" x2="214.00" y2="136.88" stroke="#627579" stroke-width="3" />
+    <circle cx="214.00" cy="199.40" r="8.00" fill="#fbf2e3" stroke="#233e41" stroke-width="3"/>
+    <path d="M214 128.88l8 8-8 8-8-8z" fill="#135963" stroke="#135963" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <text x="214" y="265" font-size="17" text-anchor="middle" fill="#233e41">Phthalic acid</text>
+    <line x1="36.00" y1="230.00" x2="265.00" y2="230.00" stroke="#627579" stroke-width="1.5" />
+  </g>
+</svg>

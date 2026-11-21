@@ -1,5 +1,9 @@
 # %% [markdown]
-# # Can wet aerosol release glyoxal while it forms an imidazole?
+# # After glyoxal dilution, two models predict rising organic mass per sulfate as measurements fall
+#
+# ![Change in organic mass per sulfate after dilution: the chamber measurement and growth-calibrated fit fall below their starting values. The reversible-pool model and its imidazole-producing variant (IC) both rise.](../../../images/glyoxal-chamber/graphical-abstract.svg)
+#
+# After dilution, the chamber organic-to-sulfate mass ratio fell 10.2%. A response fitted to the growth period predicted a 6.7% decline. The reversible-pool and imidazole-producing particle models predicted increases of about 32% and 87% over the same windows. The graphic shows changes relative to each series’ own starting value.
 #
 # Galloway et al. exposed wet ammonium sulfate seed to glyoxal in the dark,
 # then diluted the chamber. Replay the vapor in their Figure 6 and compare two
@@ -383,7 +387,9 @@ def independent_checks():
 
 
 # %% [markdown]
-# ## Estimate a reversible response from chamber growth
+# <a id="estimate-a-reversible-response-from-chamber-growth"></a>
+#
+# ## A fit to the growth period predicts part of the later decline
 #
 # At dilution the measured organic/sulfate ratio is about 3.07. With the
 # assumed water and sulfate, the literature-based reversible run has reached
@@ -521,7 +527,9 @@ def simulate():
 
 
 # %% [markdown]
-# ## Compare the release and the persistent product
+# <a id="compare-the-release-and-the-persistent-product"></a>
+#
+# ## Organic mass per sulfate falls as the nitrogen marker rises
 #
 # The organic-to-sulfate panel compares dry organic mass with sulfate ion
 # mass. Retain all digitized observations from seed injection onward. The
@@ -658,7 +666,9 @@ def summarize(report):
 
 
 # %% [markdown]
-# ## What the comparison tells us
+# <a id="what-the-comparison-tells-us"></a>
+#
+# ## The two particle models keep accumulating organics after dilution
 #
 # The chamber organic/sulfate ratio falls from 3.066 to 2.753 in the
 # selected windows, a 10.20% decline. Its uncalibrated nitrogen marker
