@@ -59,7 +59,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   study-carousel[data-featured] { margin-block-start: clamp(2.75rem, 5vw, 4rem); }
   .slides { display: grid; position: relative; overflow: clip; padding-block: .35rem; }
   .slide { grid-area: 1 / 1; width: 61%; min-width: 0; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: clamp(.8rem, 2vw, 1.25rem); text-align: center; text-decoration: none; color: var(--sl-color-white); }
-  .slide[inert] { visibility: hidden; }
+  .slide[inert]:not([data-leaving]) { visibility: hidden; }
   .slide img, .peek img { display: block; width: 100%; height: auto; border-radius: .85rem; margin: 0; }
   .study-title { font-size: clamp(1.12rem, 2.6vw, 1.75rem); line-height: 1.22; font-weight: 600; text-wrap: balance; margin: 0; }
   /* Clip both neighboring squares at the viewport edges, leaving the center square unobstructed. */
@@ -95,28 +95,83 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       const events = new AbortController();
       const options = { signal: events.signal };
       const peeks = [...this.querySelectorAll<HTMLButtonElement>('.peek')];
-      const updatePeeks = () => {
-        for (const peek of peeks) {
-          const offset = peek.hasAttribute('data-next') ? 1 : -1;
-          const neighbor = slides[(index + offset + slides.length) % slides.length];
-          peek.querySelector('img')!.src = neighbor.querySelector('img')!.src;
-        }
-      };
       let index = slides.findIndex((slide) => !slide.inert);
+      const wrap = (i: number) => (i + slides.length) % slides.length;
+      function updatePeek(peek: HTMLButtonElement) {
+        const offset = peek.hasAttribute('data-next') ? 1 : -1;
+        peek.querySelector('img')!.src = slides[wrap(index + offset)].querySelector('img')!.src;
+      }
       let enabled = !motion.matches;
       let onScreen = false;
       let hovering = false;
       let timer: number | undefined;
 
+      let animations: Animation[] = [];
+      let pendingSteps = 0;
+
       function advance(direction: number, announce: boolean) {
-        slides[index].inert = true;
-        slides[index].setAttribute('aria-hidden', 'true');
-        index = (index + direction + slides.length) % slides.length;
-        slides[index].inert = false;
-        slides[index].removeAttribute('aria-hidden');
-        updatePeeks();
+        if (animations.length) {
+          if (announce) pendingSteps += direction;
+          return;
+        }
+        const outgoing = slides[index];
+        index = wrap(index + direction);
+        const incoming = slides[index];
+        outgoing.inert = true;
+        outgoing.setAttribute('aria-hidden', 'true');
+        incoming.inert = false;
+        incoming.removeAttribute('aria-hidden');
         position.textContent = `${index + 1} / ${slides.length}`;
-        if (announce) announcement.textContent = `${position.textContent}. ${slides[index].textContent?.trim()}`;
+        if (announce) announcement.textContent = `${position.textContent}. ${incoming.textContent?.trim()}`;
+        if (motion.matches || document.hidden) {
+          peeks.forEach(updatePeek);
+          return;
+        }
+
+        // Match the two central figures to the actual size and position of the edge previews.
+        const near = peeks[direction > 0 ? 1 : 0];
+        const far = peeks[direction > 0 ? 0 : 1];
+        const outgoingImage = outgoing.querySelector('img')!;
+        const center = outgoingImage.getBoundingClientRect();
+        function edgeFrame(peek: HTMLButtonElement) {
+          const rect = peek.getBoundingClientRect();
+          const dx = (rect.left + rect.right - center.left - center.right) / 2;
+          const dy = (rect.top + rect.bottom - center.top - center.bottom) / 2;
+          return {
+            transform: `translate(${dx}px, ${dy}px) scale(${rect.width / center.width})`,
+            opacity: getComputedStyle(peek.querySelector('img')!).opacity,
+          };
+        }
+        const timing = { duration: 450, easing: 'cubic-bezier(.4, 0, .2, 1)', fill: 'both' } as const;
+        const centered = { transform: 'none', opacity: 1 };
+        outgoing.setAttribute('data-leaving', '');
+        updatePeek(near);
+        animations = [
+          outgoingImage.animate([centered, edgeFrame(far)], timing),
+          incoming.querySelector('img')!.animate([edgeFrame(near), centered], timing),
+          far.animate([{ transform: 'none' }, { transform: `translateX(${-direction * 100}%)` }], timing),
+          near.animate([{ transform: `translateX(${direction * 100}%)` }, { transform: 'none' }], timing),
+          outgoing.querySelector('.study-title')!.animate([centered, { transform: `translateX(${-direction * 30}%)`, opacity: 0 }], timing),
+          incoming.querySelector('.study-title')!.animate([{ transform: `translateX(${direction * 30}%)`, opacity: 0 }, centered], timing),
+        ];
+        animations[0].onfinish = () => {
+          settle();
+          if (pendingSteps) {
+            const step = Math.sign(pendingSteps);
+            pendingSteps -= step;
+            advance(step, true);
+          }
+        };
+      }
+
+      function settle() {
+        for (const animation of animations) {
+          animation.onfinish = null;
+          animation.cancel();
+        }
+        animations = [];
+        slides.forEach((slide) => slide.removeAttribute('data-leaving'));
+        peeks.forEach(updatePeek);
       }
 
       function schedule() {
@@ -149,9 +204,23 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         schedule();
       }, options);
       this.addEventListener('pointerleave', () => { hovering = false; schedule(); }, options);
-      document.addEventListener('visibilitychange', schedule, options);
+      function settlePending() {
+        settle();
+        while (pendingSteps) {
+          const step = Math.sign(pendingSteps);
+          pendingSteps -= step;
+          advance(step, true);
+        }
+      }
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) settlePending();
+        schedule();
+      }, options);
       motion.addEventListener('change', () => {
-        if (motion.matches) enabled = false;
+        if (motion.matches) {
+          enabled = false;
+          settlePending();
+        }
         schedule();
       }, options);
       const viewport = new IntersectionObserver(([entry]) => {
@@ -159,11 +228,13 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         schedule();
       });
       viewport.observe(this);
-      updatePeeks();
+      peeks.forEach(updatePeek);
       peeks.forEach((peek) => { peek.disabled = false; });
       controls.hidden = false;
       schedule();
       this.cleanup = () => {
+        pendingSteps = 0;
+        settle();
         events.abort();
         viewport.disconnect();
         window.clearInterval(timer);
