@@ -2782,7 +2782,7 @@
     },
     {
       "source": "docs/studies/literature/pi-chamber/haze-and-cloud/pi_chamber_spectra.py",
-      "title": "When do two Π Chamber size distributions converge?",
+      "title": "Dry and wet starts give Π Chamber model spectra within 1% by 32 seconds",
       "topic": "chambers",
       "also": [
         "condensation",
@@ -2793,7 +2793,7 @@
     },
     {
       "source": "docs/studies/literature/pi-chamber/seed-chemistry.md",
-      "title": "Seed chemistry and organic vapor in the Π Chamber",
+      "title": "At the inferred Π Chamber humidity, modeled sulfate haze falls below the optical detection limit",
       "topic": "chambers",
       "also": [
         "condensation",
@@ -2816,7 +2816,7 @@
     },
     {
       "source": "docs/studies/literature/pi-chamber/haze-and-cloud/index.md",
-      "title": "Haze and cloud partitioning in the Π Chamber",
+      "title": "Π Chamber cloud counts rose over salt water, but separate haze fits predicted a decline",
       "topic": "chambers",
       "also": [
         "verification-scientific",
@@ -4177,7 +4177,7 @@
     },
     {
       "source": "docs/studies/literature/nacl-scavenging/nacl_scavenging.py",
-      "title": "Estimate bipolar charges and multiply charged diameters",
+      "title": "A 100 nm mobility channel also admits larger, multiply charged NaCl collectors",
       "topic": "charged",
       "also": [
         "interparticle-forces",
@@ -4188,7 +4188,7 @@
     },
     {
       "source": "docs/studies/literature/nacl-scavenging/index.md",
-      "title": "NaCl nanoparticle scavenging in a chamber",
+      "title": "Particula predicts about 60% of the NaCl capture rate measured at 4 nm",
       "topic": "charged",
       "also": [
         "interparticle-forces",

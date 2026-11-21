@@ -1154,7 +1154,7 @@
     "full_canvas": true
   },
   "nacl-scavenging": {
-    "title": "What passes through a 100 nm mobility channel?",
+    "title": "A 100 nm mobility channel also admits larger, multiply charged NaCl collectors",
     "source": "docs/studies/literature/nacl-scavenging/nacl_scavenging.py",
     "policy": "cpu",
     "device": "cpu",
@@ -1217,7 +1217,7 @@
     "full_canvas": true
   },
   "pi-chamber-spectra": {
-    "title": "Time-resolved wet-size spectra in the Π Chamber",
+    "title": "Dry and wet starts give Π Chamber model spectra within 1% by 32 seconds",
     "source": "docs/studies/literature/pi-chamber/haze-and-cloud/pi_chamber_spectra.py",
     "policy": "cuda",
     "device": "cuda",
