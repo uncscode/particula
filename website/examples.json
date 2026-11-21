@@ -1586,5 +1586,71 @@
       "scripts/shear_drop_spectrum/plots.py"
     ],
     "full_canvas": false
+  },
+  "dense-optical-history": {
+    "title": "Record aerosol extinction at 10 Hz during hygroscopic growth",
+    "source": "docs/studies/validation/material-properties/optical-recording/dense_optical_history.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 600,
+    "inputs": [],
+    "invoke": "report = simulate()\nfigure = plot_results(report)\nplt.show()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)\nplt.show()",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
+  },
+  "optical-effective-index": {
+    "title": "Retrieve effective refractive index and hygroscopic growth from optics",
+    "source": "docs/studies/validation/material-properties/optical-retrieval/infer_refractive_index.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 600,
+    "inputs": [
+      "docs/data/optical-retrieval/suchdol.json"
+    ],
+    "invoke": "report = simulate()\nfigure = plot_results(report)\nplt.show()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)\nplt.show()",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
+  },
+  "optical-mixing-state": {
+    "title": "Can bulk optics resolve aerosol mixing state?",
+    "source": "docs/studies/validation/material-properties/optical-mixing-state/infer_mixing_state.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 600,
+    "inputs": [],
+    "invoke": "report = simulate()\nfigure = plot_results(report)\nplt.show()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)\nplt.show()",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
+  },
+  "optical-growth-trajectory": {
+    "title": "Fit a growth trajectory from light alone",
+    "source": "docs/studies/validation/condensation/optical-trajectory/infer_optical_trajectory.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 600,
+    "inputs": [],
+    "invoke": "report = simulate()\nfigure = plot_results(report)\nplt.show()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)\nplt.show()",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
   }
 }

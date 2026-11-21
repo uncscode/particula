@@ -87,3 +87,35 @@ Next wire the bulk adjoint into the observation and fitting APIs, including
 growth and composition derivatives. The size-bin audit, physical feedback,
 checkpointed optical trajectory, published examples, full validation,
 self review and PR are still open.
+
+## Retrievals, optical trajectory, and measured inputs
+
+The parameters now run through a Warp tape and the tiled Mie adjoint. The
+effective-index fit handles measured-at-RH radii, prescribed growth
+factors, specified or fitted κ, and nonzero sizing RH. The mixing-state fit
+preserves number and dry species inventories for arbitrary prescribed
+volume fractions per bin. Both use observation covariance, project
+spectral/time channels, and report bounded least-squares sensitivity and
+profile intervals. The checkpointed inverse retains only the selected optical
+observations and the mass checkpoints needed to replay gradients.
+
+EBAS station CZ0004B provides the 71 instrument diameter centers (8.8 to
+835.7 nm), hourly size spectra and measurement RH for the campaign years.
+Its metadata states STP, Nafion drying below 40% RH, and 20% intercomparison
+uncertainty. The standard sizing protocol reports number density per decade
+of mobility diameter. The published campaign spectra agreed best with
+three-hour means of the extracted EBAS spectra at zero time offset over the
+four audited days. The example uses individual hourly size distributions
+and corrected nephelometer total scattering for two dry–wet–dry windows.
+It fits 450/550 nm channels and campaign-processed dry 550 nm absorption,
+then predicts held-out 700 nm scattering. Bin edges are approximated from
+the published centers. PM₁₀ optics include size contributions above the
+measured mobility range. The small reproducible fixture carries archive
+locations, slice offsets, and original source file hashes.
+
+- [Hourly EBAS archive](https://doi.org/10.48597/GHVT-PE5Z)
+- [Instrument methods and field limitations](https://amt.copernicus.org/articles/19/1611/2026/)
+- [Optical studies and worked examples](../docs/studies/validation/material-properties/optical-integration.md)
+
+Remaining scope includes the active optical heating and evaporation process
+and worked example, full repository validation, integrated self-review, and PR.
