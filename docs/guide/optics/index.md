@@ -176,3 +176,51 @@ Huffman, *Absorption and Scattering of Light by Small Particles* (1983),
 stored PyMieScatt observations with independent Bessel/polynomial calculations,
 energy identities and CPU/CUDA comparisons. Known reference discrepancies are
 preserved and documented rather than reproduced as physical behavior.
+
+## Record an optical history during a simulation
+
+Use an optical observer with a CPU simulation or a fixed-step Warp owner.
+The observer evaluates the live particle population on its owning backend.
+The recording schedule and the snapshot schedule are independent. For example,
+with a prepared owner using a 0.1 s timestep, the following captures three
+wavelengths at 10 Hz, including the initial state.
+
+```python
+from particula.execution.optical_recording import (
+    OpticalHistory,
+    OpticalObserver,
+    read_optical_history,
+)
+from particula.execution.prepared_recording import run_prepared
+from particula.optics import OpticalConfig
+
+config = OpticalConfig([450e-9, 550e-9, 700e-9], particle_index=1.5 + 0.02j)
+history = OpticalHistory("optics.sqlite", config, variables=("extinction",))
+observer = OpticalObserver(owner, history, batch_size=32)
+run_prepared(owner, 10.0, optics=observer, optical_initial=True)
+
+for metadata, arrays in read_optical_history(history.path):
+    time_s = arrays["time"]
+    extinction_per_m = arrays["extinction"]  # time, box, wavelength
+```
+
+Use `run_until` with the same optical arguments for a `CPUSimulation`.
+Supply `optical_output_times` for a sparse optical grid. A prepared owner
+requires those times to lie on its existing step grid. Explicit CPU output
+times may shorten cycles to reach those times. The dense schedule simply
+observes each completed step. Manual calls to `observer.record()` can
+select additional accepted states. Call `observer.flush()` before closing
+the owner when recording manually.
+
+The history commits complete batches and stores wavelengths, units, index
+configuration and caller-provided provenance. On CUDA, the observer transfers
+bulk optical rows and status in batches and reads no full-state snapshots.
+Set `coefficient_capacity` to a bound appropriate to the simulated size
+range to control Mie workspace memory. An insufficient bound raises an error
+when the batch is checked.
+
+Use `species_index` with axes (wavelength, material) to recompute index
+from current composition. Supply indices in the order of the particle
+material axis, including the water index for particles that take up water.
+The homogeneous mixture uses volume fractions of each material and the
+Lorentz–Lorenz function of its dielectric constant.

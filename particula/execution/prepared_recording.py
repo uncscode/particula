@@ -5,12 +5,18 @@ Subsequent observations explicitly choose reduced diagnostics or full snapshots.
 The runner never changes the prepared timestep, capture plan or RNG schedule.
 """
 
+from heapq import merge
+
 import numpy as np
 
 from particula import _cpu_batch
 from particula.execution.analysis_io import AnalysisWriter
 from particula.execution.prepared import PreparedSimulation
-from particula.execution.recording import Recorder
+from particula.execution.recording import (
+    Recorder,
+    _observation_times,
+    _optical_schedule,
+)
 
 _REDUCED = {
     "number_density": "number_concentration",
@@ -153,7 +159,16 @@ class PreparedObserver:
             self._writer.flush()
 
 
-def run_prepared(simulation, end_time, *, output_times=(), observer=None):
+def run_prepared(  # noqa: C901
+    simulation,
+    end_time,
+    *,
+    output_times=(),
+    observer=None,
+    optics=None,
+    optical_output_times=None,
+    optical_initial=False,
+):
     """Run complete fixed steps and explicitly observe the requested grid.
 
     All requested/final times must be on the frozen grid before any work is
@@ -162,6 +177,8 @@ def run_prepared(simulation, end_time, *, output_times=(), observer=None):
     within floating-point roundoff of that grid are admitted. No interpolation,
     shortened step, automatic capture or checkpoint is performed. The final
     synchronize surfaces asynchronous failures even without an observer.
+    An OpticalObserver uses its own schedule. By default it records every
+    accepted step, plus the starting state if optical_initial is true.
     """
     if type(simulation) is not PreparedSimulation:
         raise TypeError("requires an exact PreparedSimulation owner")
@@ -171,34 +188,43 @@ def run_prepared(simulation, end_time, *, output_times=(), observer=None):
     ):
         raise ValueError("observer belongs to a different prepared owner")
     end_time = _cpu_batch.duration(end_time, 1)
-    times = np.asarray(output_times, dtype=float)
-    if (
-        times.ndim != 1
-        or not np.all(np.isfinite(times))
-        or np.any(times < 0)
-        or np.any(np.diff(times) <= 0)
-        or np.any(times > end_time)
-    ):
-        raise ValueError("output times must be ordered within the run interval")
+    times = _observation_times(output_times, end_time)
     with simulation._lock:
         _ready(simulation)
         end = _index(simulation, end_time)
         start = simulation.completed_steps
         if end < start:
             raise ValueError("end_time precedes accepted simulation time")
-        indices = sorted(
-            {_index(simulation, float(time)) for time in times} | {end}
+        indices = {_index(simulation, float(time)) for time in times}
+        dense, optical_times = _optical_schedule(
+            simulation,
+            optics,
+            optical_output_times,
+            optical_initial,
+            _time(simulation),
+            end_time,
         )
+        optical_indices = {
+            _index(simulation, float(time)) for time in optical_times
+        }
+        dense_steps = range(start + 1, end + 1) if dense else range(0)
+        schedule = merge(sorted(indices | optical_indices), dense_steps)
         # Preflight the recorder's time too, so a mismatched history cannot
         # consume physics steps before its first failed observation.
         if observer is not None and observer.recorder.last_time is not None:
             if _index(simulation, observer.recorder.last_time) > start:
                 raise ValueError("recorder is ahead of the prepared simulation")
-        for index in indices:
-            if index < start:
+        previous = None
+        for index in schedule:
+            if index < start or index == previous:
                 continue
             simulation.run(index - simulation.completed_steps)
-            if observer is not None:
+            if index in optical_indices or (dense and index > start):
+                optics.record()
+            if observer is not None and index in indices:
                 observer.record()
+            previous = index
+        if optics is not None:
+            optics.flush()
         simulation.synchronize()
     return simulation
