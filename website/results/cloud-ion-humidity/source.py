@@ -1,9 +1,9 @@
 # %% [markdown]
-# At the same ion production rate, the CERN CLOUD experiment recorded many more ions in humid air than in dry air. Can the published humidity dependence of ion recombination explain the difference? Reproduce three particle-resolved ensembles, then use two fitted explanations to design a discriminating measurement. The [study report](index.md) gives the observations, provenance and interpretation.
+# At the same ion production rate, the CERN CLOUD experiment recorded many more ions in humid air than in dry air. Can the published humidity dependence of ion recombination explain the difference? Reproduce the four-humidity sweep and three matched-condition ensembles, then use two fitted explanations to design a discriminating measurement. The [study report](index.md) gives the observations, provenance and interpretation.
 #
 # The bundled `figure5d.csv` contains our digitization of [Franchin et al. (2015), Figure 5d](https://doi.org/10.5194/acp-15-7203-2015), used under [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). The bundled `two-inlet-design.csv` contains synthetic discrimination results using a noise reference from the [Mirme et al. counter archive](https://doi.org/10.5281/zenodo.17357061).
 #
-# ## Reproduce the three chamber conditions
+# ## Reproduce the humidity sweep and matched chamber conditions
 #
 # Each ion pair enters a well-mixed sampling volume. Opposite ions can recombine, and each ion can be lost at a wall. Relative humidity (RH) selects the measured recombination coefficient. The example requires a CUDA device and the complete downloadable bundle. The publication runner supplies verified numerical data for a CPU-only replot.
 #
@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from scripts.cloud_ion_humidity.plots import (
     comparison,
     design_figure,
+    humidity_sweep,
     recovery_figure,
 )
 
@@ -32,6 +33,19 @@ print(
 )
 
 # %% [markdown]
+# ## Five of six humid observations exceed the sensitivity band
+#
+# The sweep runs 64 independent boxes at each of three ion production rates (2, 20 and 65 pairs cm⁻³ s⁻¹) for each humidity. Compare the diamonds with the measured circles and with the steady balance. The dashed line holds recombination fixed. The solid line uses the coefficient inferred at that humidity. Shading varies recombination and first-order loss across their reported ranges.
+#
+# The downloadable numerical plot data contain all 29 measured points and bar endpoints, the 12 CUDA means and their standard errors, and the sampled curves and band edges under `humidity_sweep`.
+
+# %%
+humidity_sweep(report)
+plt.show()
+
+# %% [markdown]
+# At 0%, 7% and 40% RH, the bands contain 21 of 23 central measurements. At 70% RH, five of six measurements remain above the upper band even at their lower bars. The comparison below isolates nearly equal source rates in dry and humid air.
+#
 # ## Humidity accounts for about half the measured rise in this reconstruction
 #
 # Compare the measurement and model at each humidity in the left panel. The right panel tests the humid low-source observation against the maximum possible well-mixed concentration at the weakest reported first-order loss. The panels use different concentration scales.
