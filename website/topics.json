@@ -4726,7 +4726,8 @@
       "study": {
         "id": "pinic-isomers",
         "runs": [
-          "pinic-isomers"
+          "pinic-isomers",
+          "isomer-history"
         ],
         "companions": [],
         "relations": [
@@ -4737,6 +4738,14 @@
         ]
       },
       "tocFigure": "pinic-isomers/graphical-abstract.svg"
+    },
+    {
+      "source": "docs/studies/literature/pinic-isomers/isomer_history.py",
+      "title": "Can partitioning explain two measured isomer time histories?",
+      "topic": "condensation",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
     }
   ],
   "supporting": [
