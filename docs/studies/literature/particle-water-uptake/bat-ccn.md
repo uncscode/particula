@@ -2,7 +2,7 @@
 
 <a id="bat-puts-pinic-acids-activation-hygroscopicity-too-low-and-phthalic-acids-too-high"></a>
 
-![From measurements to BAT predictions, the lines for the two acids cross. Pinic acid has the larger measured activation hygroscopicity, while BAT assigns the larger value to phthalic acid.](../../../images/bat-ccn/graphical-abstract.svg)
+![A dry particle grows into a cloud droplet. On the activation hygroscopicity (κ) scale, measurements rank pinic acid (0.248) above phthalic acid (0.051). BAT predicts the reverse, 0.114 for pinic acid and 0.155 for phthalic acid.](../../../images/bat-ccn/graphical-abstract.svg)
 
 At cloud activation, the reported hygroscopicity parameter κ for pinic acid was **0.248**, nearly five times the **0.051** for phthalic acid. Gorkowski, Preston and Zuend compiled those measurements and compared them with their Binary Activity Thermodynamics (BAT) model. BAT gives **0.114** for pinic acid and **0.155** for phthalic acid, reversing their order. Across all 30 records, the model’s mean signed error is only −0.009. Applying that average as a correction to both acids would leave their predicted order intact. A separate modeled sweep shows how activation depends on oxygen content at fixed dry diameter and molar mass. Choosing between these two real compounds calls for a comparison with the individual measurements. [Gorkowski et al., Figures 9 and 12](https://doi.org/10.5194/acp-19-13383-2019)
 

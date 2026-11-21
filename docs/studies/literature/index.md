@@ -31,7 +31,7 @@ Particula sizes a 100.7 nm PSL standard at about 102 nm near atmospheric pressur
 [![Water activity declines as citric acid mass fraction rises. The BAT line and AIOMFAC ticks sit close together and above all 12 measured points. The largest separation from the measurements occurs toward concentrated acid.](../../images/citric-acid-activity/graphical-abstract.svg)\
 BAT and AIOMFAC both overpredict water activity at all 12 measured citric acid concentrations](particle-water-uptake/citric-acid/index.md)
 
-[![From measurements to BAT predictions, the lines for the two acids cross. Pinic acid has the larger measured activation hygroscopicity, while BAT assigns the larger value to phthalic acid.](../../images/bat-ccn/graphical-abstract.svg)\
+[![A dry particle grows into a cloud droplet. On the activation hygroscopicity (κ) scale, measurements rank pinic acid (0.248) above phthalic acid (0.051). BAT predicts the reverse, 0.114 for pinic acid and 0.155 for phthalic acid.](../../images/bat-ccn/graphical-abstract.svg)\
 BAT reverses the measured ordering of pinic and phthalic acid hygroscopicity at cloud activation](particle-water-uptake/bat-ccn.md)
 
 [![Change in organic mass per sulfate after dilution: the chamber measurement and growth-calibrated fit fall below their starting values. The reversible-pool model and its imidazole-producing variant (IC) both rise.](../../images/glyoxal-chamber/graphical-abstract.svg)\
