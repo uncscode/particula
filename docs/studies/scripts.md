@@ -22,6 +22,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Brownian coagulation in a PDF population](tutorials/coagulation-populations/coagulation_2_pdf_pattern.py)
 - [Brownian coagulation in a PMF population](tutorials/coagulation-populations/coagulation_1_pmf_pattern.py)
 - [Build on the CPU, evolve on CUDA, analyze on the CPU](tutorials/working-with-gpu/gpu_prepared_quick_start.py)
+- [Can ship-track nitric acid predict the two marine events?](literature/sea2cloud-events/marine_history.py)
 - [Capture and replay a native CUDA schedule](tutorials/working-with-gpu/resident/gpu_resident_graph_capture.py)
 - [Change a model state without losing its meaning](tutorials/building-an-aerosol/native_state_access.py)
 - [Charge-dependent Brownian collisions on CUDA](validation/coagulation/charged-aerosols/gpu_charged_models.py)

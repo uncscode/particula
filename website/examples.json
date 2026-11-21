@@ -1349,5 +1349,29 @@
       "scripts/sea2cloud_events/plots.py"
     ],
     "full_canvas": true
+  },
+  "marine-history": {
+    "title": "Can ship-track nitric acid predict the two marine events?",
+    "source": "docs/studies/literature/sea2cloud-events/marine_history.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 7200,
+    "inputs": [
+      "scripts/sea2cloud_events/marine_history.py",
+      "scripts/sea2cloud_events/replay_plots.py",
+      "scripts/sea2cloud_events/study.py",
+      "scripts/sea2cloud_events/figure_inputs.py",
+      "docs/data/sea2cloud-events/hourly-acid.csv",
+      "docs/data/sea2cloud-events/observations.csv",
+      "docs/data/sea2cloud-events/background.csv",
+      "scripts/sea2cloud_events/navigation.py",
+      "docs/data/sea2cloud-events/track.csv"
+    ],
+    "data_expression": "report",
+    "render_functions": [],
+    "plot_inputs": [
+      "scripts/sea2cloud_events/replay_plots.py"
+    ],
+    "full_canvas": true
   }
 }

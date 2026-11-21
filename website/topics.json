@@ -4726,7 +4726,8 @@
       "study": {
         "id": "sea2cloud-events",
         "runs": [
-          "sea2cloud-events"
+          "sea2cloud-events",
+          "marine-history"
         ],
         "companions": [],
         "relations": [
@@ -4737,6 +4738,14 @@
         ]
       },
       "tocFigure": "sea2cloud-events/graphical-abstract.svg"
+    },
+    {
+      "source": "docs/studies/literature/sea2cloud-events/marine_history.py",
+      "title": "Can ship-track nitric acid predict the two marine events?",
+      "topic": "nucleation",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
     }
   ],
   "supporting": [
