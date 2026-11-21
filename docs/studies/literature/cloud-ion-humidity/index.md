@@ -8,7 +8,7 @@ At 20 °C in the CERN CLOUD chamber, raising relative humidity (RH) from 7% to 7
 
 Franchin and colleagues varied ion production with a particle beam in a 26.1 m³ chamber. Their spectrometer sampled positive and negative cluster ions. Figure 5d gives the mean concentration of the two signs, averaged over the final 10–15 minutes of each setting. The dry and humid measurements came from separate runs. [Experimental method and Figure 5d](https://acp.copernicus.org/articles/15/7203/2015/)
 
-![Across ion production rates, the humidity-specific curves follow most observations at 0%, 7% and 40% relative humidity. At 70%, five of six measured concentrations lie above the shaded range.](../../../images/cloud-ion-humidity/humidity-sweep.png)
+![Across ion production rates, the humidity-specific curves follow most observations at 0%, 7% and 40% relative humidity. At 70%, five of six measured concentrations lie above the shaded range.](../../../../website/results/cloud-ion-humidity/figure-2-1.png)
 
 *Mean ion concentration per polarity at 20 °C. Open circles and vertical bars are the measurements and scatter digitized from Franchin et al., Figure 5d. The dashed curve uses a fixed recombination coefficient of 1.7 × 10⁻⁶ cm³ s⁻¹. Each solid curve uses the coefficient fitted for that humidity in Table A2. Shading spans the reported ranges of recombination and first-order loss. Diamonds show Particula CUDA ensemble means at 2, 20 and 65 ion pairs cm⁻³ s⁻¹, with 95% Monte Carlo intervals.* [Franchin et al., Figure 5d](https://acp.copernicus.org/articles/15/7203/2015/acp-15-7203-2015.pdf#page=6) · [Table A2](https://acp.copernicus.org/articles/15/7203/2015/acp-15-7203-2015.pdf#page=10)
 
@@ -22,7 +22,7 @@ Using the humidity-specific coefficients puts **21 of 23 measured concentrations
 | 70% | 68.05 | 5,815 (5,215–6,417) | 4,100 ± 22 |
 | 70% | 2.64 | 1,768 (1,579–1,956) | 293 ± 7 |
 
-![At high production the 7% measurement and simulated concentration coincide while the 70% reading lies above the simulation. At low production even the lower measurement bar is well above the loss ceiling.](../../../../website/results/cloud-ion-humidity/figure-2-1.png)
+![At high production the 7% measurement and simulated concentration coincide while the 70% reading lies above the simulation. At low production even the lower measurement bar is well above the loss ceiling.](../../../../website/results/cloud-ion-humidity/figure-3-1.png)
 
 The measured bars describe scatter in the steady readings. The simulation intervals describe sampling across independent boxes at fixed physical inputs. The two high-source simulations use 68 ion pairs cm⁻³ s⁻¹. Their independent standard errors add in quadrature for the humidity contrast. [Runnable matched-condition and clearing comparisons](cloud_ion_humidity.py)
 
@@ -51,11 +51,11 @@ An ordinary beam-off trace can be identical for two physically different explana
 
 Both use $\alpha=1.938\times10^{-6}$ cm³ s⁻¹. The useful intervention is to establish the physical zero independently through the humid sampling path. Repeat the 2.28 and 2.64 ion-pair settings, switch off the beam, hold the clearing field for **120 s**, then release to a background of 1.84 ion pairs cm⁻³ s⁻¹. Record both polarities at 5, 10, 30, 60 and 120 s. With a starting reading of 1,407 ions cm⁻³, residual concentrations from 0–100 ions cm⁻³, detector time constants from 0–60 s and unit gain, the predicted reading **30 s after release** is **1,086–1,196** for the offset and **82–286 ions cm⁻³** for the extra source. The ranges describe synthetic trajectories.
 
-![Predicted detector readings after field release. At 30 seconds the offset model remains above 1,086 ions per cubic centimetre while the extra-source model stays below 286.](../../../../website/results/cloud-ion-humidity/figure-3-1.png)
+![Predicted detector readings after field release. At 30 seconds the offset model remains above 1,086 ions per cubic centimetre while the extra-source model stays below 286.](../../../../website/results/cloud-ion-humidity/figure-4-1.png)
 
 In a blinded recovery test, one inlet distinguished these two fitted cases in 512 of 512 trials in each direction (pointwise 95% Wilson lower bound 99.3%). Separating localized production from nonuniform wall loss also requires a spatial measurement. With the reference noise and inlet gains known to ±5%, the second inlet needed to sample **at most half the plume fraction** of the first. At ±10% gain the smallest passing reduction tested rose to 62.5%, and at ±15% to 87.5%. At double the noise, only exactly known gains and complete exposure contrast passed. These thresholds apply to the four fitted hypotheses and tested grid. Co-locate the counters to measure humid gain and noise, then independently establish the contrast with a beam profile and a transport or tracer measurement.
 
-![Smallest passing reduction in plume fraction at each inlet gain uncertainty. More uncertain gains require a greater contrast, and under doubled noise only the idealized design passes.](../../../../website/results/cloud-ion-humidity/figure-4-1.png)
+![Smallest passing reduction in plume fraction at each inlet gain uncertainty. More uncertain gains require a greater contrast, and under doubled noise only the idealized design passes.](../../../../website/results/cloud-ion-humidity/figure-5-1.png)
 
 ## Data, methods and reproduction
 
@@ -63,15 +63,27 @@ In a blinded recovery test, one inlet distinguished these two fitted cases in 51
 
 **Native simulation.** Paired production, opposite-ion recombination, neutral cleanup and spherical wall loss run in sequence on CUDA. Each active ion represents one physical ion. The sphere has the chamber volume. Its loss parameter is set so both polarities match the shared linear sink within 0.01%. RH selects the empirical coefficient. The model assumes a well-mixed, aerosol-free gas at 293.15 K and 101,325 Pa. It approximates humidity through the measured rates. Hydration chemistry and spatial transport would require further inputs. [Native atmospheric ion balance](../../validation/coagulation/charged-aerosols/gpu_ion_balance.py)
 
-The original 29 ensembles comprised 2,208 boxes on an NVIDIA GeForce RTX 5060. At a source of 65 pairs cm⁻³ s⁻¹, halving the step changed the means by at most 65 ions cm⁻³ across the three RH values tested. Doubling volume at the finer step changed them by at most 74. The published example reruns the three final ensembles. Each high-source case uses 96 boxes of 0.02 cm³ at a 0.25 s step. The low-source case uses 128 boxes of 0.04 cm³ at a 0.5 s step. After a 400 s burn-in, 30 samples span 600 s. The calculation checks ion inventories, charge and integer wall losses.
+The original 29 ensembles comprised 2,208 boxes on an NVIDIA GeForce RTX 5060. At a source of 65 pairs cm⁻³ s⁻¹, halving the step changed the means by at most 65 ions cm⁻³ across the three RH values tested. Doubling volume at the finer step changed them by at most 74. The published example reruns the 12 ensembles shown in the four-panel sweep and the three final matched-condition ensembles. Each sweep case uses 64 boxes of 0.01 cm³ at a 1 s step, then averages six samples over 240 s after a 160 s burn-in. Each high-source case uses 96 boxes of 0.02 cm³ at a 0.25 s step. The low-source case uses 128 boxes of 0.04 cm³ at a 0.5 s step. After a 400 s burn-in, 30 samples span 600 s. The calculation checks ion inventories, charge and integer wall losses.
 
 **Measurement design.** The example computes the clearing envelopes from the fitted rates and a first-order detector response. Its third figure redraws the archived blinded comparison. At each gain and inlet contrast we retained the lowest pairwise Wilson bound across two seeds and two fitting grids with 512 trials per generating case. Passing requires every bound to exceed 90%. The spatial cases were matched at the original inlet plateaus. Fit and evaluation drew separate runs of field-blank noise in 60 s blocks from a later CLOUD Cluster Ion Counter. Those blanks supply a reference noise scale for the proposed test. The 2015 spectrometer's humid gain, noise and sampling footprint still require measurement. [Download the example ZIP containing two-inlet-design.csv](cloud_ion_humidity.py) · [Mirme et al. (2025)](https://amt.copernicus.org/articles/18/5717/2025/) · [Counter data](https://doi.org/10.5281/zenodo.17357061)
 
-From a Particula development environment with CUDA, refresh the study to rerun the three native cases and produce the figures. The second command redraws the same figures from verified saved numbers on CPU.
+From a Particula development environment with CUDA, refresh the study to rerun all 15 native cases and produce the figures. The second command redraws the same figures from verified saved numbers on CPU.
 
 ```bash
 python scripts/docs_examples.py refresh cloud-ion-humidity
 python scripts/docs_examples.py replot cloud-ion-humidity
 ```
 
-The [worked example](cloud_ion_humidity.py) includes the saved figures, source, device record and downloadable inputs. From the extracted ZIP run `python example.py`.
+The [worked example](cloud_ion_humidity.py) includes all four figures, their numerical plot data, the device record and a downloadable source-and-input ZIP. In the numerical data, `humidity_sweep` holds the 29 measurements and scatter bars, 12 CUDA ensembles with their seeds and standard errors, and the exact arrays used for both model curves and the sensitivity bands. From the extracted ZIP run `python example.py`.
+
+To redraw just the humidity sweep on CPU, download **Numerical plot data** from the worked example, save it as `data.json` beside `example.py` in the extracted ZIP, and run the following Python from that directory with NumPy and Matplotlib installed.
+
+```python
+import json
+from pathlib import Path
+
+from scripts.cloud_ion_humidity.plots import humidity_sweep
+
+report = json.loads(Path("data.json").read_text())
+humidity_sweep(report).savefig("humidity-sweep.png", dpi=300)
+```
