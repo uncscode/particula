@@ -42,6 +42,11 @@ See `references/sources.md` for search commands and older-version fallback.
 
 Use [particula-studies-literature](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-studies-literature/SKILL.md) to check simulation outputs, compare them with published measurements and write a report whose title states the scientific finding.
 
+Studies, worked examples and substantial guide or theory edits share
+[drafting and editing roles](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/references/drafting-and-editing.md). An
+independent literature reader can supply the study question. The page owner
+checks the draft against the evidence and approves revisions directly.
+
 Use [particula-toc](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-toc/SKILL.md) to turn a study finding into a square graphical abstract that accompanies its title.
 
 ## Report a research concern

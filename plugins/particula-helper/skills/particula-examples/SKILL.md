@@ -14,6 +14,10 @@ for the adaptable format and visual requirements. Use
 
 ## Scope and write
 
+Use the [drafting and editing roles](../../references/drafting-and-editing.md)
+for a new example or substantial prose revision. The page owner approves the
+brief and integrates the edited narrative into the maintained Python cells.
+
 1. Establish the scientific question, reader prerequisites, intended takeaway,
    model assumptions, units and supported backend. For an edit, inspect the
    current source, registered invocation, saved results and topic associations.

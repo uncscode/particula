@@ -1,12 +1,12 @@
 {
   "name": "particula-helper-opencode",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
       "name": "particula-helper-opencode",
-      "version": "0.3.5",
+      "version": "0.3.6",
       "license": "MIT",
       "dependencies": {
         "@opencode/plugin": "2.1.3"

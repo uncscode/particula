@@ -25,6 +25,10 @@ complete topic/navigation integration. For other scientific explanations, use
 `../../references/scientific-narratives.md`. Keep short reference edits
 proportional.
 
+Use the [drafting and editing roles](../../references/drafting-and-editing.md)
+for substantive guide and theory writing. Adapt the brief to the page's
+reader and task. The page owner can approve and apply the revision directly.
+
 Choose the reader's task and extend its owning topic before creating a page:
 Guide for supported usage, Studies for runnable calculations and scientific
 comparisons, Theory for derivations, API for symbol reference, and Contribute

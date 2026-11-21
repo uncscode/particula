@@ -5,6 +5,11 @@ description: "Analyze Particula simulations and write literature studies compari
 
 # Analyze aerosol studies and write literature reports
 
+Use the [drafting and editing roles](../../references/drafting-and-editing.md)
+when framing a study question or writing its report. An independently launched
+literature analysis can originate the question. The study owner can select
+it from the primary evidence and proceed without an intake interview.
+
 ## Analyze the results
 
 1. Read run metadata and numerical outputs before interpreting plots. Establish units, distribution representation, radius/diameter convention, species and process configuration.
@@ -17,7 +22,20 @@ Deliver key findings, linked plots/data, quantitative check results and justifie
 
 ## Write a literature report
 
-Open with what the paper measured, what Particula predicted under comparable conditions, and why the difference matters. Link the specific figure, table or equation beside the comparison. Use a figure that lets readers see the underlying series when a matched pair or summary could hide where the model succeeds or fails.
+Give the drafter the selected question and the saved results. After the
+editor checks the summary, conclusion and proposed future work using the
+three reader questions in the drafting and editing roles, the study owner
+applies any repairs and approves the copy against the paper and run evidence.
+
+Give the reader this sequence. Choose the published headings from the science of the particular study.
+
+1. Pair the table-of-contents (TOC) figure with an unheaded 100–200 word opening directly below the title. Let the figure show the comparison and the prose explain the question, the reference study, the principal result and its implication. Include the decisive numbers and conditions. When a report has no TOC figure, the opening still stands on its own.
+2. Give the paper's background a descriptive heading naming the experiment, phenomenon or question that motivated it. In fewer than 300 words, explain what the authors measured or modeled and how their work motivates the comparison.
+3. Introduce the Particula analysis under a heading that names the scientific test or finding. Nest the individual comparisons and extensions beneath it as subsections with informative headings. Distinguish observations, fitted quantities, predictions and proposed tests. Link the specific figure, table or equation beside each comparison.
+4. Close the scientific narrative under a heading that states the takeaway or calls for a specific next test. Explain what the result lets the reader infer, where that inference is limited and what evidence could change it.
+5. End with reproducibility information and study resources. Collect inputs, run conditions, versions, commands and saved outputs there. A **Study resources** section can serve this purpose on its own or follow **Reproducibility** with the site's generated links. Place footnote definitions at the end and keep reference markers beside the material they credit.
+
+Let the reader see the contribution through a specific consequence, such as an assumption that reverses a prediction or a measurement that could distinguish two explanations. Credit the original study and identify the model where needed for attribution.
 
 Write the headline as the answer you would give a researcher. Lead with a surprising, defensible comparison and name the observable, direction and decisive condition. A longer title earns its length when the added detail changes the interpretation. For example, “Particula predicts half the rise in ion concentration CLOUD measured from 7% to 70% humidity.” The counts establish a concentration discrepancy. Its cause could involve wall loss, production or sampling. When several explanations fit, the headline can say what the data constrain or which test would distinguish them.
 
