@@ -1,22 +1,35 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
   <title id="title">Cloud droplets over fresh and salt water in the Π Chamber</title>
-  <desc id="desc">A droplet denotes cloud number per cubic centimeter. From the fresh-water to the salt-water floor experiment the measured count rises, while a model with humidity fitted separately to each haze population predicts a decline. Both series use the same vertical scale.</desc>
+  <desc id="desc">Measured cloud droplet concentration rises from the fresh-water to the salt-water experiment. Fitting humidity separately to each haze population predicts a decline on the same scale. Beside the salt-water endpoints, a denser cluster of solid blue droplets represents the measurement and a sparser cluster of outlined droplets represents the simulation.</desc>
+  <defs>
+    <path id="droplet" d="M0-6.5C-1.6-3.5-4.5-.8-4.5 2a4.5 4.5 0 0 0 9 0C4.5-.8 1.6-3.5 0-6.5Z"/>
+  </defs>
   <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
-  <path d="M40 24c-4 9-13 17-13 26a13 13 0 0 0 26 0c0-9-9-17-13-26z" fill="#135963"/>
-  <path d="M33 49q0 6 5 8" stroke="#bad5d1" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-  <text x="60" y="55" font-family="sans-serif" font-weight="bold" font-size="20" fill="#233e41">cm⁻³</text>
-  <!-- One linear y scale. Fresh/salt measurements: 771/1038. Separate haze fits: 734/462. -->
-  <path d="M55 139.8 243 81.0" stroke="#135963" stroke-width="5" fill="none"/>
-  <g fill="#135963"><circle cx="55" cy="139.8" r="6"/><circle cx="243" cy="81" r="6"/></g>
-  <path d="M55 147.9 243 207.8" stroke="#a45121" stroke-width="4" stroke-dasharray="8 5" fill="none"/>
-  <path d="m55 141.9 6 6-6 6-6-6z M243 201.8l6 6-6 6-6-6z" fill="#fbf2e3" stroke="#95431e" stroke-width="3"/>
-  <g font-family="sans-serif" font-size="17" font-weight="bold">
-    <text x="251" y="65" text-anchor="end" fill="#135963">Measured</text>
-    <text x="251" y="169" text-anchor="end" fill="#86401c">Modeled</text>
+  <path d="M32 51a9 9 0 0 1-1-18 12 12 0 0 1 23-1 9.5 9.5 0 1 1 2 19Z" fill="#d9e9ec" stroke="#235879" stroke-width="2.5"/>
+  <text x="78" y="43" font-family="sans-serif" font-weight="bold" font-size="19" fill="#233e41">Droplets/cm³</text>
+
+  <!-- Common linear y scale. Measured fresh/salt: 771/1038. Separate haze fits: 734/462. -->
+  <path d="M52 140 214 81" stroke="#1e6289" stroke-width="4.5" fill="none"/>
+  <g fill="#1e6289"><circle cx="52" cy="140" r="5"/><circle cx="214" cy="81" r="5"/></g>
+  <path d="M52 148 214 208" stroke="#a45121" stroke-width="4" stroke-dasharray="8 5" fill="none"/>
+  <path d="m52 143 5 5-5 5-5-5z m162 60 5 5-5 5-5-5z" fill="#fbf2e3" stroke="#95431e" stroke-width="2.5"/>
+  <g font-family="sans-serif" font-size="17" font-weight="bold" text-anchor="end">
+    <text x="218" y="67" fill="#205777">Measured</text>
+    <text x="218" y="175" fill="#86401c">Modeled</text>
   </g>
-  <path d="M39 238h222 M55 238v6 M243 238v6" fill="none" stroke="#526263" stroke-width="2"/>
+  <!-- Equal-sized icons show relative abundance at the salt-water endpoints. -->
+  <g fill="#3986af" stroke="#205777" stroke-width="1.2">
+    <use href="#droplet" x="241" y="67"/><use href="#droplet" x="258" y="67"/>
+    <use href="#droplet" x="233" y="82"/><use href="#droplet" x="250" y="82"/><use href="#droplet" x="267" y="82"/>
+    <use href="#droplet" x="241" y="97"/><use href="#droplet" x="258" y="97"/>
+  </g>
+  <g fill="#fbf2e3" stroke="#28668b" stroke-width="1.9">
+    <use href="#droplet" x="241" y="201"/><use href="#droplet" x="258" y="201"/>
+    <use href="#droplet" x="250" y="217"/>
+  </g>
+  <path d="M34 238h236 M52 238v6 M214 238v6" fill="none" stroke="#526263" stroke-width="2"/>
   <g fill="#233e41" font-family="sans-serif" font-size="18" text-anchor="middle">
-    <text x="55" y="271">Freshwater</text>
-    <text x="243" y="271">Saltwater</text>
+    <text x="52" y="271">Freshwater</text>
+    <text x="214" y="271">Saltwater</text>
   </g>
 </svg>
