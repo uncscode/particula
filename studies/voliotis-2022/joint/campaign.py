@@ -17,7 +17,7 @@ PPB_TO_UG_M3 = MW * 101325 / (8.314462618 * 298.15) * 1e-3
 STEP_S = 60
 
 
-def inputs():
+def inputs(knot_seconds=1200):
     """Match original AMS samples with full measured parent histories."""
     primary = pd.read_csv(HERE.parent / "data/observations.csv").rename(
         columns={"kind": "variable"}
@@ -47,7 +47,9 @@ def inputs():
         steps = np.arange(0, last + 1, STEP_S)  # cover the gas window
         if len(steps) < 61:
             continue
-        grid = np.unique(np.r_[np.arange(0, steps[-1], 1200), steps[-1]])
+        grid = np.unique(
+            np.r_[np.arange(0, steps[-1], knot_seconds), steps[-1]]
+        )
         ams = ams[(ams.time_s >= 0) & (ams.time_s <= steps[-1])]
         mass = np.zeros((len(steps) - 1, 3))
         for i, (d, v) in enumerate(zip(doses, vocs, strict=True)):

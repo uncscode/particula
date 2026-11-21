@@ -1,6 +1,6 @@
 # An α-pinene chamber fit predicts 77 µg m⁻³ of suspended organic aerosol in a second run that reached 109
 
-The final campaign assessment quantifies chemistry and wall-loss uncertainty across the 15 paired experiments. [Read the study assessment](ASSESSMENT.md)
+The final campaign assessment quantifies chemistry and wall-loss uncertainty across the 15 paired experiments. [Read the wall and chemistry assessment](ASSESSMENT.md) · [Explore the additional chemical pathways](CHEMICAL_PATHWAYS.md)
 
 Two Manchester chamber experiments began with the same nominal α-pinene loading. One reached 68.47 µg m⁻³ of suspended organic aerosol and the other reached 109.46 µg m⁻³. We fitted Particula's gas chemistry and reversible condensation to the first run and supplied the second run's own measured α-pinene decay, initial particle number and seed mass. With the product and loss parameters fixed, the predicted second peak was 76.88 µg m⁻³, 30% below the measurement. All 21 parameter sets that fit the first trajectory within 2 µg m⁻³ of its lowest root-mean-square error underpredicted the second peak. Yet uncertainty in the relative precursor injections could account for much of the difference. An independent particle-number record also challenges the removal rate inferred from the first mass curve. Together, these comparisons identify what the gas and aerosol records constrain and where experimental uncertainty still admits different explanations. [Chamber paper](https://acp.copernicus.org/articles/22/14147/2022/) · [Archived observations](data/README.md)
 

@@ -1,0 +1,78 @@
+{
+  "python": "3.12.12",
+  "particula": "0.3.3",
+  "scipy": "1.16.2",
+  "numpy": "2.3.4",
+  "warp": "1.11.1",
+  "device": "NVIDIA GeForce RTX 5060",
+  "seeds": [
+    2371,
+    8191
+  ],
+  "bounds": {
+    "lag_pinene_h": [
+      0.08333333333333333,
+      4.0
+    ],
+    "lag_cresol_h": [
+      0.08333333333333333,
+      4.0
+    ],
+    "lag_isoprene_h": [
+      0.08333333333333333,
+      4.0
+    ],
+    "own_pinene_yield": [
+      0.0,
+      2.0
+    ],
+    "own_cresol_yield": [
+      0.0,
+      2.0
+    ],
+    "own_isoprene_yield": [
+      0.0,
+      2.0
+    ],
+    "mixture_pinene_yield": [
+      0.0,
+      2.0
+    ],
+    "mixture_cresol_yield": [
+      0.0,
+      2.0
+    ],
+    "mixture_isoprene_yield": [
+      0.0,
+      2.0
+    ],
+    "wall_eddy_s": [
+      2.818382931264455,
+      16.551404797047777
+    ],
+    "alpha_branch_g_g": [
+      0.0,
+      0.25
+    ],
+    "auto_time_s": [
+      0.1,
+      300.0
+    ],
+    "competition_per_ppb_min": [
+      0.0,
+      10.0
+    ],
+    "uptake_precursor_g_g": [
+      0.0,
+      0.25
+    ],
+    "effective_gamma": [
+      1e-05,
+      0.03
+    ],
+    "vapor_loss_h_inv": [
+      0.05,
+      5.0
+    ]
+  }
+}

@@ -6,7 +6,7 @@ import json
 import numpy as np
 import pandas as pd
 import warp as wp
-from campaign import HERE, inputs
+from campaign import HERE, PPB_TO_UG_M3, inputs
 from engine import CONDITIONS, F64, KB, brownian_equal_pair
 from particula.gas.properties.dynamic_viscosity import get_dynamic_viscosity
 from particula.gas.properties.mean_free_path import get_molecule_mean_free_path
@@ -19,6 +19,23 @@ from scipy.stats import qmc
 from wall_fit import OUT
 
 V3 = wp.vec3d
+ISOPRENE_UG_M3_PER_PPB = wp.constant(F64(PPB_TO_UG_M3[2]))
+
+
+@wp.func
+def vapor_step(old: F64, source: F64, gain: F64, loss: F64, dt: F64):
+    """Integrate uniform production and two competing first-order sinks."""
+    rate = gain + loss
+    x = rate * dt
+    # Taylor form preserves the source term at small rate times step.
+    release = F64(1.0) - wp.exp(-x)
+    source_release = F64(0.5) * x - x * x / F64(6.0)
+    if x > F64(0.0001):
+        source_release = F64(1.0) - release / x
+    removed = old * release + source * source_release
+    return V3(
+        old + source - removed, removed * gain / rate, removed * loss / rate
+    )
 
 
 @wp.kernel
@@ -31,6 +48,7 @@ def campaign_kernel(  # noqa: C901 - fused CUDA integration and observation loop
     eddy: int,
     brownian: int,
     sub: int,
+    pathway: int,
     errors: wp.array4d(dtype=F64),
 ):
     """Integrate product maturation, particle deposition and number loss."""
@@ -48,6 +66,11 @@ def campaign_kernel(  # noqa: C901 - fused CUDA integration and observation loop
         mature[s] = F64(1.0) - wp.exp(-arg)
         supply_mature[s] = F64(1.0) - mature[s] / arg
     observed_time_peak = F64(0.0)
+    auto_gas = F64(0.0)
+    uptake_gas = F64(0.0)
+    other_sink = F64(0.0)
+    auto_delivered = F64(0.0)
+    uptake_delivered = F64(0.0)
     ms = F64(0.0)
     ns = F64(0.0)
     deposited = F64(0.0)
@@ -65,6 +88,41 @@ def campaign_kernel(  # noqa: C901 - fused CUDA integration and observation loop
                 * doses[d]
                 / F64(sub)
             )
+        alpha = (src[r, j, 0] + src[r, j, 3]) * doses[d] / F64(sub)
+        cresol = (src[r, j, 1] + src[r, j, 4]) * doses[d] / F64(sub)
+        iso_ppb_min = (
+            (src[r, j, 2] + src[r, j, 5]) * doses[d] / (ISOPRENE_UG_M3_PER_PPB)
+        )
+        diverted = F64(0.0)
+        if pathway == 5:
+            # Split the existing mixed-parent source between its two partners.
+            reacted = V3()
+            for s in range(3):
+                reacted[s] = src[r, j, s] + src[r, j, s + 3]
+            for s in range(3):
+                first = (s + 1) % 3
+                second = (s + 2) % 3
+                # Alternate partners are isoprene, isoprene and cresol.
+                alt = 2
+                if s == 2:
+                    alt = 1
+                other = reacted[first] + reacted[second]
+                if other > F64(0.0):
+                    mixed = src[r, j, s + 3] * doses[d] / F64(sub)
+                    supply[s] += (
+                        mixed
+                        * reacted[alt]
+                        / other
+                        * (params[i, 16 + s] - params[i, 6 + s])
+                    )
+        if pathway >= 6:
+            retain = F64(1.0) / (F64(1.0) + params[i, 12] * iso_ppb_min)
+            if pathway != 9:
+                diverted += supply[0] * (F64(1.0) - retain)
+                supply[0] *= retain
+            if pathway != 8:
+                diverted += supply[1] * (F64(1.0) - retain)
+                supply[1] *= retain
         for _step in range(sub):
             volume = seed / F64(1770.0) + soa / F64(1400.0)
             radius = wp.pow(
@@ -86,12 +144,52 @@ def campaign_kernel(  # noqa: C901 - fused CUDA integration and observation loop
                     KB,
                 )
             keep = wp.exp(-kw * dt)
+            supplied += diverted
+            other_sink += diverted
             product = F64(0.0)
             for s in range(3):
                 move = inter[s] * mature[s] + supply[s] * supply_mature[s]
                 inter[s] += supply[s] - move
                 supplied += supply[s]
                 product += move
+            # Candidate product yields are per mass of reacted parent.
+            if pathway == 1:
+                prompt = params[i, 10] * alpha
+                supplied += prompt
+                product += prompt
+                auto_delivered += prompt
+            if pathway == 2 or pathway == 4:
+                source = params[i, 10] * alpha
+                k_auto = F64(1.0) / params[i, 11]
+                step = vapor_step(
+                    auto_gas,
+                    source,
+                    k_auto,
+                    k_auto * params[i, 12] * iso_ppb_min,
+                    dt,
+                )
+                auto_gas = step[0]
+                product += step[1]
+                auto_delivered += step[1]
+                other_sink += step[2]
+                supplied += source
+            if pathway == 3 or pathway == 4 or pathway == 7:
+                source = params[i, 13] * (alpha + cresol)
+                area = F64(4.0 * 3.141592653589793) * radius * radius * count
+                # cbar = 200 m/s, geometric area in m2/m3.
+                k_uptake = params[i, 14] * F64(50.0) * area
+                step = vapor_step(
+                    uptake_gas,
+                    source,
+                    k_uptake,
+                    params[i, 15] / F64(3600.0),
+                    dt,
+                )
+                uptake_gas = step[0]
+                product += step[1]
+                uptake_delivered += step[1]
+                other_sink += step[2]
+                supplied += source
             if brownian == 1:
                 pair = brownian_equal_pair(
                     radius,
@@ -110,6 +208,9 @@ def campaign_kernel(  # noqa: C901 - fused CUDA integration and observation loop
                 F64(1.0) - survived
             )
             soa = soa * keep + product * survived
+        if errors.shape[3] > 8:
+            errors[i, r, d, 8 + 2 * j] = soa
+            errors[i, r, d, 9 + 2 * j] = count / initial[r, 1]
         if observations[r, j, 0] >= F64(0.0):
             pred = old + (soa - old) * observations[r, j, 0]
             observed_time_peak = wp.max(observed_time_peak, pred)
@@ -122,20 +223,33 @@ def campaign_kernel(  # noqa: C901 - fused CUDA integration and observation loop
     errors[i, r, d, 0] = wp.sqrt(ms / initial[r, 3])
     errors[i, r, d, 1] = wp.sqrt(ns / initial[r, 4])
     errors[i, r, d, 2] = wp.abs(
-        supplied - deposited - soa - inter[0] - inter[1] - inter[2]
+        supplied
+        - deposited
+        - soa
+        - inter[0]
+        - inter[1]
+        - inter[2]
+        - auto_gas
+        - uptake_gas
+        - other_sink
     )
 
-    if errors.shape[3] == 5:
+    if errors.shape[3] >= 5:
         errors[i, r, d, 3] = observed_time_peak
         errors[i, r, d, 4] = count / initial[r, 1]
+    if errors.shape[3] > 5:
+        errors[i, r, d, 5] = auto_delivered
+        errors[i, r, d, 6] = uptake_delivered
+        errors[i, r, d, 7] = other_sink
+        errors[i, r, d, 608] = soa + deposited
 
 
 class Campaign:
     """Batch kinetic and injection candidates on a single CUDA device."""
 
-    def __init__(self):
+    def __init__(self, source_knot_seconds=1200):
         """Align the measured gas, aerosol and particle counter records."""
-        self.runs = inputs()
+        self.runs = inputs(source_knot_seconds)
         conditions = pd.read_csv(HERE / "data/campaign_peaks.csv").set_index(
             "run"
         )
@@ -201,9 +315,33 @@ class Campaign:
             for a in (src, obs, props)
         ]
 
-    def evaluate(self, p, eddy, objective, doses, sub=1, *, outcomes=False):
-        """Profile a distinct bounded dose for each run at the chosen rates."""
+    def evaluate(
+        self,
+        p,
+        eddy,
+        objective,
+        doses,
+        sub=1,
+        *,
+        outcomes=False,
+        pathway=0,
+        traces=False,
+    ):
+        """Select one bounded dose per run and return score, errors and doses.
+
+        With outcomes, append observed-time peak SOA and final number fraction.
+        With traces, append ledger error, peak, final number fraction, gross
+        aerosol mass from the alpha and uptake branches, alternative gas loss,
+        300 consecutive (SOA, N/N0) minute pairs and gross SOA production.
+        Mass diagnostics use micrograms per cubic meter.
+        """
         p = np.atleast_2d(p)
+        if pathway not in range(10) or (
+            pathway and p.shape[1] != (19 if pathway == 5 else 16)
+        ):
+            raise ValueError(
+                "Expected an extended parameter vector for each pathway"
+            )
         args = [
             wp.array(p, dtype=F64, device="cuda:0"),
             *self.data,
@@ -211,9 +349,15 @@ class Campaign:
             int(eddy),
             1,
             sub,
+            pathway,
         ]
         out = wp.empty(
-            (len(p), len(self.runs), len(doses), 5 if outcomes else 3),
+            (
+                len(p),
+                len(self.runs),
+                len(doses),
+                609 if traces else (5 if outcomes else 3),
+            ),
             dtype=F64,
             device="cuda:0",
         )
@@ -231,6 +375,8 @@ class Campaign:
         ii = np.arange(len(p))[:, None]
         rr = np.arange(len(self.runs))[None, :]
         result = merit[ii, rr, ix].max(1), e[ii, rr, ix, :2], doses[ix]
+        if traces:
+            return *result, e[ii, rr, ix, 2:]
         if outcomes:
             return *result, e[ii, rr, ix, 3:]
         return result
