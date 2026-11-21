@@ -1,6 +1,8 @@
 # %% [markdown]
 # # Dry charged aerosols: ground level, mesopause and pressurized chambers
 #
+# ![At the same initial dry particle number density and temperature, the higher-pressure chamber retains more particles. The gauge needles and particle densities illustrate the direction of the simulated pressure contrast.](../../../../images/coupled-populations/dry-chamber-pressure.svg)
+#
 # How much of a collision response comes from the environment rather than the
 # starting aerosol abundance? This scan keeps the dry population controlled and
 # separates an atmospheric temperature-pressure path from a pressure-only chamber

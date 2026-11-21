@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">When a size-distribution plot hides a composition error</title>
+  <desc id="desc">A smooth size spectrum sits above species inventories that drift in opposite directions from their common starting reference during fixed-composition binned coagulation. The marks show directions schematically.</desc>
+  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
+  <g font-family="sans-serif" font-weight="600">
+    <text x="30" y="39" text-anchor="start" font-size="20" fill="#243e43">Size spectrum</text>
+    <path d="M33 128H267" fill="none" stroke="#617679" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" />
+    <path d="M36 126C63 126 78 119 103 84S143 56 162 70S195 121 262 126" fill="none" stroke="#135963" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" />
+    <text x="30" y="176" text-anchor="start" font-size="20" fill="#243e43">Species inventory</text>
+    <path d="M36 226H266" fill="none" stroke="#617679" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4 6"/>
+    <path d="M70 226V195" fill="none" stroke="#135963" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
+    <circle cx="70" cy="195" r="6" fill="#135963" stroke="none" stroke-width="2"/>
+    <path d="M122 226V212" fill="none" stroke="#135963" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
+    <circle cx="122" cy="212" r="6" fill="#135963" stroke="none" stroke-width="2"/>
+    <path d="M174 226V246" fill="none" stroke="#be6932" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
+    <circle cx="174" cy="246" r="6" fill="#be6932" stroke="none" stroke-width="2"/>
+    <path d="M226 226V261" fill="none" stroke="#be6932" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" />
+    <circle cx="226" cy="261" r="6" fill="#be6932" stroke="none" stroke-width="2"/>
+  </g>
+</svg>

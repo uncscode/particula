@@ -15,6 +15,8 @@
 # %% [markdown]
 # # When a size-distribution plot hides a composition error
 #
+# ![A smooth size spectrum sits above species inventories that drift in opposite directions from their common starting reference during fixed-composition binned coagulation. The marks show directions schematically.](../../../../images/coupled-populations/organic-binned-inventories.svg)
+#
 # Can a representation that conserves each species during condensation remain
 # suitable after coagulation begins? This example follows organic uptake onto
 # sulfate seeds, then exposes a limitation of fixed-composition binned coagulation.

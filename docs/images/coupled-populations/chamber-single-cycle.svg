@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Follow droplets through one wet–dry chamber cycle</title>
+  <desc id="desc">A surviving seed keeps its core while its water shell expands in humid air and contracts in dry air. The three drawings follow one illustrative trajectory.</desc>
+  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
+  <g font-family="sans-serif" font-weight="600">
+    <path d="M124 73q10-9 21-2t27-2" fill="none" stroke="#135963" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" />
+    <path d="M136 86q8-6 17-1t16-1" fill="none" stroke="#135963" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" />
+    <circle cx="51" cy="151" r="17" fill="#a6d4d9" stroke="#135963" stroke-width="2.8"/>
+    <circle cx="51" cy="151" r="12" fill="#efd1a5" stroke="#243e43" stroke-width="2"/>
+    <circle cx="150" cy="151" r="47" fill="#a6d4d9" stroke="#135963" stroke-width="2.8"/>
+    <circle cx="150" cy="151" r="12" fill="#efd1a5" stroke="#243e43" stroke-width="2"/>
+    <circle cx="249" cy="151" r="17" fill="#a6d4d9" stroke="#135963" stroke-width="2.8"/>
+    <circle cx="249" cy="151" r="12" fill="#efd1a5" stroke="#243e43" stroke-width="2"/>
+    <path d="M74 151H92" fill="none" stroke="#617679" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
+    <path d="M86 146l6 5-6 5" fill="none" stroke="#617679" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
+    <path d="M205 151H223" fill="none" stroke="#617679" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
+    <path d="M217 146l6 5-6 5" fill="none" stroke="#617679" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
+    <text x="51" y="235" text-anchor="middle" font-size="21" fill="#243e43">Start</text>
+    <text x="150" y="235" text-anchor="middle" font-size="21" fill="#243e43">Wet</text>
+    <text x="249" y="235" text-anchor="middle" font-size="21" fill="#243e43">Dry</text>
+  </g>
+</svg>

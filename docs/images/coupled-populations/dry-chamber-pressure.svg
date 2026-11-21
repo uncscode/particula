@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Dry charged aerosols: ground level, mesopause and pressurized chambers</title>
+  <desc id="desc">At the same initial dry particle number density and temperature, the higher-pressure chamber retains more particles. The gauge needles and particle densities illustrate the direction of the simulated pressure contrast.</desc>
+  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
+  <g font-family="sans-serif" font-weight="600">
+    <rect x="24" y="123" width="108" height="85" rx="13" fill="#fffaf1" stroke="#135963" stroke-width="3"/>
+    <rect x="72" y="103" width="12" height="20" rx="0" fill="#cad9d2" stroke="#135963" stroke-width="2"/>
+    <circle cx="78" cy="83" r="24" fill="#fffaf1" stroke="#135963" stroke-width="3"/>
+    <path d="M61 83a17 17 0 0 1 34 0" fill="none" stroke="#617679" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" />
+    <path d="M78 85l-13 -4" fill="none" stroke="#be6932" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" />
+    <circle cx="78" cy="85" r="3.5" fill="#243e43" stroke="none" stroke-width="2"/>
+    <text x="78" y="244" text-anchor="middle" font-size="19" fill="#243e43">Lower</text>
+    <circle cx="48" cy="156" r="4.5" fill="#135963" stroke="none" stroke-width="2"/>
+    <circle cx="94" cy="142" r="4.5" fill="#135963" stroke="none" stroke-width="2"/>
+    <circle cx="74" cy="169" r="4.5" fill="#135963" stroke="none" stroke-width="2"/>
+    <circle cx="108" cy="181" r="4.5" fill="#135963" stroke="none" stroke-width="2"/>
+    <circle cx="59" cy="186" r="4.5" fill="#135963" stroke="none" stroke-width="2"/>
+    <rect x="168" y="123" width="108" height="85" rx="13" fill="#fffaf1" stroke="#135963" stroke-width="3"/>
+    <rect x="216" y="103" width="12" height="20" rx="0" fill="#cad9d2" stroke="#135963" stroke-width="2"/>
+    <circle cx="222" cy="83" r="24" fill="#fffaf1" stroke="#135963" stroke-width="3"/>
+    <path d="M205 83a17 17 0 0 1 34 0" fill="none" stroke="#617679" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" />
+    <path d="M222 85l13 -8" fill="none" stroke="#be6932" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" />
+    <circle cx="222" cy="85" r="3.5" fill="#243e43" stroke="none" stroke-width="2"/>
+    <text x="222" y="244" text-anchor="middle" font-size="19" fill="#243e43">Higher</text>
+    <circle cx="190" cy="146" r="4.5" fill="#135963" stroke="none" stroke-width="2"/>
+    <circle cx="209" cy="141" r="4.5" fill="#135963" stroke="none" stroke-width="2"/>
+    <circle cx="229" cy="140" r="4.5" fill="#135963" stroke="none" stroke-width="2"/>
+    <circle cx="252" cy="145" r="4.5" fill="#135963" stroke="none" stroke-width="2"/>
+    <circle cx="193" cy="165" r="4.5" fill="#135963" stroke="none" stroke-width="2"/>
+    <circle cx="214" cy="160" r="4.5" fill="#135963" stroke="none" stroke-width="2"/>
+    <circle cx="236" cy="159" r="4.5" fill="#135963" stroke="none" stroke-width="2"/>
+    <circle cx="256" cy="165" r="4.5" fill="#135963" stroke="none" stroke-width="2"/>
+    <circle cx="188" cy="183" r="4.5" fill="#135963" stroke="none" stroke-width="2"/>
+    <circle cx="207" cy="178" r="4.5" fill="#135963" stroke="none" stroke-width="2"/>
+    <circle cx="228" cy="180" r="4.5" fill="#135963" stroke="none" stroke-width="2"/>
+    <circle cx="248" cy="184" r="4.5" fill="#135963" stroke="none" stroke-width="2"/>
+    <circle cx="218" cy="194" r="4.5" fill="#135963" stroke="none" stroke-width="2"/>
+    <text x="150" y="278" text-anchor="middle" font-size="21" fill="#243e43">Pressure</text>
+  </g>
+</svg>
