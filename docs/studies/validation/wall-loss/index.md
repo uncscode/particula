@@ -1,6 +1,6 @@
 # Adding settling and diffusion losses predicts too few airborne particles in a spherical chamber
 
-![Identical spherical chambers start with equal numbers of 1 µm particles. After an hour, coupled theory retains about 68% and the additive approximation retains about 58%. Starting from 50 in each chamber, 34 versus 29 dots remain after rounding. The extra row of five makes the difference visible; the dots are a tally.](../../../images/spherical-wall-loss/graphical-abstract.svg)
+![Two equal spherical chambers show a fuller airborne particle cloud for coupled wall loss and a sparser cloud for additive wall loss. The schematic exaggerates the density difference to show its direction.](../../../images/spherical-wall-loss/graphical-abstract.svg)
 
 For 1 µm particles in the reference chamber, the additive approximation leaves **58.2%** airborne after one hour. Coupled spherical deposition theory leaves **68.4%**. Particula’s CUDA wall removal simulation gives **68.55% ± 0.27 percentage points** (95% Monte Carlo interval). This tests agreement with theory under shared diffusion and settling inputs. Independent chamber decay measurements would test the transport assumptions.
 
