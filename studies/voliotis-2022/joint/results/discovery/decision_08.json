@@ -1,0 +1,11 @@
+{
+  "round": 8,
+  "key": "ii_gas",
+  "accepted": true,
+  "match": "direct-process",
+  "analogue": "Two isoprene-derived hydroxyperoxy radicals HO–C₅H₈O₂ form gaseous C₁₀H₁₈O₄ accretion product plus O₂.",
+  "citation": "First oxidation products from the reaction of hydroxyl radicals with isoprene for pristine environmental conditions",
+  "url": "https://www.nature.com/articles/s42004-019-0120-9",
+  "evidence": "Direct sampling of products from OH + isoprene identified the C₁₀ accretion product assigned to the first-generation hydroxyperoxy radical self-reaction.",
+  "difference": "The Manchester lump aggregates many oxidation products and immediately assigns the accretion flux to stable suspended material; the paper measured gaseous products and does not establish that condensed yield or rate."
+}

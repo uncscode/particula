@@ -1,0 +1,11 @@
+{
+  "round": 15,
+  "key": "c_uptake",
+  "accepted": true,
+  "match": "reaction-family",
+  "analogue": "Glyoxal vapor reacts during uptake onto deliquesced aqueous ammonium sulfate particles, including formation of nitrogen-containing condensed products.",
+  "citation": "Online Speciation of Glyoxal Multiphase Reactions on Deliquesced Ammonium Sulfate Particles",
+  "url": "https://doi.org/10.1021/acsearthspacechem.4c00369",
+  "evidence": "Simultaneous gas- and particle-phase chemical speciation tracked glyoxal uptake and chemical transformation on sulfate seed at relative humidity at or above about 80%.",
+  "difference": "The experiment supplied glyoxal directly rather than identifying the o-cresol-derived V_C mixture. Liquid water, reversibility, and the yield of persistent material near 50% RH are unresolved."
+}

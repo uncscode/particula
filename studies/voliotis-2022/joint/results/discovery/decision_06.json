@@ -1,0 +1,11 @@
+{
+  "round": 6,
+  "key": "c_ringopen",
+  "accepted": true,
+  "match": "reaction-family",
+  "analogue": "Gas-phase OH oxidation and ring opening of toluene and 1,2,4-trimethylbenzene to glyoxal, methylglyoxal and other oxygenated fragments.",
+  "citation": "Mechanistic study of the formation of ring-retaining and ring-opening products from the oxidation of aromatic compounds under urban atmospheric conditions",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7133713/",
+  "evidence": "Product measurements in aromatic photooxidation identified first-generation ring-opening dicarbonyls from these aromatic precursors.",
+  "difference": "The measured parent aromatics differ from o-cresol, whose oxidation also has strong ring-retaining channels. No o-cresol-specific cleavage yield, delayed reservoir lifetime or conversion of all reactant mass to one oxygenated vapor follows."
+}

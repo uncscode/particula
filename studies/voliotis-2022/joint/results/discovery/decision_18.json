@@ -1,0 +1,11 @@
+{
+  "round": 18,
+  "key": "ai_term",
+  "accepted": true,
+  "match": "reaction-family",
+  "analogue": "Cross-termination of α-pinene- and isoprene-derived gas-phase peroxy radicals giving C14–15 products at the expense of C19–20 monoterpene dimers.",
+  "citation": "Molecular understanding of the suppression of new-particle formation by isoprene",
+  "url": "https://acp.copernicus.org/articles/20/11809/2020/",
+  "evidence": "CLOUD experiments measured a shift from C19–20 toward C14–15 dimers and suppressed early particle formation upon adding isoprene, consistent with mixed RO₂ termination.",
+  "difference": "The C14–15 products can still participate in growth. Treating all material as permanently volatile F_AI is a model end member; Manchester NOx, loading, and suspended seed differ."
+}

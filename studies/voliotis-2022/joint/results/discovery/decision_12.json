@@ -1,0 +1,11 @@
+{
+  "round": 12,
+  "key": "c_oxid",
+  "accepted": true,
+  "match": "direct-process",
+  "analogue": "Gas-phase OH addition to o-cresol-derived 3-methylcatechol and successive phenolics produces more oxygenated toluenes and methylbenzoquinones, some of which enter particles.",
+  "citation": "Formation of highly oxygenated low-volatility products from cresol oxidation",
+  "url": "https://acp.copernicus.org/articles/17/3453/2017/",
+  "evidence": "CIMS and particle DART-MS detected later-generation oxygenated products from cresol oxidation. Separate 3-methylcatechol oxidation experiments traced the next generation of products.",
+  "difference": "V_C pools compounds spanning many volatilities and the single irreversible S_C flux omits explicitly oxidant-dependent rates, multiple generations and repartitioning."
+}

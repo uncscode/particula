@@ -1,5 +1,7 @@
 # Chemistry controls most of the modeled peak SOA spread, while particle counts constrain wall loss
 
+The 20-reaction follow-up compares each fitted equation with published chemistry and tests whether evaporation gives the same observed response. [Sequential reaction study](REACTION_DISCOVERY.md)
+
 The follow-up compares gas-phase low-volatility formation, reactive uptake and partner-dependent product yields against the same observations. [Chemical pathway experiments](CHEMICAL_PATHWAYS.md)
 
 One shared reduced mechanism reproduced parts of the Manchester SOA campaign, but the best joint fit left a **21.41% worst trajectory error** across the 15 experiments with measured precursor decay, suspended organic mass and particle counts. The worst mass trajectory alone had 21.41% error, exceeding the original 10% mass target. A matched fit with constant particle loss gave 24.93%. Size-dependent deposition improves agreement, and chemistry can compensate for part of the change in wall loss. Neither effect resolved the ternary mass excess or the rising particle count in a binary run. These are same-experiment reproduction results conditional on measured precursor decay. The paper reports 24 experiments in total. [Voliotis et al.](https://acp.copernicus.org/articles/22/14147/2022/) · [Coverage and archive reconciliation](joint/data/CAMPAIGN_SERIES.md) · [Run-by-run results](joint/results/uncertainty/best_by_run.csv)

@@ -1,0 +1,11 @@
+{
+  "round": 9,
+  "key": "i_uptake",
+  "accepted": true,
+  "match": "direct-process",
+  "analogue": "Gas-phase isoprene epoxydiol reactive uptake onto sulfate-containing aerosol.",
+  "citation": "Reactive Uptake of an Isoprene-Derived Epoxydiol to Submicron Aerosol Particles",
+  "url": "https://doi.org/10.1021/es5034266",
+  "evidence": "Gaston et al. measured over 500-fold greater uptake on ammonium bisulfate than on ammonium sulfate, where the coefficient was at most 10⁻⁴.",
+  "difference": "V_I is not measured IEPOX, and Manchester supplied nominally neutral sulfate. Acidity, organic coating, available surface and gas-phase precursor abundance control whether uptake contributes."
+}

@@ -1,0 +1,11 @@
+{
+  "round": 5,
+  "key": "a_uptake",
+  "accepted": true,
+  "match": "reaction-family",
+  "analogue": "Gas-phase pinonaldehyde reacting after uptake on sulfuric acid/ammonium sulfate particles, giving oligomeric particle material.",
+  "citation": "Reactive uptake of pinonaldehyde on acidic aerosols",
+  "url": "https://doi.org/10.1029/2005JD006978",
+  "evidence": "Particle spectra showed fragments heavier than the pinonaldehyde monomer after vapor exposure. Uptake depended strongly on acidity and was absent on neutral ammonium sulfate in the authors' controls.",
+  "difference": "V_A is an unresolved pool rather than identified pinonaldehyde. Nominally neutral Manchester seed differs from the acidic seed that gave reactive uptake; neither an uptake coefficient nor permanent coating retention transfers directly."
+}

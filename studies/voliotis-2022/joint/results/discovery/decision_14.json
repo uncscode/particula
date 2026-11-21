@@ -1,0 +1,11 @@
+{
+  "round": 14,
+  "key": "ii_particle",
+  "accepted": true,
+  "match": "direct-process",
+  "analogue": "Particle-phase ester formation involving isoprene-derived 2-methylglyceric acid units following methacrolein oxidation at high NOx.",
+  "citation": "Chemical Composition of Secondary Organic Aerosol Formed from the Photooxidation of Isoprene",
+  "url": "https://authors.library.caltech.edu/records/a5pcq-9gb04",
+  "evidence": "Chamber SOA product analysis linked 2-methylglyceric acid monomer units to ester-linked higher oligomers in the high-NOx pathway.",
+  "difference": "This supports accretion of particular particle constituents, not conversion of all particle organics at one quadratic rate. Humidity, precursor branching, and the negligible suspended mass in Manchester's isoprene-only controls restrict transfer."
+}
