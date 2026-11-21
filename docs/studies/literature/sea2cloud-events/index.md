@@ -4,6 +4,8 @@
 
 How much of the 1–10 nm particle population observed aboard the *Tangaroa* could have formed locally during each detection window? At the upper calibration limit of the Salignat et al. nitric-acid formation law, an initially empty box gains at most **157 particles cm⁻³ per hour**. The two reported pristine-marine windows span seven hours and one hour. Both plotted peaks exceed the respective production ceilings, even if every new particle survives. [Runnable comparison](sea2cloud_events.py) · [Salignat et al., Eq. 1, §3.1.3 and Fig. 5a](https://doi.org/10.5194/egusphere-2026-6891)
 
+Across the nine-day counter archive, rolling comparisons cover 56 later published bins. Adding organic uptake improves the modeled count, while simply carrying forward the last observation gives a similar average error. The larger size band on March 19 supplies the strongest independent test of the growth assumption. [Size-resolved event fits](#the-size-spectrum-tests-an-explanation-that-fits-the-small-particle-count) · [Nine-day series](#across-nine-days-the-model-has-little-predictive-advantage-over-the-last-count)
+
 | Event (UTC, March 2020) | Figure 5a peak (cm⁻³) | No-loss ceiling (cm⁻³) | Additional inventory required (cm⁻³) | Minimum equivalent formation time |
 | --- | ---: | ---: | ---: | ---: |
 | 19 March, 09–16 | ~1,540 | 1,100 | ~440 | 9.8 h |
@@ -86,3 +88,86 @@ In the March 19 peak interval, the PSM-only 1–3 nm estimate rose to **2,037 cm
 The [main-inlet SMPS deposit](https://doi.org/10.6096/4021) describes 64 channels. Its download points to a 26-column file marked SSA with a 13 min 41 s cadence, consistent with the independently documented sea-spray generator. We retained the Figure 3b size distribution for the Brownian sink. The most informative next inputs are the UTC processing history and instrument identity for the Figure 5a CPC, the four-port clock and exhaust mask, and the matching main-inlet SMPS export. [Sea-spray size distribution deposit](https://doi.org/10.6096/4003)
 
 <a href="/particula/study-data/sea2cloud/tangaroa-counts.zip" download>Download the processed counts, clock scans, event tables and reproducible analysis</a>. The packet retains all three signed nominal size bands, flags, alternative clock assignments, raw-file hashes and model curves. The two PSM settings continue through March 27 at 06:48 on the archive clock. Parallel CPC coverage ends March 26 at 17:43 on its clock.
+
+## The size spectrum tests an explanation that fits the small-particle count
+
+On March 19, allowing organic uptake improves the fit to the **pre-event** 1–10 nm counts slightly. It also predicts **245–695 particles cm⁻³ at 12–25 nm** during the event and following six hours. The reconstructed size spectrum contains **0.37–8.28 cm⁻³** at the 19 available times. Moving hundreds of particles into that band to explain their disappearance from the smaller band gives a measurable prediction, and the ship-track spectrum contradicts it. A changing air mass, dilution or time-varying particle supply can change the number at the ship without producing that larger-particle population there. The comparison leaves those alternatives open. [Published Figures 3b and 5a](https://doi.org/10.5194/egusphere-2026-6891)
+
+![Pre-event fits and withheld particle counts for March 19 and 22. March 19 growth overpredicts 12–25 nm particles. Two March 22 fits separate in the 1–3 nm band.](../../../images/sea2cloud-events/process-comparison.png)
+
+The upper panels show Figure 5a ranges and their midpoints. Gray shading marks the reported events. The middle panels use PSM differences on the instrument clock, with the spread obtained by subtracting each adjacent low-flow reading. The lower panels show particle number *present* at 12–25 nm, including the pre-event background. Dry size defines the model bands. The lines connect evaluated model times, including across gaps in ship observations.
+
+| Held-out comparison | March 19 | March 22 |
+| --- | ---: | ---: |
+| Highest visible 1–10 nm count in the event, cm⁻³ | 1,548 | 776 |
+| Total births possible from recovered ship-track acid since initialization, cm⁻³ | 2.32 | 0.029 |
+| Peak with initial inventory and fitted continuous 1 nm supply, cm⁻³ | 604 | 187 |
+| Peak after fitting the low or high edges of the pre-event bins, cm⁻³ | 450–891 | 150–224 |
+| Pre-event midpoint RMSE with organic uptake / with uptake switched off, cm⁻³ | 581 / 594 | 29.6 / 30.0 |
+| 12–25 nm mean absolute error with organic uptake / with uptake switched off, cm⁻³ | 489 / 1.98 | 25.1 / 11.5 |
+
+On March 19 the fitted inventory was 1,204 cm⁻³ and the continuous source reached its lower bound of zero. The predicted maximum occurred at the start of the event. By the observed peak bin around 15:15 UTC the prediction had fallen to **442 cm⁻³**. The no-uptake fit gives a much smaller error above 12 nm, but it also misses the late small-particle peak. This comparison tests steady uptake in one parcel. It leaves room for organic growth in a shorter exposure or in air sampled elsewhere.
+
+On March 22, the pre-event data support two fits with similar errors. Supplying **6.72 cm⁻³ h⁻¹ at 1 nm** or **5.64 cm⁻³ h⁻¹ at 5 nm** gives event peaks of 187 and 186 cm⁻³. Both stay below 500. Across the four time-matched counter passages they predict **73.7 versus 0.018 cm⁻³ at 1–3 nm**. The signed PSM estimates range from −0.8 to 27.7 cm⁻³. All four simultaneous nominal 1–10 nm differences are negative and carry the CPC liquid-level flag. On March 19 all eight candidate triplets with an independent CPC value also place the nominal 1–3 nm difference above 1–10 nm. At 15:17 the choice of adjacent low-flow reading alone moves the March 19 difference from 2,289 to 4,799 cm⁻³. These inconsistencies preclude choosing a source size from the archive. A synchronized ambient 1–3 nm measurement would directly distinguish the two March 22 predictions. [PSM deposit](https://doi.org/10.6096/4009)
+
+### How much particle supply is missing?
+
+A lower bound follows from the observed rise alone. Subtract the highest visible count in an earlier half-hour bin from the peak, allow 30 cm⁻³ of reading error at **each** end, then subtract an upper estimate of all acid-driven births between the outer bin edges. Give the rise the full elapsed time between those edges. Comparing all earlier bins to the published event peak gives these strongest rate bounds.
+
+| Event | Earlier and peak bin centers (UTC) | Maximum elapsed time | Additional number required | Minimum average additional supply |
+| --- | --- | ---: | ---: | ---: |
+| March 19 | Mar 19 13:45 → 15:15 | 2 h | 997 cm⁻³ | 499 cm⁻³ h⁻¹ |
+| March 22 | Mar 21 18:45 → Mar 22 06:45 | 12.5 h | 607 cm⁻³ | 48.5 cm⁻³ h⁻¹ |
+
+These are conditional number budgets. They assume comparable ambient counts, fixed cutoffs, the recovered acid forcing and particles growing toward larger sizes. Scavenging and growth out of the band raise the required supply. Advection of an existing population, formation from an unrepresented precursor and changes in sampling can all appear as a rise along the ship track. The long observation gap before March 22 prevents locating that rise within the preceding night. The first development priority is a time-varying incoming size distribution or air-mass exchange, constrained by a matched upwind spectrum. The 12–25 nm observations then provide an independent test of how much of the loss from the smaller band can be assigned to growth.
+
+### What changes when the collision and growth physics change?
+
+For each controlled run we hold the initial inventory at 350 cm⁻³, supply 50 cm⁻³ h⁻¹ at 1 nm and prescribe 10⁶ condensable organic molecules cm⁻³. These assumed inputs isolate the physics. Their absolute peaks are scenarios. Each row uses a single thermal collision law.
+
+| Collision and humidity assumption | March 19 peak (cm⁻³) | March 22 peak (cm⁻³) |
+| --- | ---: | ---: |
+| Dry Brownian | 856 | 1,269 |
+| Brownian at 80% RH | 727 | 1,146 |
+| Brownian across 78.1–82.7% RH | 709–737 | 1,129–1,156 |
+| Hard sphere at 80% RH | 742 | 1,160 |
+| Gatti–Kortshagen implementation, zero charge at 80% RH | 541 | 964 |
+| Same implementation with assumed bipolar charge at 80% RH | 546 | 967 |
+
+The assumed charge mixture shifts the peak by only 3–5 cm⁻³ relative to the same law at zero charge. Changing the neutral collision formulation produces a much larger shift. The Gatti–Kortshagen formulation originated in plasma charging. Its use here tests sensitivity to that implementation. A campaign charge distribution and a validated atmospheric kernel would be needed to infer a charge effect. The mixed case makes 10% of the small particles and 50% of collectors singly charged, with equal positive and negative fractions and independent signs. The box uses stationary collectors from the pre-event median of each Figure 3b bin. Coagulation between evolving small particles and ion attachment fall outside this comparison. [Gatti and Kortshagen](https://doi.org/10.1103/PhysRevE.78.046402)
+
+The humid calculations assume equilibrium κ-Köhler water uptake with κ = 0.3 and water surface tension 0.072 N m⁻¹. During the two events the authors report a median temperature of 14.2 °C and median RH of 80%, with an RH interquartile range of 78.1–82.7%. Hydration changes collision radius, particle mass and condensing surface area. Using dry diameter for detection is an instrument assumption. For the organic vapor we assume 200 g mol⁻¹, diffusivity 6 × 10⁻⁶ m² s⁻¹, unit accommodation and negligible equilibrium vapor pressure. Particula's Fuchs–Sutugin correction gives a dry-diameter growth rate of 0.071–0.093 nm h⁻¹ at 1–10 nm for the unit vapor concentration at 80% RH. Vapor is replenished externally. Its abundance, volatility and the particles' hygroscopicity were not determined for these events. Finite volatility and organic curvature effects can reduce uptake, particularly at the smallest sizes. [Petters and Kreidenweis](https://doi.org/10.5194/acp-7-1961-2007) · [Tröstl et al.](https://doi.org/10.1038/nature18271)
+
+### Fitting, numerical checks and reproduction
+
+We initialize March 19 at 21:00 UTC March 18 and March 22 at 06:00 UTC March 21. The first three hours of missing March 19 forcing use zero acid, with the separate ceiling test above. We fit the 12 and 14 available pre-event half-hour midpoints with equal weight. The low and high edges are alternative targets representing the visible sample span. Neither provides a statistical confidence interval. All event and post-event counts, PSM steps and 12–25 nm stocks are held out. The model evaluates the published acid history retrospectively. It uses four equally populated starting sizes (1.5, 3, 6 and 8 nm) and a smooth upper cutoff with width 5% of nominal diameter to permit size derivatives. This response has no campaign-specific calibration.
+
+Particula evaluates collision and uptake coefficients on the CPU. CUDA advances cohort survival and instrument-weighted counts and differentiates the fit objective with respect to vapor, initial number and the two source amplitudes. A bounded optimizer uses those gradients from three starting vapor levels. Each source-size fit activates one supply at a time. Bounds are 0–4 × 10⁶ molecules cm⁻³, 0–6,000 initial particles cm⁻³ and 0–1,200 particles cm⁻³ h⁻¹ of supply. On March 19 the central fit reaches the vapor upper bound. An independent bounded linear fit at seven fixed vapor levels through 32 × 10⁶ molecules cm⁻³ gives event peaks of **554–824** on March 19 and **149–205** on March 22. On March 22 the lowest pre-event error on that wider grid occurs at 16 × 10⁶, yet the peak is only 156 cm⁻³. The fitted vapor is poorly constrained by the total count.
+
+All four CUDA derivatives agree with centered finite differences to within 10⁻⁶ relative error at an interior test point for each event. A separate CPU integration in time reproduces the first candidate 1–3 nm prediction to within 0.001 cm⁻³ on both days. Halving the cohort time step from three minutes to 90 seconds changes the compared small-particle counts by less than 0.001 cm⁻³ in the central supply fits. The raw counter differences and the published-figure reconstruction dominate those numerical errors.
+
+Run `python -m scripts.sea2cloud_events.process_inverse` from the repository root with CUDA available. The saved tables include the <a href="/particula/study-data/sea2cloud/process-scores.csv" download>fit scores</a>, <a href="/particula/study-data/sea2cloud/process-profile.csv" download>vapor profiles</a>, <a href="/particula/study-data/sea2cloud/process-counters.csv" download>time-matched counter differences</a>, <a href="/particula/study-data/sea2cloud/process-observations.csv" download>1–10 nm predictions</a>, <a href="/particula/study-data/sea2cloud/process-spectrum.csv" download>12–25 nm stocks</a>, <a href="/particula/study-data/sea2cloud/process-gain.csv" download>minimum additional supply</a>, <a href="/particula/study-data/sea2cloud/process-physics.csv" download>per-size process rates</a> and <a href="/particula/study-data/sea2cloud/process-checks.csv" download>numerical checks</a>.
+
+## Across nine days, the model has little predictive advantage over the last count
+
+We applied the same humid Brownian and organic-uptake model beyond the two named events. Starting at 12:00 UTC on March 19, each fit uses the preceding 12 hours of published 1–10 nm counts and background spectra. It then predicts the next 12 hours with its particle supply, initial inventory and vapor parameters frozen. Each window starts a fresh parcel at the beginning of its training period. The model uses the subsequently plotted ship-track acid as a known forcing, so this tests the particle model under retrospective chemistry. Each held-out bin contributes once. The first six windows contain **56** digitizable Figure 5a bins through March 22 at 10:15 UTC. The seventh window extends to the end of the recovered acid record at 00:00 UTC March 23 and can be compared only with the counters. The counter analysis continues until March 27.
+
+| Prediction for the following 12 hours | Mean absolute midpoint error (cm⁻³) | Midpoint RMSE (cm⁻³) | Mean distance outside observed bin span (cm⁻³) |
+| --- | ---: | ---: | ---: |
+| Carry the last observed midpoint forward | 111.8 | 184.9 | 68.7 |
+| Initial inventory, acid and 1 nm supply with organic uptake | 112.5 | 204.5 | 64.7 |
+| Initial inventory, acid and 5 nm supply with organic uptake | 112.3 | 204.5 | 64.3 |
+| Initial inventory, acid and 1 nm supply with uptake off | 178.4 | 244.7 | 134.1 |
+| Acid-driven births alone | 269.4 | 373.5 | 212.2 |
+
+Organic uptake substantially improves on the no-uptake model under these assumptions. Against simply carrying forward the last measurement, the 1 nm supply model reduces midpoint error in two of six windows, gives nearly the same pooled mean absolute error, and has a larger RMSE. Its average distance outside the observed bin span is about 4 cm⁻³ smaller. The 1 and 5 nm sources yield nearly identical scores. This larger sample reinforces the need for independent size bands and an air-mass history before assigning the changing counts to a process.
+
+![Withheld 12-hour predictions followed by the nine-day signed PSM and CPC series. Many nominal 1–10 nm differences fall below zero, including after the acid record ends.](../../../images/sea2cloud-events/cruise-series.png)
+
+Each point in the two lower panels is the median from one sampled half hour on the PSM clock. Only triples of consecutive PSM plateaus within the same VOC tracer window enter the candidate series. The bottom panel further requires a clear CPC flag. Gaps show missing coverage. The downloadable table also preserves flagged observations, control and ozone tank tracer windows, the alternate absolute clock, sample counts and the within-bin range. These sparse windows do not provide day-long ambient averages.
+
+Across all nine files, 1,023 of 5,934 high-flow plateaus met the candidate-triplet condition on the PSM clock. Of the 847 with a matched CPC, 452 had a clear flag. **433 of those 452** gave a negative nominal 1–10 nm difference. Only **four** satisfied the basic physical ordering of both bands, 0 ≤ N₁₋₃ ≤ N₁₋₁₀. During the model overlap, all 16 candidate half-hour medians with a clear CPC flag were negative. Shifting the PSM to the CPC clock also shifts the tracer assignment. Under that alternative 116 of 659 clear candidate pairs satisfy the ordering, and 430 are negative. The clock choice materially changes which intervals look usable, even after the relative lag has been estimated.
+
+On March 24, three consecutive candidate differences exceeded 500 cm⁻³ between 14:48 and 14:53 UTC on the PSM clock. At each passage the nominal 1–3 nm count exceeded the corresponding 1–10 nm count. The alternative clock produced no clear candidate pair over 500 anywhere in the record. These three readings identify a specific interval for checking the valve log, instrument response and exhaust screening. The authors separately report March 24 events and discuss terrestrial or anthropogenic influence. Matching this raw interval to one of those events requires a verified ambient clock. [Salignat et al., Sect. 3.1.3](https://doi.org/10.5194/egusphere-2026-6891)
+
+Run `python -m scripts.sea2cloud_events.cruise_series` to reproduce the rolling CUDA fits and the nine-day reductions. Download the <a href="/particula/study-data/sea2cloud/cruise-daily.csv" download>daily coverage</a>, <a href="/particula/study-data/sea2cloud/cruise-half-hour.csv" download>half-hour series</a>, <a href="/particula/study-data/sea2cloud/cruise-fits.csv" download>rolling fit parameters</a>, <a href="/particula/study-data/sea2cloud/cruise-predictions.csv" download>held-out predictions and errors</a> and <a href="/particula/study-data/sea2cloud/cruise-matched.csv" download>counter-matched model output</a>.
