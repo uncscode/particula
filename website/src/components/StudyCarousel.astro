@@ -63,7 +63,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   .slide img, .peek img { display: block; width: 100%; height: auto; border-radius: .85rem; margin: 0; }
   .study-title { font-size: clamp(1.12rem, 2.6vw, 1.75rem); line-height: 1.22; font-weight: 600; text-wrap: balance; margin: 0; }
   /* Clip both neighboring squares at the viewport edges, leaving the center square unobstructed. */
-  .peek { position: absolute; top: .35rem; width: 53%; aspect-ratio: 1; margin: 4% 0 0; padding: 0; overflow: hidden; border: 1px solid var(--sl-color-gray-5); border-radius: .85rem; background: var(--sl-color-bg); cursor: pointer; }
+  .peek { position: absolute; top: .35rem; width: 53%; aspect-ratio: 1; margin: 4% 0 0; padding: 0; overflow: hidden; border: 0; border-radius: .85rem; background: transparent; cursor: pointer; }
   .previous { left: -37.5%; }
   .next { right: -37.5%; }
   .peek img { opacity: .52; }
