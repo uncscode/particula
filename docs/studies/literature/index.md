@@ -40,7 +40,7 @@ After glyoxal dilution, two models predict rising organic mass per sulfate as me
 [![A batch chamber holds aerosol formed during α-pinene oxidation. In sampled particles, cis-pinic acid reaches half its late signal 20.7 minutes after the unidentified isomer. The common-source and delayed-source models predict gaps of 0.11 and 19.11 minutes, respectively.](../../images/pinic-isomers/graphical-abstract.svg)\
 A delayed source predicts 19 minutes of the 21-minute gap between two chamber isomer signals](pinic-isomers/index.md)
 
-[![For the winter foothill extracts, mean predicted minus measured growth factor increases from +0.542 with AIOMFAC pure salts to +0.716 with the full AIOMFAC liquid mixture.](../../images/mt-hua-salts/graphical-abstract.svg)\
+[![Above the Mt. Hua ridge, three particles show mean wet diameters at 90% relative humidity for 18 winter foothill extracts. Dashed rings repeat the measured 157 nm diameter inside the larger pure-salt (212 nm) and liquid-mixture (229 nm) predictions.](../../images/mt-hua-salts/graphical-abstract.svg)\
 Liquid salt mixing widens the winter foothill growth-factor bias at Mt. Hua from +0.54 to +0.72](particle-water-uptake/mt-hua/index.md)
 
 [![Sub-100 nm particles per cubic centimetre after 24 hours in polluted air. Archived MAM4xx gives 3,379. With coarse collisions and neutral attraction, extended MAM4xx gives 2,424, the sectional model 1,187 and the particle-resolved model 1,180.](../../images/mam4xx-coagulation/graphical-abstract.svg)\
