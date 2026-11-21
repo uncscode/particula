@@ -4,6 +4,7 @@
 # Can a simulation save the optical transient without saving each aerosol
 # state? We follow water uptake in a closed, isothermal box and record bulk
 # extinction, scattering, and absorption every 0.1 s at 450, 550, and 700 nm.
+# Every row also carries relative humidity from the live gas water.
 # Sparse aerosol snapshots from separate runs provide an offline calculation
 # at matching times. A second comparison measures the cost of writing the
 # same number of optical and native-array observations.
@@ -205,6 +206,7 @@ def timed_run(initial, process, backend, mode, grid, folder):
                 OpticalConfig(WAVELENGTH_M, species_index=SPECIES_INDEX),
                 variables=CHANNELS,
                 provenance=optical_provenance(backend),
+                water_vapor="water",
             )
             optics = OpticalObserver(
                 owner,
@@ -357,6 +359,9 @@ def simulate():
                 if mode == "optical":
                     chunks = list(read_optical_history(output / mode))
                     times = np.concatenate([part["time"] for _, part in chunks])
+                    dense_rh = np.concatenate(
+                        [part["relative_humidity"][:, 0] for _, part in chunks]
+                    )
                     bulk = np.stack(
                         [
                             np.concatenate(
@@ -377,11 +382,12 @@ def simulate():
             np.testing.assert_allclose(
                 bulk[rows], offline, rtol=5e-10, atol=1e-12
             )
+            np.testing.assert_allclose(dense_rh[rows], rh, rtol=2e-13)
             ext = bulk[..., 0]
             offline_ext = offline[..., 0]
             if not np.all(ext[-1] > ext[0]):
                 raise ValueError("Expected growth to increase extinction")
-            optical_payload = BATCH_SIZE * (8 + WAVELENGTH_M.size * 9 * 8)
+            optical_payload = BATCH_SIZE * (16 + WAVELENGTH_M.size * 9 * 8)
             if backend == "CUDA":
                 optical_payload += BATCH_SIZE * WAVELENGTH_M.size * 4
             native_payload = len(grid) * (4 * SLOTS + 5) * 8
@@ -391,6 +397,7 @@ def simulate():
                 "snapshot_time_s": times[rows].tolist(),
                 "snapshot_extinction_m_inv": offline_ext.tolist(),
                 "snapshot_rh_fraction": rh.tolist(),
+                "relative_humidity": dense_rh.tolist(),
                 "max_snapshot_error_m_inv": float(
                     np.max(np.abs(ext[rows] - offline_ext))
                 ),

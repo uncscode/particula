@@ -38,11 +38,13 @@ its own sensitivity or profile and held-out prediction.
 
 ## Prague-Suchdol optical retrieval inputs
 
-[suchdol.json](../../../data/optical-retrieval/suchdol.json) holds two three-hour reporting windows from the measurement
-campaign. Both underlying data sources are CC BY 4.0. The fixture preserves
-published diameter centers, hourly number spectra, relative humidities,
-temperatures, and optical coefficients. Its metadata carries the versioned
-source hashes and the exact EBAS resource name.
+The effective-index example download includes
+`docs/data/optical-retrieval/suchdol.json` with two three-hour reporting
+windows from the measurement campaign. Both underlying data sources are
+CC BY 4.0. The fixture preserves published diameter centers, hourly number
+spectra, relative humidities, temperatures, and optical coefficients.
+Its metadata carries the versioned source hashes and the exact EBAS
+resource name.
 
 - Lenka Suchánková, *Humidified single-nephelometer set-up system datasets*,
   version 2. Hourly scattering, temperature, and optical-cell RH come from

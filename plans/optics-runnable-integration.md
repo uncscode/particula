@@ -57,12 +57,11 @@ is CC BY 4.0. Five downloaded source files matched their listed SHA-256 sums.
   as two observations of one population.
 - The [instrument paper](https://amt.copernicus.org/articles/19/1611/2026/)
   reports five-minute mobility spectra over about 10–800 nm, at 32
-  channels per decade. Verify the exact size columns, measure and sizing RH
-  from source metadata before fitting. Its total scattering coefficients
-  were truncation-corrected and standardized to STP. Confirm the concentration
-  basis for the paired size spectra. Keep any modeled extinction derived
-  from scattering and absorption out of the independent residual vector.
-  Use EC/OC as partial composition evidence.
+  channels per decade. The hourly EBAS archive supplies the diameter
+  centers, instrument RH and standard-volume convention described below.
+  Campaign total scattering was truncation-corrected and standardized to
+  STP. Extinction derived from scattering and absorption adds no independent
+  observation. EC/OC provides partial composition evidence.
 
 ## Resident optical observations and local gradients
 
@@ -116,7 +115,7 @@ Four worked examples were executed and visually checked on the RTX 5060.
 The expanded optics, recording and inverse suites passed 292 tests. The
 closed-box optical fit recovered both initial radii across all starts to
 0.042 nm or better. The saved trajectory fit used 90 forwards and 45
-adjoints versus 220 finite-difference forwards, taking 1.97 and 1.86 s
+adjoints versus 220 finite-difference forwards, taking 2.38 and 1.93 s
 respectively for the three warm starts on this device. The joint run's
 CUDA pool high-water and per-method mass/gas payload estimates are separate
 reported quantities.
@@ -135,3 +134,28 @@ spectra. The dense optical archive now records the named gas water RH by
 box alongside each spectrum and verifies it against sparse snapshots.
 CPU PDF diagnostics use the supplied radius grid for both sizes and
 quadrature; a direct trapezoid test covers nonuniform nodes.
+
+## Integrated scientific checks
+
+| Outcome | Evidence |
+| --- | --- |
+| Optical history independent of particle snapshots | The 181-row CUDA archive is 40 KiB with three wavelengths, three optical coefficients and box RH. The same-cadence native-array comparison is about 1,097 KiB. All channels and RH agree with independently sampled sparse states. The recorder checks the populated device rows before writing. |
+| Optical absorption as a state-changing process | Explicit CPU and staged resident CUDA agree with an independent temperature-root calculation, conserve water, and verify the energy ledger and dark equilibrium. The resident regression also covers exact continuation plus a failed batch that changes neither phase. |
+| Conditional measurement retrieval | The effective index, κ and mixing-state examples include rank or profile diagnostics and held-out channels. The Suchdol comparison fits 450/550 nm channels and tests held-out 700 nm scattering. The mixing-state experiment preserves number and species mass while comparing the effects of size selection and uncertain composition allocation. |
+| CUDA derivative accuracy | The targeted native-CUDA suite passed 347 tests. The tiled adjoint covers refractive index, radius and number-density weights, and the complete trajectory loss agrees with centered differences for several segment lengths. |
+| Reproducible examples | Five clean-source manifests from `9bd9309bd1` identify the same package source SHA-256, native RTX 5060 and Warp 1.11.1. Every figure was inspected after execution. |
+
+The study figures use the measured time of these local runs. GPU pool
+high-water is measured for the combined process. Per-mode retained array
+payload is calculated separately from the buffer layout.
+
+The hosted-runner-equivalent package check passed 9,448 tests at 88.9%
+coverage. The example and script check passed 646 tests. Website checks
+passed 76 Python and 16 JavaScript tests, and the production build verified
+all 739 pages. The effective-index download contains the script and the
+measured input fixture.
+
+The optional CUDA Brownian-study tests for two inventory scenarios and the
+stochastic-history scenario fail with the same coagulation budget errors on
+unchanged `51e25ee110`. The baseline has the same tree as upstream
+`3860a4b320`.
