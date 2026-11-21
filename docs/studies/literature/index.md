@@ -10,7 +10,7 @@ Fitting mean drop mass with a constant collision rate leaves a sixfold shortfall
 [![At low ion production and 70% humidity, the wall-loss ceiling of 394 ions per cm³ per polarity lies well below the measured concentration of 1,768 and its scatter bar of 1,579–1,956.](../../images/cloud-ion-humidity/graphical-abstract.svg)\
 At low ion production, CLOUD’s 70% humidity measurement exceeds the ceiling set by the reported wall loss](cloud-ion-humidity/index.md)
 
-[![Adding dielectric polarization increases the modeled capture coefficient by 35% for a singly charged 4 nm tracer and a neutral 100 nm collector. The increase is only 0.064% for the modeled chamber scan.](../../images/nacl-scavenging/graphical-abstract.svg)\
+[![A small, positively charged tracer follows a dotted path toward a larger neutral NaCl cube. Polarization increases modeled capture by 35% for the 4 nm tracer and 100 nm collector pair and by 0.064% for the chamber scan.](../../images/nacl-scavenging/graphical-abstract.svg)\
 A 35% polarization effect for a charged 4 nm NaCl tracer shrinks to 0.06% in the modeled chamber scan](nacl-scavenging/index.md)
 
 [![Measured cloud droplets per cm³ rise from fresh water to salt water (solid line, dense cluster of filled droplets). Separate haze fits predict a decline (dashed line, sparse outlined cluster).](../../images/pi-chamber/graphical-abstract.svg)\
