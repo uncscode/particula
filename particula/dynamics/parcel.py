@@ -73,7 +73,8 @@ class ParcelRK23:
     The relative scales include floors of 1e-8 in normalized pressure and
     liquid/dry class volume, and 1e-12 kg/kg dry air for vapor.
     min_step is the smallest permitted retry in seconds. max_trials bounds
-    accepted plus rejected trials over the entire trajectory.
+    accepted plus rejected trials over the entire trajectory. A linearized
+    droplet relaxation limit also protects sensitivities near equilibrium.
     """
 
     rtol: float = 1e-5

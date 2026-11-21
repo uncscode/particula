@@ -27,6 +27,7 @@ from particula.gpu.kernels.parcel import (
     EPSILON,
     GRAVITY,
     KELVIN_T,
+    LATENT_OVER_RV,
     R_DRY,
     R_VAPOR,
     F,
@@ -120,8 +121,48 @@ def _rate(
     result[i] = value
 
 
+@wp.func
+def _relaxation_rate(
+    state: FloatVector,
+    dry: FloatVector,
+    weights: FloatVector,
+    vapor: F,
+    temp: F,
+    pressure: F,
+    kappa: F,
+):
+    # Near equilibrium a zero forward residual can hide a fast tangent mode.
+    # Linearize the growth drive in class liquid/dry volume and total liquid.
+    # The latter affects every class via vapor depletion and latent heating.
+    es = _es(temp)
+    resistance = _growth_resistance(temp, pressure, es)
+    rh = pressure * vapor / (EPSILON + vapor) / es
+    rh_vapor = pressure * EPSILON / (es * (EPSILON + vapor) * (EPSILON + vapor))
+    fastest = F(0.0)
+    collective = F(0.0)
+    for j in range(weights.shape[0]):
+        x = state[j + 1]
+        d = dry[j]
+        r = d * wp.cbrt(F(1.0) + x)
+        exponent = KELVIN_T / (temp * r)
+        kelvin = wp.exp(exponent)
+        eq = kelvin * x / (x + kappa)
+        growth = F(3.0) * r / (resistance * d * d * d)
+        slope = kelvin * kappa / ((x + kappa) * (x + kappa)) - eq * exponent / (
+            F(3.0) * (F(1.0) + x)
+        )
+        fastest = wp.max(fastest, growth * slope)
+        thermal = (rh * LATENT_OVER_RV / temp - eq * exponent) / temp
+        collective += (
+            weights[j] * growth * wp.abs(rh_vapor + F(LATENT) / F(CP) * thermal)
+        )
+    return fastest + collective
+
+
 @wp.kernel
 def _reservoir_error(
+    state: FloatVector,
+    dry: FloatVector,
     weights: FloatVector,
     k1: FloatVector,
     k2: FloatVector,
@@ -162,6 +203,20 @@ def _reservoir_error(
         rtol * wp.max(temp_start, temp_end)
     )
     value = wp.max(vapor_error, temp_error)
+    if parcel.exchange and parcel.vapor + parcel.liquid > F(0.0):
+        rate = _relaxation_rate(
+            state,
+            dry,
+            weights,
+            vapor_start,
+            temp_start,
+            state[0] * parcel.pressure,
+            parcel.kappa,
+        )
+        # h*rate <= 2 lies inside RK3's negative-real stability interval.
+        # Cube this ratio to use the controller's existing 1/8 doubling test.
+        ratio = F(0.5) * h * rate
+        value = wp.max(value, ratio * ratio * ratio)
     if not wp.isfinite(value):
         value = F(1e300)
     wp.atomic_max(norm, 0, value)
@@ -355,6 +410,8 @@ def run_adaptive_parcel(
                 _reservoir_error,
                 1,
                 [
+                    state,
+                    solver.dry,
                     solver.weights,
                     scratch.k1,
                     scratch.k2,

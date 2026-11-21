@@ -130,6 +130,26 @@ def test_passive_dry_parcel_on_decimal_observation_grid(parcel, device):
     assert result.updraft_gradient == 0.0
 
 
+def test_stationary_moist_parcel_sensitivity(parcel, device):
+    """An equilibrated forward state still has a fast tangent relaxation."""
+    cadence = dict(timestep=0.5, steps=4)
+    controls = dict(device=device, adaptive=ParcelRK23())
+    rest = run_parcel(parcel, updraft=0.0, gradient=True, **cadence, **controls)
+    np.testing.assert_allclose(
+        rest.liquid, rest.liquid[0], rtol=2e-13, atol=0.0
+    )
+    assert rest.statistics.maximum_step < cadence["timestep"]
+    delta = 0.001
+    for backend in (controls, {"device": "cpu"}):
+        plus = run_parcel(parcel, updraft=delta, **cadence, **backend)
+        minus = run_parcel(parcel, updraft=-delta, **cadence, **backend)
+        fd = (plus.liquid[-1] - minus.liquid[-1]) / (2 * delta)
+        assert fd > 0.0
+        np.testing.assert_allclose(
+            rest.updraft_gradient, fd, rtol=2e-5, atol=0.0
+        )
+
+
 def test_trial_failures_are_bounded(parcel, device):
     """An unusable step raises at the floor or cap without changing inputs."""
     initial = parcel.number.copy()
