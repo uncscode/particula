@@ -4705,6 +4705,38 @@
         ]
       },
       "tocFigure": "cloud-ion-humidity/graphical-abstract.svg"
+    },
+    {
+      "source": "docs/studies/literature/pinic-isomers/pinic_isomers.py",
+      "title": "Compare observed isomer timing and conditional organic partitioning",
+      "topic": "condensation",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/pinic-isomers/index.md",
+      "title": "Two C₉H₁₄O₄ isomers reach half signal 21 minutes apart in chamber aerosol",
+      "topic": "condensation",
+      "also": [
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "pinic-isomers",
+        "runs": [
+          "pinic-isomers"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/condensation.md",
+            "label": "How to use this"
+          }
+        ]
+      },
+      "tocFigure": "pinic-isomers/graphical-abstract.svg"
     }
   ],
   "supporting": [
