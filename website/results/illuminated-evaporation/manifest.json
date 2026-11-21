@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 10.951669167960063,
+  "package_source_sha256": "117c7cedc76e0d804de46ba94ae1150a537220dda2e11d90ead91bca4ad9bdc9",
+  "scientific_source_sha256": "d81f24c089841be36f85f9a1093a346c64b48d2c6ac4bbb83e3f0bb75f196797",
+  "input_sha256": {},
+  "example": "illuminated-evaporation",
+  "fingerprint": "004e302d61e52cd59d6517465ddbc99be9ddcd5f42df82e377de64b090ed57ff",
+  "source": "docs/studies/validation/material-properties/optical-heating/illuminated_evaporation.py",
+  "revision": "9bd9309bd1b08f9570e37fd0dd5f8775c8a1a3b2",
+  "package_dirty": false,
+  "executed_at": "2026-11-21T18:00:20.757229+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     /tmp/particula-optics-warp\n"
+      },
+      {
+        "text": "Module particula.optics.gpu.state 5d8bbb2 load on device 'cuda:0' took 0.66 ms  (cached)\nModule particula.optics.gpu.mie 36c0414 load on device 'cuda:0' took 0.73 ms  (cached)\nModule particula.optics.gpu._bulk 8686aab load on device 'cuda:0' took 0.72 ms  (cached)\nModule particula.dynamics.optical_heating_gpu 85ad7c4 load on device 'cuda:0' took 0.57 ms  (cached)\nModule particula.execution.extension_guards deaab5f load on device 'cuda:0' took 0.41 ms  (cached)\nModule particula.execution.particle_field_kernels 65dc021 load on device 'cuda:0' took 0.57 ms  (cached)\nModule particula.execution.particle_field_kernels bac0cc2 load on device 'cuda:0' took 0.57 ms  (cached)\nModule particula.execution.prepared_guards c5e1f2e load on device 'cuda:0' took 0.36 ms  (cached)\n"
+      },
+      {
+        "text": "NumPy maximum optical depth 7.542e-04\n  Closure residuals 1.68e-17 kg/m\u00b3 water and 3.64e-14 J/m\u00b3 energy\n  Maximum change in absorbed power within a cycle 0.124 W/m\u00b3\n  Fine-to-coarse endpoint changes for radius, temperature and vapor\n  0.497, 0.500, 0.498\nCUDA maximum optical depth 7.542e-04\n  Closure residuals 1.68e-17 kg/m\u00b3 water and 4.97e-14 J/m\u00b3 energy\n  Maximum change in absorbed power within a cycle 0.124 W/m\u00b3\n  Fine-to-coarse endpoint changes for radius, temperature and vapor\n  0.497, 0.500, 0.498\n"
+      },
+      {
+        "image": "figure-5-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-5-1.png": "33271f83d00303f8f0e224e603849ee1d66235dfc760fe8732dd75a053d07ae0",
+    "data.json": "036119e66c1ffcde5841aeb4414b2c6bef3be0c088100af6686460c02d699e91",
+    "source.py": "19a779752e8e6f807fd2d09702cc6f0f21d600468edd62e49da5d2f11c6743ec"
+  },
+  "simulation_fingerprint": "27724bef82a71a645377f50f25d663abf523337783c44c58cb801902cb3cd9ce"
+}
