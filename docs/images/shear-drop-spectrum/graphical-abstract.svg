@@ -1,15 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
-  <title id="title">Drops at eight times their starting mass</title>
-  <desc id="desc">Three bars share a linear scale and zero baseline. The published shear equations predict 614 drops per million, Particula predicts 610, and a constant rate fitted to mean mass predicts 102. A small sphere and one with twice its radius show the mass change.</desc>
+  <title id="title">Cloud droplets colliding in turbulent air</title>
+  <desc id="desc">A schematic cloud contains curling eddies and two spherical drops meeting between them. Below, three bars show drops at eight times the initial mass per million starting drops. Shear theory gives 614, Particula gives 610, and a constant rate fitted to mean mass gives 102.</desc>
+  <defs>
+    <marker id="flow" viewBox="0 0 8 8" refX="6.5" refY="4" markerWidth="3.6" markerHeight="3.6" orient="auto">
+      <path d="M0 0 8 4 0 8 2.2 4Z" fill="#457683"/>
+    </marker>
+  </defs>
   <rect width="300" height="300" rx="12" fill="#f6f5ee"/>
-  <g fill="#1c6373"><circle cx="220" cy="38" r="8"/><circle cx="265" cy="38" r="16"/></g>
-  <path d="M234 38h9m-4-4 4 4-4 4" fill="none" stroke="#596568" stroke-width="2"/>
-  <g font-family="sans-serif" text-anchor="middle">
-    <path d="M28 236h244" stroke="#536366" stroke-width="2"/>
-    <rect x="38" y="82.5" width="48" height="153.5" fill="#e4eff0" stroke="#245563" stroke-width="2"/>
-    <rect x="126" y="83.5" width="48" height="152.5" fill="#236d80"/>
-    <rect x="214" y="210.5" width="48" height="25.5" fill="#bc711f"/>
-    <g fill="#20373d" font-weight="bold" font-size="18"><text x="62" y="73">614</text><text x="150" y="74">610</text><text x="238" y="201">102</text></g>
-    <g fill="#20373d" font-size="15"><text x="62" y="259">Theory</text><text x="150" y="259">Particula</text><text x="238" y="259">Constant</text></g>
+  <!-- An idealized cloud and two flow paths converging on a droplet encounter. -->
+  <path d="M56 105C37 105 25 95 25 80c0-14 10-25 24-27 2-19 21-31 39-24 12-20 37-25 55-11 17-12 40-7 49 10 18-5 37 5 42 21 20-2 38 11 39 29 1 16-12 27-31 27Z"
+        fill="#e1eff0" stroke="#66939c" stroke-width="2.4"/>
+  <g fill="none" stroke="#457683" stroke-width="2.5" stroke-linecap="round" marker-end="url(#flow)">
+    <path d="M83 64c-7 6-17-3-13-12 5-12 24-13 33-3 9 10 12 18 30 21"/>
+    <path d="M207 60c9-4 15 6 10 13-8 11-24 8-33 2-7-5-12-7-19-5"/>
+  </g>
+  <g fill="#216477" stroke="#123f50" stroke-width="1.4">
+    <circle cx="142.5" cy="70.5" r="5.8"/><circle cx="155.1" cy="70.5" r="6.8"/>
+    <circle cx="48" cy="81" r="3"/><circle cx="95" cy="87" r="4"/>
+    <circle cx="126" cy="36" r="3.5"/><circle cx="174" cy="44" r="4.5"/>
+    <circle cx="243" cy="81" r="3.5"/>
+  </g>
+  <g font-family="sans-serif" fill="#20373d" text-anchor="middle">
+    <text x="150" y="129" font-size="14">Eightfold drops per million initial drops</text>
+    <!-- All bars share a zero baseline and 0.17 SVG units per drop per million. -->
+    <path d="M28 263h244" stroke="#536366" stroke-width="2"/>
+    <rect x="38" y="158.62" width="48" height="104.38" fill="#e4eff0" stroke="#245563" stroke-width="2"/>
+    <rect x="126" y="159.3" width="48" height="103.7" fill="#236d80"/>
+    <rect x="214" y="245.66" width="48" height="17.34" fill="#bc711f"/>
+    <g font-weight="bold" font-size="18"><text x="62" y="151">614</text><text x="150" y="152">610</text><text x="238" y="238">102</text></g>
+    <g font-size="15"><text x="62" y="284">Theory</text><text x="150" y="284">Particula</text><text x="238" y="284">Constant</text></g>
   </g>
 </svg>

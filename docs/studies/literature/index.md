@@ -4,7 +4,7 @@ Follow comparisons with published measurements, reference calculations and datas
 
 <div class="study-figures">
 
-[![Two tall bars show agreement between shear theory and Particula. The constant-rate prediction reaches about one sixth of their height.](../../images/shear-drop-spectrum/graphical-abstract.svg)\
+[![Cloud droplets meet between two eddies. Two tall bars show agreement between shear theory and Particula. The constant-rate prediction reaches about one sixth of their height.](../../images/shear-drop-spectrum/graphical-abstract.svg)\
 Particula reproduces Saffman and Turner’s prediction for the number of large drops](shear-drop-spectrum/index.md)
 
 [![The horizontal axis runs from dry to humid air, and ion concentration per polarity (ions/cm³) increases upward. The measured rise exceeds the model prediction. A beam produces positive and negative ions.](../../images/cloud-ion-humidity/graphical-abstract.svg)\
