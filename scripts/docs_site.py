@@ -476,8 +476,6 @@ def prepare_article(page, catalog):
             f"- [{catalog.title(child)}]({BASE}{route(child)}/)"
             for child in catalog.children(folder)
         )
-    elif key in {r["source"] for r in catalog.studies}:
-        text = catalog.run_links(key, BASE) + text
     write_page(
         page,
         title,

@@ -69,6 +69,7 @@ def test_shared_companion_multiscript_and_prose_only_studies(tmp_path):
         }
         for key in ["run-a", "run-b"]
     }
+    runs["run-b"]["inputs"] = ["measurements.csv"]
     catalog = docs_studies.StudyCatalog(graph, runs, tmp_path)
     assert not catalog.errors
     assert [r["key"] for r in catalog.rows] == ["run-a", "run-b"]
@@ -79,7 +80,19 @@ def test_shared_companion_multiscript_and_prose_only_studies(tmp_path):
         ("paper", "studies/literature/paper/"),
         ("mobility", "studies/validation/mobility/"),
     }
-    assert "/guide/mobility/#limits" in catalog.links(report, "/")
+    resources = catalog.links(report, "/").split("## Study resources")[1]
+    for key in runs:
+        row = next(
+            line
+            for line in resources.splitlines()
+            if f"Calculation · {key}]" in line
+        )
+        assert f"{key}/#python-source" in row
+        assert f'/downloads/{key}.py"' in row
+        assert (f'/downloads/{key}.zip"' in row) == bool(
+            runs[key].get("inputs")
+        )
+    assert "/guide/mobility/#limits" in resources
     assert (
         "/API/particula/dynamics/wall_loss/#particula.dynamics.wall_loss.Loss"
         in catalog.links(report, "/")
