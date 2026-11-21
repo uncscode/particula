@@ -45,6 +45,16 @@ def _es(t: F):
     return ES_REF * wp.exp(LATENT_OVER_RV * (F(1.0) / T_REF - F(1.0) / t))
 
 
+@wp.func
+def _growth_resistance(t: F, p: F, es: F):
+    diffusivity = D_REF * wp.pow(t / T_REF, D_EXPONENT) * F(101325.0) / p
+    conduction = _thermal_conductivity_wp(t)
+    return F(RHO_W) * (
+        R_VAPOR * t / (es * diffusivity)
+        + F(LATENT) / (conduction * t) * (LATENT_OVER_RV / t - F(1.0))
+    )
+
+
 @wp.kernel
 def _grow(
     previous: FloatVector,
@@ -70,12 +80,7 @@ def _grow(
         kelvin_length = KELVIN_T / t
         curvature = wp.exp(kelvin_length / r)
         eq = activity * curvature
-        diffusivity = D_REF * wp.pow(t / T_REF, D_EXPONENT) * F(101325.0) / p
-        conduction = _thermal_conductivity_wp(t)
-        resistance = F(RHO_W) * (
-            R_VAPOR * t / (es * diffusivity)
-            + F(LATENT) / (conduction * t) * (LATENT_OVER_RV / t - F(1.0))
-        )
+        resistance = _growth_resistance(t, p, es)
         # Linearize equilibrium about the old r² on its restoring branch.
         deq_dr = curvature * (
             F(3.0) * r * r * solute / (denom * denom)

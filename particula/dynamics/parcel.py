@@ -66,6 +66,45 @@ class ParcelInitialState:
 
 
 @dataclass(frozen=True)
+class ParcelRK23:
+    """Adaptive Warp controls for the embedded Bogacki–Shampine 3(2) pair.
+
+    rtol controls pressure, each class's liquid volume, vapor and temperature.
+    The relative scales include floors of 1e-8 in normalized pressure and
+    liquid/dry class volume, and 1e-12 kg/kg dry air for vapor.
+    min_step is the smallest permitted retry in seconds. max_trials bounds
+    accepted plus rejected trials over the entire trajectory.
+    """
+
+    rtol: float = 1e-5
+    min_step: float = 1e-9
+    max_trials: int = 100_000
+
+    def __post_init__(self):
+        """Reject invalid controller settings before device allocation."""
+        if not np.isfinite(self.rtol) or not 0 < self.rtol < 1:
+            raise ValueError("parcel rtol must be between zero and one")
+        if not np.isfinite(self.min_step) or self.min_step <= 0:
+            raise ValueError("parcel min_step must be positive and finite")
+        if (
+            isinstance(self.max_trials, (bool, np.bool_))
+            or not isinstance(self.max_trials, (int, np.integer))
+            or self.max_trials < 1
+        ):
+            raise ValueError("parcel max_trials must be a positive integer")
+
+
+@dataclass(frozen=True)
+class ParcelStepStatistics:
+    """Whole-run trial counts and smallest/largest accepted timestep (s)."""
+
+    accepted_steps: int
+    rejected_steps: int
+    minimum_step: float
+    maximum_step: float
+
+
+@dataclass(frozen=True)
 class ParcelTrajectory:
     """Float64 samples, including the initial state, on the requested cadence.
 
@@ -73,7 +112,8 @@ class ParcelTrajectory:
     vapor and liquid (kg/kg dry air), and supersaturation (fraction above
     saturation) each have one entry per time. wet_radius (m) has axes time
     and class. updraft_gradient is the terminal liquid mixing ratio derivative
-    per m/s at fixed elapsed time, or None when unrequested.
+    per m/s at fixed elapsed time, or None when unrequested. statistics
+    contains work counts and step extrema for adaptive Warp execution.
     """
 
     time: FloatArray
@@ -87,6 +127,7 @@ class ParcelTrajectory:
     wet_radius: FloatArray
     updraft_gradient: float | None
     initial: ParcelInitialState
+    statistics: ParcelStepStatistics | None = None
 
     def aerosol_at(self, sample: int, *, dry_density: float) -> Aerosol:
         """Return an independent native one-box snapshot at a time index.
@@ -276,19 +317,22 @@ def run_parcel(
     device: str = "cpu",
     gradient: bool = False,
     phase_exchange: bool = True,
+    adaptive: ParcelRK23 | None = None,
 ) -> ParcelTrajectory:
     """Advance a single parcel under constant signed vertical velocity.
 
     Args:
         initial: Subsaturated state including any equilibrium aerosol water.
         updraft: Vertical velocity in m/s, positive upward.
-        timestep: Output spacing in seconds and Warp integration step.
+        timestep: Output spacing (s). Also the fixed Warp step by default.
         steps: Positive number of intervals.
         device: 'cpu' selects the independent SciPy Radau reference.
-            'warp:cpu' or a CUDA device selects fixed-step Warp execution.
+            'warp:cpu' or a CUDA device selects Warp execution.
         gradient: Use Warp reverse mode for terminal liquid versus updraft.
         phase_exchange: Enable signed condensation and latent feedback.
             A passive run retains the initial equilibrium water on each class.
+        adaptive: Optional Warp RK23 controls. Internal steps end exactly at
+            output times. The gradient follows the accepted discrete schedule.
 
     Returns:
         State histories and the requested Warp derivative.
@@ -315,22 +359,41 @@ def run_parcel(
     initial.number.setflags(write=False)
     wet = _initial_radii(initial)
     time = np.arange(steps + 1, dtype=np.float64) * timestep
+    if adaptive is not None and not isinstance(adaptive, ParcelRK23):
+        raise TypeError("adaptive must be ParcelRK23 or None")
     if device == "cpu":
+        if adaptive is not None:
+            raise ValueError("ParcelRK23 requires a Warp device")
         if gradient:
             raise ValueError("the gradient requires a Warp device")
         result = _cpu_reference(initial, wet, time, updraft, phase_exchange)
     elif device == "warp:cpu" or device == "cuda" or device.startswith("cuda:"):
-        from particula.gpu.kernels.parcel import run_warp_parcel
+        warp_device = "cpu" if device == "warp:cpu" else device
+        if adaptive is None:
+            from particula.gpu.kernels.parcel import run_warp_parcel
 
-        result = run_warp_parcel(
-            initial,
-            wet,
-            time,
-            updraft,
-            "cpu" if device == "warp:cpu" else device,
-            gradient,
-            phase_exchange,
-        )
+            result = run_warp_parcel(
+                initial,
+                wet,
+                time,
+                updraft,
+                warp_device,
+                gradient,
+                phase_exchange,
+            )
+        else:
+            from particula.gpu.kernels.parcel_rk23 import run_adaptive_parcel
+
+            result = run_adaptive_parcel(
+                initial,
+                wet,
+                time,
+                updraft,
+                warp_device,
+                gradient,
+                phase_exchange,
+                adaptive,
+            )
     else:
         raise ValueError(f"unsupported parcel device {device!r}")
     if (
