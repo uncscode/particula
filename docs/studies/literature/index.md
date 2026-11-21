@@ -4,6 +4,9 @@ Follow comparisons with published measurements, reference calculations and datas
 
 <div class="study-figures">
 
+[![Cloud droplets meet between two eddies. Two tall bars show agreement between shear theory and Particula. The constant-rate prediction reaches about one sixth of their height.](../../images/shear-drop-spectrum/graphical-abstract.svg)\
+Particula reproduces Saffman and Turner’s prediction for the number of large drops](shear-drop-spectrum/index.md)
+
 [![The horizontal axis runs from dry to humid air, and ion concentration per polarity (ions/cm³) increases upward. The measured rise exceeds the model prediction. A beam produces positive and negative ions.](../../images/cloud-ion-humidity/graphical-abstract.svg)\
 Particula predicts half the rise in ion concentration CLOUD measured from 7% to 70% humidity](cloud-ion-humidity/index.md)
 
@@ -43,6 +46,7 @@ After glyoxal dilution, two models predict rising organic mass per sulfate as me
 - [Particle-resolved coagulation leaves 6.7% fewer particles for nearby modes but agrees in number for widely separated modes](mam4xx-coagulation/index.md)
 - [Particula predicts about 60% of the NaCl capture rate measured at 4 nm](nacl-scavenging/index.md)
 - [Particula predicts half the rise in ion concentration CLOUD measured from 7% to 70% humidity](cloud-ion-humidity/index.md)
+- [Particula reproduces Saffman and Turner’s prediction for the number of large drops](shear-drop-spectrum/index.md)
 - [Particula sizes a 100.7 nm PSL standard at about 102 nm near atmospheric pressure](dry-psl-mobility/index.md)
 - [Two C₉H₁₄O₄ isomers reach half signal 21 minutes apart in chamber aerosol](pinic-isomers/index.md)
 - [Π Chamber experiments and modeling](pi-chamber/index.md)

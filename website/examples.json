@@ -1568,5 +1568,23 @@
       "scripts/sea2cloud_events/replay_plots.py"
     ],
     "full_canvas": true
+  },
+  "shear-drop-spectrum": {
+    "title": "Reproduce the turbulent shear drop spectrum",
+    "source": "docs/studies/literature/shear-drop-spectrum/shear_drop_spectrum.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 900,
+    "inputs": [
+      "scripts/shear_drop_spectrum/study.py",
+      "scripts/shear_drop_spectrum/plots.py",
+      "docs/data/shear-drop-spectrum/figure2.csv"
+    ],
+    "data_expression": "report",
+    "render_functions": [],
+    "plot_inputs": [
+      "scripts/shear_drop_spectrum/plots.py"
+    ],
+    "full_canvas": false
   }
 }

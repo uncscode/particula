@@ -4878,6 +4878,41 @@
       "also": [],
       "role": "Studies",
       "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/shear-drop-spectrum/shear_drop_spectrum.py",
+      "title": "Reproduce the turbulent shear drop spectrum",
+      "topic": "turbulent",
+      "also": [
+        "gpu"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/shear-drop-spectrum/index.md",
+      "title": "Particula reproduces Saffman and Turner’s prediction for the number of large drops",
+      "topic": "turbulent",
+      "also": [
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "shear-drop-spectrum",
+        "runs": [
+          "shear-drop-spectrum"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/coagulation.md",
+            "fragment": "turbulent-shear-coagulation",
+            "label": "Size-dependent Saffman–Turner shear kernel"
+          }
+        ]
+      },
+      "tocFigure": "shear-drop-spectrum/graphical-abstract.svg"
     }
   ],
   "supporting": [
