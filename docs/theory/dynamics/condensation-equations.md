@@ -81,6 +81,8 @@ mass and must therefore use the species-specific gas constant. When `L_i = 0`,
 the thermal factor is `R_specific_i × T`, `correction_i = 1`, and the shipped
 path is exactly isothermal.
 
+The [drizzle settling comparison](../../studies/literature/drizzle-settling/index.md) uses this rate to predict wet diameter before assigning a terminal speed from the measured size–speed curve.
+
 **Implementation status:**
 
 - The CPU implementation is available through `CondensationLatentHeat`,
