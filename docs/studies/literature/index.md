@@ -19,7 +19,7 @@ A 35% polarization effect for a charged 4 nm NaCl tracer shrinks to 0.06% in the
 [![Warm air passes a fed pentane drop. A short heat-supply bar and a three-times-longer heat-demand bar share the same baseline.](../../images/pendant-evaporation/graphical-abstract.svg)\
 Modeled convection supplies only a third of the heat needed for the reported pentane drop evaporation rate](evaporation-and-uptake/pendant-drop/index.md)
 
-[![Equal dry organic cores have different water shells at 95% relative humidity. The bars compare condensed water volume: the activation-fitted κ model holds about half again as much water as BAT.](../../images/ccn-kappa-retrieval/graphical-abstract.svg)\
+[![Two arrows lead from the same 100 nm dry organic particle to its modeled wet sizes at 95% relative humidity. BAT predicts 127.7 nm and the activation-fitted κ predicts 137.6 nm. The bars show 1.49 times as much condensed water by volume with the fit.](../../images/ccn-kappa-retrieval/graphical-abstract.svg)\
 A cloud activation fit predicts 49% more water than BAT at 95% humidity for one organic](particle-water-uptake/ccn-retrieval/index.md)
 
 [![A spherical chamber cross-section shows particles in the air and on the wall. The bars show the predicted fraction of 1 µm particles still airborne after one hour in the same chamber, 68.4% for coupled theory and 58.2% for added loss rates.](../../images/spherical-wall-loss/graphical-abstract.svg)\
