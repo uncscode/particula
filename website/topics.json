@@ -4716,7 +4716,7 @@
     },
     {
       "source": "docs/studies/literature/sea2cloud-events/index.md",
-      "title": "Local production during two Sea2Cloud detection windows falls short of both plotted peaks",
+      "title": "A pulse fitted to Sea2Cloud’s smallest particles misses the early 12–25 nm enhancement",
       "topic": "nucleation",
       "also": [
         "brownian"

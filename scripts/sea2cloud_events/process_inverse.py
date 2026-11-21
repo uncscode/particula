@@ -101,13 +101,13 @@ def physics(start, onset, scenario):
     return diameter, hazard, growth
 
 
-def exposure_table(diameter, hazard, growth):
+def exposure_table(diameter, hazard, growth, initial_sizes=START_SIZES):
     """Tabulate dry size and mean trajectory hazard against vapor × age."""
     integral = cumulative_trapezoid(1 / growth, diameter, initial=0)
     optical = cumulative_trapezoid(hazard / growth, diameter, initial=0)
     x = np.arange(0, 1025, DX)
     sizes, means = [], []
-    for initial in START_SIZES:
+    for initial in initial_sizes:
         t0 = np.interp(initial, diameter, integral)
         if t0 + x[-1] >= integral[-1]:
             raise ValueError("Size grid does not span the exposure table")

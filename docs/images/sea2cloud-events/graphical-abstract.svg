@@ -1,9 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img">
-<title>Two marine particle peaks exceed local production</title><desc>On March 19 and 22 the no-loss ceilings are 1100 and 157 particles per cubic centimetre. The measured peaks read from the figure are 1540 and 770.</desc>
-<rect width="300" height="300" fill="#f3f7f4"/><g font-family="sans-serif" fill="#233e46">
-<text x="18" y="33" font-size="19">1–10 nm particles (cm⁻³)</text>
-<path d="M22 56h20" stroke="#357c89" stroke-width="8"/><text x="51" y="61" font-size="15">Local production ceiling</text>
-<circle cx="32" cy="81" r="5" fill="#a94d24"/><text x="51" y="86" font-size="15">Observed peak</text>
-<path d="M38 235h232" stroke="#677779"/><path d="M78 235v-88 M200 235v-13" stroke="#357c89" stroke-width="34"/>
-<g fill="#a94d24"><circle cx="105" cy="112" r="6"/><circle cx="227" cy="173" r="6"/></g>
-<g text-anchor="middle" font-size="16"><text x="76" y="138">1100</text><text x="140" y="117">1540</text><text x="197" y="213">157</text><text x="256" y="178">770</text><text x="94" y="260">19 March</text><text x="214" y="260">22 March</text><text x="94" y="282">7 hours</text><text x="214" y="282">1 hour</text></g></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="3in"
+ height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+<title id="title">March 22 aboard Tangaroa, 12–25 nm particles</title>
+<desc id="desc">On a common linear scale the ship measurements fall from
+45 to 7 per cubic centimetre. A model in which 16 nm particles arrive
+with a fitted small-particle pulse starts near 6 and rises above 34.</desc>
+<rect width="300" height="300" rx="12" fill="#f5f4ea"/>
+<g fill="#17363b"><path d="M23 42h67l-10 12H32z M35 31h21v11H35z
+ M52 22h14v20H52z M65 33h12v9H65z M58 13h3v10h-3z"/>
+<path d="M19 59q9 5 18 0q9 5 18 0q9 5 18 0q9 5 18 0" fill="none"
+ stroke="#42696d" stroke-width="2.5"/></g>
+<g font-family="sans-serif" fill="#17363b">
+<text x="109" y="37" font-size="23" font-weight="bold">12–25 nm</text>
+<text x="110" y="57" font-size="13">March 22 · cm⁻³</text>
+<path d="M48 88v147h225" fill="none" stroke="#9ba8a2" stroke-width="1"/>
+<g font-size="12"><text x="25" y="94">50</text><text x="34" y="239">0</text>
+<text x="48" y="254">06:00</text>
+<text x="273" y="254" text-anchor="end">07:30 UTC</text></g>
+<polyline points="48.00,217.95 55.50,211.45 63.00,203.40 70.50,194.00 78.00,183.65 85.50,172.91 93.00,162.43 100.50,152.86 108.00,144.70 115.50,138.30 123.00,133.76 130.50,131.00 138.00,129.78 145.50,129.78 153.00,130.69 160.50,132.22 168.00,134.13 175.50,136.25 183.00,138.46 190.50,140.71 198.00,142.94 205.50,145.13 213.00,147.28 220.50,149.38 228.00,151.43 235.50,153.43 243.00,155.38 250.50,157.29 258.00,159.14 265.50,160.95 273.00,162.72" fill="none" stroke="#ab492b"
+ stroke-width="4" stroke-dasharray="7 4"/>
+<polyline points="48.00,102.30 123.00,152.92 198.00,192.96 273.00,213.48" fill="none" stroke="#17363b" stroke-width="2"/>
+<g fill="#17363b"><circle cx="48.00" cy="102.30" r="5"/><circle cx="123.00" cy="152.92" r="5"/><circle cx="198.00" cy="192.96" r="5"/><circle cx="273.00" cy="213.48" r="5"/></g>
+<circle cx="42" cy="278" r="4"/><text x="54" y="282" font-size="14">Ship</text>
+<path d="M132 278h25" stroke="#ab492b" stroke-width="4"
+ stroke-dasharray="7 4"/>
+<text x="165" y="282" font-size="14">Shared pulse</text>
+</g></svg>

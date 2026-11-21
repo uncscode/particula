@@ -38,7 +38,7 @@ After glyoxal dilution, two models predict rising organic mass per sulfate as me
 
 <!-- STUDY_LIST_START -->
 - [Evaporation and reactive uptake](evaporation-and-uptake/index.md)
-- [Local production during two Sea2Cloud detection windows falls short of both plotted peaks](sea2cloud-events/index.md)
+- [A pulse fitted to Sea2Cloud’s smallest particles misses the early 12–25 nm enhancement](sea2cloud-events/index.md)
 - [Particle water uptake and activation](particle-water-uptake/index.md)
 - [Particula predicts about 60% of the NaCl capture rate measured at 4 nm](nacl-scavenging/index.md)
 - [Particula predicts half the rise in ion concentration CLOUD measured from 7% to 70% humidity](cloud-ion-humidity/index.md)
