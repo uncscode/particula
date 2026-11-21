@@ -5039,6 +5039,36 @@
         ]
       },
       "tocFigure": "drizzle-settling.svg"
+    },
+    {
+      "source": "docs/studies/examples/thermodynamics/moist_parcel.py",
+      "title": "How does a faster updraft change cloud water at a fixed time?",
+      "topic": "condensation-energy",
+      "also": [
+        "atmosphere",
+        "activity-kappa",
+        "gpu"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "moist-parcel-updraft",
+        "runs": [
+          "moist-parcel-updraft"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/condensation.md",
+            "label": "Water vapor and the condensation budget"
+          },
+          {
+            "target": "docs/theory/dynamics/condensation-equations.md",
+            "fragment": "kelvin-effect-correction-factor",
+            "label": "Curvature correction to the equilibrium vapor pressure"
+          }
+        ]
+      }
     }
   ],
   "supporting": [

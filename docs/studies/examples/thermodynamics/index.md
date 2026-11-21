@@ -8,6 +8,7 @@ for a small particle's surface, then follow partitioning to predict condensed
 mass. These are complementary pieces of a model, with different assumptions.
 
 <!-- STUDY_LIST_START -->
+- [How does a faster updraft change cloud water at a fixed time?](moist_parcel.py)
 - [Mixture and surface properties](particle-properties/index.md)
 - [Phase equilibria](equilibria/index.md)
 - [Water activity](activity/index.md)

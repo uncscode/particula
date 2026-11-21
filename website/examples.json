@@ -1686,5 +1686,21 @@
     ],
     "plot_inputs": [],
     "full_canvas": false
+  },
+  "moist-parcel-updraft": {
+    "title": "How does a faster updraft change cloud water at a fixed time?",
+    "source": "docs/studies/examples/thermodynamics/moist_parcel.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1200,
+    "inputs": [],
+    "invoke": "report = run_example()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nplot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
   }
 }
