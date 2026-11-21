@@ -4,7 +4,21 @@ import { CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 <a id="particula"></a>
 
-<StudyCarousel featured={["cloud-ion-humidity", "examples-simulations-cloud-chamber-multi-cycle", "pendant-drop-evaporation", "nacl-scavenging", "pi-chamber-spectra"]} label="Featured studies" />
+<StudyCarousel
+  label="Featured studies"
+  featured={[
+    "cloud-ion-humidity",
+    "examples-simulations-cloud-chamber-multi-cycle",
+    "pendant-drop-evaporation",
+    "nacl-scavenging",
+    "pi-chamber-spectra",
+    "shear-drop-spectrum",
+    "sea2cloud-events",
+    "pinic-isomers",
+    "mam4xx-coagulation",
+    "mt-hua-salts",
+  ]}
+/>
 
 ## Dig deeper into the science
 
