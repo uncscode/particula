@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 295.27694125892594,
+  "package_source_sha256": "de9c4fa23fbd4833d9eeae22e97ffd8e2496acae8432510149eed8ada42f4ee3",
+  "scientific_source_sha256": "1ac66c614e80ae7a0f6aae70e885469d5f8609ca95421966dfcd08ebcf41597f",
+  "input_sha256": {
+    "scripts/mam4xx_coagulation/regimes.py": "837b5059244b93c20eb92caf34f7c1969777f9e00c7c40f1ddfa84a87302f813",
+    "scripts/mam4xx_coagulation/regime_plots.py": "63aa8d82a9aec7cc614aed0baa6247d95a7a91ddaf66398bed8adb9923647076",
+    "scripts/mam4xx_coagulation/regime_rates.py": "9de0528d2646d09eff66ea66c98b92b837936ae78603ba1fa8c2b440c0bdf169",
+    "scripts/mam4xx_coagulation/regime_box.py": "2b3cc0658e801b919eac070b4593d2584b91455fb3bc71db28f6943f9b4dff32",
+    "scripts/mam4xx_coagulation/matched.py": "7022fde22a0f6853bc816fdfefb1a5bcfe06fa09a99e74d2b68d8f5c382c7dc1",
+    "scripts/mam4xx_coagulation/campaign.py": "ac2f488f33fca6e5617f213c7283ebe457c922820edcbe337b34d0c6948b1adb",
+    "scripts/mam4xx_coagulation/particles.py": "18f75c4c5567f1028c52b5a1d66ed0c5d7cbde174c5ea0eb8f0edaba012ed618",
+    "docs/data/mam4xx-coagulation/modal.csv": "dd609292b60baddcf6708f6664c664ce15bf21b0338f9b605093b42dd55df849",
+    "scripts/mam4xx_coagulation/native_regimes.py": "4773b3145369a8e58002360a862717fbf6bb64519b5f56977936bbb8967c3a88",
+    "scripts/mam4xx_coagulation/regime_driver.cpp": "8d05e57b106f21e1543bab073369448bf2a34406744eed1b588090e833666ba0",
+    "scripts/mam4xx_coagulation/regime_reference.py": "5186c6d06d4a44488f5453c168564098a86cc560e49fcccd00e5a4c6edd2a96e",
+    "scripts/mam4xx_coagulation/reference_driver.cpp": "32388e90fa67b2f3204aeca4cd00290019e1e4c4d1f72642e893758fce900b92",
+    "scripts/mam4xx_coagulation/build_reference.py": "8d8c341b0e695c90bf2a28952ebb9cade62f1026303974fb342cf5e0131b9860",
+    "docs/data/mam4xx-coagulation/regional-modal.csv": "5bce852b401db6dada7763c99b14f4e8c041fee9e8e725219e054397caaf629d",
+    "docs/data/mam4xx-coagulation/mode-coefficients.csv": "5f4eaed5130b4526c5a175ce0a4a3b2c3aa3d6f8449cf9a0b8b06e724b1ceb4a",
+    "docs/data/mam4xx-coagulation/archived-attraction.csv": "4b6d7b2698287d86ddd3323ee75db872cc83fc1d4216e2f77a9748f8e5556345",
+    "scripts/mam4xx_coagulation/host_attraction.py": "c53160da21cb61bdfa864079e8543d540e6ef9fc00a32b817ac7627e11de78e5",
+    "scripts/mam4xx_coagulation/host_attraction.cpp": "78f4e53c2191313cedd2e343e767440cb54fca5c02f405c638f3111395d1c8fe",
+    "scripts/mam4xx_coagulation/attraction_campaign.py": "84a8413a180bba79d89c3b3049b949cf76d67fc9b80904be56fdbbdb60736ba1",
+    "scripts/mam4xx_coagulation/attraction_particles.py": "c5ebffb18cdd97ca2f585f792c767a2bf4bc2d938d30ac4efcace367ab117e1e",
+    "scripts/mam4xx_coagulation/modal_attraction.py": "1b8ad5feebf7f91cb0602381704613749d0548ce1a96e70657fbad8e9ec15278",
+    "scripts/mam4xx_coagulation/neutral_geometry.py": "5f0046d53e845fb718b972075bb67ccda57e0cf8aa72820cc01921751402db41"
+  },
+  "example": "regimes",
+  "fingerprint": "a215ce8c27dc58d2c6a06f9c1f8dcaf03b43670c4be44231966031311ed01a97",
+  "source": "docs/studies/literature/mam4xx-coagulation/regimes.py",
+  "revision": "63dfa59700498460cdad39f7ee6896cf38ff39c8",
+  "package_dirty": false,
+  "executed_at": "2026-11-21T13:16:24.298963+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "image": "figure-2-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-3-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-4-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-4-1.png": "8ed0672b4c7a2eef8e276c52b84c7f9a98cf24062edfdb03cfeeaaf082da595e",
+    "figure-3-1.png": "fba110f83b727288206580352ff736d085aef6ea41b8d597fb345cc53b4528a1",
+    "figure-2-1.png": "55a4ee6257b1c85b90a435a6c248e445c4711c054dd213e6fff22314a8a0dc01",
+    "executed_source.py": "cc9206d90af28e14740dd01013ca9718e024d75da21eaf40ec4be3dd8720c47a",
+    "data.json": "d3b813e5e9fff68af9855e59bedb667c26cefb6c9db84fb9c0e7b8ffb624542c",
+    "source.py": "cc9206d90af28e14740dd01013ca9718e024d75da21eaf40ec4be3dd8720c47a"
+  },
+  "simulation_fingerprint": "2facca08f9a8b34219e5c16beb3c32a3ba7f50f4e722e409cbe45dd683c37ddb",
+  "render_versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {
+    "scripts/mam4xx_coagulation/regimes.py": "837b5059244b93c20eb92caf34f7c1969777f9e00c7c40f1ddfa84a87302f813",
+    "scripts/mam4xx_coagulation/regime_plots.py": "63aa8d82a9aec7cc614aed0baa6247d95a7a91ddaf66398bed8adb9923647076",
+    "scripts/mam4xx_coagulation/regime_rates.py": "9de0528d2646d09eff66ea66c98b92b837936ae78603ba1fa8c2b440c0bdf169",
+    "scripts/mam4xx_coagulation/regime_box.py": "2b3cc0658e801b919eac070b4593d2584b91455fb3bc71db28f6943f9b4dff32",
+    "scripts/mam4xx_coagulation/matched.py": "7022fde22a0f6853bc816fdfefb1a5bcfe06fa09a99e74d2b68d8f5c382c7dc1",
+    "scripts/mam4xx_coagulation/campaign.py": "ac2f488f33fca6e5617f213c7283ebe457c922820edcbe337b34d0c6948b1adb",
+    "scripts/mam4xx_coagulation/particles.py": "18f75c4c5567f1028c52b5a1d66ed0c5d7cbde174c5ea0eb8f0edaba012ed618",
+    "docs/data/mam4xx-coagulation/modal.csv": "dd609292b60baddcf6708f6664c664ce15bf21b0338f9b605093b42dd55df849",
+    "scripts/mam4xx_coagulation/native_regimes.py": "4773b3145369a8e58002360a862717fbf6bb64519b5f56977936bbb8967c3a88",
+    "scripts/mam4xx_coagulation/regime_driver.cpp": "8d05e57b106f21e1543bab073369448bf2a34406744eed1b588090e833666ba0",
+    "scripts/mam4xx_coagulation/regime_reference.py": "5186c6d06d4a44488f5453c168564098a86cc560e49fcccd00e5a4c6edd2a96e",
+    "scripts/mam4xx_coagulation/reference_driver.cpp": "32388e90fa67b2f3204aeca4cd00290019e1e4c4d1f72642e893758fce900b92",
+    "scripts/mam4xx_coagulation/build_reference.py": "8d8c341b0e695c90bf2a28952ebb9cade62f1026303974fb342cf5e0131b9860",
+    "docs/data/mam4xx-coagulation/regional-modal.csv": "5bce852b401db6dada7763c99b14f4e8c041fee9e8e725219e054397caaf629d",
+    "docs/data/mam4xx-coagulation/mode-coefficients.csv": "5f4eaed5130b4526c5a175ce0a4a3b2c3aa3d6f8449cf9a0b8b06e724b1ceb4a",
+    "docs/data/mam4xx-coagulation/archived-attraction.csv": "4b6d7b2698287d86ddd3323ee75db872cc83fc1d4216e2f77a9748f8e5556345",
+    "scripts/mam4xx_coagulation/host_attraction.py": "c53160da21cb61bdfa864079e8543d540e6ef9fc00a32b817ac7627e11de78e5",
+    "scripts/mam4xx_coagulation/host_attraction.cpp": "78f4e53c2191313cedd2e343e767440cb54fca5c02f405c638f3111395d1c8fe",
+    "scripts/mam4xx_coagulation/attraction_campaign.py": "84a8413a180bba79d89c3b3049b949cf76d67fc9b80904be56fdbbdb60736ba1",
+    "scripts/mam4xx_coagulation/attraction_particles.py": "c5ebffb18cdd97ca2f585f792c767a2bf4bc2d938d30ac4efcace367ab117e1e",
+    "scripts/mam4xx_coagulation/modal_attraction.py": "1b8ad5feebf7f91cb0602381704613749d0548ce1a96e70657fbad8e9ec15278",
+    "scripts/mam4xx_coagulation/neutral_geometry.py": "5f0046d53e845fb718b972075bb67ccda57e0cf8aa72820cc01921751402db41"
+  },
+  "rendered_at": "2026-11-21T13:16:29.248784+00:00",
+  "render_revision": "63dfa59700498460cdad39f7ee6896cf38ff39c8",
+  "render_elapsed_seconds": 3.5598735879175365
+}

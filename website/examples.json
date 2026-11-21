@@ -1402,5 +1402,86 @@
       "scripts/mt_hua_salts/activity_plots.py"
     ],
     "full_canvas": true
+  },
+  "mam4xx-coagulation": {
+    "title": "Compare MAM4xx and particle-resolved Brownian coagulation",
+    "source": "docs/studies/literature/mam4xx-coagulation/mam4xx_coagulation.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 10800,
+    "inputs": [
+      "scripts/mam4xx_coagulation/campaign.py",
+      "scripts/mam4xx_coagulation/compare.py",
+      "scripts/mam4xx_coagulation/particles.py",
+      "scripts/mam4xx_coagulation/plots.py",
+      "scripts/mam4xx_coagulation/build_reference.py",
+      "scripts/mam4xx_coagulation/reference_driver.cpp",
+      "docs/data/mam4xx-coagulation/modal.csv"
+    ],
+    "data_expression": "report",
+    "render_functions": [],
+    "plot_inputs": [
+      "scripts/mam4xx_coagulation/plots.py"
+    ],
+    "full_canvas": true
+  },
+  "regimes": {
+    "title": "Which coagulation processes matter in three atmospheric regimes?",
+    "source": "docs/studies/literature/mam4xx-coagulation/regimes.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 7200,
+    "inputs": [
+      "scripts/mam4xx_coagulation/regimes.py",
+      "scripts/mam4xx_coagulation/regime_plots.py",
+      "scripts/mam4xx_coagulation/regime_rates.py",
+      "scripts/mam4xx_coagulation/regime_box.py",
+      "scripts/mam4xx_coagulation/matched.py",
+      "scripts/mam4xx_coagulation/campaign.py",
+      "scripts/mam4xx_coagulation/particles.py",
+      "docs/data/mam4xx-coagulation/modal.csv",
+      "scripts/mam4xx_coagulation/native_regimes.py",
+      "scripts/mam4xx_coagulation/regime_driver.cpp",
+      "scripts/mam4xx_coagulation/regime_reference.py",
+      "scripts/mam4xx_coagulation/reference_driver.cpp",
+      "scripts/mam4xx_coagulation/build_reference.py",
+      "docs/data/mam4xx-coagulation/regional-modal.csv",
+      "docs/data/mam4xx-coagulation/mode-coefficients.csv",
+      "docs/data/mam4xx-coagulation/archived-attraction.csv",
+      "scripts/mam4xx_coagulation/host_attraction.py",
+      "scripts/mam4xx_coagulation/host_attraction.cpp",
+      "scripts/mam4xx_coagulation/attraction_campaign.py",
+      "scripts/mam4xx_coagulation/attraction_particles.py",
+      "scripts/mam4xx_coagulation/modal_attraction.py",
+      "scripts/mam4xx_coagulation/neutral_geometry.py"
+    ],
+    "data_expression": "report",
+    "render_functions": [],
+    "plot_inputs": [
+      "scripts/mam4xx_coagulation/regime_plots.py"
+    ],
+    "full_canvas": true
+  },
+  "mode-attraction": {
+    "title": "Does neutral attraction survive averaging over MAM4xx modes?",
+    "source": "docs/studies/literature/mam4xx-coagulation/mode_attraction.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 7200,
+    "inputs": [
+      "scripts/mam4xx_coagulation/attraction_campaign.py",
+      "scripts/mam4xx_coagulation/attraction_particles.py",
+      "scripts/mam4xx_coagulation/attraction_plots.py",
+      "scripts/mam4xx_coagulation/modal_attraction.py",
+      "scripts/mam4xx_coagulation/neutral_geometry.py",
+      "scripts/mam4xx_coagulation/regime_box.py",
+      "scripts/mam4xx_coagulation/regime_rates.py"
+    ],
+    "data_expression": "report",
+    "render_functions": [],
+    "plot_inputs": [
+      "scripts/mam4xx_coagulation/attraction_plots.py"
+    ],
+    "full_canvas": true
   }
 }

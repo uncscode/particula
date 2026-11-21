@@ -34,6 +34,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Compare chamber geometry and competing particle processes](examples/particle-processes/wall-loss/wall_loss_tutorial.py)
 - [Compare coagulation after matching distribution units](tutorials/coagulation-populations/coagulation_4_compared.py)
 - [Compare ideal and nonideal organic activity](examples/thermodynamics/activity/bat_activity_example.py)
+- [Compare MAM4xx and particle-resolved Brownian coagulation](literature/mam4xx-coagulation/mam4xx_coagulation.py)
 - [Compare neutral salt pairings with Mt. Hua growth measurements](literature/particle-water-uptake/mt-hua/mt_hua_salts.py)
 - [Competition for a finite water-vapor reservoir](tutorials/condensation/condensation_3_massresolved.py)
 - [Condensation in radius bins](tutorials/condensation/condensation_1_bin.py)
@@ -52,6 +53,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Distinguish chemical conversion from a timed emission and dilution](examples/custom-processes/timed_box_chemistry.py)
 - [Distinguish dry-phase oscillation from physical droplet relaxation](validation/condensation/adaptive/adaptive_cloud_relaxation.py)
 - [Does heating make a fixed vapor inventory less saturated?](tutorials/building-an-aerosol/gas/vapor_pressure.py)
+- [Does neutral attraction survive averaging over MAM4xx modes?](literature/mam4xx-coagulation/mode_attraction.py)
 - [Does particle-number decay depend on representation?](tutorials/coagulation-populations/coagulation_5_time_evolution.py)
 - [Does update ordering change a condensation calculation?](examples/particle-processes/condensation/staggered_condensation_example.py)
 - [Dry and wet starts give Π Chamber model spectra within 1% by 32 seconds](literature/pi-chamber/haze-and-cloud/pi_chamber_spectra.py)
@@ -115,5 +117,6 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Water uptake from a maintained vapor reservoir](tutorials/condensation/condensation_2_massbin.py)
 - [What survives a data transfer?](tutorials/building-an-aerosol/containers/data_containers.py)
 - [When a size-distribution plot hides a composition error](examples/coupled-populations/emissions/organic_partitioning_and_coagulation.py)
+- [Which coagulation processes matter in three atmospheric regimes?](literature/mam4xx-coagulation/regimes.py)
 - [Which composition rule controls equilibrium pressure?](examples/thermodynamics/particle-properties/activity_tutorial.py)
 <!-- STUDY_LIST_END -->
