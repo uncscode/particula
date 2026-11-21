@@ -10,7 +10,7 @@ Particula predicts half the rise in ion concentration CLOUD measured from 7% to 
 [![A small NaCl particle approaches a collector. On a common scale the modeled 4 nm capture coefficient reaches about three fifths of the measured value.](../../images/nacl-scavenging/graphical-abstract.svg)\
 Particula predicts about 60% of the NaCl capture rate measured at 4 nm](nacl-scavenging/index.md)
 
-[![Cloud droplets per cubic centimeter increase from the fresh-water to the salt-water experiment. Fitting humidity separately to each haze population predicts a decrease.](../../images/pi-chamber/graphical-abstract.svg)\
+[![Measured cloud droplets per cm³ rise from fresh water to salt water (solid line, dense blue cluster). Separate haze fits predict a decline (dashed line, sparse outlined cluster).](../../images/pi-chamber/graphical-abstract.svg)\
 Π Chamber cloud counts rose over salt water, but separate haze fits predicted a decline](pi-chamber/haze-and-cloud/index.md)
 
 [![Warm air passes a fed pentane drop. A short heat-supply bar and a three-times-longer heat-demand bar share the same baseline.](../../images/pendant-evaporation/graphical-abstract.svg)\
