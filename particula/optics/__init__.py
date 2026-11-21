@@ -34,8 +34,18 @@ from particula.optics.population import (
     get_population_optics,
     get_population_weights,
 )
+from particula.optics.state import (
+    OpticalConfig,
+    mix_refractive_index,
+    particle_optics,
+    population_optics,
+)
 
 __all__ = [
+    "OpticalConfig",
+    "mix_refractive_index",
+    "particle_optics",
+    "population_optics",
     "ColumnOptics",
     "get_column_optics",
     "get_mass_specific_opacity",
