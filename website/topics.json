@@ -1819,7 +1819,8 @@
         "charged"
       ],
       "role": "Studies",
-      "start_here": false
+      "start_here": false,
+      "tocFigure": "coupled-populations/dry-chamber-pressure.svg"
     },
     {
       "source": "docs/studies/examples/coupled-populations/environment/gpu_environment_sweep.py",
@@ -2754,7 +2755,8 @@
             "label": "Workflow qualification"
           }
         ]
-      }
+      },
+      "tocFigure": "coupled-populations/biomass-collision-branches.svg"
     },
     {
       "source": "docs/studies/examples/coupled-populations/chambers/cloud_chamber_multi_cycle.py",
@@ -2778,7 +2780,8 @@
             "label": "How to use this"
           }
         ]
-      }
+      },
+      "tocFigure": "coupled-populations/chamber-multiple-cycles.svg"
     },
     {
       "source": "docs/studies/literature/pi-chamber/haze-and-cloud/pi_chamber_spectra.py",
@@ -2838,7 +2841,8 @@
             "label": "How to use this"
           }
         ]
-      }
+      },
+      "tocFigure": "pi-chamber/graphical-abstract.svg"
     },
     {
       "source": "docs/studies/examples/coupled-populations/chambers/cloud_chamber_single_cycle.py",
@@ -2862,7 +2866,8 @@
             "label": "How to use this"
           }
         ]
-      }
+      },
+      "tocFigure": "coupled-populations/chamber-single-cycle.svg"
     },
     {
       "source": "docs/studies/examples/coupled-populations/emissions/cough_droplets_partitioning.py",
@@ -2889,7 +2894,8 @@
             "label": "Workflow qualification"
           }
         ]
-      }
+      },
+      "tocFigure": "coupled-populations/respiratory-material-identity.svg"
     },
     {
       "source": "docs/studies/examples/coupled-populations/index.md",
@@ -2918,7 +2924,8 @@
             "label": "How to use this"
           }
         ]
-      }
+      },
+      "tocFigure": "coupled-populations/organic-binned-inventories.svg"
     },
     {
       "source": "docs/studies/examples/coupled-populations/emissions/soot_formation_in_flames.py",
@@ -2939,7 +2946,8 @@
             "label": "How to use this"
           }
         ]
-      }
+      },
+      "tocFigure": "coupled-populations/cooling-organic-uptake.svg"
     },
     {
       "source": "docs/studies/examples/thermodynamics/activity/activity_tutorial.py",
@@ -3443,7 +3451,8 @@
             "label": "Slip correction used in the fit"
           }
         ]
-      }
+      },
+      "tocFigure": "dry-psl-mobility/graphical-abstract.svg"
     },
     {
       "source": "docs/guide/processes/ccn-retrieval.md",
@@ -3488,7 +3497,8 @@
             "label": "How to use this"
           }
         ]
-      }
+      },
+      "tocFigure": "ccn-kappa-retrieval/graphical-abstract.svg"
     },
     {
       "source": "docs/guide/processes/activity.md",
@@ -3856,7 +3866,8 @@
             "label": "How to use this"
           }
         ]
-      }
+      },
+      "tocFigure": "citric-acid-activity/graphical-abstract.svg"
     },
     {
       "source": "docs/studies/validation/material-properties/process-references/qualification.md",
@@ -4109,7 +4120,8 @@
             "label": "How to use this"
           }
         ]
-      }
+      },
+      "tocFigure": "bat-ccn/graphical-abstract.svg"
     },
     {
       "source": "docs/theory/dynamics/interparticle-forces.md",
@@ -4210,7 +4222,8 @@
             "label": "How to use this"
           }
         ]
-      }
+      },
+      "tocFigure": "nacl-scavenging/graphical-abstract.svg"
     },
     {
       "source": "docs/studies/validation/wall-loss/spherical_wall_loss_theory.py",
@@ -4250,7 +4263,8 @@
           }
         ],
         "secondary_category": "literature"
-      }
+      },
+      "tocFigure": "spherical-wall-loss/graphical-abstract.svg"
     },
     {
       "source": "docs/studies/validation/condensation/initial-size/infer_initial_radius.py",
@@ -4620,7 +4634,8 @@
             "label": "Resolved chemistry process"
           }
         ]
-      }
+      },
+      "tocFigure": "glyoxal-chamber/graphical-abstract.svg"
     },
     {
       "source": "docs/studies/literature/evaporation-and-uptake/pendant-drop/pendant_drop_evaporation.py",
@@ -4654,7 +4669,8 @@
             "label": "Pentane vapor pressure"
           }
         ]
-      }
+      },
+      "tocFigure": "pendant-evaporation/graphical-abstract.svg"
     },
     {
       "source": "docs/studies/literature/cloud-ion-humidity/cloud_ion_humidity.py",
@@ -4687,7 +4703,8 @@
             "label": "Native atmospheric ion balance"
           }
         ]
-      }
+      },
+      "tocFigure": "cloud-ion-humidity/graphical-abstract.svg"
     }
   ],
   "supporting": [

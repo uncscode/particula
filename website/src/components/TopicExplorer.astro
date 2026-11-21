@@ -1,5 +1,6 @@
 ---
 import { graph, topics, ancestors, children, topicPath, resourcePath } from './topic-model.mjs';
+import StudyCarousel from './StudyCarousel.astro';
 import TopicLookup from './TopicLookup.astro';
 const { topicId } = Astro.props;
 const topic = topics.get(topicId);
@@ -62,6 +63,7 @@ const icon = (id) => `${base.replace(/\/$/, '')}/topic-icons/${id}.svg`;
     {topic.related.length > 0 && <section><h3>Connect the ideas</h3><p>Explore a neighboring question.</p><ul>{topic.related.map((id) => <li><a data-topic-link href={topicPath(id, base)}>{topics.get(id).label}</a></li>)}</ul></section>}
   </div>}
   {resources.length > 0 && <section class="topic-resources" aria-label="Topic resources"><h3>Read, calculate, investigate</h3>
+    <StudyCarousel resources={resources} label={`Studies on ${topic.label}`} />
     <div class="topic-resource-groups">{groups.map((role) => {
       const entries = resources.filter((r) => r.role === role && (role !== 'Studies' || r.study));
       return entries.length > 0 && <section><h4>{role}</h4><ul>{entries.map((r) => <li><a href={resourcePath(r.source, base)}>{r.title}</a></li>)}</ul></section>;

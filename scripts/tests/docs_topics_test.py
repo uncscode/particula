@@ -167,3 +167,13 @@ def test_topics_have_distinct_local_svg_illustrations():
         )
         assert geometry and geometry not in drawings
         drawings.add(geometry)
+
+
+def test_toc_figure_must_belong_to_a_study_and_exist():
+    """Illustrated topic entries link to artwork copied into the site."""
+    data = docs_topics.load()
+    resource = next(row for row in data["resources"] if row.get("tocFigure"))
+    resource["tocFigure"] = "missing-figure.svg"
+    assert f"{resource['source']}: invalid study TOC figure" in (
+        docs_topics.validate(data)
+    )
