@@ -4997,6 +4997,48 @@
         ]
       },
       "tocFigure": "shear-drop-spectrum/graphical-abstract.svg"
+    },
+    {
+      "source": "docs/studies/literature/drizzle-settling/drizzle_settling.py",
+      "title": "Compare drizzle fall speeds and model evaporating drop sizes",
+      "topic": "transport",
+      "also": [
+        "condensation",
+        "gpu"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/drizzle-settling/index.md",
+      "title": "Particula predicts water-drop fall speeds within 4.2% at nine diameters from 0.20 to 1.00 mm",
+      "topic": "transport",
+      "also": [
+        "condensation",
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "drizzle-settling",
+        "runs": [
+          "drizzle-settling"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/properties/air-transport.md",
+            "fragment": "air-viscosity",
+            "label": "Air viscosity in both drag calculations"
+          },
+          {
+            "target": "docs/theory/dynamics/condensation-equations.md",
+            "fragment": "condensation-with-latent-heat",
+            "label": "Latent-heat correction to the native evaporation rate"
+          }
+        ]
+      },
+      "tocFigure": "drizzle-settling.svg"
     }
   ],
   "supporting": [

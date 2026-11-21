@@ -1668,5 +1668,23 @@
     ],
     "plot_inputs": [],
     "full_canvas": true
+  },
+  "drizzle-settling": {
+    "title": "Compare drizzle fall speeds and model evaporating drop sizes",
+    "source": "docs/studies/literature/drizzle-settling/drizzle_settling.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 600,
+    "inputs": [
+      "docs/data/drizzle-settling/reference.csv"
+    ],
+    "invoke": "report = simulate()\nfigure = plot_results(report)\nplt.show()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)\nplt.show()",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": false
   }
 }

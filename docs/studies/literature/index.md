@@ -4,6 +4,9 @@ Follow comparisons with published measurements, reference calculations and datas
 
 <div class="study-figures">
 
+[![A water drop falls through still air. At 0.20 mm diameter the measured speed is 0.72 m/s, Particula sphere drag gives 0.706 m/s, and Stokes’ law gives 1.20 m/s.](../../images/drizzle-settling.svg)\
+Particula predicts water-drop fall speeds within 4.2% at nine diameters from 0.20 to 1.00 mm](drizzle-settling/index.md)
+
 [![Schematic eddies bring cloud droplets together above two bars. For drops of exactly twice the starting radius, size-dependent shear gives about six times the count from a constant rate fitted to the same mean mass.](../../images/shear-drop-spectrum/graphical-abstract.svg)\
 Fitting mean drop mass with a constant collision rate leaves a sixfold shortfall in counts at twice the starting radius](shear-drop-spectrum/index.md)
 
@@ -62,6 +65,7 @@ At the inferred Π Chamber humidity, modeled sulfate haze falls below the optica
 - [Evaporation and reactive uptake](evaporation-and-uptake/index.md)
 - [Fitting mean drop mass with a constant collision rate leaves a sixfold shortfall in counts at twice the starting radius](shear-drop-spectrum/index.md)
 - [Particle water uptake and activation](particle-water-uptake/index.md)
+- [Particula predicts water-drop fall speeds within 4.2% at nine diameters from 0.20 to 1.00 mm](drizzle-settling/index.md)
 - [Particula sizes a 100.7 nm PSL standard at about 102 nm near atmospheric pressure](dry-psl-mobility/index.md)
 - [Sea2Cloud’s March 22 spectra favor earlier arrival of larger particles in a two-hour exchange model](sea2cloud-events/index.md)
 - [Π Chamber experiments and modeling](pi-chamber/index.md)
