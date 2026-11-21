@@ -1,8 +1,10 @@
-# How seed chemistry and organic vapor change Π Chamber predictions
+# At the inferred Π Chamber humidity, modeled sulfate haze falls below the optical detection limit
 
 The fresh-water and salt-water experiments of Prabhakaran et al. both used nearly monodisperse **130 nm dry sodium chloride** particles. The salt water was on the chamber floor. The measurements anchor the NaCl case. A separate Particula mixture study changed particle composition, while treating all dry constituents as nonvolatile. Here we compare two dissolved salts at fixed dry diameter and let a semivolatile organic exchange with the gas. These are predictions for follow-up experiments. [Original experiment, Table 1](https://doi.org/10.1073/pnas.2006426117) · [Chamber comparison](haze-and-cloud/index.md)
 
-## What was in the earlier mixtures?
+<a id="what-was-in-the-earlier-mixtures"></a>
+
+## The same dry composition can give different activation when particles mix differently
 
 The hygroscopicity parameter κ controls how dissolved material lowers water activity. In the earlier scenarios, internal mixtures contained each component in every particle. External mixtures placed the same inventory into separate particle types at each dry size. Intermediate mixtures placed half the dry volume in the external endmember and half in the internal blend.
 
@@ -15,7 +17,9 @@ The hygroscopicity parameter κ controls how dissolved material lowers water act
 
 Volume-weighting these κ values gives **0.741** for the internally mixed marine-like seed and **0.270** (rounded) for the continental-like seed. Separate external particles span the endmember values. Thus two populations with identical total constituent volumes can activate differently. The organic proxy represents a prescribed water affinity. It contains no molecular identity, pure vapor pressure or gas-phase inventory. For a named organic, the [citric-acid comparison](../particle-water-uptake/citric-acid/index.md) shows how BAT water activity can be checked against laboratory data. [κ mixing rule](https://doi.org/10.5194/acp-7-1961-2007)
 
-## What changes if the 130 nm seed is ammonium sulfate?
+<a id="what-changes-if-the-130-nm-seed-is-ammonium-sulfate"></a>
+
+## At 99.55% humidity, NaCl haze clears the detection limit and sulfate haze falls below it
 
 The following single-particle calculations use the full κ–Köhler curve at 293.15 K, a water surface tension of 0.072 N/m and a dissolved liquid particle. The shared 99.55% RH was inferred in the earlier chamber fit. Crystallization and deliquescence histories are outside this calculation.
 
@@ -26,7 +30,9 @@ The following single-particle calculations use the full κ–Köhler curve at 29
 
 At this RH, the sodium chloride haze particle lies above the instrument’s 0.6 µm lower limit. The sulfate haze particle lies below it. Sulfate also requires a larger supersaturation fluctuation to activate. The paper’s approximately 1.8 µm optical split can still be applied to count particles consistently across experiments. The physical critical size changes with the seed. These roots describe equilibrated particles, while the turbulent chamber samples a range of humidity histories.
 
-## Can the same organic vapor make one particle evaporate and another grow?
+<a id="can-the-same-organic-vapor-make-one-particle-evaporate-and-another-grow"></a>
+
+## Raising humidity can switch modeled organic evaporation to uptake
 
 We used Binary Activity Thermodynamics (BAT) for a homogeneous water–organic liquid. The organic has molar mass 200 g/mol, O:C = 0.5 and density 1,243.5 kg/m³, following the miscible Figure 9 reference composition. We assigned two illustrative pure-component saturation mass concentrations, **C\* = 1 or 10 µg/m³** at 293.15 K. This holds the water affinity fixed while changing volatility. Each closed box starts with 2,000 particles/cm³, 130 nm organic dry diameter and 2.861 µg/m³ of particle organic. Water first equilibrates at the specified initial RH. The gas then starts with 0, 1 or 5 µg/m³ organic vapor, and both water and organic can move between gas and particles. [Gorkowski, Preston and Zuend (2019)](https://doi.org/10.5194/acp-19-13383-2019) · [Particula BAT reference checks](../../validation/material-properties/binary-bat.md)
 

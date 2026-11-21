@@ -7,6 +7,7 @@
 The catalog lists each registered Python script once. Each entry leads to its source, saved results and required inputs. In the installed documentation bundle, scripts that need helpers or data have a complete ZIP beside the Python file.
 
 <!-- STUDY_LIST_START -->
+- [A 100 nm mobility channel also admits larger, multiply charged NaCl collectors](literature/nacl-scavenging/nacl_scavenging.py)
 - [A compact comparison of bin totals and radius densities](examples/particle-processes/coagulation/kernel-functions/coagulation_basic_3_compared.py)
 - [A compact particle-resolved collision calculation](examples/particle-processes/coagulation/kernel-functions/coagulation_basic_4_particleresolved.py)
 - [A compact PDF coagulation calculation](examples/particle-processes/coagulation/kernel-functions/coagulation_basic_2_pdf.py)
@@ -51,6 +52,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Does heating make a fixed vapor inventory less saturated?](tutorials/building-an-aerosol/gas/vapor_pressure.py)
 - [Does particle-number decay depend on representation?](tutorials/coagulation-populations/coagulation_5_time_evolution.py)
 - [Does update ordering change a condensation calculation?](examples/particle-processes/condensation/staggered_condensation_example.py)
+- [Dry and wet starts give Π Chamber model spectra within 1% by 32 seconds](literature/pi-chamber/haze-and-cloud/pi_chamber_spectra.py)
 - [Dry charged aerosols: ground level, mesopause and pressurized chambers](examples/coupled-populations/environment/gpu_dry_environment_sweep.py)
 - [Dry PSL mobility sizing](literature/dry-psl-mobility/psl_mobility.py)
 - [Dynamic Viscosity](examples/gas-transport/dynamic-viscosity.py)
@@ -104,13 +106,11 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Sixty-four heterogeneous aerosol boxes on one GPU](examples/coupled-populations/forcing/gpu_prepared_multibox.py)
 - [The coupled evaporation model predicts a pentane drop 3–5 K cooler than measured](literature/evaporation-and-uptake/pendant-drop/pendant_drop_evaporation.py)
 - [The lucky few: growth, charging and background capture](examples/coupled-populations/charged-aerosols/gpu_lucky_few.py)
-- [Time-resolved wet-size spectra in the Π Chamber](literature/pi-chamber/haze-and-cloud/pi_chamber_spectra.py)
 - [Track a gas reaction through a chamber pulse](examples/custom-processes/native_gas_chemistry.py)
 - [Track removal in a rectangular chamber](examples/particle-processes/wall-loss/rectangular_wall_loss_strategy.py)
 - [Turn measurements into particle state](tutorials/building-an-aerosol/particles/particle_data.py)
 - [Water uptake and evaporation after a humidity pulse](benchmarks/bat-humidity-pulse/bat_humidity_pulse.py)
 - [Water uptake from a maintained vapor reservoir](tutorials/condensation/condensation_2_massbin.py)
-- [What passes through a 100 nm mobility channel?](literature/nacl-scavenging/nacl_scavenging.py)
 - [What survives a data transfer?](tutorials/building-an-aerosol/containers/data_containers.py)
 - [When a size-distribution plot hides a composition error](examples/coupled-populations/emissions/organic_partitioning_and_coagulation.py)
 - [Which composition rule controls equilibrium pressure?](examples/thermodynamics/particle-properties/activity_tutorial.py)
