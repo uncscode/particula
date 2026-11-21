@@ -2815,7 +2815,8 @@
             "label": "How to use this"
           }
         ]
-      }
+      },
+      "tocFigure": "pi-chamber/seed-optical-cutoff.svg"
     },
     {
       "source": "docs/studies/literature/pi-chamber/haze-and-cloud/index.md",
@@ -4103,7 +4104,7 @@
     },
     {
       "source": "docs/studies/literature/particle-water-uptake/bat-ccn.md",
-      "title": "BAT puts pinic acid’s activation hygroscopicity too low and phthalic acid’s too high",
+      "title": "BAT reverses the measured ordering of pinic and phthalic acid hygroscopicity at cloud activation",
       "topic": "activity-kappa",
       "also": [
         "verification-scientific"
@@ -4200,7 +4201,7 @@
     },
     {
       "source": "docs/studies/literature/nacl-scavenging/index.md",
-      "title": "Particula predicts about 60% of the NaCl capture rate measured at 4 nm",
+      "title": "A 35% polarization effect for a charged 4 nm NaCl tracer shrinks to 0.06% in the modeled chamber scan",
       "topic": "charged",
       "also": [
         "interparticle-forces",
@@ -4237,7 +4238,7 @@
     },
     {
       "source": "docs/studies/validation/wall-loss/index.md",
-      "title": "Adding settling and diffusion losses predicts too few airborne particles in a spherical chamber",
+      "title": "Adding settling and diffusion lowers predicted one-hour survival of 1 µm particles from 68% to 58% in a spherical chamber",
       "topic": "losses-deposition",
       "also": [
         "verification"
@@ -4684,7 +4685,7 @@
     },
     {
       "source": "docs/studies/literature/cloud-ion-humidity/index.md",
-      "title": "Particula predicts half the rise in ion concentration CLOUD measured from 7% to 70% humidity",
+      "title": "At low ion production, CLOUD’s 70% humidity measurement exceeds the ceiling set by the reported wall loss",
       "topic": "charged",
       "also": [
         "verification-scientific"
@@ -4716,7 +4717,7 @@
     },
     {
       "source": "docs/studies/literature/particle-water-uptake/mt-hua/index.md",
-      "title": "Neutral salt pairings overpredict growth for 72 of 79 Mt. Hua inorganic extracts",
+      "title": "Liquid salt mixing widens the winter foothill growth-factor bias at Mt. Hua from +0.54 to +0.72",
       "topic": "activity-nonideal",
       "also": [
         "verification-scientific"
@@ -4757,7 +4758,7 @@
     },
     {
       "source": "docs/studies/literature/mam4xx-coagulation/index.md",
-      "title": "Particle-resolved coagulation leaves 6.7% fewer particles for nearby modes but agrees in number for widely separated modes",
+      "title": "After a day in simulated polluted air, archived MAM4xx retains nearly three times the sub-100 nm count predicted by two models with attraction",
       "topic": "brownian",
       "also": [
         "verification-scientific"
@@ -4807,7 +4808,7 @@
     },
     {
       "source": "docs/studies/literature/pinic-isomers/index.md",
-      "title": "Two C₉H₁₄O₄ isomers reach half signal 21 minutes apart in chamber aerosol",
+      "title": "A delayed source predicts 19 minutes of the 21-minute gap between two chamber isomer signals",
       "topic": "condensation",
       "also": [
         "verification-scientific"
@@ -4848,7 +4849,7 @@
     },
     {
       "source": "docs/studies/literature/sea2cloud-events/index.md",
-      "title": "A pulse fitted to Sea2Cloud’s smallest particles misses the early 12–25 nm enhancement",
+      "title": "Sea2Cloud’s March 22 spectra favor earlier arrival of larger particles in a two-hour exchange model",
       "topic": "nucleation",
       "also": [
         "brownian"
@@ -4891,7 +4892,7 @@
     },
     {
       "source": "docs/studies/literature/shear-drop-spectrum/index.md",
-      "title": "Particula reproduces Saffman and Turner’s prediction for the number of large drops",
+      "title": "Fitting mean drop mass with a constant collision rate leaves a sixfold shortfall in counts at twice the starting radius",
       "topic": "turbulent",
       "also": [
         "verification-scientific"

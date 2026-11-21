@@ -470,14 +470,16 @@ def prepare_article(page, catalog):
             + '\n\n<StudyCarousel label="Illustrated studies" />'
         )
         page = str(Path(page).with_suffix(".mdx"))
-    if key in catalog.collections.values():
+    # The literature gallery already links every study through a figure card.
+    if (
+        key in catalog.collections.values()
+        and key != "docs/studies/literature/index.md"
+    ):
         folder = str(Path(key).parent)
         text += "\n\n" + "\n".join(
             f"- [{catalog.title(child)}]({BASE}{route(child)}/)"
             for child in catalog.children(folder)
         )
-    elif key in {r["source"] for r in catalog.studies}:
-        text = catalog.run_links(key, BASE) + text
     write_page(
         page,
         title,

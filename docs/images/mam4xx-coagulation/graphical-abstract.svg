@@ -1,15 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img">
-<title>Particle number approaches the modal reference as the modes separate</title>
-<desc>For an Aitken to accumulation number ratio of four, Particula retains 93.3, 96.3 and 100.0 percent of MAM4xx number at accumulation diameters of 60, 110 and 220 nanometres after one hour. The horizontal coordinate is logarithmic.</desc>
-<rect width="300" height="300" fill="#f7f4eb"/>
-<g font-family="sans-serif" fill="#223e3e">
-<text x="22" y="38" font-size="18">Number after one hour</text>
-<text x="65" y="83" font-size="15" fill="#8e401e">MAM4xx</text>
-<path d="M59 96H275" fill="none" stroke="#a74e24" stroke-width="3" stroke-dasharray="8 5"/>
-<g font-size="13" text-anchor="end"><text x="54" y="101">100%</text><text x="54" y="204">94%</text></g>
-<path d="M63 211.5L159 160.4 269 96.7" fill="none" stroke="#116a72" stroke-width="5"/>
-<g fill="#116a72"><circle cx="63" cy="211.5" r="6"/><circle cx="159" cy="160.4" r="6"/><circle cx="269" cy="96.7" r="6"/></g>
-<text x="154" y="194" font-size="17" fill="#116a72">Particula</text>
-<path d="M60 230H273" stroke="#778680" stroke-width="1.5"/>
-<g text-anchor="middle" font-size="15"><text x="63" y="251">60</text><text x="159" y="251">110</text><text x="269" y="251">220</text><text x="150" y="281">Accumulation diameter (nm)</text></g></g>
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Predicted particles below 100 nm in polluted air</title>
+  <desc id="desc">After 24 hours archived MAM4xx gives 3,379 particles per cubic centimetre. With coarse collisions and neutral attraction the extended modal calculation gives 2,424, the sectional model 1,187 and the particle-resolved mean 1,180. All four bars start at zero and share the same scale.</desc>
+  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
+  <g font-family="sans-serif" fill="#243e43">
+    <text x="16" y="37" font-size="19" font-weight="bold">Sub-100 nm</text>
+    <text x="16" y="74" font-size="16">Archived MAM4xx</text>
+    <rect x="16" y="83" width="206.13" height="13" fill="#243e43"/>
+    <path d="M16 111H284" stroke="#617679"/>
+    <text x="16" y="132" font-size="14" font-weight="bold">Coarse collisions + attraction</text>
+    <g font-size="16">
+      <text x="16" y="156">Extended MAM4xx</text>
+      <text x="16" y="207">Sectional</text>
+      <text x="16" y="258">Particle-resolved</text>
+    </g>
+    <rect x="16" y="164" width="147.88" height="13" fill="#a44d21"/>
+    <rect x="16" y="215" width="72.39" height="13" fill="#135963"/>
+    <rect x="16" y="266" width="71.99" height="13" fill="#135963"/>
+  </g>
 </svg>

@@ -12,7 +12,7 @@
     <path id="observed" d="M34 215 L211 109"/>
     <path id="modeled" d="M34 215 L211 162"/>
   </defs>
-  <rect width="300" height="300" rx="16" fill="#f7f2e7"/>
+  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
   <!-- Qualitative axes: the two traces compare dry and humid endpoints. -->
   <g fill="none" stroke="#53656a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M34 195V89m-4 6 4-6 4 6"/>
@@ -44,7 +44,7 @@
       <use href="#modeled" stroke="#ffaf71" stroke-dasharray="11 8"/>
     </g>
   </g>
-  <circle cx="34" cy="215" r="7.5" fill="#f7f2e7" stroke="#163e46" stroke-width="4.5"/>
+  <circle cx="34" cy="215" r="7.5" fill="#fbf2e3" stroke="#163e46" stroke-width="4.5"/>
   <circle cx="211" cy="109" r="11" fill="#114d5a" stroke="#fff6df" stroke-width="6"/>
   <path d="M211 150 L223 162 L211 174 L199 162Z" fill="#ffaf71"/>
   <g font-family="sans-serif" font-size="17" font-weight="600">

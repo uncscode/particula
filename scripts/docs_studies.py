@@ -310,35 +310,37 @@ class StudyCatalog:
             + "</nav>\n\n"
         )
 
-    def run_links(self, source, base):
-        """Expose code and complete downloads on the canonical report, too."""
-        rows = [row for row in self.rows if row["study"] == source]
-        output = []
-        for row in rows:
-            key = row["key"]
-            run = self.runs[key]
-            code = f"[View code]({base}{route(row['source'])}/#python-source)"
-            downloads = download_links(key, bool(run.get("inputs")), base)
-            prefix = f"{row['title']} · " if len(rows) > 1 else ""
-            output.append(f"{prefix}{code} · {downloads}")
-        return "\n\n".join(output) + "\n\n" if output else ""
-
     def links(self, source, base):
-        """Render explicit links forward and back."""
+        """Group companion calculations and downloads in the end matter."""
+        downloads_by_link = {}
+        for row in self.rows:
+            if row["study"] != source or row["source"] == source:
+                continue
+            key = row["key"]
+            url = route(row["source"]) + "/"
+            link = (f"Calculation · {row['title']}", url)
+            downloads = download_links(
+                key, bool(self.runs[key].get("inputs")), base
+            )
+            downloads_by_link[link] = (
+                f" · [View code]({base}{url}#python-source) · {downloads}"
+            )
+
+        resources = [
+            f"- [{label}]({base}{url})"
+            + downloads_by_link.get((label, url), "")
+            for label, url in self.relations[source]
+        ]
+        related = [
+            f"- [{label}]({base}{url})" for label, url in self.backlinks[source]
+        ]
         sections = []
-        for heading, links in [
-            ("Study resources", self.relations[source]),
-            ("Related studies", self.backlinks[source]),
+        for heading, items in [
+            ("Study resources", resources),
+            ("Related studies", related),
         ]:
-            if links:
-                sections.append(
-                    "## "
-                    + heading
-                    + "\n\n"
-                    + "\n".join(
-                        f"- [{label}]({base}{url})" for label, url in links
-                    )
-                )
+            if items:
+                sections.append(f"## {heading}\n\n" + "\n".join(items))
         return "\n\n" + "\n\n".join(sections) if sections else ""
 
 

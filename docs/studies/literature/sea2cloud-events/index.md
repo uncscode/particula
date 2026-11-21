@@ -1,8 +1,10 @@
-# A pulse fitted to Sea2Cloud’s smallest particles misses the early 12–25 nm enhancement
+# Sea2Cloud’s March 22 spectra favor earlier arrival of larger particles in a two-hour exchange model
 
-![On March 22 the ship’s 12–25 nm count falls while the model with a shared incoming particle pulse rises.](../../../images/sea2cloud-events/graphical-abstract.svg)
+![At 06:30 UTC the ship recorded 28 particles/cm³ at 12–25 nm. After matching the previous spectrum, the model predicts 300 for simultaneous arrival and 36 when 16 nm particles arrive one hour before the small-particle pulse.](../../../images/sea2cloud-events/graphical-abstract.svg)
 
-At 06:00 UTC on March 22, the *Tangaroa* size spectrum already contained about **45 particles cm⁻³ at 12–25 nm**. Ninety minutes later it contained **7 cm⁻³**. In between, the reported **1–10 nm** count reached **776 cm⁻³**. An incoming pulse fitted to the smaller particles can supply much of their peak. If larger particles enter in the same proportions throughout that pulse, Particula puts their rise too late. Allowing the larger particles to arrive earlier improves the subsequent size predictions, although the ship observations leave the origin of both populations unresolved. [Salignat et al., Figures 3b and 5a](https://doi.org/10.5194/egusphere-2026-6891)
+On March 22 the *Tangaroa* encountered a burst of 1–10 nm particles while the ship’s 12–25 nm count was already falling. Could the same incoming pulse explain both populations? In a box exchanging air over two hours, we fitted the small-particle pulse and used only the 06:00 UTC larger-size spectrum to set the amplitude of an incoming 16 nm component. At 06:30 the ship recorded **28 particles cm⁻³** at 12–25 nm. Simultaneous arrival predicts **300 cm⁻³**. Moving the larger particles one hour earlier predicts **36 cm⁻³**. One- and two-hour leads fit the seven later spectra almost equally well. The comparison favors an arrival sequence under these exchange assumptions. The shipboard record leaves the precise lag and upwind origin unresolved. [Salignat et al., Figures 3b and 5a](https://doi.org/10.5194/egusphere-2026-6891) · [March 22 fit and withheld spectra](../../../../website/public/study-data/sea2cloud/incoming-size-lead.csv)
+
+<a id="a-pulse-fitted-to-sea2clouds-smallest-particles-misses-the-early-1225-nm-enhancement"></a>
 
 ## What the regional model and the ship can each tell us
 
@@ -10,13 +12,9 @@ Salignat et al. studied nighttime particle formation above the biologically acti
 
 The regional model follows formation, growth and transport before air reaches the vessel. Particula lets us ask a narrower question. Given the modeled acid at the ship, how many particles could form there, how many would have to enter with the air, and where should we find them in the size spectrum afterward? We use the published, exhaust-filtered Figure 5a for the ambient 1–10 nm target. Its half-hour spans enclose visible observations. Their midpoints are fitting targets, and their upper edges retain brief peaks. The estimated plot-reading precision is about 30 cm⁻³. For the independent larger-size comparison, we integrate the digitized Figure 3b distribution in log diameter. The plotted concentrations already include the authors’ SMPS correction. [Paper, Figures 3 and 5](https://doi.org/10.5194/egusphere-2026-6891) · [Acid and trajectory data, Figures S3 and S5](https://doi.org/10.5194/egusphere-2026-6891-supplement)
 
-## Local production leaves a measurable number deficit
+## What can the size record tell us about arrival and growth?
 
-At the chamber calibration ceiling of 2 × 10⁷ HNO₃ molecules cm⁻³, the published law produces about **157 particles cm⁻³ h⁻¹**. Even seven hours at that ceiling with perfect survival supplies only 1,100 cm⁻³ on March 19. One hour supplies 157 cm⁻³ on March 22. Using the recovered ship-track acid gives much lower local peaks of **2.24 and 0.021 cm⁻³** in the original 12-hour-history calculation. March 19 lacks acid for its first three initialization hours. Holding that interval at the calibration ceiling gives a maximum of 403 cm⁻³ in the slow-growth, weak-scavenging case, at the beginning of the event. [Runnable production calculation](sea2cloud_events.py) · [Pre-event hindcasts](marine_history.py)
-
-The observed *rise* constrains how much additional number the ship must encounter. We subtract the highest earlier count, allow 30 cm⁻³ of reading error at each endpoint, and subtract an upper estimate of all local births between the outer edges of the two bins. The strongest resulting bounds are **997 cm⁻³ within two hours** on March 19 (13:45 to 15:15 bin centers) and **607 cm⁻³ within 12.5 hours** on March 22 (18:45 the preceding day to 06:45). Scavenging and growth past 10 nm increase the required supply. Changing air masses and formation from another precursor could both contribute. These bounds assume comparable ambient sampling and growth toward larger diameters. [Number budgets and bin times](../../../../website/public/study-data/sea2cloud/process-gain.csv).
-
-## A changing inflow can supply a peak. Can its arrival be predicted?
+### A changing inflow can supply a peak. Can its arrival be predicted?
 
 We replace air continuously in a well-mixed box. For each size class, exchange contributes the difference between its incoming and resident number concentrations divided by the exchange time. Particles also grow by organic condensation and are scavenged by the measured background. The central test uses a two-hour exchange time, 80% relative humidity and 10⁶ condensable molecules cm⁻³. Entering small particles are divided equally among four dry diameters (1.5, 3, 6 and 8 nm). We initially give each incoming population the same pre-event 12–25 nm background, then test an explicit change to that assumption.
 
@@ -39,7 +37,7 @@ With two-hour exchange, the fitted incoming air reaches about **4,060 cm⁻³ on
 
 Shading marks the reported events. The 25–100 nm ship indicator supplies a history independent of the target size bands. The pulse curve uses the event itself. The dotted lower curve adds five incoming 16 nm particles per hundred particles in the small-particle pulse. The crosses on March 22 show the one-hour-lead case, with its amplitude set from the first larger-size observation. [Boundary and receptor histories](../../../../website/public/study-data/sea2cloud/incoming-curves.csv) · [All exchange times, growth settings and event scores](../../../../website/public/study-data/sea2cloud/incoming-scores.csv).
 
-## The March 22 size spectrum distinguishes histories with similar peaks
+### The March 22 size spectrum distinguishes histories with similar peaks
 
 With only sub-10 nm particles in the pulse, the central calculation gives **0.84–1.05 cm⁻³** at 12–25 nm over the March 22 comparison. Adding a simultaneous 16 nm component at 5% gives **5.8 cm⁻³ at 06:00** and **34.4 at 06:30**. The ship measured **45.1 and 27.9**, respectively. Increasing the larger-particle fraction can fix the first count, but sends the second in the wrong direction. On March 19 the same 5% addition raises the largest predicted 12–25 nm stock from 1.05 to 37.3 cm⁻³. The reconstructed measurements span 0.37–8.28 cm⁻³.
 
@@ -56,7 +54,13 @@ We tested timing independently of that particular 5% assumption. For each propos
 
 In the central box, simultaneous arrival would predict **300 cm⁻³ at 06:30** after matching 45.1 at 06:00. A one-hour lead gives **35.5**, much closer to the observed 27.9. The one- and two-hour leads have nearly identical errors despite quite different incoming concentrations. The spectra constrain the ordering more strongly than the lag. Varying the exchange time changes that inference. At 30-minute exchange and the central vapor level, one hour of lead gives an error of 1.5 cm⁻³. At six-hour exchange and the highest vapor setting, all four leads give roughly 27 cm⁻³ error. Other compositions, earlier growth and dilution histories remain plausible. [Predictions for every size spectrum and timing assumption](../../../../website/public/study-data/sea2cloud/incoming-size-lead.csv).
 
-## Growth can remove small particles and still put them in the wrong size band
+### Local production leaves a measurable number deficit
+
+At the chamber calibration ceiling of 2 × 10⁷ HNO₃ molecules cm⁻³, the published law produces about **157 particles cm⁻³ h⁻¹**. Even seven hours at that ceiling with perfect survival supplies only 1,100 cm⁻³ on March 19. One hour supplies 157 cm⁻³ on March 22. Using the recovered ship-track acid gives much lower local peaks of **2.24 and 0.021 cm⁻³** in the original 12-hour-history calculation. March 19 lacks acid for its first three initialization hours. Holding that interval at the calibration ceiling gives a maximum of 403 cm⁻³ in the slow-growth, weak-scavenging case, at the beginning of the event. [Runnable production calculation](sea2cloud_events.py) · [Pre-event hindcasts](marine_history.py)
+
+The observed *rise* constrains how much additional number the ship must encounter. We subtract the highest earlier count, allow 30 cm⁻³ of reading error at each endpoint, and subtract an upper estimate of all local births between the outer edges of the two bins. The strongest resulting bounds are **997 cm⁻³ within two hours** on March 19 (13:45 to 15:15 bin centers) and **607 cm⁻³ within 12.5 hours** on March 22 (18:45 the preceding day to 06:45). Scavenging and growth past 10 nm increase the required supply. Changing air masses and formation from another precursor could both contribute. These bounds assume comparable ambient sampling and growth toward larger diameters. [Number budgets and bin times](../../../../website/public/study-data/sea2cloud/process-gain.csv).
+
+### Growth can remove small particles and still put them in the wrong size band
 
 The earlier CUDA optimization fitted organic uptake, initial inventory and a continuous source to pre-event small-particle counts. On March 19, growth improved the pre-event midpoint RMSE from **594 to 581 cm⁻³**. Yet that fit placed **245–695 cm⁻³ at 12–25 nm**, compared with the measured 0.37–8.28. Across 19 larger-size observations the mean absolute error was **489 cm⁻³**, falling to **1.98 cm⁻³** with organic uptake switched off. This is evidence against the tested steady-growth history in a single parcel. The regional calculation can also move growing particles away from the vessel. Organic uptake earlier along a trajectory remains physically possible. [Role of low-volatility organics in initial growth](https://doi.org/10.1038/nature18271)
 
@@ -64,7 +68,7 @@ The earlier CUDA optimization fitted organic uptake, initial inventory and a con
 
 The fixed-input collision comparisons used 350 initial particles cm⁻³, continuous 1 nm supply of 50 cm⁻³ h⁻¹ and 10⁶ organic molecules cm⁻³. Changing RH across the events’ 78.1–82.7% interquartile range moved either peak by about 28 cm⁻³. At 80% RH, neutral Brownian and hard-sphere kernels gave March 19 peaks of 727 and 742, respectively. The Gatti–Kortshagen implementation gave 541 at zero charge and 546 under the assumed bipolar mixture. Its March 22 charge increment was 3 cm⁻³. The larger difference comes from changing the underlying collision law. A measured charge distribution would be needed to translate these sensitivities to the voyage. [κ-Köhler hydration](https://doi.org/10.5194/acp-7-1961-2007) · [Gatti and Kortshagen](https://doi.org/10.1103/PhysRevE.78.046402) · [Particula rates by size](../../../../website/public/study-data/sea2cloud/process-physics.csv).
 
-## Nine days of counters and 56 withheld bins put the events in perspective
+### Nine days of counters and 56 withheld bins put the events in perspective
 
 We trained on successive 12-hour windows and withheld the following 12 hours. Six windows supplied 56 published half-hour bins. The modeled acid record ends at 00:00 UTC March 23. The counter analysis continues through March 27.
 
@@ -87,11 +91,13 @@ The nine PSM files contain 712,661 one-second records. We matched them to eight 
 
 Of 5,934 high-flow PSM plateaus, 1,023 were bracketed by low-flow plateaus within the same candidate ambient tracer stream. Among 452 candidate pairs with a clear CPC flag, **433** have negative nominal 1–10 nm differences, and only **four** satisfy 0 ≤ N₁₋₃ ≤ N₁₋₁₀. With the opposite absolute clock, 116 of 659 clear candidate pairs satisfy the ordering. Three clear March 24 pairs exceed 500 on the PSM clock, but their 1–3 nm differences exceed the corresponding 1–10 nm counts. The authors discuss terrestrial influence for March 24. These passages warrant a clock and inlet check before any assignment to a published event. [Sampling system](https://doi.org/10.1029/2024JD041072) · [Counter pairs, flags, clock alternatives and raw-file hashes](../../../../website/public/study-data/sea2cloud/tangaroa-counts.zip).
 
-## What the experiments establish
+<a id="what-the-experiments-establish"></a>
+
+## Follow the same incoming air to test particle origin
 
 Local ship-track nitric acid cannot supply the observed number fast enough under the published formation law. The regional nitrate mechanism can still contribute upwind, where residence time, concentrations and transport differ. March 19 illustrates why both scale and timing matter: replaying earlier variability recovers a threshold crossing, yet places the peak early. Assigning the decline entirely to rapid growth creates a larger-particle population far in excess of the measured spectrum. These two independent tests narrow the possible histories in a way that matching the sub-10 nm maximum alone cannot.
 
-On March 22, incoming particles can supply much of the observed number even with little local acid-driven production. The rapidly declining 12–25 nm population was present by the start of the event. Within the tested exchange model, its later evolution is better reproduced when the larger-particle enhancement precedes the smallest particles. Several leads and amplitudes explain the observations about equally well. Neither a unique transport time nor a chemical origin follows from this fit.
+On March 22, incoming particles can supply much of the observed number even with little local acid-driven production. The rapidly declining 12–25 nm population was present by the start of the event. Within the tested exchange model, its later evolution is better reproduced when the larger-particle enhancement precedes the smallest particles. In the two-hour exchange model, one- and two-hour leads give almost identical mean errors on the seven later spectra. With six-hour exchange and the highest tested vapor level, even simultaneous arrival fits about as well. The timing comparison constrains the ordering within the central model and leaves the transport time and chemical origin open.
 
 The most discriminating next comparison would follow the **same incoming air** with synchronized 1–3, 3–10 and 12–25 nm counts, beginning before the larger-size enhancement. Co-located nitric acid or nitrate-ion measurements would test formation along that path. At the ship, verified valve times, counter response and the exhaust mask would allow the 1–3 nm channel to constrain the source size: earlier fits supplying particles at 1 or 5 nm predicted almost identical March 22 1–10 nm peaks of 186–187 cm⁻³, yet predicted **73.7 versus 0.018 cm⁻³** at 1–3 nm. Until those inputs are available, the particle budgets and the ordering of the size changes provide firmer conclusions than a choice of precursor. [Precursor hypotheses and campaign measurements](https://doi.org/10.1073/pnas.2308696120)
 

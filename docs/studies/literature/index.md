@@ -4,26 +4,26 @@ Follow comparisons with published measurements, reference calculations and datas
 
 <div class="study-figures">
 
-[![Cloud droplets meet between two eddies. Two tall bars show agreement between shear theory and Particula. The constant-rate prediction reaches about one sixth of their height.](../../images/shear-drop-spectrum/graphical-abstract.svg)\
-Particula reproduces Saffman and Turner’s prediction for the number of large drops](shear-drop-spectrum/index.md)
+[![Schematic eddies bring cloud droplets together above two bars. For drops of exactly twice the starting radius, size-dependent shear gives about six times the count from a constant rate fitted to the same mean mass.](../../images/shear-drop-spectrum/graphical-abstract.svg)\
+Fitting mean drop mass with a constant collision rate leaves a sixfold shortfall in counts at twice the starting radius](shear-drop-spectrum/index.md)
 
-[![The horizontal axis runs from dry to humid air, and ion concentration per polarity (ions/cm³) increases upward. The measured rise exceeds the model prediction. A beam produces positive and negative ions.](../../images/cloud-ion-humidity/graphical-abstract.svg)\
-Particula predicts half the rise in ion concentration CLOUD measured from 7% to 70% humidity](cloud-ion-humidity/index.md)
+[![A beam produces positive and negative ions. At high ion production, CLOUD measured a larger rise in ion concentration from 7% to 70% relative humidity than Particula predicted.](../../images/cloud-ion-humidity/graphical-abstract.svg)\
+At low ion production, CLOUD’s 70% humidity measurement exceeds the ceiling set by the reported wall loss](cloud-ion-humidity/index.md)
 
-[![A small NaCl particle approaches a collector. On a common scale the modeled 4 nm capture coefficient reaches about three fifths of the measured value.](../../images/nacl-scavenging/graphical-abstract.svg)\
-Particula predicts about 60% of the NaCl capture rate measured at 4 nm](nacl-scavenging/index.md)
+[![A small, positively charged tracer follows a dotted path toward a larger neutral NaCl cube. Polarization increases modeled capture by 35% for the 4 nm tracer and 100 nm collector pair and by 0.064% for the chamber scan.](../../images/nacl-scavenging/graphical-abstract.svg)\
+A 35% polarization effect for a charged 4 nm NaCl tracer shrinks to 0.06% in the modeled chamber scan](nacl-scavenging/index.md)
 
-[![Measured cloud droplets per cm³ rise from fresh water to salt water (solid line, dense blue cluster). Separate haze fits predict a decline (dashed line, sparse outlined cluster).](../../images/pi-chamber/graphical-abstract.svg)\
+[![Measured cloud droplets per cm³ rise from fresh water to salt water (solid line, dense cluster of filled droplets). Separate haze fits predict a decline (dashed line, sparse outlined cluster).](../../images/pi-chamber/graphical-abstract.svg)\
 Π Chamber cloud counts rose over salt water, but separate haze fits predicted a decline](pi-chamber/haze-and-cloud/index.md)
 
 [![Warm air passes a fed pentane drop. A short heat-supply bar and a three-times-longer heat-demand bar share the same baseline.](../../images/pendant-evaporation/graphical-abstract.svg)\
 Modeled convection supplies only a third of the heat needed for the reported pentane drop evaporation rate](evaporation-and-uptake/pendant-drop/index.md)
 
-[![Equal dry organic cores have different water shells at 95% relative humidity. The bars compare condensed water volume: the activation-fitted κ model holds about half again as much water as BAT.](../../images/ccn-kappa-retrieval/graphical-abstract.svg)\
+[![Two arrows lead from the same 100 nm dry organic particle to its modeled wet sizes at 95% relative humidity. BAT predicts 127.7 nm and the activation-fitted κ predicts 137.6 nm. The bars show 1.49 times as much condensed water by volume with the fit.](../../images/ccn-kappa-retrieval/graphical-abstract.svg)\
 A cloud activation fit predicts 49% more water than BAT at 95% humidity for one organic](particle-water-uptake/ccn-retrieval/index.md)
 
-[![Two equal spherical chambers show a fuller airborne particle cloud for coupled wall loss and a sparser cloud for additive wall loss. The schematic exaggerates the density difference to show its direction.](../../images/spherical-wall-loss/graphical-abstract.svg)\
-Adding settling and diffusion losses predicts too few airborne particles in a spherical chamber](../validation/wall-loss/index.md)
+[![A spherical chamber cross-section shows particles in the air and on the wall. The bars show the predicted fraction of 1 µm particles still airborne after one hour in the same chamber, 68.4% for coupled theory and 58.2% for added loss rates.](../../images/spherical-wall-loss/graphical-abstract.svg)\
+Adding settling and diffusion lowers predicted one-hour survival of 1 µm particles from 68% to 58% in a spherical chamber](../validation/wall-loss/index.md)
 
 [![On an expanded diameter ruler, the 100.7 nm polystyrene latex standard lies to the left of the roughly 102 nm inferred from the two near-atmospheric mobility observations using the paper’s gas properties.](../../images/dry-psl-mobility/graphical-abstract.svg)\
 Particula sizes a 100.7 nm PSL standard at about 102 nm near atmospheric pressure](dry-psl-mobility/index.md)
@@ -31,24 +31,39 @@ Particula sizes a 100.7 nm PSL standard at about 102 nm near atmospheric pressur
 [![Water activity declines as citric acid mass fraction rises. The BAT line and AIOMFAC ticks sit close together and above all 12 measured points. The largest separation from the measurements occurs toward concentrated acid.](../../images/citric-acid-activity/graphical-abstract.svg)\
 BAT and AIOMFAC both overpredict water activity at all 12 measured citric acid concentrations](particle-water-uptake/citric-acid/index.md)
 
-[![Measured and BAT activation hygroscopicity share one scale. For pinic acid the BAT diamond is below the measured circle; for phthalic acid it is above. These opposite errors contribute to a small average bias.](../../images/bat-ccn/graphical-abstract.svg)\
-BAT puts pinic acid’s activation hygroscopicity too low and phthalic acid’s too high](particle-water-uptake/bat-ccn.md)
+[![A dry particle grows into a cloud droplet. On the activation hygroscopicity (κ) scale, measurements rank pinic acid (0.248) above phthalic acid (0.051). BAT predicts the reverse, 0.114 for pinic acid and 0.155 for phthalic acid.](../../images/bat-ccn/graphical-abstract.svg)\
+BAT reverses the measured ordering of pinic and phthalic acid hygroscopicity at cloud activation](particle-water-uptake/bat-ccn.md)
 
 [![Change in organic mass per sulfate after dilution: the chamber measurement and growth-calibrated fit fall below their starting values. The reversible-pool model and its imidazole-producing variant (IC) both rise.](../../images/glyoxal-chamber/graphical-abstract.svg)\
 After glyoxal dilution, two models predict rising organic mass per sulfate as measurements fall](https://uncscode.github.io/particula/studies/literature/evaporation-and-uptake/glyoxal_chamber/)
 
+[![A batch chamber holds aerosol formed during α-pinene oxidation. In sampled particles, cis-pinic acid reaches half its late signal 20.7 minutes after the unidentified isomer. The common-source and delayed-source models predict gaps of 0.11 and 19.11 minutes, respectively.](../../images/pinic-isomers/graphical-abstract.svg)\
+A delayed source predicts 19 minutes of the 21-minute gap between two chamber isomer signals](pinic-isomers/index.md)
+
+[![Above the Mt. Hua ridge, three particles show mean wet diameters at 90% relative humidity for 18 winter foothill extracts. Dashed rings repeat the measured 157 nm diameter inside the larger pure-salt (212 nm) and liquid-mixture (229 nm) predictions.](../../images/mt-hua-salts/graphical-abstract.svg)\
+Liquid salt mixing widens the winter foothill growth-factor bias at Mt. Hua from +0.54 to +0.72](particle-water-uptake/mt-hua/index.md)
+
+[![Sub-100 nm particles per cubic centimetre after 24 hours in polluted air. Archived MAM4xx gives 3,379. With coarse collisions and neutral attraction, extended MAM4xx gives 2,424, the sectional model 1,187 and the particle-resolved model 1,180.](../../images/mam4xx-coagulation/graphical-abstract.svg)\
+After a day in simulated polluted air, archived MAM4xx retains nearly three times the sub-100 nm count predicted by two models with attraction](mam4xx-coagulation/index.md)
+
+[![At 06:30 UTC the ship recorded 28 particles/cm³ at 12–25 nm. After matching the previous spectrum, the model predicts 300 for simultaneous arrival and 36 when 16 nm particles arrive one hour before the small-particle pulse.](../../images/sea2cloud-events/graphical-abstract.svg)\
+Sea2Cloud’s March 22 spectra favor earlier arrival of larger particles in a two-hour exchange model](sea2cloud-events/index.md)
+
+[![Equal 130 nm dry seeds grow to different modeled wet diameters at 99.55% relative humidity. The ammonium sulfate droplet (544 nm) falls below the dashed 600 nm detection limit. The NaCl droplet (723 nm) extends above it.](../../images/pi-chamber/seed-optical-cutoff.svg)\
+At the inferred Π Chamber humidity, modeled sulfate haze falls below the optical detection limit](pi-chamber/seed-chemistry.md)
+
 </div>
 
 <!-- STUDY_LIST_START -->
-- [A pulse fitted to Sea2Cloud’s smallest particles misses the early 12–25 nm enhancement](sea2cloud-events/index.md)
+- [A 35% polarization effect for a charged 4 nm NaCl tracer shrinks to 0.06% in the modeled chamber scan](nacl-scavenging/index.md)
+- [A delayed source predicts 19 minutes of the 21-minute gap between two chamber isomer signals](pinic-isomers/index.md)
+- [After a day in simulated polluted air, archived MAM4xx retains nearly three times the sub-100 nm count predicted by two models with attraction](mam4xx-coagulation/index.md)
+- [At low ion production, CLOUD’s 70% humidity measurement exceeds the ceiling set by the reported wall loss](cloud-ion-humidity/index.md)
 - [Evaporation and reactive uptake](evaporation-and-uptake/index.md)
+- [Fitting mean drop mass with a constant collision rate leaves a sixfold shortfall in counts at twice the starting radius](shear-drop-spectrum/index.md)
 - [Particle water uptake and activation](particle-water-uptake/index.md)
-- [Particle-resolved coagulation leaves 6.7% fewer particles for nearby modes but agrees in number for widely separated modes](mam4xx-coagulation/index.md)
-- [Particula predicts about 60% of the NaCl capture rate measured at 4 nm](nacl-scavenging/index.md)
-- [Particula predicts half the rise in ion concentration CLOUD measured from 7% to 70% humidity](cloud-ion-humidity/index.md)
-- [Particula reproduces Saffman and Turner’s prediction for the number of large drops](shear-drop-spectrum/index.md)
 - [Particula sizes a 100.7 nm PSL standard at about 102 nm near atmospheric pressure](dry-psl-mobility/index.md)
-- [Two C₉H₁₄O₄ isomers reach half signal 21 minutes apart in chamber aerosol](pinic-isomers/index.md)
+- [Sea2Cloud’s March 22 spectra favor earlier arrival of larger particles in a two-hour exchange model](sea2cloud-events/index.md)
 - [Π Chamber experiments and modeling](pi-chamber/index.md)
-- [Adding settling and diffusion losses predicts too few airborne particles in a spherical chamber](../validation/wall-loss/index.md)
+- [Adding settling and diffusion lowers predicted one-hour survival of 1 µm particles from 68% to 58% in a spherical chamber](../validation/wall-loss/index.md)
 <!-- STUDY_LIST_END -->

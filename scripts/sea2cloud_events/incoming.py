@@ -612,54 +612,57 @@ def plot_leads(lead_data):
     plt.close(fig)
 
 
-def graphical_abstract(curves):
-    """Draw the measured and modeled March 22 stocks on identical axes."""
-    obs = summed_spectrum(12, 25)
-    obs = obs[(obs[:, 0] >= 78) & (obs[:, 0] <= 79.5)]
-    tail = curves[
-        (curves.day == 22)
-        & (curves.history == "pulse + 5% tail")
-        & curves.hour.between(78, 79.5)
-    ]
-
-    def position(hour, count):
-        return 48 + (hour - 78) / 1.5 * 225, 235 - count / 50 * 147
-
-    points = " ".join(
-        "%.2f,%.2f" % position(t, n)
-        for t, n in zip(tail.hour, tail.n12_25, strict=True)
-    )
-    measured = " ".join("%.2f,%.2f" % position(t, n) for t, n in obs)
-    dots = "".join(
-        '<circle cx="%.2f" cy="%.2f" r="5"/>' % position(t, n) for t, n in obs
-    )
+def graphical_abstract(lead_data):
+    """Show the first held-out spectrum after matching the 06:00 size count."""
+    next_bin = lead_data[
+        (lead_data.tau_h == 2)
+        & (lead_data.vapor_million == 1)
+        & (lead_data.hour == 78.5)
+    ].set_index("lead_h")
+    observed = next_bin.loc[0, "observed"]
+    same_time = next_bin.loc[0, "predicted"]
+    earlier = next_bin.loc[1, "predicted"]
+    scale = 195 / max(observed, same_time, earlier)
     graphic = f'''<svg xmlns="http://www.w3.org/2000/svg" width="3in"
- height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
-<title id="title">March 22 aboard Tangaroa, 12–25 nm particles</title>
-<desc id="desc">On a common linear scale the ship measurements fall from
-45 to 7 per cubic centimetre. A model in which 16 nm particles arrive
-with a fitted small-particle pulse starts near 6 and rises above 34.</desc>
-<rect width="300" height="300" rx="12" fill="#f5f4ea"/>
-<g fill="#17363b"><path d="M23 42h67l-10 12H32z M35 31h21v11H35z
- M52 22h14v20H52z M65 33h12v9H65z M58 13h3v10h-3z"/>
-<path d="M19 59q9 5 18 0q9 5 18 0q9 5 18 0q9 5 18 0" fill="none"
- stroke="#42696d" stroke-width="2.5"/></g>
-<g font-family="sans-serif" fill="#17363b">
-<text x="109" y="37" font-size="23" font-weight="bold">12–25 nm</text>
-<text x="110" y="57" font-size="13">March 22 · cm⁻³</text>
-<path d="M48 88v147h225" fill="none" stroke="#9ba8a2" stroke-width="1"/>
-<g font-size="12"><text x="25" y="94">50</text><text x="34" y="239">0</text>
-<text x="48" y="254">06:00</text>
-<text x="273" y="254" text-anchor="end">07:30 UTC</text></g>
-<polyline points="{points}" fill="none" stroke="#ab492b"
- stroke-width="4" stroke-dasharray="7 4"/>
-<polyline points="{measured}" fill="none" stroke="#17363b" stroke-width="2"/>
-<g fill="#17363b">{dots}</g>
-<circle cx="42" cy="278" r="4"/><text x="54" y="282" font-size="14">Ship</text>
-<path d="M132 278h25" stroke="#ab492b" stroke-width="4"
- stroke-dasharray="7 4"/>
-<text x="165" y="282" font-size="14">Shared pulse</text>
-</g></svg>
+  height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Sea2Cloud ship measurement and arrival scenarios</title>
+  <desc id="desc">At 06:30 UTC on March 22, Tangaroa measured {observed:.0f}
+  particles/cm³ in the 12–25 nm band. The two-hour exchange model predicts
+  {same_time:.0f} particles/cm³ when the incoming 16 nm particles arrive with
+  the small-particle pulse and {earlier:.0f} when they arrive one hour before
+  it. Each model used the 06:00 spectrum for calibration.</desc>
+  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
+  <g fill="#243e43">
+    <path d="M21 39h61l-9 10H31z M36 30h15v9H36z M54 24h10v15H54z
+      M57 16h3v8h-3z"/>
+    <path d="M20 56q8 4 16 0t16 0t16 0t16 0" fill="none"
+      stroke="#617679" stroke-width="2.5"/>
+  </g>
+  <g fill="#243e43" font-family="sans-serif">
+    <text x="96" y="32" font-size="19"
+      font-weight="bold">12–25 nm particles</text>
+    <text x="96" y="55" font-size="15">per cm³ · 06:30 UTC</text>
+    <text x="22" y="94" font-size="17"
+      font-weight="bold">Ship measurement</text>
+    <rect x="22" y="106" width="{observed * scale:.2f}"
+      height="13" fill="#243e43"/>
+    <text x="{30 + observed * scale:.2f}" y="118"
+      font-size="17">{observed:.0f}</text>
+    <path d="M22 137h256" stroke="#617679" stroke-width="1"/>
+    <text x="22" y="162" font-size="17"
+      font-weight="bold">Modeled 16 nm arrival</text>
+    <text x="22" y="189" font-size="16">With the small-particle pulse</text>
+    <rect x="22" y="200" width="{same_time * scale:.2f}"
+      height="13" fill="#a44d21"/>
+    <text x="{30 + same_time * scale:.2f}" y="212"
+      font-size="17">{same_time:.0f}</text>
+    <text x="22" y="246" font-size="16">1 h before the pulse</text>
+    <rect x="22" y="257" width="{earlier * scale:.2f}"
+      height="13" fill="#135963"/>
+    <text x="{30 + earlier * scale:.2f}" y="269"
+      font-size="17">{earlier:.0f}</text>
+  </g>
+</svg>
 '''
     (ROOT / "docs/images/sea2cloud-events/graphical-abstract.svg").write_text(
         graphic
@@ -726,7 +729,7 @@ def run():
         + "\n"
     )
     plot(curves, lead_data)
-    graphical_abstract(curves)
+    graphical_abstract(lead_data)
     plot_leads(lead_data)
 
 
