@@ -105,9 +105,18 @@ def check_paths(by_id):
 def check_resources(data, root, by_id):
     """Classify each authored page once with valid topic assignments."""
     errors, covered = [], []
+    images = (root / "docs/images").resolve()
     for resource in data["resources"]:
         source = resource["source"]
         covered.append(source.split("#", 1)[0])
+        if "tocFigure" in resource:
+            image = images / resource["tocFigure"]
+            if (
+                resource["role"] != "Studies"
+                or not image.resolve().is_relative_to(images)
+                or not image.is_file()
+            ):
+                errors.append(f"{source}: invalid study TOC figure")
         assignments = [resource["topic"], *resource["also"]]
         if len(set(assignments)) != len(assignments):
             errors.append(f"{source}: duplicate topic association")

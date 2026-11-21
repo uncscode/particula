@@ -1,0 +1,156 @@
+---
+import { graph, resourcePath } from './topic-model.mjs';
+
+interface Resource {
+  source: string;
+  title: string;
+  tocFigure?: string;
+  study?: { id: string };
+}
+interface Props {
+  label: string;
+  resources?: Resource[];
+  featured?: string[];
+}
+const { label, resources = graph.resources, featured } = Astro.props;
+const illustrated = resources.filter((r) => r.tocFigure);
+const slides = featured
+  ? featured.map((id) => {
+      const entry = illustrated.find((r) => r.study?.id === id);
+      if (!entry) throw new Error(`Missing featured study illustration: ${id}`);
+      return entry;
+    })
+  : illustrated.sort((a, b) => a.title.localeCompare(b.title, 'en'));
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+{slides.length > 0 && <study-carousel role="region" aria-label={label} aria-roledescription={slides.length > 1 ? 'carousel' : undefined}>
+  <div class="slides">
+    {slides.map((r, i) => <a class="slide" href={resourcePath(r.source, base)} inert={i > 0} aria-hidden={i > 0 ? 'true' : undefined}>
+      <img src={`${base}/images/${r.tocFigure}`} alt="" width="208" height="208" loading="lazy" decoding="async" />
+      <span class="study-title">{r.title}</span>
+    </a>)}
+  </div>
+  {slides.length > 1 && <div class="controls" hidden>
+    <button type="button" data-rotate aria-label="Pause automatic rotation">
+      <svg class="pause-mark" viewBox="0 0 20 20" aria-hidden="true"><path d="M6 4h3v12H6zm5 0h3v12h-3z" /></svg>
+      <svg class="play-mark" viewBox="0 0 20 20" aria-hidden="true"><path d="m6 3 10 7-10 7z" /></svg>
+    </button>
+    <span class="position">1 / {slides.length}</span>
+    <button type="button" data-prev aria-label="Previous study">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m12 4-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" /></svg>
+    </button>
+    <button type="button" data-next aria-label="Next study">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m8 4 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" /></svg>
+    </button>
+    <span class="sr-only" aria-live="polite" aria-atomic="true"></span>
+  </div>}
+</study-carousel>}
+
+<style>
+  study-carousel { display: block; margin-block: 1.4rem; padding: clamp(.85rem, 3vw, 1.6rem); border: 1px solid var(--sl-color-gray-5); border-radius: 1rem; background: var(--sl-color-bg); }
+  .slides { display: grid; }
+  .slide { grid-area: 1 / 1; display: grid; grid-template-columns: clamp(7rem, 24vw, 13rem) 1fr; align-items: center; gap: clamp(.8rem, 3vw, 2rem); margin: 0; text-decoration: none; color: var(--sl-color-white); }
+  .slide[inert] { visibility: hidden; }
+  .slide img { width: 100%; height: auto; border-radius: .55rem; margin: 0; }
+  .study-title { font-size: clamp(1.05rem, 2.6vw, 1.75rem); line-height: 1.22; font-weight: 600; text-wrap: balance; margin: 0; }
+  .slide:hover .study-title, .slide:focus-visible .study-title { text-decoration: underline; text-decoration-thickness: .08em; text-underline-offset: .16em; }
+  .controls { display: flex; justify-content: flex-end; align-items: center; gap: .45rem; margin-top: .6rem; }
+  .controls[hidden], .play-mark, [data-paused] .pause-mark { display: none; }
+  [data-paused] .play-mark { display: inline; }
+  button { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; padding: 0; margin: 0; border: 1px solid var(--sl-color-gray-5); border-radius: 50%; background: var(--sl-color-bg); color: var(--sl-color-text); font: inherit; cursor: pointer; }
+  button svg { width: 1rem; height: 1rem; fill: currentColor; }
+  button:hover { color: var(--sl-color-text-accent); border-color: currentColor; }
+  button:focus-visible, .slide:focus-visible { outline: 2px solid var(--sl-color-text-accent); outline-offset: 3px; }
+  .position { font-size: .82rem; min-width: 3.8em; text-align: center; font-variant-numeric: tabular-nums; color: var(--sl-color-gray-2); }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  @media (max-width: 32rem) {
+    .slide { grid-template-columns: 1fr; grid-template-rows: auto 1fr; align-items: start; justify-items: center; }
+    .slide img { width: min(100%, 12rem); }
+    .study-title { width: 100%; font-size: 1.16rem; }
+  }
+</style>
+
+<script>
+  class StudyCarousel extends HTMLElement {
+    cleanup?: () => void;
+
+    connectedCallback() {
+      const controls = this.querySelector<HTMLElement>('.controls');
+      if (!controls) return;
+      const slides = [...this.querySelectorAll<HTMLAnchorElement>('.slide')];
+      const rotate = controls.querySelector<HTMLButtonElement>('[data-rotate]')!;
+      const position = controls.querySelector<HTMLElement>('.position')!;
+      const announcement = controls.querySelector<HTMLElement>('[aria-live]')!;
+      const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const events = new AbortController();
+      const options = { signal: events.signal };
+      let index = slides.findIndex((slide) => !slide.inert);
+      let enabled = !motion.matches;
+      let onScreen = false;
+      let hovering = false;
+      let timer: number | undefined;
+
+      function advance(direction: number, announce: boolean) {
+        slides[index].inert = true;
+        slides[index].setAttribute('aria-hidden', 'true');
+        index = (index + direction + slides.length) % slides.length;
+        slides[index].inert = false;
+        slides[index].removeAttribute('aria-hidden');
+        position.textContent = `${index + 1} / ${slides.length}`;
+        if (announce) announcement.textContent = `${position.textContent}. ${slides[index].textContent?.trim()}`;
+      }
+
+      function schedule() {
+        window.clearInterval(timer);
+        rotate.toggleAttribute('data-paused', !enabled);
+        rotate.setAttribute('aria-label', enabled ? 'Pause automatic rotation' : 'Start automatic rotation');
+        if (enabled && onScreen && !hovering && !document.hidden) {
+          timer = window.setInterval(() => advance(1, false), 7000);
+        }
+      }
+
+      controls.addEventListener('click', (event) => {
+        const button = (event.target as Element).closest('button');
+        if (!button) return;
+        if (button === rotate) enabled = !enabled;
+        else {
+          enabled = false;
+          advance(button.hasAttribute('data-next') ? 1 : -1, true);
+        }
+        schedule();
+      }, options);
+      this.addEventListener('focusin', (event) => {
+        if ((event.target as HTMLElement).matches(':focus-visible')) {
+          enabled = false;
+          schedule();
+        }
+      }, options);
+      this.addEventListener('pointerenter', (event) => {
+        hovering = event.pointerType === 'mouse';
+        schedule();
+      }, options);
+      this.addEventListener('pointerleave', () => { hovering = false; schedule(); }, options);
+      document.addEventListener('visibilitychange', schedule, options);
+      motion.addEventListener('change', () => {
+        if (motion.matches) enabled = false;
+        schedule();
+      }, options);
+      const viewport = new IntersectionObserver(([entry]) => {
+        onScreen = entry.isIntersecting;
+        schedule();
+      });
+      viewport.observe(this);
+      controls.hidden = false;
+      schedule();
+      this.cleanup = () => {
+        events.abort();
+        viewport.disconnect();
+        window.clearInterval(timer);
+        controls.hidden = true;
+      };
+    }
+
+    disconnectedCallback() { this.cleanup?.(); }
+  }
+  if (!customElements.get('study-carousel')) customElements.define('study-carousel', StudyCarousel);
+</script>

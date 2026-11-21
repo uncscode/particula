@@ -460,6 +460,13 @@ def prepare_article(page, catalog):
             + "\n\n<StudyCatalog />"
         )
         page = str(Path(page).with_suffix(".mdx"))
+    if key == "docs/studies/index.md":
+        text = (
+            "import StudyCarousel from '@components/StudyCarousel.astro';\n\n"
+            + text
+            + '\n\n<StudyCarousel label="Illustrated studies" />'
+        )
+        page = str(Path(page).with_suffix(".mdx"))
     if key in catalog.collections.values():
         folder = str(Path(key).parent)
         text += "\n\n" + "\n".join(

@@ -209,6 +209,11 @@ separately; a local build does not prove that GitHub Pages has updated.
 Use the [documentation guide](https://uncscode.github.io/particula/contribute/documentation/) for topic
 placement and the shared scientific narrative framework. The topic registry is
 `website/topics.json`; local SVGs live in `website/public/topic-icons/`.
+For an illustrated study, set its resource entry’s `tocFigure` to the file path
+relative to `docs/images/`. The Studies and matching topic carousels reuse that
+resource’s title and destination. The home carousel selects study IDs in
+`docs/index.md`.
+
 Preparation validates coverage and generates topic MDX adapters. Do not edit
 `website/src/content/docs/` directly. The offline entry remains maintained in
 `docs/guide/topics/index.md`.

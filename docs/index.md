@@ -1,3 +1,4 @@
+import StudyCarousel from '@components/StudyCarousel.astro';
 import { CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 
@@ -15,6 +16,8 @@ your coding agent.
 </CardGrid>
 
 ## Dig deeper into the science
+
+<StudyCarousel featured={["cloud-ion-humidity", "examples-simulations-cloud-chamber-multi-cycle", "pendant-drop-evaporation", "nacl-scavenging", "pi-chamber-spectra"]} label="Featured studies" />
 
 <CardGrid>
   <LinkCard title="Guide" description="Construction, ownership, and the CPU/GPU support boundary." href="/particula/guide/" />
