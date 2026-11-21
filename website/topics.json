@@ -4707,6 +4707,179 @@
       "tocFigure": "cloud-ion-humidity/graphical-abstract.svg"
     },
     {
+      "source": "docs/studies/literature/particle-water-uptake/mt-hua/mt_hua_salts.py",
+      "title": "Reconstruct Mt. Hua particle growth",
+      "topic": "activity-nonideal",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/particle-water-uptake/mt-hua/index.md",
+      "title": "Neutral salt pairings overpredict growth for 72 of 79 Mt. Hua inorganic extracts",
+      "topic": "activity-nonideal",
+      "also": [
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "mt-hua-salts",
+        "runs": [
+          "mt-hua-salts",
+          "mixture-activity"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/activity.md",
+            "label": "How to use this"
+          }
+        ]
+      },
+      "tocFigure": "mt-hua-salts/graphical-abstract.svg"
+    },
+    {
+      "source": "docs/studies/literature/particle-water-uptake/mt-hua/mixture_activity.py",
+      "title": "Water activity of Mt. Hua ion mixtures",
+      "topic": "activity-nonideal",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/mam4xx-coagulation/mam4xx_coagulation.py",
+      "title": "Compare MAM4xx and particle-resolved Brownian coagulation",
+      "topic": "brownian",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/mam4xx-coagulation/index.md",
+      "title": "Particle-resolved coagulation leaves 6.7% fewer particles for nearby modes but agrees in number for widely separated modes",
+      "topic": "brownian",
+      "also": [
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "mam4xx-coagulation",
+        "runs": [
+          "mam4xx-coagulation",
+          "regimes",
+          "mode-attraction"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/coagulation.md",
+            "label": "How to use this"
+          }
+        ]
+      },
+      "tocFigure": "mam4xx-coagulation/graphical-abstract.svg"
+    },
+    {
+      "source": "docs/studies/literature/mam4xx-coagulation/regimes.py",
+      "title": "Which coagulation processes matter in three atmospheric regimes?",
+      "topic": "brownian",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/mam4xx-coagulation/mode_attraction.py",
+      "title": "Does neutral attraction survive averaging over MAM4xx modes?",
+      "topic": "brownian",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/pinic-isomers/pinic_isomers.py",
+      "title": "Compare observed isomer timing and conditional organic partitioning",
+      "topic": "condensation",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/pinic-isomers/index.md",
+      "title": "Two C₉H₁₄O₄ isomers reach half signal 21 minutes apart in chamber aerosol",
+      "topic": "condensation",
+      "also": [
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "pinic-isomers",
+        "runs": [
+          "pinic-isomers",
+          "isomer-history"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/condensation.md",
+            "label": "How to use this"
+          }
+        ]
+      },
+      "tocFigure": "pinic-isomers/graphical-abstract.svg"
+    },
+    {
+      "source": "docs/studies/literature/pinic-isomers/isomer_history.py",
+      "title": "Can partitioning explain two measured isomer time histories?",
+      "topic": "condensation",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/sea2cloud-events/sea2cloud_events.py",
+      "title": "Compare two Sea2Cloud event peaks with finite local production",
+      "topic": "nucleation",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/sea2cloud-events/index.md",
+      "title": "A pulse fitted to Sea2Cloud’s smallest particles misses the early 12–25 nm enhancement",
+      "topic": "nucleation",
+      "also": [
+        "brownian"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "sea2cloud-events",
+        "runs": [
+          "sea2cloud-events",
+          "marine-history"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/nucleation.md",
+            "label": "How to use this"
+          }
+        ]
+      },
+      "tocFigure": "sea2cloud-events/graphical-abstract.svg"
+    },
+    {
+      "source": "docs/studies/literature/sea2cloud-events/marine_history.py",
+      "title": "Can ship-track nitric acid predict the two marine events?",
+      "topic": "nucleation",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
       "source": "docs/studies/literature/shear-drop-spectrum/shear_drop_spectrum.py",
       "title": "Reproduce the turbulent shear drop spectrum",
       "topic": "turbulent",

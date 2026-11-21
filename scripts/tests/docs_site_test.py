@@ -27,6 +27,15 @@ def test_guide_embeds_saved_figure_from_local_result_bundle():
     assert result == "![Calibration](/particula/results/demo/figure-1.png)"
 
 
+def test_study_table_links_to_the_published_csv():
+    """Keep a repo-relative source link and serve the CSV on the study site."""
+    result = site.rewrite_links(
+        "[Spectra](../../../../website/public/study-data/demo/spectra.csv)",
+        "docs/studies/literature/demo/index.md",
+    )
+    assert result == "[Spectra](/particula/study-data/demo/spectra.csv)"
+
+
 def test_figures_are_visible_and_stdout_is_escaped():
     """Figures are visible and stdout is escaped."""
     result = site.output_markdown(

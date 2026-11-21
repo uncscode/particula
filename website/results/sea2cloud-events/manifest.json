@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 5.059515526052564,
+  "package_source_sha256": "de9c4fa23fbd4833d9eeae22e97ffd8e2496acae8432510149eed8ada42f4ee3",
+  "scientific_source_sha256": "1ac66c614e80ae7a0f6aae70e885469d5f8609ca95421966dfcd08ebcf41597f",
+  "input_sha256": {
+    "scripts/sea2cloud_events/study.py": "ccb2afd28de18b48fedb4c992f13e5b008e4c4dde38fc2643bc37ca7badba845",
+    "scripts/sea2cloud_events/plots.py": "0af6da2bcb3a38c3e7d9190e7a4b1c3eb7896450438587cdef79f54d58612a0c",
+    "docs/data/sea2cloud-events/events.csv": "92cbeadb1f2bda1dab0682fd9b269f87f67a5eea5f6f72d75f4797438a9462f8"
+  },
+  "example": "sea2cloud-events",
+  "fingerprint": "a5934939d89e10e7cd994e8f29842e257a1f54e2089b08d4f374f0870b702dce",
+  "source": "docs/studies/literature/sea2cloud-events/sea2cloud_events.py",
+  "revision": "e51ed2b15f9bf790bf8b152b2c54176b6105b73f",
+  "package_dirty": false,
+  "executed_at": "2026-11-21T02:36:27.712419+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "image": "figure-2-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-3-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-3-1.png": "b98417efacf937cabd48625451f582081b3748af1bc9fe4e380ee7dac1e5b22f",
+    "figure-2-1.png": "0cb7cdcb51f28e2909416289dcc364f510cf0406f9ec252196fa969de287bb39",
+    "executed_source.py": "ae6d45ff3d664b3059f1c17f800b36be7c31147578787bfa22dc87fd86081d11",
+    "data.json": "91d8c85b32bdba9b0ab4e883458f0040ac6ee0ad898a54ba009ce7e5c5d450d1",
+    "source.py": "ae6d45ff3d664b3059f1c17f800b36be7c31147578787bfa22dc87fd86081d11"
+  },
+  "simulation_fingerprint": "bf6e9e1e265dfd712c5aa7426dd0865421fff509c74be5b031a7ebc5a41c80fd",
+  "render_versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {
+    "scripts/sea2cloud_events/study.py": "ccb2afd28de18b48fedb4c992f13e5b008e4c4dde38fc2643bc37ca7badba845",
+    "scripts/sea2cloud_events/plots.py": "0af6da2bcb3a38c3e7d9190e7a4b1c3eb7896450438587cdef79f54d58612a0c",
+    "docs/data/sea2cloud-events/events.csv": "92cbeadb1f2bda1dab0682fd9b269f87f67a5eea5f6f72d75f4797438a9462f8"
+  },
+  "rendered_at": "2026-11-21T02:36:30.692511+00:00",
+  "render_revision": "e51ed2b15f9bf790bf8b152b2c54176b6105b73f",
+  "render_elapsed_seconds": 1.5130979210371152
+}
