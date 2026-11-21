@@ -1,18 +1,36 @@
 # %% [markdown]
-# # After glyoxal dilution, two models predict rising organic mass per sulfate as measurements fall
+# <a id="after-glyoxal-dilution-two-models-predict-rising-organic-mass-per-sulfate-as-measurements-fall"></a>
 #
 # ![Change in organic mass per sulfate after dilution: the chamber measurement and growth-calibrated fit fall below their starting values. The reversible-pool model and its imidazole-producing variant (IC) both rise.](../../../images/glyoxal-chamber/graphical-abstract.svg)
 #
-# After dilution, the chamber organic-to-sulfate mass ratio fell 10.2%. A response fitted to the growth period predicted a 6.7% decline. The reversible-pool and imidazole-producing particle models predicted increases of about 32% and 87% over the same windows. The graphic shows changes relative to each series’ own starting value.
+# Galloway et al. measured how much organic material wet ammonium sulfate
+# particles retained when the surrounding glyoxal vapor was diluted. In our digitization
+# of Figure 6, median organic mass per unit sulfate fell **10.2%** between
+# the 20 minutes before dilution and the final 20-minute sampling window. Fitting a reversible reservoir to
+# particle growth before dilution predicted a **6.7% decline** with its
+# parameters fixed. Two models using published uptake and reaction parameters
+# gave the opposite response to the same measured vapor history. Organic mass
+# per sulfate rose **32%** with reversible storage alone and **87%** when
+# particles could also form an imidazole product. Dilution thus tests how
+# quickly the modeled particles can release what they accumulated during growth.
+# Each percentage uses that series’ own pre-dilution value.
 #
-# Galloway et al. exposed wet ammonium sulfate seed to glyoxal in the dark,
-# then diluted the chamber. Replay the vapor in their Figure 6 and compare two
-# particles with the same initial composition. Both can absorb and release
-# glyoxal. Only one can turn it into 1H-imidazole-2-carboxaldehyde (IC).
-# The gas observations drive the calculation. Particle measurements test it.
-# [Chamber study, experiment 3](https://doi.org/10.5194/acp-9-3331-2009)
+# ## How dilution revealed reversible uptake in a dark chamber
 #
-# ## Recover the measurements and start with wet seed
+# Galloway and colleagues exposed wet ammonium sulfate seed to glyoxal in the
+# dark. In experiment 3 they diluted the chamber after nearly 12 hours and
+# followed vapor concentration, particle organic mass and a nitrogen-containing
+# fragment. In Figure 6 the organic-to-sulfate ratio turns down while the
+# fragment signal continues to rise. The simultaneous changes let us ask
+# whether a model can reproduce a falling organic-to-sulfate ratio while
+# the sulfate-normalized nitrogen fragment signal at m/z 68 keeps rising.
+# [Galloway et al., Table 1 and Figure 6](https://acp.copernicus.org/articles/9/3331/2009/acp-9-3331-2009.pdf#page=7)
+#
+# ## Can the growth history predict release after dilution?
+#
+# <a id="recover-the-measurements-and-start-with-wet-seed"></a>
+#
+# ### The measured gas concentration drives the particle calculation
 #
 # Table 1 reports 293 K, 56% RH, a calculated 37% liquid water fraction and
 # 87 µm³ of wet seed per cm³ of air. We use this water fraction by volume,
@@ -129,7 +147,9 @@ def gas_kg(ppbv):
 
 
 # %% [markdown]
-# ## Give condensation and chemistry distinct material transfers
+# <a id="give-condensation-and-chemistry-distinct-material-transfers"></a>
+#
+# ### Two particle models share a reversible reservoir
 #
 # Only kinetic condensation exchanges vapor with the dissolved pool. On this
 # seed the initial salt molality exceeds 12 mol/kg water. Following Kampf et
@@ -152,7 +172,7 @@ def gas_kg(ppbv):
 # condensed-phase resistance. Use a flat
 # interface limit for this bulk-solution equilibrium comparison.
 #
-# The second pathway uses finite ammonium sulfate. Per mole of IC, two glyoxal
+# The second pathway uses finite ammonium sulfate. Per mole of 1H-imidazole-2-carboxaldehyde (IC), two glyoxal
 # and one salt formula unit produce IC, three waters and one sulfuric acid
 # equivalent. The acid lane accounts for the sulfate and protons left when two
 # ammonias are consumed. Prescribed pH controls the rate. Acid equivalents
@@ -260,7 +280,9 @@ def ledger(state):
 
 
 # %% [markdown]
-# ## Replay the chamber and close the forced budget
+# <a id="replay-the-chamber-and-close-the-forced-budget"></a>
+#
+# ### The same sampling windows test both particle models
 #
 # Use linear interpolation between gas measurements. Prescribe the midpoint
 # concentration for each interval, then let the finite gas and particles
@@ -389,7 +411,7 @@ def independent_checks():
 # %% [markdown]
 # <a id="estimate-a-reversible-response-from-chamber-growth"></a>
 #
-# ## A fit to the growth period predicts part of the later decline
+# ### A fit to the growth period predicts part of the later decline
 #
 # At dilution the measured organic/sulfate ratio is about 3.07. With the
 # assumed water and sulfate, the literature-based reversible run has reached
@@ -529,7 +551,7 @@ def simulate():
 # %% [markdown]
 # <a id="compare-the-release-and-the-persistent-product"></a>
 #
-# ## Organic mass per sulfate falls as the nitrogen marker rises
+# ### Organic mass per sulfate falls as the nitrogen marker rises
 #
 # The organic-to-sulfate panel compares dry organic mass with sulfate ion
 # mass. Retain all digitized observations from seed injection onward. The
@@ -668,21 +690,18 @@ def summarize(report):
 # %% [markdown]
 # <a id="what-the-comparison-tells-us"></a>
 #
-# ## The two particle models keep accumulating organics after dilution
+# <a id="the-two-particle-models-keep-accumulating-organics-after-dilution"></a>
 #
-# The chamber organic/sulfate ratio falls from 3.066 to 2.753 in the
-# selected windows, a 10.20% decline. Its uncalibrated nitrogen marker
-# approximately doubles. The chamber fit predicts a 6.7% decline from
-# 3.01 to 2.81. Its 6.9-hour response recovers the direction and part of the
-# magnitude using the growth data alone to set its parameters. Water content,
-# reversible chemical storage and instrument response can all affect the
-# fitted capacity. Both literature-based organic ratios rise across these same
-# windows. The reaction run can release vapor during individual intervals
-# while ending with more total organic mass. The reversible pools are still
-# filling at dilution, and transferring organic carbon into IC also
-# changes how much glyoxal the particle can take up. The IC signal is
-# especially sensitive to the prescribed pH and ammonium activity. A measurement of particle acidity
-# together with a calibrated product abundance would test that extrapolation.
+# ### Only the growth-calibrated reservoir turns down with the measurements
+#
+# In the middle panel, the measured organic-to-sulfate ratio falls from
+# 3.066 to 2.753 between the two sampling windows. The fitted reservoir
+# falls from 3.01 to 2.81. Its 6.9-hour response time was estimated from
+# the growth period. The two particle models are still filling their
+# reversible pools at dilution. Even when the reaction model releases vapor
+# during individual intervals, its final particle organic mass exceeds its
+# pre-dilution value. In the lower panel, the measured nitrogen fragment
+# approximately doubles. The two traces there have separate normalizations.
 
 # %%
 if __name__ == "__main__":
@@ -690,3 +709,22 @@ if __name__ == "__main__":
     summarize(results)
     plot_results(results)
     plt.show()
+
+# %% [markdown]
+# ## Product calibration would test how much organic mass chemistry retains
+#
+# The growth fit captures the direction of release using an effective capacity
+# and response time. Several processes contribute to those fitted quantities,
+# including water uptake and reversible chemical storage. The fragment trace
+# offers a separate test of product timing, but its response per unit product
+# mass is unknown. Simultaneous measurements of particle acidity and calibrated
+# IC abundance during dilution would test whether the model retains the right
+# amount of glyoxal as IC as the total organic-to-sulfate ratio falls.
+#
+# ## Reproducing the dilution comparison
+#
+# The study download includes the three digitized Figure 6 series, their
+# extraction notes and the reaction mechanism. The saved output includes the
+# fitting window, fitted parameters, model histories and pH sensitivity. To
+# repeat the registered CPU and CUDA calculations from a checkout, run
+# `python scripts/docs_examples.py refresh glyoxal-chamber` with CUDA available.
