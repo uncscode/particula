@@ -8,4 +8,5 @@ To see how activation, mixing and measurement cutoffs shape population spectra, 
 - [A cloud activation fit predicts 49% more water than BAT at 95% humidity for one organic](ccn-retrieval/index.md)
 - [BAT and AIOMFAC both overpredict water activity at all 12 measured citric acid concentrations](citric-acid/index.md)
 - [BAT puts pinic acid’s activation hygroscopicity too low and phthalic acid’s too high](bat-ccn.md)
+- [Neutral salt pairings overpredict growth for 72 of 79 Mt. Hua inorganic extracts](mt-hua/index.md)
 <!-- STUDY_LIST_END -->
