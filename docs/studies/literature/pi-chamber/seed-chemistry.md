@@ -1,6 +1,6 @@
 # At the inferred Π Chamber humidity, modeled sulfate haze falls below the optical detection limit
 
-![At 99.55% relative humidity the modeled wet diameters of ammonium sulfate (544 nm) and sodium chloride (723 nm) fall on opposite sides of the 600 nm optical cutoff.](../../../images/pi-chamber/seed-optical-cutoff.svg)
+![Equal 130 nm dry seeds grow to different modeled wet diameters at 99.55% relative humidity. The ammonium sulfate droplet (544 nm) falls below the dashed 600 nm detection limit. The NaCl droplet (723 nm) extends above it.](../../../images/pi-chamber/seed-optical-cutoff.svg)
 
 Would the Π Chamber see the same haze if its seed salt changed? Prabhakaran et al. used 130 nm dry sodium chloride seeds. Fitting a single mean humidity to the haze counts over both floor types in the companion study gave **99.55% relative humidity**. At that humidity, a dissolved NaCl particle of the experimental dry size has a predicted wet diameter of **723 nm**. Replacing the salt with an ammonium sulfate proxy gives **544 nm**, below the instrument’s 600 nm lower limit. A decrease in counted haze could thus accompany a change in water uptake even at the same seed abundance. A separate simulated organic population exchanges vapor while remaining below the optical cutoff, suggesting a role for gas-phase measurements in a follow-up experiment. [Chamber measurements, Table 1](https://pmc.ncbi.nlm.nih.gov/articles/PMC7382222/) · [Companion humidity fits](haze-and-cloud/index.md)
 

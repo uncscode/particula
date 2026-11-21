@@ -49,7 +49,7 @@ After a day in simulated polluted air, archived MAM4xx retains nearly three time
 [![At 06:30 UTC the ship recorded 28 particles/cm³ at 12–25 nm. After matching the previous spectrum, the model predicts 300 for simultaneous arrival and 36 when 16 nm particles arrive one hour before the small-particle pulse.](../../images/sea2cloud-events/graphical-abstract.svg)\
 Sea2Cloud’s March 22 spectra favor earlier arrival of larger particles in a two-hour exchange model](sea2cloud-events/index.md)
 
-[![At 99.55% relative humidity the modeled wet diameters of ammonium sulfate (544 nm) and sodium chloride (723 nm) fall on opposite sides of the 600 nm optical cutoff.](../../images/pi-chamber/seed-optical-cutoff.svg)\
+[![Equal 130 nm dry seeds grow to different modeled wet diameters at 99.55% relative humidity. The ammonium sulfate droplet (544 nm) falls below the dashed 600 nm detection limit. The NaCl droplet (723 nm) extends above it.](../../images/pi-chamber/seed-optical-cutoff.svg)\
 At the inferred Π Chamber humidity, modeled sulfate haze falls below the optical detection limit](pi-chamber/seed-chemistry.md)
 
 </div>
