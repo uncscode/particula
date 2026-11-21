@@ -2,7 +2,7 @@
 
 ![Measured cloud droplets per cm³ rise from fresh water to salt water (solid line, dense blue cluster). Separate haze fits predict a decline (dashed line, sparse outlined cluster).](../../../../images/pi-chamber/graphical-abstract.svg)
 
-Π Chamber emblem from the [Richter Lab’s chamber project](https://richterlab.nd.edu/research/cloud-physics-in-the-pi-chamber/).
+Two-cloud motif adapted from the Π Chamber emblem shown on the [Richter Lab’s chamber project page](https://richterlab.nd.edu/research/cloud-physics-in-the-pi-chamber/).
 
 When Prabhakaran et al. switched from the fresh-water to the salt-water floor and raised the plate temperature difference, measured cloud number rose from **771 to 1,038 droplets/cm³**. Fitting interior humidity separately to the haze in each experiment brought both modeled haze counts within 5% of the observations, but cloud number fell from **734 to 462 droplets/cm³**. Cloud counts were held out of the fit.
 
