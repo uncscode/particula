@@ -43,6 +43,7 @@ After glyoxal dilution, two models predict rising organic mass per sulfate as me
 - [Particula predicts about 60% of the NaCl capture rate measured at 4 nm](nacl-scavenging/index.md)
 - [Particula predicts half the rise in ion concentration CLOUD measured from 7% to 70% humidity](cloud-ion-humidity/index.md)
 - [Particula sizes a 100.7 nm PSL standard at about 102 nm near atmospheric pressure](dry-psl-mobility/index.md)
+- [Two C₉H₁₄O₄ isomers reach half signal 21 minutes apart in chamber aerosol](pinic-isomers/index.md)
 - [Π Chamber experiments and modeling](pi-chamber/index.md)
 - [Adding settling and diffusion losses predicts too few airborne particles in a spherical chamber](../validation/wall-loss/index.md)
 <!-- STUDY_LIST_END -->

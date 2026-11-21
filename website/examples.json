@@ -1483,5 +1483,48 @@
       "scripts/mam4xx_coagulation/attraction_plots.py"
     ],
     "full_canvas": true
+  },
+  "pinic-isomers": {
+    "title": "Compare observed isomer timing and conditional organic partitioning",
+    "source": "docs/studies/literature/pinic-isomers/pinic_isomers.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 3600,
+    "inputs": [
+      "scripts/pinic_isomers/physics.py",
+      "scripts/pinic_isomers/campaign.py",
+      "scripts/pinic_isomers/plots.py",
+      "scripts/pinic_isomers/extract.py",
+      "docs/data/pinic-isomers/traces.csv"
+    ],
+    "data_expression": "report",
+    "render_functions": [],
+    "plot_inputs": [
+      "scripts/pinic_isomers/plots.py"
+    ],
+    "full_canvas": true
+  },
+  "isomer-history": {
+    "title": "Can partitioning explain two measured isomer time histories?",
+    "source": "docs/studies/literature/pinic-isomers/isomer_history.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 7200,
+    "inputs": [
+      "scripts/pinic_isomers/isomer_history.py",
+      "scripts/pinic_isomers/history_plots.py",
+      "scripts/pinic_isomers/timing_gpu.py",
+      "scripts/pinic_isomers/smps_extract.py",
+      "scripts/pinic_isomers/physics.py",
+      "scripts/pinic_isomers/campaign.py",
+      "docs/data/pinic-isomers/smps.csv",
+      "docs/data/pinic-isomers/traces.csv"
+    ],
+    "data_expression": "report",
+    "render_functions": [],
+    "plot_inputs": [
+      "scripts/pinic_isomers/history_plots.py"
+    ],
+    "full_canvas": true
   }
 }
