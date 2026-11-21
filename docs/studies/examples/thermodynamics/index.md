@@ -9,6 +9,7 @@ mass. These are complementary pieces of a model, with different assumptions.
 
 <!-- STUDY_LIST_START -->
 - [How does a faster updraft change cloud water at a fixed time?](moist_parcel.py)
+- [How does a wider aerosol spectrum change adaptive parcel stepping?](adaptive_moist_parcel.py)
 - [Mixture and surface properties](particle-properties/index.md)
 - [Phase equilibria](equilibria/index.md)
 - [Water activity](activity/index.md)

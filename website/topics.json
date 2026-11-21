@@ -5069,6 +5069,40 @@
           }
         ]
       }
+    },
+    {
+      "source": "docs/studies/examples/thermodynamics/adaptive_moist_parcel.py",
+      "title": "How does a wider aerosol spectrum change adaptive parcel stepping?",
+      "topic": "condensation-adaptive",
+      "also": [
+        "condensation-energy",
+        "atmosphere",
+        "gpu"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "adaptive-moist-parcel",
+        "runs": [
+          "adaptive-moist-parcel"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/numerical-integration.md",
+            "label": "Embedded error and solver choice"
+          },
+          {
+            "target": "docs/studies/examples/thermodynamics/moist_parcel.py",
+            "label": "Fixed-step reference ascent"
+          },
+          {
+            "target": "docs/theory/dynamics/condensation-equations.md",
+            "fragment": "kelvin-effect-correction-factor",
+            "label": "Curvature and the critical wet radius"
+          }
+        ]
+      }
     }
   ],
   "supporting": [
