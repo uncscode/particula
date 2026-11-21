@@ -415,7 +415,7 @@ def plot_results(report):
     ]
     axes[1, 1].bar_label(bars, labels, padding=3, fontsize=8)
     axes[1, 1].margins(y=0.22)
-    axes[1, 1].set(ylabel="Fit time (s)", title="CUDA fit across three starts")
+    axes[1, 1].set(ylabel="Fit time (s)", title="Fit time over three starts")
     plotting.fit(fig)
     return fig
 

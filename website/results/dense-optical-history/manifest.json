@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 25.638782907975838,
+  "package_source_sha256": "17eb3822d453ca5ef42a5867f3d3e7c5de5290fc13d90578346f07c0d49970c1",
+  "scientific_source_sha256": "5f63ee6bda62605b06d8c6b539751f360b87add3d6a9bba6e915fb45c70d902f",
+  "input_sha256": {},
+  "example": "dense-optical-history",
+  "fingerprint": "7e2c8bdf9bca51bbd8fa54d4a04b78b4bfe0de706d882fe17e11bbbb82cc53b0",
+  "source": "docs/studies/validation/material-properties/optical-recording/dense_optical_history.py",
+  "revision": "db5fdcfa83bf844ffd5f334c5b3012e669a05e68",
+  "package_dirty": false,
+  "executed_at": "2026-11-21T17:38:49.702801+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     /tmp/particula-optics-warp\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.condensation 14a649a load on device 'cuda:0' took 0.55 ms  (cached)\nModule particula.gpu.kernels.condensation 2c7d291 load on device 'cuda:0' took 0.54 ms  (cached)\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 0.26 ms  (cached)\nModule particula.gpu.kernels._condensation_native 34375de load on device 'cuda:0' took 0.28 ms  (cached)\nModule particula.gpu.kernels.thermodynamics 563d292 load on device 'cuda:0' took 0.27 ms  (cached)\nModule particula.execution.prepared_guards c5e1f2e load on device 'cuda:0' took 0.26 ms  (cached)\nModule particula.gpu.kernels.condensation c7ee7df load on device 'cuda:0' took 0.28 ms  (cached)\nModule particula.gpu.kernels.condensation 57dfed0 load on device 'cuda:0' took 0.28 ms  (cached)\nModule particula.gpu.kernels.condensation e60be0e load on device 'cuda:0' took 0.66 ms  (cached)\nModule particula.gpu.kernels._condensation_native 9623455 load on device 'cuda:0' took 0.27 ms  (cached)\nModule particula.gpu.kernels.condensation 016bbb1 load on device 'cuda:0' took 0.67 ms  (cached)\nModule particula.gpu.kernels._condensation_native 76403ad load on device 'cuda:0' took 0.33 ms  (cached)\nModule particula.gpu.kernels.condensation b9ed110 load on device 'cuda:0' took 0.72 ms  (cached)\nModule particula.gpu.kernels._condensation_native c295a4d load on device 'cuda:0' took 0.35 ms  (cached)\nModule particula.gpu.kernels._condensation_native a80ebff load on device 'cuda:0' took 0.41 ms  (cached)\nModule particula.gpu.kernels.condensation c3b7b3c load on device 'cuda:0' took 0.72 ms  (cached)\nModule particula.gpu.kernels.condensation 328f7a7 load on device 'cuda:0' took 0.79 ms  (cached)\nModule particula.gpu.kernels.condensation e2db3ba load on device 'cuda:0' took 0.69 ms  (cached)\nModule particula.gpu.kernels._condensation_native ff4cf87 load on device 'cuda:0' took 0.61 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.optics.gpu.state 45e587d load on device 'cuda:0' took 0.39 ms  (cached)\nModule particula.optics.gpu.mie 36c0414 load on device 'cuda:0' took 0.60 ms  (cached)\nModule particula.optics.gpu._bulk 8686aab load on device 'cuda:0' took 0.34 ms  (cached)\n"
+      },
+      {
+        "text": "NumPy median elapsed time (s)\n  physics  0.5127\n  optical  4.1395\n  native   0.5458\n  retained observation payload (bytes) {'optical': 7168, 'native': 1119304}\n  largest sparse extinction difference (m^-1) 4.337e-18\nCUDA median elapsed time (s)\n  physics  0.1550\n  optical  0.3588\n  native   0.2575\n  retained observation payload (bytes) {'optical': 7552, 'native': 1119304}\n  largest sparse extinction difference (m^-1) 1.908e-17\nCUDA process pool high-water across modes (bytes) 264484\n"
+      },
+      {
+        "image": "figure-6-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-6-1.png": "e3e2e2080ab73b9ffa63fa5c2c4708d642eb51d405b1247cecdf3e0576d78684",
+    "data.json": "ddd12df5068a98c8a8bf882835d65416c4cf181b5daaf314ce6f2f3486c77719",
+    "source.py": "9aff9f536bd798e199499f5665e5463786e134689b60c93e48500b8fcacd8891"
+  },
+  "simulation_fingerprint": "549d8ad178d74345ca331a794922e801726c4faa05ac7971d1cb80ad30467e2d"
+}

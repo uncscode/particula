@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 18.843830238096416,
+  "package_source_sha256": "17eb3822d453ca5ef42a5867f3d3e7c5de5290fc13d90578346f07c0d49970c1",
+  "scientific_source_sha256": "5f63ee6bda62605b06d8c6b539751f360b87add3d6a9bba6e915fb45c70d902f",
+  "input_sha256": {},
+  "example": "optical-mixing-state",
+  "fingerprint": "675c4da6b80300f79ff45b40c8cb0e567a3314423a3849aaf8fe4950d604f88f",
+  "source": "docs/studies/validation/material-properties/optical-mixing-state/infer_mixing_state.py",
+  "revision": "db5fdcfa83bf844ffd5f334c5b3012e669a05e68",
+  "package_dirty": false,
+  "executed_at": "2026-11-21T17:39:23.337731+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     /tmp/particula-optics-warp\nModule particula.optics.gpu.retrieval c97d6d6 load on device 'cuda:0' took 0.63 ms  (cached)\nModule particula.optics.gpu.inverse 3ffa894 load on device 'cuda:0' took 0.34 ms  (cached)\nModule particula.optics.gpu.mie 36c0414 load on device 'cuda:0' took 0.57 ms  (cached)\nModule particula.optics.gpu.derivatives 5334410 load on device 'cuda:0' took 0.65 ms  (cached)\n"
+      },
+      {
+        "image": "figure-5-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-5-1.png": "d1912e31d848b4e077b632ac95f1ec6423a2fe1b3e52376f6bd27b6e55600f14",
+    "data.json": "4b541d969178146c1f6d8a7186327d450b40339ea21db49a3e30c6b910903af2",
+    "source.py": "cc271634eec09fae737aa52f404217b2f0c387a347abac0a551245cbf2220c2b"
+  },
+  "simulation_fingerprint": "3b8f7b791294fb389cb74d482a09649bf4f6b4d2a05a26f394c11f5c6049453b"
+}

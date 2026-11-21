@@ -141,8 +141,9 @@ def cpu_process_identity(process):
     """Retain native configuration without imposing GPU capability limits."""
     from particula.dynamics.chemistry.process import GasChemistry
     from particula.dynamics.chemistry.resolved import ResolvedChemistry
+    from particula.dynamics.optical_heating import OpticalHeating
 
-    if type(process) in (GasChemistry, ResolvedChemistry):
+    if type(process) in (GasChemistry, ResolvedChemistry, OpticalHeating):
         return (
             process.extension_id,
             process.version,
