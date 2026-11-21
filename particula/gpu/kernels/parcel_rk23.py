@@ -2,8 +2,8 @@
 
 The independent coordinates are p/p0 and liquid volume / dry volume per
 class. At every stage total water and the parcel first law determine vapor
-and temperature. Only the maximum embedded error crosses to the host during
-trials. The accepted trajectory uses the same third-order tableau on replay.
+and temperature. Only scalar trial errors cross to the host during integration.
+The accepted trajectory uses the same third-order tableau on replay.
 """
 
 from dataclasses import dataclass
@@ -34,6 +34,8 @@ from particula.gpu.kernels.parcel import (
     _es,
     _growth_resistance,
 )
+
+_BATCH_CAPACITY = 32
 
 
 @wp.struct
@@ -337,6 +339,13 @@ class _Stepper:
             *(self.empty(1, grad) for _ in range(3)),
         )
 
+    @staticmethod
+    def record_step(checkpoints, accepted, start, t, h):
+        """Keep one device checkpoint for each block of accepted intervals."""
+        if accepted % 32 == 0:
+            checkpoints.append((wp.clone(start, requires_grad=True), []))
+        checkpoints[-1][1].append((t, h))
+
     def reverse(self, checkpoints):
         """Bound tape storage by replaying at most 32 accepted steps at once."""
         seed = self.seed
@@ -352,32 +361,32 @@ class _Stepper:
         return float(self.speed.grad.numpy()[0])
 
 
-def run_adaptive_parcel(
-    initial, wet, time, updraft, device, gradient, phase_exchange, controls
-):
-    """Integrate to fixed observations with an embedded componentwise error."""
-    solver = _Stepper(initial, wet, updraft, device, gradient, phase_exchange)
-    state = solver.initial_state
-    out = solver.empty(solver.width)
-    scratch = solver.scratch()
-    k4 = solver.empty(solver.width)
-    liquid = solver.empty(1)
-    error = solver.empty(1)
-    rtol = solver.array(np.full(solver.width, controls.rtol))
-    atol = solver.array(np.full(solver.width, controls.rtol * 1e-8))
-    air = solver.empty((len(time), 7))
-    radii = solver.empty((len(time), len(wet)))
-    accepted = rejected = 0
-    smallest, largest = np.inf, 0.0
-    t = 0.0
-    proposed = time[1]
-    solver.rate(state, t, scratch.k1, scratch.q1)
-    checkpoints = []
-    intervals = []
-    for i, target in enumerate(time):
-        while t < target:
-            if accepted + rejected >= controls.max_trials:
-                raise ValueError(f"parcel RK23 max_trials exhausted at {t:g} s")
+class _TrialBatch:
+    """Stage speculative candidates in disjoint rows until the next decision."""
+
+    def __init__(self, solver, tolerance):
+        self.solver = solver
+        self.tolerance = tolerance
+        # A single-box CUDA trial is small. Amortize device/host waits when
+        # several consecutive steps take the same size on a shared GPU.
+        self.capacity = _BATCH_CAPACITY
+        self.states = [solver.empty(solver.width) for _ in range(self.capacity)]
+        self.errors = solver.empty((self.capacity, 1))
+        self.rtol = solver.array(np.full(solver.width, tolerance))
+        self.atol = solver.array(np.full(solver.width, tolerance * 1e-8))
+        self.work = solver.scratch()
+        self.k4 = solver.empty(solver.width)
+        self.ql = solver.empty(1)
+
+    def evaluate(self, initial, start, target, proposed, count):
+        if count <= 0:
+            raise ValueError(f"parcel RK23 max_trials exhausted at {start:g} s")
+        solver, work = self.solver, self.work
+        t, state = start, initial
+        steps = []
+        self.errors.zero_()
+        solver.rate(state, t, work.k1, work.q1)
+        for j in range(count):
             remaining = target - t
             # Snap a roundoff-sized remainder to the requested observation.
             h = (
@@ -387,23 +396,14 @@ def run_adaptive_parcel(
             )
             if t + h <= t:
                 raise ValueError(f"parcel RK23 cannot advance time at {t:g} s")
-            solver.advance(state, t, h, out, scratch, reuse_first=True)
-            solver.rate(out, t + h, k4, liquid)
-            error.zero_()
+            out, error = self.states[j], self.errors[j]
+            solver.advance(state, t, h, out, work, reuse_first=True)
+            solver.rate(out, t + h, self.k4, self.ql)
+            rates = [work.k1, work.k2, work.k3, self.k4]
             solver.launch(
                 error_norm,
                 solver.width,
-                [
-                    state,
-                    out,
-                    scratch.k1,
-                    scratch.k2,
-                    scratch.k3,
-                    k4,
-                    atol,
-                    rtol,
-                    h,
-                ],
+                [state, out, *rates, self.atol, self.rtol, h],
                 error,
             )
             solver.launch(
@@ -413,48 +413,78 @@ def run_adaptive_parcel(
                     state,
                     solver.dry,
                     solver.weights,
-                    scratch.k1,
-                    scratch.k2,
-                    scratch.k3,
-                    k4,
-                    scratch.q1,
-                    liquid,
+                    *rates,
+                    work.q1,
+                    self.ql,
                     solver.speed,
                     solver.parcel,
                     t,
                     h,
-                    controls.rtol,
+                    self.tolerance,
                 ],
                 error,
             )
-            norm = float(error.numpy()[0])
-            if norm > 1 or not np.isfinite(norm):
-                rejected += 1
-                if h <= controls.min_step:
-                    raise ValueError(
-                        f"parcel RK23 cannot meet tolerance at {t:g} s"
-                    )
-                proposed = max(controls.min_step, h / 2)
-                continue
-            if gradient:
-                if accepted % 32 == 0:
-                    intervals = []
-                    checkpoints.append(
-                        (wp.clone(state, requires_grad=True), intervals)
-                    )
-                intervals.append((t, h))
-            accepted += 1
-            smallest, largest = min(smallest, h), max(largest, h)
-            # The fourth stage is the derivative at the accepted endpoint.
-            # Rejections preserve the first derivative of the current state.
-            scratch.k1, k4 = k4, scratch.k1
-            scratch.q1, liquid = liquid, scratch.q1
-            state, out = out, state
-            t = target if h == remaining else t + h
-            # Dyadic changes make the accepted grid locally constant in the
-            # updraft. A factor of two multiplies the O(h³) estimate by eight.
-            if h == proposed or norm > 0.125:
-                proposed = h * 2 if norm <= 0.125 else h
+            steps.append(h)
+            if h == remaining:
+                break
+            # The last slope of a trial is the first slope of its successor.
+            work.k1, self.k4 = self.k4, work.k1
+            work.q1, self.ql = self.ql, work.q1
+            t, state = t + h, out
+        return steps, self.errors.numpy()[: len(steps), 0]
+
+
+def run_adaptive_parcel(
+    initial, wet, time, updraft, device, gradient, phase_exchange, controls
+):
+    """Integrate to fixed observations with an embedded componentwise error."""
+    solver = _Stepper(initial, wet, updraft, device, gradient, phase_exchange)
+    state = solver.initial_state
+    trials = _TrialBatch(solver, controls.rtol)
+    liquid = solver.empty(1)
+    air = solver.empty((len(time), 7))
+    radii = solver.empty((len(time), len(wet)))
+    accepted = rejected = evaluated = 0
+    smallest, largest = np.inf, 0.0
+    t = 0.0
+    proposed = time[1]
+    batch_size = 1
+    checkpoints = []
+    for i, target in enumerate(time):
+        while t < target:
+            budget = controls.max_trials - evaluated
+            steps, errors = trials.evaluate(
+                state, t, target, proposed, min(budget, batch_size)
+            )
+            evaluated += len(steps)
+            last = state
+            for j, (h, norm) in enumerate(zip(steps, errors, strict=True)):
+                if norm > 1 or not np.isfinite(norm):
+                    rejected += 1
+                    if h <= controls.min_step:
+                        raise ValueError(
+                            f"parcel RK23 cannot meet tolerance at {t:g} s"
+                        )
+                    proposed = max(controls.min_step, h / 2)
+                    batch_size = 1
+                    break
+                if gradient:
+                    solver.record_step(checkpoints, accepted, last, t, h)
+                accepted += 1
+                smallest, largest = min(smallest, h), max(largest, h)
+                t = target if h == target - t else t + h
+                last = trials.states[j]
+                # The embedded difference is O(h³). Keep the dyadic mesh
+                # locally constant in speed between controller decisions.
+                if norm <= 0.125 and h == proposed:
+                    proposed = h * 2
+                    batch_size = 1
+                    break
+                if norm > 0.125:
+                    proposed = h
+                batch_size = trials.capacity
+            if last is not state:
+                wp.copy(state, last)
         solver.launch(_sum_water, 1, [state, solver.weights], liquid)
         wp.launch(
             _sample,
@@ -484,5 +514,5 @@ def run_adaptive_parcel(
         radii.numpy(),
         sensitivity,
         initial,
-        ParcelStepStatistics(accepted, rejected, smallest, largest),
+        ParcelStepStatistics(accepted, rejected, smallest, largest, evaluated),
     )

@@ -73,7 +73,7 @@ class ParcelRK23:
     The relative scales include floors of 1e-8 in normalized pressure and
     liquid/dry class volume, and 1e-12 kg/kg dry air for vapor.
     min_step is the smallest permitted retry in seconds. max_trials bounds
-    accepted plus rejected trials over the entire trajectory. A linearized
+    all evaluated trials, including unused speculative Warp trials. A linearized
     droplet relaxation limit also protects sensitivities near equilibrium.
     """
 
@@ -97,12 +97,17 @@ class ParcelRK23:
 
 @dataclass(frozen=True)
 class ParcelStepStatistics:
-    """Whole-run trial counts and smallest/largest accepted timestep (s)."""
+    """Controller counts and smallest/largest accepted timestep (s).
+
+    evaluated_trials includes speculative candidates discarded after the
+    controller changes step size. rejected_steps counts controller rejections.
+    """
 
     accepted_steps: int
     rejected_steps: int
     minimum_step: float
     maximum_step: float
+    evaluated_trials: int
 
 
 @dataclass(frozen=True)
