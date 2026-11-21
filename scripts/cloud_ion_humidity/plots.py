@@ -15,6 +15,82 @@ def style(ax):
     ax.spines[["top", "right"]].set_visible(False)
 
 
+def humidity_sweep(report):
+    """Overlay digitized chamber observations, balances and CUDA ensembles."""
+    sweep = report["humidity_sweep"]
+    q = sweep["source_pairs_cm3_s"]
+    fig, axes = plt.subplots(
+        2,
+        2,
+        figsize=(10.6, 7.5),
+        sharex=True,
+        sharey=True,
+        layout="constrained",
+    )
+    for ax, panel in zip(axes.flat, sweep["panels"], strict=True):
+        ax.fill_between(
+            q,
+            panel["lower_cm3"],
+            panel["upper_cm3"],
+            color="#b9dce7",
+            label="Parameter sensitivity",
+        )
+        ax.plot(
+            q,
+            sweep["fixed_cm3"],
+            ls="--",
+            color="#747474",
+            label="Fixed recombination",
+        )
+        ax.plot(
+            q,
+            panel["balance_cm3"],
+            color=BLUE,
+            lw=2,
+            label="RH-specific balance",
+        )
+        points = panel["observations"]
+        measured = np.array([p["ions_cm3"] for p in points])
+        ax.errorbar(
+            [p["q_cm3_s"] for p in points],
+            measured,
+            yerr=[
+                measured - [p["bar_low_cm3"] for p in points],
+                [p["bar_high_cm3"] for p in points] - measured,
+            ],
+            fmt="o",
+            ms=5,
+            mfc="white",
+            mec=INK,
+            ecolor=INK,
+            capsize=2,
+            label="CLOUD measurement",
+        )
+        runs = panel["ensembles"]
+        ax.errorbar(
+            [r["q"] for r in runs],
+            [r["mean_cm3"] for r in runs],
+            yerr=[1.96 * r["sem_cm3"] for r in runs],
+            fmt="D",
+            ms=4,
+            color=RUST,
+            capsize=3,
+            label="CUDA ensemble",
+        )
+        ax.set_title(
+            f"{panel['rh']}% relative humidity", loc="left", fontweight="bold"
+        )
+        ax.grid(alpha=0.15)
+        ax.set(xlim=(0, 102), ylim=(0, 7600))
+    fig.supxlabel("Ion-pair production (pairs cm⁻³ s⁻¹)")
+    fig.supylabel("Mean concentration per polarity (ions cm⁻³)")
+    handles, labels = axes.flat[0].get_legend_handles_labels()
+    fig.legend(
+        handles, labels, loc="outside upper center", ncols=3, frameon=False
+    )
+    return fig
+
+
 def comparison(report):
     """Plot chamber scatter, CUDA intervals and the physical ceiling."""
     fig, axes = plt.subplots(1, 2, figsize=(9, 4.2), layout="constrained")

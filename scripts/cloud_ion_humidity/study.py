@@ -18,6 +18,7 @@ from scipy.optimize import brentq
 DATA = Path(__file__).resolve().parents[2] / "docs/data/cloud-ion-humidity"
 ALPHA = {"default": 1.7, "0": 9.9, "7": 8.1, "40": 2.3, "70": 2.0}
 BETA = 0.0083
+BETA_UNCERTAINTY = 0.0016
 MASSES = np.array([POSITIVE_ION_MASS, NEGATIVE_ION_MASS])
 DENSITY = MASSES / (np.pi / 6 * (0.5e-9) ** 3)
 RADIUS = (3 * 26.1 / (4 * np.pi)) ** (1 / 3)
@@ -71,7 +72,9 @@ def state(boxes, slots, pairs, vol):
     )
 
 
-def run(label, q, vol, dt, boxes, seed, eddy):
+def run(
+    label, q, vol, dt, boxes, seed, eddy, *, burn=400, window=600, stride=20
+):
     """Return concentration and inventory checks for one CUDA ensemble."""
     ref = mean_field(q, ALPHA[label])
     pairs = round(vol * ref)
@@ -94,7 +97,6 @@ def run(label, q, vol, dt, boxes, seed, eddy):
         initial, device="cuda:0", time_step=dt, root_seed=seed
     ) as sim:
         sim.capture()
-        burn, window, stride = 400, 600, 20
         for t in range(stride, burn + window + 1, stride):
             sim.run(round(stride / dt))
             d = sim.diagnostics()
@@ -139,6 +141,9 @@ def run(label, q, vol, dt, boxes, seed, eddy):
         dt_s=dt,
         boxes=boxes,
         seed=seed,
+        burn_s=burn,
+        window_s=window,
+        sample_interval_s=stride,
         initial_pairs=pairs,
         capacity=slots,
         peak_active=maxima,
@@ -192,8 +197,61 @@ def recovery(times, alpha, beta, extra, offset):
     }
 
 
+def simulate_humidity_sweep(points, eddy):
+    """Recreate the four Figure 5d panels at the original sources and seeds."""
+    production = np.linspace(0, 100, 401)
+    panels = []
+    # The archived campaign also ran a fixed-alpha control before each group.
+    # Only the four humidity-specific ensembles were plotted at each source.
+    for rh, uncertainty, seeds in (
+        ("0", 3.0, (71532, 71537, 71542)),
+        ("7", 2.8, (71533, 71538, 71543)),
+        ("40", 0.7, (71534, 71539, 71544)),
+        ("70", 0.7, (71535, 71540, 71545)),
+    ):
+        alpha = ALPHA[rh]
+        panels.append(
+            {
+                "rh": int(rh),
+                "alpha_cm3_s": alpha * 1e-6,
+                "alpha_uncertainty_cm3_s": uncertainty * 1e-6,
+                "observations": [p for p in points if p["rh"] == int(rh)],
+                "ensembles": [
+                    run(
+                        rh,
+                        q,
+                        0.01,
+                        1.0,
+                        64,
+                        seed,
+                        eddy,
+                        burn=160,
+                        window=240,
+                        stride=40,
+                    )
+                    for q, seed in zip((2, 20, 65), seeds, strict=True)
+                ],
+                "balance_cm3": mean_field(production, alpha).tolist(),
+                "lower_cm3": mean_field(
+                    production, alpha + uncertainty, BETA + BETA_UNCERTAINTY
+                ).tolist(),
+                "upper_cm3": mean_field(
+                    production, alpha - uncertainty, BETA - BETA_UNCERTAINTY
+                ).tolist(),
+            }
+        )
+    return {
+        "source_pairs_cm3_s": production.tolist(),
+        "fixed_cm3": mean_field(production, ALPHA["default"]).tolist(),
+        "fixed_alpha_cm3_s": ALPHA["default"] * 1e-6,
+        "beta_s_inv": BETA,
+        "beta_uncertainty_s_inv": BETA_UNCERTAINTY,
+        "panels": panels,
+    }
+
+
 def simulate():
-    """Reproduce the matched chamber comparison and conditional design."""
+    """Reproduce the humidity sweep, matched cases and conditional design."""
     if not wp.is_cuda_available():
         raise RuntimeError("The particle-resolved ensembles require CUDA.")
     eddy = brentq(lambda k: coefficients(k).mean() - BETA, 1e-5, 1e5)
@@ -237,6 +295,7 @@ def simulate():
     return {
         "device": wp.get_device("cuda:0").name,
         "cases": runs,
+        "humidity_sweep": simulate_humidity_sweep(points, eddy),
         "observed_difference": runs[1]["observation"]["ions_cm3"]
         - runs[0]["observation"]["ions_cm3"],
         "simulated_difference": runs[1]["mean_cm3"] - runs[0]["mean_cm3"],
