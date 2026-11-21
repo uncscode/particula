@@ -127,7 +127,7 @@ def heating_step(
 
 
 class OpticalHeating(BoxProcess):
-    """Heat a two-material water/solute population with prescribed irradiance.
+    """Heat a particle-resolved water/solute population with irradiance.
 
     The irradiances are band-integrated W/m², one value per configured
     wavelength. Absorption is recomputed from live wet sizes and composition
@@ -205,7 +205,7 @@ class OpticalHeating(BoxProcess):
                 self.power_field,
                 *self.energy_fields,
             ),
-            representations=("discrete", "particle_resolved"),
+            representations=("particle_resolved",),
             parameters=self.configuration(),
         )
 
@@ -228,8 +228,15 @@ class OpticalHeating(BoxProcess):
             *(FieldSpec(key, ("box",), "J/m^3") for key in self.energy_fields),
         )
 
+    def _validate_representation(self, aerosol):
+        if aerosol.particles.distribution_type not in self.representations:
+            raise ValueError(
+                "Optical heating requires particle_resolved storage"
+            )
+
     def attach_fields(self, aerosol):
         """Register diagnostic and thermal state on the initial aerosol."""
+        self._validate_representation(aerosol)
         specs = self._specs()
         if any(spec.name in aerosol.fields.specs for spec in specs):
             raise ValueError("An optical heating field is already registered")
@@ -237,7 +244,8 @@ class OpticalHeating(BoxProcess):
             aerosol.fields.add(spec)
 
     def validate(self, aerosol):
-        """Require two materials, mapped vapor, and matching fields."""
+        """Require resolved slots, two materials and mapped vapor."""
+        self._validate_representation(aerosol)
         if (
             aerosol.particles.n_species != 2
             or self.gas_water not in aerosol.gas.name
@@ -315,9 +323,7 @@ class OpticalHeating(BoxProcess):
             time_step,
             self.physics,
         )
-        weight = particles.concentration[0, active]
-        if particles.distribution_type == "particle_resolved":
-            weight = weight / particles.volume[0]
+        weight = particles.concentration[0, active] / particles.volume[0]
         remaining = water - loss
         particles.masses[0, active, water_index] = remaining
         aerosol.gas.concentration[0, gas_index] += weight @ (water - remaining)

@@ -65,6 +65,27 @@ def illuminated_state(*, irradiance=9e4, gas_offset=0):
     return state, light
 
 
+def test_discrete_heating_rejects_before_registering_fields():
+    """Reject storage that cannot hold per-slot temperature and power."""
+    resolved, process = illuminated_state()
+    particles = ParticleData(
+        masses=resolved.particles.masses,
+        concentration=resolved.particles.slot_concentration_density,
+        charge=resolved.particles.charge,
+        density=resolved.particles.density,
+        volume=np.ones(1),
+        distribution_type="discrete",
+    )
+    aerosol = Aerosol(
+        particles=particles, gas=resolved.gas, environment=resolved.environment
+    )
+    with pytest.raises(ValueError, match="requires particle_resolved storage"):
+        process.attach_fields(aerosol)
+    with pytest.raises(ValueError, match="requires particle_resolved storage"):
+        process.validate(aerosol)
+    assert not aerosol.fields.specs
+
+
 def test_energy_water_and_temperature_match_independent_roots():
     """Compare a directly calculated first-step energy and mass ledger."""
     aerosol, process = illuminated_state()
