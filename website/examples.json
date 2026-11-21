@@ -1331,5 +1331,23 @@
       "scripts/cloud_ion_humidity/plots.py"
     ],
     "full_canvas": true
+  },
+  "sea2cloud-events": {
+    "title": "Compare two Sea2Cloud event peaks with finite local production",
+    "source": "docs/studies/literature/sea2cloud-events/sea2cloud_events.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 3600,
+    "inputs": [
+      "scripts/sea2cloud_events/study.py",
+      "scripts/sea2cloud_events/plots.py",
+      "docs/data/sea2cloud-events/events.csv"
+    ],
+    "data_expression": "report",
+    "render_functions": [],
+    "plot_inputs": [
+      "scripts/sea2cloud_events/plots.py"
+    ],
+    "full_canvas": true
   }
 }

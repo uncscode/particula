@@ -34,6 +34,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Compare chamber geometry and competing particle processes](examples/particle-processes/wall-loss/wall_loss_tutorial.py)
 - [Compare coagulation after matching distribution units](tutorials/coagulation-populations/coagulation_4_compared.py)
 - [Compare ideal and nonideal organic activity](examples/thermodynamics/activity/bat_activity_example.py)
+- [Compare two Sea2Cloud event peaks with finite local production](literature/sea2cloud-events/sea2cloud_events.py)
 - [Competition for a finite water-vapor reservoir](tutorials/condensation/condensation_3_massresolved.py)
 - [Condensation in radius bins](tutorials/condensation/condensation_1_bin.py)
 - [Configure chamber loss without a unit mismatch](examples/particle-processes/wall-loss/wall_loss_builders_factory.py)

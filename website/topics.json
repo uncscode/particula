@@ -4705,6 +4705,38 @@
         ]
       },
       "tocFigure": "cloud-ion-humidity/graphical-abstract.svg"
+    },
+    {
+      "source": "docs/studies/literature/sea2cloud-events/sea2cloud_events.py",
+      "title": "Compare two Sea2Cloud event peaks with finite local production",
+      "topic": "nucleation",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/sea2cloud-events/index.md",
+      "title": "Local production during two Sea2Cloud detection windows falls short of both plotted peaks",
+      "topic": "nucleation",
+      "also": [
+        "brownian"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "sea2cloud-events",
+        "runs": [
+          "sea2cloud-events"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/nucleation.md",
+            "label": "How to use this"
+          }
+        ]
+      },
+      "tocFigure": "sea2cloud-events/graphical-abstract.svg"
     }
   ],
   "supporting": [

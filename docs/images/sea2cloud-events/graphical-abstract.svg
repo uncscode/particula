@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img">
+<title>Two marine particle peaks exceed local production</title><desc>On March 19 and 22 the no-loss ceilings are 1100 and 157 particles per cubic centimetre. The measured peaks read from the figure are 1540 and 770.</desc>
+<rect width="300" height="300" fill="#f3f7f4"/><g font-family="sans-serif" fill="#233e46">
+<text x="18" y="33" font-size="19">1–10 nm particles (cm⁻³)</text>
+<path d="M22 56h20" stroke="#357c89" stroke-width="8"/><text x="51" y="61" font-size="15">Local production ceiling</text>
+<circle cx="32" cy="81" r="5" fill="#a94d24"/><text x="51" y="86" font-size="15">Observed peak</text>
+<path d="M38 235h232" stroke="#677779"/><path d="M78 235v-88 M200 235v-13" stroke="#357c89" stroke-width="34"/>
+<g fill="#a94d24"><circle cx="105" cy="112" r="6"/><circle cx="227" cy="173" r="6"/></g>
+<g text-anchor="middle" font-size="16"><text x="76" y="138">1100</text><text x="140" y="117">1540</text><text x="197" y="213">157</text><text x="256" y="178">770</text><text x="94" y="260">19 March</text><text x="214" y="260">22 March</text><text x="94" y="282">7 hours</text><text x="214" y="282">1 hour</text></g></g></svg>
