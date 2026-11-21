@@ -3,6 +3,7 @@
 import csv
 import json
 from pathlib import Path
+from shutil import copyfile
 
 import numpy as np
 from scipy.special import ndtr
@@ -18,6 +19,10 @@ def export(root):
         (root / "website/results/mode-attraction/data.json").read_text()
     )
     path = root / "website/public/study-data/mam4xx/attraction-response.csv"
+    for name in ("archived-attraction.csv", "mode-coefficients.csv"):
+        copyfile(
+            root / "docs/data/mam4xx-coagulation" / name, path.parent / name
+        )
     with path.open("w", newline="") as stream:
         writer = csv.writer(stream, lineterminator="\n")
         writer.writerow(

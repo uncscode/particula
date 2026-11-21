@@ -91,12 +91,12 @@ Neutral dispersion and coarse Brownian collection have overlapping ranges. Pilot
 | --- | ---: | ---: | ---: | ---: | ---: |
 | Neutral dispersion | -11.4 | -3.47 | -5.34 to -1.93 | 0.0086 | 0.003 |
 | Full charged interaction | -11.1 | -3.38 | -5.16 to -1.9 | 0.01 | 0.003 |
-| Add coarse Brownian pairs | -8.31 | -2.48 | -3.02 to -1.69 | 0.019 | 0.693 |
+| Add coarse Brownian pairs | -8.31 | -2.48 | -3.02 to -1.69 | 0.019 | 0.710 |
 | Equilibrium bipolar charge | -0.552 | -0.168 | -0.209 to -0.118 | 0.00097 | 0.003 |
-| Differential settling | -0.313 | -0.0952 | -0.126 to -0.0696 | 0.0017 | 0.004 |
-| Fixed-width closure | +0.283 | +0.0839 | +0.0406 to +0.102 | 0.043 | 0.008 |
-| Evolve free ions and charge | +0.166 | +0.0504 | +0.0218 to +0.0577 | 0.029 | 0.133 |
-| Turbulent shear | -0.00296 | -0.000901 | -0.00377 to -0.00021 | 1.3e-05 | 0.003 |
+| Differential settling | -0.313 | -0.0952 | -0.126 to -0.0696 | 0.0017 | 0.003 |
+| Fixed-width closure | +0.283 | +0.0839 | +0.0406 to +0.102 | 0.043 | 0.007 |
+| Evolve free ions and charge | +0.166 | +0.0504 | +0.0218 to +0.0577 | 0.029 | 0.145 |
+| Turbulent shear | -0.00296 | -0.000901 | -0.00377 to -0.00021 | 1.3e-05 | 0.004 |
 
 ### Continental background
 
@@ -106,12 +106,12 @@ Neutral dispersion leads across the input range. Check the two-mode closure agai
 | --- | ---: | ---: | ---: | ---: | ---: |
 | Neutral dispersion | -109 | -11.4 | -15.6 to -7.14 | 0.008 | 0.008 |
 | Full charged interaction | -104 | -11 | -14.9 to -7.04 | 0.00048 | 0.009 |
-| Fixed-width closure | -18.6 | -1.95 | -2.55 to -1.03 | 0.14 | 0.015 |
-| Equilibrium bipolar charge | -5.53 | -0.58 | -0.665 to -0.455 | 0.0079 | 0.008 |
-| Add coarse Brownian pairs | -5.09 | -0.534 | -0.591 to -0.398 | 0.00012 | 0.008 |
-| Evolve free ions and charge | +0.762 | +0.0804 | +0.0243 to +0.081 | 0.056 | 0.159 |
-| Differential settling | -0.235 | -0.0248 | -0.0319 to -0.0198 | 0.00066 | 0.009 |
-| Turbulent shear | -0.00387 | -0.000408 | -0.00167 to -0.000104 | 5.5e-06 | 0.009 |
+| Fixed-width closure | -18.6 | -1.95 | -2.55 to -1.03 | 0.14 | 0.014 |
+| Equilibrium bipolar charge | -5.53 | -0.58 | -0.665 to -0.455 | 0.0079 | 0.009 |
+| Add coarse Brownian pairs | -5.09 | -0.534 | -0.591 to -0.398 | 0.00012 | 0.009 |
+| Evolve free ions and charge | +0.762 | +0.0804 | +0.0243 to +0.081 | 0.056 | 0.172 |
+| Differential settling | -0.235 | -0.0248 | -0.0319 to -0.0198 | 0.00066 | 0.011 |
+| Turbulent shear | -0.00387 | -0.000408 | -0.00167 to -0.000104 | 5.5e-06 | 0.011 |
 
 ### Polluted air
 
@@ -119,12 +119,12 @@ Neutral dispersion is the largest persistent effect. The mode-width effect chang
 
 | Process representation | ΔN <100 nm (cm⁻³) | Change (%) | Input and grid range (%) | Grid shift (points) | Box time (s) |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Neutral dispersion | -961 | -35.3 | -44.8 to -26.3 | 0.21 | 0.031 |
+| Neutral dispersion | -961 | -35.3 | -44.8 to -26.3 | 0.21 | 0.032 |
 | Full charged interaction | -867 | -32.5 | -41.6 to -24.3 | 0.25 | 0.033 |
-| Fixed-width closure | -104 | -3.74 | -14.2 to +8.59 | 0.64 | 0.084 |
-| Equilibrium bipolar charge | -51.4 | -1.89 | -2.01 to -1.77 | 0.047 | 0.031 |
-| Evolve free ions and charge | +12.3 | +0.462 | +0.144 to +0.472 | 0.32 | 0.356 |
-| Add coarse Brownian pairs | -10.9 | -0.391 | -0.451 to -0.324 | 0.0039 | 0.031 |
+| Fixed-width closure | -104 | -3.74 | -14.2 to +8.59 | 0.64 | 0.087 |
+| Equilibrium bipolar charge | -51.4 | -1.89 | -2.01 to -1.77 | 0.047 | 0.035 |
+| Evolve free ions and charge | +12.3 | +0.462 | +0.144 to +0.472 | 0.32 | 0.352 |
+| Add coarse Brownian pairs | -10.9 | -0.391 | -0.451 to -0.324 | 0.0039 | 0.033 |
 | Differential settling | -1.56 | -0.0562 | -0.0562 to -0.0515 | 0.0024 | 0.031 |
 | Turbulent shear | -0.0504 | -0.00181 | -0.00438 to -0.00061 | 2.2e-05 | 0.031 |
 
@@ -211,4 +211,4 @@ Particula supplies the neutral GPU capture rate through radius ratio 32. For lar
 
 Varying the Hamaker constant from 4.45 × 10⁻²⁰ to 1.78 × 10⁻¹⁹ J gives a polluted three-mode MAM-width response of **−22.9% to −33.6%** in the fixed-width calculation and **−31.9% to −45.7%** in sections. Comparing at each matched material value preserves the shortfall. The corresponding marine ranges are **−3.0% to −4.7%** and **−2.9% to −4.6%**. The Monte Carlo experiment samples continuous waiting times and collision partners from the size-tabulated kernel while conserving actual merged particle volumes. An exact constant-kernel decay checks the modal solver. A two-particle exponential waiting-time experiment checks the Monte Carlo collision rate and self-pair exclusion. The refined polluted and marine three-mode boxes hold 1,380,054 and 7,662 particles initially. Their stochastic bands describe collision histories for one prescribed population. The literature modal means do not determine campaign-to-campaign variability.
 
-The response table gives paired number below and above 100 nm and dry volume above 100 nm at 1, 6 and 24 hours. The saved results also contain initial modes, spectra, seed-level endpoints and the numerical refinements. Regenerate the host tables with `python -m scripts.mam4xx_coagulation.host_attraction PATH/TO/coagulation.hpp website/public/study-data/mam4xx`. Run `python scripts/docs_examples.py refresh mode-attraction` on CUDA and `python -m scripts.mam4xx_coagulation.export_attraction` for the particle, sectional and modal response table. [Paired simulation responses](../../../../website/public/study-data/mam4xx/attraction-response.csv) · [Particle simulation and download](mode_attraction.py) · [Regime spectra, host coefficients and download](regimes.py)
+The response table gives paired number below and above 100 nm and dry volume above 100 nm at 1, 6 and 24 hours. The saved results also contain initial modes, spectra, seed-level endpoints and the numerical refinements. Regenerate the host tables with `python -m scripts.mam4xx_coagulation.host_attraction PATH/TO/coagulation.hpp docs/data/mam4xx-coagulation`. Run `python scripts/docs_examples.py refresh mode-attraction` on CUDA and `python -m scripts.mam4xx_coagulation.export_attraction` for the particle, sectional and modal response table. [Paired simulation responses](../../../../website/public/study-data/mam4xx/attraction-response.csv) · [Particle simulation and download](mode_attraction.py) · [Regime spectra, host coefficients and download](regimes.py)

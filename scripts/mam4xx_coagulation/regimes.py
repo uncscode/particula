@@ -128,7 +128,7 @@ def simulate():
                 )
             )
     directory = (
-        Path(__file__).resolve().parents[2] / "website/public/study-data/mam4xx"
+        Path(__file__).resolve().parents[2] / "docs/data/mam4xx-coagulation"
     )
     with (directory / "mode-coefficients.csv").open() as stream:
         coefficients = list(csv.DictReader(stream))
