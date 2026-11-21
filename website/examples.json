@@ -18,7 +18,7 @@
     "full_canvas": true
   },
   "pendant-drop-evaporation": {
-    "title": "Can warm air explain the measured evaporation of a pentane drop?",
+    "title": "The coupled evaporation model predicts a pentane drop 3–5 K cooler than measured",
     "source": "docs/studies/literature/evaporation-and-uptake/pendant-drop/pendant_drop_evaporation.py",
     "policy": "cuda",
     "device": "cuda",

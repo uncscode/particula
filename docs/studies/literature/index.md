@@ -14,3 +14,6 @@ Particula predicts half the rise in ion concentration CLOUD measured from 7% to 
 - [Π Chamber experiments and modeling](pi-chamber/index.md)
 - [CUDA wall loss agrees with spherical deposition theory](../validation/wall-loss/index.md)
 <!-- STUDY_LIST_END -->
+
+[![Warm air passes a fed pentane drop. A short heat-supply bar and a three-times-longer heat-demand bar share the same baseline.](../../images/pendant-evaporation/graphical-abstract.svg)\
+Modeled convection supplies only a third of the heat needed for the reported pentane drop evaporation rate](evaporation-and-uptake/pendant-drop/index.md)
