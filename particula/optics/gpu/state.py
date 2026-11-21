@@ -7,14 +7,17 @@ from math import pi
 import numpy as np
 import warp as wp
 
+from particula.gpu.kernels.thermodynamics import _buck_vapor_pressure
 from particula.gpu.warp_types import WarpParticleData
 from particula.optics.gpu._complex import divide
 from particula.optics.gpu.bulk import prepare_population_mie
 from particula.optics.state import lorentz_lorenz
+from particula.util.constants import GAS_CONSTANT
 
 _RADIUS_FACTOR = wp.constant(wp.float64(3.0 / (4.0 * pi)))
 _CUBE_ROOT = wp.constant(wp.float64(1.0 / 3.0))
 _TWO_PI = wp.constant(wp.float64(2.0 * pi))
+_GAS = wp.constant(wp.float64(GAS_CONSTANT))
 
 
 @wp.kernel
@@ -84,14 +87,26 @@ def _store_row(
     statuses[row, group] = status[group]
 
 
-class DeviceOpticalBatch:
-    """Reduce on the owner stream and retain a fixed number of optical rows."""
+@wp.kernel
+def _relative_humidity_row(
+    vapor: wp.array2d(dtype=wp.float64),
+    molar_mass: wp.array(dtype=wp.float64),
+    temperature: wp.array(dtype=wp.float64),
+    species: int,
+    row: int,
+    humidity: wp.array2d(dtype=wp.float64),
+):
+    box = wp.tid()
+    t = temperature[box]
+    partial_pressure = vapor[box, species] * _GAS * t / molar_mass[species]
+    humidity[row, box] = partial_pressure / _buck_vapor_pressure(t)
 
-    def __init__(
-        self, owner, config, batch_size, particle_tile, coefficient_capacity
-    ):
-        """Bind device workspaces to the live particle arrays."""
-        particles = owner._session.particles
+
+class ParticleOpticalCases:
+    """Prepare the optical inputs shared by resident observers and processes."""
+
+    def __init__(self, particles, config, *, device, stream):
+        """Allocate input buffers and retain a refresh command."""
         boxes, slots, materials = particles.masses.shape
         if particles.distribution_kind not in (1, 3) or slots < 1:
             raise ValueError(
@@ -100,7 +115,6 @@ class DeviceOpticalBatch:
         config.validate_materials(materials)
         wave = np.asarray(config.wavelength)
         groups = boxes * wave.size
-        device = owner.device.native
         mixed = config.species_index is not None
         indices = (
             lorentz_lorenz(config.species_index)
@@ -113,20 +127,13 @@ class DeviceOpticalBatch:
             dtype=wp.vec2d,
             device=device,
         )
-        index = wp.empty((groups, slots), dtype=wp.vec2d, device=device)
-        size, radius, weight = [
+        self.index = wp.empty((groups, slots), dtype=wp.vec2d, device=device)
+        self.size, self.radius, self.weight = [
             wp.empty((groups, slots), dtype=wp.float64, device=device)
             for _ in range(3)
         ]
-        self._owner = owner
-        self._inputs = (wavelengths, indices)
-        self._shape = (boxes, wave.size, 9)
-        self._rows = wp.empty(
-            (batch_size, groups, 9), dtype=wp.float64, device=device
-        )
-        self._statuses = wp.empty(
-            (batch_size, groups), dtype=wp.int32, device=device
-        )
+        self._inputs = (particles, wavelengths, indices)
+        self._stream = stream
         self._fill = wp.launch(
             _fill_cases,
             (groups, slots),
@@ -136,20 +143,65 @@ class DeviceOpticalBatch:
                 indices,
                 int(mixed),
                 wp.float64(config.medium_index),
-                index,
-                size,
-                radius,
-                weight,
+                self.index,
+                self.size,
+                self.radius,
+                self.weight,
             ],
             device=device,
-            stream=owner._stream,
+            stream=stream,
             record_cmd=True,
         )
+
+    def enqueue(self):
+        """Fill optical coordinates from the live particle state."""
+        self._fill.launch(stream=self._stream)
+
+
+class DeviceOpticalBatch:
+    """Reduce on the owner stream and retain a fixed number of optical rows."""
+
+    def __init__(
+        self,
+        owner,
+        config,
+        batch_size,
+        particle_tile,
+        coefficient_capacity,
+        *,
+        water_lane=None,
+    ):
+        """Bind device workspaces to the live particle arrays."""
+        particles = owner._session.particles
+        device = owner.device.native
+        self._cases = ParticleOpticalCases(
+            particles,
+            config,
+            device=device,
+            stream=owner._stream,
+        )
+        boxes = particles.masses.shape[0]
+        wave_count = len(config.wavelength)
+        groups = boxes * wave_count
+        self._owner = owner
+        self._water_lane = water_lane
+        self._humidity = (
+            wp.empty((batch_size, boxes), dtype=wp.float64, device=device)
+            if water_lane is not None
+            else None
+        )
+        self._shape = (boxes, wave_count, 9)
+        self._rows = wp.empty(
+            (batch_size, groups, 9), dtype=wp.float64, device=device
+        )
+        self._statuses = wp.empty(
+            (batch_size, groups), dtype=wp.int32, device=device
+        )
         self._workspace = prepare_population_mie(
-            index,
-            size,
-            radius,
-            weight,
+            self._cases.index,
+            self._cases.size,
+            self._cases.radius,
+            self._cases.weight,
             particle_tile=particle_tile,
             coefficient_capacity=coefficient_capacity,
             stream=owner._stream,
@@ -158,7 +210,7 @@ class DeviceOpticalBatch:
     def enqueue(self, row):
         """Append device results and status to a batch slot."""
         owner = self._owner
-        self._fill.launch(stream=owner._stream)
+        self._cases.enqueue()
         self._workspace.enqueue()
         wp.launch(
             _store_row,
@@ -174,6 +226,23 @@ class DeviceOpticalBatch:
             stream=owner._stream,
         )
 
+        if self._humidity is not None:
+            session = owner._session
+            wp.launch(
+                _relative_humidity_row,
+                self._shape[0],
+                inputs=[
+                    session.gas.concentration,
+                    session.gas.molar_mass,
+                    session.environment.temperature,
+                    self._water_lane,
+                    row,
+                    self._humidity,
+                ],
+                device=owner.device.native,
+                stream=owner._stream,
+            )
+
     def download(self, count):
         """Check physics and optics before exposing any row of the batch."""
         owner = self._owner
@@ -183,4 +252,10 @@ class DeviceOpticalBatch:
             if np.any(status):
                 codes = np.unique(status[status != 0])
                 raise RuntimeError(f"Resident optics failed with codes {codes}")
-            return self._rows[:count].numpy().reshape((count, *self._shape))
+            optics = self._rows[:count].numpy().reshape((count, *self._shape))
+            rh = (
+                self._humidity[:count].numpy()
+                if self._humidity is not None
+                else None
+            )
+            return optics, rh

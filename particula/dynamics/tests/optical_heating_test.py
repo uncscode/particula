@@ -153,3 +153,137 @@ def test_dark_control_and_failed_temperature_step():
         process.execute(hot, DT)
     npt.assert_array_equal(hot.particles.masses, initial)
     npt.assert_array_equal(hot.fields[process.temperature_field], 0)
+
+
+@pytest.fixture(params=["cpu", "cuda:0"])
+def resident_device(request):
+    """Run resident kernels on each available device."""
+    import warp as wp
+
+    if request.param == "cuda:0" and not wp.is_cuda_available():
+        pytest.skip("CUDA unavailable")
+    return request.param
+
+
+def _register_heating(capacity=512):
+    from particula import ProcessRegistry
+    from particula.dynamics.optical_heating_gpu import OpticalHeatingAdapter
+
+    registry = ProcessRegistry()
+    registry.register(
+        OpticalHeating, OpticalHeatingAdapter(coefficient_capacity=capacity)
+    )
+    return registry
+
+
+def test_resident_optics_follow_mass_and_temperature(resident_device, tmp_path):
+    """Recompute optical feedback on device and record post-step state."""
+    from particula.execution.optical_recording import (
+        OpticalHistory,
+        OpticalObserver,
+        read_optical_history,
+    )
+    from particula.execution.prepared_recording import run_prepared
+    from particula.optics import population_optics
+
+    initial, process = illuminated_state()
+    config = OpticalConfig(
+        [450e-9, 550e-9, 700e-9],
+        species_index=[(1.33, 1.73 + 0.03j)] * 3,
+    )
+    process = OpticalHeating(
+        config,
+        [3e4, 4e4, 2e4],
+        gas_water="water",
+        physics=process.physics,
+    )
+    reference = CPUSimulation(initial, process, time_step=DT)
+    count = 12
+    reference.step(DT)
+    first_power = reference.snapshot().fields[process.power_field]
+    for step in range(2, count + 1):
+        reference.step(step * DT)
+    expected = reference.snapshot()
+    path = tmp_path / "heating.sqlite"
+    registry = _register_heating()
+    with process.prepare(
+        initial,
+        device=resident_device,
+        time_step=DT,
+        process_registry=registry,
+    ) as owner:
+        history = OpticalHistory(
+            path, config, variables=("absorption",), water_vapor="water"
+        )
+        observer = OpticalObserver(
+            owner, history, batch_size=3, coefficient_capacity=512
+        )
+        run_prepared(owner, count * DT, optics=observer, optical_initial=True)
+        actual = owner.snapshot()
+        checkpoint = owner.checkpoint()
+        owner.run(2)
+        continued = owner.snapshot()
+        with process.resume(checkpoint, process_registry=registry) as resumed:
+            resumed.run(2)
+            npt.assert_array_equal(
+                resumed.snapshot().particles.masses,
+                continued.particles.masses,
+            )
+    assert not np.array_equal(actual.fields[process.power_field], first_power)
+    npt.assert_allclose(
+        actual.particles.masses, expected.particles.masses, rtol=6e-12
+    )
+    npt.assert_allclose(
+        actual.gas.concentration, expected.gas.concentration, rtol=2e-14
+    )
+    for name, array in expected.fields.items():
+        npt.assert_allclose(actual.fields[name], array, rtol=2e-9, atol=1e-21)
+    metadata, observations = list(read_optical_history(path))[-1]
+    assert metadata["relative_humidity"]["gas_species"] == "water"
+    assert metadata["relative_humidity"]["axes"] == ["time", "box"]
+    humidity = WaterBuckStrategy().saturation_ratio(
+        expected.gas.concentration[:, 1],
+        MOLAR_WATER,
+        expected.environment.temperature,
+    )
+    npt.assert_allclose(
+        observations["relative_humidity"][-1], humidity, rtol=2e-14
+    )
+    npt.assert_allclose(
+        observations["absorption"][-1],
+        population_optics(actual.particles, config).absorption,
+        rtol=2e-10,
+    )
+
+
+@pytest.mark.parametrize(
+    ("capacity", "irradiance", "status"), [(1, 9e4, 102), (512, 1e12, 103)]
+)
+def test_resident_failed_batch_does_not_publish(
+    resident_device,
+    capacity,
+    irradiance,
+    status,
+):
+    """Reject invalid optics or an unbracketed root before touching state."""
+    initial, process = illuminated_state(irradiance=irradiance)
+    with process.prepare(
+        initial,
+        device=resident_device,
+        time_step=DT,
+        process_registry=_register_heating(capacity),
+    ) as owner:
+        owner.step()
+        with pytest.raises(ValueError, match=f"failure {status}"):
+            owner.synchronize()
+        with owner._scope():
+            npt.assert_array_equal(
+                owner._session.particles.masses.numpy(),
+                initial.particles.masses,
+            )
+            npt.assert_array_equal(
+                owner._session.gas.concentration.numpy(),
+                initial.gas.concentration,
+            )
+            for name, buffer in owner._extension_fields.arrays.items():
+                npt.assert_array_equal(buffer.numpy(), initial.fields[name])

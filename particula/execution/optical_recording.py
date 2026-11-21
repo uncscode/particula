@@ -8,6 +8,7 @@ from pathlib import Path
 
 import numpy as np
 
+from particula.gas.vapor_pressure_strategies import WaterBuckStrategy
 from particula.optics.population import PopulationOptics
 from particula.optics.state import OpticalConfig, population_optics
 
@@ -50,8 +51,23 @@ class OpticalHistory:
     and accompanied by validity masks. One writer owns the observation buffer.
     """
 
-    def __init__(self, path, config, *, variables=_DEFAULT, provenance=None):
-        """Configure the output and provenance before binding an owner."""
+    def __init__(
+        self,
+        path,
+        config,
+        *,
+        variables=_DEFAULT,
+        provenance=None,
+        water_vapor=None,
+    ):
+        """Configure output; a named water gas enables box RH observations."""
+        if water_vapor is not None and (
+            not isinstance(water_vapor, str) or not water_vapor.strip()
+        ):
+            raise ValueError(
+                "Select water vapor by its native gas species name"
+            )
+        self.water_vapor = water_vapor
         self.path = Path(path)
         self.config = config
         self.variables = _channels(variables)
@@ -65,7 +81,25 @@ class OpticalHistory:
         """Time of the last committed row, or None for an empty history."""
         return self._last_time
 
+    def _water_lane(self, gas_names):
+        if self.water_vapor is None:
+            return None
+        if self.water_vapor not in gas_names:
+            raise ValueError(
+                "Optical history water vapor is absent from the gas"
+            )
+        return gas_names.index(self.water_vapor)
+
     def _bind(self, boxes, distribution):
+        humidity = {}
+        if self.water_vapor is not None:
+            humidity["relative_humidity"] = {
+                "gas_species": self.water_vapor,
+                "saturation_model": "Buck water/ice",
+                "temperature": "live gas temperature",
+                "axes": ["time", "box"],
+                "unit": "1",
+            }
         metadata = json.dumps(
             {
                 **self.config.metadata(),
@@ -82,6 +116,7 @@ class OpticalHistory:
                     },
                 },
                 "provenance": json.loads(self._provenance),
+                **humidity,
             },
             sort_keys=True,
         )
@@ -112,7 +147,12 @@ class OpticalHistory:
             ).fetchone()
         self._last_time = None if last is None else last[0]
 
-    def _write(self, times, values):
+    def _write(self, times, values, humidity):
+        humidity_bytes = b""
+        if humidity is not None:
+            if np.any(~np.isfinite(humidity) | (humidity < 0)):
+                raise ValueError("Optical history relative humidity is invalid")
+            humidity_bytes = np.asarray(humidity, dtype="<f8").tobytes()
         times = np.asarray(times, dtype="<f8")
         selected = np.asarray(
             values[..., [_CHANNELS.index(name) for name in self.variables]],
@@ -142,7 +182,7 @@ class OpticalHistory:
                     times[0].item(),
                     times[-1].item(),
                     times.size,
-                    times.tobytes() + selected.tobytes(),
+                    times.tobytes() + selected.tobytes() + humidity_bytes,
                 ),
             )
         self._last_time = times[-1].item()
@@ -168,8 +208,15 @@ def read_optical_history(path):
             "SELECT n_rows, data FROM optics_chunks ORDER BY first_time"
         ):
             buffer = np.frombuffer(data, dtype="<f8")
-            values = buffer[count:].reshape((count, *shape))
+            optical_end = count * (1 + int(np.prod(shape)))
+            values = buffer[count:optical_end].reshape((count, *shape))
             arrays = {"time": buffer[:count]}
+            if "relative_humidity" in metadata:
+                arrays["relative_humidity"] = buffer[optical_end:].reshape(
+                    (count, metadata["boxes"])
+                )
+            elif buffer.size != optical_end:
+                raise ValueError("Unexpected optical history payload length")
             arrays.update(
                 {
                     name: values[..., i].astype(bool)
@@ -215,9 +262,11 @@ class OpticalObserver:
             raise ValueError("Optical batch size must be a positive integer")
         self._times = []
         self._cpu_rows = []
+        self._cpu_humidity = []
         self._device_batch = None
         if isinstance(simulation, CPUSimulation):
             particles = simulation._state.particles
+            self._water_lane = history._water_lane(simulation._state.gas.name)
             history.config.validate_materials(particles.n_species)
             history._bind(particles.n_boxes, particles.distribution_type)
         elif type(simulation) is PreparedSimulation:
@@ -226,6 +275,9 @@ class OpticalObserver:
             with simulation._lock:
                 _ready(simulation)
                 particles = simulation._session.particles
+                water_lane = history._water_lane(
+                    simulation._session.metadata.gas_names
+                )
                 distribution = {1: "discrete", 3: "particle_resolved"}.get(
                     particles.distribution_kind
                 )
@@ -236,6 +288,7 @@ class OpticalObserver:
                         self._batch_size,
                         particle_tile,
                         coefficient_capacity,
+                        water_lane=water_lane,
                     )
                 history._bind(particles.masses.shape[0], distribution)
         else:
@@ -266,9 +319,15 @@ class OpticalObserver:
         if self._check_start(time) == time:
             return
         if self._device_batch is None:
-            values = population_optics(
-                self.simulation._state.particles, self.history.config
-            )
+            state = self.simulation._state
+            values = population_optics(state.particles, self.history.config)
+            if self._water_lane is not None:
+                humidity = WaterBuckStrategy().saturation_ratio(
+                    state.gas.concentration[:, self._water_lane],
+                    state.gas.molar_mass[self._water_lane],
+                    state.environment.temperature,
+                )
+                self._cpu_humidity.append(humidity)
             self._cpu_rows.append(np.stack(values, axis=-1))
         else:
             self._device_batch.enqueue(len(self._times))
@@ -281,12 +340,16 @@ class OpticalObserver:
         if not self._times:
             return
         if self._device_batch is None:
-            self._publish(np.stack(self._cpu_rows))
+            humidity = (
+                np.stack(self._cpu_humidity) if self._cpu_humidity else None
+            )
+            self._publish(np.stack(self._cpu_rows), humidity)
         else:
             with self.simulation._lock:
-                self._publish(self._device_batch.download(len(self._times)))
+                self._publish(*self._device_batch.download(len(self._times)))
 
-    def _publish(self, values):
-        self.history._write(self._times, values)
+    def _publish(self, values, humidity):
+        self.history._write(self._times, values, humidity)
         self._times.clear()
         self._cpu_rows.clear()
+        self._cpu_humidity.clear()

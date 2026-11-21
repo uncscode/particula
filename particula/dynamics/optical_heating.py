@@ -100,6 +100,7 @@ def heating_step(
         loss = np.minimum(
             water, transfer_factor * np.maximum(activity * saturated - vapor, 0)
         )
+        loss = water - (water - loss)
         latent = physics.latent_heat * loss
         sensible = heat_capacity * (temperature - old_temperature)
         return loss, conduction, radiation, latent, sensible
@@ -154,6 +155,8 @@ class OpticalHeating(BoxProcess):
         name="optical_heating",
     ):
         """Bind optical forcing, liquid material index and gas species name."""
+        if not isinstance(name, str) or not name.isidentifier():
+            raise ValueError("Optical heating needs an identifier-style name")
         self.optics = optics
         self.physics = HeatingPhysics() if physics is None else physics
         if not isinstance(optics, OpticalConfig) or not isinstance(
@@ -213,7 +216,7 @@ class OpticalHeating(BoxProcess):
             self.irradiance,
             self.gas_water,
             self.water_material,
-            astuple(self.physics),
+            tuple(float(value) for value in astuple(self.physics)),
         )
 
     def _specs(self):
@@ -242,6 +245,11 @@ class OpticalHeating(BoxProcess):
             raise ValueError(
                 "Require water, one nonvolatile solute and named gas water"
             )
+        gas_index = aerosol.gas.name.index(self.gas_water)
+        if not aerosol.gas.partitioning[gas_index]:
+            raise ValueError(
+                "Water vapor must be enabled for phase partitioning"
+            )
         self.optics.validate_materials(2)
         for spec in self._specs():
             if aerosol.fields.specs.get(spec.name) != spec:
@@ -251,6 +259,13 @@ class OpticalHeating(BoxProcess):
         ambient = aerosol.environment.temperature
         if np.any((ambient < _MIN_K) | (ambient > _MAX_K)):
             raise ValueError("Gas temperature outside the liquid domain")
+        temperature = aerosol.fields[self.temperature_field]
+        active = aerosol.particles.concentration > 0
+        outside = (temperature != 0) & (
+            (temperature < _MIN_K) | (temperature > _MAX_K)
+        )
+        if np.any(active & outside):
+            raise ValueError("Particle temperature outside the liquid domain")
         i = self.water_material
         if np.any(
             (aerosol.particles.concentration > 0)

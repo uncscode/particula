@@ -6,8 +6,9 @@ NumPy CPU, Warp CPU and CUDA. Import numerical CPU functions from
 `particula.optics.gpu`. No PyMieScatt installation is needed.
 
 Start with the executed [spectra, polarization and cloud example](../../studies/validation/material-properties/sphere-optics/sphere_optics.py).
-This feature supplies optical properties for later radiation and microphysics
-models. It does not update particle mass, temperature, gas or environment state.
+Optical calculations supply properties for observation and feedback. A
+heating runnable uses particle absorption to advance temperature and water
+transfer in a separate step.
 
 ## Physical scope and units
 
@@ -153,7 +154,7 @@ workspaces for changed shapes, devices or capacities. Do not concurrently
 launch the same workspace on different streams: its scratch is shared.
 There is no hidden transfer, synchronization in enqueue, or CPU fallback.
 
-## Later thermal and evaporation feedback
+## Absorption and a particle energy balance
 
 Keep optical evaluation separate from a custom state-changing process:
 
@@ -269,3 +270,39 @@ trajectory can use `condensation_optics` with an optical time-series adjoint.
 The [optical integration studies](../../studies/validation/material-properties/optical-integration.md)
 show a measured multi-RH fit, a case where bulk optics leave a size-band mixing
 fraction unresolved, and recovery of the initial radius from a time series.
+
+## Feed light absorption back into evaporation
+
+Pass `water_vapor="water"` to `OpticalHistory` when the named native gas
+species is water. The reader returns `relative_humidity` on (time, box), as
+the ratio of gas-water partial pressure to Buck saturation pressure at
+the live gas temperature. On the prepared backend, the optional RH values
+are transferred with the other reduced observations. Values above one
+represent supersaturation.
+
+Use `OpticalHeating` from `particula.dynamics.optical_heating` to compute
+the effect of prescribed illumination on a warm solution sphere. Configure
+two particle materials (water and a nonvolatile absorbing solute), the
+water gas name and a band-integrated irradiance [W m⁻²] for each wavelength
+in the `OpticalConfig`. Call `heating.attach_fields(aerosol)` once before
+starting a new simulation. For a resident run, register `OpticalHeating` and
+its `OpticalHeatingAdapter` from
+`particula.dynamics.optical_heating_gpu` on a `ProcessRegistry` and pass it
+to `prepare`. The staged resident operation supports exact checkpoints.
+
+The runnable evaluates absorption at the start of its position in the
+sequence. It solves a per-particle temperature balance with gas conduction,
+grey infrared emission, sensible heat and latent cooling. The removed
+water enters the mapped gas lane using the native number measure.
+Temperature [K], absorbed power [W per physical particle] and cumulative
+energy transfers [J m⁻³] are available through the registered fields. The
+optical observer reevaluates final geometry if recording after the accepted
+step. The [illuminated evaporation example](../../studies/validation/material-properties/optical-heating/illuminated_evaporation.py)
+checks the two timings and both inventories separately.
+
+This process assumes a prescribed optically thin source, continuum transport,
+a liquid water/solute surface activity and one-way evaporation. Geometry
+and gas-water concentration are frozen during each temperature solve.
+The gas and longwave radiation temperatures are prescribed reservoirs.
+Use a timestep refinement check if evaporation changes sizes or humidity
+substantially over one step.

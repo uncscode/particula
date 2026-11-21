@@ -64,7 +64,7 @@ is CC BY 4.0. Five downloaded source files matched their listed SHA-256 sums.
   from scattering and absorption out of the independent residual vector.
   Use EC/OC as partial composition evidence.
 
-## Verified foundation and remaining work
+## Resident optical observations and local gradients
 
 The branch implements dense or scheduled live-state bulk histories and
 batched device transfer on the prepared owner. Optical recording tests compare
@@ -82,11 +82,6 @@ passed on Warp CPU and an RTX 5060 with Warp 1.11.1. The broader optics and
 recording validation returned 318 passes with CUDA available. Two additional
 CPU humidity-equilibrium checks passed against independent scalar roots and
 the flat-interface limit.
-
-Next wire the bulk adjoint into the observation and fitting APIs, including
-growth and composition derivatives. The size-bin audit, physical feedback,
-checkpointed optical trajectory, published examples, full validation,
-self review and PR are still open.
 
 ## Retrievals, optical trajectory, and measured inputs
 
@@ -117,9 +112,6 @@ locations, slice offsets, and original source file hashes.
 - [Instrument methods and field limitations](https://amt.copernicus.org/articles/19/1611/2026/)
 - [Optical studies and worked examples](../docs/studies/validation/material-properties/optical-integration.md)
 
-Remaining scope includes the active optical heating and evaporation process
-and worked example, full repository validation, integrated self-review, and PR.
-
 Four worked examples were executed and visually checked on the RTX 5060.
 The expanded optics, recording and inverse suites passed 292 tests. The
 closed-box optical fit recovered both initial radii across all starts to
@@ -129,10 +121,17 @@ respectively for the three warm starts on this device. The joint run's
 CUDA pool high-water and per-method mass/gas payload estimates are separate
 reported quantities.
 
-CPU active heating now stages a liquid-temperature energy balance and
-moves evaporated mass into the named gas species once. The independent
-scalar-root check covers the conductive, radiative, latent and sensible
-terms, along with represented-volume weighting and the inert gas. A dark
-equilibrium and out-of-domain rollback check also pass. The CUDA
-heating adapter and device staging, timestep refinement example, and final
-integrated qualification remain open.
+## Active feedback and humidity provenance
+
+CPU and CUDA active heating stage a liquid-temperature energy balance and
+move evaporated mass into the named gas species once. Failed optical and
+thermal batch checks leave the resident gas, particle and auxiliary arrays
+untouched. Thermal and energy fields travel with exact checkpoints. The
+independent scalar-root check covers the conductive, radiative, latent and
+sensible terms and the count-to-density conversion. The fifth example
+qualifies light and dark controls and halves the timestep twice. It uses
+distinct timestamps for cycle-start absorbed power and accepted-state
+spectra. The dense optical archive now records the named gas water RH by
+box alongside each spectrum and verifies it against sparse snapshots.
+CPU PDF diagnostics use the supplied radius grid for both sizes and
+quadrature; a direct trapezoid test covers nonuniform nodes.

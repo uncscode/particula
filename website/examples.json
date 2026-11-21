@@ -1652,5 +1652,21 @@
     ],
     "plot_inputs": [],
     "full_canvas": true
+  },
+  "illuminated-evaporation": {
+    "title": "How illumination warms and evaporates a wet aerosol",
+    "source": "docs/studies/validation/material-properties/optical-heating/illuminated_evaporation.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 600,
+    "inputs": [],
+    "invoke": "report = simulate()\nfigure = plot_results(report)\nplt.show()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)\nplt.show()",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
   }
 }
