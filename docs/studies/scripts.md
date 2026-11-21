@@ -86,6 +86,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [How do collision models change a water-grown mixed aerosol?](examples/coupled-populations/emissions/biomass_burning_cloud_interactions.py)
 - [How does attraction change a Brownian collision rate?](validation/coagulation/dispersion/van_der_waals.py)
 - [How does water uptake change organic aerosol partitioning?](examples/thermodynamics/equilibria/equilibria_part1.py)
+- [How illumination warms and evaporates a wet aerosol](validation/material-properties/optical-heating/illuminated_evaporation.py)
 - [How much energy accompanies a condensation step?](examples/particle-processes/condensation/condensation_latent_heat.py)
 - [How strongly does curvature raise equilibrium vapor pressure?](examples/thermodynamics/particle-properties/particle_surface_tutorial.py)
 - [How two particle sizes share a reactive gas](examples/custom-processes/resolved_reactive_uptake.py)

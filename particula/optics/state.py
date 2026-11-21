@@ -146,19 +146,28 @@ def particle_optics(particles, config):
     """Return per-particle Mie efficiencies and cross sections.
 
     Arrays have axes (box, wavelength, slot). Empty slots have zero radius
-    for the optical calculation. Particle size uses native mass and density.
+    for the optical calculation. Discrete and resolved sizes come from
+    material mass and density. Continuous PDFs use their explicit nodes.
     """
     particles.validate_representation()
     config.validate_materials(particles.n_species)
-    radius = np.where(particles.concentration > 0, particles.radii, 0)[
-        :, None, :
-    ]
+    active = particles.concentration > 0
+    native_radius = (
+        particles.radius_grid
+        if particles.distribution_type == "continuous_pdf"
+        else particles.radii
+    )
+    radius = np.where(active, native_radius, 0)[:, None, :]
     if config.species_index is None:
         index = np.asarray(config.particle_index)[None, :, None]
     else:
         volumes = particles.masses / particles.density
         volumes = np.where(particles.concentration[..., None] > 0, volumes, 0)
         total = volumes.sum(axis=-1, keepdims=True)
+        if np.any(active & (total[..., 0] <= 0)):
+            raise ValueError(
+                "Species optics require positive active material volume"
+            )
         fraction = np.divide(
             volumes, total, out=np.zeros_like(volumes), where=total > 0
         )

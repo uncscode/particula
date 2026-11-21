@@ -1097,6 +1097,17 @@
   ],
   "resources": [
     {
+      "source": "docs/studies/validation/material-properties/optical-heating/illuminated_evaporation.py",
+      "title": "How illumination warms and evaporates a wet aerosol",
+      "topic": "optics",
+      "also": [
+        "condensation-energy",
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
       "source": "docs/studies/validation/material-properties/optical-recording/dense_optical_history.py",
       "title": "Record aerosol extinction at 10 Hz during hygroscopic growth",
       "topic": "optics",
@@ -1152,7 +1163,8 @@
           "dense-optical-history",
           "optical-effective-index",
           "optical-mixing-state",
-          "optical-growth-trajectory"
+          "optical-growth-trajectory",
+          "illuminated-evaporation"
         ],
         "companions": [],
         "relations": [
