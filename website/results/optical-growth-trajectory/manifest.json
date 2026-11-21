@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 11.360562441172078,
+  "package_source_sha256": "39bf9c0158dce189a52585883b479fad2fec4e1cea0e3657d029d8dbd17d086c",
+  "scientific_source_sha256": "1115134f6264df4df66b56eae9c0b05b682abd43d350362576e3f818db7342ab",
+  "input_sha256": {},
+  "example": "optical-growth-trajectory",
+  "fingerprint": "8da958b7f2af68a189df5f9087698a5dddbc388e4fe5bb77518102dfd4a976aa",
+  "source": "docs/studies/validation/condensation/optical-trajectory/infer_optical_trajectory.py",
+  "revision": "db5fdcfa83bf844ffd5f334c5b3012e669a05e68",
+  "package_dirty": true,
+  "executed_at": "2026-11-21T17:43:17.270181+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     /tmp/particula-optics-warp\nModule particula.execution.inverse_condensation 9d6d8ab load on device 'cuda:0' took 0.65 ms  (cached)\nModule particula.execution.inverse_optics a459093 load on device 'cuda:0' took 0.30 ms  (cached)\nModule particula.optics.gpu.inverse 3ffa894 load on device 'cuda:0' took 0.37 ms  (cached)\nModule particula.optics.gpu.mie 36c0414 load on device 'cuda:0' took 0.59 ms  (cached)\nModule particula.optics.gpu.derivatives 5334410 load on device 'cuda:0' took 0.46 ms  (cached)\n"
+      },
+      {
+        "text": "Combined CUDA pool high-water mark 39,596 bytes\n"
+      },
+      {
+        "image": "figure-6-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-6-1.png": "6bba1e1ef4fe9d76672b200e1fca0e2ff2e93ff8f9f8dc160354433f052555cf",
+    "data.json": "cd023bed15e2699bb1c14ad98a2ae51d388241b3d8b2f63a7d60f787646fa7f5",
+    "source.py": "c0b63f4a600a5d18f320da98561bffd42651ef8936444ec8516c8e75aa2c57e7"
+  },
+  "simulation_fingerprint": "4d211ff0ccc56c2a233ed4fcb9d392494529657ca0c59375821317003e379f16"
+}

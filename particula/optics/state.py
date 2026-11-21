@@ -192,7 +192,13 @@ def population_optics(particles, config) -> PopulationOptics:
         config.validate_materials(particles.n_species)
         particles.validate_representation()
         return PopulationOptics(
-            *(zero.copy() for _ in range(7)),
+            zero,
+            zero.copy(),
+            zero.copy(),
+            zero.copy(),
+            zero.copy(),
+            zero.copy(),
+            zero.copy(),
             zero.astype(bool),
             zero.astype(bool),
         )

@@ -29,7 +29,7 @@ def _fill_cases(
     radius: wp.array2d(dtype=wp.float64),
     weight: wp.array2d(dtype=wp.float64),
 ):
-    group, slot = wp.tid()
+    group, slot = wp.tid()  # type: ignore[misc]
     wave = group % wavelengths.shape[0]
     box = group // wavelengths.shape[0]
     count = particles.concentration[box, slot]
@@ -50,11 +50,11 @@ def _fill_cases(
             if mixed != 0:
                 polar = polar + volume * configured_index[wave, material]
         r = wp.pow(total * _RADIUS_FACTOR, _CUBE_ROOT)
-        if mixed != 0 and total > wp.float64(0.0):
+        if mixed != 0 and total > wp.float64(0.0):  # type: ignore[operator]
             polar = polar / total
             one = wp.vec2d(wp.float64(1.0), wp.float64(0.0))
             dielectric = divide(one + wp.float64(2.0) * polar, one - polar)
-            magnitude = wp.length(dielectric)
+            magnitude = wp.length(dielectric)  # type: ignore[call-overload]
             if dielectric[0] >= wp.float64(0.0):
                 real = wp.sqrt((magnitude + dielectric[0]) / wp.float64(2.0))
                 imag = dielectric[1] / (wp.float64(2.0) * real)

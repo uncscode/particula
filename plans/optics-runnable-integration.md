@@ -119,3 +119,20 @@ locations, slice offsets, and original source file hashes.
 
 Remaining scope includes the active optical heating and evaporation process
 and worked example, full repository validation, integrated self-review, and PR.
+
+Four worked examples were executed and visually checked on the RTX 5060.
+The expanded optics, recording and inverse suites passed 292 tests. The
+closed-box optical fit recovered both initial radii across all starts to
+0.042 nm or better. The saved trajectory fit used 90 forwards and 45
+adjoints versus 220 finite-difference forwards, taking 1.97 and 1.86 s
+respectively for the three warm starts on this device. The joint run's
+CUDA pool high-water and per-method mass/gas payload estimates are separate
+reported quantities.
+
+CPU active heating now stages a liquid-temperature energy balance and
+moves evaporated mass into the named gas species once. The independent
+scalar-root check covers the conductive, radiative, latent and sensible
+terms, along with represented-volume weighting and the inert gas. A dark
+equilibrium and out-of-domain rollback check also pass. The CUDA
+heating adapter and device staging, timestep refinement example, and final
+integrated qualification remain open.

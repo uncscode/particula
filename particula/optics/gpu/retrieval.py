@@ -55,10 +55,11 @@ def _water_ratio_grad(
 def _refractive_index(polar: wp.vec2d):
     one = wp.vec2d(_ONE, _ZERO)
     dielectric = divide(one + _TWO * polar, one - polar)
+    magnitude = wp.length(dielectric)  # type: ignore[call-overload]
     if dielectric[0] >= _ZERO:
-        real_index = wp.sqrt((wp.length(dielectric) + dielectric[0]) / _TWO)
+        real_index = wp.sqrt((magnitude + dielectric[0]) / _TWO)
         return wp.vec2d(real_index, dielectric[1] / (_TWO * real_index))
-    imag_index = wp.sqrt((wp.length(dielectric) - dielectric[0]) / _TWO)
+    imag_index = wp.sqrt((magnitude - dielectric[0]) / _TWO)
     return wp.vec2d(dielectric[1] / (_TWO * imag_index), imag_index)
 
 
@@ -78,7 +79,7 @@ def _effective_population(
     radius: wp.array2d(dtype=wp.float64),
     index: wp.array2d(dtype=wp.vec2d),
 ):
-    group, slot = wp.tid()
+    group, slot = wp.tid()  # type: ignore[misc]
     dry_radius = dry[group, slot]
     dry_index = wp.vec2d(p[0], p[1])
     if humidify == 0:
@@ -115,7 +116,7 @@ def _partition_weights(
     subpopulations: int,
     weight: wp.array2d(dtype=wp.float64),
 ):
-    group, population = wp.tid()
+    group, population = wp.tid()  # type: ignore[misc]
     fraction = p[band[group, population // subpopulations]]
     if population % subpopulations == 0:
         weight[group, population] = endpoint[group, population] * fraction

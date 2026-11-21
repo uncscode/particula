@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 11.871256102109328,
+  "package_source_sha256": "17eb3822d453ca5ef42a5867f3d3e7c5de5290fc13d90578346f07c0d49970c1",
+  "scientific_source_sha256": "5f63ee6bda62605b06d8c6b539751f360b87add3d6a9bba6e915fb45c70d902f",
+  "input_sha256": {
+    "docs/data/optical-retrieval/suchdol.json": "15cf6516cd014d295f8ec98f607f04b59771e9ce819eed6be7e380e51d563492"
+  },
+  "example": "optical-effective-index",
+  "fingerprint": "d54363e51c9f19cdaa8d9633ff7527a1a710a4901440f00afe3ba9189e83d511",
+  "source": "docs/studies/validation/material-properties/optical-retrieval/infer_refractive_index.py",
+  "revision": "db5fdcfa83bf844ffd5f334c5b3012e669a05e68",
+  "package_dirty": false,
+  "executed_at": "2026-11-21T17:39:03.010116+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     /tmp/particula-optics-warp\nModule particula.optics.gpu.retrieval c97d6d6 load on device 'cuda:0' took 0.78 ms  (cached)\nModule particula.optics.gpu.inverse 3ffa894 load on device 'cuda:0' took 0.51 ms  (cached)\nModule particula.optics.gpu.mie 36c0414 load on device 'cuda:0' took 0.80 ms  (cached)\nModule particula.optics.gpu.derivatives 5334410 load on device 'cuda:0' took 0.65 ms  (cached)\n"
+      },
+      {
+        "text": "2022-11-15T00:00:00Z Dry\u2013wet\u2013dry RH (%) [30.4 84.9 30.8]\nFitted n, k, \u03ba [1.733 0.116 0.07 ]\nCalibration sensitivity [1.624 0.096 0.062] to [1.876 0.117 0.081]\n2023-08-08T12:00:00Z Dry\u2013wet\u2013dry RH (%) [21.5 84.1 25.7]\nFitted n, k, \u03ba [1.794 0.058 0.137]\nCalibration sensitivity [1.679 0.05  0.12 ] to [1.979 0.068 0.16 ]\n"
+      },
+      {
+        "image": "figure-6-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-6-1.png": "8abfaeac3b88ac218d6760238ef01c1adde258a33479838409b6667ea635ac74",
+    "data.json": "cfd2e0181f6ed37283afe9bf35a790122bea5e03ab73b4d62b84194664248fe4",
+    "source.py": "1f28803297777f70e220a183a00a19061d466467a5d977d754e70fd880074434"
+  },
+  "simulation_fingerprint": "b177f6c078a03d73ee918d779e86c09c37cf77b21a9c75b9443bbc40ffbcd6e8"
+}
