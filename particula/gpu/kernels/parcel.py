@@ -46,13 +46,19 @@ def _es(t: F):
 
 
 @wp.func
-def _growth_resistance(t: F, p: F, es: F):
+def _resistance_terms(t: F, p: F, es: F):
+    """Diffusive and thermal components before multiplying by water density."""
     diffusivity = D_REF * wp.pow(t / T_REF, D_EXPONENT) * F(101325.0) / p
     conduction = _thermal_conductivity_wp(t)
-    return F(RHO_W) * (
-        R_VAPOR * t / (es * diffusivity)
-        + F(LATENT) / (conduction * t) * (LATENT_OVER_RV / t - F(1.0))
-    )
+    mass = R_VAPOR * t / (es * diffusivity)
+    heat_scale = F(LATENT) / (conduction * t)
+    return mass, heat_scale, conduction
+
+
+@wp.func
+def _growth_resistance(t: F, p: F, es: F):
+    mass, heat_scale, conduction = _resistance_terms(t, p, es)
+    return F(RHO_W) * (mass + heat_scale * (LATENT_OVER_RV / t - F(1.0)))
 
 
 @wp.kernel
