@@ -40,9 +40,11 @@ After glyoxal dilution, two models predict rising organic mass per sulfate as me
 - [Evaporation and reactive uptake](evaporation-and-uptake/index.md)
 - [A pulse fitted to Sea2Cloud’s smallest particles misses the early 12–25 nm enhancement](sea2cloud-events/index.md)
 - [Particle water uptake and activation](particle-water-uptake/index.md)
+- [Particle-resolved coagulation leaves 6.7% fewer particles for nearby modes but agrees in number for widely separated modes](mam4xx-coagulation/index.md)
 - [Particula predicts about 60% of the NaCl capture rate measured at 4 nm](nacl-scavenging/index.md)
 - [Particula predicts half the rise in ion concentration CLOUD measured from 7% to 70% humidity](cloud-ion-humidity/index.md)
 - [Particula sizes a 100.7 nm PSL standard at about 102 nm near atmospheric pressure](dry-psl-mobility/index.md)
+- [Two C₉H₁₄O₄ isomers reach half signal 21 minutes apart in chamber aerosol](pinic-isomers/index.md)
 - [Π Chamber experiments and modeling](pi-chamber/index.md)
 - [Adding settling and diffusion losses predicts too few airborne particles in a spherical chamber](../validation/wall-loss/index.md)
 <!-- STUDY_LIST_END -->

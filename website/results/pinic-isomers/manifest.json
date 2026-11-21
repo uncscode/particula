@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 21.180576965911314,
+  "package_source_sha256": "de9c4fa23fbd4833d9eeae22e97ffd8e2496acae8432510149eed8ada42f4ee3",
+  "scientific_source_sha256": "1ac66c614e80ae7a0f6aae70e885469d5f8609ca95421966dfcd08ebcf41597f",
+  "input_sha256": {
+    "scripts/pinic_isomers/physics.py": "a358c8c2325e9ea67640291fae35d46312e918efd128cdbc8f2e8f787ef4c6f7",
+    "scripts/pinic_isomers/campaign.py": "0a286707984015c336ac6b012df101c70d42b206f59db6f8045ee65dfbc08741",
+    "scripts/pinic_isomers/plots.py": "821c74754f6cf69fa01bce860feefffdb44a54c00b0a07202bc806a6a7baffb2",
+    "scripts/pinic_isomers/extract.py": "9077ac4087951f46ad86b4f01ccafc9e1298e5eb71d8ea9d52a673cc8c38387c",
+    "docs/data/pinic-isomers/traces.csv": "d19d16b7d93fc901735d2ad1963318df4925631245f2cf32c41676c2a8cf1b0d"
+  },
+  "example": "pinic-isomers",
+  "fingerprint": "1b349e5dbc224955ac3c5c69ea36d75d26905865b3e2db04b97a94f8dc64825f",
+  "source": "docs/studies/literature/pinic-isomers/pinic_isomers.py",
+  "revision": "e51ed2b15f9bf790bf8b152b2c54176b6105b73f",
+  "package_dirty": false,
+  "executed_at": "2026-11-21T02:41:47.292584+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "image": "figure-2-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-3-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-3-1.png": "0370be464676a448afe37db8b149fe4895c2da2a73eab68e0211e549669e2b2f",
+    "figure-2-1.png": "7f845b4fd233bccac78334628d97db018941d420772b1f57fd2da24c59f9554f",
+    "executed_source.py": "6fd2a195f3373700d5c9c9a9e747ea35d344f54562297fd7d15890fed3e2d0d3",
+    "data.json": "8ec1c65a56a7356ec974aeb956cb9ddcae8f6bfb4242db6043bf1ee4fc476f75",
+    "source.py": "6fd2a195f3373700d5c9c9a9e747ea35d344f54562297fd7d15890fed3e2d0d3"
+  },
+  "simulation_fingerprint": "a3e59d0cf5e475a6c48335f1ed84d6a4122179e690f3004d31d52d51f0492bba",
+  "render_versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {
+    "scripts/pinic_isomers/physics.py": "a358c8c2325e9ea67640291fae35d46312e918efd128cdbc8f2e8f787ef4c6f7",
+    "scripts/pinic_isomers/campaign.py": "0a286707984015c336ac6b012df101c70d42b206f59db6f8045ee65dfbc08741",
+    "scripts/pinic_isomers/plots.py": "821c74754f6cf69fa01bce860feefffdb44a54c00b0a07202bc806a6a7baffb2",
+    "scripts/pinic_isomers/extract.py": "9077ac4087951f46ad86b4f01ccafc9e1298e5eb71d8ea9d52a673cc8c38387c",
+    "docs/data/pinic-isomers/traces.csv": "d19d16b7d93fc901735d2ad1963318df4925631245f2cf32c41676c2a8cf1b0d"
+  },
+  "rendered_at": "2026-11-21T02:41:51.130848+00:00",
+  "render_revision": "e51ed2b15f9bf790bf8b152b2c54176b6105b73f",
+  "render_elapsed_seconds": 2.0780131220817566
+}
