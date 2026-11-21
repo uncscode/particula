@@ -1,8 +1,9 @@
-# Adding settling and diffusion lowers predicted one-hour survival of 1 µm particles from 68% to 58% in a sphere
+# Adding settling and diffusion lowers predicted one-hour survival of 1 µm particles from 68% to 58% in a spherical chamber
 
+<a id="adding-settling-and-diffusion-lowers-predicted-one-hour-survival-of-1-µm-particles-from-68-to-58-in-a-sphere"></a>
 <a id="adding-settling-and-diffusion-losses-predicts-too-few-airborne-particles-in-a-spherical-chamber"></a>
 
-![Two circles show the one-hour airborne fractions of 1 µm particles in a sphere. Coupled theory gives 68.4% and adding the two limiting rates gives 58.2%. Arc length shows the airborne fraction on the same scale.](../../../images/spherical-wall-loss/graphical-abstract.svg)
+![A spherical chamber cross-section shows particles in the air and on the wall. The bars show the predicted fraction of 1 µm particles still airborne after one hour in the same chamber, 68.4% for coupled theory and 58.2% for added loss rates.](../../../images/spherical-wall-loss/graphical-abstract.svg)
 
 How much aerosol remains in a spherical chamber after an hour if diffusion and settling act together at the wall? For neutral particles 1 µm in diameter in a sphere of radius 0.30 m, Crump and Seinfeld’s coupled theory predicts **68.4%** airborne at a wall mixing coefficient of 3.6 s⁻¹. Adding the two limiting loss rates instead leaves **58.2%**. Particula’s particle-resolved simulation leaves **68.55% ± 0.27 percentage points**, where the 95% interval describes sampling at fixed model inputs. Using the additive correction would attribute about ten extra percentage points of disappearance to the wall under these conditions. Size-selected decay measurements with independently characterized mixing would test whether the calculated difference holds in a real chamber. [Crump and Seinfeld, equations 13 and 17](https://thesis.caltech.edu/3500/3/crump-jg_1983.pdf#page=39)
 

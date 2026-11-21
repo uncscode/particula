@@ -22,8 +22,8 @@ Modeled convection supplies only a third of the heat needed for the reported pen
 [![Equal dry organic cores have different water shells at 95% relative humidity. The bars compare condensed water volume: the activation-fitted κ model holds about half again as much water as BAT.](../../images/ccn-kappa-retrieval/graphical-abstract.svg)\
 A cloud activation fit predicts 49% more water than BAT at 95% humidity for one organic](particle-water-uptake/ccn-retrieval/index.md)
 
-[![Two circles show the one-hour airborne fractions of 1 µm particles in a sphere. Coupled theory gives 68.4% and adding the two limiting rates gives 58.2%. Arc length shows the airborne fraction on the same scale.](../../images/spherical-wall-loss/graphical-abstract.svg)\
-Adding settling and diffusion lowers predicted one-hour survival of 1 µm particles from 68% to 58% in a sphere](../validation/wall-loss/index.md)
+[![A spherical chamber cross-section shows particles in the air and on the wall. The bars show the predicted fraction of 1 µm particles still airborne after one hour in the same chamber, 68.4% for coupled theory and 58.2% for added loss rates.](../../images/spherical-wall-loss/graphical-abstract.svg)\
+Adding settling and diffusion lowers predicted one-hour survival of 1 µm particles from 68% to 58% in a spherical chamber](../validation/wall-loss/index.md)
 
 [![On an expanded diameter ruler, the 100.7 nm polystyrene latex standard lies to the left of the roughly 102 nm inferred from the two near-atmospheric mobility observations using the paper’s gas properties.](../../images/dry-psl-mobility/graphical-abstract.svg)\
 Particula sizes a 100.7 nm PSL standard at about 102 nm near atmospheric pressure](dry-psl-mobility/index.md)
@@ -65,5 +65,5 @@ At the inferred Π Chamber humidity, modeled sulfate haze falls below the optica
 - [Particula sizes a 100.7 nm PSL standard at about 102 nm near atmospheric pressure](dry-psl-mobility/index.md)
 - [Sea2Cloud’s March 22 spectra favor earlier arrival of larger particles in a two-hour exchange model](sea2cloud-events/index.md)
 - [Π Chamber experiments and modeling](pi-chamber/index.md)
-- [Adding settling and diffusion lowers predicted one-hour survival of 1 µm particles from 68% to 58% in a sphere](../validation/wall-loss/index.md)
+- [Adding settling and diffusion lowers predicted one-hour survival of 1 µm particles from 68% to 58% in a spherical chamber](../validation/wall-loss/index.md)
 <!-- STUDY_LIST_END -->
