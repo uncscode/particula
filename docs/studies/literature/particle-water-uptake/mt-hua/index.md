@@ -34,3 +34,22 @@ The preprint gives the ZSR equation and group residuals. Its workbook and supple
 ## Reproduce the comparison
 
 Run `python scripts/docs_examples.py refresh mt-hua-salts` on a CUDA machine. Run `python scripts/docs_examples.py replot mt-hua-salts` to redraw the figures from the saved numerical output. The example bundle includes the matched composition table and measured growth factors. The archived source workbook has SHA-256 `62ffa071a9e765f354d08f8995388009230807ce83cfc9843826079f6678dc54`. The CSV reproduces the authors’ Summit and Foothill sheets by joining column P to column A, using column Q for growth and columns G, F, H, J, I, E, D and C for ions in µg m⁻³. This independent automated Particula analysis used the public preprint and its first data deposit.
+
+## Liquid-mixture activity increases the winter foothill discrepancy
+
+**All 72 original overpredictions persist.** With one homogeneous aqueous phase, AIOMFAC also overpredicts the other seven reconstructable growth factors. The winter foothill mean bias rises from +0.292 with the authors’ ZSR equation and our pure-salt inputs to **+0.716** with the full mixture. The paper reports +0.02. Liquid nonideality at this fixed neutral composition moves the prediction away from the measurements. [Paired sample predictions and activity tables](mixture_activity.py)
+
+| Site and season | Samples | ZSR, literature pure-salt inputs | ZSR, AIOMFAC pure-salt inputs | Full AIOMFAC mixture | Full minus AIOMFAC-pure ZSR |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Summit, summer | 21 | +0.217 | +0.418 | +0.539 | +0.121 |
+| Summit, winter | 18 | +0.361 | +0.668 | +0.848 | +0.180 |
+| Foothill, summer | 22 | +0.228 | +0.484 | +0.610 | +0.126 |
+| Foothill, winter | 18 | +0.292 | +0.542 | +0.716 | +0.174 |
+
+The first three result columns are mean predicted minus measured diameter growth factors. Applying the same volume-additive ZSR equation to the 15 AIOMFAC pure-salt controls separates the change of pure-salt reference from the additional effect of mixing. At the winter foothill the two changes are about +0.250 and +0.174. The +0.289 bias in the earlier comparison used a volume-weighted κ before solving for growth. The +0.292 value applies Equation 5 directly to the pure growth factors.
+
+We submitted the same proportionally charge-balanced dry mass inventory used above, including divalent-ion stoichiometry. All 94 compositions have 33 web calculations at 298.15 K over water-to-dry mass ratios of 0.35–30. The downloadable inputs preserve each form submission, the server’s input and output text, the version (**AIOMFAC-web 3.15**) and flags. Particula interpolates water activity linearly in log mass ratio, adds water volume at 997 kg m⁻³ to the same anhydrous dry volume, and solves the Kelvin-corrected equilibrium for the same 100 nm dry diameter and 90% RH. Every composition brackets one increasing equilibrium crossing with unflagged endpoints. Halving the table resolution changes sample growth factors by less than 0.017. CPU root finding independently reproduces the GPU values. A separate web submission at 15% NaCl by mass gives water activity 0.891330, reproduced by interpolation within 0.001. The saved output includes the activities, sample identifiers, measured growth, both paired residuals and interpolation sensitivity. [AIOMFAC-web conventions](https://www.aiomfac.lab.mcgill.ca/help.html)
+
+These are liquid-branch calculations. Sparingly soluble calcium sulfate, for example, remains dissolved even where a solid could coexist. The field extracts’ phase histories, dry-state hydration and missing counterions remain material uncertainties. Recovering the authors’ actual pure-salt factors and sample dry volumes, then constraining the dissolved calcium and sulfate fractions, would discriminate those explanations before introducing additional activity models. [Original Figure 8 and supplement](https://egusphere.copernicus.org/preprints/2026/egusphere-2026-6766/)
+
+Download the <a href="/particula/study-data/mt-hua/sample-growth.csv" download>79 paired sample residuals (CSV)</a> or the <a href="/particula/study-data/mt-hua/water-activity.csv" download>water activity versus water-to-dry mass ratio (CSV)</a>. Each mixture identifier joins the activity table to the sample results or a named pure control.

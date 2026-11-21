@@ -4726,7 +4726,8 @@
       "study": {
         "id": "mt-hua-salts",
         "runs": [
-          "mt-hua-salts"
+          "mt-hua-salts",
+          "mixture-activity"
         ],
         "companions": [],
         "relations": [
@@ -4737,6 +4738,14 @@
         ]
       },
       "tocFigure": "mt-hua-salts/graphical-abstract.svg"
+    },
+    {
+      "source": "docs/studies/literature/particle-water-uptake/mt-hua/mixture_activity.py",
+      "title": "Water activity of Mt. Hua ion mixtures",
+      "topic": "activity-nonideal",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
     }
   ],
   "supporting": [
