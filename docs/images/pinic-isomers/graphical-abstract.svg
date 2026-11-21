@@ -1,9 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img">
-<title>Three timing markers in chamber aerosol</title><desc>Time to reach half of each channel's late signal is 31 minutes for the unidentified isomer, 38 minutes for the formula-level signal, and 52 minutes for cis-pinic acid.</desc>
-<rect width="300" height="300" fill="#f7f5ee"/><g font-family="sans-serif" fill="#243e45">
-<text x="18" y="33" font-size="20">Time to half signal</text><text x="18" y="57" font-size="15">C₉H₁₄O₄ chamber aerosol</text>
-<g font-size="15"><text x="18" y="94">Unidentified isomer</text><text x="18" y="147">Formula-level MS</text><text x="18" y="200">cis-Pinic acid</text></g>
-<g stroke-width="6" fill="none"><path d="M28 109H155" stroke="#ad522c"/><path d="M28 162H184" stroke="#66706d"/><path d="M28 215H240" stroke="#195c85"/></g>
-<g font-size="15"><text x="164" y="114">31 min</text><text x="193" y="167">38 min</text><text x="247" y="220">52</text></g>
-<path d="M28 243H273 M28 239v8 M150 239v8 M272 239v8" stroke="#5c6c6e"/>
-<g text-anchor="middle" font-size="14"><text x="28" y="262">0</text><text x="150" y="262">30</text><text x="272" y="262">60</text><text x="150" y="283">Chamber time (min)</text></g></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">A delayed source recovers most of the observed isomer timing gap</title>
+  <desc id="desc">On a common time scale the measured separation between isomer half-signals is 20.7 minutes. The fitted common and delayed sources give 0.11 and 19.11 minutes at an effective particle radius of 80 nm.</desc>
+  <rect width="300" height="300" rx="12" fill="#f7f5ee"/>
+  <g font-family="sans-serif" fill="#253e44">
+    <text x="26" y="42" font-size="24" font-weight="bold">Half-signal gap</text>
+    <text x="26" y="73" font-size="16">C₉H₁₄O₄ isomers</text>
+    <path d="M27 110V260" stroke="#aaa99c" stroke-width="1.5"/>
+    <g font-size="17">
+      <text x="27" y="105">Measured</text>
+      <text x="27" y="170">Common source</text>
+      <text x="27" y="235">Delayed source</text>
+    </g>
+    <path d="M27 124H213.3" stroke="#263f45" stroke-width="6"/>
+    <circle cx="213.3" cy="124" r="6" fill="#263f45"/>
+    <path d="M27 189H27.99" stroke="#9e552e" stroke-width="5"/>
+    <path d="M27.99 183l6 6-6 6-6-6z" fill="#9e552e"/>
+    <path d="M27 254H198.99" stroke="#176f74" stroke-width="5"/>
+    <path d="M198.99 248l6 6-6 6-6-6z" fill="#176f74"/>
+    <g font-size="17" font-weight="bold">
+      <text x="224" y="130">20.7 min</text>
+      <text x="41" y="195">0.11 min</text>
+      <text x="211" y="260">19.1 min</text>
+    </g>
+  </g>
+</svg>

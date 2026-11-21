@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
-  <title id="title">Cloud droplets colliding in turbulent air</title>
-  <desc id="desc">A schematic cloud contains curling eddies and two spherical drops meeting between them. Below, three model predictions give counts of drops at eight times the initial mass per million starting drops. Shear theory gives 614, Particula gives 610, and a constant rate fitted to mean mass gives 102.</desc>
+  <title id="title">Size-dependent shear gives six times as many drops at twice the initial radius</title>
+  <desc id="desc">A schematic cloud contains curling eddies and two spherical drops meeting between them. The two bars show predicted counts for drops of exactly twice the initial radius after 133 minutes, per million starting drops. Turbulent shear gives 610 and a constant rate fitted to the same mean mass gives 102.</desc>
   <defs>
     <marker id="flow" viewBox="0 0 8 8" refX="6.5" refY="4" markerWidth="3.6" markerHeight="3.6" orient="auto">
       <path d="M0 0 8 4 0 8 2.2 4Z" fill="#457683"/>
@@ -20,15 +20,19 @@
     <circle cx="126" cy="36" r="3.5"/><circle cx="174" cy="44" r="4.5"/>
     <circle cx="243" cy="81" r="3.5"/>
   </g>
+  <!-- Both predictions have the same mean mass; bar heights share one zero. -->
   <g font-family="sans-serif" fill="#20373d" text-anchor="middle">
-    <text x="150" y="123" font-size="14" font-weight="bold">Predicted eightfold drops</text>
-    <text x="150" y="138" font-size="12">per million initial drops</text>
-    <!-- All bars share a zero baseline and 0.15 SVG units per drop per million. -->
-    <path d="M28 263h244" stroke="#536366" stroke-width="2"/>
-    <rect x="38" y="170.9" width="48" height="92.1" fill="#e4eff0" stroke="#245563" stroke-width="2"/>
-    <rect x="126" y="171.5" width="48" height="91.5" fill="#236d80"/>
-    <rect x="214" y="247.7" width="48" height="15.3" fill="#bc711f"/>
-    <g font-weight="bold" font-size="18"><text x="62" y="164">614</text><text x="150" y="164.6">610</text><text x="238" y="240.7">102</text></g>
-    <g font-size="15"><text x="62" y="284">Equations</text><text x="150" y="284">Particula</text><text x="238" y="284">Constant</text></g>
+    <text x="150" y="131" font-size="17">Drops per million</text>
+    <path d="M28 255h244" fill="none" stroke="#536366" stroke-width="2"/>
+    <rect x="52" y="163.45" width="58" height="91.55" fill="#236d80"/>
+    <rect x="188" y="239.75" width="58" height="15.25" fill="#aa5b25"/>
+    <g font-weight="bold" font-size="18">
+      <text x="81" y="156">610</text>
+      <text x="217" y="232">102</text>
+    </g>
+    <g font-size="17">
+      <text x="81" y="281">Shear</text>
+      <text x="217" y="281">Constant rate</text>
+    </g>
   </g>
 </svg>

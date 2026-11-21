@@ -1,21 +1,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
-  <title id="title">Neutral attraction reduces sub-100 nm number more with evolving sizes</title>
-  <desc id="desc">In the polluted-air simulation at 24 hours, each arrow starts at its own model’s hard-sphere reference. Adding attraction gives 27.91% fewer particles below 100 nm in corrected fixed-width MAM4xx and 38.72% fewer in evolving size sections. Both arrows use the same percentage scale.</desc>
+  <title id="title">Predicted particles below 100 nm in polluted air</title>
+  <desc id="desc">After 24 hours archived MAM4xx gives 3,379 particles per cubic centimetre. With coarse collisions and neutral attraction the extended modal calculation gives 2,424, the sectional model 1,187 and the particle-resolved mean 1,180. All four bars start at zero and share the same scale.</desc>
   <rect width="300" height="300" rx="12" fill="#f7f4eb"/>
   <g font-family="sans-serif" fill="#203c42">
-    <text x="20" y="37" font-size="19" font-weight="bold">Particles &lt;100 nm · 24 h</text>
-    <text x="20" y="81" font-size="15">Hard-sphere reference</text>
-    <path d="M20 93H280" stroke="#526569" stroke-width="2" stroke-dasharray="6 4"/>
-    <!-- Arrow length is 3.15 viewBox units per percentage point. -->
-    <path d="M79 93V170" stroke="#96512e" stroke-width="13"/>
-    <path d="m65 165 14 15.92L93 165Z" fill="#96512e"/>
-    <path d="M217 93V204" stroke="#17646b" stroke-width="13"/>
-    <path d="m203 199 14 15.97L231 199Z" fill="#17646b"/>
-    <g text-anchor="middle">
-      <text x="79" y="210" font-size="25" font-weight="bold">−28%</text>
-      <text x="217" y="244" font-size="25" font-weight="bold">−39%</text>
-      <text x="79" y="275" font-size="16">Fixed widths</text>
-      <text x="217" y="275" font-size="16">Evolving sizes</text>
+    <text x="16" y="26" font-size="19" font-weight="bold">Particles below 100 nm</text>
+    <text x="16" y="47" font-size="14">Polluted air · 24 hours · particles/cm³</text>
+    <text x="16" y="75" font-size="16">Archived MAM4xx</text>
+    <rect x="16" y="83" width="206.13" height="13" fill="#41525b"/>
+    <text x="230" y="95" font-size="16" font-weight="bold">3,379</text>
+    <path d="M16 111H284" stroke="#a4aaa2"/>
+    <text x="16" y="132" font-size="14" font-weight="bold">With coarse collisions + attraction</text>
+    <g font-size="16">
+      <text x="16" y="156">Extended MAM4xx</text>
+      <text x="16" y="207">Sectional (size bins)</text>
+      <text x="16" y="258">Particle-resolved (mean)</text>
+    </g>
+    <rect x="16" y="164" width="147.88" height="13" fill="#97522e"/>
+    <rect x="16" y="215" width="72.39" height="13" fill="#17646b"/>
+    <rect x="16" y="266" width="71.99" height="13" fill="#17646b"/>
+    <g font-size="16" font-weight="bold">
+      <text x="172" y="176">2,424</text>
+      <text x="96" y="227">1,187</text>
+      <text x="96" y="278">1,180</text>
     </g>
   </g>
 </svg>

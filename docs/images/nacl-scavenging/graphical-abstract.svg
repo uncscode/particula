@@ -1,21 +1,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
-  <title id="title">NaCl capture in the recorded 4 nm scan</title>
-  <desc id="desc">A small salt particle approaches a larger collector. Bars from a common zero compare the native model's apparent capture coefficient with the measurement. The modeled bar reaches about three fifths of the measured bar.</desc>
-  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
-  <!-- Schematic of one tracer approaching a collector, independent of the bar scale. -->
-  <path d="M38 84q24-22 43-5t32-3" fill="none" stroke="#9d6441" stroke-width="3" stroke-linecap="round" stroke-dasharray="3 6"/>
-  <path d="m120 68 9-5 10 5v12l-10 5-9-5z" fill="#b86332" stroke="#773817" stroke-width="2"/>
-  <g stroke="#164e56" stroke-width="2.5" stroke-linejoin="round">
-    <path d="m163 50 44-22 43 22-43 23z" fill="#c1d9ce"/>
-    <path d="m163 50 44 23v48l-44-24z" fill="#659b96"/>
-    <path d="m207 73 43-23v47l-43 24z" fill="#347477"/>
+  <title id="title">Polarization has a large pair effect and a small scan effect</title>
+  <desc id="desc">On a common horizontal scale, adding dielectric polarization to the dispersion calculation raises capture by 35.46% for a singly charged 4 nm tracer and a neutral 100 nm collector. The same comparison increases the modeled apparent capture coefficient by 0.064% for the recorded 4 nm chamber scan. The pair icon is schematic.</desc>
+  <rect width="300" height="300" rx="16" fill="#f7f2e7"/>
+  <g fill="none" stroke="#33545a" stroke-width="2.5" stroke-linejoin="round">
+    <circle cx="48" cy="61" r="11" fill="#faeccd"/>
+    <path d="M43 61h10m-5-5v10" stroke="#684926"/>
+    <circle cx="99" cy="53" r="24" fill="#d4e4dd"/>
+    <path d="M62 60l10-2"/>
   </g>
-  <g font-family="sans-serif" fill="#233e41">
-    <text x="30" y="157" font-size="19" font-weight="bold">Capture (cm³/s)</text>
-    <text x="30" y="194" font-size="17">Measured</text>
-    <text x="30" y="247" font-size="17">Modeled</text>
+  <g font-family="sans-serif" fill="#24454a">
+    <text x="144" y="55" font-size="18">NaCl capture</text>
+    <text x="144" y="76" font-size="15">polarization gain</text>
+    <text x="32" y="123" font-size="19" font-weight="bold">Charged tracer pair</text>
+    <text x="32" y="212" font-size="19" font-weight="bold">Chamber scan</text>
   </g>
-  <!-- The recorded-scan coefficients are 1.760 and 1.066 in units of 10⁻⁷ cm³/s. -->
-  <rect x="30" y="202" width="232" height="14" rx="3" fill="#135963"/>
-  <rect x="30" y="255" width="140.5" height="14" rx="3" fill="#ae561d"/>
+  <!-- The common baseline is x=36. One percentage point occupies 6 SVG units. -->
+  <path d="M36 133v36m0 54v36" fill="none" stroke="#72817b" stroke-width="2"/>
+  <path d="M36 154H248.76" fill="none" stroke="#17666d" stroke-width="7"/>
+  <circle cx="248.76" cy="154" r="8" fill="#17666d"/>
+  <path d="M36 244h.386" fill="none" stroke="#985020" stroke-width="7"/>
+  <path d="m36.386 237 7 7-7 7-7-7Z" fill="#985020"/>
+  <g font-family="sans-serif" font-weight="bold" font-size="18">
+    <text x="249" y="139" text-anchor="end" fill="#135661">+35%</text>
+    <text x="51" y="250" fill="#80401e">+0.064%</text>
+  </g>
 </svg>

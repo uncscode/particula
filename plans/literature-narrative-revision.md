@@ -8,7 +8,24 @@ This plan covers the 15 primary studies and one cross-listed validation study in
 
 Completed on `codex/literature-narrative-revision` in the dedicated worktree based on `51e25ee110`. Fifteen studies received narrative edits. A fresh reading of the [Π Chamber haze-and-cloud report](../docs/studies/literature/pi-chamber/haze-and-cloud/index.md) recovered all three distinctions from its existing opening and ending. The report identifies the haze counts used to fit humidity, the independent cloud counts and the proposed near-floor size and deposition measurements. Its wording was retained.
 
-The revised reports place previously separated findings together and link them to their original evidence. The MAM4xx report and its TOC figure now lead with the 28% and 39% reductions in sub-100 nm particle counts in the 24-hour polluted-air comparison. Five reports now show existing quantitative plots alongside the comparison. A new [seed-chemistry graphic](../docs/images/pi-chamber/seed-optical-cutoff.svg) shows the two modeled wet diameters against the instrument cutoff. All 16 reports have an illustrated link in the [collection](../docs/studies/literature/index.md).
+The revised reports place previously separated findings together and link them to their original evidence. The MAM4xx report and its TOC figure use the unmodified archived Brownian calculation as the reference. After 24 hours it retains 3,379 particles cm⁻³ below 100 nm, compared with 2,424 in the extended modal calculation, 1,187 in the sectional model and 1,180 in the particle-resolved model with attraction. The 28% and 39% effects isolate attraction within the extended models. Five reports now show existing quantitative plots alongside the comparison. A new [seed-chemistry graphic](../docs/images/pi-chamber/seed-optical-cutoff.svg) shows the two modeled wet diameters against the instrument cutoff. All 16 reports have an illustrated link in the [collection](../docs/studies/literature/index.md).
+
+## Findings selected after the TOC review
+
+Eight of the other fifteen reports now lead with a different comparison or a more precise statement of its consequence. Each has corresponding TOC artwork.
+
+| Study | What the comparison lets a reader infer |
+| --- | --- |
+| Pinic isomers | Delayed production recovers 19 minutes of the measured 21-minute separation and improves the withheld signal prediction. The chemical pathway remains unresolved. |
+| Mt. Hua | Moving from matched pure-salt controls to one liquid mixture increases the winter foothill growth-factor bias from +0.54 to +0.72 at fixed reconstructed composition. |
+| Sea2Cloud | Earlier arrival of larger particles improves the March 22 spectrum comparison at two-hour exchange. Other exchange times leave the timing less constrained. |
+| NaCl scavenging | Polarization raises capture by 35% for one charged-tracer pairing but by only 0.064% in the simulated scan. The contrast makes charge and size selection consequential. |
+| CLOUD ions | At low production, even turning recombination off gives a ceiling of 394 ions cm⁻³ under the assumed wall loss. The lower plotted bar of the humid measurement is 1,579. |
+| Shear-driven drops | A constant collision rate fitted to mean mass produces about one sixth as many drops at exactly twice the starting radius as the shear model. |
+| BAT activation | The model reverses the measured hygroscopicity ranking of pinic and phthalic acid. The small mean bias across 30 records conceals that reversal. |
+| Spherical wall loss | The additive approximation lowers one-hour survival from 68% to 58% near 1 µm in the reference sphere. Both quantities are predictions. |
+
+Seven reports retain their titles and artwork. The pendant-drop heat budget and dry PSL diameter inversion remain anchored in measurements. The Π Chamber haze study already tests fitted humidity against independent cloud counts. Its seed-chemistry companion compares predicted salt sizes with a known optical cutoff. CCN retrieval tests whether an activation fit transfers to subsaturated water uptake. The citric acid comparison shows that both models overpredict all 12 measured activities. The glyoxal study uses dilution observations withheld from the growth fit to test the direction of the organic response. Where an additional condition qualified one of these findings, it was added to the prose.
 
 ## First revision: reconnect results separated by reproduction instructions
 

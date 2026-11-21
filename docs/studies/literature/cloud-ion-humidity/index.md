@@ -1,14 +1,30 @@
-# Particula predicts half the rise in ion concentration CLOUD measured from 7% to 70% humidity
+# At low ion production, CLOUD’s 70% humidity measurement exceeds the ceiling set by the reported wall loss
 
-![The horizontal axis runs from dry to humid air, and ion concentration per polarity (ions/cm³) increases upward. The measured rise exceeds the model prediction. A beam produces positive and negative ions.](../../../images/cloud-ion-humidity/graphical-abstract.svg)
+![At low ion production and 70% humidity, the wall-loss ceiling of 394 ions per cm³ per polarity lies well below the measured concentration of 1,768 and its scatter bar of 1,579–1,956.](../../../images/cloud-ion-humidity/graphical-abstract.svg)
 
-At 20 °C in the CERN CLOUD chamber, raising relative humidity (RH) from 7% to 70% at nearly the same ion production rate increased the measured concentration by **3,399 ions cm⁻³ per polarity**. A particle-resolved Particula simulation using the published recombination coefficients and a shared wall loss reproduced **1,691 ± 25 ions cm⁻³** of that increase (95% Monte Carlo interval). The strongest constraint comes from a second, low-production measurement. Even if recombination stopped entirely, the weakest reported linear loss would limit the steady humid concentration to 394 ions cm⁻³, while the lower end of the measured scatter bar was 1,579. The low-source comparison leaves the ion source, wall loss and sampling response open. Establishing a physical zero in the humid inlet would test whether a readout offset contributes to the discrepancy. [Franchin et al. (2015), Figure 5d and Table A2](https://acp.copernicus.org/articles/15/7203/2015/acp-15-7203-2015.pdf)
+At 70% relative humidity and 20 °C, Franchin et al. measured **1,768 ions cm⁻³ per polarity** in the CERN CLOUD chamber at a nominal source of 2.64 ion pairs cm⁻³ s⁻¹. Could slower recombination account for so many ions? Even switching recombination off leaves a well-mixed steady population of at most **394 ions cm⁻³** when the lower end of the wall-loss rate reported near 38% humidity is applied to the humid run. The measured scatter bar reached down to **1,579 ions cm⁻³**, four times that ceiling. At high production, humidity-dependent recombination accounts for about half the measured dry-to-humid rise. The low-production result gives a sharper test. With that source and loss, tuning recombination cannot recover the humid count. Independently clearing the humid sampling path would test whether a reading persists when the physical ion concentration is near zero. [Franchin et al., Figure 5d and Table A2](https://acp.copernicus.org/articles/15/7203/2015/acp-15-7203-2015.pdf) · [Digitized steady readings and scatter](https://github.com/uncscode/particula/blob/main/docs/data/cloud-ion-humidity/figure5d.csv)
+
+<a id="particula-predicts-half-the-rise-in-ion-concentration-cloud-measured-from-7-to-70-humidity"></a>
 
 ## How CLOUD measured humidity-dependent ion recombination
 
 Franchin and colleagues varied ion production with a particle beam in a 26.1 m³ chamber. Their spectrometer sampled positive and negative cluster ions. Figure 5d gives the mean concentration of the two signs, averaged over the final 10–15 minutes of each setting. The dry and humid measurements came from separate runs. The authors used these concentrations to estimate how the recombination coefficient varied with humidity. Reusing those coefficients tests how well their fitted rates and a common first-order loss can account for the observed pattern across beam settings. [Experimental method and Figure 5d](https://acp.copernicus.org/articles/15/7203/2015/)
 
 ## How much of the humid ion increase can the fitted rates explain?
+
+### At low production, even zero recombination leaves the predicted ion count too low
+
+Let $q$ be the rate of ion-pair production, $n$ the concentration of each polarity, $\alpha$ the opposite-ion recombination coefficient and $\beta$ the first-order loss rate. In well-mixed air with equal mean concentrations of both signs, the balance is
+
+$$
+\frac{dn}{dt}=q-\alpha n^2-\beta n.
+$$
+
+The authors inferred $\beta=0.0083\pm0.0016$ s⁻¹ near 38% RH and used a common value across runs. Their fitted $\alpha$ falls from $8.1\times10^{-6}$ at 7% RH to $2.0\times10^{-6}$ cm³ s⁻¹ at 70% RH. This weaker recombination in humid air explains the direction of the change. A humidity-independent coefficient would give the same steady concentration at either humidity for the same source and linear loss. [Table A2](https://acp.copernicus.org/articles/15/7203/2015/acp-15-7203-2015.pdf#page=10) · [Authors’ response on the shared loss rate](https://acp.copernicus.org/preprints/15/3667/2015/acpd-15-3667-2015-AR1.pdf)
+
+At steady state every recombination removes ions, so $n\le q/\beta$. At $q=2.64$ and the weakest reported loss, $\beta=0.0067$ s⁻¹, this gives **394 ions cm⁻³**. The lower experimental bar is **1,579**. The same upper bound holds for the mean of unequal polarity concentrations when both share the linear sink. The bound depends on the source, wall loss and whether the inlet represents the chamber mean.
+
+Two further checks show why the source rate and sampling location matter. Tracing the published humid model curve gives an *effective* $\beta$ of 0.00169 s⁻¹ and $\alpha$ of $1.98\times10^{-6}$ cm³ s⁻¹. Those coefficients predict 804 ions cm⁻³ at the low setting, still below the measured bar. In a fitted two-region model with 3.16% of the volume in the beam, the illuminated region could reach 1,731 while the volume mean was 282. Reaching even the lower observed bar would require about 90% of sampled air to come from the enriched region. The authors placed the spectrometer outside the beam trajectory. How much enriched air reached it at each plateau remains unknown. [Franchin et al., apparatus and beam conditions](https://acp.copernicus.org/articles/15/7203/2015/)
 
 ### Five of six measurements at 70% humidity exceed the model’s sensitivity range
 
@@ -29,20 +45,6 @@ Using the humidity-specific coefficients puts **21 of 23 measured concentrations
 ![At high production the 7% measurement and simulated concentration coincide while the 70% reading lies above the simulation. At low production even the lower measurement bar is well above the loss ceiling.](../../../../website/results/cloud-ion-humidity/figure-3-1.png)
 
 The measured bars describe scatter in the steady readings. The simulation intervals describe sampling across independent boxes at fixed physical inputs. The two high-source simulations use 68 ion pairs cm⁻³ s⁻¹. Their independent standard errors add in quadrature for the humidity contrast. [Runnable matched-condition and clearing comparisons](cloud_ion_humidity.py)
-
-### At low production, even zero recombination leaves the predicted ion count too low
-
-Let $q$ be the rate of ion-pair production, $n$ the concentration of each polarity, $\alpha$ the opposite-ion recombination coefficient and $\beta$ the first-order loss rate. In well-mixed air with equal mean concentrations of both signs, the balance is
-
-$$
-\frac{dn}{dt}=q-\alpha n^2-\beta n.
-$$
-
-The authors inferred $\beta=0.0083\pm0.0016$ s⁻¹ near 38% RH and used a common value across runs. Their fitted $\alpha$ falls from $8.1\times10^{-6}$ at 7% RH to $2.0\times10^{-6}$ cm³ s⁻¹ at 70% RH. This weaker recombination in humid air explains the direction of the change. A humidity-independent coefficient would give the same steady concentration at either humidity for the same source and linear loss. [Table A2](https://acp.copernicus.org/articles/15/7203/2015/acp-15-7203-2015.pdf#page=10) · [Authors’ response on the shared loss rate](https://acp.copernicus.org/preprints/15/3667/2015/acpd-15-3667-2015-AR1.pdf)
-
-At steady state every recombination removes ions, so $n\le q/\beta$. At $q=2.64$ and the weakest reported loss, $\beta=0.0067$ s⁻¹, this gives **394 ions cm⁻³**. The lower experimental bar is **1,579**. The same upper bound holds for the mean of unequal polarity concentrations when both share the linear sink. The bound depends on the source, wall loss and whether the inlet represents the chamber mean.
-
-Two further checks narrow the interpretation. Tracing the published humid model curve gives an *effective* $\beta$ of 0.00169 s⁻¹ and $\alpha$ of $1.98\times10^{-6}$ cm³ s⁻¹. Those coefficients predict 804 ions cm⁻³ at the low setting, still below the measured bar. In a fitted two-region model with 3.16% of the volume in the beam, the illuminated region could reach 1,731 while the volume mean was 282. Reaching even the lower observed bar would require about 90% of sampled air to come from the enriched region. The authors placed the spectrometer outside the beam trajectory. How much enriched air reached it at each plateau remains unknown. [Franchin et al., apparatus and beam conditions](https://acp.copernicus.org/articles/15/7203/2015/)
 
 ### Two models can fit the same humid signal
 

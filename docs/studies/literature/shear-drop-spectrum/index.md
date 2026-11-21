@@ -1,10 +1,10 @@
-# Particula reproduces Saffman and Turner’s prediction for the number of large drops
+# Fitting mean drop mass with a constant collision rate leaves a sixfold shortfall in counts at twice the starting radius
 
-![Schematic eddies bring two cloud droplets into contact. For drops with eight times their starting mass, shear theory gives 614 per million, Particula gives 610 and a constant rate fitted to mean mass gives 102.](../../../images/shear-drop-spectrum/graphical-abstract.svg)
+<a id="particula-reproduces-saffman-and-turners-prediction-for-the-number-of-large-drops"></a>
 
-*All three bars are model predictions. The shear-theory bar comes from an independent integration of Saffman and Turner’s equations. The eddies illustrate the assumed turbulent flow.*
+![Schematic eddies bring cloud droplets together above two bars. For drops of exactly twice the starting radius, size-dependent shear gives about six times the count from a constant rate fitted to the same mean mass.](../../../images/shear-drop-spectrum/graphical-abstract.svg)
 
-Saffman and Turner (1956) asked how quickly turbulent air could produce large drops in a cloud that started with identical droplets. Their model lets larger drops encounter other drops faster. At the final time in Figure 2, Particula produced **610 drops of exactly eight times the initial mass per million starting drops**. Integrating the authors’ equations independently gave **614**. Reading the authors’ plotted marker gives approximately 675, with some uncertainty in locating the center of the printed point. Giving every pair the same collision rate and fitting that rate to the final mean mass gave only **102**. Matching mean growth therefore leaves a sixfold shortfall in this mass class. The comparison tests a calculation of cloud growth against theory. Testing its accuracy in real clouds requires measured drop counts. [Saffman and Turner, equations 1–3 and Figure 2](https://authors.library.caltech.edu/records/mvczm-fey53)
+In a modeled cloud that starts with identical drops, fitting the mean drop mass can miss the size distribution that produced it. At about 133 minutes, size-dependent turbulent shear in Particula gave **610 drops of exactly twice the starting radius per million initial drops**. Fitting a constant pair collision rate to the same final mean mass gave **102**. The sixfold ratio had a 95% sampling interval of 5.49–6.57. Saffman and Turner originally calculated how turbulence broadens the drop spectrum. Independently integrating their shear equations gave 614 in this mass class, compared with about 675 read from their printed Figure 2. All of these counts are predictions. A chamber test would need enough sampled air to detect the rare large drops. [Saffman and Turner, equations 1–3 and Figure 2](https://authors.library.caltech.edu/records/mvczm-fey53)
 
 ## How drop size enters the collision rate
 
@@ -44,7 +44,7 @@ The ratio of the CUDA shear result to the fitted constant-rate result is **6.00*
 
 ### A small sample can miss the large drops
 
-At $K=0.09$, just **141 of 1,024** simulated 0.427 mL boxes (13.8%) contained an exact eightfold drop. Increasing the volume to **1.71 mL** raised the fraction to **363 of 768** (47.3%). The corresponding pooled abundances were similar at **595 and 610 per million initial drops**. Earlier, at $K=0.03$, only one of the 768 larger boxes contained a drop in this class.
+At $K=0.09$, just **141 of 1,024** simulated 0.427 mL boxes (13.8%) contained an exact eightfold drop. Increasing the volume to **1.71 mL** raised the fraction to **363 of 768** (47.3%). The pooled abundances were similar at **595 and 610 per million initial drops**. Fitting the constant rate to each volume’s own mean mass gave 100 and 102 per million, respectively. The sixfold difference persisted even though the chance of seeing one of these drops in a single sample changed substantially. Earlier, at $K=0.03$, only one of the 768 larger boxes contained a drop in this class.
 
 The authors also estimated roughly **100 drops/L** at two different times and minimum masses. These are cumulative counts. At 90 minutes every drop at or above eight times the initial mass contributes, including drops that have outgrown the exact eightfold class. The shear simulations reproduced the scale of both estimates. [Authors’ physical-time estimates, p. 24](https://authors.library.caltech.edu/records/mvczm-fey53)
 
@@ -55,7 +55,7 @@ The authors also estimated roughly **100 drops/L** at two different times and mi
 
 ## What would test this in a cloud chamber?
 
-Measure the initial size distribution, the large drops already present, turbulent dissipation and the probe’s sampling volume. Fit a constant rate using only the total number of drops. Then compare the withheld count at or above twice the initial radius at 90 minutes with both predictions. Calibrate detection near that radius and repeat across independent samples. Initial size spread, gravitational settling, spatial mixing and imperfect coalescence could all alter the measured tail. The reported intervals describe simulation sampling under the stated assumptions.
+At the same final mean mass, the two collision laws predict different numbers of large drops in the idealized cloud. To test that distinction in a chamber, measure the initial size distribution, any large drops already present, turbulent dissipation and the probe’s sampling volume. Fit a constant rate using only the total number of drops. Then compare the withheld count at or above twice the initial radius at 90 minutes with both predictions. Calibrate detection near that radius and repeat across independent samples. Initial size spread, gravitational settling, spatial mixing and imperfect coalescence could all alter the measured tail. The reported intervals describe simulation sampling under the stated assumptions.
 
 ## Reproduce the comparison
 

@@ -1,27 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in"
- height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
-<title id="title">March 22 aboard Tangaroa, 12–25 nm particles</title>
-<desc id="desc">On a common linear scale the ship measurements fall from
-45 to 7 per cubic centimetre. A model in which 16 nm particles arrive
-with a fitted small-particle pulse starts near 6 and rises above 34.</desc>
-<rect width="300" height="300" rx="12" fill="#f5f4ea"/>
-<g fill="#17363b"><path d="M23 42h67l-10 12H32z M35 31h21v11H35z
- M52 22h14v20H52z M65 33h12v9H65z M58 13h3v10h-3z"/>
-<path d="M19 59q9 5 18 0q9 5 18 0q9 5 18 0q9 5 18 0" fill="none"
- stroke="#42696d" stroke-width="2.5"/></g>
-<g font-family="sans-serif" fill="#17363b">
-<text x="109" y="37" font-size="23" font-weight="bold">12–25 nm</text>
-<text x="110" y="57" font-size="13">March 22 · cm⁻³</text>
-<path d="M48 88v147h225" fill="none" stroke="#9ba8a2" stroke-width="1"/>
-<g font-size="12"><text x="25" y="94">50</text><text x="34" y="239">0</text>
-<text x="48" y="254">06:00</text>
-<text x="273" y="254" text-anchor="end">07:30 UTC</text></g>
-<polyline points="48.00,217.95 55.50,211.45 63.00,203.40 70.50,194.00 78.00,183.65 85.50,172.91 93.00,162.43 100.50,152.86 108.00,144.70 115.50,138.30 123.00,133.76 130.50,131.00 138.00,129.78 145.50,129.78 153.00,130.69 160.50,132.22 168.00,134.13 175.50,136.25 183.00,138.46 190.50,140.71 198.00,142.94 205.50,145.13 213.00,147.28 220.50,149.38 228.00,151.43 235.50,153.43 243.00,155.38 250.50,157.29 258.00,159.14 265.50,160.95 273.00,162.72" fill="none" stroke="#ab492b"
- stroke-width="4" stroke-dasharray="7 4"/>
-<polyline points="48.00,102.30 123.00,152.92 198.00,192.96 273.00,213.48" fill="none" stroke="#17363b" stroke-width="2"/>
-<g fill="#17363b"><circle cx="48.00" cy="102.30" r="5"/><circle cx="123.00" cy="152.92" r="5"/><circle cx="198.00" cy="192.96" r="5"/><circle cx="273.00" cy="213.48" r="5"/></g>
-<circle cx="42" cy="278" r="4"/><text x="54" y="282" font-size="14">Ship</text>
-<path d="M132 278h25" stroke="#ab492b" stroke-width="4"
- stroke-dasharray="7 4"/>
-<text x="165" y="282" font-size="14">Shared pulse</text>
-</g></svg>
+  height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Earlier arrival improves the next Sea2Cloud count</title>
+  <desc id="desc">At 06:30 UTC the ship observed 28 particles/cm³ at
+  12–25 nm. The two-hour exchange model predicts 300
+  for simultaneous arrival and 36 when the larger particles arrive
+  one hour earlier. Both amplitudes were fitted at 06:00.</desc>
+  <rect width="300" height="300" rx="12" fill="#f5f4ea"/>
+  <g fill="#17363b">
+    <path d="M21 39h61l-9 10H31z M36 30h15v9H36z M54 24h10v15H54z
+      M57 16h3v8h-3z"/>
+    <path d="M20 56q8 4 16 0t16 0t16 0t16 0" fill="none"
+      stroke="#42696d" stroke-width="2.5"/>
+  </g>
+  <g fill="#17363b" font-family="sans-serif">
+    <text x="100" y="40" font-size="22" font-weight="bold">12–25 nm</text>
+    <text x="101" y="62" font-size="15">06:30 UTC · cm⁻³</text>
+    <g font-size="18">
+      <text x="25" y="104">Ship</text>
+      <text x="25" y="171">Simultaneous</text>
+      <text x="25" y="238">One hour earlier</text>
+    </g>
+    <path d="M25 111v154" stroke="#b7b5a9" stroke-width="1.5"/>
+    <rect x="25" y="116"
+      width="18.16" height="13" fill="#263e43"/>
+    <rect x="25" y="183"
+      width="195.00" height="13" fill="#a4532c"/>
+    <rect x="25" y="250"
+      width="23.12" height="13" fill="#166c71"/>
+    <g font-weight="bold" font-size="18">
+      <text x="52.16" y="130">28</text>
+      <text x="229.00" y="197">300</text>
+      <text x="57.12" y="264">36</text>
+    </g>
+  </g>
+</svg>

@@ -45,7 +45,9 @@ The last row tests the diameter scaling of critical supersaturation within this 
 
 ## A humidified diameter would test the activation fit
 
-For this organic, cloud activation alone gives little leverage to choose between the fitted κ and BAT over 50–200 nm. A paired measurement of critical supersaturation and humidified diameter at 100 nm dry size would test both observables. Keeping the organic mass fixed, or measuring any change in it, would make the 95% RH diameter informative about the water-activity model. An optical scan alone would also require a calibrated size threshold and exposure time.
+For this organic, cloud activation alone gives little leverage to choose between the fitted κ and BAT over 50–200 nm. For the 100 nm particle the fitted κ predicts excess water at all three tested humidities. Its condensed water volume exceeds BAT by 39% at 90% RH, 49% at 95% RH and 23% at 99% RH. [Modeled growth across humidities](https://github.com/uncscode/particula/blob/main/docs/data/thermodynamics/ccn-retrieval/bat-kappa-growth.csv)
+
+A paired measurement of critical supersaturation and humidified diameter at 100 nm dry size would test both observables. Keeping the organic mass fixed, or measuring any change in it, would make the 95% RH diameter informative about the water-activity model. An optical scan alone would also require a calibrated size threshold and exposure time.
 
 ## Reproduce the figures and tables
 

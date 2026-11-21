@@ -1,8 +1,10 @@
-# Neutral salt pairings overpredict growth for 72 of 79 Mt. Hua inorganic extracts
+# Liquid salt mixing widens the winter foothill growth-factor bias at Mt. Hua from +0.54 to +0.72
 
-![Schematic of the observed and larger predicted humidified particles above Mt. Hua.](../../../../images/mt-hua-salts/graphical-abstract.svg)
+![For the winter foothill extracts, mean predicted minus measured growth factor increases from +0.292 with literature pure salts to +0.542 with AIOMFAC pure salts and +0.716 with the full AIOMFAC liquid mixture.](../../../../images/mt-hua-salts/graphical-abstract.svg)
 
-At 90% relative humidity, 100 nm particles made from Mt. Hua inorganic extracts grew less than even the least hygroscopic neutral salt pairing allowed by the model in **72 of 79** reconstructable samples. Wang et al.’s summer summit mean bias was reproduced, but the same calculation overpredicted winter foothill growth by much more than the authors reported. Would allowing ions to interact in one liquid phase reduce that discrepancy? At the winter foothill, changing the pure-salt reference raised the mean diameter growth-factor bias from **+0.292 to +0.542**. Mixing those salts in one liquid raised it again, to **+0.716**. These comparisons hold the reconstructed dry inventory fixed. They point to dry volume and the fraction of salt actually in solution as quantities worth recovering. [Preprint, methods and Figure 8](https://doi.org/10.5194/egusphere-2026-6766) · [Sample residuals](../../../../../website/public/study-data/mt-hua/sample-growth.csv)
+Would interactions among dissolved salts bring the predicted water uptake of Mt. Hua aerosol closer to the measurements? Wang et al. measured humidified diameters of 100 nm dry particles made from inorganic extracts. For 18 winter foothill samples at 90% relative humidity, adding the volumes of water taken up by the pure salts gives a mean growth-factor bias of **+0.292** using literature inputs. Switching to AIOMFAC pure-salt inputs raises the bias to **+0.542**. Allowing those same ions to mix in one liquid raises it again, to **+0.716**. The positive bias means the predicted wet particles are too large. The mixing step increases mean bias in all four site and season groups. This comparison holds the reconstructed neutral inventory fixed, making dry volume and the fraction actually dissolved priorities for an independent measurement. [Wang et al., Figure 8](https://doi.org/10.5194/egusphere-2026-6766) · [Paired sample residuals](../../../../../website/public/study-data/mt-hua/sample-growth.csv)
+
+<a id="neutral-salt-pairings-overpredict-growth-for-72-of-79-mt-hua-inorganic-extracts"></a>
 
 ## How water uptake varied between the summit and foothill
 
@@ -43,20 +45,20 @@ Seven of the 79 expanded reconstructions enclose the measured growth factor. For
 
 | Site and season | Samples | ZSR, literature pure-salt inputs | ZSR, AIOMFAC pure-salt inputs | Full AIOMFAC mixture | Full minus AIOMFAC-pure ZSR |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Summit, summer | 21 | +0.217 | +0.418 | +0.539 | +0.121 |
+| Summit, summer | 21 | +0.217 | +0.418 | +0.539 | +0.122 |
 | Summit, winter | 18 | +0.361 | +0.668 | +0.848 | +0.180 |
 | Foothill, summer | 22 | +0.228 | +0.484 | +0.610 | +0.126 |
-| Foothill, winter | 18 | +0.292 | +0.542 | +0.716 | +0.174 |
+| Foothill, winter | 18 | +0.292 | +0.542 | +0.716 | +0.173 |
 
 ![Growth-factor comparisons across four site and season groups show the winter foothill bias increasing from the literature pure-salt reconstruction to the AIOMFAC pure-salt and full-mixture calculations.](../../../../../website/results/mixture-activity/figure-2-1.png)
 
-The first three result columns are mean predicted minus measured diameter growth factors. Applying the same volume-additive ZSR equation to the 15 AIOMFAC pure-salt controls separates the change of pure-salt reference from the additional effect of mixing. At the winter foothill the two changes are about +0.250 and +0.174. The +0.289 bias in the earlier comparison used a volume-weighted κ before solving for growth. The +0.292 value applies Equation 5 directly to the pure growth factors.
+The first three result columns are mean predicted minus measured diameter growth factors. Applying the same volume-additive ZSR equation to the 15 AIOMFAC pure-salt controls separates the change of pure-salt reference from the additional effect of mixing. At the winter foothill the two changes are +0.250 and +0.173. The +0.289 bias in the earlier comparison used a volume-weighted κ before solving for growth. The +0.292 value applies Equation 5 directly to the pure growth factors.
 
 We submitted the same proportionally charge-balanced dry mass inventory used above, including divalent-ion stoichiometry. All 94 compositions have 33 web calculations at 298.15 K over water-to-dry mass ratios of 0.35–30. The downloadable inputs preserve each form submission, the server’s input and output text, the version (**AIOMFAC-web 3.15**) and flags. Particula interpolates water activity linearly in log mass ratio, adds water volume at 997 kg m⁻³ to the same anhydrous dry volume, and solves the Kelvin-corrected equilibrium for the same 100 nm dry diameter and 90% RH. Every composition brackets one increasing equilibrium crossing with unflagged endpoints. Halving the table resolution changes sample growth factors by less than 0.017. CPU root finding independently reproduces the GPU values. A separate web submission at 15% NaCl by mass gives water activity 0.891330, reproduced by interpolation within 0.001. The saved output includes the activities, sample identifiers, measured growth, both paired residuals and interpolation sensitivity. [AIOMFAC-web conventions](https://www.aiomfac.lab.mcgill.ca/help.html)
 
 ## Recover the dry volumes and dissolved calcium and sulfate
 
-The authors’ sample-specific salt volumes and pure-salt growth factors would allow their Figure 8 to be replayed with the same inputs. The matched pure-salt controls show why this matters. At the winter foothill, changing the reference accounts for +0.250 of the bias before ion mixing adds another +0.174. The full mixture assumes that even sparingly soluble calcium sulfate remains dissolved. Independent measurements of dry volume, counterion balance and the dissolved calcium and sulfate fractions would constrain the inventory and phase state that both calculations assume. [Original Figure 8 and supplement](https://egusphere.copernicus.org/preprints/2026/egusphere-2026-6766/)
+The authors’ sample-specific salt volumes and pure-salt growth factors would allow their Figure 8 to be replayed with the same inputs. The matched pure-salt controls show why this matters. At the winter foothill, changing the pure-salt reference adds +0.250 to the mean growth-factor bias. Mixing the same ions in a single liquid adds a further +0.173. All four site and season means move toward greater overprediction, though the change varies by extract. The full mixture assumes that even sparingly soluble calcium sulfate remains dissolved. Independent measurements of dry volume, counterion balance and the dissolved calcium and sulfate fractions would constrain the inventory and phase state that both calculations assume. [Original Figure 8 and supplement](https://egusphere.copernicus.org/preprints/2026/egusphere-2026-6766/)
 
 ## Reproduce the comparison
 
