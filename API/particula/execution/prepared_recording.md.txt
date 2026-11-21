@@ -18,7 +18,7 @@ The runner never changes the prepared timestep, capture plan or RNG schedule.
 _REDUCED = {'number_density': 'number_concentration', 'particle_mass_density': 'particle_mass_concentration', 'gas_concentration': 'gas_concentration', 'temperature': 'temperature', 'pressure': 'pressure', 'volume': 'volume'}
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L15-L22)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L21-L28)
 
 ## particula.execution.prepared_recording.PreparedObserver
 
@@ -37,7 +37,7 @@ slot variables require download='snapshot'. Returned history is detached.
 Existing captured *replay* may be observed between steps; running this host
 workflow inside an active CUDA capture is rejected before any transfer.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L59-L153)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L65-L159)
 
 ### particula.execution.prepared_recording.PreparedObserver._metadata
 
@@ -47,7 +47,7 @@ workflow inside an active CUDA capture is rejected before any transfer.
 _metadata = probe.metadata
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L102-L102)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L108-L108)
 
 ### particula.execution.prepared_recording.PreparedObserver._writer
 
@@ -57,7 +57,7 @@ _metadata = probe.metadata
 _writer = recorder if isinstance(recorder, AnalysisWriter) else None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L72-L74)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L78-L80)
 
 ### particula.execution.prepared_recording.PreparedObserver.initial_snapshot_downloads
 
@@ -67,7 +67,7 @@ _writer = recorder if isinstance(recorder, AnalysisWriter) else None
 initial_snapshot_downloads = 1
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L109-L109)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L115-L115)
 
 ### particula.execution.prepared_recording.PreparedObserver.observation_downloads
 
@@ -77,7 +77,7 @@ initial_snapshot_downloads = 1
 observation_downloads = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L93-L93)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L99-L99)
 
 ### particula.execution.prepared_recording.PreparedObserver.__init__
 
@@ -89,7 +89,7 @@ def __init__(simulation, recorder, *, download)
 
 Validate the observation profile before the initial full download.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L70-L109)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L76-L115)
 
 ### particula.execution.prepared_recording.PreparedObserver._flush
 
@@ -99,7 +99,7 @@ Validate the observation profile before the initial full download.
 def _flush()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L151-L153)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L157-L159)
 
 ### particula.execution.prepared_recording.PreparedObserver.record
 
@@ -111,7 +111,7 @@ def record()
 
 Synchronize and append one complete-step observation, if new.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L111-L149)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L117-L155)
 
 ## particula.execution.prepared_recording._index
 
@@ -121,7 +121,7 @@ Synchronize and append one complete-step observation, if new.
 def _index(simulation, time)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L46-L56)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L52-L62)
 
 ## particula.execution.prepared_recording._ready
 
@@ -131,7 +131,7 @@ def _index(simulation, time)
 def _ready(simulation)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L25-L34)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L31-L40)
 
 ## particula.execution.prepared_recording._time
 
@@ -141,14 +141,14 @@ def _ready(simulation)
 def _time(simulation)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L37-L43)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L43-L49)
 
 ## particula.execution.prepared_recording.run_prepared
 
 *function*
 
 ```python
-def run_prepared(simulation, end_time, *, output_times=(), observer=None)
+def run_prepared(simulation, end_time, *, output_times=(), observer=None, optics=None, optical_output_times=None, optical_initial=False)
 ```
 
 Run complete fixed steps and explicitly observe the requested grid.
@@ -159,5 +159,7 @@ initial_time + integer_step * dt, including the final row; decimal inputs
 within floating-point roundoff of that grid are admitted. No interpolation,
 shortened step, automatic capture or checkpoint is performed. The final
 synchronize surfaces asynchronous failures even without an observer.
+An OpticalObserver uses its own schedule. By default it records every
+accepted step, plus the starting state if optical_initial is true.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L156-L204)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L162-L230)

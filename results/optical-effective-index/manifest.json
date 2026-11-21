@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 12.750635641161352,
+  "package_source_sha256": "117c7cedc76e0d804de46ba94ae1150a537220dda2e11d90ead91bca4ad9bdc9",
+  "scientific_source_sha256": "d81f24c089841be36f85f9a1093a346c64b48d2c6ac4bbb83e3f0bb75f196797",
+  "input_sha256": {
+    "docs/data/optical-retrieval/suchdol.json": "15cf6516cd014d295f8ec98f607f04b59771e9ce819eed6be7e380e51d563492"
+  },
+  "example": "optical-effective-index",
+  "fingerprint": "44e0b1fad670c3f10371ea534e584f40c900d5e47c25a26dda1422291bc06ff4",
+  "source": "docs/studies/validation/material-properties/optical-retrieval/infer_refractive_index.py",
+  "revision": "9bd9309bd1b08f9570e37fd0dd5f8775c8a1a3b2",
+  "package_dirty": false,
+  "executed_at": "2026-11-21T17:59:33.194775+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     /tmp/particula-optics-warp\nModule particula.optics.gpu.retrieval bab5b3f load on device 'cuda:0' took 0.79 ms  (cached)\nModule particula.optics.gpu.inverse 3ffa894 load on device 'cuda:0' took 0.44 ms  (cached)\nModule particula.optics.gpu.mie 36c0414 load on device 'cuda:0' took 0.73 ms  (cached)\nModule particula.optics.gpu.derivatives a7a1782 load on device 'cuda:0' took 0.47 ms  (cached)\n"
+      },
+      {
+        "text": "2022-11-15T00:00:00Z Dry\u2013wet\u2013dry RH (%) [30.4 84.9 30.8]\nFitted n, k, \u03ba [1.733 0.116 0.07 ]\nCalibration sensitivity [1.624 0.096 0.062] to [1.876 0.117 0.081]\n2023-08-08T12:00:00Z Dry\u2013wet\u2013dry RH (%) [21.5 84.1 25.7]\nFitted n, k, \u03ba [1.794 0.058 0.137]\nCalibration sensitivity [1.679 0.05  0.12 ] to [1.979 0.068 0.16 ]\n"
+      },
+      {
+        "image": "figure-6-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-6-1.png": "5e0eecbc0446d1a1c048d2e4ced457cabf7746aa0fd8cbb1a81b5029baba4e17",
+    "executed_source.py": "1f28803297777f70e220a183a00a19061d466467a5d977d754e70fd880074434",
+    "data.json": "3f7b0caad2a8788946f584d1e8573026a1067e65f532dd0bbb0c0c770e8a86e8",
+    "source.py": "e0e0a09d5512dbefa9b50243caa0619c71abd708b9aee8b0cd40d8643fc86e44"
+  },
+  "simulation_fingerprint": "b177f6c078a03d73ee918d779e86c09c37cf77b21a9c75b9443bbc40ffbcd6e8",
+  "render_versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {
+    "docs/data/optical-retrieval/suchdol.json": "15cf6516cd014d295f8ec98f607f04b59771e9ce819eed6be7e380e51d563492"
+  },
+  "rendered_at": "2026-11-21T18:32:39.106952+00:00",
+  "render_revision": "ac35dc61a5e9b5f8f666e6e1b710d3c92d624353",
+  "render_elapsed_seconds": 4.108696768060327
+}

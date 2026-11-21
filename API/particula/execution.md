@@ -3601,7 +3601,9 @@ invalid.
 - `particula.execution.gpu_session`
 - `particula.execution.graph_capture`
 - `particula.execution.inverse_condensation`
+- `particula.execution.inverse_optics`
 - `particula.execution.ode`
+- `particula.execution.optical_recording`
 - `particula.execution.particle_field_kernels`
 - `particula.execution.preparation_context`
 - `particula.execution.prepared`

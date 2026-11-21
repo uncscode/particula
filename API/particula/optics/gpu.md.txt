@@ -440,6 +440,10 @@ are reported by check after enqueue, without host input readback.
 - `particula.optics.gpu.bulk`
 - `particula.optics.gpu.column`
 - `particula.optics.gpu.cross_sections`
+- `particula.optics.gpu.derivatives`
+- `particula.optics.gpu.inverse`
 - `particula.optics.gpu.mie`
 - `particula.optics.gpu.population`
+- `particula.optics.gpu.retrieval`
+- `particula.optics.gpu.state`
 - `particula.optics.gpu.workspace`

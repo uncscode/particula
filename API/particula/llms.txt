@@ -5312,6 +5312,8 @@ helpers remain concrete-only.
 - `particula.dynamics.dilution`
 - `particula.dynamics.ions`
 - `particula.dynamics.nucleation`
+- `particula.dynamics.optical_heating`
+- `particula.dynamics.optical_heating_gpu`
 - `particula.dynamics.particle_process`
 - `particula.dynamics.properties`
 - `particula.dynamics.wall_loss`
@@ -39499,6 +39501,1247 @@ Validate alignment and return particle-lane source mass.
 
 ---
 
+# particula.dynamics.optical_heating
+
+*module*
+
+Optically thin heating and one-way water evaporation of wet spheres.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L1-L1)
+
+## particula.dynamics.optical_heating._HEAT_CHANNELS
+
+*attribute* · *module attribute*
+
+```python
+_HEAT_CHANNELS = ('absorbed', 'conduction', 'radiation', 'latent', 'sensible')
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L15-L15)
+
+## particula.dynamics.optical_heating._MAX_K
+
+*attribute* · *module attribute*
+
+```python
+_MAX_K = 373.15
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L17-L17)
+
+## particula.dynamics.optical_heating._MIN_K
+
+*attribute* · *module attribute*
+
+```python
+_MIN_K = 273.15
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L16-L16)
+
+## particula.dynamics.optical_heating._WATER
+
+*attribute* · *module attribute*
+
+```python
+_WATER = WaterBuckStrategy()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L18-L18)
+
+## particula.dynamics.optical_heating.HeatingPhysics
+
+*class* · *dataclass*
+
+```python
+class HeatingPhysics
+```
+
+Prescribed continuum transport and liquid-solution properties.
+
+Conductivity is W/(m K), water diffusivity is m²/s, specific heat
+capacities are J/(kg K), latent heat is J/kg, and radiation_temperature
+is K. Kappa and grey infrared emissivity are dimensionless.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L21-L57)
+
+### particula.dynamics.optical_heating.HeatingPhysics.conductivity
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+conductivity: float = 0.026
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L31-L31)
+
+### particula.dynamics.optical_heating.HeatingPhysics.diffusivity
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+diffusivity: float = 2.5e-05
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L32-L32)
+
+### particula.dynamics.optical_heating.HeatingPhysics.emissivity
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+emissivity: float = 0.95
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L36-L36)
+
+### particula.dynamics.optical_heating.HeatingPhysics.kappa
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+kappa: float = 0.3
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L30-L30)
+
+### particula.dynamics.optical_heating.HeatingPhysics.latent_heat
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+latent_heat: float = 2440000.0
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L35-L35)
+
+### particula.dynamics.optical_heating.HeatingPhysics.radiation_temperature
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+radiation_temperature: float = 298.15
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L37-L37)
+
+### particula.dynamics.optical_heating.HeatingPhysics.solute_heat_capacity
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+solute_heat_capacity: float = 1500.0
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L34-L34)
+
+### particula.dynamics.optical_heating.HeatingPhysics.water_heat_capacity
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+water_heat_capacity: float = 4180.0
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L33-L33)
+
+### particula.dynamics.optical_heating.HeatingPhysics.__init__
+
+*method*
+
+```python
+def __init__(kappa: float = 0.3, conductivity: float = 0.026, diffusivity: float = 2.5e-05, water_heat_capacity: float = 4180.0, solute_heat_capacity: float = 1500.0, latent_heat: float = 2440000.0, emissivity: float = 0.95, radiation_temperature: float = 298.15) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L0-L0)
+
+### particula.dynamics.optical_heating.HeatingPhysics.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Validate physical constants before evaluating a temperature root.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L39-L57)
+
+## particula.dynamics.optical_heating.OpticalHeating
+
+*class*
+
+```python
+class OpticalHeating(BoxProcess)
+```
+
+Bases: `particula.box_process.BoxProcess`
+
+Heat a particle-resolved water/solute population with irradiance.
+
+The irradiances are band-integrated W/m², one value per configured
+wavelength. Absorption is recomputed from live wet sizes and composition
+at the start of the process. Use attach_fields() before preparing the
+sequence. Each box exchanges heat with its fixed-temperature gas and a
+grey radiation bath. Evaporated water enters the named gas species.
+
+The liquid, spherical continuum model neglects curvature in the vapor
+balance. Its transport coefficients are prescribed. Complete optical
+heat exchange and mass loss are implicit in particle temperature.
+Geometry, irradiance, heat capacity and surrounding gas are evaluated
+at the beginning of each cycle.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L129-L333)
+
+### particula.dynamics.optical_heating.OpticalHeating._namespace
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+_namespace = 'optical_heating'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L145-L145)
+
+### particula.dynamics.optical_heating.OpticalHeating.energy_fields
+
+*attribute* · *instance attribute*
+
+```python
+energy_fields = tuple(({name}.{key}_energy for key in _HEAT_CHANNELS))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L184-L186)
+
+### particula.dynamics.optical_heating.OpticalHeating.gas_water
+
+*attribute* · *instance attribute*
+
+```python
+gas_water = gas_water
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L180-L180)
+
+### particula.dynamics.optical_heating.OpticalHeating.irradiance
+
+*attribute* · *instance attribute*
+
+```python
+irradiance = tuple((float(value) for value in flux))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L179-L179)
+
+### particula.dynamics.optical_heating.OpticalHeating.optics
+
+*attribute* · *instance attribute*
+
+```python
+optics = optics
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L160-L160)
+
+### particula.dynamics.optical_heating.OpticalHeating.physics
+
+*attribute* · *instance attribute*
+
+```python
+physics = HeatingPhysics() if physics is None else physics
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L161-L161)
+
+### particula.dynamics.optical_heating.OpticalHeating.power_field
+
+*attribute* · *instance attribute*
+
+```python
+power_field = {name}.absorbed_power
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L183-L183)
+
+### particula.dynamics.optical_heating.OpticalHeating.temperature_field
+
+*attribute* · *instance attribute*
+
+```python
+temperature_field = {name}.temperature
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L182-L182)
+
+### particula.dynamics.optical_heating.OpticalHeating.water_material
+
+*attribute* · *instance attribute*
+
+```python
+water_material = water_material
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L181-L181)
+
+### particula.dynamics.optical_heating.OpticalHeating.extension_id
+
+*attribute* · *instance attribute*
+
+```python
+extension_id = extension_id or name
+```
+
+Inherited from: `particula.box_process.BoxProcess`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/box_process.py#L100-L100)
+
+### particula.dynamics.optical_heating.OpticalHeating.name
+
+*attribute* · *instance attribute*
+
+```python
+name = name
+```
+
+Inherited from: `particula.box_process.BoxProcess`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/box_process.py#L95-L95)
+
+### particula.dynamics.optical_heating.OpticalHeating.parameters
+
+*attribute* · *instance attribute*
+
+```python
+parameters = parameters
+```
+
+Inherited from: `particula.box_process.BoxProcess`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/box_process.py#L105-L105)
+
+### particula.dynamics.optical_heating.OpticalHeating.reads
+
+*attribute* · *instance attribute*
+
+```python
+reads = tuple(reads)
+```
+
+Inherited from: `particula.box_process.BoxProcess`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/box_process.py#L96-L96)
+
+### particula.dynamics.optical_heating.OpticalHeating.representations
+
+*attribute* · *instance attribute*
+
+```python
+representations = tuple(representations)
+```
+
+Inherited from: `particula.box_process.BoxProcess`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/box_process.py#L99-L99)
+
+### particula.dynamics.optical_heating.OpticalHeating.stochastic
+
+*attribute* · *instance attribute*
+
+```python
+stochastic = stochastic
+```
+
+Inherited from: `particula.box_process.BoxProcess`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/box_process.py#L98-L98)
+
+### particula.dynamics.optical_heating.OpticalHeating.version
+
+*attribute* · *instance attribute*
+
+```python
+version = version
+```
+
+Inherited from: `particula.box_process.BoxProcess`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/box_process.py#L106-L106)
+
+### particula.dynamics.optical_heating.OpticalHeating.writes
+
+*attribute* · *instance attribute*
+
+```python
+writes = tuple(writes)
+```
+
+Inherited from: `particula.box_process.BoxProcess`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/box_process.py#L97-L97)
+
+### particula.dynamics.optical_heating.OpticalHeating.__init__
+
+*method*
+
+```python
+def __init__(optics, irradiance, *, gas_water, water_material=0, physics=None, name='optical_heating')
+```
+
+Bind optical forcing, liquid material index and gas species name.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L147-L210)
+
+### particula.dynamics.optical_heating.OpticalHeating._specs
+
+*method*
+
+```python
+def _specs()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L222-L229)
+
+### particula.dynamics.optical_heating.OpticalHeating._validate_representation
+
+*method*
+
+```python
+def _validate_representation(aerosol)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L231-L235)
+
+### particula.dynamics.optical_heating.OpticalHeating.advance
+
+*method*
+
+```python
+def advance(aerosol, *, time, time_step, context)
+```
+
+Advance one box and add represented water and energy inventories.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L286-L333)
+
+### particula.dynamics.optical_heating.OpticalHeating.attach_fields
+
+*method*
+
+```python
+def attach_fields(aerosol)
+```
+
+Register diagnostic and thermal state on the initial aerosol.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L237-L244)
+
+### particula.dynamics.optical_heating.OpticalHeating.configuration
+
+*method*
+
+```python
+def configuration()
+```
+
+Return the parameters retained in exact process identity.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L212-L220)
+
+### particula.dynamics.optical_heating.OpticalHeating.validate
+
+*method*
+
+```python
+def validate(aerosol)
+```
+
+Require resolved slots, two materials and mapped vapor.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L246-L284)
+
+### particula.dynamics.optical_heating.OpticalHeating.execute
+
+*method*
+
+```python
+def execute(aerosol, time_step, sub_steps=1, *, context=None, time=0.0)
+```
+
+Inherited from: `particula.box_process.BoxProcess`
+
+Publish a successful process substep atomically across boxes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/box_process.py#L115-L186)
+
+### particula.dynamics.optical_heating.OpticalHeating.__or__
+
+*method*
+
+```python
+def __or__(other: RunnableABC) -> RunnableSequence
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Chain this Runnable with another using the '|' operator.
+
+This method enables an easy way to sequence processes, so they
+can be executed in a defined order.
+
+**Parameters**
+
+- `other` (`RunnableABC`) — Another Runnable to append after this one.
+
+**Returns**
+
+- (`RunnableSequence`) — A sequence containing both processes.
+
+**Examples**
+
+```py title="Chaining two processes"
+combined_process = process1 | process2
+final_aerosol = combined_process.execute(aerosol, time_step=1.0)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L272-L293)
+
+### particula.dynamics.optical_heating.OpticalHeating._advance_box
+
+*method*
+
+```python
+def _advance_box(aerosol, time_step)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Dispatch one staged interval through the native extension seam.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L171-L173)
+
+### particula.dynamics.optical_heating.OpticalHeating._box_worker
+
+*method*
+
+```python
+def _box_worker(box, boxes, transaction)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Create isolated hook state for a single box.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L159-L161)
+
+### particula.dynamics.optical_heating.OpticalHeating._execute_box
+
+*method*
+
+```python
+def _execute_box(aerosol, time_step, sub_steps=1)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Execute the single-box numerical building block.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L175-L177)
+
+### particula.dynamics.optical_heating.OpticalHeating._is_stochastic
+
+*method*
+
+```python
+def _is_stochastic(aerosol)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Report whether this process requires independent box streams.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L155-L157)
+
+### particula.dynamics.optical_heating.OpticalHeating._prepare_commit
+
+*method*
+
+```python
+def _prepare_commit(workers, uses_context)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Prepare a non-failing diagnostics publisher before numeric writes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L163-L165)
+
+### particula.dynamics.optical_heating.OpticalHeating._rate_box
+
+*method*
+
+```python
+def _rate_box(aerosol)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Evaluate the single-box numerical building block.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L167-L169)
+
+### particula.dynamics.optical_heating.OpticalHeating._validate_batch
+
+*method*
+
+```python
+def _validate_batch(aerosol)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Validate process-wide controls before staging boxes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L148-L149)
+
+### particula.dynamics.optical_heating.OpticalHeating._writer_fields
+
+*method*
+
+```python
+def _writer_fields(aerosol)
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Declare numeric destinations for transactional publication.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L151-L153)
+
+### particula.dynamics.optical_heating.OpticalHeating.prepare
+
+*method*
+
+```python
+def prepare(aerosol: Aerosol, *, time_step: float, backend: Backend | None = None, device: str = 'cuda:0', root_seed: int = 0, logical_box_ids=None, process_registry=None, coagulation_work_config=None, coagulation_subcycling=None, time: float = 0.0) -> PreparedSimulation
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Upload native state once and prepare supported resident GPU physics.
+
+**Parameters**
+
+- `aerosol` (`Aerosol`) — Initial native particle, gas and environment state.
+- `time_step` (`float`) — Fixed duration of each complete process cycle [s].
+- `backend` (`Backend | None`) (default: `None`) — Backend.WARP by default; CPU execution uses execute().
+- `device` (`str`) (default: `'cuda:0'`) — Explicit Warp device, default CUDA device zero.
+- `root_seed` (`int`) (default: `0`) — Root seed for persistent independent process/box streams.
+- `logical_box_ids` (default: `None`) — Optional stable identities in physical box order.
+- `process_registry` (default: `None`) — Exact-type custom GPU adapter registrations.
+- `coagulation_work_config` (default: `None`) — Optional coagulation resource budgets.
+- `coagulation_subcycling` (default: `None`) — Optional bounded adaptive policy.
+- `time` (`float`) (default: `0.0`) — Absolute initial simulation time [s].
+
+**Returns**
+
+- (`PreparedSimulation`) — An owned PreparedSimulation. Use its context manager or close().
+- (`PreparedSimulation`) — snapshot() returns detached CPU state for analysis and plotting.
+
+**Raises**
+
+- `ValueError` — If process physics or state cannot be represented.
+- `RuntimeError` — If the requested runtime/device is unavailable.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L179-L230)
+
+### particula.dynamics.optical_heating.OpticalHeating.rate
+
+*method*
+
+```python
+def rate(aerosol: Aerosol) -> Any
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Evaluate detached box hooks and retain a leading box axis.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L72-L87)
+
+### particula.dynamics.optical_heating.OpticalHeating.resume
+
+*method*
+
+```python
+def resume(checkpoint: SimulationCheckpoint, *, backend: Backend | None = None, device: str | None = None, process_registry=None, retry_subcycling=None) -> PreparedSimulation
+```
+
+Inherited from: `particula.runnable.RunnableABC`
+
+Resume exact saved state using the same process configuration.
+
+**Parameters**
+
+- `checkpoint` (`SimulationCheckpoint`) — SimulationCheckpoint from a prepared owner.
+- `backend` (`Backend | None`) (default: `None`) — Backend.WARP by default.
+- `device` (`str | None`) (default: `None`) — Exact checkpoint device by default; migration rejects.
+- `process_registry` (default: `None`) — Compatible caller-supplied GPU implementations.
+- `retry_subcycling` (default: `None`) — Explicitly relax a saved adaptive coagulation policy while retaining the outer timestep and random streams.
+
+**Returns**
+
+- (`PreparedSimulation`) — A new owner preserving state, RNG words, timestep and counters.
+- (`PreparedSimulation`) — Capture is explicit again; native graph handles are never restored.
+
+**Raises**
+
+- `ValueError` — If configuration, order, schema or device differs, or
+current population cannot be admitted (e.g. unequal Brownian
+counts after a later process injected new particles).
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/runnable.py#L232-L270)
+
+## particula.dynamics.optical_heating.heating_step
+
+*function*
+
+```python
+def heating_step(radius, water, solute, activity, absorbed, old_temperature, ambient, vapor, water_molar_mass, dt, physics)
+```
+
+Solve one frozen-radius energy balance with conservative mass loss.
+
+Returns new temperature [K], water transferred to gas [kg per particle],
+and one energy amount [J per particle] for each heating ledger.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L60-L126)
+
+---
+
+# particula.dynamics.optical_heating_gpu
+
+*module*
+
+Resident optical heating using staged particle and box inventories.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L1-L1)
+
+## particula.dynamics.optical_heating_gpu._FOUR
+
+*attribute* · *module attribute*
+
+```python
+_FOUR = wp.constant(wp.float64(4.0))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L35-L35)
+
+## particula.dynamics.optical_heating_gpu._MAX
+
+*attribute* · *module attribute*
+
+```python
+_MAX = wp.constant(wp.float64(_MAX_K))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L30-L30)
+
+## particula.dynamics.optical_heating_gpu._MIN
+
+*attribute* · *module attribute*
+
+```python
+_MIN = wp.constant(wp.float64(_MIN_K))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L29-L29)
+
+## particula.dynamics.optical_heating_gpu._PI
+
+*attribute* · *module attribute*
+
+```python
+_PI = wp.constant(wp.float64(pi))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L28-L28)
+
+## particula.dynamics.optical_heating_gpu._R
+
+*attribute* · *module attribute*
+
+```python
+_R = wp.constant(wp.float64(GAS_CONSTANT))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L32-L32)
+
+## particula.dynamics.optical_heating_gpu._SIGMA
+
+*attribute* · *module attribute*
+
+```python
+_SIGMA = wp.constant(wp.float64(Stefan_Boltzmann))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L31-L31)
+
+## particula.dynamics.optical_heating_gpu._TWO
+
+*attribute* · *module attribute*
+
+```python
+_TWO = wp.constant(wp.float64(2.0))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L34-L34)
+
+## particula.dynamics.optical_heating_gpu._ZERO
+
+*attribute* · *module attribute*
+
+```python
+_ZERO = wp.constant(wp.float64(0.0))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L33-L33)
+
+## particula.dynamics.optical_heating_gpu.OpticalHeatingAdapter
+
+*class* · *dataclass*
+
+```python
+class OpticalHeatingAdapter
+```
+
+Bind optical heating to Warp with bounded coefficient-series scratch.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L343-L514)
+
+### particula.dynamics.optical_heating_gpu.OpticalHeatingAdapter.coefficient_capacity
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+coefficient_capacity: int = 512
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L347-L347)
+
+### particula.dynamics.optical_heating_gpu.OpticalHeatingAdapter.particle_tile
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+particle_tile: int = 128
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L348-L348)
+
+### particula.dynamics.optical_heating_gpu.OpticalHeatingAdapter.__init__
+
+*method*
+
+```python
+def __init__(coefficient_capacity: int = 512, particle_tile: int = 128) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L0-L0)
+
+### particula.dynamics.optical_heating_gpu.OpticalHeatingAdapter.plan
+
+*method*
+
+```python
+def plan(process, aerosol)
+```
+
+Validate process identity, native fields and workspace limits.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L350-L382)
+
+### particula.dynamics.optical_heating_gpu.OpticalHeatingAdapter.prepare
+
+*method*
+
+```python
+def prepare(plan, context)
+```
+
+Retain an optical workspace, then stage and commit on its stream.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L384-L514)
+
+## particula.dynamics.optical_heating_gpu._Balance
+
+*class*
+
+```python
+class _Balance
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L59-L71)
+
+### particula.dynamics.optical_heating_gpu._Balance.conduction
+
+*attribute* · *instance attribute*
+
+```python
+conduction: wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L67-L67)
+
+### particula.dynamics.optical_heating_gpu._Balance.emission
+
+*attribute* · *instance attribute*
+
+```python
+emission: wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L68-L68)
+
+### particula.dynamics.optical_heating_gpu._Balance.gas_temperature
+
+*attribute* · *instance attribute*
+
+```python
+gas_temperature: wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L71-L71)
+
+### particula.dynamics.optical_heating_gpu._Balance.gas_vapor
+
+*attribute* · *instance attribute*
+
+```python
+gas_vapor: wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L63-L63)
+
+### particula.dynamics.optical_heating_gpu._Balance.heat_capacity
+
+*attribute* · *instance attribute*
+
+```python
+heat_capacity: wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L66-L66)
+
+### particula.dynamics.optical_heating_gpu._Balance.latent_heat
+
+*attribute* · *instance attribute*
+
+```python
+latent_heat: wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L65-L65)
+
+### particula.dynamics.optical_heating_gpu._Balance.old_temperature
+
+*attribute* · *instance attribute*
+
+```python
+old_temperature: wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L70-L70)
+
+### particula.dynamics.optical_heating_gpu._Balance.radiative_background
+
+*attribute* · *instance attribute*
+
+```python
+radiative_background: wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L69-L69)
+
+### particula.dynamics.optical_heating_gpu._Balance.saturation_to_density
+
+*attribute* · *instance attribute*
+
+```python
+saturation_to_density: wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L62-L62)
+
+### particula.dynamics.optical_heating_gpu._Balance.transfer
+
+*attribute* · *instance attribute*
+
+```python
+transfer: wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L64-L64)
+
+### particula.dynamics.optical_heating_gpu._Balance.water
+
+*attribute* · *instance attribute*
+
+```python
+water: wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L61-L61)
+
+## particula.dynamics.optical_heating_gpu._BoxEnergy
+
+*class*
+
+```python
+class _BoxEnergy
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L50-L56)
+
+### particula.dynamics.optical_heating_gpu._BoxEnergy.absorbed
+
+*attribute* · *instance attribute*
+
+```python
+absorbed: wp.array(dtype=wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L52-L52)
+
+### particula.dynamics.optical_heating_gpu._BoxEnergy.conduction
+
+*attribute* · *instance attribute*
+
+```python
+conduction: wp.array(dtype=wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L53-L53)
+
+### particula.dynamics.optical_heating_gpu._BoxEnergy.latent
+
+*attribute* · *instance attribute*
+
+```python
+latent: wp.array(dtype=wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L55-L55)
+
+### particula.dynamics.optical_heating_gpu._BoxEnergy.radiation
+
+*attribute* · *instance attribute*
+
+```python
+radiation: wp.array(dtype=wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L54-L54)
+
+### particula.dynamics.optical_heating_gpu._BoxEnergy.sensible
+
+*attribute* · *instance attribute*
+
+```python
+sensible: wp.array(dtype=wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L56-L56)
+
+## particula.dynamics.optical_heating_gpu._Settings
+
+*class*
+
+```python
+class _Settings
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L38-L47)
+
+### particula.dynamics.optical_heating_gpu._Settings.conductivity
+
+*attribute* · *instance attribute*
+
+```python
+conductivity: wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L41-L41)
+
+### particula.dynamics.optical_heating_gpu._Settings.cp_solute
+
+*attribute* · *instance attribute*
+
+```python
+cp_solute: wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L44-L44)
+
+### particula.dynamics.optical_heating_gpu._Settings.cp_water
+
+*attribute* · *instance attribute*
+
+```python
+cp_water: wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L43-L43)
+
+### particula.dynamics.optical_heating_gpu._Settings.diffusivity
+
+*attribute* · *instance attribute*
+
+```python
+diffusivity: wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L42-L42)
+
+### particula.dynamics.optical_heating_gpu._Settings.emissivity
+
+*attribute* · *instance attribute*
+
+```python
+emissivity: wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L46-L46)
+
+### particula.dynamics.optical_heating_gpu._Settings.kappa
+
+*attribute* · *instance attribute*
+
+```python
+kappa: wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L40-L40)
+
+### particula.dynamics.optical_heating_gpu._Settings.latent
+
+*attribute* · *instance attribute*
+
+```python
+latent: wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L45-L45)
+
+### particula.dynamics.optical_heating_gpu._Settings.radiation_temperature
+
+*attribute* · *instance attribute*
+
+```python
+radiation_temperature: wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L47-L47)
+
+## particula.dynamics.optical_heating_gpu._absorbed_power
+
+*function*
+
+```python
+def _absorbed_power(box: int, slot: int, n_slots: int, cross_area: wp.float64, irradiance: wp.array(dtype=wp.float64), efficiencies: wp.array2d(dtype=wp.float64), optical_status: wp.array(dtype=wp.int32)) -> wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L107-L124)
+
+## particula.dynamics.optical_heating_gpu._fourth
+
+*function*
+
+```python
+def _fourth(value: wp.float64) -> wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L74-L77)
+
+## particula.dynamics.optical_heating_gpu._optical_config
+
+*function*
+
+```python
+def _optical_config(metadata)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L330-L340)
+
+## particula.dynamics.optical_heating_gpu._publish
+
+*function*
+
+```python
+def _publish(particles: WarpParticleData, gas: wp.array2d(dtype=wp.float64), temperature: wp.array2d(dtype=wp.float64), power: wp.array2d(dtype=wp.float64), ledger: _BoxEnergy, particle_water: int, gas_water: int, proposed: wp.array3d(dtype=wp.float64), next_box: wp.array2d(dtype=wp.float64), failure: wp.array(dtype=wp.int32))
+```
+
+Commit both phases and the energy ledger after a successful batch.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L299-L327)
+
+## particula.dynamics.optical_heating_gpu._stage_box
+
+*function*
+
+```python
+def _stage_box(particles: WarpParticleData, gas: wp.array2d(dtype=wp.float64), ledger: _BoxEnergy, weights: wp.array2d(dtype=wp.float64), waves: int, particle_water: int, gas_water: int, proposed: wp.array3d(dtype=wp.float64), next_box: wp.array2d(dtype=wp.float64), failure: wp.array(dtype=wp.int32))
+```
+
+Form extensive changes in a fixed order before publishing any box.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L241-L296)
+
+## particula.dynamics.optical_heating_gpu._stage_particle
+
+*function*
+
+```python
+def _stage_particle(particles: WarpParticleData, gas: wp.array2d(dtype=wp.float64), molar_mass: wp.array(dtype=wp.float64), ambient: wp.array(dtype=wp.float64), temperature: wp.array2d(dtype=wp.float64), settings: _Settings, particle_water: int, gas_water: int, dt: wp.float64, irradiance: wp.array(dtype=wp.float64), radii: wp.array2d(dtype=wp.float64), efficiencies: wp.array2d(dtype=wp.float64), optical_status: wp.array(dtype=wp.int32), proposed: wp.array3d(dtype=wp.float64), failure: wp.array(dtype=wp.int32))
+```
+
+Propose each active particle's temperature, transfer and energies.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L146-L238)
+
+## particula.dynamics.optical_heating_gpu._sum4
+
+*function*
+
+```python
+def _sum4(x: wp.vec4d) -> wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L102-L104)
+
+## particula.dynamics.optical_heating_gpu._temperature_root
+
+*function*
+
+```python
+def _temperature_root(balance: _Balance, absorbed: wp.float64) -> wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L127-L143)
+
+## particula.dynamics.optical_heating_gpu._terms
+
+*function*
+
+```python
+def _terms(temperature: wp.float64, balance: _Balance)
+```
+
+Evaluate step energies and the evaporation proposal at temperature.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating_gpu.py#L80-L99)
+
+---
+
 # particula.dynamics.particle_process
 
 *module*
@@ -53202,7 +54445,9 @@ invalid.
 - `particula.execution.gpu_session`
 - `particula.execution.graph_capture`
 - `particula.execution.inverse_condensation`
+- `particula.execution.inverse_optics`
 - `particula.execution.ode`
+- `particula.execution.optical_recording`
 - `particula.execution.particle_field_kernels`
 - `particula.execution.preparation_context`
 - `particula.execution.prepared`
@@ -60471,7 +61716,7 @@ def cpu_process_identity(process)
 
 Retain native configuration without imposing GPU capability limits.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L140-L154)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L140-L155)
 
 ---
 
@@ -75865,6 +77110,16 @@ def _mass_from_radius(radius: FloatMatrix, factor: wp.float64, mass: FloatMatrix
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_condensation.py#L25-L33)
 
+## particula.execution.inverse_condensation._mass_step
+
+*function*
+
+```python
+def _mass_step(initial, current, counts, vapor, transport, empty, launch)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_condensation.py#L154-L167)
+
 ## particula.execution.inverse_condensation._observe
 
 *function*
@@ -75900,7 +77155,278 @@ vapor (kg/m³) has one entry per box. Density is kg/m³, molecular mean
 free path is m, diffusivity is m²/s and duration is seconds. An optional
 adjoint gives one terminal observation weight per component.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_condensation.py#L154-L257)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_condensation.py#L170-L259)
+
+---
+
+# particula.execution.inverse_optics
+
+*module*
+
+Bulk optical losses for the smooth closed-condensation inverse model.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L1-L1)
+
+## particula.execution.inverse_optics._OpticalGrowth
+
+*class*
+
+```python
+class _OpticalGrowth
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L74-L146)
+
+### particula.execution.inverse_optics._OpticalGrowth.count
+
+*attribute* · *instance attribute*
+
+```python
+count = self.upload(numbers)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L86-L86)
+
+### particula.execution.inverse_optics._OpticalGrowth.density
+
+*attribute* · *instance attribute*
+
+```python
+density = self.upload(np.repeat(numbers, wave.size, axis=0))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L97-L97)
+
+### particula.execution.inverse_optics._OpticalGrowth.device
+
+*attribute* · *instance attribute*
+
+```python
+device = device
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L78-L78)
+
+### particula.execution.inverse_optics._OpticalGrowth.grad
+
+*attribute* · *instance attribute*
+
+```python
+grad = grad
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L79-L79)
+
+### particula.execution.inverse_optics._OpticalGrowth.grid
+
+*attribute* · *instance attribute*
+
+```python
+grid = (len(radii) * wave.size, radii.shape[1])
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L87-L87)
+
+### particula.execution.inverse_optics._OpticalGrowth.index
+
+*attribute* · *instance attribute*
+
+```python
+index = wp.array(np.ascontiguousarray(np.stack((indices.real, indices.imag), axis=-1).reshape((*self.grid, 2))), dtype=wp.vec2d, device=device)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L88-L96)
+
+### particula.execution.inverse_optics._OpticalGrowth.initial
+
+*attribute* · *instance attribute*
+
+```python
+initial = self.empty(radii.shape)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L84-L84)
+
+### particula.execution.inverse_optics._OpticalGrowth.mie
+
+*attribute* · *instance attribute*
+
+```python
+mie = BulkOpticsAdjoint(self.grid, np.tile(wave, len(radii)), device=device)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L98-L100)
+
+### particula.execution.inverse_optics._OpticalGrowth.output_shape
+
+*attribute* · *instance attribute*
+
+```python
+output_shape = (radii.shape[0], wave.size, 3)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L82-L82)
+
+### particula.execution.inverse_optics._OpticalGrowth.radius
+
+*attribute* · *instance attribute*
+
+```python
+radius = self.upload(radii, grad=grad)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L83-L83)
+
+### particula.execution.inverse_optics._OpticalGrowth.transport
+
+*attribute* · *instance attribute*
+
+```python
+transport = transport
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L80-L80)
+
+### particula.execution.inverse_optics._OpticalGrowth.water
+
+*attribute* · *instance attribute*
+
+```python
+water = self.upload(vapor)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L85-L85)
+
+### particula.execution.inverse_optics._OpticalGrowth.waves
+
+*attribute* · *instance attribute*
+
+```python
+waves = wave.size
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L81-L81)
+
+### particula.execution.inverse_optics._OpticalGrowth.__init__
+
+*method*
+
+```python
+def __init__(radii, numbers, vapor, wave, indices, transport, grad, device)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L75-L100)
+
+### particula.execution.inverse_optics._OpticalGrowth.empty
+
+*method*
+
+```python
+def empty(shape)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L107-L113)
+
+### particula.execution.inverse_optics._OpticalGrowth.initialize
+
+*method*
+
+```python
+def initialize()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L118-L123)
+
+### particula.execution.inverse_optics._OpticalGrowth.launch
+
+*method*
+
+```python
+def launch(kernel, dim, args)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L115-L116)
+
+### particula.execution.inverse_optics._OpticalGrowth.observe
+
+*method*
+
+```python
+def observe(mass, tape=None)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L125-L132)
+
+### particula.execution.inverse_optics._OpticalGrowth.segment
+
+*method*
+
+```python
+def segment(mass, start, end, visit)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L134-L146)
+
+### particula.execution.inverse_optics._OpticalGrowth.upload
+
+*method*
+
+```python
+def upload(data, *, grad=False)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L102-L105)
+
+## particula.execution.inverse_optics._observation_inputs
+
+*function*
+
+```python
+def _observation_inputs(observation_steps, wavelength, index, steps, shape, adjoint)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L31-L71)
+
+## particula.execution.inverse_optics._optical_radii
+
+*function*
+
+```python
+def _optical_radii(mass: FloatMatrix, coefficient: wp.float64, waves: int, output: FloatMatrix)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L17-L28)
+
+## particula.execution.inverse_optics._reverse
+
+*function*
+
+```python
+def _reverse(model, adjoint, initial_tape, first, checkpoints, selection)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L238-L262)
+
+## particula.execution.inverse_optics.condensation_optics
+
+*function*
+
+```python
+def condensation_optics(initial_um, number_density, vapor, *, wavelength, refractive_index, observation_steps, density, mean_path, diffusivity, duration, steps, device='cuda:0', adjoint=None, segment_steps=None)
+```
+
+Evaluate a closed-box bulk optical trajectory and optional initial VJP.
+
+Physics inputs and fixed-step restrictions match terminal_radius().
+Wavelengths [m] are shared across boxes. Absolute refractive indices
+broadcast to (box, wavelength, slot) and stay prescribed. Outputs
+are in m⁻¹ on (observation, box, wavelength, channel), with channels
+extinction, scattering and absorption in that order. Supply optical
+adjoint weights in the same layout for a gradient per initial radius
+measured in micrometres. The reverse pass replays checkpoint segments
+and uses bounded Mie scratch at each optical observation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_optics.py#L149-L235)
 
 ---
 
@@ -76422,6 +77948,349 @@ def _readonly(value)
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/ode.py#L59-L62)
+
+---
+
+# particula.execution.optical_recording
+
+*module*
+
+Bounded optical histories independent of aerosol snapshots.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L1-L1)
+
+## particula.execution.optical_recording._CHANNELS
+
+*attribute* · *module attribute*
+
+```python
+_CHANNELS = PopulationOptics._fields
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L15-L15)
+
+## particula.execution.optical_recording._DEFAULT
+
+*attribute* · *module attribute*
+
+```python
+_DEFAULT = ('extinction', 'scattering', 'absorption', 'single_scattering_albedo', 'asymmetry', 'extinction_valid', 'scattering_valid')
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L16-L24)
+
+## particula.execution.optical_recording.OpticalHistory
+
+*class*
+
+```python
+class OpticalHistory
+```
+
+Append and read atomic optical chunks in a SQLite file.
+
+Every chunk has time [s] and bulk arrays with axes (time, box, wavelength).
+Coefficients are in inverse metres. Albedo and asymmetry are dimensionless
+and accompanied by validity masks. One writer owns the observation buffer.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L46-L188)
+
+### particula.execution.optical_recording.OpticalHistory._last_time
+
+*attribute* · *instance attribute*
+
+```python
+_last_time = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L77-L77)
+
+### particula.execution.optical_recording.OpticalHistory._provenance
+
+*attribute* · *instance attribute*
+
+```python
+_provenance = json.dumps(provenance or {}, sort_keys=True, allow_nan=False)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L74-L76)
+
+### particula.execution.optical_recording.OpticalHistory.config
+
+*attribute* · *instance attribute*
+
+```python
+config = config
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L72-L72)
+
+### particula.execution.optical_recording.OpticalHistory.path
+
+*attribute* · *instance attribute*
+
+```python
+path = Path(path)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L71-L71)
+
+### particula.execution.optical_recording.OpticalHistory.variables
+
+*attribute* · *instance attribute*
+
+```python
+variables = _channels(variables)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L73-L73)
+
+### particula.execution.optical_recording.OpticalHistory.water_vapor
+
+*attribute* · *instance attribute*
+
+```python
+water_vapor = water_vapor
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L70-L70)
+
+### particula.execution.optical_recording.OpticalHistory.last_time
+
+*property*
+
+```python
+last_time
+```
+
+Time of the last committed row, or None for an empty history.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L80-L82)
+
+### particula.execution.optical_recording.OpticalHistory.__init__
+
+*method*
+
+```python
+def __init__(path, config, *, variables=_DEFAULT, provenance=None, water_vapor=None)
+```
+
+Configure output; a named water gas enables box RH observations.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L54-L77)
+
+### particula.execution.optical_recording.OpticalHistory._bind
+
+*method*
+
+```python
+def _bind(boxes, distribution)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L93-L148)
+
+### particula.execution.optical_recording.OpticalHistory._water_lane
+
+*method*
+
+```python
+def _water_lane(gas_names)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L84-L91)
+
+### particula.execution.optical_recording.OpticalHistory._write
+
+*method*
+
+```python
+def _write(times, values, humidity)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L150-L188)
+
+## particula.execution.optical_recording.OpticalObserver
+
+*class*
+
+```python
+class OpticalObserver
+```
+
+Bind a bulk optical history to a CPU or fixed-step Warp owner.
+
+Use run_until or run_prepared with optics=observer, or call record()
+at chosen accepted states and flush() before closing the owner.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L231-L355)
+
+### particula.execution.optical_recording.OpticalObserver._batch_size
+
+*attribute* · *instance attribute*
+
+```python
+_batch_size = index(batch_size)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L260-L260)
+
+### particula.execution.optical_recording.OpticalObserver._cpu_humidity
+
+*attribute* · *instance attribute*
+
+```python
+_cpu_humidity = []
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L265-L265)
+
+### particula.execution.optical_recording.OpticalObserver._cpu_rows
+
+*attribute* · *instance attribute*
+
+```python
+_cpu_rows = []
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L264-L264)
+
+### particula.execution.optical_recording.OpticalObserver._device_batch
+
+*attribute* · *instance attribute*
+
+```python
+_device_batch = DeviceOpticalBatch(simulation, history.config, self._batch_size, particle_tile, coefficient_capacity, water_lane=water_lane)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L285-L292)
+
+### particula.execution.optical_recording.OpticalObserver._times
+
+*attribute* · *instance attribute*
+
+```python
+_times = []
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L263-L263)
+
+### particula.execution.optical_recording.OpticalObserver._water_lane
+
+*attribute* · *instance attribute*
+
+```python
+_water_lane = history._water_lane(simulation._state.gas.name)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L269-L269)
+
+### particula.execution.optical_recording.OpticalObserver.history
+
+*attribute* · *instance attribute*
+
+```python
+history = history
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L259-L259)
+
+### particula.execution.optical_recording.OpticalObserver.simulation
+
+*attribute* · *instance attribute*
+
+```python
+simulation = simulation
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L258-L258)
+
+### particula.execution.optical_recording.OpticalObserver.__init__
+
+*method*
+
+```python
+def __init__(simulation, history, *, batch_size=32, particle_tile=256, coefficient_capacity=10090)
+```
+
+Allocate bounded observation storage for this owner.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L238-L297)
+
+### particula.execution.optical_recording.OpticalObserver._check_start
+
+*method*
+
+```python
+def _check_start(time)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L299-L303)
+
+### particula.execution.optical_recording.OpticalObserver._publish
+
+*method*
+
+```python
+def _publish(values, humidity)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L351-L355)
+
+### particula.execution.optical_recording.OpticalObserver._record
+
+*method*
+
+```python
+def _record(time)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L316-L336)
+
+### particula.execution.optical_recording.OpticalObserver.flush
+
+*method*
+
+```python
+def flush()
+```
+
+Publish all buffered rows once every row has passed validation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L338-L349)
+
+### particula.execution.optical_recording.OpticalObserver.record
+
+*method*
+
+```python
+def record()
+```
+
+Evaluate live state and skip duplicate continuation times.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L305-L314)
+
+## particula.execution.optical_recording._channels
+
+*function*
+
+```python
+def _channels(variables)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L27-L43)
+
+## particula.execution.optical_recording.read_optical_history
+
+*function*
+
+```python
+def read_optical_history(path)
+```
+
+Yield metadata and arrays for each committed chunk.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/optical_recording.py#L191-L228)
 
 ---
 
@@ -78647,7 +80516,7 @@ The runner never changes the prepared timestep, capture plan or RNG schedule.
 _REDUCED = {'number_density': 'number_concentration', 'particle_mass_density': 'particle_mass_concentration', 'gas_concentration': 'gas_concentration', 'temperature': 'temperature', 'pressure': 'pressure', 'volume': 'volume'}
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L15-L22)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L21-L28)
 
 ## particula.execution.prepared_recording.PreparedObserver
 
@@ -78666,7 +80535,7 @@ slot variables require download='snapshot'. Returned history is detached.
 Existing captured *replay* may be observed between steps; running this host
 workflow inside an active CUDA capture is rejected before any transfer.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L59-L153)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L65-L159)
 
 ### particula.execution.prepared_recording.PreparedObserver._metadata
 
@@ -78676,7 +80545,7 @@ workflow inside an active CUDA capture is rejected before any transfer.
 _metadata = probe.metadata
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L102-L102)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L108-L108)
 
 ### particula.execution.prepared_recording.PreparedObserver._writer
 
@@ -78686,7 +80555,7 @@ _metadata = probe.metadata
 _writer = recorder if isinstance(recorder, AnalysisWriter) else None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L72-L74)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L78-L80)
 
 ### particula.execution.prepared_recording.PreparedObserver.initial_snapshot_downloads
 
@@ -78696,7 +80565,7 @@ _writer = recorder if isinstance(recorder, AnalysisWriter) else None
 initial_snapshot_downloads = 1
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L109-L109)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L115-L115)
 
 ### particula.execution.prepared_recording.PreparedObserver.observation_downloads
 
@@ -78706,7 +80575,7 @@ initial_snapshot_downloads = 1
 observation_downloads = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L93-L93)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L99-L99)
 
 ### particula.execution.prepared_recording.PreparedObserver.__init__
 
@@ -78718,7 +80587,7 @@ def __init__(simulation, recorder, *, download)
 
 Validate the observation profile before the initial full download.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L70-L109)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L76-L115)
 
 ### particula.execution.prepared_recording.PreparedObserver._flush
 
@@ -78728,7 +80597,7 @@ Validate the observation profile before the initial full download.
 def _flush()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L151-L153)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L157-L159)
 
 ### particula.execution.prepared_recording.PreparedObserver.record
 
@@ -78740,7 +80609,7 @@ def record()
 
 Synchronize and append one complete-step observation, if new.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L111-L149)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L117-L155)
 
 ## particula.execution.prepared_recording._index
 
@@ -78750,7 +80619,7 @@ Synchronize and append one complete-step observation, if new.
 def _index(simulation, time)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L46-L56)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L52-L62)
 
 ## particula.execution.prepared_recording._ready
 
@@ -78760,7 +80629,7 @@ def _index(simulation, time)
 def _ready(simulation)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L25-L34)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L31-L40)
 
 ## particula.execution.prepared_recording._time
 
@@ -78770,14 +80639,14 @@ def _ready(simulation)
 def _time(simulation)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L37-L43)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L43-L49)
 
 ## particula.execution.prepared_recording.run_prepared
 
 *function*
 
 ```python
-def run_prepared(simulation, end_time, *, output_times=(), observer=None)
+def run_prepared(simulation, end_time, *, output_times=(), observer=None, optics=None, optical_output_times=None, optical_initial=False)
 ```
 
 Run complete fixed steps and explicitly observe the requested grid.
@@ -78788,8 +80657,10 @@ initial_time + integer_step * dt, including the final row; decimal inputs
 within floating-point roundoff of that grid are admitted. No interpolation,
 shortened step, automatic capture or checkpoint is performed. The final
 synchronize surfaces asynchronous failures even without an observer.
+An OpticalObserver uses its own schedule. By default it records every
+accepted step, plus the starting state if optical_initial is true.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L156-L204)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L162-L230)
 
 ---
 
@@ -81664,24 +83535,44 @@ changes require a new recorder; widths do not imply species order.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L95-L151)
 
+## particula.execution.recording._observation_times
+
+*function*
+
+```python
+def _observation_times(output_times, end_time)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L194-L206)
+
+## particula.execution.recording._optical_schedule
+
+*function*
+
+```python
+def _optical_schedule(simulation, observer, times, initial, start, end)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L209-L225)
+
 ## particula.execution.recording.run_until
 
 *function*
 
 ```python
-def run_until(simulation, end_time, *, output_times=(), recorder=None)
+def run_until(simulation, end_time, *, output_times=(), recorder=None, optics=None, optical_output_times=None, optical_initial=False)
 ```
 
 Advance an owner and observe requested times plus final time.
 
-The owner supplies time, step(bound), and detached snapshot(). Every output
-is at a complete accepted step. Resumed calls skip older output requests and
-Recorder prevents duplicates at the joining time. Adaptive GPU observation
-explicitly downloads a full accepted snapshot at each requested output.
-Fixed prepared owners instead use run_prepared and PreparedObserver, which
-define their grid admission and explicit reduced/full download profiles.
+The owner supplies time, step(bound), and detached snapshot(). Each output
+is at a complete accepted step. With an OpticalObserver, the default optical
+schedule observes every accepted step without taking snapshots. Explicit
+optical_output_times may shorten CPU steps to reach those times. Set
+optical_initial=True to observe the starting state on the dense schedule.
+Fixed prepared owners instead use run_prepared.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L194-L235)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L228-L282)
 
 ---
 
@@ -119006,6 +120897,101 @@ scattering_valid: NDArray[np.bool_]
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L48-L48)
 
+## particula.optics.OpticalConfig
+
+*class* · *dataclass*
+
+```python
+class OpticalConfig
+```
+
+Re-exported from: `particula.optics.state`
+
+Prescribed optical inputs for homogeneous spheres.
+
+Wavelengths are ordered vacuum wavelengths [m]. Supply an absolute
+particle index (scalar or per wavelength), or a species index table
+(wavelength, material) in native particle-material order. Medium index
+is real, positive and constant across the spectrum.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L50-L142)
+
+### particula.optics.OpticalConfig.medium_index
+
+*attribute* · *instance attribute*
+
+```python
+medium_index: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L61-L61)
+
+### particula.optics.OpticalConfig.particle_index
+
+*attribute* · *instance attribute*
+
+```python
+particle_index: tuple[complex, ...] | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L62-L62)
+
+### particula.optics.OpticalConfig.species_index
+
+*attribute* · *instance attribute*
+
+```python
+species_index: tuple[tuple[complex, ...], ...] | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L63-L63)
+
+### particula.optics.OpticalConfig.wavelength
+
+*attribute* · *instance attribute*
+
+```python
+wavelength: tuple[float, ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L60-L60)
+
+### particula.optics.OpticalConfig.__init__
+
+*method*
+
+```python
+def __init__(wavelength, *, particle_index=None, species_index=None, medium_index=1.0)
+```
+
+Validate and freeze wavelengths and the chosen index model.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L65-L116)
+
+### particula.optics.OpticalConfig.metadata
+
+*method*
+
+```python
+def metadata()
+```
+
+Return JSON-compatible optical inputs.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L126-L142)
+
+### particula.optics.OpticalConfig.validate_materials
+
+*method*
+
+```python
+def validate_materials(materials)
+```
+
+Check the species table against the native material axis.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L118-L124)
+
 ## particula.optics.OpticalCrossSections
 
 *class*
@@ -119655,6 +121641,55 @@ Calculate S1 and S2 without repeating the coefficient calculation.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/optics/angular.py#L28-L80)
 
+## particula.optics.mix_refractive_index
+
+*function*
+
+```python
+def mix_refractive_index(index, volume_fraction)
+```
+
+Re-exported from: `particula.optics.state`
+
+Mix absolute indices along the last axis on a volume basis.
+
+The fractions are dimensionless, nonnegative and sum to one.
+Both inputs broadcast with their common final material axis.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L33-L47)
+
+## particula.optics.particle_optics
+
+*function*
+
+```python
+def particle_optics(particles, config)
+```
+
+Re-exported from: `particula.optics.state`
+
+Return per-particle Mie efficiencies and cross sections.
+
+Arrays have axes (box, wavelength, slot). Empty slots have zero radius
+for the optical calculation. Discrete and resolved sizes come from
+material mass and density. Continuous PDFs use their explicit nodes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L145-L185)
+
+## particula.optics.population_optics
+
+*function*
+
+```python
+def population_optics(particles, config) -> PopulationOptics
+```
+
+Re-exported from: `particula.optics.state`
+
+Evaluate live CPU particle state into (box, wavelength) results.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L188-L217)
+
 ## particula.optics.rotate_stokes
 
 *function*
@@ -119689,9 +121724,12 @@ Express a Stokes vector in axes rotated toward the perpendicular axis.
 - `particula.optics.column`
 - `particula.optics.cross_sections`
 - `particula.optics.gpu`
+- `particula.optics.humidity`
 - `particula.optics.mie`
 - `particula.optics.polarization`
 - `particula.optics.population`
+- `particula.optics.retrieval`
+- `particula.optics.state`
 
 ---
 
@@ -120577,8 +122615,12 @@ are reported by check after enqueue, without host input readback.
 - `particula.optics.gpu.bulk`
 - `particula.optics.gpu.column`
 - `particula.optics.gpu.cross_sections`
+- `particula.optics.gpu.derivatives`
+- `particula.optics.gpu.inverse`
 - `particula.optics.gpu.mie`
 - `particula.optics.gpu.population`
+- `particula.optics.gpu.retrieval`
+- `particula.optics.gpu.state`
 - `particula.optics.gpu.workspace`
 
 ---
@@ -121070,6 +123112,321 @@ synchronization, transfer, allocation or source mutation occurs here.
 
 ---
 
+# particula.optics.gpu.derivatives
+
+*module*
+
+Analytic derivatives of the smooth Mie cross-section channels.
+
+These local derivatives use the same evaluated coefficients as the forward
+Mie calculation. They avoid differentiating through convergence-controlled
+loops and can seed a Warp tape for upstream size and composition physics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/derivatives.py#L1-L1)
+
+## particula.optics.gpu.derivatives._coefficient_slopes
+
+*function*
+
+```python
+def _coefficient_slopes(d: wp.vec2d, dm: wp.vec2d, dx: wp.vec2d, a: wp.vec2d, psi: wp.float64, psi_derivative: wp.float64, xi: wp.vec2d, xi_derivative: wp.vec2d, previous_xi: wp.vec2d, previous_xi_derivative: wp.vec2d, previous_psi_derivative: wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/derivatives.py#L20-L50)
+
+## particula.optics.gpu.derivatives._slopes
+
+*function*
+
+```python
+def _slopes(a: wp.vec2d, index_slope: wp.vec2d, size_slope: wp.vec2d)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/derivatives.py#L53-L62)
+
+## particula.optics.gpu.derivatives.mie_cross_section_sums_jacobian
+
+*function*
+
+```python
+def mie_cross_section_sums_jacobian(relative_index: wp.array(dtype=wp.vec2d), size_parameter: wp.array(dtype=wp.float64), derivatives: wp.array2d(dtype=wp.vec2d), electric: wp.array2d(dtype=wp.vec2d), magnetic: wp.array2d(dtype=wp.vec2d), term_count: wp.array(dtype=wp.int32), status: wp.array(dtype=wp.int32), extinction: wp.array(dtype=wp.vec3d), scattering: wp.array(dtype=wp.vec3d))
+```
+
+Differentiate the dimensionless Mie sums before the 2/x² factor.
+
+Each output vector is ordered (relative n, relative k, x). Physical cross
+sections multiply the sums by 2*pi*(lambda/(2*pi*n_medium))². At k=0
+the index derivative is the right derivative of the unrounded solution.
+Inputs require successful coefficients and positive x in the qualified
+gradient domain. A failed case retains or sets nonzero status.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/derivatives.py#L65-L178)
+
+---
+
+# particula.optics.gpu.inverse
+
+*module*
+
+Bounded-memory CUDA bulk optical predictions and Warp tape adjoints.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L1-L1)
+
+## particula.optics.gpu.inverse._PI
+
+*attribute* · *module attribute*
+
+```python
+_PI = wp.constant(wp.float64(pi))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L17-L17)
+
+## particula.optics.gpu.inverse.BulkOpticsAdjoint
+
+*class*
+
+```python
+class BulkOpticsAdjoint
+```
+
+Bulk extinction, scattering and absorption with an analytic Warp VJP.
+
+Construct for fixed (group, particle) dimensions and one vacuum
+wavelength per group, allowing duplicates. Groups can represent
+box/wavelength pairs or measurement windows. One workspace is used
+on its device's current stream at a time.
+
+Each evaluate() returns independent reduced arrays. With a Tape,
+the reverse pass recomputes the local coefficients one tile at a time.
+Inputs must stay alive and immutable through backward. Treat particle
+count and coefficient series order as discrete. Only derivatives of the
+smooth spherical optical model are supported.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L134-L319)
+
+### particula.optics.gpu.inverse.BulkOpticsAdjoint._count
+
+*attribute* · *instance attribute*
+
+```python
+_count = groups * particles
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L179-L179)
+
+### particula.optics.gpu.inverse.BulkOpticsAdjoint._ext
+
+*attribute* · *instance attribute*
+
+```python
+_ext = empty(tile, wp.vec3d)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L200-L200)
+
+### particula.optics.gpu.inverse.BulkOpticsAdjoint._index
+
+*attribute* · *instance attribute*
+
+```python
+_index = empty(tile, wp.vec2d)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L190-L190)
+
+### particula.optics.gpu.inverse.BulkOpticsAdjoint._medium
+
+*attribute* · *instance attribute*
+
+```python
+_medium = wp.float64(medium_index)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L184-L184)
+
+### particula.optics.gpu.inverse.BulkOpticsAdjoint._q
+
+*attribute* · *instance attribute*
+
+```python
+_q = empty((tile, 7), wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L199-L199)
+
+### particula.optics.gpu.inverse.BulkOpticsAdjoint._sca
+
+*attribute* · *instance attribute*
+
+```python
+_sca = empty(tile, wp.vec3d)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L201-L201)
+
+### particula.optics.gpu.inverse.BulkOpticsAdjoint._scale
+
+*attribute* · *instance attribute*
+
+```python
+_scale = wp.array(2 * pi * medium_index / wave, dtype=wp.float64, device=self.device)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L181-L183)
+
+### particula.optics.gpu.inverse.BulkOpticsAdjoint._series
+
+*attribute* · *instance attribute*
+
+```python
+_series = (empty((tile, coefficient_capacity + 1), wp.vec2d), empty((tile, coefficient_capacity), wp.vec2d), empty((tile, coefficient_capacity), wp.vec2d), empty(tile, wp.int32), empty(tile, wp.int32))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L192-L198)
+
+### particula.optics.gpu.inverse.BulkOpticsAdjoint._size
+
+*attribute* · *instance attribute*
+
+```python
+_size = empty(tile, wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L191-L191)
+
+### particula.optics.gpu.inverse.BulkOpticsAdjoint._tile
+
+*attribute* · *instance attribute*
+
+```python
+_tile = min(self._count, particle_tile)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L180-L180)
+
+### particula.optics.gpu.inverse.BulkOpticsAdjoint.device
+
+*attribute* · *instance attribute*
+
+```python
+device = wp.get_device(device)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L177-L177)
+
+### particula.optics.gpu.inverse.BulkOpticsAdjoint.shape
+
+*attribute* · *instance attribute*
+
+```python
+shape = shape
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L178-L178)
+
+### particula.optics.gpu.inverse.BulkOpticsAdjoint.__init__
+
+*method*
+
+```python
+def __init__(shape, wavelength, *, device='cuda:0', medium_index=1.0, particle_tile=256, coefficient_capacity=128)
+```
+
+Allocate fixed-capacity particle and Mie series scratch.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L149-L201)
+
+### particula.optics.gpu.inverse.BulkOpticsAdjoint._backward
+
+*method*
+
+```python
+def _backward(radius, index, weight, bulk, failure, stream)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L289-L319)
+
+### particula.optics.gpu.inverse.BulkOpticsAdjoint._check
+
+*method*
+
+```python
+def _check(bulk, failure)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L280-L287)
+
+### particula.optics.gpu.inverse.BulkOpticsAdjoint._evaluate_tile
+
+*method*
+
+```python
+def _evaluate_tile(radius, index, weight, start)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L212-L234)
+
+### particula.optics.gpu.inverse.BulkOpticsAdjoint._launch
+
+*method*
+
+```python
+def _launch(kernel, *args)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L203-L210)
+
+### particula.optics.gpu.inverse.BulkOpticsAdjoint.evaluate
+
+*method*
+
+```python
+def evaluate(radius, index, weight, *, tape=None)
+```
+
+Return device bulk coefficients (group, 3) [m⁻¹].
+
+Radius [m] and number-density weights [m⁻³] are float64. The
+absolute refractive index is a vec2d of (n,k). All arrays are
+contiguous with the prepared (group, particle) dimensions. To
+record this operation, pass the same tape as the surrounding
+Warp model. This call and the backward hook check device status.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L236-L278)
+
+## particula.optics.gpu.inverse._gather
+
+*function*
+
+```python
+def _gather(radius: wp.array2d(dtype=wp.float64), index: wp.array2d(dtype=wp.vec2d), weight: wp.array2d(dtype=wp.float64), scale: wp.array(dtype=wp.float64), medium: wp.float64, start: int, n_cases: int, gathered_index: wp.array(dtype=wp.vec2d), size: wp.array(dtype=wp.float64))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L20-L45)
+
+## particula.optics.gpu.inverse._propagate
+
+*function*
+
+```python
+def _propagate(radius: wp.array2d(dtype=wp.float64), weight: wp.array2d(dtype=wp.float64), q: wp.array2d(dtype=wp.float64), ext: wp.array(dtype=wp.vec3d), sca: wp.array(dtype=wp.vec3d), status: wp.array(dtype=wp.int32), scale: wp.array(dtype=wp.float64), medium: wp.float64, start: int, n_cases: int, adj_bulk: wp.array2d(dtype=wp.float64), adj_radius: wp.array2d(dtype=wp.float64), adj_index: wp.array2d(dtype=wp.vec2d), adj_weight: wp.array2d(dtype=wp.float64), failure: wp.array(dtype=wp.int32))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L78-L131)
+
+## particula.optics.gpu.inverse._reduce
+
+*function*
+
+```python
+def _reduce(radius: wp.array2d(dtype=wp.float64), weight: wp.array2d(dtype=wp.float64), q: wp.array2d(dtype=wp.float64), status: wp.array(dtype=wp.int32), start: int, n_cases: int, bulk: wp.array2d(dtype=wp.float64), failure: wp.array(dtype=wp.int32))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/inverse.py#L48-L75)
+
+---
+
 # particula.optics.gpu.mie
 
 *module*
@@ -121261,6 +123618,546 @@ Measure 0 is discrete density, 1 represented count divided by box volume,
 and must be at least two. Volume/grid arrays are only read when needed.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/population.py#L12-L64)
+
+---
+
+# particula.optics.gpu.retrieval
+
+*module*
+
+Warp parameter transforms for optical retrieval.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L1-L1)
+
+## particula.optics.gpu.retrieval._NEG_THIRD
+
+*attribute* · *module attribute*
+
+```python
+_NEG_THIRD = wp.constant(wp.float64(-1 / 3))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L17-L17)
+
+## particula.optics.gpu.retrieval._ONE
+
+*attribute* · *module attribute*
+
+```python
+_ONE = wp.constant(wp.float64(1))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L14-L14)
+
+## particula.optics.gpu.retrieval._THIRD
+
+*attribute* · *module attribute*
+
+```python
+_THIRD = wp.constant(wp.float64(1 / 3))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L16-L16)
+
+## particula.optics.gpu.retrieval._TWO
+
+*attribute* · *module attribute*
+
+```python
+_TWO = wp.constant(wp.float64(2))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L15-L15)
+
+## particula.optics.gpu.retrieval._ZERO
+
+*attribute* · *module attribute*
+
+```python
+_ZERO = wp.constant(wp.float64(0))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L13-L13)
+
+## particula.optics.gpu.retrieval.DeviceRetrieval
+
+*class*
+
+```python
+class DeviceRetrieval
+```
+
+Bind a small-parameter optical retrieval to an explicit Warp device.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L132-L225)
+
+### particula.optics.gpu.retrieval.DeviceRetrieval._bulk
+
+*attribute* · *instance attribute*
+
+```python
+_bulk = BulkOpticsAdjoint(shape, wavelength, device=device)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L137-L137)
+
+### particula.optics.gpu.retrieval.DeviceRetrieval._density
+
+*attribute* · *instance attribute*
+
+```python
+_density = self._array(model.grid.number_density)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L157-L157)
+
+### particula.optics.gpu.retrieval.DeviceRetrieval._device
+
+*attribute* · *instance attribute*
+
+```python
+_device = self._bulk.device
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L139-L139)
+
+### particula.optics.gpu.retrieval.DeviceRetrieval._effective
+
+*attribute* · *instance attribute*
+
+```python
+_effective = isinstance(model, EffectiveIndexModel)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L140-L140)
+
+### particula.optics.gpu.retrieval.DeviceRetrieval._index
+
+*attribute* · *instance attribute*
+
+```python
+_index = self._complex_array(model._index)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L165-L165)
+
+### particula.optics.gpu.retrieval.DeviceRetrieval._inputs
+
+*attribute* · *instance attribute*
+
+```python
+_inputs = (self._array(model.grid.radius), self._array(rh), self._array(model._sizing_rh), self._array(model.kelvin), self._complex_array(lorentz_lorenz(model.water_index)), self._array(ratio), wp.float64(model._kappa or 0), int(len(model.parameters) == 3), int(model._rh is not None or model._ratio is not None), int(model._ratio is not None))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L145-L156)
+
+### particula.optics.gpu.retrieval.DeviceRetrieval._radii
+
+*attribute* · *instance attribute*
+
+```python
+_radii = self._array(model._radius)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L164-L164)
+
+### particula.optics.gpu.retrieval.DeviceRetrieval._shape
+
+*attribute* · *instance attribute*
+
+```python
+_shape = shape
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L138-L138)
+
+### particula.optics.gpu.retrieval.DeviceRetrieval.__init__
+
+*method*
+
+```python
+def __init__(model, shape, wavelength, *, device)
+```
+
+Upload coordinates fixed across all evaluations.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L135-L165)
+
+### particula.optics.gpu.retrieval.DeviceRetrieval._array
+
+*method*
+
+```python
+def _array(value, *, dtype=wp.float64, requires_grad=False)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L167-L173)
+
+### particula.optics.gpu.retrieval.DeviceRetrieval._complex_array
+
+*method*
+
+```python
+def _complex_array(value)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L175-L179)
+
+### particula.optics.gpu.retrieval.DeviceRetrieval._population
+
+*method*
+
+```python
+def _population(p, grad)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L181-L203)
+
+### particula.optics.gpu.retrieval.DeviceRetrieval.evaluate
+
+*method*
+
+```python
+def evaluate(parameters, seeds)
+```
+
+Return predictions and optional projected Jacobian rows.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L205-L225)
+
+## particula.optics.gpu.retrieval._effective_population
+
+*function*
+
+```python
+def _effective_population(p: wp.array(dtype=wp.float64), dry: wp.array2d(dtype=wp.float64), relative_humidity: wp.array(dtype=wp.float64), sizing_rh: wp.array(dtype=wp.float64), kelvin: wp.array(dtype=wp.float64), water_polar: wp.array(dtype=wp.vec2d), water_ratio: wp.array2d(dtype=wp.float64), fixed_kappa: wp.float64, fitted_kappa: int, humidify: int, measured_growth: int, radius: wp.array2d(dtype=wp.float64), index: wp.array2d(dtype=wp.vec2d))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L69-L111)
+
+## particula.optics.gpu.retrieval._partition_weights
+
+*function*
+
+```python
+def _partition_weights(p: wp.array(dtype=wp.float64), band: wp.array2d(dtype=wp.int32), endpoint: wp.array2d(dtype=wp.float64), subpopulations: int, weight: wp.array2d(dtype=wp.float64))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L114-L129)
+
+## particula.optics.gpu.retrieval._refractive_index
+
+*function*
+
+```python
+def _refractive_index(polar: wp.vec2d)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L57-L66)
+
+## particula.optics.gpu.retrieval._water_ratio
+
+*function*
+
+```python
+def _water_ratio(kappa: wp.float64, rh: wp.float64, bend: wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L20-L32)
+
+## particula.optics.gpu.retrieval._water_ratio_grad
+
+*function*
+
+```python
+def _water_ratio_grad(kappa: wp.float64, rh: wp.float64, bend: wp.float64, adj: wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/retrieval.py#L35-L54)
+
+---
+
+# particula.optics.gpu.state
+
+*module*
+
+Read live native particle arrays into the prepared optical workspace.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L1-L1)
+
+## particula.optics.gpu.state._CUBE_ROOT
+
+*attribute* · *module attribute*
+
+```python
+_CUBE_ROOT = wp.constant(wp.float64(1.0 / 3.0))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L18-L18)
+
+## particula.optics.gpu.state._GAS
+
+*attribute* · *module attribute*
+
+```python
+_GAS = wp.constant(wp.float64(GAS_CONSTANT))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L20-L20)
+
+## particula.optics.gpu.state._RADIUS_FACTOR
+
+*attribute* · *module attribute*
+
+```python
+_RADIUS_FACTOR = wp.constant(wp.float64(3.0 / 4.0 * pi))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L17-L17)
+
+## particula.optics.gpu.state._TWO_PI
+
+*attribute* · *module attribute*
+
+```python
+_TWO_PI = wp.constant(wp.float64(2.0 * pi))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L19-L19)
+
+## particula.optics.gpu.state.DeviceOpticalBatch
+
+*class*
+
+```python
+class DeviceOpticalBatch
+```
+
+Reduce on the owner stream and retain a fixed number of optical rows.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L161-L261)
+
+### particula.optics.gpu.state.DeviceOpticalBatch._cases
+
+*attribute* · *instance attribute*
+
+```python
+_cases = ParticleOpticalCases(particles, config, device=device, stream=owner._stream)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L177-L182)
+
+### particula.optics.gpu.state.DeviceOpticalBatch._humidity
+
+*attribute* · *instance attribute*
+
+```python
+_humidity = wp.empty((batch_size, boxes), dtype=wp.float64, device=device) if water_lane is not None else None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L188-L192)
+
+### particula.optics.gpu.state.DeviceOpticalBatch._owner
+
+*attribute* · *instance attribute*
+
+```python
+_owner = owner
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L186-L186)
+
+### particula.optics.gpu.state.DeviceOpticalBatch._rows
+
+*attribute* · *instance attribute*
+
+```python
+_rows = wp.empty((batch_size, groups, 9), dtype=wp.float64, device=device)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L194-L196)
+
+### particula.optics.gpu.state.DeviceOpticalBatch._shape
+
+*attribute* · *instance attribute*
+
+```python
+_shape = (boxes, wave_count, 9)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L193-L193)
+
+### particula.optics.gpu.state.DeviceOpticalBatch._statuses
+
+*attribute* · *instance attribute*
+
+```python
+_statuses = wp.empty((batch_size, groups), dtype=wp.int32, device=device)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L197-L199)
+
+### particula.optics.gpu.state.DeviceOpticalBatch._water_lane
+
+*attribute* · *instance attribute*
+
+```python
+_water_lane = water_lane
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L187-L187)
+
+### particula.optics.gpu.state.DeviceOpticalBatch._workspace
+
+*attribute* · *instance attribute*
+
+```python
+_workspace = prepare_population_mie(self._cases.index, self._cases.size, self._cases.radius, self._cases.weight, particle_tile=particle_tile, coefficient_capacity=coefficient_capacity, stream=owner._stream)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L200-L208)
+
+### particula.optics.gpu.state.DeviceOpticalBatch.__init__
+
+*method*
+
+```python
+def __init__(owner, config, batch_size, particle_tile, coefficient_capacity, *, water_lane=None)
+```
+
+Bind device workspaces to the live particle arrays.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L164-L208)
+
+### particula.optics.gpu.state.DeviceOpticalBatch.download
+
+*method*
+
+```python
+def download(count)
+```
+
+Check physics and optics before exposing any row of the batch.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L246-L261)
+
+### particula.optics.gpu.state.DeviceOpticalBatch.enqueue
+
+*method*
+
+```python
+def enqueue(row)
+```
+
+Append device results and status to a batch slot.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L210-L244)
+
+## particula.optics.gpu.state.ParticleOpticalCases
+
+*class*
+
+```python
+class ParticleOpticalCases
+```
+
+Prepare the optical inputs shared by resident observers and processes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L105-L158)
+
+### particula.optics.gpu.state.ParticleOpticalCases._fill
+
+*attribute* · *instance attribute*
+
+```python
+_fill = wp.launch(_fill_cases, (groups, slots), inputs=[particles, wavelengths, indices, int(mixed), wp.float64(config.medium_index), self.index, self.size, self.radius, self.weight], device=device, stream=stream, record_cmd=True)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L137-L154)
+
+### particula.optics.gpu.state.ParticleOpticalCases._inputs
+
+*attribute* · *instance attribute*
+
+```python
+_inputs = (particles, wavelengths, indices)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L135-L135)
+
+### particula.optics.gpu.state.ParticleOpticalCases._stream
+
+*attribute* · *instance attribute*
+
+```python
+_stream = stream
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L136-L136)
+
+### particula.optics.gpu.state.ParticleOpticalCases.index
+
+*attribute* · *instance attribute*
+
+```python
+index = wp.empty((groups, slots), dtype=wp.vec2d, device=device)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L130-L130)
+
+### particula.optics.gpu.state.ParticleOpticalCases.__init__
+
+*method*
+
+```python
+def __init__(particles, config, *, device, stream)
+```
+
+Allocate input buffers and retain a refresh command.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L108-L154)
+
+### particula.optics.gpu.state.ParticleOpticalCases.enqueue
+
+*method*
+
+```python
+def enqueue()
+```
+
+Fill optical coordinates from the live particle state.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L156-L158)
+
+## particula.optics.gpu.state._fill_cases
+
+*function*
+
+```python
+def _fill_cases(particles: WarpParticleData, wavelengths: wp.array(dtype=wp.float64), configured_index: wp.array2d(dtype=wp.vec2d), mixed: int, medium: wp.float64, index: wp.array2d(dtype=wp.vec2d), size: wp.array2d(dtype=wp.float64), radius: wp.array2d(dtype=wp.float64), weight: wp.array2d(dtype=wp.float64))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L23-L73)
+
+## particula.optics.gpu.state._relative_humidity_row
+
+*function*
+
+```python
+def _relative_humidity_row(vapor: wp.array2d(dtype=wp.float64), molar_mass: wp.array(dtype=wp.float64), temperature: wp.array(dtype=wp.float64), species: int, row: int, humidity: wp.array2d(dtype=wp.float64))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L90-L102)
+
+## particula.optics.gpu.state._store_row
+
+*function*
+
+```python
+def _store_row(result: wp.array2d(dtype=wp.float64), status: wp.array(dtype=wp.int32), row: int, rows: wp.array3d(dtype=wp.float64), statuses: wp.array2d(dtype=wp.int32))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L76-L87)
 
 ---
 
@@ -121557,6 +124454,66 @@ Prepare tiled device optics for already-uploaded numeric inputs.
 - `RuntimeError` — If the explicitly requested device cannot be used.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/workspace.py#L154-L313)
+
+---
+
+# particula.optics.humidity
+
+*module*
+
+Subsaturated homogeneous-particle water uptake for optical closure.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/humidity.py#L1-L1)
+
+## particula.optics.humidity._real_arrays
+
+*function*
+
+```python
+def _real_arrays(*values)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/humidity.py#L8-L13)
+
+## particula.optics.humidity.hydrate_index
+
+*function*
+
+```python
+def hydrate_index(dry_index, water_index, water_to_dry_volume)
+```
+
+Mix the dry and water indices at a prescribed water/dry volume ratio.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/humidity.py#L74-L90)
+
+## particula.optics.humidity.subsaturated_growth
+
+*function*
+
+```python
+def subsaturated_growth(dry_radius, relative_humidity, kappa, kelvin_length)
+```
+
+Return the wet radius and water/dry volume ratio at equilibrium.
+
+**Parameters**
+
+- `dry_radius` — Positive dry radius [m].
+- `relative_humidity` — Water saturation ratio in [0, 1).
+- `kappa` — Nonnegative effective hygroscopicity.
+- `kelvin_length` — Nonnegative radius-form Kelvin coefficient [m], determined by temperature, water density and surface tension. A zero length selects the flat-interface model.
+
+**Returns**
+
+- Wet radius [m] and dimensionless water/dry volume ratio.
+- Inputs use NumPy broadcasting.
+
+The model follows the liquid branch of the kappa-Köhler relation.
+A prescribed dry solid population can use kappa zero. Phase selection and
+uptake kinetics are outside this equilibrium calculation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/humidity.py#L16-L71)
 
 ---
 
@@ -122132,6 +125089,1154 @@ Convert native population measures to number-density weights.
 - `ValueError` — If the measure, shape, values or supplied metadata conflict.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L52-L114)
+
+---
+
+# particula.optics.retrieval
+
+*module*
+
+Optical closure with prescribed size distributions and measurement errors.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L1-L1)
+
+## particula.optics.retrieval.CHANNELS
+
+*attribute* · *module attribute*
+
+```python
+CHANNELS = ('extinction', 'scattering', 'absorption')
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L13-L13)
+
+## particula.optics.retrieval.EffectiveIndexModel
+
+*class*
+
+```python
+class EffectiveIndexModel(_OpticalModel)
+```
+
+Bases: `particula.optics.retrieval._OpticalModel`
+
+Fit a common complex index, with optional water uptake.
+
+With wet sizes use the default configuration for an index at the optical
+RH. With dry sizes supply relative_humidity and either a fixed kappa or
+leave kappa open for fitting. Alternatively supply a measured diameter
+growth factor to determine water volume directly. Supply sizing RH if
+the measured distribution retains water at a known equilibrium RH.
+This model shares one dry index across all wavelengths and RH groups.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L155-L251)
+
+### particula.optics.retrieval.EffectiveIndexModel._kappa
+
+*attribute* · *instance attribute*
+
+```python
+_kappa = kappa
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L188-L188)
+
+### particula.optics.retrieval.EffectiveIndexModel._ratio
+
+*attribute* · *instance attribute*
+
+```python
+_ratio = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L187-L187)
+
+### particula.optics.retrieval.EffectiveIndexModel._rh
+
+*attribute* · *instance attribute*
+
+```python
+_rh = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L186-L186)
+
+### particula.optics.retrieval.EffectiveIndexModel._sizing_rh
+
+*attribute* · *instance attribute*
+
+```python
+_sizing_rh = np.zeros(groups)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L202-L202)
+
+### particula.optics.retrieval.EffectiveIndexModel.grid
+
+*attribute* · *instance attribute*
+
+```python
+grid = grid
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L179-L179)
+
+### particula.optics.retrieval.EffectiveIndexModel.kelvin
+
+*attribute* · *instance attribute*
+
+```python
+kelvin = _freeze(np.broadcast_to(_real(kelvin_length), (groups)))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L185-L185)
+
+### particula.optics.retrieval.EffectiveIndexModel.parameters
+
+*attribute* · *instance attribute*
+
+```python
+parameters = ('n', 'k', 'kappa') if self._rh is not None and self._ratio is None and kappa is None else ('n', 'k')
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L214-L218)
+
+### particula.optics.retrieval.EffectiveIndexModel.water_index
+
+*attribute* · *instance attribute*
+
+```python
+water_index = _freeze(np.broadcast_to(_physical_index(water_index), (groups)))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L182-L184)
+
+### particula.optics.retrieval.EffectiveIndexModel.wavelength
+
+*attribute* · *instance attribute*
+
+```python
+wavelength = grid.wavelength
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L180-L180)
+
+### particula.optics.retrieval.EffectiveIndexModel.__init__
+
+*method*
+
+```python
+def __init__(grid, *, relative_humidity=None, sizing_relative_humidity=None, kappa=None, growth_factor=None, kelvin_length=1.05e-09, water_index=1.333, device='numpy')
+```
+
+Prepare the measured grid and a CPU or explicit Warp backend.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L166-L219)
+
+### particula.optics.retrieval.EffectiveIndexModel._parameters
+
+*method*
+
+```python
+def _parameters(values)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L221-L225)
+
+### particula.optics.retrieval.EffectiveIndexModel._population
+
+*method*
+
+```python
+def _population(values)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L227-L251)
+
+### particula.optics.retrieval.EffectiveIndexModel._eval
+
+*method*
+
+```python
+def _eval(parameters, seeds)
+```
+
+Inherited from: `particula.optics.retrieval._OpticalModel`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L128-L134)
+
+### particula.optics.retrieval.EffectiveIndexModel._setup
+
+*method*
+
+```python
+def _setup(wavelength, shape, backend)
+```
+
+Inherited from: `particula.optics.retrieval._OpticalModel`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L115-L122)
+
+### particula.optics.retrieval.EffectiveIndexModel.predictions
+
+*method*
+
+```python
+def predictions(parameters)
+```
+
+Inherited from: `particula.optics.retrieval._OpticalModel`
+
+Return bulk extinction, scattering and absorption [m⁻¹].
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L124-L126)
+
+## particula.optics.retrieval.MixingStateModel
+
+*class*
+
+```python
+class MixingStateModel(_OpticalModel)
+```
+
+Bases: `particula.optics.retrieval._OpticalModel`
+
+Prescribed composition with internal/external number fractions by size.
+
+Each dry bin has a monodisperse internal population and size-matched
+pure-species external populations. The endpoints have the same dry
+number density and per-bin species inventories. Volume fractions may
+be uniform across bins or specified per group and bin.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L254-L364)
+
+### particula.optics.retrieval.MixingStateModel._band
+
+*attribute* · *instance attribute*
+
+```python
+_band = _freeze(np.zeros(grid.radius.shape, dtype=np.int32) if dry_boundary is None else 2 * grid.radius >= dry_boundary.astype(np.int32))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L327-L331)
+
+### particula.optics.retrieval.MixingStateModel._endpoint_density
+
+*attribute* · *instance attribute*
+
+```python
+_endpoint_density = _freeze(grid.number_density[..., None] * np.concatenate((np.ones_like(fraction[..., :1]), fraction), axis=-1).reshape(shape))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L319-L326)
+
+### particula.optics.retrieval.MixingStateModel._index
+
+*attribute* · *instance attribute*
+
+```python
+_index = _freeze(wet_index.reshape(shape))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L318-L318)
+
+### particula.optics.retrieval.MixingStateModel._radius
+
+*attribute* · *instance attribute*
+
+```python
+_radius = _freeze(wet.reshape(shape))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L317-L317)
+
+### particula.optics.retrieval.MixingStateModel._subpopulations
+
+*attribute* · *instance attribute*
+
+```python
+_subpopulations = species + 1
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L315-L315)
+
+### particula.optics.retrieval.MixingStateModel.grid
+
+*attribute* · *instance attribute*
+
+```python
+grid = grid
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L313-L313)
+
+### particula.optics.retrieval.MixingStateModel.parameters
+
+*attribute* · *instance attribute*
+
+```python
+parameters = ('internal_fraction')
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L332-L332)
+
+### particula.optics.retrieval.MixingStateModel.wavelength
+
+*attribute* · *instance attribute*
+
+```python
+wavelength = grid.wavelength
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L314-L314)
+
+### particula.optics.retrieval.MixingStateModel.__init__
+
+*method*
+
+```python
+def __init__(grid, *, volume_fractions, species_index, species_kappa, relative_humidity, water_index=1.333, kelvin_length=1.05e-09, dry_boundary=None, device='numpy')
+```
+
+Prepare optics inputs for both endpoint populations.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L263-L346)
+
+### particula.optics.retrieval.MixingStateModel._parameters
+
+*method*
+
+```python
+def _parameters(values)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L348-L352)
+
+### particula.optics.retrieval.MixingStateModel._population
+
+*method*
+
+```python
+def _population(values)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L354-L364)
+
+### particula.optics.retrieval.MixingStateModel._eval
+
+*method*
+
+```python
+def _eval(parameters, seeds)
+```
+
+Inherited from: `particula.optics.retrieval._OpticalModel`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L128-L134)
+
+### particula.optics.retrieval.MixingStateModel._setup
+
+*method*
+
+```python
+def _setup(wavelength, shape, backend)
+```
+
+Inherited from: `particula.optics.retrieval._OpticalModel`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L115-L122)
+
+### particula.optics.retrieval.MixingStateModel.predictions
+
+*method*
+
+```python
+def predictions(parameters)
+```
+
+Inherited from: `particula.optics.retrieval._OpticalModel`
+
+Return bulk extinction, scattering and absorption [m⁻¹].
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L124-L126)
+
+## particula.optics.retrieval.OpticalFit
+
+*class* · *dataclass*
+
+```python
+class OpticalFit
+```
+
+Best bounded fit, with sensitivity diagnostics in measurement space.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L461-L476)
+
+### particula.optics.retrieval.OpticalFit.active_bounds
+
+*attribute* · *instance attribute*
+
+```python
+active_bounds: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L472-L472)
+
+### particula.optics.retrieval.OpticalFit.backward_evaluations
+
+*attribute* · *instance attribute*
+
+```python
+backward_evaluations: int
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L476-L476)
+
+### particula.optics.retrieval.OpticalFit.chi_square
+
+*attribute* · *instance attribute*
+
+```python
+chi_square: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L473-L473)
+
+### particula.optics.retrieval.OpticalFit.forward_evaluations
+
+*attribute* · *instance attribute*
+
+```python
+forward_evaluations: int
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L475-L475)
+
+### particula.optics.retrieval.OpticalFit.names
+
+*attribute* · *instance attribute*
+
+```python
+names: tuple[str, ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L465-L465)
+
+### particula.optics.retrieval.OpticalFit.parameters
+
+*attribute* · *instance attribute*
+
+```python
+parameters: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L466-L466)
+
+### particula.optics.retrieval.OpticalFit.predictions
+
+*attribute* · *instance attribute*
+
+```python
+predictions: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L467-L467)
+
+### particula.optics.retrieval.OpticalFit.residual
+
+*attribute* · *instance attribute*
+
+```python
+residual: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L468-L468)
+
+### particula.optics.retrieval.OpticalFit.sensitivity
+
+*attribute* · *instance attribute*
+
+```python
+sensitivity: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L470-L470)
+
+### particula.optics.retrieval.OpticalFit.singular_values
+
+*attribute* · *instance attribute*
+
+```python
+singular_values: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L471-L471)
+
+### particula.optics.retrieval.OpticalFit.success
+
+*attribute* · *instance attribute*
+
+```python
+success: bool
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L474-L474)
+
+### particula.optics.retrieval.OpticalFit.whitened_residual
+
+*attribute* · *instance attribute*
+
+```python
+whitened_residual: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L469-L469)
+
+### particula.optics.retrieval.OpticalFit.__init__
+
+*method*
+
+```python
+def __init__(names: tuple[str, ...], parameters: np.ndarray, predictions: np.ndarray, residual: np.ndarray, whitened_residual: np.ndarray, sensitivity: np.ndarray, singular_values: np.ndarray, active_bounds: np.ndarray, chi_square: float, success: bool, forward_evaluations: int, backward_evaluations: int) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L0-L0)
+
+## particula.optics.retrieval.OpticalGrid
+
+*class* · *dataclass*
+
+```python
+class OpticalGrid
+```
+
+One particle spectrum per optical wavelength and measurement window.
+
+Radius and number_density have shape (group, bin). A one-dimensional
+spectrum broadcasts over groups. Radii and vacuum wavelengths are in
+metres and number densities are integrated counts per bin in m⁻³.
+Groups can repeat a wavelength at different humidity or time conditions.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L42-L102)
+
+### particula.optics.retrieval.OpticalGrid.number_density
+
+*attribute* · *instance attribute*
+
+```python
+number_density: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L53-L53)
+
+### particula.optics.retrieval.OpticalGrid.radius
+
+*attribute* · *instance attribute*
+
+```python
+radius: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L52-L52)
+
+### particula.optics.retrieval.OpticalGrid.wavelength
+
+*attribute* · *instance attribute*
+
+```python
+wavelength: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L54-L54)
+
+### particula.optics.retrieval.OpticalGrid.__init__
+
+*method*
+
+```python
+def __init__(radius: np.ndarray, number_density: np.ndarray, wavelength: np.ndarray) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L0-L0)
+
+### particula.optics.retrieval.OpticalGrid.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Validate and detach fixed measurement coordinates.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L56-L76)
+
+### particula.optics.retrieval.OpticalGrid.from_diameter_bins
+
+*method* · *classmethod*
+
+```python
+def from_diameter_bins(edges, values, wavelength, *, measure)
+```
+
+Build a log-midpoint grid from mobility-diameter edges in metres.
+
+Use `bin_density` for number per m³ already integrated across the
+bin or `dN_dlog10D` for number per m³ per decade. The spectrum
+must already use the same volume basis as the optical coefficients.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L78-L102)
+
+## particula.optics.retrieval.OpticalObservations
+
+*class*
+
+```python
+class OpticalObservations
+```
+
+Calibrated measurements projected from (group, E/S/A) coefficients.
+
+Response has shape (observation, group, 3). Use it to select a channel
+or average predicted spectra across measured time or spectral windows.
+Use only measured channels with an independent uncertainty model.
+Observations and standard deviations have units m⁻¹. Covariance entries
+have units m⁻². Include environmental and sizing uncertainty through
+sensitivity cases or a supplied covariance.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L381-L458)
+
+### particula.optics.retrieval.OpticalObservations._factor
+
+*attribute* · *instance attribute*
+
+```python
+_factor = _freeze(factor)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L432-L432)
+
+### particula.optics.retrieval.OpticalObservations.response
+
+*attribute* · *instance attribute*
+
+```python
+response = _freeze(response)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L430-L430)
+
+### particula.optics.retrieval.OpticalObservations.values
+
+*attribute* · *instance attribute*
+
+```python
+values = _freeze(values)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L431-L431)
+
+### particula.optics.retrieval.OpticalObservations.__init__
+
+*method*
+
+```python
+def __init__(response, values, *, standard_deviation=None, covariance=None)
+```
+
+Validate the response and factor its measurement covariance.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L392-L432)
+
+### particula.optics.retrieval.OpticalObservations._whiten
+
+*method*
+
+```python
+def _whiten(residual)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L457-L458)
+
+### particula.optics.retrieval.OpticalObservations.channels
+
+*method* · *classmethod*
+
+```python
+def channels(groups, selectors, values, **uncertainty)
+```
+
+Construct observations from (group index, channel name) selectors.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L434-L448)
+
+### particula.optics.retrieval.OpticalObservations.project
+
+*method*
+
+```python
+def project(coefficients)
+```
+
+Apply the calibrated linear response in measurement coordinates.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L450-L455)
+
+## particula.optics.retrieval._OpticalModel
+
+*class*
+
+```python
+class _OpticalModel
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L114-L134)
+
+### particula.optics.retrieval._OpticalModel._eval
+
+*method*
+
+```python
+def _eval(parameters, seeds)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L128-L134)
+
+### particula.optics.retrieval._OpticalModel._setup
+
+*method*
+
+```python
+def _setup(wavelength, shape, backend)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L115-L122)
+
+### particula.optics.retrieval._OpticalModel.predictions
+
+*method*
+
+```python
+def predictions(parameters)
+```
+
+Return bulk extinction, scattering and absorption [m⁻¹].
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L124-L126)
+
+## particula.optics.retrieval._Residual
+
+*class*
+
+```python
+class _Residual
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L479-L518)
+
+### particula.optics.retrieval._Residual.autodiff
+
+*attribute* · *instance attribute*
+
+```python
+autodiff = method == 'autodiff'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L489-L489)
+
+### particula.optics.retrieval._Residual.backwards
+
+*attribute* · *instance attribute*
+
+```python
+backwards = 0
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L494-L494)
+
+### particula.optics.retrieval._Residual.forwards
+
+*attribute* · *instance attribute*
+
+```python
+forwards = 0
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L493-L493)
+
+### particula.optics.retrieval._Residual.jacobian
+
+*attribute* · *instance attribute*
+
+```python
+jacobian = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L492-L492)
+
+### particula.optics.retrieval._Residual.model
+
+*attribute* · *instance attribute*
+
+```python
+model = model
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L487-L487)
+
+### particula.optics.retrieval._Residual.observations
+
+*attribute* · *instance attribute*
+
+```python
+observations = observations
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L488-L488)
+
+### particula.optics.retrieval._Residual.point
+
+*attribute* · *instance attribute*
+
+```python
+point = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L490-L490)
+
+### particula.optics.retrieval._Residual.values
+
+*attribute* · *instance attribute*
+
+```python
+values = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L491-L491)
+
+### particula.optics.retrieval._Residual.__init__
+
+*method*
+
+```python
+def __init__(model, observations, method)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L480-L494)
+
+### particula.optics.retrieval._Residual.calculate
+
+*method*
+
+```python
+def calculate(point, *, jacobian=False)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L496-L510)
+
+### particula.optics.retrieval._Residual.derivative
+
+*method*
+
+```python
+def derivative(point)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L516-L518)
+
+### particula.optics.retrieval._Residual.residual
+
+*method*
+
+```python
+def residual(point)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L512-L514)
+
+## particula.optics.retrieval._bulk
+
+*function*
+
+```python
+def _bulk(radius, index, density, wave)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L105-L111)
+
+## particula.optics.retrieval._fit_inputs
+
+*function*
+
+```python
+def _fit_inputs(model, bounds, starts, method)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L521-L539)
+
+## particula.optics.retrieval._freeze
+
+*function*
+
+```python
+def _freeze(value)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L25-L28)
+
+## particula.optics.retrieval._humidity
+
+*function*
+
+```python
+def _humidity(value, groups)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L137-L141)
+
+## particula.optics.retrieval._measured_water
+
+*function*
+
+```python
+def _measured_water(growth_factor, shape, kappa)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L144-L152)
+
+## particula.optics.retrieval._physical_index
+
+*function*
+
+```python
+def _physical_index(value)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L31-L39)
+
+## particula.optics.retrieval._real
+
+*function*
+
+```python
+def _real(value)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L16-L22)
+
+## particula.optics.retrieval.dry_volume_fractions
+
+*function*
+
+```python
+def dry_volume_fractions(mass, density)
+```
+
+Convert measured dry species mass and density to volume fractions.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L367-L378)
+
+## particula.optics.retrieval.fit_optical
+
+*function*
+
+```python
+def fit_optical(model, observations, *, bounds, starts, method='autodiff', max_nfev=None)
+```
+
+Fit optically constrained parameters from one or more bounded starts.
+
+Sensitivity is the whitened Jacobian per parameter in its native units.
+Singular values include structural zeros when there are fewer independent
+observations than unknowns. Inspect profiles and held-out predictions
+before treating a least-squares solution as a unique retrieval.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L542-L593)
+
+## particula.optics.retrieval.profile_optical
+
+*function*
+
+```python
+def profile_optical(model, observations, fit, parameter, coordinates, *, bounds, method='autodiff', delta_chi_square=3.841459)
+```
+
+Profile a fitted parameter by optimizing all others at fixed values.
+
+Returns the grid, profiled chi square, and the intervals resolved by the
+grid and threshold. A component touching either search bound is limited
+by that bound. The default delta is the asymptotic 95% cutoff for one
+parameter under a regular Gaussian measurement model.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L596-L683)
+
+---
+
+# particula.optics.state
+
+*module*
+
+Bulk and individual optics from native particle state.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L1-L1)
+
+## particula.optics.state.OpticalConfig
+
+*class* · *dataclass*
+
+```python
+class OpticalConfig
+```
+
+Prescribed optical inputs for homogeneous spheres.
+
+Wavelengths are ordered vacuum wavelengths [m]. Supply an absolute
+particle index (scalar or per wavelength), or a species index table
+(wavelength, material) in native particle-material order. Medium index
+is real, positive and constant across the spectrum.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L50-L142)
+
+### particula.optics.state.OpticalConfig.medium_index
+
+*attribute* · *instance attribute*
+
+```python
+medium_index: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L61-L61)
+
+### particula.optics.state.OpticalConfig.particle_index
+
+*attribute* · *instance attribute*
+
+```python
+particle_index: tuple[complex, ...] | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L62-L62)
+
+### particula.optics.state.OpticalConfig.species_index
+
+*attribute* · *instance attribute*
+
+```python
+species_index: tuple[tuple[complex, ...], ...] | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L63-L63)
+
+### particula.optics.state.OpticalConfig.wavelength
+
+*attribute* · *instance attribute*
+
+```python
+wavelength: tuple[float, ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L60-L60)
+
+### particula.optics.state.OpticalConfig.__init__
+
+*method*
+
+```python
+def __init__(wavelength, *, particle_index=None, species_index=None, medium_index=1.0)
+```
+
+Validate and freeze wavelengths and the chosen index model.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L65-L116)
+
+### particula.optics.state.OpticalConfig.metadata
+
+*method*
+
+```python
+def metadata()
+```
+
+Return JSON-compatible optical inputs.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L126-L142)
+
+### particula.optics.state.OpticalConfig.validate_materials
+
+*method*
+
+```python
+def validate_materials(materials)
+```
+
+Check the species table against the native material axis.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L118-L124)
+
+## particula.optics.state._index
+
+*function*
+
+```python
+def _index(values)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L16-L24)
+
+## particula.optics.state.lorentz_lorenz
+
+*function*
+
+```python
+def lorentz_lorenz(index)
+```
+
+Convert absolute refractive index to Lorentz–Lorenz polarizability.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L27-L30)
+
+## particula.optics.state.mix_refractive_index
+
+*function*
+
+```python
+def mix_refractive_index(index, volume_fraction)
+```
+
+Mix absolute indices along the last axis on a volume basis.
+
+The fractions are dimensionless, nonnegative and sum to one.
+Both inputs broadcast with their common final material axis.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L33-L47)
+
+## particula.optics.state.particle_optics
+
+*function*
+
+```python
+def particle_optics(particles, config)
+```
+
+Return per-particle Mie efficiencies and cross sections.
+
+Arrays have axes (box, wavelength, slot). Empty slots have zero radius
+for the optical calculation. Discrete and resolved sizes come from
+material mass and density. Continuous PDFs use their explicit nodes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L145-L185)
+
+## particula.optics.state.population_optics
+
+*function*
+
+```python
+def population_optics(particles, config) -> PopulationOptics
+```
+
+Evaluate live CPU particle state into (box, wavelength) results.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L188-L217)
 
 ---
 

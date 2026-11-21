@@ -42,6 +42,16 @@ def _mass_from_radius(radius: FloatMatrix, factor: wp.float64, mass: FloatMatrix
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_condensation.py#L25-L33)
 
+## particula.execution.inverse_condensation._mass_step
+
+*function*
+
+```python
+def _mass_step(initial, current, counts, vapor, transport, empty, launch)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_condensation.py#L154-L167)
+
 ## particula.execution.inverse_condensation._observe
 
 *function*
@@ -77,4 +87,4 @@ vapor (kg/m³) has one entry per box. Density is kg/m³, molecular mean
 free path is m, diffusivity is m²/s and duration is seconds. An optional
 adjoint gives one terminal observation weight per component.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_condensation.py#L154-L257)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_condensation.py#L170-L259)

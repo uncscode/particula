@@ -38,6 +38,8 @@ helpers remain concrete-only.
 - `particula.dynamics.dilution`
 - `particula.dynamics.ions`
 - `particula.dynamics.nucleation`
+- `particula.dynamics.optical_heating`
+- `particula.dynamics.optical_heating_gpu`
 - `particula.dynamics.particle_process`
 - `particula.dynamics.properties`
 - `particula.dynamics.wall_loss`

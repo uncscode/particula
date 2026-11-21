@@ -258,6 +258,101 @@ scattering_valid: NDArray[np.bool_]
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/optics/mie.py#L48-L48)
 
+## particula.optics.OpticalConfig
+
+*class* · *dataclass*
+
+```python
+class OpticalConfig
+```
+
+Re-exported from: `particula.optics.state`
+
+Prescribed optical inputs for homogeneous spheres.
+
+Wavelengths are ordered vacuum wavelengths [m]. Supply an absolute
+particle index (scalar or per wavelength), or a species index table
+(wavelength, material) in native particle-material order. Medium index
+is real, positive and constant across the spectrum.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L50-L142)
+
+### particula.optics.OpticalConfig.medium_index
+
+*attribute* · *instance attribute*
+
+```python
+medium_index: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L61-L61)
+
+### particula.optics.OpticalConfig.particle_index
+
+*attribute* · *instance attribute*
+
+```python
+particle_index: tuple[complex, ...] | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L62-L62)
+
+### particula.optics.OpticalConfig.species_index
+
+*attribute* · *instance attribute*
+
+```python
+species_index: tuple[tuple[complex, ...], ...] | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L63-L63)
+
+### particula.optics.OpticalConfig.wavelength
+
+*attribute* · *instance attribute*
+
+```python
+wavelength: tuple[float, ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L60-L60)
+
+### particula.optics.OpticalConfig.__init__
+
+*method*
+
+```python
+def __init__(wavelength, *, particle_index=None, species_index=None, medium_index=1.0)
+```
+
+Validate and freeze wavelengths and the chosen index model.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L65-L116)
+
+### particula.optics.OpticalConfig.metadata
+
+*method*
+
+```python
+def metadata()
+```
+
+Return JSON-compatible optical inputs.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L126-L142)
+
+### particula.optics.OpticalConfig.validate_materials
+
+*method*
+
+```python
+def validate_materials(materials)
+```
+
+Check the species table against the native material axis.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L118-L124)
+
 ## particula.optics.OpticalCrossSections
 
 *class*
@@ -907,6 +1002,55 @@ Calculate S1 and S2 without repeating the coefficient calculation.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/optics/angular.py#L28-L80)
 
+## particula.optics.mix_refractive_index
+
+*function*
+
+```python
+def mix_refractive_index(index, volume_fraction)
+```
+
+Re-exported from: `particula.optics.state`
+
+Mix absolute indices along the last axis on a volume basis.
+
+The fractions are dimensionless, nonnegative and sum to one.
+Both inputs broadcast with their common final material axis.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L33-L47)
+
+## particula.optics.particle_optics
+
+*function*
+
+```python
+def particle_optics(particles, config)
+```
+
+Re-exported from: `particula.optics.state`
+
+Return per-particle Mie efficiencies and cross sections.
+
+Arrays have axes (box, wavelength, slot). Empty slots have zero radius
+for the optical calculation. Discrete and resolved sizes come from
+material mass and density. Continuous PDFs use their explicit nodes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L145-L185)
+
+## particula.optics.population_optics
+
+*function*
+
+```python
+def population_optics(particles, config) -> PopulationOptics
+```
+
+Re-exported from: `particula.optics.state`
+
+Evaluate live CPU particle state into (box, wavelength) results.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L188-L217)
+
 ## particula.optics.rotate_stokes
 
 *function*
@@ -941,6 +1085,9 @@ Express a Stokes vector in axes rotated toward the perpendicular axis.
 - `particula.optics.column`
 - `particula.optics.cross_sections`
 - `particula.optics.gpu`
+- `particula.optics.humidity`
 - `particula.optics.mie`
 - `particula.optics.polarization`
 - `particula.optics.population`
+- `particula.optics.retrieval`
+- `particula.optics.state`
