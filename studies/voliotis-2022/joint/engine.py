@@ -7,13 +7,25 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import warp as wp
+from particula.gas.properties.dynamic_viscosity import get_dynamic_viscosity
 from particula.gas.properties.mean_free_path import get_molecule_mean_free_path
+from particula.gpu.dynamics.coagulation_funcs import (
+    brownian_kernel_pair_wp,
+    g_collection_term_wp,
+    particle_mean_free_path_wp,
+)
 from particula.gpu.dynamics.condensation_funcs import (
     first_order_mass_transport_k_wp,
 )
+from particula.gpu.dynamics.wall_loss_funcs import (
+    rectangle_wall_loss_coefficient_from_transport_wp,
+)
 from particula.gpu.properties.particle_properties import (
+    aerodynamic_mobility_wp,
+    cunningham_slip_correction_wp,
     vapor_transition_correction_wp,
 )
+from particula.util.constants import BOLTZMANN_CONSTANT, MOLECULAR_WEIGHT_AIR
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
@@ -34,6 +46,23 @@ RESULT.mkdir(exist_ok=True)
 F64 = wp.float64
 MASS = wp.constant(wp.float64(0.168236))
 RT = wp.constant(wp.float64(8.314462618))
+
+
+KB = wp.constant(wp.float64(BOLTZMANN_CONSTANT))
+
+
+@wp.func
+def brownian_equal_pair(
+    radius: F64, mass: F64, temp: F64, viscosity: F64, air_mfp: F64
+):
+    """Return the monodisperse neutral Brownian collision kernel in m³/s."""
+    slip = cunningham_slip_correction_wp(air_mfp / radius)
+    diff = KB * temp * aerodynamic_mobility_wp(radius, slip, viscosity)
+    speed = wp.sqrt(F64(8.0) * KB * temp / (F64(3.141592653589793) * mass))
+    g = g_collection_term_wp(particle_mean_free_path_wp(diff, speed), radius)
+    return brownian_kernel_pair_wp(
+        radius, radius, diff, diff, g, g, speed, speed, F64(1.0)
+    )
 
 
 @wp.func
@@ -57,7 +86,11 @@ def batch_kernel(
     count_curve: wp.array2d(dtype=F64),
     dt: F64,
     sub: int,
+    wall_sub: int,
     count_mode: int,
+    eddy: wp.array(dtype=F64),
+    brownian: int,
+    numbers: wp.array3d(dtype=F64),
     out: wp.array3d(dtype=F64),
     error: wp.array2d(dtype=F64),
 ):
@@ -90,14 +123,59 @@ def batch_kernel(
     supplied = F64(0.0)
     worst = F64(0.0)
     out[i, r, 0] = F64(0.0)
+    numbers[i, r, 0] = F64(1.0)
+    wall_seconds = dt * F64(wall_sub)
     for j in range(50):
-        number_keep = wp.exp(-params[i, 4] * F64(0.1))
+        number_keep = wp.exp(-params[i, 4] * (wall_seconds / F64(3600.0)))
         mass_keep = number_keep
         if count_mode == 1:
             number_keep = count_curve[r, j + 1] / count_curve[r, j]
             mass_keep = wp.pow(number_keep, params[i, 14])
         for n in range(sub):
-            if n == sub / 2:
+            if n % wall_sub == wall_sub / 2:
+                if eddy[i] > F64(0.0) or brownian == 1:
+                    organic = part_s + part_l
+                    volume = seed / F64(1770.0) + organic / F64(1400.0)
+                    radius_now = wp.pow(
+                        F64(3e-9)
+                        * volume
+                        / (F64(4.0 * 3.141592653589793) * number),
+                        F64(1.0 / 3.0),
+                    )
+                    if eddy[i] > F64(0.0):
+                        rate_s = (
+                            rectangle_wall_loss_coefficient_from_transport_wp(
+                                eddy[i],
+                                radius_now,
+                                (seed + organic) / volume,
+                                temp,
+                                F64(3.0),
+                                F64(2.0),
+                                F64(3.0),
+                                props[r, 5],
+                                props[r, 6],
+                                KB,
+                            )
+                        )
+                        mass_keep = wp.exp(-rate_s * wall_seconds)
+                        number_keep = mass_keep
+                    if brownian == 1:
+                        pair = brownian_equal_pair(
+                            radius_now,
+                            (seed + organic) * F64(1e-9) / number,
+                            temp,
+                            props[r, 5],
+                            props[r, 6],
+                        )
+                        # Exact simultaneous wall and binary number removal
+                        # over the interval at frozen radius and coefficients.
+                        kw = -wp.log(mass_keep) / wall_seconds
+                        exposure = wall_seconds
+                        if kw > F64(1e-12):
+                            exposure = (F64(1.0) - mass_keep) / kw
+                        number_keep = mass_keep / (
+                            F64(1.0) + F64(0.5) * pair * number * exposure
+                        )
                 deposits += (part_s + part_l) * (F64(1.0) - mass_keep)
                 part_s *= mass_keep
                 part_l *= mass_keep
@@ -147,6 +225,7 @@ def batch_kernel(
             part_s += ds
             gas_l -= dl
             part_l += dl
+        numbers[i, r, j + 1] = number / props[r, 1]
         out[i, r, j + 1] = part_s + part_l
         worst = wp.max(
             worst,
@@ -168,13 +247,30 @@ def observations(run):
 class Engine:
     """Store gas forcing and experimental conditions once per search."""
 
-    def __init__(self, dt=18, device="cuda:0", proxy_hazard=1.0, nox=None):
+    def __init__(
+        self,
+        dt=18,
+        device="cuda:0",
+        proxy_hazard=1.0,
+        nox=None,
+        wall_interval_s=360,
+    ):
         """Precompute observed forcing for the requested step size."""
         self.dt = dt
         self.device = device
         self.sub = 360 // dt
         if self.sub * dt != 360 or self.sub % 2:
             raise ValueError("The timestep must divide the two half intervals")
+        self.wall_sub = wall_interval_s // dt
+        if (
+            not self.wall_sub
+            or self.wall_sub % 2
+            or self.sub % self.wall_sub
+            or self.wall_sub * dt != wall_interval_s
+        ):
+            raise ValueError(
+                "Wall intervals must tile the grid in even step counts"
+            )
         source = []
         props = []
         count = []
@@ -197,6 +293,10 @@ class Engine:
                     temp,
                     get_molecule_mean_free_path(OM, temp, PRESSURE),
                     np.log((nox or NOX)[run] / 30.0),
+                    get_dynamic_viscosity(temp),
+                    get_molecule_mean_free_path(
+                        MOLECULAR_WEIGHT_AIR, temp, PRESSURE
+                    ),
                 ]
             )
             if run == 2:
@@ -219,17 +319,41 @@ class Engine:
             for v in (source, props, count)
         ]
 
-    def __call__(self, params, count_mode=False):
+    def __call__(
+        self,
+        params,
+        count_mode=False,
+        *,
+        eddy_s=None,
+        brownian=False,
+        return_numbers=False,
+    ):
         """Return one suspended mass curve per candidate and run."""
         params = np.atleast_2d(params).astype(float)
         if params.shape[1] != 17 or not np.isfinite(params).all():
             raise ValueError(
                 "Expected 17 finite physical parameters per vector"
             )
+        if count_mode and self.wall_sub != self.sub:
+            raise ValueError(
+                "Measured count ratios are defined on six-minute intervals"
+            )
+        if count_mode and (eddy_s is not None or brownian):
+            raise ValueError(
+                "Measured counts and modeled count loss are mutually exclusive"
+            )
+        eddy = np.zeros(len(params))
+        if eddy_s is not None:
+            eddy[:] = np.broadcast_to(eddy_s, eddy.shape)
+            if not np.isfinite(eddy).all() or np.any(eddy <= 0):
+                raise ValueError(
+                    "Wall eddy coefficient must be positive, in s^-1"
+                )
         arg = wp.array(params, dtype=F64, device=self.device)
         out = wp.empty(
             (len(params), len(ORDER), 51), dtype=F64, device=self.device
         )
+        numbers = wp.empty_like(out)
         error = wp.empty(
             (len(params), len(ORDER)), dtype=F64, device=self.device
         )
@@ -241,7 +365,11 @@ class Engine:
                 *self.inputs,
                 float(self.dt),
                 self.sub,
+                self.wall_sub,
                 int(count_mode),
+                wp.array(eddy, dtype=F64, device=self.device),
+                int(brownian),
+                numbers,
                 out,
                 error,
             ],
@@ -254,4 +382,4 @@ class Engine:
             or error.numpy().max() > 1e-7
         ):
             raise ArithmeticError("Nonphysical state or product ledger failure")
-        return arr
+        return (arr, numbers.numpy()) if return_numbers else arr
