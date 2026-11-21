@@ -2,11 +2,15 @@
 
 ![The horizontal axis runs from dry to humid air, and ion concentration per polarity (ions/cm³) increases upward. The measured rise exceeds the model prediction. A beam produces positive and negative ions.](../../../images/cloud-ion-humidity/graphical-abstract.svg)
 
-At 20 °C in the CERN CLOUD chamber, raising relative humidity (RH) from 7% to 70% at nearly the same ion production rate increased the measured concentration by **3,399 ions cm⁻³ per polarity**. A particle-resolved Particula simulation using the published recombination coefficients and a shared wall loss reproduced **1,691 ± 25 ions cm⁻³** of that increase. The strongest constraint comes from a second, low-production measurement. Even if recombination stopped entirely, the humid chamber reading would exceed the modeled ceiling by more than a factor of four. [Franchin et al. (2015), Figure 5d and Table A2](https://acp.copernicus.org/articles/15/7203/2015/acp-15-7203-2015.pdf)
+At 20 °C in the CERN CLOUD chamber, raising relative humidity (RH) from 7% to 70% at nearly the same ion production rate increased the measured concentration by **3,399 ions cm⁻³ per polarity**. A particle-resolved Particula simulation using the published recombination coefficients and a shared wall loss reproduced **1,691 ± 25 ions cm⁻³** of that increase (95% Monte Carlo interval). The strongest constraint comes from a second, low-production measurement. Even if recombination stopped entirely, the weakest reported linear loss would limit the steady humid concentration to 394 ions cm⁻³, while the lower end of the measured scatter bar was 1,579. The low-source comparison leaves the ion source, wall loss and sampling response open. Establishing a physical zero in the humid inlet would test whether a readout offset contributes to the discrepancy. [Franchin et al. (2015), Figure 5d and Table A2](https://acp.copernicus.org/articles/15/7203/2015/acp-15-7203-2015.pdf)
 
-## Five of six measurements at 70% humidity exceed the model’s sensitivity range
+## How CLOUD measured humidity-dependent ion recombination
 
-Franchin and colleagues varied ion production with a particle beam in a 26.1 m³ chamber. Their spectrometer sampled positive and negative cluster ions. Figure 5d gives the mean concentration of the two signs, averaged over the final 10–15 minutes of each setting. The dry and humid measurements came from separate runs. [Experimental method and Figure 5d](https://acp.copernicus.org/articles/15/7203/2015/)
+Franchin and colleagues varied ion production with a particle beam in a 26.1 m³ chamber. Their spectrometer sampled positive and negative cluster ions. Figure 5d gives the mean concentration of the two signs, averaged over the final 10–15 minutes of each setting. The dry and humid measurements came from separate runs. The authors used these concentrations to estimate how the recombination coefficient varied with humidity. Reusing those coefficients tests how well their fitted rates and a common first-order loss can account for the observed pattern across beam settings. [Experimental method and Figure 5d](https://acp.copernicus.org/articles/15/7203/2015/)
+
+## How much of the humid ion increase can the fitted rates explain?
+
+### Five of six measurements at 70% humidity exceed the model’s sensitivity range
 
 ![Across ion production rates, the humidity-specific curves follow most observations at 0%, 7% and 40% relative humidity. At 70%, five of six measured concentrations lie above the shaded range.](../../../../website/results/cloud-ion-humidity/figure-2-1.png)
 
@@ -14,7 +18,7 @@ Franchin and colleagues varied ion production with a particle beam in a 26.1 m³
 
 Using the humidity-specific coefficients puts **21 of 23 measured concentrations** inside the shaded range across 0%, 7% and 40% RH. At **70% RH, only one of six** falls inside. The other five remain above the band even at the lower ends of their plotted bars. The 0% series ends near 22 ion pairs cm⁻³ s⁻¹, so the curves at higher production in that panel are extrapolations.
 
-## At the same production rate, Particula matches the dry ion count and underpredicts the humid count
+### At the same production rate, Particula matches the dry ion count and underpredicts the humid count
 
 | RH | Measured source (ion pairs cm⁻³ s⁻¹) | Measured concentration and plotted bar (ions cm⁻³) | Particula ten-minute mean and 95% Monte Carlo interval (ions cm⁻³) |
 | --- | ---: | ---: | ---: |
@@ -26,7 +30,7 @@ Using the humidity-specific coefficients puts **21 of 23 measured concentrations
 
 The measured bars describe scatter in the steady readings. The simulation intervals describe sampling across independent boxes at fixed physical inputs. The two high-source simulations use 68 ion pairs cm⁻³ s⁻¹. Their independent standard errors add in quadrature for the humidity contrast. [Runnable matched-condition and clearing comparisons](cloud_ion_humidity.py)
 
-## At low production, even zero recombination leaves the predicted ion count too low
+### At low production, even zero recombination leaves the predicted ion count too low
 
 Let $q$ be the rate of ion-pair production, $n$ the concentration of each polarity, $\alpha$ the opposite-ion recombination coefficient and $\beta$ the first-order loss rate. In well-mixed air with equal mean concentrations of both signs, the balance is
 
@@ -40,7 +44,7 @@ At steady state every recombination removes ions, so $n\le q/\beta$. At $q=2.64$
 
 Two further checks narrow the interpretation. Tracing the published humid model curve gives an *effective* $\beta$ of 0.00169 s⁻¹ and $\alpha$ of $1.98\times10^{-6}$ cm³ s⁻¹. Those coefficients predict 804 ions cm⁻³ at the low setting, still below the measured bar. In a fitted two-region model with 3.16% of the volume in the beam, the illuminated region could reach 1,731 while the volume mean was 282. Reaching even the lower observed bar would require about 90% of sampled air to come from the enriched region. The authors placed the spectrometer outside the beam trajectory. How much enriched air reached it at each plateau remains unknown. [Franchin et al., apparatus and beam conditions](https://acp.copernicus.org/articles/15/7203/2015/)
 
-## A verified humid zero would distinguish an offset from a source
+### Two models can fit the same humid signal
 
 An ordinary beam-off trace can be identical for two physically different explanations. At unit gain write the reading as $Y=n+d$, with a constant offset $d$. Substitution into the balance yields a model for $Y$ with an extra constant source $\beta d-\alpha d^2$ and a weaker linear loss $\beta-2\alpha d$. We fit the six humid plateaus by minimizing log-concentration error with CUDA derivatives, unit gain and the authors’ coefficient ranges. The fitted offset case reaches the lower limit on linear loss. The second row follows algebraically when humid loss is allowed below that range. These are alternative descriptions of the same signal. The historical data leave their physical origin open. With rates fixed at the published central values and the two lowest sources withheld together, an offset gave a prediction error of 416 ions cm⁻³ (root mean square), compared with 1,008 for extra production. This predictive advantage depends on the loss assumption.
 
@@ -49,13 +53,17 @@ An ordinary beam-off trace can be identical for two physically different explana
 | Offset | 0.00670 | 0 | 1,065 |
 | Extra source and weaker loss | 0.00257 | 4.94 | 0 |
 
-Both use $\alpha=1.938\times10^{-6}$ cm³ s⁻¹. The useful intervention is to establish the physical zero independently through the humid sampling path. Repeat the 2.28 and 2.64 ion-pair settings, switch off the beam, hold the clearing field for **120 s**, then release to a background of 1.84 ion pairs cm⁻³ s⁻¹. Record both polarities at 5, 10, 30, 60 and 120 s. With a starting reading of 1,407 ions cm⁻³, residual concentrations from 0–100 ions cm⁻³, detector time constants from 0–60 s and unit gain, the predicted reading **30 s after release** is **1,086–1,196** for the offset and **82–286 ions cm⁻³** for the extra source. The ranges describe synthetic trajectories.
+## A verified humid zero would distinguish an offset from a source
+
+Both fitted models use $\alpha=1.938\times10^{-6}$ cm³ s⁻¹. The useful intervention is to establish the physical zero independently through the humid sampling path. Repeat the 2.28 and 2.64 ion-pair settings, switch off the beam, hold the clearing field for **120 s**, then release to a background of 1.84 ion pairs cm⁻³ s⁻¹. Record both polarities at 5, 10, 30, 60 and 120 s. With a starting reading of 1,407 ions cm⁻³, residual concentrations from 0–100 ions cm⁻³, detector time constants from 0–60 s and unit gain, the predicted reading **30 s after release** is **1,086–1,196** for the offset and **82–286 ions cm⁻³** for the extra source. The ranges describe synthetic trajectories.
 
 ![Predicted detector readings after field release. At 30 seconds the offset model remains above 1,086 ions per cubic centimetre while the extra-source model stays below 286.](../../../../website/results/cloud-ion-humidity/figure-4-1.png)
 
 In a blinded recovery test, one inlet distinguished these two fitted cases in 512 of 512 trials in each direction (pointwise 95% Wilson lower bound 99.3%). Separating localized production from nonuniform wall loss also requires a spatial measurement. With the reference noise and inlet gains known to ±5%, the second inlet needed to sample **at most half the plume fraction** of the first. At ±10% gain the smallest passing reduction tested rose to 62.5%, and at ±15% to 87.5%. At double the noise, only exactly known gains and complete exposure contrast passed. These thresholds apply to the four fitted hypotheses and tested grid. Co-locate the counters to measure humid gain and noise, then independently establish the contrast with a beam profile and a transport or tracer measurement.
 
 ![Smallest passing reduction in plume fraction at each inlet gain uncertainty. More uncertain gains require a greater contrast, and under doubled noise only the idealized design passes.](../../../../website/results/cloud-ion-humidity/figure-5-1.png)
+
+The low-source counts rule out recovering the humid signal by adjusting recombination alone within the shared-loss model. A persistently high reading after independently clearing the humid sampling path would support an offset. A reading near the physical zero followed by a rise would favor renewed production in these fitted cases. Explaining where that production occurs would still require the two calibrated inlets and a measured exposure contrast.
 
 ## Data, methods and reproduction
 

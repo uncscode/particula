@@ -2,13 +2,15 @@
 
 ![Schematic eddies bring two cloud droplets into contact. For drops with eight times their starting mass, shear theory gives 614 per million, Particula gives 610 and a constant rate fitted to mean mass gives 102.](../../../images/shear-drop-spectrum/graphical-abstract.svg)
 
-*All three bars are model predictions. Saffman and Turner calculated the drop counts in their paper. The eddies illustrate the assumed turbulent flow.*
+*All three bars are model predictions. The shear-theory bar comes from an independent integration of Saffman and Turner’s equations. The eddies illustrate the assumed turbulent flow.*
 
-Saffman and Turner (1956) asked how quickly turbulent air could produce large drops in a cloud that started with identical droplets. Their model lets larger drops encounter other drops faster. **Particula used that size-dependent shear model and reproduced its prediction.** At the final time in Figure 2, Particula produced **610 drops of exactly eight times the initial mass per million starting drops**. Integrating the authors’ equations independently gave **614**. Giving every pair the same collision rate and fitting that rate to the final mean mass gave only **102**. The sixfold shortfall belongs to the constant-rate approximation. The comparison tests a calculation of cloud growth against theory. Testing its accuracy in real clouds requires measured drop counts. [Saffman and Turner, equations 1–3 and Figure 2](https://authors.library.caltech.edu/records/mvczm-fey53)
+Saffman and Turner (1956) asked how quickly turbulent air could produce large drops in a cloud that started with identical droplets. Their model lets larger drops encounter other drops faster. At the final time in Figure 2, Particula produced **610 drops of exactly eight times the initial mass per million starting drops**. Integrating the authors’ equations independently gave **614**. Reading the authors’ plotted marker gives approximately 675, with some uncertainty in locating the center of the printed point. Giving every pair the same collision rate and fitting that rate to the final mean mass gave only **102**. Matching mean growth therefore leaves a sixfold shortfall in this mass class. The comparison tests a calculation of cloud growth against theory. Testing its accuracy in real clouds requires measured drop counts. [Saffman and Turner, equations 1–3 and Figure 2](https://authors.library.caltech.edu/records/mvczm-fey53)
 
 ## How drop size enters the collision rate
 
-Consider a closed, well-mixed volume of air with **600 water drops/cm³** and **1.5 g of liquid water/m³**. At a liquid density of 1,000 kg/m³, each drop starts with a radius of **8.42 µm** and a mass of **2.50 ng**. Eight times that mass corresponds to **twice the initial radius**. The drops follow the turbulent air, and every encounter leads to coalescence. Only turbulent shear acts. We use the paper’s example dissipation rate of 0.01 m²/s³ and air kinematic viscosity of 1.7 × 10⁻⁵ m²/s. [Original cloud example, pp. 23–24](https://doi.org/10.1017/S0022112056000020)
+Saffman and Turner asked whether shear could broaden an initially uniform drop population enough to help initiate rainfall. In their shear calculation, drops are small compared with the smallest turbulent eddies. Nearby fluid velocities differ across a drop pair, so even equal-sized drops can collide. The authors integrated their collision equations and plotted the predicted abundance of each mass class in Figure 2. [Saffman and Turner (1956)](https://authors.library.caltech.edu/records/mvczm-fey53)
+
+Their cloud example uses **600 water drops/cm³** and **1.5 g of liquid water/m³**. At a liquid density of 1,000 kg/m³, each drop starts with a radius of **8.42 µm** and a mass of **2.50 ng**. Eight times that mass corresponds to **twice the initial radius**. The drops follow the turbulent air, and every encounter leads to coalescence. Only turbulent shear acts. We use the paper’s example dissipation rate of 0.01 m²/s³ and air kinematic viscosity of 1.7 × 10⁻⁵ m²/s. [Original cloud example, pp. 23–24](https://doi.org/10.1017/S0022112056000020)
 
 For drops with radii $r_i$ and $r_j$, equation 1 gives the pair collision kernel $\beta_{ij}$ in m³/s,
 
@@ -18,7 +20,11 @@ $$
 
 Here $\epsilon$ is turbulent kinetic energy dissipation per unit mass and $\nu$ is air kinematic viscosity. Both stay fixed. After each merger, Particula recalculates encounter rates using the new drop sizes. Particula samples individual mergers on CUDA. The independent CPU calculation integrates equation 2 for the abundance of each integer mass class. Both use the exact square-root coefficient in equation 1, which the authors confirmed in their corrigendum. [Particula shear strategy](../../../guide/processes/coagulation.md#turbulent-shear-coagulation) · [1988 corrigendum](https://doi.org/10.1017/S002211208800285X)
 
-## Matching average growth still leaves too few large drops
+## Can a rate fitted to mean growth reproduce the large-drop counts?
+
+We compare the exact eightfold mass class at the final dimensionless time and then ask whether a sample of the modeled cloud is likely to contain a drop in that class.
+
+### Matching average growth still leaves too few large drops
 
 Figure 2 reports time as $K=\sqrt{8\pi\epsilon/(15\nu)}\,r_1^3 n_0t$, where $r_1$ is the initial radius, $n_0$ is the initial number concentration and $t$ is elapsed time. At $K=0.09$ (about 133 minutes here), the CUDA ensemble retained **70.26%** of its starting drop count. Because water mass is conserved, fitting the final number also fits final mean mass. The upper end of the distribution still distinguishes the models.
 
@@ -36,7 +42,7 @@ The ratio of the CUDA shear result to the fitted constant-rate result is **6.00*
 
 *Left, abundance in each mass class relative to the starting count. Open circles are digitized theoretical results from the 1956 paper. The mean-matched line uses the continuous shear solution’s mean. The table fits the same baseline to the CUDA mean. Right, fraction of independent boxes containing an exact eightfold drop, with 95% Wilson intervals. The two volumes have identical initial concentration.*
 
-## A small sample can miss the large drops
+### A small sample can miss the large drops
 
 At $K=0.09$, just **141 of 1,024** simulated 0.427 mL boxes (13.8%) contained an exact eightfold drop. Increasing the volume to **1.71 mL** raised the fraction to **363 of 768** (47.3%). The corresponding pooled abundances were similar at **595 and 610 per million initial drops**. Earlier, at $K=0.03$, only one of the 768 larger boxes contained a drop in this class.
 
@@ -49,7 +55,7 @@ The authors also estimated roughly **100 drops/L** at two different times and mi
 
 ## What would test this in a cloud chamber?
 
-Measure the initial size distribution, the large drops already present, turbulent dissipation and the probe’s sampling volume. Fit a constant rate using only the total number of drops. Then compare the withheld count above twice the initial radius at 90 minutes with both predictions. Calibrate detection near that radius and repeat across independent samples. Initial size spread, gravitational settling, spatial mixing and imperfect coalescence could all alter the measured tail. The reported intervals describe simulation sampling under the stated assumptions.
+Measure the initial size distribution, the large drops already present, turbulent dissipation and the probe’s sampling volume. Fit a constant rate using only the total number of drops. Then compare the withheld count at or above twice the initial radius at 90 minutes with both predictions. Calibrate detection near that radius and repeat across independent samples. Initial size spread, gravitational settling, spatial mixing and imperfect coalescence could all alter the measured tail. The reported intervals describe simulation sampling under the stated assumptions.
 
 ## Reproduce the comparison
 

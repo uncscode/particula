@@ -2815,7 +2815,8 @@
             "label": "How to use this"
           }
         ]
-      }
+      },
+      "tocFigure": "pi-chamber/seed-optical-cutoff.svg"
     },
     {
       "source": "docs/studies/literature/pi-chamber/haze-and-cloud/index.md",

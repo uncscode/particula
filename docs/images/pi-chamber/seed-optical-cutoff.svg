@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Two modeled salts straddle the optical cutoff</title>
+  <desc id="desc">At 99.55% relative humidity, equilibrium wet diameters for 130 nm dry seed are 544 nm for ammonium sulfate and 723 nm for sodium chloride. Their positions on a common linear diameter scale fall below and above the 600 nm optical cutoff.</desc>
+  <rect width="300" height="300" rx="14" fill="#f8f6ed"/>
+  <rect x="22" y="34" width="256" height="141" rx="5" fill="#e4eeea"/>
+  <path d="M22 175H278" fill="none" stroke="#405252" stroke-width="2.5" stroke-dasharray="7 5"/>
+  <g font-family="sans-serif" fill="#203a3d">
+    <text x="32" y="60" font-size="15">Wet diameter</text>
+    <text x="31" y="167" font-size="17">600 nm cutoff</text>
+    <circle cx="215" cy="82.75" r="9" fill="#13636c"/>
+    <text x="215" y="111" text-anchor="middle" font-size="20" font-weight="bold">NaCl</text>
+    <text x="215" y="132" text-anchor="middle" font-size="16">723 nm</text>
+    <path d="m84 207 10 10-10 10-10-10z" fill="#9c4f27"/>
+    <text x="84" y="251" text-anchor="middle" font-size="20" font-weight="bold">(NH₄)₂SO₄</text>
+    <text x="84" y="274" text-anchor="middle" font-size="16">544 nm</text>
+  </g>
+</svg>

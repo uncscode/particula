@@ -1,0 +1,55 @@
+# Revising the literature analysis studies
+
+A researcher skimming a study should be able to say what the original paper established, what the Particula comparison adds, and which uncertainty matters for using the result. Start with the four reports whose later analyses change how the opening should be read. In each, a reproduction section currently interrupts the scientific argument.
+
+This plan covers the 15 primary studies and one cross-listed validation study in the [Literature analyses collection](../docs/studies/literature/index.md) at local main revision `51e25ee110`. The [study registry](../website/topics.json) identifies the owning source, including the glyoxal Python report. The queue below uses findings as reported in those sources. During revision, verify each changed quantitative claim against its underlying evidence.
+
+## Review outcome
+
+Completed on `codex/literature-narrative-revision` in the dedicated worktree based on `51e25ee110`. Fifteen studies received narrative edits. A fresh reading of the [Π Chamber haze-and-cloud report](../docs/studies/literature/pi-chamber/haze-and-cloud/index.md) recovered all three distinctions from its existing opening and ending. The report identifies the haze counts used to fit humidity, the independent cloud counts and the proposed near-floor size and deposition measurements. Its wording was retained.
+
+The revised reports place previously separated findings together and link them to their original evidence. Five reports now show existing quantitative plots alongside the comparison. A new [seed-chemistry graphic](../docs/images/pi-chamber/seed-optical-cutoff.svg) shows the two modeled wet diameters against the instrument cutoff. All 16 reports have an illustrated link in the [collection](../docs/studies/literature/index.md).
+
+## First revision: reconnect results separated by reproduction instructions
+
+**Start with the pinic isomers.** The question is small enough to test the editorial approach on one report. A reader currently reaches “Reproduction” before learning which model predicts the withheld observations better.
+
+| Study | Proposed sequence and evidence to keep together |
+| --- | --- |
+| [Pinic isomers](../docs/studies/literature/pinic-isomers/index.md) | Open with the 20.7 min separation between measured half-signals. Follow the original Figure 4A traces with the common-source and delayed-production fits. At 80 nm effective radius they predict gaps of 0.11 and 19.11 min. Use the held-out errors to explain why delayed production is plausible and the fitted timescale limit to explain why the pathway remains unresolved. Present the hypothetical volatility and seed-loading exercise as a separate transfer test. Close with what gas-phase isomer measurements at the proposed lower loading could distinguish. |
+| [Mt. Hua extracts](../docs/studies/literature/particle-water-uptake/mt-hua/index.md) | Lead from measured diameter growth across the 79 extracts to the winter foothill discrepancy. Put the matched pure-salt control beside the liquid-mixture result so readers can see how much of the change comes from changing the reference and how much from mixing. Distinguish the two baseline growth calculations in the table. End with the dry-volume, counterion and phase information needed to interpret the residual. |
+| [Pendant pentane drop](../docs/studies/literature/evaporation-and-uptake/pendant-drop/index.md) | Establish when a steady drop makes feed rate a measure of evaporation. Compare the implied heat demand with modeled convective supply, then show what happens using the reported Prandtl number. Put the numerical refinement next to the uncertainty it bounds. End with the rate, area and thermal-boundary information that would discriminate explanations for the residual. Move run history and reproduction commands together at the end. |
+| [MAM4xx coagulation](../docs/studies/literature/mam4xx-coagulation/index.md) | Organize around two questions. First, when can one-hour number agreement hide different spectra? Follow the nine-mixture table with the matched-kernel result before interpreting the 220 nm case. Second, how much of the 24-hour attraction response survives a fixed-width modal treatment? Compare the archived-host and evolving-size results under matched inputs, preserving the polluted-air and marine distinction. Keep the initial loss rate, one-hour total number and 24-hour sub-100 nm number clearly labeled. Consolidate replay and reproduction details after both answers. |
+
+The pilot is ready when a fresh reader can trace the measured gap to the two isomer signals, identify the withheld model test, and explain why improved prediction leaves the chemical pathway open. Apply that same read to the other three reports using their own questions.
+
+## Second revision: clarify which evidence answers each question
+
+| Study | Editorial focus and evidence to check |
+| --- | --- |
+| [Sea2Cloud events](../docs/studies/literature/sea2cloud-events/index.md) | Follow the March 22 event from the fitted 1–10 nm pulse to the independent 12–25 nm timing check. Identify what observations each fit had already seen. Keep the two dates and the shipboard versus upwind evidence distinct. |
+| [NaCl scavenging](../docs/studies/literature/nacl-scavenging/index.md) | Explain how blank and loaded counts yield an apparent 4 nm capture rate before comparing candidate mechanisms. Pair the remaining discrepancy with the measured scan and identify which wall-loss and collector fractions come from the simulated pulse. |
+| [Glyoxal dilution](../docs/studies/literature/evaporation-and-uptake/glyoxal_chamber.py) | In the explanatory cells, introduce the growth fit before the post-dilution comparison. Show which models predict rising organic mass per sulfate as the measured ratio falls. Keep the observed ratio, inferred mechanism and modeled chemical products distinct. Preserve cell order and outputs where the narrative can be repaired in place. |
+| [Π Chamber seed chemistry](../docs/studies/literature/pi-chamber/seed-chemistry.md) | Link the inferred humidity to the haze-and-cloud report before comparing synthetic seed compositions against the optical cutoff. Describe the sulfate visibility result and vapor response as conditional predictions. |
+| [CCN retrieval](../docs/studies/literature/particle-water-uptake/ccn-retrieval/index.md) | Follow the activation fit through the counter threshold to its subsaturated transfer test. For the 49% excess at 95% humidity, identify the organic, the modeled water quantity and the BAT reference in the same passage. |
+| [BAT activation](../docs/studies/literature/particle-water-uptake/bat-ccn.md) | Lead with why the 30-record mean conceals opposite compound-level errors. Use Figure 12 for the measurement comparison and Figure 9 for the separate modeled composition sweep. Credit the authors’ archived BAT values. |
+| [Dry PSL mobility](../docs/studies/literature/dry-psl-mobility/index.md) | Carry the near-atmospheric inversion from measured mobility to inferred diameter, then explain what the one-point calibration can transfer. Keep the inconsistent pressure entries with the affected 269 nm comparison. |
+
+## Final pass: retain effective narratives and check their limits
+
+| Study | Reader check that determines whether an edit is needed |
+| --- | --- |
+| [Π Chamber haze and cloud](../docs/studies/literature/pi-chamber/haze-and-cloud/index.md) | Use this as the structural reference. Can the reader identify the haze counts used to fit humidity, the cloud counts used to test it, and the floor measurement proposed to constrain the model? |
+| [Citric acid water activity](../docs/studies/literature/particle-water-uptake/citric-acid/index.md) | Can the reader explain how two models can agree closely while both overpredict all 12 measured compositions, and why a refit needs an independent test? |
+| [CLOUD ion humidity](../docs/studies/literature/cloud-ion-humidity/index.md) | Can the reader identify the size of the humid discrepancy, the dry reference, and what a verified humid zero could resolve? Keep source, loss and offset explanations conditional. |
+| [Shear and drop growth](../docs/studies/literature/shear-drop-spectrum/index.md) | Can the reader distinguish the Particula result, the integration of the published equations and the constant-rate fit? Keep “exactly eight times the initial mass” and the per-million starting-drop denominator with the comparison. |
+| [Spherical wall loss](../docs/studies/validation/wall-loss/index.md) | Keep the report in its validation home. Can the reader distinguish coupled theory, the additive approximation and the simulated airborne fraction? Specify what the Monte Carlo interval covers and what chamber measurements would test. |
+
+## How to review and finish each study
+
+1. **Trace the claim.** Identify the specific paper figure, table or equation and the saved output behind the opening comparison. Record the observable, units, conditions, evidence used for fitting and evidence reserved for testing. If either source cannot support the proposed wording, narrow the claim and identify the gap.
+2. **Write for the skimming reader.** Pair the TOC figure with an unheaded 100–200 word opening. Give the paper’s motivation a descriptive heading and fewer than 300 words. Group the analysis under a scientific question with subsections for its comparisons. Close on what the result permits the reader to infer and which observation could change that inference. Put run details, resources and footnotes last. Follow the [literature report guidance](../plugins/particula-helper/skills/particula-studies-literature/SKILL.md).
+3. **Check the interpretation independently.** Give a fresh reader the opening, headings, figure and final scientific paragraph. Ask what changed, what conclusion follows, and what evidence could change it. Check the answers against the paper and saved result. Revise the passage if a reader could mistake a fit, model comparison or synthetic extension for an independent observation. Use the [drafting and editing roles](../plugins/particula-helper/references/drafting-and-editing.md).
+4. **Verify the published reading path.** For changed titles, captions or headings, inspect the collection card, alt text, registry title, existing anchor links and rendered page. Preserve stable study IDs and downloads. For glyoxal, check that explanatory cells still sit beside the outputs they interpret. Use saved results for editorial changes. Run `python scripts/docs_studies.py check` and `npm --prefix website run build` for each revision batch, following the [site authoring guide](../website/AUTHORING.md).
+
+A batch is complete when every study in it has a revised passage or a documented reason to retain its current wording, its lead comparison traces to evidence, and its rendered reading path passes review. Any new measurement or simulation identified by the review remains a proposed follow-up with its question and observable stated.

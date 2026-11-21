@@ -1,10 +1,18 @@
 # At the inferred Π Chamber humidity, modeled sulfate haze falls below the optical detection limit
 
-The fresh-water and salt-water experiments of Prabhakaran et al. both used nearly monodisperse **130 nm dry sodium chloride** particles. The salt water was on the chamber floor. The measurements anchor the NaCl case. A separate Particula mixture study changed particle composition, while treating all dry constituents as nonvolatile. Here we compare two dissolved salts at fixed dry diameter and let a semivolatile organic exchange with the gas. These are predictions for follow-up experiments. [Original experiment, Table 1](https://doi.org/10.1073/pnas.2006426117) · [Chamber comparison](haze-and-cloud/index.md)
+![At 99.55% relative humidity the modeled wet diameters of ammonium sulfate (544 nm) and sodium chloride (723 nm) fall on opposite sides of the 600 nm optical cutoff.](../../../images/pi-chamber/seed-optical-cutoff.svg)
+
+Would the Π Chamber see the same haze if its seed salt changed? Prabhakaran et al. used 130 nm dry sodium chloride seeds. Fitting a single mean humidity to the haze counts over both floor types in the companion study gave **99.55% relative humidity**. At that humidity, a dissolved NaCl particle of the experimental dry size has a predicted wet diameter of **723 nm**. Replacing the salt with an ammonium sulfate proxy gives **544 nm**, below the instrument’s 600 nm lower limit. A decrease in counted haze could thus accompany a change in water uptake even at the same seed abundance. A separate simulated organic population exchanges vapor while remaining below the optical cutoff, suggesting a role for gas-phase measurements in a follow-up experiment. [Chamber measurements, Table 1](https://pmc.ncbi.nlm.nih.gov/articles/PMC7382222/) · [Companion humidity fits](haze-and-cloud/index.md)
+
+## The chamber used the same NaCl seeds over both floors
+
+The fresh-water and salt-water labels refer to the chamber floor. Both experiments received nearly monodisperse 130 nm NaCl seeds and used the same optical counter to measure wet particles between 0.6 and 40 µm. Those observations establish a reference for NaCl. The companion chamber analysis inferred humidity from the observed haze counts. Here we hold that inferred condition fixed to ask what an instrument with the same lower size limit would see for other compositions. [Prabhakaran et al., Table 1 and Figure 2C](https://doi.org/10.1073/pnas.2006426117) · [Haze and cloud comparison](haze-and-cloud/index.md)
+
+## Changing the seed changes what the optical counter can see
 
 <a id="what-was-in-the-earlier-mixtures"></a>
 
-## The same dry composition can give different activation when particles mix differently
+### The same dry composition can give different activation when particles mix differently
 
 The hygroscopicity parameter κ controls how dissolved material lowers water activity. In the earlier scenarios, internal mixtures contained each component in every particle. External mixtures placed the same inventory into separate particle types at each dry size. Intermediate mixtures placed half the dry volume in the external endmember and half in the internal blend.
 
@@ -19,7 +27,7 @@ Volume-weighting these κ values gives **0.741** for the internally mixed marine
 
 <a id="what-changes-if-the-130-nm-seed-is-ammonium-sulfate"></a>
 
-## At 99.55% humidity, NaCl haze clears the detection limit and sulfate haze falls below it
+### At 99.55% humidity, NaCl haze clears the detection limit and sulfate haze falls below it
 
 The following single-particle calculations use the full κ–Köhler curve at 293.15 K, a water surface tension of 0.072 N/m and a dissolved liquid particle. The shared 99.55% RH was inferred in the earlier chamber fit. Crystallization and deliquescence histories are outside this calculation.
 
@@ -32,7 +40,7 @@ At this RH, the sodium chloride haze particle lies above the instrument’s 0.6 
 
 <a id="can-the-same-organic-vapor-make-one-particle-evaporate-and-another-grow"></a>
 
-## Raising humidity can switch modeled organic evaporation to uptake
+### Raising humidity can switch modeled organic evaporation to uptake
 
 We used Binary Activity Thermodynamics (BAT) for a homogeneous water–organic liquid. The organic has molar mass 200 g/mol, O:C = 0.5 and density 1,243.5 kg/m³, following the miscible Figure 9 reference composition. We assigned two illustrative pure-component saturation mass concentrations, **C\* = 1 or 10 µg/m³** at 293.15 K. This holds the water affinity fixed while changing volatility. Each closed box starts with 2,000 particles/cm³, 130 nm organic dry diameter and 2.861 µg/m³ of particle organic. Water first equilibrates at the specified initial RH. The gas then starts with 0, 1 or 5 µg/m³ organic vapor, and both water and organic can move between gas and particles. [Gorkowski, Preston and Zuend (2019)](https://doi.org/10.5194/acp-19-13383-2019) · [Particula BAT reference checks](../../validation/material-properties/binary-bat.md)
 
@@ -46,6 +54,10 @@ For **C\* = 10 µg/m³ and initial vapor = 1 µg/m³**, the organic flux changes
 The ideal-molar control also predicts the sign change. BAT reduces the predicted uptake at 99.55% RH by about 12% relative to the ideal control. Each control equilibrates its starting water content under its own activity law. The difference therefore includes both initial water uptake and subsequent exchange. Under BAT the final particle diameters were 150 and 294 nm, respectively. Both are below the chamber counter’s lower limit. A vapor measurement would still distinguish the two cases because the modeled gas ends at 1.135 and 0.407 µg/m³, respectively.
 
 ![Particle organic mass change over 64 seconds for two volatilities, three initial vapor doses and two humidities. Dashed curves show 90% RH and solid curves show 99.55% RH at initialization.](../../../images/thermodynamics/pi-chamber-organic-vapor.png)
+
+## Pair wet sizes with a vapor measurement after a change in composition
+
+A counter with a lower size limit of 600 nm would miss the predicted sulfate haze at the fitted humidity. Measuring wet diameters below that limit for size-selected NaCl and sulfate seeds would test the predicted separation. For the organic case, the predicted gas concentrations diverge even though both final particle sizes stay below the cutoff.
 
 The 64 s trajectories describe finite closed reservoirs at constant temperature with no additional injection, turbulence or deposition. They isolate local transfer. The two-region chamber calculation separately addresses transport and removal. Homogeneous binary BAT covers water and one organic here. A salt core with an organic coating introduces ion–organic interactions, possible phase separation and surface composition effects. A quantitative prediction for such a particle would need constraints on those interactions. One discriminating experiment would measure dry mobility size, particle organic mass and gas-phase organic concentration along with the wet optical spectrum after a vapor step.
 
