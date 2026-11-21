@@ -1,6 +1,8 @@
 """Study atmospheric process effects with matched structures and inputs."""
 
+import csv
 import time
+from pathlib import Path
 
 import numpy as np
 from scripts.mam4xx_coagulation.campaign import ensemble
@@ -31,6 +33,27 @@ def regime_options(control, regime, options):
             "temp": 273.15 + bounds[regime][control == "warm/higher"]
         }
     return options
+
+
+def ranking_particles():
+    """Sample the same field modes and eight-bin-per-decade ranking kernels."""
+    from scripts.mam4xx_coagulation.attraction_particles import (
+        ensemble as sample,
+    )
+    from scripts.mam4xx_coagulation.modal_attraction import HAMAKER, kernel_grid
+
+    edges, hard, attraction, _ = kernel_grid(8, HAMAKER)
+    rows = {}
+    for reg, box in [
+        ("polluted", 5.0),
+        ("marine", 20.0),
+        ("continental", 25.0),
+    ]:
+        rows[reg] = {
+            key: sample(MODES[reg], edges, law, box, range(2501, 2517))
+            for key, law in [("neutral", hard), ("dispersion", attraction)]
+        }
+    return rows
 
 
 def simulate():
@@ -104,7 +127,15 @@ def simulate():
                     grid_shift=abs(values[1] - values[0]),
                 )
             )
+    directory = (
+        Path(__file__).resolve().parents[2] / "website/public/study-data/mam4xx"
+    )
+    with (directory / "mode-coefficients.csv").open() as stream:
+        coefficients = list(csv.DictReader(stream))
     return dict(
+        ranking_particles=ranking_particles(),
+        host_coefficients=coefficients,
+        input_modes=MODES,
         atmospheric_reference=comparison(),
         endpoints=endpoint_contrasts(records + modal_cases),
         anchors=benchmark,

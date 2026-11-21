@@ -4727,7 +4727,8 @@
         "id": "mam4xx-coagulation",
         "runs": [
           "mam4xx-coagulation",
-          "regimes"
+          "regimes",
+          "mode-attraction"
         ],
         "companions": [],
         "relations": [
@@ -4742,6 +4743,14 @@
     {
       "source": "docs/studies/literature/mam4xx-coagulation/regimes.py",
       "title": "Which coagulation processes matter in three atmospheric regimes?",
+      "topic": "brownian",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/mam4xx-coagulation/mode_attraction.py",
+      "title": "Does neutral attraction survive averaging over MAM4xx modes?",
       "topic": "brownian",
       "also": [],
       "role": "Studies",

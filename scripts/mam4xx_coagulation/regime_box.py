@@ -24,10 +24,11 @@ MODES = {
 }
 
 
-def initial(edges, regime, coarse, factor):
+def initial(edges, regime, coarse, factor, modes=None):
     """Integrate the observed modal number distribution on common edges."""
     n = np.zeros(len(edges) - 1)
-    for diameter, sigma, count in MODES[regime][: 3 if coarse else 2]:
+    population = MODES[regime][: 3 if coarse else 2] if modes is None else modes
+    for diameter, sigma, count in population:
         n += (
             count
             * factor
@@ -62,6 +63,21 @@ def select_kernel(mechanism, prob, bare, full, brown, settle, shear, epsilon):
     return kernel
 
 
+def replace_neutral(kernel, neutral_kernel, d, mechanism):
+    """Permit a neutral-only replacement for the dispersion experiment."""
+    if neutral_kernel is not None:
+        if mechanism != "dispersion":
+            raise ValueError(
+                "The replacement applies to neutral dispersion only"
+            )
+        kernel = neutral_kernel(d)
+        if kernel.shape != (len(d), len(d)) or not np.all(
+            np.isfinite(kernel) & (kernel > 0)
+        ):
+            raise ValueError("Invalid neutral pair table")
+    return kernel
+
+
 def evolve(
     regime,
     mechanism,
@@ -74,6 +90,8 @@ def evolve(
     dielectric=5.9,
     epsilon=0.01,
     rtol=2e-6,
+    modes=None,
+    neutral_kernel=None,
 ):
     """Compute endpoint spectra, volume redistribution and integral budgets."""
     start = time.monotonic()
@@ -81,13 +99,14 @@ def evolve(
         tables(per_decade, cap, temp, hamaker, dielectric)
     )
     dynamic = mechanism == "dynamic"
-    n = initial(edge, regime, mechanism != "fine", factor)
+    n = initial(edge, regime, mechanism != "fine", factor, modes)
     m = len(d)
     width = len(q)
     neutral = np.arange(cap, m * width, width)
     kernel = select_kernel(
         mechanism, prob, bare, full, brown, settle, shear, epsilon
     )
+    kernel = replace_neutral(kernel, neutral_kernel, d, mechanism)
     if mechanism == "diagnostic":
         zero = np.zeros_like(prob)
         zero[:, cap] = 1.0

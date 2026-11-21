@@ -1,14 +1,14 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 1451.9670116909547,
+  "elapsed_seconds": 297.3734269540291,
   "package_source_sha256": "de9c4fa23fbd4833d9eeae22e97ffd8e2496acae8432510149eed8ada42f4ee3",
   "scientific_source_sha256": "1ac66c614e80ae7a0f6aae70e885469d5f8609ca95421966dfcd08ebcf41597f",
   "input_sha256": {
-    "scripts/mam4xx_coagulation/regimes.py": "f610eaecde7f48ad1c5028fa90ad3756c9b9785177ab6e0103c0412772676910",
-    "scripts/mam4xx_coagulation/regime_plots.py": "04c8871471c5d417d3461fc57091fead648dc74d6b3270324fee02df4c884d20",
+    "scripts/mam4xx_coagulation/regimes.py": "6ab830452725e487527cf264a04dadaf5107a1556dd59c17babf439c128ca93a",
+    "scripts/mam4xx_coagulation/regime_plots.py": "63aa8d82a9aec7cc614aed0baa6247d95a7a91ddaf66398bed8adb9923647076",
     "scripts/mam4xx_coagulation/regime_rates.py": "9de0528d2646d09eff66ea66c98b92b837936ae78603ba1fa8c2b440c0bdf169",
-    "scripts/mam4xx_coagulation/regime_box.py": "4789b32e22698b2f7c8506c982f2fbc930e95d9f335643e35204864a939596f8",
+    "scripts/mam4xx_coagulation/regime_box.py": "2b3cc0658e801b919eac070b4593d2584b91455fb3bc71db28f6943f9b4dff32",
     "scripts/mam4xx_coagulation/matched.py": "7022fde22a0f6853bc816fdfefb1a5bcfe06fa09a99e74d2b68d8f5c382c7dc1",
     "scripts/mam4xx_coagulation/campaign.py": "ac2f488f33fca6e5617f213c7283ebe457c922820edcbe337b34d0c6948b1adb",
     "scripts/mam4xx_coagulation/particles.py": "18f75c4c5567f1028c52b5a1d66ed0c5d7cbde174c5ea0eb8f0edaba012ed618",
@@ -18,14 +18,22 @@
     "scripts/mam4xx_coagulation/regime_reference.py": "5186c6d06d4a44488f5453c168564098a86cc560e49fcccd00e5a4c6edd2a96e",
     "scripts/mam4xx_coagulation/reference_driver.cpp": "32388e90fa67b2f3204aeca4cd00290019e1e4c4d1f72642e893758fce900b92",
     "scripts/mam4xx_coagulation/build_reference.py": "8d8c341b0e695c90bf2a28952ebb9cade62f1026303974fb342cf5e0131b9860",
-    "docs/data/mam4xx-coagulation/regional-modal.csv": "5bce852b401db6dada7763c99b14f4e8c041fee9e8e725219e054397caaf629d"
+    "docs/data/mam4xx-coagulation/regional-modal.csv": "5bce852b401db6dada7763c99b14f4e8c041fee9e8e725219e054397caaf629d",
+    "website/public/study-data/mam4xx/mode-coefficients.csv": "5f4eaed5130b4526c5a175ce0a4a3b2c3aa3d6f8449cf9a0b8b06e724b1ceb4a",
+    "website/public/study-data/mam4xx/archived-attraction.csv": "4b6d7b2698287d86ddd3323ee75db872cc83fc1d4216e2f77a9748f8e5556345",
+    "scripts/mam4xx_coagulation/host_attraction.py": "c53160da21cb61bdfa864079e8543d540e6ef9fc00a32b817ac7627e11de78e5",
+    "scripts/mam4xx_coagulation/host_attraction.cpp": "78f4e53c2191313cedd2e343e767440cb54fca5c02f405c638f3111395d1c8fe",
+    "scripts/mam4xx_coagulation/attraction_campaign.py": "84a8413a180bba79d89c3b3049b949cf76d67fc9b80904be56fdbbdb60736ba1",
+    "scripts/mam4xx_coagulation/attraction_particles.py": "c5ebffb18cdd97ca2f585f792c767a2bf4bc2d938d30ac4efcace367ab117e1e",
+    "scripts/mam4xx_coagulation/modal_attraction.py": "1b8ad5feebf7f91cb0602381704613749d0548ce1a96e70657fbad8e9ec15278",
+    "scripts/mam4xx_coagulation/neutral_geometry.py": "5f0046d53e845fb718b972075bb67ccda57e0cf8aa72820cc01921751402db41"
   },
   "example": "regimes",
-  "fingerprint": "c76137218a2ce889c87d325310152f34995986269bde3c6c759d3f1f28b50258",
+  "fingerprint": "3efa1588aa0b630e6d7e5899a5520994da32cd00fe71da7e3846edee2bc9a504",
   "source": "docs/studies/literature/mam4xx-coagulation/regimes.py",
-  "revision": "436cf2e8b4da821c19f38b04cdc6ef60d7a171c4",
+  "revision": "e6bd1343a5757c35f6fc2d6180d022b80d4f798b",
   "package_dirty": false,
-  "executed_at": "2026-11-21T06:29:42.192221+00:00",
+  "executed_at": "2026-11-21T12:49:28.645049+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
@@ -44,15 +52,27 @@
       {
         "image": "figure-2-1.png"
       }
+    ],
+    [
+      {
+        "image": "figure-3-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-4-1.png"
+      }
     ]
   ],
   "files": {
+    "figure-4-1.png": "8ed0672b4c7a2eef8e276c52b84c7f9a98cf24062edfdb03cfeeaaf082da595e",
+    "figure-3-1.png": "fba110f83b727288206580352ff736d085aef6ea41b8d597fb345cc53b4528a1",
     "figure-2-1.png": "55a4ee6257b1c85b90a435a6c248e445c4711c054dd213e6fff22314a8a0dc01",
-    "executed_source.py": "4666a881d8b26b8e10f26ed916d5ac4b4e272941a664d245610ef944c1ad29a4",
-    "data.json": "9329c334e62352df38fd27b83b916d055bd4386f2772f06976738e9f07754d6c",
-    "source.py": "4666a881d8b26b8e10f26ed916d5ac4b4e272941a664d245610ef944c1ad29a4"
+    "executed_source.py": "cc9206d90af28e14740dd01013ca9718e024d75da21eaf40ec4be3dd8720c47a",
+    "data.json": "ed91f4f84e083860bb20f61558c747dee9a67c6dc7e9eafdcb2f6dee1225bbdd",
+    "source.py": "cc9206d90af28e14740dd01013ca9718e024d75da21eaf40ec4be3dd8720c47a"
   },
-  "simulation_fingerprint": "86100cc66831fe5e33354031065dc4864288fadc4db571def19b0b3eb2c4d99c",
+  "simulation_fingerprint": "17c5c7db5644686a60e1fcbbc231387181ccd698ec157d31d7eaab557d7bd086",
   "render_versions": {
     "particula": "0.3.3",
     "numpy": "2.3.4",
@@ -65,10 +85,10 @@
   },
   "render_device": "CPU",
   "execution_input_sha256": {
-    "scripts/mam4xx_coagulation/regimes.py": "f610eaecde7f48ad1c5028fa90ad3756c9b9785177ab6e0103c0412772676910",
-    "scripts/mam4xx_coagulation/regime_plots.py": "04c8871471c5d417d3461fc57091fead648dc74d6b3270324fee02df4c884d20",
+    "scripts/mam4xx_coagulation/regimes.py": "6ab830452725e487527cf264a04dadaf5107a1556dd59c17babf439c128ca93a",
+    "scripts/mam4xx_coagulation/regime_plots.py": "63aa8d82a9aec7cc614aed0baa6247d95a7a91ddaf66398bed8adb9923647076",
     "scripts/mam4xx_coagulation/regime_rates.py": "9de0528d2646d09eff66ea66c98b92b837936ae78603ba1fa8c2b440c0bdf169",
-    "scripts/mam4xx_coagulation/regime_box.py": "4789b32e22698b2f7c8506c982f2fbc930e95d9f335643e35204864a939596f8",
+    "scripts/mam4xx_coagulation/regime_box.py": "2b3cc0658e801b919eac070b4593d2584b91455fb3bc71db28f6943f9b4dff32",
     "scripts/mam4xx_coagulation/matched.py": "7022fde22a0f6853bc816fdfefb1a5bcfe06fa09a99e74d2b68d8f5c382c7dc1",
     "scripts/mam4xx_coagulation/campaign.py": "ac2f488f33fca6e5617f213c7283ebe457c922820edcbe337b34d0c6948b1adb",
     "scripts/mam4xx_coagulation/particles.py": "18f75c4c5567f1028c52b5a1d66ed0c5d7cbde174c5ea0eb8f0edaba012ed618",
@@ -78,9 +98,17 @@
     "scripts/mam4xx_coagulation/regime_reference.py": "5186c6d06d4a44488f5453c168564098a86cc560e49fcccd00e5a4c6edd2a96e",
     "scripts/mam4xx_coagulation/reference_driver.cpp": "32388e90fa67b2f3204aeca4cd00290019e1e4c4d1f72642e893758fce900b92",
     "scripts/mam4xx_coagulation/build_reference.py": "8d8c341b0e695c90bf2a28952ebb9cade62f1026303974fb342cf5e0131b9860",
-    "docs/data/mam4xx-coagulation/regional-modal.csv": "5bce852b401db6dada7763c99b14f4e8c041fee9e8e725219e054397caaf629d"
+    "docs/data/mam4xx-coagulation/regional-modal.csv": "5bce852b401db6dada7763c99b14f4e8c041fee9e8e725219e054397caaf629d",
+    "website/public/study-data/mam4xx/mode-coefficients.csv": "5f4eaed5130b4526c5a175ce0a4a3b2c3aa3d6f8449cf9a0b8b06e724b1ceb4a",
+    "website/public/study-data/mam4xx/archived-attraction.csv": "4b6d7b2698287d86ddd3323ee75db872cc83fc1d4216e2f77a9748f8e5556345",
+    "scripts/mam4xx_coagulation/host_attraction.py": "c53160da21cb61bdfa864079e8543d540e6ef9fc00a32b817ac7627e11de78e5",
+    "scripts/mam4xx_coagulation/host_attraction.cpp": "78f4e53c2191313cedd2e343e767440cb54fca5c02f405c638f3111395d1c8fe",
+    "scripts/mam4xx_coagulation/attraction_campaign.py": "84a8413a180bba79d89c3b3049b949cf76d67fc9b80904be56fdbbdb60736ba1",
+    "scripts/mam4xx_coagulation/attraction_particles.py": "c5ebffb18cdd97ca2f585f792c767a2bf4bc2d938d30ac4efcace367ab117e1e",
+    "scripts/mam4xx_coagulation/modal_attraction.py": "1b8ad5feebf7f91cb0602381704613749d0548ce1a96e70657fbad8e9ec15278",
+    "scripts/mam4xx_coagulation/neutral_geometry.py": "5f0046d53e845fb718b972075bb67ccda57e0cf8aa72820cc01921751402db41"
   },
-  "rendered_at": "2026-11-21T06:29:56.815494+00:00",
-  "render_revision": "436cf2e8b4da821c19f38b04cdc6ef60d7a171c4",
-  "render_elapsed_seconds": 1.5515087980311364
+  "rendered_at": "2026-11-21T12:50:34.549264+00:00",
+  "render_revision": "e6bd1343a5757c35f6fc2d6180d022b80d4f798b",
+  "render_elapsed_seconds": 3.522119509987533
 }

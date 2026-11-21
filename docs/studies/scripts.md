@@ -52,6 +52,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Distinguish chemical conversion from a timed emission and dilution](examples/custom-processes/timed_box_chemistry.py)
 - [Distinguish dry-phase oscillation from physical droplet relaxation](validation/condensation/adaptive/adaptive_cloud_relaxation.py)
 - [Does heating make a fixed vapor inventory less saturated?](tutorials/building-an-aerosol/gas/vapor_pressure.py)
+- [Does neutral attraction survive averaging over MAM4xx modes?](literature/mam4xx-coagulation/mode_attraction.py)
 - [Does particle-number decay depend on representation?](tutorials/coagulation-populations/coagulation_5_time_evolution.py)
 - [Does update ordering change a condensation calculation?](examples/particle-processes/condensation/staggered_condensation_example.py)
 - [Dry and wet starts give Π Chamber model spectra within 1% by 32 seconds](literature/pi-chamber/haze-and-cloud/pi_chamber_spectra.py)

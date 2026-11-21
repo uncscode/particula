@@ -4,6 +4,8 @@
 
 Two equally initialized aerosol models can lose similar numbers of particles while retaining different size spectra. In a dry box with four 26 nm Aitken particles per accumulation particle, Particula leaves 6.7% fewer particles than MAM4xx after one hour when the accumulation mode starts at 60 nm. Moving it to 220 nm reduces the difference to 0.04%, within sampling variability. At initialization the Particula Brownian kernel predicts **19–23% faster number loss in all nine mixtures**. A smaller discrepancy at the endpoint consequently cannot establish agreement on the underlying collision rates. [Number trajectories and spectra](mam4xx_coagulation.py)
 
+In the atmospheric extension, applying neutral attraction to the archived MAM4xx fine-mode rates lowers 24-hour sub-100 nm number by **28% in polluted air**. Freely evolving size sections at the same initial modal widths give **39%**. In clean marine air the attraction effect is smaller, and the coarse-mode size distribution controls how much fine aerosol is collected. [Modal attraction and particle ensembles](mode_attraction.py)
+
 ## Mode separation changes the number discrepancy
 
 The table gives the high-resolution Particula mean minus MAM4xx at one hour, as a percentage of the modal number. Values after ± are 95% sampling half-widths for the mean of 12 seeds. They exclude model and input uncertainty.
@@ -63,6 +65,20 @@ The coarse comparison adds the entire coarse mode to the fine-only Brownian popu
 
 Material controls span Hamaker constants of 4.45 × 10⁻²⁰ to 1.78 × 10⁻¹⁹ J and relative permittivities of 2.1–12. The nominal values are 8.9 × 10⁻²⁰ J and 5.9. Uncovered radius/charge pairs retain the bare thermal rate. They account for roughly 22%, 13% and 14% of the initial charge-averaged encounter rate. A neutral two-radius CPU calculation checks the GPU capture kernel. Concentrating all charge probability at zero recovers the neutral hard-sphere rate. Refinement increases size bins per decade from 8 to 12, extends the charge range from ±3 to ±5 and tightens the integration tolerance. Collisions that would exceed the finite state domain are excluded. The 24-hour dry-volume relative error stays below 10⁻⁸ and the free-ion plus particle charge residual stays below 2 × 10⁻⁶ elementary charges cm⁻³. The ion source introduces equal positive and negative charge.
 
+### The distributions behind the rankings
+
+The top row shows the three lognormal number spectra used to initialize each regime. In the middle row, shading gives the binwise mean ± one sample standard deviation of four refined native Brownian trajectories. These two-mode runs provide the particle baseline. In the third row, solid lines are the three-mode sectional distributions entering the neutral dispersion ranking. Dashed lines and shading show the means and pointwise 16th–84th percentiles of 16 three-mode particle trajectories with the same field inputs and kernel spacing. The fourth row shows those bands as departures from the corresponding sectional bins. It includes bins with at least ten particles per box on average. Each bin contains its plotted height multiplied by its width in log₁₀ diameter. Summing bins left of the vertical 100 nm line recovers the reported ultrafine concentration. The native ensembles also retain underflow and overflow counts. [Number densities and sampling bands by diameter bin](../../../../website/public/study-data/mam4xx/regime-spectra.csv) · [Saved spectra and plotting code](regimes.py)
+
+![Marine, continental and polluted input spectra, shaded Monte Carlo variation in the fine-mode Brownian reference, and the final three-mode sectional spectra and their matched particle bands.](../../../../website/results/regimes/figure-3-1.png)
+
+On the original kernel grid, integrating the plotted spectra gives the following 24-hour changes. Particle percentages use ratios within each seed before averaging. The intervals quantify uncertainty in the paired mean.
+
+| Field input | Sectional dispersion effect | Particle dispersion effect, mean ± 95% CI |
+| --- | ---: | ---: |
+| Clean marine | -3.47% | -3.55% ± 0.17 points |
+| Continental background | -11.43% | -11.34% ± 0.09 points |
+| Polluted air | -35.32% | -35.87% ± 0.21 points |
+
 ## Ranked changes in sub-100 nm retention at 24 hours
 
 Signed percentages compare the fraction of the initial ultrafine number remaining in each process pair. Absolute differences use final concentrations directly. The range spans the stated inputs and refinement. The grid column gives the absolute shift in percentage points after numerical refinement. Rows are ordered by central magnitude. The full charged interaction is an alternative to neutral dispersion and uses its own charged reference. Times are seconds per central 24-hour box on this machine, including available table setup. The clean marine coarse row also pays for the shared capture-table construction used by later rows. Subsequent timings reflect warm tables. These timings do not estimate coupled MAM4xx cost.
@@ -73,13 +89,13 @@ Neutral dispersion and coarse Brownian collection have overlapping ranges. Pilot
 
 | Process representation | ΔN <100 nm (cm⁻³) | Change (%) | Input and grid range (%) | Grid shift (points) | Box time (s) |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Neutral dispersion | -11.4 | -3.47 | -5.34 to -1.93 | 0.0086 | 0.004 |
+| Neutral dispersion | -11.4 | -3.47 | -5.34 to -1.93 | 0.0086 | 0.003 |
 | Full charged interaction | -11.1 | -3.38 | -5.16 to -1.9 | 0.01 | 0.003 |
-| Add coarse Brownian pairs | -8.31 | -2.48 | -3.02 to -1.69 | 0.019 | 0.702 |
+| Add coarse Brownian pairs | -8.31 | -2.48 | -3.02 to -1.69 | 0.019 | 0.693 |
 | Equilibrium bipolar charge | -0.552 | -0.168 | -0.209 to -0.118 | 0.00097 | 0.003 |
-| Differential settling | -0.313 | -0.0952 | -0.126 to -0.0696 | 0.0017 | 0.003 |
-| Fixed-width closure | +0.283 | +0.0839 | +0.0406 to +0.102 | 0.043 | 0.007 |
-| Evolve free ions and charge | +0.166 | +0.0504 | +0.0218 to +0.0577 | 0.029 | 0.135 |
+| Differential settling | -0.313 | -0.0952 | -0.126 to -0.0696 | 0.0017 | 0.004 |
+| Fixed-width closure | +0.283 | +0.0839 | +0.0406 to +0.102 | 0.043 | 0.008 |
+| Evolve free ions and charge | +0.166 | +0.0504 | +0.0218 to +0.0577 | 0.029 | 0.133 |
 | Turbulent shear | -0.00296 | -0.000901 | -0.00377 to -0.00021 | 1.3e-05 | 0.003 |
 
 ### Continental background
@@ -89,13 +105,13 @@ Neutral dispersion leads across the input range. Check the two-mode closure agai
 | Process representation | ΔN <100 nm (cm⁻³) | Change (%) | Input and grid range (%) | Grid shift (points) | Box time (s) |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | Neutral dispersion | -109 | -11.4 | -15.6 to -7.14 | 0.008 | 0.008 |
-| Full charged interaction | -104 | -11 | -14.9 to -7.04 | 0.00048 | 0.008 |
-| Fixed-width closure | -18.6 | -1.95 | -2.55 to -1.03 | 0.14 | 0.014 |
+| Full charged interaction | -104 | -11 | -14.9 to -7.04 | 0.00048 | 0.009 |
+| Fixed-width closure | -18.6 | -1.95 | -2.55 to -1.03 | 0.14 | 0.015 |
 | Equilibrium bipolar charge | -5.53 | -0.58 | -0.665 to -0.455 | 0.0079 | 0.008 |
 | Add coarse Brownian pairs | -5.09 | -0.534 | -0.591 to -0.398 | 0.00012 | 0.008 |
-| Evolve free ions and charge | +0.762 | +0.0804 | +0.0243 to +0.081 | 0.056 | 0.154 |
+| Evolve free ions and charge | +0.762 | +0.0804 | +0.0243 to +0.081 | 0.056 | 0.159 |
 | Differential settling | -0.235 | -0.0248 | -0.0319 to -0.0198 | 0.00066 | 0.009 |
-| Turbulent shear | -0.00387 | -0.000408 | -0.00167 to -0.000104 | 5.5e-06 | 0.008 |
+| Turbulent shear | -0.00387 | -0.000408 | -0.00167 to -0.000104 | 5.5e-06 | 0.009 |
 
 ### Polluted air
 
@@ -103,14 +119,14 @@ Neutral dispersion is the largest persistent effect. The mode-width effect chang
 
 | Process representation | ΔN <100 nm (cm⁻³) | Change (%) | Input and grid range (%) | Grid shift (points) | Box time (s) |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Neutral dispersion | -961 | -35.3 | -44.8 to -26.3 | 0.21 | 0.030 |
-| Full charged interaction | -867 | -32.5 | -41.6 to -24.3 | 0.25 | 0.030 |
-| Fixed-width closure | -104 | -3.74 | -14.2 to +8.59 | 0.64 | 0.081 |
-| Equilibrium bipolar charge | -51.4 | -1.89 | -2.01 to -1.77 | 0.047 | 0.030 |
-| Evolve free ions and charge | +12.3 | +0.462 | +0.144 to +0.472 | 0.32 | 0.323 |
-| Add coarse Brownian pairs | -10.9 | -0.391 | -0.451 to -0.324 | 0.0039 | 0.030 |
-| Differential settling | -1.56 | -0.0562 | -0.0562 to -0.0515 | 0.0024 | 0.036 |
-| Turbulent shear | -0.0504 | -0.00181 | -0.00438 to -0.00061 | 2.2e-05 | 0.032 |
+| Neutral dispersion | -961 | -35.3 | -44.8 to -26.3 | 0.21 | 0.031 |
+| Full charged interaction | -867 | -32.5 | -41.6 to -24.3 | 0.25 | 0.033 |
+| Fixed-width closure | -104 | -3.74 | -14.2 to +8.59 | 0.64 | 0.084 |
+| Equilibrium bipolar charge | -51.4 | -1.89 | -2.01 to -1.77 | 0.047 | 0.031 |
+| Evolve free ions and charge | +12.3 | +0.462 | +0.144 to +0.472 | 0.32 | 0.356 |
+| Add coarse Brownian pairs | -10.9 | -0.391 | -0.451 to -0.324 | 0.0039 | 0.031 |
+| Differential settling | -1.56 | -0.0562 | -0.0562 to -0.0515 | 0.0024 | 0.031 |
+| Turbulent shear | -0.0504 | -0.00181 | -0.00438 to -0.00061 | 2.2e-05 | 0.031 |
 
 ### What the particle-resolved reference changes
 
@@ -152,6 +168,47 @@ Native ensemble wall times include all seeds and all four output times. Hardware
 
 The saved numerical data contain spectra, number below and above 100 nm, volume above 100 nm, and absolute and percentage differences at 1, 6 and 24 h. The archived two-mode outputs also retain dry-volume exchange and timestep sensitivity. Regenerate the regional archive with `python -m scripts.mam4xx_coagulation.regime_reference PATH/TO/coagulation.hpp docs/data/mam4xx-coagulation/regional-modal.csv`. Run `python scripts/docs_examples.py refresh regimes` on CUDA to reproduce the ensembles and `python scripts/mam4xx_coagulation/export_regimes.py` to regenerate the two CSV tables. A long workstation run can set `PARTICULA_MAM4XX_CHECKPOINTS` to a fresh directory for this checkout. It saves each regional particle case, its hardware and exact inputs before advancing.
 
-The neutral dispersion calculation reproduces the full charge-averaged interaction’s central sub-100 nm count to +0.07% in marine air, +0.12% in continental background and −2.35% in polluted air. The retention metric counts all particles below the threshold, including newly merged particles in that size range. It does not follow individually tagged initial particles. The intervals on the native boxes quantify Monte Carlo sampling at fixed inputs. The process tables use deterministic integrations of published representative spectra. Campaign-to-campaign sampling uncertainty is unavailable from modal means alone. Before implementing a global parameterization, integrate the neutral dispersion rate over the host modes and compare it with the resolved response, first with polluted spectra and then with marine coarse particles. Collect material properties and spectra from the same air mass to test transfer to field conditions.
+The neutral dispersion calculation reproduces the full charge-averaged interaction’s central sub-100 nm count to +0.07% in marine air, +0.12% in continental background and −2.35% in polluted air. The retention metric counts all particles below the threshold, including newly merged particles in that size range. It does not follow individually tagged initial particles. The intervals on the native boxes quantify Monte Carlo sampling at fixed inputs. The process tables use deterministic integrations of published representative spectra. Campaign-to-campaign sampling uncertainty is unavailable from modal means alone. The next experiment below applies the integrated neutral rate to the archived host and compares the result with freely evolving particles. Collect material properties and spectra from the same air mass to test transfer to field conditions.
 
 The CSV tables contain [ranked retention effects](../../../../website/public/study-data/mam4xx/priorities.csv) and [time-resolved paired number and dry-volume differences](../../../../website/public/study-data/mam4xx/paired-effects.csv).
+
+## The host correction captures a smaller polluted-air response than freely evolving particles
+
+At 24 hours, the polluted box with all three MAM-width modes contains **3,363 cm⁻³ below 100 nm** with the archived fine-mode rates and proposed hard-sphere coarse collection. Applying the neutral attraction correction lowers that to **2,424 cm⁻³**, a **27.91%** decrease. Replacing the archived fine-mode coefficients entirely with Particula’s integrated coefficients gives **28.02%**. Letting the size spectrum evolve in sections gives **38.72%** at the same initial widths. Most of the response difference therefore persists after replacing the archived rate approximation. [Modal and stochastic comparison](mode_attraction.py)
+
+| Three-mode box | Archived fine rates with pair-specific corrections | Integrated Particula rates, fixed widths | Evolving size sections | Particle Monte Carlo, mean ± 95% CI |
+| --- | ---: | ---: | ---: | ---: |
+| Polluted, MAM widths | -27.91% | -28.02% | -38.72% | -38.78% ± 0.17 points |
+| Polluted, field widths | — | -24.24% | -35.73% | -35.80% ± 0.17 points |
+| Clean marine, MAM widths | -3.29% | -3.75% | -3.70% | -3.74% ± 0.13 points |
+| Clean marine, field widths | — | -3.49% | -3.50% | -3.53% ± 0.08 points |
+
+Percentages give the change in 24-hour sub-100 nm number when attraction replaces hard-sphere capture. The first column applies multipliers to the archived Aitken and accumulation coefficients. Both variants extend collection to the coarse mode. The field-width rows keep the published widths as a separate control. The archived code prescribes its widths, so only the MAM-width rows have an archived-host value. Particle intervals measure sampling across 16 paired seeds. Ratios in the deterministic columns use the two endpoint concentrations.
+
+![The modal, sectional and stochastic estimates of the attraction effect separate in polluted air and lie much closer in marine air.](../../../../website/results/mode-attraction/figure-2-1.png)
+
+The earlier polluted result was **−35.32%** at the published field widths and original eight bins per decade. Replaying those inputs recovers that value. Refining the sections to 32 bins per decade and evaluating neutral attraction beyond the native 32:1 ratio gives **−35.73%**. Holding those field widths fixed throughout gives **−24.24%**. Changing the initial widths and holding widths fixed during aging are distinct interventions. Both field- and MAM-width runs retain the initial number and dry volume of each mode.
+
+### Clean marine collection depends on the width of the coarse mode
+
+Activating coarse encounters while attraction is already present removes **20.9 cm⁻³** from the archived marine host after 24 hours, or **6.3%** relative to a passive coarse population at the same initial composition. In the evolving sections, active coarse collection removes **19.2 cm⁻³ (5.90%)** at MAM widths and **8.0 cm⁻³ (2.44%)** at field widths. The passive comparison carries the initial coarse population through without any collisions and adds it to the fine-only endpoint. It therefore counts the same initial aerosol on both sides.
+
+The field coarse mode has number-median diameter 0.58 µm and geometric width 2.49. Preserving its number and dry volume while narrowing it to the archived width of 1.8 moves its median to **1.20 µm**. This changes the number of effective collectors in each size range. A fixed-width attraction correction is a reasonable marine development candidate **provided the coarse spectrum is constrained**. For polluted air, test a representation that lets the fine distribution reshape before calibrating a single enhancement factor against the 24-hour endpoint. [Published input spectra, Table 1](https://doi.org/10.1029/2004JD004596) · [Archived modal widths](https://github.com/eagles-project/mam4xx/blob/0f51633242168c90018f6e296d02776f86dc9be6/src/mam4xx/aero_modes.hpp)
+
+![Three-mode particle spectra at initialization and after 24 hours, with pointwise Monte Carlo bands for hard-sphere and attraction runs and a lower panel magnifying the relative spread.](../../../../website/results/mode-attraction/figure-3-1.png)
+
+Under attraction, the polluted fixed-width calculation retains **2,012 cm⁻³ between 31.6 and 100 nm**, compared with **1,179 cm⁻³** in the particle mean. That interval accounts for **94%** of the 883 cm⁻³ excess below 100 nm. In marine air the same interval holds 64.7 and 64.8 cm⁻³, respectively. This identifies the part of the polluted distribution to target with a second width or shape moment.
+
+### Integrating number loss and dry-volume transfer separately
+
+For each pair of evolving lognormals we average the complete neutral thermal kernel over the two **number** distributions. For intermodal dry-volume transfer, the donor distribution is instead weighted by its particle volume. Each multiplier divides its attraction-weighted integral by its own hard-sphere integral **at the same current diameters and widths**. At initialization the polluted Aitken–accumulation number multiplier is 1.289 and the donor-volume multiplier is 1.364. The marine values are 1.344 and 1.427. Intramodal encounters remove one particle per distinct colliding pair and retain all dry volume in that mode. Intermodal products remain in the receiving mode. [Time-dependent factors for every pair](../../../../website/public/study-data/mam4xx/mode-coefficients.csv)
+
+The archived replay recomputes its fine-pair base rates each host step and uses the original number and aerosol-mass updates. We add coarse self-collection and fine-to-coarse encounters in two half steps around the archived update. Primary carbon is empty. With all multipliers set to one and coarse collection disabled, the replay matches the archived Aitken and accumulation number and volume at 0, 1, 6 and 24 hours within 10⁻¹⁰ relative tolerance. Refining from 48 to 96 diameter cells per decade and updating the factors every 30 rather than 60 seconds changes the archived three-mode attraction effect by less than **0.002 percentage points** in either regime. The host step is 10 seconds in both refinements. These are dry, closed boxes at 298.15 K and 101325 Pa. [Pinned coagulation routines](https://github.com/eagles-project/mam4xx/blob/0f51633242168c90018f6e296d02776f86dc9be6/src/mam4xx/coagulation.hpp) · [Archived-host trajectories and refinements](../../../../website/public/study-data/mam4xx/archived-attraction.csv)
+
+![The archived host's number and donor-volume factors diverge for mixed-mode collisions and change during the polluted run.](../../../../website/results/regimes/figure-4-1.png)
+
+Particula supplies the neutral GPU capture rate through radius ratio 32. For larger ratios we separately integrate the nonretarded neutral Hamaker sphere potential over separation for continuum resistance and over thermal incident energy for ballistic capture, then use the same transition law. The independent neutral integral agrees with GPU rates to **0.014%** across their shared nominal grid. Doubling radial and energy resolution changes the independent rates by at most **0.012%** there and across the wider grid. An adaptive integration with continuous orbit minimization independently checks the continuum and ballistic limits at radius ratios 32, 128 and 1,024 to within 0.05%. Zero attraction recovers hard spheres. With MAM widths, about 90% of the initial Aitken-to-coarse dry-volume transfer rate involves radius ratios above 32 in both regimes. Including attraction for those pairs changes the *whole marine box’s* 24-hour modal attraction effect from −3.65% to −3.75%. A large share of a particular transfer pathway need not dominate total ultrafine number. The extension assumes compact neutral spheres, a common material, unit sticking and no retardation. [Hamaker’s sphere potential](https://www.damtp.cam.ac.uk/user/gold/pdfs/teaching/hamaker.pdf) · [Particula interparticle forces](../../../theory/dynamics/interparticle-forces.md)
+
+Varying the Hamaker constant from 4.45 × 10⁻²⁰ to 1.78 × 10⁻¹⁹ J gives a polluted three-mode MAM-width response of **−22.9% to −33.6%** in the fixed-width calculation and **−31.9% to −45.7%** in sections. Comparing at each matched material value preserves the shortfall. The corresponding marine ranges are **−3.0% to −4.7%** and **−2.9% to −4.6%**. The Monte Carlo experiment samples continuous waiting times and collision partners from the size-tabulated kernel while conserving actual merged particle volumes. An exact constant-kernel decay checks the modal solver. A two-particle exponential waiting-time experiment checks the Monte Carlo collision rate and self-pair exclusion. The refined polluted and marine three-mode boxes hold 1,380,054 and 7,662 particles initially. Their stochastic bands describe collision histories for one prescribed population. The literature modal means do not determine campaign-to-campaign variability.
+
+The response table gives paired number below and above 100 nm and dry volume above 100 nm at 1, 6 and 24 hours. The saved results also contain initial modes, spectra, seed-level endpoints and the numerical refinements. Regenerate the host tables with `python -m scripts.mam4xx_coagulation.host_attraction PATH/TO/coagulation.hpp website/public/study-data/mam4xx`. Run `python scripts/docs_examples.py refresh mode-attraction` on CUDA and `python -m scripts.mam4xx_coagulation.export_attraction` for the particle, sectional and modal response table. [Paired simulation responses](../../../../website/public/study-data/mam4xx/attraction-response.csv) · [Particle simulation and download](mode_attraction.py) · [Regime spectra, host coefficients and download](regimes.py)
