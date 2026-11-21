@@ -1,5 +1,7 @@
 # Particle counts favor a wall-mixing coefficient near 5 s⁻¹ in the Manchester SOA fits
 
+The final campaign assessment quantifies chemistry and wall-loss uncertainty across the 15 paired experiments. [Read the study assessment](../ASSESSMENT.md)
+
 The original four-run Particula optimizer fitted separate first-order loss rates for suspended particles and product vapor. Its count-conditioned variants prescribed a measured count history, and the 15-run reduced model fitted a single effective suspended-product removal rate. We replaced the particle removal rate with size-dependent deposition and fitted its wall eddy coefficient jointly with chemistry. Across 15 paired Voliotis experiments, the best shared coefficient was **5.11 s⁻¹** when both organic aerosol and particle number constrained the fit. The worst trajectory error fell from **24.93% to 21.41%** relative to the matched constant-loss model. Fitting organic mass alone favored **81.45 s⁻¹** and produced a **56.47%** count error. The 15-run data support including particle counts when estimating wall transport. Size-dependent deposition still leaves a substantial discrepancy in the organic mass curves. [Original joint study](REPORT.md) · [Campaign measurements](https://acp.copernicus.org/articles/22/14147/2022/)
 
 ![Four measured and fitted count histories, independent dark particle losses by size, and error trade-off for all 15 experiments](results/wall/wall-loss.png)

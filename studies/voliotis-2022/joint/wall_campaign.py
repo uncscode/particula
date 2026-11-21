@@ -22,7 +22,7 @@ V3 = wp.vec3d
 
 
 @wp.kernel
-def campaign_kernel(
+def campaign_kernel(  # noqa: C901 - fused CUDA integration and observation loop
     params: wp.array2d(dtype=F64),
     src: wp.array3d(dtype=F64),
     observations: wp.array3d(dtype=F64),
@@ -47,6 +47,7 @@ def campaign_kernel(
         arg = dt / (F64(3600.0) * params[i, s])
         mature[s] = F64(1.0) - wp.exp(-arg)
         supply_mature[s] = F64(1.0) - mature[s] / arg
+    observed_time_peak = F64(0.0)
     ms = F64(0.0)
     ns = F64(0.0)
     deposited = F64(0.0)
@@ -111,6 +112,7 @@ def campaign_kernel(
             soa = soa * keep + product * survived
         if observations[r, j, 0] >= F64(0.0):
             pred = old + (soa - old) * observations[r, j, 0]
+            observed_time_peak = wp.max(observed_time_peak, pred)
             ms += wp.pow(
                 (pred - observations[r, j, 1]) / initial[r, 2], F64(2.0)
             )
@@ -122,6 +124,10 @@ def campaign_kernel(
     errors[i, r, d, 2] = wp.abs(
         supplied - deposited - soa - inter[0] - inter[1] - inter[2]
     )
+
+    if errors.shape[3] == 5:
+        errors[i, r, d, 3] = observed_time_peak
+        errors[i, r, d, 4] = count / initial[r, 1]
 
 
 class Campaign:
@@ -195,7 +201,7 @@ class Campaign:
             for a in (src, obs, props)
         ]
 
-    def evaluate(self, p, eddy, objective, doses, sub=1):
+    def evaluate(self, p, eddy, objective, doses, sub=1, *, outcomes=False):
         """Profile a distinct bounded dose for each run at the chosen rates."""
         p = np.atleast_2d(p)
         args = [
@@ -207,7 +213,9 @@ class Campaign:
             sub,
         ]
         out = wp.empty(
-            (len(p), len(self.runs), len(doses), 3), dtype=F64, device="cuda:0"
+            (len(p), len(self.runs), len(doses), 5 if outcomes else 3),
+            dtype=F64,
+            device="cuda:0",
         )
         wp.launch(
             campaign_kernel,
@@ -222,7 +230,10 @@ class Campaign:
         ix = merit.argmin(2)
         ii = np.arange(len(p))[:, None]
         rr = np.arange(len(self.runs))[None, :]
-        return merit[ii, rr, ix].max(1), e[ii, rr, ix, :2], doses[ix]
+        result = merit[ii, rr, ix].max(1), e[ii, rr, ix, :2], doses[ix]
+        if outcomes:
+            return *result, e[ii, rr, ix, 3:]
+        return result
 
 
 def search(campaign, eddy, objective, start, fixed_eddy=None):

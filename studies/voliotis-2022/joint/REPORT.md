@@ -1,5 +1,7 @@
 # One product reproduces four α-pinene curves. The best 15-run campaign fit still misses by 20%.
 
+The final campaign assessment quantifies chemistry and wall-loss uncertainty across the 15 paired experiments. [Read the study assessment](../ASSESSMENT.md)
+
 At the same nominal 155 ppb α-pinene dose, the Manchester chamber produced peak suspended organic aerosol concentrations of 68.47 and 109.46 µg m⁻³. Could a single set of chemical parameters reproduce both curves and the experiments at other doses? We fitted every available paired α-pinene run together, then asked the broader question across all 15 campaign runs with both measured precursor decay and aerosol mass. In native Particula, one condensable product reproduced all four α-pinene curves when the injections could vary within their reported uncertainty. Its worst trajectory error was 7.5% of the measured peak, and its largest peak error was 11.1%. A shared dependence on initial NOₓ also worked with nominal injections. Adding a second volatility class alone gave little improvement. Across three precursors and their mixtures, a separate reduced mechanism left substantially larger discrepancies. All scores describe joint reproduction of the same data used to choose the parameters. [Chamber experiment](https://acp.copernicus.org/articles/22/14147/2022/) · [Earlier held-out comparison](../REPORT.md)
 
 A follow-up fits size-dependent wall deposition and Brownian number loss directly to the particle counts and organic mass across the same campaign. [Joint wall-loss analysis](WALL_LOSS.md)
