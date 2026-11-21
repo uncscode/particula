@@ -204,3 +204,50 @@ def test_reference_and_fixed_controls(parcel):
         run_parcel(parcel, **options, adaptive=ParcelRK23())
     with pytest.raises(TypeError, match="ParcelRK23"):
         run_parcel(parcel, **options, adaptive=True)
+
+
+def test_batched_trials_keep_the_serial_mesh(parcel, device, monkeypatch):
+    """Discard speculative states and adjoints after each controller change."""
+    from particula.gpu.kernels import parcel_rk23
+
+    case = replace(parcel, vapor=0.01205)
+    options = dict(
+        updraft=1.0,
+        timestep=1.0,
+        steps=10,
+        device=device,
+        gradient=True,
+        adaptive=ParcelRK23(),
+    )
+    batched = run_parcel(case, **options)
+    monkeypatch.setattr(parcel_rk23, "_BATCH_CAPACITY", 1)
+    serial = run_parcel(case, **options)
+    work = batched.statistics
+    assert work.evaluated_trials > work.accepted_steps + work.rejected_steps
+    assert (
+        serial.statistics.evaluated_trials
+        == work.accepted_steps + work.rejected_steps
+    )
+    for name in (
+        "accepted_steps",
+        "rejected_steps",
+        "minimum_step",
+        "maximum_step",
+    ):
+        assert getattr(work, name) == getattr(serial.statistics, name)
+    for name in (
+        "height",
+        "pressure",
+        "temperature",
+        "volume",
+        "vapor",
+        "liquid",
+        "wet_radius",
+        "supersaturation",
+    ):
+        np.testing.assert_array_equal(
+            getattr(batched, name), getattr(serial, name)
+        )
+    np.testing.assert_allclose(
+        batched.updraft_gradient, serial.updraft_gradient, rtol=1e-13, atol=0.0
+    )
