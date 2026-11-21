@@ -1,10 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in"
   height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
-  <title id="title">Earlier arrival improves the next Sea2Cloud count</title>
-  <desc id="desc">At 06:30 UTC the ship observed 28 particles/cm³ at
-  12–25 nm. The two-hour exchange model predicts 300
-  for simultaneous arrival and 36 when the larger particles arrive
-  one hour earlier. Both amplitudes were fitted at 06:00.</desc>
+  <title id="title">Sea2Cloud ship measurement and arrival scenarios</title>
+  <desc id="desc">At 06:30 UTC on March 22, Tangaroa measured 28
+  particles/cm³ in the 12–25 nm band. The two-hour exchange model predicts
+  300 particles/cm³ when the incoming 16 nm particles arrive with
+  the small-particle pulse and 36 when they arrive one hour before
+  it. Each model used the 06:00 spectrum for calibration.</desc>
   <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
   <g fill="#243e43">
     <path d="M21 39h61l-9 10H31z M36 30h15v9H36z M54 24h10v15H54z
@@ -13,18 +14,27 @@
       stroke="#617679" stroke-width="2.5"/>
   </g>
   <g fill="#243e43" font-family="sans-serif">
-    <text x="100" y="40" font-size="22" font-weight="bold">12–25 nm</text>
-    <g font-size="18">
-      <text x="25" y="104">Ship</text>
-      <text x="25" y="171">Simultaneous</text>
-      <text x="25" y="238">Earlier arrival</text>
-    </g>
-    <path d="M25 111v154" stroke="#617679" stroke-width="1.5"/>
-    <rect x="25" y="116"
-      width="18.16" height="13" fill="#243e43"/>
-    <rect x="25" y="183"
-      width="195.00" height="13" fill="#a44d21"/>
-    <rect x="25" y="250"
-      width="23.12" height="13" fill="#135963"/>
+    <text x="96" y="32" font-size="19"
+      font-weight="bold">12–25 nm particles</text>
+    <text x="96" y="55" font-size="15">per cm³ · 06:30 UTC</text>
+    <text x="22" y="94" font-size="17"
+      font-weight="bold">Ship measurement</text>
+    <rect x="22" y="106" width="18.16"
+      height="13" fill="#243e43"/>
+    <text x="48.16" y="118"
+      font-size="17">28</text>
+    <path d="M22 137h256" stroke="#617679" stroke-width="1"/>
+    <text x="22" y="162" font-size="17"
+      font-weight="bold">Modeled 16 nm arrival</text>
+    <text x="22" y="189" font-size="16">With the small-particle pulse</text>
+    <rect x="22" y="200" width="195.00"
+      height="13" fill="#a44d21"/>
+    <text x="225.00" y="212"
+      font-size="17">300</text>
+    <text x="22" y="246" font-size="16">1 h before the pulse</text>
+    <rect x="22" y="257" width="23.12"
+      height="13" fill="#135963"/>
+    <text x="53.12" y="269"
+      font-size="17">36</text>
   </g>
 </svg>
