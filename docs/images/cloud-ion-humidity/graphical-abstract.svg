@@ -1,25 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
   <title id="title">The humid CLOUD ion reading exceeds the steady loss ceiling</title>
   <desc id="desc">At 70% relative humidity and a nominal source of 2.64 ion pairs per cubic centimetre per second, the weakest shared loss rate gives an upper limit of 394 ions per cubic centimetre per polarity. The open point shows the measured 1,768, with its scatter bar from 1,579 to 1,956. Both are on the same linear scale from zero.</desc>
-  <rect width="300" height="300" rx="16" fill="#f7f2e7"/>
-  <g font-family="sans-serif" fill="#233f49">
-    <path d="M40 14C36 25 23 36 23 46a17 17 0 0034 0c0-10-13-23-17-32Z" fill="#175665"/>
-    <path d="M30 47h8m-4-4v8m7-9h8" fill="none" stroke="#f9f6e9" stroke-width="2.4" stroke-linecap="round"/>
+  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
+  <g font-family="sans-serif" fill="#243e43">
+    <path d="M40 14C36 25 23 36 23 46a17 17 0 0034 0c0-10-13-23-17-32Z" fill="#135963"/>
+    <path d="M30 47h8m-4-4v8m7-9h8" fill="none" stroke="#fbf2e3" stroke-width="2.4" stroke-linecap="round"/>
     <text x="68" y="40" font-size="23" font-weight="bold">70% RH</text>
-    <text x="275" y="41" text-anchor="end" font-size="18">ions/cm³</text>
   </g>
   <!-- Linear vertical scale, zero at 250 and 0.09 SVG units per ion/cm³. -->
-  <rect x="31" y="214.54" width="242" height="35.46" fill="#e1e7df"/>
-  <path d="M31 214.54H273" stroke="#784126" stroke-width="3.5" stroke-dasharray="9 4"/>
-  <path d="M31 250H273" stroke="#455960" stroke-width="1.6"/>
-  <g fill="none" stroke="#175665" stroke-width="3.2">
+  <rect x="31" y="214.54" width="242" height="35.46" fill="#cad9d2"/>
+  <path d="M31 214.54H273" stroke="#135963" stroke-width="3.5" stroke-dasharray="9 4"/>
+  <path d="M31 250H273" stroke="#617679" stroke-width="1.6"/>
+  <g fill="none" stroke="#243e43" stroke-width="3.2">
     <path d="M108 73.96v33.93m-8-33.93h16m-16 33.93h16"/>
-    <circle cx="108" cy="90.88" r="7" fill="#f7f2e7"/>
+    <circle cx="108" cy="90.88" r="7" fill="#fbf2e3"/>
   </g>
   <g font-family="sans-serif">
-    <text x="131" y="89" fill="#173c47" font-size="20" font-weight="bold">1,768</text>
-    <text x="131" y="110" fill="#173c47" font-size="16">Measured</text>
-    <text x="40" y="204" fill="#713e25" font-size="18" font-weight="bold">394 ceiling</text>
-    <text x="33" y="273" fill="#455960" font-size="15">0</text>
+    <text x="131" y="110" fill="#243e43" font-size="16">Measured</text>
+    <text x="40" y="204" fill="#135963" font-size="18" font-weight="bold">Model ceiling</text>
   </g>
 </svg>

@@ -2,20 +2,17 @@
   <title id="title">Adding loss rates predicts lower particle survival in a sphere</title>
   <desc id="desc">Two circles compare predictions for particles one micrometre in diameter at a wall mixing coefficient of 3.6 per second. The colored arc covers 68.4% of the circle for coupled theory and 58.2% when the two limiting loss rates are added.</desc>
   <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
-  <g font-family="sans-serif" fill="#233e41" text-anchor="middle">
-    <text x="150" y="55" font-size="24" font-weight="bold">Airborne after 1 h</text>
+  <g font-family="sans-serif" fill="#243e43" text-anchor="middle">
+    <text x="150" y="55" font-size="24" font-weight="bold">Airborne fraction</text>
     <!-- Both arcs start at twelve o'clock on identical 100% scales. -->
-    <g fill="#f8f6ef" stroke="#d1d5ce" stroke-width="10">
+    <g fill="#fbf2e3" stroke="#cad9d2" stroke-width="10">
       <circle cx="79" cy="153" r="59"/><circle cx="221" cy="153" r="59"/>
     </g>
     <g fill="none" stroke-width="10" transform="rotate(-90 79 153)">
       <circle cx="79" cy="153" r="59" stroke="#135963" stroke-dasharray="253.564 117.144"/>
     </g>
     <g fill="none" stroke-width="10" transform="rotate(-90 221 153)">
-      <circle cx="221" cy="153" r="59" stroke="#9e4928" stroke-dasharray="215.752 154.956"/>
-    </g>
-    <g font-size="23" font-weight="bold">
-      <text x="79" y="161">68.4%</text><text x="221" y="161">58.2%</text>
+      <circle cx="221" cy="153" r="59" stroke="#a44d21" stroke-dasharray="215.752 154.956"/>
     </g>
     <g font-size="20" font-weight="600">
       <text x="79" y="253">Coupled</text><text x="221" y="253">Additive</text>

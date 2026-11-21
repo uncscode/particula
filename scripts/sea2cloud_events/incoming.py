@@ -630,33 +630,27 @@ def graphical_abstract(lead_data):
   12–25 nm. The two-hour exchange model predicts {same_time:.0f}
   for simultaneous arrival and {earlier:.0f} when the larger particles arrive
   one hour earlier. Both amplitudes were fitted at 06:00.</desc>
-  <rect width="300" height="300" rx="12" fill="#f5f4ea"/>
-  <g fill="#17363b">
+  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
+  <g fill="#243e43">
     <path d="M21 39h61l-9 10H31z M36 30h15v9H36z M54 24h10v15H54z
       M57 16h3v8h-3z"/>
     <path d="M20 56q8 4 16 0t16 0t16 0t16 0" fill="none"
-      stroke="#42696d" stroke-width="2.5"/>
+      stroke="#617679" stroke-width="2.5"/>
   </g>
-  <g fill="#17363b" font-family="sans-serif">
+  <g fill="#243e43" font-family="sans-serif">
     <text x="100" y="40" font-size="22" font-weight="bold">12–25 nm</text>
-    <text x="101" y="62" font-size="15">06:30 UTC · cm⁻³</text>
     <g font-size="18">
       <text x="25" y="104">Ship</text>
       <text x="25" y="171">Simultaneous</text>
-      <text x="25" y="238">One hour earlier</text>
+      <text x="25" y="238">Earlier arrival</text>
     </g>
-    <path d="M25 111v154" stroke="#b7b5a9" stroke-width="1.5"/>
+    <path d="M25 111v154" stroke="#617679" stroke-width="1.5"/>
     <rect x="25" y="116"
-      width="{observed * scale:.2f}" height="13" fill="#263e43"/>
+      width="{observed * scale:.2f}" height="13" fill="#243e43"/>
     <rect x="25" y="183"
-      width="{same_time * scale:.2f}" height="13" fill="#a4532c"/>
+      width="{same_time * scale:.2f}" height="13" fill="#a44d21"/>
     <rect x="25" y="250"
-      width="{earlier * scale:.2f}" height="13" fill="#166c71"/>
-    <g font-weight="bold" font-size="18">
-      <text x="{34 + observed * scale:.2f}" y="130">{observed:.0f}</text>
-      <text x="{34 + same_time * scale:.2f}" y="197">{same_time:.0f}</text>
-      <text x="{34 + earlier * scale:.2f}" y="264">{earlier:.0f}</text>
-    </g>
+      width="{earlier * scale:.2f}" height="13" fill="#135963"/>
   </g>
 </svg>
 '''

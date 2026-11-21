@@ -1,27 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
   <title id="title">Predicted particles below 100 nm in polluted air</title>
   <desc id="desc">After 24 hours archived MAM4xx gives 3,379 particles per cubic centimetre. With coarse collisions and neutral attraction the extended modal calculation gives 2,424, the sectional model 1,187 and the particle-resolved mean 1,180. All four bars start at zero and share the same scale.</desc>
-  <rect width="300" height="300" rx="12" fill="#f7f4eb"/>
-  <g font-family="sans-serif" fill="#203c42">
-    <text x="16" y="26" font-size="19" font-weight="bold">Particles below 100 nm</text>
-    <text x="16" y="47" font-size="14">Polluted air · 24 hours · particles/cm³</text>
-    <text x="16" y="75" font-size="16">Archived MAM4xx</text>
-    <rect x="16" y="83" width="206.13" height="13" fill="#41525b"/>
-    <text x="230" y="95" font-size="16" font-weight="bold">3,379</text>
-    <path d="M16 111H284" stroke="#a4aaa2"/>
-    <text x="16" y="132" font-size="14" font-weight="bold">With coarse collisions + attraction</text>
+  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
+  <g font-family="sans-serif" fill="#243e43">
+    <text x="16" y="37" font-size="19" font-weight="bold">Sub-100 nm</text>
+    <text x="16" y="74" font-size="16">Archived MAM4xx</text>
+    <rect x="16" y="83" width="206.13" height="13" fill="#243e43"/>
+    <path d="M16 111H284" stroke="#617679"/>
+    <text x="16" y="132" font-size="14" font-weight="bold">Coarse collisions + attraction</text>
     <g font-size="16">
       <text x="16" y="156">Extended MAM4xx</text>
-      <text x="16" y="207">Sectional (size bins)</text>
-      <text x="16" y="258">Particle-resolved (mean)</text>
+      <text x="16" y="207">Sectional</text>
+      <text x="16" y="258">Particle-resolved</text>
     </g>
-    <rect x="16" y="164" width="147.88" height="13" fill="#97522e"/>
-    <rect x="16" y="215" width="72.39" height="13" fill="#17646b"/>
-    <rect x="16" y="266" width="71.99" height="13" fill="#17646b"/>
-    <g font-size="16" font-weight="bold">
-      <text x="172" y="176">2,424</text>
-      <text x="96" y="227">1,187</text>
-      <text x="96" y="278">1,180</text>
-    </g>
+    <rect x="16" y="164" width="147.88" height="13" fill="#a44d21"/>
+    <rect x="16" y="215" width="72.39" height="13" fill="#135963"/>
+    <rect x="16" y="266" width="71.99" height="13" fill="#135963"/>
   </g>
 </svg>

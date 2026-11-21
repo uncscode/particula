@@ -1,24 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
   <title id="title">Liquid mixing increases the winter foothill growth-factor bias</title>
-  <desc id="desc">Three bars measure mean predicted minus observed diameter growth factor for 18 winter foothill extracts. Additive water uptake gives +0.292 with literature pure-salt properties and +0.542 with AIOMFAC pure-salt properties. The full AIOMFAC liquid mixture gives +0.716.</desc>
-  <rect width="300" height="300" rx="12" fill="#f3f5ea"/>
-  <path d="M170 60l29-20 10 6 24-29 16 25 12-8 22 26z" fill="#c9d7c9"/>
-  <g font-family="sans-serif" fill="#243d3d">
+  <desc id="desc">Two bars measure mean predicted minus observed diameter growth factor for 18 winter foothill extracts. Using AIOMFAC pure-salt properties, additive water uptake gives +0.542. The full AIOMFAC liquid mixture gives +0.716.</desc>
+  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
+  <path d="M170 60l29-20 10 6 24-29 16 25 12-8 22 26z" fill="#cad9d2"/>
+  <g font-family="sans-serif" fill="#243e43">
     <text x="24" y="38" font-weight="bold" font-size="22">Growth bias</text>
-    <text x="24" y="63" font-size="16">Winter foothill</text>
     <g font-size="17">
-      <text x="25" y="103">Literature pure salts</text>
-      <text x="25" y="172">AIOMFAC pure salts</text>
-      <text x="25" y="241">AIOMFAC mixture</text>
+      <text x="25" y="117">Pure salts</text>
+      <text x="25" y="220">Liquid mixture</text>
     </g>
-    <path d="M25 109v154" stroke="#b5b7a9" stroke-width="1.5"/>
-    <rect x="25" y="115" width="72.99" height="12" rx="2" fill="#535f5d"/>
-    <rect x="25" y="184" width="135.60" height="12" rx="2" fill="#535f5d"/>
-    <rect x="25" y="253" width="178.96" height="12" rx="2" fill="#14676c"/>
-    <g font-size="18" font-weight="bold">
-      <text x="107" y="129">+0.29</text>
-      <text x="170" y="198">+0.54</text>
-      <text x="213" y="267">+0.72</text>
-    </g>
+    <path d="M25 119v123" stroke="#617679" stroke-width="1.5"/>
+
+    <rect x="25" y="132" width="135.60" height="18" rx="2" fill="#243e43"/>
+    <rect x="25" y="235" width="178.96" height="18" rx="2" fill="#135963"/>
   </g>
 </svg>

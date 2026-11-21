@@ -2,24 +2,23 @@
   <title id="title">BAT reverses the measured order of activation hygroscopicity for two acids</title>
   <desc id="desc">The lines connect measured and modeled activation hygroscopicities on a common linear scale. Pinic acid falls from 0.248 to 0.114, while phthalic acid rises from 0.051 to 0.155.</desc>
   <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
-  <g font-family="sans-serif" fill="#233e41">
-    <text x="25" y="40" font-size="22" font-weight="bold">Activation κ</text>
+  <g font-family="sans-serif" fill="#243e43">
     <!-- Each endpoint uses y = 259 − 710κ. -->
-    <g fill="none" stroke="#9a9f98" stroke-width="1.4">
+    <g fill="none" stroke="#617679" stroke-width="1.4">
       <path d="M58 59v184"/>
       <path d="M160 59v184"/>
     </g>
-    <path d="M58 82.92L160 177.97" fill="none" stroke="#175e68" stroke-width="4.5"/>
-    <g fill="#175e68">
+    <path d="M58 82.92L160 177.97" fill="none" stroke="#135963" stroke-width="4.5"/>
+    <g fill="#135963">
       <circle cx="58" cy="82.92" r="7"/><circle cx="160" cy="177.97" r="7"/>
     </g>
-    <path d="M58 222.79L160 148.81" fill="none" stroke="#9f4825" stroke-width="4" stroke-dasharray="7 4"/>
-    <g fill="#fbf2e3" stroke="#9f4825" stroke-width="3">
+    <path d="M58 222.79L160 148.81" fill="none" stroke="#a44d21" stroke-width="4" stroke-dasharray="7 4"/>
+    <g fill="#fbf2e3" stroke="#a44d21" stroke-width="3">
       <path d="M58 214.79l8 8-8 8-8-8z"/><path d="M160 140.81l8 8-8 8-8-8z"/>
     </g>
     <g font-weight="600" font-size="17">
-      <text x="175" y="150" fill="#85391a">Phthalic acid</text>
-      <text x="175" y="185" fill="#175e68">Pinic acid</text>
+      <text x="175" y="150" fill="#a44d21">Phthalic</text>
+      <text x="175" y="185" fill="#135963">Pinic</text>
     </g>
     <g text-anchor="middle" font-size="17">
       <text x="58" y="269">Measured</text>

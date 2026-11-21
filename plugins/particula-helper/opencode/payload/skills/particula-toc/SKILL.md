@@ -16,6 +16,12 @@ For an existing study, review the artwork again once the narrative is final. If 
 - Use a few direct labels when they help readers identify the subject or compare marks. Typically use fewer than five visible words in total across the figure. Place words beside what they name. Use the remaining space for meaningful details such as the ion pair and beam in the CLOUD study. Keep the headline, explanatory sentences and precise values in the report.
 - For example, the CLOUD title names the underpredicted humidity response. Two marks starting together and ending at different heights inside a humidity motif convey the gap. A drawing of ions sticking to a wall would imply a cause the measurements leave open.
 
+## Color and lettering
+
+Use the collection’s [TOC color guide](../../references/toc-design.md#collection-colors) for every square, including artwork written by a study script. Start with the paper-yellow canvas. Use ink for a measured or archived reference when it has its own mark. Label each comparison directly and give it a distinct position, shape or line style.
+
+Read the figure beside its listing title at thumbnail size. Aim for about five visible words. Remove a repeated headline, subtitle, conditions or row of numbers before shortening a scientific name. Keep a unit or threshold when the graphic needs it. If several methods are the finding, keep each method name and let the marks carry the magnitude. Record precise endpoints, units and conditions in the accessible description and report.
+
 ## Export and check
 
 For Particula, produce a **3 × 3 inch square**. Use a self-contained SVG with equal physical dimensions (for example, `width="3in" height="3in" viewBox="0 0 300 300"`), or a **900 × 900 pixel** raster with **300 pixels/inch** set on both axes. Preserve crisp edges and generous margins. Keep the detailed quantitative figure in the report.

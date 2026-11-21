@@ -13,7 +13,7 @@ At low ion production, CLOUD’s 70% humidity measurement exceeds the ceiling se
 [![Adding dielectric polarization increases the modeled capture coefficient by 35% for a singly charged 4 nm tracer and a neutral 100 nm collector. The increase is only 0.064% for the modeled chamber scan.](../../images/nacl-scavenging/graphical-abstract.svg)\
 A 35% polarization effect for a charged 4 nm NaCl tracer shrinks to 0.06% in the modeled chamber scan](nacl-scavenging/index.md)
 
-[![Measured cloud droplets per cm³ rise from fresh water to salt water (solid line, dense blue cluster). Separate haze fits predict a decline (dashed line, sparse outlined cluster).](../../images/pi-chamber/graphical-abstract.svg)\
+[![Measured cloud droplets per cm³ rise from fresh water to salt water (solid line, dense cluster of filled droplets). Separate haze fits predict a decline (dashed line, sparse outlined cluster).](../../images/pi-chamber/graphical-abstract.svg)\
 Π Chamber cloud counts rose over salt water, but separate haze fits predicted a decline](pi-chamber/haze-and-cloud/index.md)
 
 [![Warm air passes a fed pentane drop. A short heat-supply bar and a three-times-longer heat-demand bar share the same baseline.](../../images/pendant-evaporation/graphical-abstract.svg)\
@@ -40,7 +40,7 @@ After glyoxal dilution, two models predict rising organic mass per sulfate as me
 [![The observed gap between half-signals is 20.7 minutes. At an assumed 80 nm particle radius a common source predicts 0.1 minutes and a delayed cis-pinic source predicts 19.1 minutes.](../../images/pinic-isomers/graphical-abstract.svg)\
 A delayed source predicts 19 minutes of the 21-minute gap between two chamber isomer signals](pinic-isomers/index.md)
 
-[![For the winter foothill extracts, mean predicted minus measured growth factor increases from +0.292 with literature pure salts to +0.542 with AIOMFAC pure salts and +0.716 with the full AIOMFAC liquid mixture.](../../images/mt-hua-salts/graphical-abstract.svg)\
+[![For the winter foothill extracts, mean predicted minus measured growth factor increases from +0.542 with AIOMFAC pure salts to +0.716 with the full AIOMFAC liquid mixture.](../../images/mt-hua-salts/graphical-abstract.svg)\
 Liquid salt mixing widens the winter foothill growth-factor bias at Mt. Hua from +0.54 to +0.72](particle-water-uptake/mt-hua/index.md)
 
 [![Sub-100 nm particles per cubic centimetre after 24 hours in polluted air. Archived MAM4xx gives 3,379. With coarse collisions and neutral attraction, extended MAM4xx gives 2,424, the sectional model 1,187 and the particle-resolved model 1,180.](../../images/mam4xx-coagulation/graphical-abstract.svg)\
