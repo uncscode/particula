@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 7.085128248902038,
+  "package_source_sha256": "bb5d36dc97cf15fc0dfa1c9341d4c98df3eba752db86ecde3323ed4edd9b4e23",
+  "scientific_source_sha256": "a2616a91adf4b8ccd43e77f29cac86e447968c9557ed57ac42e494d3357ba91f",
+  "input_sha256": {},
+  "example": "moist-parcel-updraft",
+  "fingerprint": "74d7a1c98c842a821f320a6cf5b9d55a58424f196f084193918e5ff7432621b7",
+  "source": "docs/studies/examples/thermodynamics/moist_parcel.py",
+  "revision": "f2bca4469b46e91489f68a4d528336b637b49803",
+  "package_dirty": false,
+  "executed_at": "2026-11-21T21:24:27.234868+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.parcel 8e67a63 load on device 'cuda:0' took 516.30 ms  (compiled)\n"
+      },
+      {
+        "text": "After 100 s at 1 m/s, liquid water = 0.000106408 kg/kg dry air.\nPeak supersaturation = 0.5291% at 61.55 m.\nLiquid-water saturation reached at 45.1 m.\nMaximum CPU/CUDA discrepancies on NVIDIA GeForce RTX 5060 (float64): 3.71e-08 kg/kg liquid water, 0.000917 percentage points supersaturation.\nCUDA derivative = +0.0002123371 (kg/kg)/(m/s)\nCentered at \u00b10.01 m/s: +0.0002123388 (kg/kg)/(m/s)\nCentered at \u00b10.001 m/s: +0.0002123372 (kg/kg)/(m/s)\nCentered at \u00b10.0001 m/s: +0.0002123371 (kg/kg)/(m/s)\nFor +0.01 m/s the derivative predicts +2.1234 mg liquid/kg dry air, and the rerun gives +2.1227 mg/kg.\n"
+      },
+      {
+        "image": "figure-5-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-5-1.png": "4f05bd5c28db46da3d20a82f0a4d8030a252e38bf6b88e8d3ce741fcb3aef838",
+    "data.json": "ef94c8a2609dc7b180456e986eb5982f5c73c2838d15441340a4b499e868bfbf",
+    "source.py": "7866f0d7ba4f284043961ce19d5e58e39f15416c59a9829950f33d023fc4a76c"
+  },
+  "simulation_fingerprint": "8ec6b581d640b7e96270b51fd3aae8836473937df21310219fd8b1dc4e6a1ce3"
+}

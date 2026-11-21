@@ -85,6 +85,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [From stored vapor mass to saturation](tutorials/building-an-aerosol/gas/gas_data.py)
 - [Horizontal droplet velocities in turbulence](validation/cloud-droplet-collisions/dns-horizontal-velocity-comparison.py)
 - [How do collision models change a water-grown mixed aerosol?](examples/coupled-populations/emissions/biomass_burning_cloud_interactions.py)
+- [How does a faster updraft change cloud water at a fixed time?](examples/thermodynamics/moist_parcel.py)
 - [How does attraction change a Brownian collision rate?](validation/coagulation/dispersion/van_der_waals.py)
 - [How does water uptake change organic aerosol partitioning?](examples/thermodynamics/equilibria/equilibria_part1.py)
 - [How illumination warms and evaporates a wet aerosol](validation/material-properties/optical-heating/illuminated_evaporation.py)

@@ -71,6 +71,11 @@ each particle species and each mapped gas species separately. The independent
 limit in a closed box and a fixed reservoir; it does not qualify stiff water
 equilibrium or latent-temperature feedback.
 
+The [moist parcel example](../../studies/examples/thermodynamics/moist_parcel.py)
+advances parcel temperature, vapor and physical volume together during
+ascent and differentiates the final liquid-water mixing ratio with respect
+to updraft speed.
+
 ## Native data contract (v0.3.0)
 
 Direct native calls to `CondensationIsothermal`,

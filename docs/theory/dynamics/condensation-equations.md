@@ -215,6 +215,8 @@ kᵢ, Kelvin radius = [2 × σ_surface × molar massᵢ] / [ R × T × density ]
 
 The Kelvin effect expresses how vapor pressure over a curved surface differs from that over a flat surface. Small particles exhibit increased vapor pressure due to curvature, influencing condensation and evaporation rates.
 
+The [moist parcel example](../../studies/examples/thermodynamics/moist_parcel.py) combines curvature with κ-dependent water activity to follow each size class through cloud base.
+
 ## Variable Descriptions
 
 **Understanding the Parameters:**
