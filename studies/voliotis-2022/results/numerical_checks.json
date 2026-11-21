@@ -1,0 +1,5 @@
+{
+  "cpu_cuda_max_abs_ug_m3": 0.08810056284940515,
+  "refinement_12s_to_6s_max_abs_ug_m3": 0.2878624487625734,
+  "refinement_6s_to_3s_max_abs_ug_m3": 0.03856035532905011
+}
