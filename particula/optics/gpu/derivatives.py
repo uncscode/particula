@@ -89,10 +89,18 @@ def mie_cross_section_sums_jacobian(
     sca = wp.vec3d(zero, zero, zero)
     extinction[case] = ext
     scattering[case] = sca
-    if status[case] != 0 or term_count[case] == 0:
+    if status[case] != 0:
         return
     m = relative_index[case]
     x = size_parameter[case]
+    if term_count[case] == 0:
+        # At index match, the right derivative of absorption is the
+        # Beer–Lambert coefficient per k times the sphere volume.
+        if m[0] == one and m[1] == zero and x > zero:
+            extinction[case] = wp.vec3d(
+                zero, wp.float64(4.0) / wp.float64(3.0) * x * x * x, zero
+            )
+        return
     z = m * x
     z_squared = multiply(z, z)
     m_squared = multiply(m, m)

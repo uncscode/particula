@@ -224,3 +224,48 @@ from current composition. Supply indices in the order of the particle
 material axis, including the water index for particles that take up water.
 The homogeneous mixture uses volume fractions of each material and the
 Lorentz–Lorenz function of its dielectric constant.
+
+## Fit bulk optical measurements
+
+Start from a size spectrum and optical observations from a compatible sampling
+window. Normalize gas-volume conditions, align instrument RH and wavelengths,
+and choose an uncertainty model. An `OpticalGrid` takes number density
+integrated over each bin in m⁻³. Use `OpticalGrid.from_diameter_bins` to
+convert a spectrum reported as dN/dlog₁₀D using its diameter edges.
+
+`EffectiveIndexModel(grid)` fits a common complex refractive index using
+sizes measured at the optical RH. To model dry material, supply the optical
+`relative_humidity` and either a prescribed `kappa` or bounds for fitting
+it. A `sizing_relative_humidity` accounts for water retained in the sizing
+instrument under the assumed equilibrium model. A prescribed diameter
+`growth_factor` can also supply the radius and water-volume change.
+The fitted index is shared across the specified wavelengths.
+
+`MixingStateModel` fits one internal-mixing number fraction, or two fractions
+split by one dry diameter. Supply dry species volume fractions, indices and
+hygroscopicities. `dry_volume_fractions` converts a mass composition using
+species densities. This model redistributes material among equally sized dry
+spheres at each bin. Each candidate has the same total dry count and species
+inventory. Wet growth is evaluated separately for each subpopulation.
+When the data only constrain the bulk composition, the allocation of
+composition across dry sizes is an explicit model input.
+
+Use `OpticalObservations` to form the measurement channels from the bulk
+extinction, scattering and absorption coefficients. It supports wavelength
+or time averaging and a full measurement covariance. Use a truncation-corrected
+total scattering observation for comparison to the modeled total scattering.
+An angular-channel response requires the differential scattering calculation
+above. Treat derived and independently measured coefficients according to
+their covariance when forming the residual vector.
+
+Use `fit_optical` with explicit bounds and multiple starts. Select
+`device="cuda:0"` on the model for the Warp adjoint. It supports
+float64 gradients through the optical and humidity calculations. Use the
+local sensitivity, `profile_optical`, and held-out measurements to check which
+parameters can be distinguished. Profile intervals depend on the fitted
+population, searched bounds and assumed errors. A smooth closed-condensation
+trajectory can use `condensation_optics` with an optical time-series adjoint.
+
+The [optical integration studies](../../studies/validation/material-properties/optical-integration.md)
+show a measured multi-RH fit, a case where bulk optics leave a size-band mixing
+fraction unresolved, and recovery of the initial radius from a time series.

@@ -1097,6 +1097,77 @@
   ],
   "resources": [
     {
+      "source": "docs/studies/validation/material-properties/optical-recording/dense_optical_history.py",
+      "title": "Record aerosol extinction at 10 Hz during hygroscopic growth",
+      "topic": "optics",
+      "also": [
+        "gpu-prepared"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/validation/material-properties/optical-retrieval/infer_refractive_index.py",
+      "title": "Retrieve effective refractive index and hygroscopic growth from optics",
+      "topic": "optics",
+      "also": [
+        "composition"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/validation/material-properties/optical-mixing-state/infer_mixing_state.py",
+      "title": "Can bulk optics resolve aerosol mixing state?",
+      "topic": "optics",
+      "also": [
+        "composition"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/validation/condensation/optical-trajectory/infer_optical_trajectory.py",
+      "title": "Fit a growth trajectory from light alone",
+      "topic": "optics",
+      "also": [
+        "condensation-reservoirs"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/validation/material-properties/optical-integration.md",
+      "title": "Record and infer aerosol properties from optics",
+      "topic": "optics",
+      "also": [
+        "verification-scientific",
+        "gpu"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "optical-integration",
+        "runs": [
+          "dense-optical-history",
+          "optical-effective-index",
+          "optical-mixing-state",
+          "optical-growth-trajectory"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/optics/index.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/studies/validation/material-properties/cuda-optics/index.md",
+            "label": "Forward qualification"
+          }
+        ]
+      }
+    },
+    {
       "source": "docs/contribute/architecture/warp/autodiff-limitations.md",
       "title": "Warp Autodiff: Limitations and Stochastic Process Handling",
       "topic": "gpu-foundations-warp",

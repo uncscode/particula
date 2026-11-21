@@ -8,4 +8,5 @@ Compare material, optical and process properties against published calculations 
 - [Independent process reference equations](process-references.md)
 - [Particle mass precision across four size scales](mass-precision.md)
 - [PyMieScatt reference corpus](sphere-optics/index.md)
+- [Record and infer aerosol properties from optics](optical-integration.md)
 <!-- STUDY_LIST_END -->

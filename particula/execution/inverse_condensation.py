@@ -151,6 +151,22 @@ def _growth_inputs(
     return radii, numbers, vapor, factor
 
 
+def _mass_step(
+    initial,
+    current,
+    counts,
+    vapor,
+    transport,
+    empty,
+    launch,
+):
+    gas = empty(initial.shape[:1])
+    following = empty(initial.shape)
+    launch(_reservoir, len(initial), [initial, current, counts, vapor, gas])
+    launch(_advance, initial.shape, [current, gas, *transport, following])
+    return following
+
+
 def terminal_radius(
     initial_um,
     number_density,
@@ -199,26 +215,12 @@ def terminal_radius(
     m0 = empty(radii.shape)
     r = empty(radii.shape)
 
+    transport = (factor, mean_path, diffusivity, duration / steps)
+
     def segment(start, length):
         mass = start
         for _ in range(length):
-            gas = empty(len(radii))
-            launch(_reservoir, len(radii), [m0, mass, weights, g0, gas])
-            following = empty(radii.shape)
-            launch(
-                _advance,
-                radii.shape,
-                [
-                    mass,
-                    gas,
-                    factor,
-                    mean_path,
-                    diffusivity,
-                    duration / steps,
-                    following,
-                ],
-            )
-            mass = following
+            mass = _mass_step(m0, mass, weights, g0, transport, empty, launch)
         return mass
 
     tape = wp.Tape() if grad else None
