@@ -9,6 +9,14 @@ A Particula TOC figure draws the eye to a study and makes its title easier to un
 | The National Park Service starts wayside design with the visitor’s surroundings and recommends small sketches to establish focus and hierarchy. [Harpers Ferry Center design guide](https://www.nps.gov/subjects/hfc/wayside-exhibit-design.htm) | Sketch the composition, then test the Particula figure at 2 × 2 inches with the actual title in place. See which relationship survives a quick glance before polishing the drawing. |
 | ACS asks authors to consider the graphic and manuscript title together, limit text, and inspect the art at its output size. [ACS TOC graphic guidelines](https://pubsapp.acs.org/paragonplus/submission/toc_abstract_graphics_guidelines.pdf) | Keep the evidence plot available in the report. For the Particula listing, use the square dimensions in the skill. A journal submission may specify its own dimensions. |
 
+## Labeling the comparison
+
+| Study | What earns space in the square |
+| --- | --- |
+| Sea2Cloud shipboard aerosol | The ship identifies the sampling setting. A shared heading gives the size range, time and particles per cm³. Label the observed bar “Ship measurement” and group the predictions by when the 16 nm particles arrive relative to the small-particle pulse. Now a longer bar reads as more particles in the sampled air. |
+| Mt. Hua winter foothill extracts | The mountain ridge identifies the sampling site. The particle diameters show measured and predicted mean wet size at the same humidity. Repeating the measured diameter as a dashed ring inside each prediction lets readers see the excess directly. |
+| Cloud activation and water uptake | Start the two model branches at one dry organic particle. Draw the wet diameters on a shared scale and label the bars “Condensed water volume.” That label tells readers which quantity differs by 49%. |
+
 ## Collection colors
 
 The paper-yellow canvas identifies a Particula TOC figure across study topics. Apply the same solid fill to the full square. Give each scientific mark a direct label, recognizable shape or distinct position so its meaning also survives grayscale reproduction.
