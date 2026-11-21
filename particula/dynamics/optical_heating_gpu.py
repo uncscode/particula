@@ -18,6 +18,7 @@ from particula.execution.extension_registry import (
 )
 from particula.execution.process_extensions import GPUProcessPlan
 from particula.gpu.kernels.thermodynamics import _buck_vapor_pressure
+from particula.gpu.population_metadata import PARTICLE_RESOLVED
 from particula.gpu.warp_types import WarpParticleData
 from particula.optics.gpu.state import ParticleOpticalCases
 from particula.optics.gpu.workspace import prepare_mie
@@ -364,11 +365,6 @@ class OpticalHeatingAdapter:
             >= np.iinfo(np.int32).max
         ):
             raise ValueError("Optical heating exceeds device index limits")
-        kind = (
-            3
-            if aerosol.particles.distribution_type == "particle_resolved"
-            else 1
-        )
         return GPUProcessPlan(
             name=process.name,
             extension_id=process.extension_id,
@@ -378,7 +374,7 @@ class OpticalHeatingAdapter:
             parameters=(
                 ("identity", process.configuration()),
                 ("gas_lane", aerosol.gas.name.index(process.gas_water)),
-                ("kind", kind),
+                ("kind", PARTICLE_RESOLVED),
                 ("capacity", self.coefficient_capacity),
                 ("tile", self.particle_tile),
             ),

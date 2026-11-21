@@ -281,10 +281,12 @@ are transferred with the other reduced observations. Values above one
 represent supersaturation.
 
 Use `OpticalHeating` from `particula.dynamics.optical_heating` to compute
-the effect of prescribed illumination on a warm solution sphere. Configure
-two particle materials (water and a nonvolatile absorbing solute), the
-water gas name and a band-integrated irradiance [W m⁻²] for each wavelength
-in the `OpticalConfig`. Call `heating.attach_fields(aerosol)` once before
+the effect of prescribed illumination on a particle-resolved population of
+warm solution spheres. Each resolved slot stores its temperature and
+absorbed power. Configure two particle materials (water and a nonvolatile
+absorbing solute), the water gas name and a band-integrated irradiance
+[W m⁻²] for each wavelength in the `OpticalConfig`. Call
+`heating.attach_fields(aerosol)` once before
 starting a new simulation. For a resident run, register `OpticalHeating` and
 its `OpticalHeatingAdapter` from
 `particula.dynamics.optical_heating_gpu` on a `ProcessRegistry` and pass it
