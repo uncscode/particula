@@ -2,6 +2,8 @@
 
 ![Schematic eddies bring two cloud droplets into contact. For drops with eight times their starting mass, shear theory gives 614 per million, Particula gives 610 and a constant rate fitted to mean mass gives 102.](../../../images/shear-drop-spectrum/graphical-abstract.svg)
 
+*All three bars are model predictions. Saffman and Turner calculated the drop counts in their paper. The eddies illustrate the assumed turbulent flow.*
+
 Saffman and Turner (1956) asked how quickly turbulent air could produce large drops in a cloud that started with identical droplets. Their model lets larger drops encounter other drops faster. **Particula used that size-dependent shear model and reproduced its prediction.** At the final time in Figure 2, Particula produced **610 drops of exactly eight times the initial mass per million starting drops**. Integrating the authors’ equations independently gave **614**. Giving every pair the same collision rate and fitting that rate to the final mean mass gave only **102**. The sixfold shortfall belongs to the constant-rate approximation. The comparison tests a calculation of cloud growth against theory. Testing its accuracy in real clouds requires measured drop counts. [Saffman and Turner, equations 1–3 and Figure 2](https://authors.library.caltech.edu/records/mvczm-fey53)
 
 ## How drop size enters the collision rate

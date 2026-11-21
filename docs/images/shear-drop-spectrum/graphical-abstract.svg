@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
   <title id="title">Cloud droplets colliding in turbulent air</title>
-  <desc id="desc">A schematic cloud contains curling eddies and two spherical drops meeting between them. Below, three bars show drops at eight times the initial mass per million starting drops. Shear theory gives 614, Particula gives 610, and a constant rate fitted to mean mass gives 102.</desc>
+  <desc id="desc">A schematic cloud contains curling eddies and two spherical drops meeting between them. Below, three model predictions give counts of drops at eight times the initial mass per million starting drops. Shear theory gives 614, Particula gives 610, and a constant rate fitted to mean mass gives 102.</desc>
   <defs>
     <marker id="flow" viewBox="0 0 8 8" refX="6.5" refY="4" markerWidth="3.6" markerHeight="3.6" orient="auto">
       <path d="M0 0 8 4 0 8 2.2 4Z" fill="#457683"/>
@@ -21,13 +21,14 @@
     <circle cx="243" cy="81" r="3.5"/>
   </g>
   <g font-family="sans-serif" fill="#20373d" text-anchor="middle">
-    <text x="150" y="129" font-size="14">Eightfold drops per million initial drops</text>
-    <!-- All bars share a zero baseline and 0.17 SVG units per drop per million. -->
+    <text x="150" y="123" font-size="14" font-weight="bold">Predicted eightfold drops</text>
+    <text x="150" y="138" font-size="12">per million initial drops</text>
+    <!-- All bars share a zero baseline and 0.15 SVG units per drop per million. -->
     <path d="M28 263h244" stroke="#536366" stroke-width="2"/>
-    <rect x="38" y="158.62" width="48" height="104.38" fill="#e4eff0" stroke="#245563" stroke-width="2"/>
-    <rect x="126" y="159.3" width="48" height="103.7" fill="#236d80"/>
-    <rect x="214" y="245.66" width="48" height="17.34" fill="#bc711f"/>
-    <g font-weight="bold" font-size="18"><text x="62" y="151">614</text><text x="150" y="152">610</text><text x="238" y="238">102</text></g>
-    <g font-size="15"><text x="62" y="284">Theory</text><text x="150" y="284">Particula</text><text x="238" y="284">Constant</text></g>
+    <rect x="38" y="170.9" width="48" height="92.1" fill="#e4eff0" stroke="#245563" stroke-width="2"/>
+    <rect x="126" y="171.5" width="48" height="91.5" fill="#236d80"/>
+    <rect x="214" y="247.7" width="48" height="15.3" fill="#bc711f"/>
+    <g font-weight="bold" font-size="18"><text x="62" y="164">614</text><text x="150" y="164.6">610</text><text x="238" y="240.7">102</text></g>
+    <g font-size="15"><text x="62" y="284">Equations</text><text x="150" y="284">Particula</text><text x="238" y="284">Constant</text></g>
   </g>
 </svg>
