@@ -1,8 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img">
-<title>Inorganic salt growth at Mt. Hua</title><desc>Schematic paired droplets above a mountain ridge. The salt reconstruction produces a larger wet particle than measured for most extracts.</desc>
-<rect width="300" height="300" fill="#f4f6ed"/>
-<path d="M0 260 57 201 87 221 161 124 189 175 208 157 300 246V300H0Z" fill="#9cb5a6"/>
-<path d="m0 278 71-62 37 29 57-53 42 37 37-21 56 42v50H0Z" fill="#42645e"/>
-<circle cx="82" cy="98" r="32" fill="#783b63"/><circle cx="209" cy="98" r="55" fill="none" stroke="#12676b" stroke-width="6"/>
-<circle cx="209" cy="98" r="36" fill="#12676b"/>
-<g fill="#203c39" font-family="sans-serif" font-size="17" text-anchor="middle"><text x="82" y="33">Measured</text><text x="209" y="33">Salt model</text></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Wet particle sizes for Mt. Hua winter foothill extracts</title>
+  <desc id="desc">Above the Mt. Hua ridge, circles compare mean wet diameters for 18 winter foothill extracts. Starting from 100 nm dry particles at 90% relative humidity, the measured mean is 157 nm. The pure-salt and liquid-mixture models predict 212 and 229 nm. All three diameters share one scale. The inner dashed rings repeat the measured diameter.</desc>
+  <defs>
+    <clipPath id="card"><rect width="300" height="300" rx="16"/></clipPath>
+  </defs>
+  <g clip-path="url(#card)">
+    <rect width="300" height="300" fill="#fbf2e3"/>
+    <!-- Mountain silhouettes from the original Mt. Hua graphical abstract. -->
+    <path d="M0 260 57 201 87 221 161 124 189 175 208 157 300 246V300H0Z" fill="#cad9d2"/>
+    <path d="m0 278 71-62 37 29 57-53 42 37 37-21 56 42v50H0Z" fill="#135963"/>
+  </g>
+  <g font-family="sans-serif" fill="#243e43" text-anchor="middle">
+    <text x="150" y="28" font-size="19" font-weight="bold">Wet diameter at 90% RH</text>
+    <!-- Radius in SVG units = 18 times the mean diameter growth factor. -->
+    <circle cx="47" cy="88" r="28.321" fill="#cad9d2" stroke="#243e43" stroke-width="2.5"/>
+    <circle cx="145" cy="88" r="38.085" fill="#efd1a5" stroke="#a44d21" stroke-width="2.5"/>
+    <circle cx="248" cy="88" r="41.206" fill="#cad9d2" stroke="#135963" stroke-width="2.5"/>
+    <g fill="none" stroke="#243e43" stroke-width="1.6" stroke-dasharray="4 4">
+      <circle cx="145" cy="88" r="28.321"/><circle cx="248" cy="88" r="28.321"/>
+    </g>
+    <g font-size="14" font-weight="bold">
+      <text x="47" y="93">157 nm</text><text x="145" y="93">212 nm</text><text x="248" y="93">229 nm</text>
+    </g>
+    <g font-size="15" font-weight="600">
+      <text x="47" y="151">Measured</text><text x="145" y="151">Pure salts</text><text x="248" y="151">Liquid mix</text>
+    </g>
+    <text x="150" y="278" fill="#fbf2e3" font-size="19" font-weight="bold">Mt. Hua · winter foothill</text>
+  </g>
+</svg>

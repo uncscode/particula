@@ -25,7 +25,7 @@
       },
       "requires_local_executor": true,
       "publication": {
-        "release_notes": "Studies, worked examples and guides can use drafting and editing agents to revise prose autonomously. Literature studies can start from an independent reading of the paper, pair the opening summary with the TOC figure, and close with a concrete scientific takeaway and reproducibility resources."
+        "release_notes": "Literature studies lead with the strongest supported finding and revisit their TOC figure after revision. The TOC guidance adds a shared palette and examples for showing the study setting, identifying measured and modeled quantities, and labeling bars and particles at thumbnail size."
       }
     }
   },
@@ -37,7 +37,7 @@
     "scientific-computing"
   ],
   "name": "particula-helper",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "license": "MIT",
   "homepage": "https://uncscode.github.io/particula/guide/agent-plugins/",
   "repository": "https://github.com/uncscode/particula"

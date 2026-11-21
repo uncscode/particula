@@ -19,7 +19,10 @@ choice. A collection with seven choices merits review for subject or task
 groups. Make each group landing meaningful in the installed Markdown bundle.
 Run `python scripts/docs_studies.py sync` to regenerate the marked lists in the
 installed Markdown. Verify them with `python scripts/docs_studies.py check`.
-Check the generated catalog and the source and ZIP downloads on the built site.
+Study reports list each companion calculation with its code and downloads in
+the generated **Study resources** section after the report. Keep reproduction
+instructions in the report’s closing sections. Check the generated catalog
+and the source and ZIP downloads on the built site.
 
 ## Refresh results deliberately
 

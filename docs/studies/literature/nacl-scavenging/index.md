@@ -1,14 +1,40 @@
-# Particula predicts about 60% of the NaCl capture rate measured at 4 nm
+# A 35% polarization effect for a charged 4 nm NaCl tracer shrinks to 0.06% in the modeled chamber scan
 
-![A small NaCl particle approaches a collector. On a common scale the modeled 4 nm capture coefficient reaches about three fifths of the measured value.](../../../images/nacl-scavenging/graphical-abstract.svg)
+![A small, positively charged tracer follows a dotted path toward a larger neutral NaCl cube. Polarization increases modeled capture by 35% for the 4 nm tracer and 100 nm collector pair and by 0.064% for the chamber scan.](../../../images/nacl-scavenging/graphical-abstract.svg)
 
-In Cai et al.’s recorded 4 nm scan, the apparent capture coefficient was **1.760 × 10⁻⁷ cm³/s**. Particula’s native dispersion and dielectric model predicts **1.066 × 10⁻⁷ cm³/s** under the reference collector spectrum. Dispersion raises the modeled coefficient from 0.926 to 1.065 in those units. Adding dielectric polarization changes only the last digit. Pairs outside the kernel’s supported range use charged hard-sphere rates. Most of those pairs involve larger collectors admitted by the classifier. [Matched process comparisons and domain coverage](#dispersion-raises-capture-at-4-nm-and-dielectric-polarization-adds-little)
+Can charge-induced attraction explain the capture of 4 nm sodium chloride particles measured by Cai et al.? For a singly charged 4 nm tracer approaching a neutral 100 nm collector, adding dielectric polarization to dispersion raises the modeled pair capture coefficient by **35%**. In the simulated chamber most tracers are neutral. Applying the recorded seven-channel scan settings to the whole population, the same change raises the apparent capture coefficient by **0.064%**, from 1.0651 × 10⁻⁷ to 1.0658 × 10⁻⁷ cm³/s. Cai et al. reported **1.760 × 10⁻⁷ cm³/s**. The strength of attraction for one charge pairing therefore gives little guidance about its contribution to the observed rate without knowing which particles reach the chamber. Measuring the charge of the entering tracers and the sizes of the transmitted collectors would test that population weighting. [Cai et al., Figure 6](https://doi.org/10.5194/acp-22-11529-2022) · [Pair calculations](https://github.com/uncscode/particula/blob/main/docs/data/nacl-scavenging/capture-pairs.csv) · [Recorded-scan retrievals](https://github.com/uncscode/particula/blob/main/docs/data/nacl-scavenging/pulse-matched-steady.csv)
 
-Across the full 3.6–10 nm tracer range, Cai et al. measured capture by nominally 100 nm NaCl collectors at 1.84–2.14 times Particula’s neutral Brownian hard-sphere prediction. At 4 nm, electrostatic attraction adds only 2.7% at the expected neutralizer outlet charge distribution. Doubly and triply charged collectors can also pass the upstream classifier at larger physical diameters. Under the reference source spectrum, finite classifier widths and multiple charges together raise the dispersion calculation by 16% at 4 nm. [Cai et al. (2022)](https://doi.org/10.5194/acp-22-11529-2022) · [Runlong Cai’s archived figure data, CC BY 4.0](https://doi.org/10.5281/zenodo.6982767)
+<a id="particula-predicts-about-60-of-the-nacl-capture-rate-measured-at-4-nm"></a>
+
+## How the chamber isolates losses to larger NaCl particles
+
+Cai and colleagues supplied sub-10 nm tracers continuously and varied the concentration of nominally 100 nm collectors. Even without collectors, dilution and wall deposition removed tracers. The authors measured their loss rate and used the further decrease in steady tracer counts with increasing collector abundance to infer a capture coefficient. Across the five NaCl sizes from 3.6 to 10 nm, the reported coefficients are 1.84–2.14 times the neutral Brownian hard-sphere predictions in this comparison. The question is how much of that excess survives an instrument-matched calculation that includes particle charge, attraction and the range of sizes the classifiers transmit. [Cai et al., Figures 1, 3 and 4 and Eq. 4](https://acp.copernicus.org/articles/22/11529/2022/) · [Authors’ archived figure data](https://doi.org/10.5281/zenodo.6982767)
+
+## Which mechanisms change the apparent capture coefficient?
+
+<a id="compare-the-same-observable-as-the-experiment"></a>
+
+### Blank and loaded particle counts give the apparent capture rate
+
+For each size we fitted the blank decay to obtain the total first-order loss rate. At 4 nm this gives 7.07 h⁻¹, including 0.60 h⁻¹ of dilution and 6.47 h⁻¹ of wall loss. We interpolate six wall-loss fits in log diameter and log rate, holding endpoint rates constant outside 3–100 nm. The steady chamber calculation balances continuous injection, both polarities of ion attachment, wall loss, dilution and collector capture. Let $S_0$ be the simulated scanning mobility particle sizer (SMPS) signal without collectors, $S_N$ the signal with collector concentration $N$, and $\lambda_{\mathrm{blank}}$ the first-order blank loss rate. From those signals we retrieve $\beta_{\mathrm{app}}=\lambda_{\mathrm{blank}}(S_0/S_N-1)/N$. The steady calculation holds the collector abundance at its CPC value. [Six blank decay fits](https://github.com/uncscode/particula/blob/main/docs/data/nacl-scavenging/wall-fits.csv)
+
+| Tracer (nm) | Measured | Charged hard spheres with transfer | Particula + dispersion with transfer | Published attraction at nominal sizes | Published attraction with transfer |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 3.6 | 1.89 | 1.13 | 1.58 | 1.73 | 2.02 |
+| 3.7 | 1.74 | 1.08 | 1.52 | 1.66 | 1.94 |
+| 4.0 | 1.76 | 0.953 | 1.34 | 1.48 | 1.72 |
+| 5.0 | 1.22 | 0.668 | 0.953 | 1.06 | 1.22 |
+| 10.0 | 0.425 | 0.221 | 0.325 | 0.378 | 0.424 |
+
+All rates are in 10⁻⁷ cm³/s. The last column anchors the absolute rate for a 100 nm collector to the authors’ van der Waals curve and uses the simulation for the relative size and charge dependence. Changing the assumed collector source geometric mean from 70 to 160 nm moves its 4 nm prediction from 1.60 to 2.01. Finite classifier widths and multiple collector charges together raise the earlier dispersion calculation by 16% at 4 nm under the reference source spectrum. The reference anchored to the authors’ curve agrees within 2.3% at 4, 5 and 10 nm and overshoots at 3.6 and 3.7 nm by 6.6% and 11.2%. A downstream size scan spanning 100–200 nm would constrain the collector spectrum and distinguish this explanation from a change in collision physics. [Coefficient comparison](https://github.com/uncscode/particula/blob/main/docs/data/nacl-scavenging/comparison.csv) · [Authors’ model, Eqs. S4–S11](https://doi.org/10.5194/acp-22-11529-2022-supplement)
+
+![Measured and simulated capture rates by nominal tracer size, and true collector diameters admitted by each charge branch.](../../../images/coagulation/nacl-scavenging.png)
+
+For a tracer growing from 3.6 to 10 nm at a prescribed 3 nm/h, the concentration of 100 nm collectors giving 50% survival is 2,096/cm³ using neutral Particula rates and 1,010/cm³ using log-log interpolation of the five measurements. Linear interpolation gives 916/cm³. This calculation integrates coagulation loss alone and shows how the unmeasured 5–10 nm interval affects inferred survival. [Survival calculations](https://github.com/uncscode/particula/blob/main/docs/data/nacl-scavenging/survival.csv)
 
 <a id="what-charge-reached-the-chamber"></a>
 
-## Most 4 nm tracers enter the model chamber neutral
+### Most 4 nm tracers enter the model chamber neutral
 
 Cai et al. identify a 90 MBq ⁶³Ni neutralizer on the chamber inlet, **after** mobility selection. Bipolar ion attachment establishes a distribution of signed charges. The authors describe electrostatic loss of charged sub-10 nm particles in the Teflon inlet. The sampling SMPS has a separate charger and classifier. Its charge distribution determines the probability of detection at each mobility setting. The total-count CPC monitoring collector abundance counts each particle once. [Experiment layout and methods, Fig. 1 and §2.1](https://acp.copernicus.org/articles/22/11529/2022/)
 
@@ -27,43 +53,23 @@ The [worked example](nacl_scavenging.py) evaluates `par.particles.get_bipolar_ch
 
 <a id="what-did-the-size-classifiers-transmit"></a>
 
-## Larger, multiply charged collectors pass the 100 nm classifier
+### Larger, multiply charged collectors pass the 100 nm classifier
 
-The classifier passes a band of electrical mobilities proportional to $|z|C_c(d)/d$. For a nominal 100 nm setting, particle diameters of **100, 152 and 197 nm** share the central mobility at charges +1, +2 and +3. The inlet neutralizer changes their subsequent charge while preserving their physical size. In the reference run, those branches supplied 82.2%, 15.5% and 2.3% of the incoming collectors. The +2 branch supplied only 0.022% of the nominal 4 nm tracers. The deposited chamber scans do not characterize the upstream collector size spectrum, so the transmitted branch weights are model estimates. [DMA transfer theory](https://doi.org/10.1080/02786820802157823)
+The classifier passes a band of electrical mobilities proportional to $|z|C_c(d)/d$. For a nominal 100 nm setting, particle diameters of **100, 152 and 197 nm** share the central mobility at charges +1, +2 and +3. The inlet neutralizer changes their subsequent charge while preserving their physical size. At the expected neutralizer outlet charge distribution, the electrostatic-only model increases the nominal 4 nm rate by 2.7%. In the reference run, those branches supplied 82.2%, 15.5% and 2.3% of the incoming collectors. The +2 branch supplied only 0.022% of the nominal 4 nm tracers. The deposited chamber scans do not characterize the upstream collector size spectrum, so the transmitted branch weights are model estimates. [DMA transfer theory](https://doi.org/10.1080/02786820802157823)
 
 We assumed lognormal source number spectra centered at the nominal diameters with geometric standard deviation 1.6. Balanced-flow triangular transfer functions use the reported 3.5/10 aerosol-to-sheath flow ratio for the small classifier and an assumed 0.10 for the collector and the original single-channel sampling calculation. Additional Gaussian broadening in relative mobility has standard deviation 0.03 for the small classifier and sampling SMPS, and 0.01 for the collector classifier. The sampling calculation sums the three positive branches with unit CPC efficiency. Sensitivity runs vary polarity, charge distribution, source spectrum, transmission width, charge tails and counting efficiency. [Study inputs](https://github.com/uncscode/particula/blob/main/scripts/nacl_scavenging/instrument.py)
 
 <a id="check-against-the-recorded-4-nm-smps-scan"></a>
 
-### The recorded scan spans seven channels around 4 nm
+#### The recorded scan spans seven channels around 4 nm
 
 The authors’ later deposit preserves the original figure archive and adds chamber SMPS, CPC and flow time series. The July 29 4 nm file identifies a TSI 3085 DMA and a 3776 high-flow CPC. It exports raw counts at seven nominal diameters from 3.59 to 4.45 nm, with multiple-charge and diffusion corrections switched off. The recorded aerosol and sheath settings are 1.5 and 5 L/min, giving a flow ratio of **0.30**. All 103 scans carry an inlet flow rate error flag. Those entries establish the configured flows. Actual flow and size-dependent transmission remain uncertain. [Cai’s updated archive, `metadata/timeseries/SMPSchamber20210729_4nm.txt`](https://doi.org/10.5281/zenodo.13291658)
 
 We summed the seven modeled channels with equal dwell time, including singly, doubly and triply charged particles in each. Keeping the original collector spectrum, wall model and flat CPC efficiency gives **1.31 × 10⁻⁷ cm³/s** for Particula plus dispersion and **1.67 × 10⁻⁷ cm³/s** on the authors’ attraction baseline, 5.0% below the measured 1.76. This is a forward calculation with recorded scan settings. Recovering an experimental coefficient directly from those time series also requires matching the blank, loaded periods and source-flow corrections. [Results with the recorded 4 nm settings](https://github.com/uncscode/particula/blob/main/docs/data/nacl-scavenging/archived-4nm-scan.csv)
 
-<a id="compare-the-same-observable-as-the-experiment"></a>
-
-## Blank and loaded particle counts give the apparent capture rate
-
-For each size we fitted the blank decay to obtain the total first-order loss rate. At 4 nm this gives 7.07 h⁻¹, including 0.60 h⁻¹ of dilution and 6.47 h⁻¹ of wall loss. We interpolate six wall-loss fits in log diameter and log rate, holding endpoint rates constant outside 3–100 nm. The steady chamber calculation balances continuous injection, both polarities of ion attachment, wall loss, dilution and collector capture. From the simulated blank and loaded SMPS signals $S_0$ and $S_N$, we retrieve $\beta_{\mathrm{app}}=\lambda_{\mathrm{blank}}(S_0/S_N-1)/N$. The steady calculation holds the collector abundance at its CPC value. [Six blank decay fits](https://github.com/uncscode/particula/blob/main/docs/data/nacl-scavenging/wall-fits.csv)
-
-| Tracer (nm) | Measured | Charged hard spheres with transfer | Particula + dispersion with transfer | Published attraction at nominal sizes | Published attraction with transfer |
-| ---: | ---: | ---: | ---: | ---: | ---: |
-| 3.6 | 1.89 | 1.13 | 1.58 | 1.73 | 2.02 |
-| 3.7 | 1.74 | 1.08 | 1.52 | 1.66 | 1.94 |
-| 4.0 | 1.76 | 0.953 | 1.34 | 1.48 | 1.72 |
-| 5.0 | 1.22 | 0.668 | 0.953 | 1.06 | 1.22 |
-| 10.0 | 0.425 | 0.221 | 0.325 | 0.378 | 0.424 |
-
-All rates are in 10⁻⁷ cm³/s. The last column anchors the absolute rate for a 100 nm collector to the authors’ van der Waals curve and uses the simulation for the relative size and charge dependence. Changing the assumed collector source geometric mean from 70 to 160 nm moves its 4 nm prediction from 1.60 to 2.01. The reference agrees within 2.3% at 4, 5 and 10 nm and overshoots at 3.6 and 3.7 nm by 6.6% and 11.2%. A downstream size scan spanning 100–200 nm would constrain the collector spectrum and distinguish this explanation from a change in collision physics. [Coefficient comparison](https://github.com/uncscode/particula/blob/main/docs/data/nacl-scavenging/comparison.csv) · [Authors’ model, Eqs. S4–S11](https://doi.org/10.5194/acp-22-11529-2022-supplement)
-
-![Measured and simulated capture rates by nominal tracer size, and true collector diameters admitted by each charge branch.](../../../images/coagulation/nacl-scavenging.png)
-
-For a tracer growing from 3.6 to 10 nm at a prescribed 3 nm/h, the concentration of 100 nm collectors giving 50% survival is 2,096/cm³ using neutral Particula rates and 1,010/cm³ using log-log interpolation of the five measurements. Linear interpolation gives 916/cm³. This calculation integrates coagulation loss alone and shows how the unmeasured 5–10 nm interval affects inferred survival. [Survival calculations](https://github.com/uncscode/particula/blob/main/docs/data/nacl-scavenging/survival.csv)
-
 <a id="what-changes-with-the-native-dispersion-and-dielectric-kernel"></a>
 
-## Dispersion raises capture at 4 nm and dielectric polarization adds little
+### Dispersion raises capture at 4 nm and dielectric polarization adds little
 
 We repeated the continuous-source retrieval with the same injection, charging, wall loss, classifier transfer and SMPS response. Four calculations switch the effective Hamaker constant between zero and 8.9 × 10⁻²⁰ J and the static relative permittivity between 1 and 5.9. Every calculation retains the signed monopole charges. The values represent a dry, homogeneous NaCl sphere scenario at 293.15 K and 101325 Pa, with unit sticking. The native CUDA pair law evaluates dispersion and dielectric polarization along the same encounter trajectory. The earlier calculation added an approximate neutral dispersion correction to a charged kernel. [Kernel theory](../../../theory/dynamics/interparticle-forces.md) · [Capture model validation](../../validation/coagulation/dispersion/index.md) · [Cai et al., supplement](https://doi.org/10.5194/acp-22-11529-2022-supplement)
 
@@ -87,7 +93,7 @@ With the seven recorded 4 nm SMPS channels, the full calculation gives **1.066**
 
 <a id="can-settling-turbulence-or-another-thermal-kernel-explain-the-residual"></a>
 
-## Settling and turbulent shear barely change the predicted capture rate
+### Settling and turbulent shear barely change the predicted capture rate
 
 Cai et al. report a low-speed mixing fan and a verified well-mixed chamber. We found no measured turbulent energy dissipation rate in the article. We therefore swept dissipation over 0.001, 0.1, 1 and 10 m²/s³, with air density 1.204 kg/m³. We applied the geometric settling kernel at unit collection efficiency and the Saffman–Turner turbulent shear kernel to all modeled tracer–collector diameters. For each addition we recomputed the loaded chamber populations and the apparent rate with the same blank retrieval. Settling here means particles catching one another because their fall speeds differ. Wall deposition is already included in the separately fitted blank. [Cai et al., chamber methods](https://acp.copernicus.org/articles/22/11529/2022/#section2) · [Saffman and Turner (1956)](https://doi.org/10.1017/S0022112056000020)
 
@@ -111,7 +117,7 @@ Rates are in 10⁻⁷ cm³/s. The Gatti–Kortshagen fit comes closest among the
 
 <a id="what-did-the-particle-resolved-runs-check"></a>
 
-## In the 4 nm dispersion pulse, more tracers reach the wall than a collector
+### In the 4 nm dispersion pulse, more tracers reach the wall than a collector
 
 The CUDA calculation follows 300 s source-off pulses. Each independent volume initially contains one tagged tracer and zero or eight collectors. Two salt mass inventories distinguish the cohorts after collisions. We track wall deposition, dilution, charge exchanged with a prescribed ion bath, collector depletion and the capture exposure experienced by live tracers. The ensembles check number, mass and signed charge at each output. The chamber uses the conductive-particle ion-attachment rates at their tabulated 298.15 K, with pair collisions calculated at 293.15 K. The assumed ion balance includes recombination, dilution and initial collector uptake. [Attachment model](https://doi.org/10.1080/02786826.2013.783684) · [Ion recombination](https://doi.org/10.5194/acp-15-7203-2015)
 
@@ -121,7 +127,7 @@ The original GPU dispersion calculation adds $(E_{\mathrm{vdW}}-1)K_0$ to the na
 
 <a id="particle-trajectories-with-the-additional-kernels-and-the-recorded-smps-distribution"></a>
 
-### Fitting tracer sizes to the recorded scan lowers the predicted pulse capture rate
+#### Fitting tracer sizes to the recorded scan lowers the predicted pulse capture rate
 
 The extended campaign follows each particle for 300 s on an RTX 5060. Each live pair has a collision rate based on its current masses and signed charges. After a merger the two NaCl inventories and charge move to the surviving particle. We use a study-specific competing-clock sampler to give out-of-domain pairs the same charged hard-sphere fallback as the steady study. Settling and shear enter the same draw as thermal capture. The exploratory Ayala case uses a CPU-tabulated rate interpolated on the GPU. Environmental ion attachment, wall loss and dilution operate between collision steps.
 
@@ -140,6 +146,10 @@ Each entry is a detector-weighted **pulse** coefficient in 10⁻⁷ cm³/s at a 
 Paired runs used the same initial particles and random streams within each input and time step. Adding settling and the strongest shear produced **zero mechanically caused tracer captures** in the fitted 4 nm ensemble at 2.5 s. Integrating the mechanical hazard along those trajectories predicts **0.0041 such events**, or a detector-weighted contribution of **2.52 × 10⁻¹³ cm³/s**. The event count has insufficient resolution to measure that increment. Integrated thermal hazards give 0.9901 for dispersion alone and 0.9908 with dielectric polarization, in units of 10⁻⁷ cm³/s. About 25% of the latter thermal hazard comes from the hard-sphere fallback. Sampling and fallback uncertainty matter for small differences between models. [Pulse coefficients and Monte Carlo intervals](https://github.com/uncscode/particula/blob/main/docs/data/nacl-scavenging/pulse-kernels-summary.csv) · [Per-channel spectra](https://github.com/uncscode/particula/blob/main/docs/data/nacl-scavenging/pulse-smps-spectrum.csv)
 
 The 208 GPU runs followed 2,555,904 box histories across the campaign and recorded 246,920 mergers. Models sharing an input and seed reuse identical initial draws. The campaign includes all five charge-dependent thermal fits with charge-zero controls, Fuchs Brownian capture, separate dispersion and polarization cases, settling, four shear strengths, the combined settling and shear case, and the Ayala sensitivity. The five primary models were repeated at half the time step. Checks cover both species masses, signed charge and particle number against the collision and loss records at each output. The GPU rate components passed 126 pair/model comparisons against the CPU equations. An independent two-particle case with 32,768 boxes gave a captured fraction of 0.25369 against 0.25286 from the exponential survival law. [GPU run record](https://github.com/uncscode/particula/blob/main/docs/data/nacl-scavenging/pulse-kernels-run.json)
+
+## Measure the collector spectrum to interpret the 4 nm residual
+
+A charged 4 nm tracer can polarize a neutral collector strongly enough to change that pair’s capture rate. How often such a pair occurs is decisive. In the reference chamber calculation, the small charged fraction leaves the predicted scan rate about 39% below the measured coefficient even after polarization is included. An independent measurement of the charge distribution at the chamber inlet would test that weighting. The simulated source-off pulse answers a different question. Its wall, dilution and collector fractions describe the modeled fates of individual tracers and have no measured counterpart in the scan. The seven-channel tracer record helps constrain tracer sizes, but its flow flags and the unknown collector population still limit the comparison. Measuring physical collector diameters downstream of the classifier, especially across the 100–200 nm range, would allow the model to predict a new blank-to-loaded count ratio with the collector spectrum fixed independently. A persistent residual would then give a more specific test of capture and detection under those conditions.
 
 ## Reproduce the calculations
 
