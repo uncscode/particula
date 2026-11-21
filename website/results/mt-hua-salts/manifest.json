@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 5.959754475974478,
+  "package_source_sha256": "de9c4fa23fbd4833d9eeae22e97ffd8e2496acae8432510149eed8ada42f4ee3",
+  "scientific_source_sha256": "1ac66c614e80ae7a0f6aae70e885469d5f8609ca95421966dfcd08ebcf41597f",
+  "input_sha256": {
+    "scripts/mt_hua_salts/study.py": "6da7ce264313e738fc671a5111d306c62663f4a7a5e9893da01f09888680e070",
+    "scripts/mt_hua_salts/plots.py": "c5959746803d2f4bc04dc132e521dacdbd2524c22c2bc6608a1402b090a3e8d2",
+    "docs/data/mt-hua-salts/matched.csv": "830d2691fbcd0b0444be9fbeb0812cf5a51cf64ca4f271c978ec76e98d682057"
+  },
+  "example": "mt-hua-salts",
+  "fingerprint": "0d70b53d6568228b94acaf18c800b95916afae52c9a2dcb1e5e968463f7aa99c",
+  "source": "docs/studies/literature/particle-water-uptake/mt-hua/mt_hua_salts.py",
+  "revision": "e51ed2b15f9bf790bf8b152b2c54176b6105b73f",
+  "package_dirty": false,
+  "executed_at": "2026-11-21T01:57:26.559380+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "image": "figure-2-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-3-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-3-1.png": "56581889dfcf08716acd0c24bb7accd86f3a0f9d956c06c13d1dbbdf38e4fa8b",
+    "figure-2-1.png": "800719b794243eb3881f3df4dd66ed6477ef2dd1c844253e8b3019b7474a4bf1",
+    "executed_source.py": "35a541fd41b7057a13fc33b68abf6874bb096f185ef225d2bb19eb82f11200ae",
+    "data.json": "f6e6e5578eaade789326aa4defb71bd45b00d917ab6deb1a6300a99582e49db1",
+    "source.py": "35a541fd41b7057a13fc33b68abf6874bb096f185ef225d2bb19eb82f11200ae"
+  },
+  "simulation_fingerprint": "a6c3bde4bdc6cb6dad9507cabf2bb91a9474282e42cebeedcead07ca7ce527cb",
+  "render_versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {
+    "scripts/mt_hua_salts/study.py": "6da7ce264313e738fc671a5111d306c62663f4a7a5e9893da01f09888680e070",
+    "scripts/mt_hua_salts/plots.py": "c5959746803d2f4bc04dc132e521dacdbd2524c22c2bc6608a1402b090a3e8d2",
+    "docs/data/mt-hua-salts/matched.csv": "830d2691fbcd0b0444be9fbeb0812cf5a51cf64ca4f271c978ec76e98d682057"
+  },
+  "rendered_at": "2026-11-21T01:57:39.932614+00:00",
+  "render_revision": "e51ed2b15f9bf790bf8b152b2c54176b6105b73f",
+  "render_elapsed_seconds": 1.6600799990119413
+}

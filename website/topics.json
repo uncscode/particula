@@ -4705,6 +4705,38 @@
         ]
       },
       "tocFigure": "cloud-ion-humidity/graphical-abstract.svg"
+    },
+    {
+      "source": "docs/studies/literature/particle-water-uptake/mt-hua/mt_hua_salts.py",
+      "title": "Reconstruct Mt. Hua particle growth",
+      "topic": "activity-nonideal",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/particle-water-uptake/mt-hua/index.md",
+      "title": "Neutral salt pairings overpredict growth for 72 of 79 Mt. Hua inorganic extracts",
+      "topic": "activity-nonideal",
+      "also": [
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "mt-hua-salts",
+        "runs": [
+          "mt-hua-salts"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/activity.md",
+            "label": "How to use this"
+          }
+        ]
+      },
+      "tocFigure": "mt-hua-salts/graphical-abstract.svg"
     }
   ],
   "supporting": [
