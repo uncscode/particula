@@ -4705,6 +4705,38 @@
         ]
       },
       "tocFigure": "cloud-ion-humidity/graphical-abstract.svg"
+    },
+    {
+      "source": "docs/studies/literature/mam4xx-coagulation/mam4xx_coagulation.py",
+      "title": "Compare MAM4xx and particle-resolved Brownian coagulation",
+      "topic": "brownian",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/mam4xx-coagulation/index.md",
+      "title": "Particle-resolved coagulation leaves 6.7% fewer particles for nearby modes but agrees in number for widely separated modes",
+      "topic": "brownian",
+      "also": [
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "mam4xx-coagulation",
+        "runs": [
+          "mam4xx-coagulation"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/coagulation.md",
+            "label": "How to use this"
+          }
+        ]
+      },
+      "tocFigure": "mam4xx-coagulation/graphical-abstract.svg"
     }
   ],
   "supporting": [

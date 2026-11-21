@@ -1331,5 +1331,27 @@
       "scripts/cloud_ion_humidity/plots.py"
     ],
     "full_canvas": true
+  },
+  "mam4xx-coagulation": {
+    "title": "Compare MAM4xx and particle-resolved Brownian coagulation",
+    "source": "docs/studies/literature/mam4xx-coagulation/mam4xx_coagulation.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 10800,
+    "inputs": [
+      "scripts/mam4xx_coagulation/campaign.py",
+      "scripts/mam4xx_coagulation/compare.py",
+      "scripts/mam4xx_coagulation/particles.py",
+      "scripts/mam4xx_coagulation/plots.py",
+      "scripts/mam4xx_coagulation/build_reference.py",
+      "scripts/mam4xx_coagulation/reference_driver.cpp",
+      "docs/data/mam4xx-coagulation/modal.csv"
+    ],
+    "data_expression": "report",
+    "render_functions": [],
+    "plot_inputs": [
+      "scripts/mam4xx_coagulation/plots.py"
+    ],
+    "full_canvas": true
   }
 }
