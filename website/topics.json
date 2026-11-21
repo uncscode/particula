@@ -4624,7 +4624,7 @@
     },
     {
       "source": "docs/studies/literature/evaporation-and-uptake/pendant-drop/pendant_drop_evaporation.py",
-      "title": "Can warm air explain the measured evaporation of a pentane drop?",
+      "title": "The coupled evaporation model predicts a pentane drop 3–5 K cooler than measured",
       "topic": "condensation-energy",
       "also": [
         "condensation"
@@ -4634,7 +4634,7 @@
     },
     {
       "source": "docs/studies/literature/evaporation-and-uptake/pendant-drop/index.md",
-      "title": "Pentane drop heat and mass consistency: numerical evidence",
+      "title": "Modeled convection supplies only a third of the heat needed for the reported pentane drop evaporation rate",
       "topic": "condensation-energy",
       "also": [
         "condensation",

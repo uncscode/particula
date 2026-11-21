@@ -4,5 +4,5 @@ One experiment measures evaporation from a continuously fed pentane drop. The ot
 
 <!-- STUDY_LIST_START -->
 - [Glyoxal uptake and imidazole formation in wet aerosol](glyoxal_chamber.py)
-- [Pentane drop heat and mass consistency: numerical evidence](pendant-drop/index.md)
+- [Modeled convection supplies only a third of the heat needed for the reported pentane drop evaporation rate](pendant-drop/index.md)
 <!-- STUDY_LIST_END -->

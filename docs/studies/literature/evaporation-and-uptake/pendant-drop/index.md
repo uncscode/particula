@@ -1,15 +1,10 @@
-# Pentane drop evaporation: heat and mass consistency evidence
+# Modeled convection supplies only a third of the heat needed for the reported pentane drop evaporation rate
 
-The [worked example](pendant_drop_evaporation.py)
-compares a reported fed pentane drop condition with reconstructed mass transport
-and convection-only heat supply. It predicts 258.59–260.36 K with the 1984
-blowing correction on both heat and mass, versus reported 263.6 K.
-The dimensionless reported rate implies a flux needing 9.85–10.88 kW m⁻²
-beyond the no-blowing convection reference. These are conditional consistency
-discrepancies, not evidence of an implementation defect or an established error
-in the paper.
+![Warm air passes a fed pentane drop. A short heat-supply bar and a three-times-longer heat-demand bar share the same baseline.](../../../../images/pendant-evaporation/graphical-abstract.svg)
 
-## Experimental facts and reconstruction boundaries
+For a continuously fed drop evaporating in dry air at 326 K, Particula estimates that convection supplies **4.74–5.14 kW m⁻²** at the reported surface temperature of 263.6 K. The reported evaporation rate implies a latent heat demand of **14.94–15.67 kW m⁻²** under the study’s property and geometry assumptions. Across paired calculations the gap is **9.85–10.88 kW m⁻²**. When the heat and mass balances are solved together with the 1984 blowing correction on both, the predicted drop temperature is **258.59–260.36 K**, about 3–5 K cooler than measured. The feed, support and wall thermal conditions remain uncertain. [Worked comparison](pendant_drop_evaporation.py)
+
+## The feed rate measures evaporation while the drop size stays steady
 
 Chuchottaworn, Fujinami and Asano's
 [experimental study](https://doi.org/10.1252/jcej.17.7) reports the selected
@@ -71,7 +66,7 @@ use HEOS_FIT; pure gas conductivity uses REFPROP_FIT.
 and [the original summary](https://github.com/uncscode/particula/blob/main/docs/data/pendant-evaporation/summary.json)
 record provenance.
 
-## Execution and numerical checks
+## Even the coarsest grid locates the equilibrium temperature within 0.002 K
 
 The original full campaign ran on an NVIDIA GeForce RTX 5060 with Warp 1.11.1,
 Python 3.12.12, NumPy 2.3.4 and SciPy 1.16.2. Properties and scalar roots run
@@ -105,7 +100,7 @@ and absolute tolerance $10^{-15}$; all 192 equilibrium roots agree within
 $10^{-9}$ K. A saved-data replot preserves the CUDA execution provenance.
 Runtime is whole-workload evidence, not a GPU speedup measurement.
 
-## Uncertainty and the next discriminating test
+## The heat gap persists when the model uses the reported Prandtl number
 
 Plotted ranges describe selected method variation, not confidence intervals.
 Unknown geometry, flow/property conventions, feed enthalpy, support conduction
