@@ -29,6 +29,14 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       <img src={`${base}/images/${r.tocFigure}`} alt="" width="208" height="208" loading="lazy" decoding="async" />
       <span class="study-title">{r.title}</span>
     </a>)}
+    {slides.length > 1 && <>
+      <button class="peek previous" type="button" data-prev tabindex="-1" aria-label="Previous study" disabled>
+        <img src={`${base}/images/${slides[slides.length - 1].tocFigure}`} alt="" width="208" height="208" loading="lazy" />
+      </button>
+      <button class="peek next" type="button" data-next tabindex="-1" aria-label="Next study" disabled>
+        <img src={`${base}/images/${slides[1].tocFigure}`} alt="" width="208" height="208" loading="lazy" />
+      </button>
+    </>}
   </div>
   {slides.length > 1 && <div class="controls" hidden>
     <button type="button" data-rotate aria-label="Pause automatic rotation">
@@ -47,27 +55,28 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 </study-carousel>}
 
 <style>
-  study-carousel { display: block; margin-block: 1.4rem; padding: clamp(.85rem, 3vw, 1.6rem); border: 1px solid var(--sl-color-gray-5); border-radius: 1rem; background: var(--sl-color-bg); }
-  .slides { display: grid; }
-  .slide { grid-area: 1 / 1; display: grid; grid-template-columns: clamp(7rem, 24vw, 13rem) 1fr; align-items: center; gap: clamp(.8rem, 3vw, 2rem); margin: 0; text-decoration: none; color: var(--sl-color-white); }
+  study-carousel { display: block; margin-block: 1.5rem; }
+  .slides { display: grid; position: relative; overflow: clip; padding-block: .35rem; }
+  .slide { grid-area: 1 / 1; width: 66.6667%; min-width: 0; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: clamp(.8rem, 2vw, 1.25rem); text-align: center; text-decoration: none; color: var(--sl-color-white); }
   .slide[inert] { visibility: hidden; }
-  .slide img { width: 100%; height: auto; border-radius: .55rem; margin: 0; }
-  .study-title { font-size: clamp(1.05rem, 2.6vw, 1.75rem); line-height: 1.22; font-weight: 600; text-wrap: balance; margin: 0; }
+  .slide img, .peek img { display: block; width: 100%; height: auto; border-radius: .85rem; margin: 0; }
+  .study-title { font-size: clamp(1.12rem, 2.6vw, 1.75rem); line-height: 1.22; font-weight: 600; text-wrap: balance; margin: 0; }
+  /* Clip both neighboring squares at the viewport edges, leaving the center square unobstructed. */
+  .peek { position: absolute; top: .35rem; width: 58%; aspect-ratio: 1; margin: 4.333% 0 0; padding: 0; overflow: hidden; border: 1px solid var(--sl-color-gray-5); border-radius: .85rem; background: var(--sl-color-bg); cursor: pointer; }
+  .previous { left: -45%; }
+  .next { right: -45%; }
+  .peek img { opacity: .52; }
+  .peek:hover img, .peek:focus-visible img { opacity: .85; }
   .slide:hover .study-title, .slide:focus-visible .study-title { text-decoration: underline; text-decoration-thickness: .08em; text-underline-offset: .16em; }
-  .controls { display: flex; justify-content: flex-end; align-items: center; gap: .45rem; margin-top: .6rem; }
+  .controls { display: flex; justify-content: center; align-items: center; gap: .45rem; margin-top: .6rem; }
   .controls[hidden], .play-mark, [data-paused] .pause-mark { display: none; }
   [data-paused] .play-mark { display: inline; }
-  button { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; padding: 0; margin: 0; border: 1px solid var(--sl-color-gray-5); border-radius: 50%; background: var(--sl-color-bg); color: var(--sl-color-text); font: inherit; cursor: pointer; }
-  button svg { width: 1rem; height: 1rem; fill: currentColor; }
-  button:hover { color: var(--sl-color-text-accent); border-color: currentColor; }
+  .controls button { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; padding: 0; margin: 0; border: 1px solid var(--sl-color-gray-5); border-radius: 50%; background: var(--sl-color-bg); color: var(--sl-color-text); font: inherit; cursor: pointer; }
+  .controls button svg { width: 1rem; height: 1rem; fill: currentColor; }
+  .controls button:hover { color: var(--sl-color-text-accent); border-color: currentColor; }
   button:focus-visible, .slide:focus-visible { outline: 2px solid var(--sl-color-text-accent); outline-offset: 3px; }
   .position { font-size: .82rem; min-width: 3.8em; text-align: center; font-variant-numeric: tabular-nums; color: var(--sl-color-gray-2); }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-  @media (max-width: 32rem) {
-    .slide { grid-template-columns: 1fr; grid-template-rows: auto 1fr; align-items: start; justify-items: center; }
-    .slide img { width: min(100%, 12rem); }
-    .study-title { width: 100%; font-size: 1.16rem; }
-  }
 </style>
 
 <script>
@@ -84,6 +93,14 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
       const events = new AbortController();
       const options = { signal: events.signal };
+      const peeks = [...this.querySelectorAll<HTMLButtonElement>('.peek')];
+      const updatePeeks = () => {
+        for (const peek of peeks) {
+          const offset = peek.hasAttribute('data-next') ? 1 : -1;
+          const neighbor = slides[(index + offset + slides.length) % slides.length];
+          peek.querySelector('img')!.src = neighbor.querySelector('img')!.src;
+        }
+      };
       let index = slides.findIndex((slide) => !slide.inert);
       let enabled = !motion.matches;
       let onScreen = false;
@@ -96,6 +113,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         index = (index + direction + slides.length) % slides.length;
         slides[index].inert = false;
         slides[index].removeAttribute('aria-hidden');
+        updatePeeks();
         position.textContent = `${index + 1} / ${slides.length}`;
         if (announce) announcement.textContent = `${position.textContent}. ${slides[index].textContent?.trim()}`;
       }
@@ -109,7 +127,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         }
       }
 
-      controls.addEventListener('click', (event) => {
+      this.addEventListener('click', (event) => {
         const button = (event.target as Element).closest('button');
         if (!button) return;
         if (button === rotate) enabled = !enabled;
@@ -140,12 +158,15 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         schedule();
       });
       viewport.observe(this);
+      updatePeeks();
+      peeks.forEach((peek) => { peek.disabled = false; });
       controls.hidden = false;
       schedule();
       this.cleanup = () => {
         events.abort();
         viewport.disconnect();
         window.clearInterval(timer);
+        peeks.forEach((peek) => { peek.disabled = true; });
         controls.hidden = true;
       };
     }
