@@ -212,52 +212,38 @@ def test_recipe_declared_inputs_exist_in_staged_source(runner, tmp_path):
     assert all((staged / relative).is_file() for relative in required)
 
 
-def test_staging_retains_integration_and_fixtures_without_application_sources(
-    runner,
-    tmp_path,
-):
-    """A release workspace cannot shadow the installed application package."""
+def test_installed_suite_requires_all_package_test_inputs(tmp_path):
+    """A missing fixture fails even if all of its test modules were shipped."""
     import run_release_tests as release
 
     source = tmp_path / "source"
-    destination = tmp_path / "tests"
-    required = (
-        "particula/conftest.py",
-        "particula/integration_tests/process_test.py",
-        "particula/gas/tests/gas_test.py",
-        "particula/gas/tests/fixtures/reference.csv",
+    installed = tmp_path / "installed"
+    inputs = (
         "conftest.py",
-        "pyproject.toml",
+        "integration_tests/process_test.py",
+        "gas/tests/gas_test.py",
+        "gas/tests/fixtures/reference.csv",
     )
-    excluded = (
-        "particula/__init__.py",
-        "particula/gas/__init__.py",
-        "particula/gas/species.py",
-        "particula/gas/tests/__pycache__/test.pyc",
-        *release.CPU_EXAMPLES,
-        *release.CPU_EXAMPLE_TESTS,
-    )
-    for relative in (*required, *excluded):
-        path = source / relative
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text("fixture")
-    release.stage_test_inputs(source, destination)
-    assert all((destination / relative).is_file() for relative in required)
-    assert not any((destination / relative).exists() for relative in excluded)
-    assert not (destination / "docs").exists()
-    assert not (destination / "examples_tests").exists()
+    for relative in inputs:
+        for folder in (source, installed):
+            path = folder / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.touch()
+    release.check_installed_test_inputs(source, installed)
+    for relative in inputs:
+        path = installed / relative
+        path.unlink()
+        with pytest.raises(FileNotFoundError, match=relative):
+            release.check_installed_test_inputs(source, installed)
+        path.touch()
 
 
-def test_missing_package_is_an_error_instead_of_silent_skip(runner, tmp_path):
+def test_missing_package_is_an_error_instead_of_silent_skip(tmp_path):
     """A missing package test tree must not produce an empty release suite."""
     import run_release_tests as release
 
-    source = tmp_path / "source"
-    source.mkdir()
-    (source / "conftest.py").write_text("")
-    (source / "pyproject.toml").write_text("")
     with pytest.raises(FileNotFoundError):
-        release.stage_test_inputs(source, tmp_path / "tests")
+        release.check_installed_test_inputs(tmp_path / "absent", tmp_path)
 
 
 def test_release_counts_match_pytest_final_categories(runner, capsys):
