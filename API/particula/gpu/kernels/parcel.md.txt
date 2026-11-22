@@ -128,7 +128,7 @@ T_REF = wp.constant(F(273.15))
 def _advance(previous: FloatVector, liquid: FloatVector, speed: FloatVector, total_water: F, dry_mass: F, dt: F, result: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L123-L152)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L132-L161)
 
 ## particula.gpu.kernels.parcel._es
 
@@ -148,7 +148,19 @@ def _es(t: F)
 def _grow(previous: FloatVector, radius: FloatVector, dry: FloatVector, kappa: F, dt: F, active: bool, result: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L64-L103)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L93-L112)
+
+## particula.gpu.kernels.parcel._grown_radius
+
+*function*
+
+```python
+def _grown_radius(r: F, d: F, kappa: F, t: F, p: F, rh: F, dt: F, bound_dry: bool)
+```
+
+One linearly implicit water-growth step, shared with forced replay.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L64-L90)
 
 ## particula.gpu.kernels.parcel._growth_resistance
 
@@ -168,7 +180,7 @@ def _growth_resistance(t: F, p: F, es: F)
 def _liquid_water(wet: FloatVector, dry: FloatVector, weights: FloatVector, result: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L106-L120)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L115-L129)
 
 ## particula.gpu.kernels.parcel._observe
 
@@ -178,7 +190,7 @@ def _liquid_water(wet: FloatVector, dry: FloatVector, weights: FloatVector, resu
 def _observe(state: FloatVector, loss: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L155-L157)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L164-L166)
 
 ## particula.gpu.kernels.parcel._resistance_terms
 
@@ -202,4 +214,4 @@ def run_warp_parcel(initial, wet, time, updraft, device, gradient, phase_exchang
 
 Advance from equilibrated radii, reading host outputs after the tape.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L160-L241)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L169-L250)

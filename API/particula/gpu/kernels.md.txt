@@ -69,6 +69,8 @@ Lazily resolve a supported public direct-kernel entry point.
 - `particula.gpu.kernels.ion_source`
 - `particula.gpu.kernels.nucleation`
 - `particula.gpu.kernels.parcel`
+- `particula.gpu.kernels.parcel_motion`
+- `particula.gpu.kernels.parcel_replay`
 - `particula.gpu.kernels.parcel_rk23`
 - `particula.gpu.kernels.parcel_ros3`
 - `particula.gpu.kernels.slot_management`

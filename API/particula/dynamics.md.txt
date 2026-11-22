@@ -32,6 +32,7 @@ helpers remain concrete-only.
 
 **Modules**
 
+- `particula.dynamics._parcel_experiment`
 - `particula.dynamics.chemistry`
 - `particula.dynamics.coagulation`
 - `particula.dynamics.condensation`
@@ -41,6 +42,10 @@ helpers remain concrete-only.
 - `particula.dynamics.optical_heating`
 - `particula.dynamics.optical_heating_gpu`
 - `particula.dynamics.parcel`
+- `particula.dynamics.parcel_cluster`
+- `particula.dynamics.parcel_motion`
+- `particula.dynamics.parcel_replay`
+- `particula.dynamics.parcel_trace`
 - `particula.dynamics.particle_process`
 - `particula.dynamics.properties`
 - `particula.dynamics.wall_loss`

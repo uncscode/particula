@@ -5306,6 +5306,7 @@ helpers remain concrete-only.
 
 **Modules**
 
+- `particula.dynamics._parcel_experiment`
 - `particula.dynamics.chemistry`
 - `particula.dynamics.coagulation`
 - `particula.dynamics.condensation`
@@ -5315,9 +5316,227 @@ helpers remain concrete-only.
 - `particula.dynamics.optical_heating`
 - `particula.dynamics.optical_heating_gpu`
 - `particula.dynamics.parcel`
+- `particula.dynamics.parcel_cluster`
+- `particula.dynamics.parcel_motion`
+- `particula.dynamics.parcel_replay`
+- `particula.dynamics.parcel_trace`
 - `particula.dynamics.particle_process`
 - `particula.dynamics.properties`
 - `particula.dynamics.wall_loss`
+
+---
+
+# particula.dynamics._parcel_experiment
+
+*module*
+
+Common schedule, budgets and device dispatch for parcel experiments.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L1-L1)
+
+## particula.dynamics._parcel_experiment.ClusterResult
+
+*class* · *dataclass*
+
+```python
+class ClusterResult
+```
+
+Common observations and cumulative donor-to-receiver transfers.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L14-L24)
+
+### particula.dynamics._parcel_experiment.ClusterResult.flow_gradient
+
+*attribute* · *instance attribute*
+
+```python
+flow_gradient: float | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L24-L24)
+
+### particula.dynamics._parcel_experiment.ClusterResult.inventories_transferred
+
+*attribute* · *instance attribute*
+
+```python
+inventories_transferred: dict
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L21-L21)
+
+### particula.dynamics._parcel_experiment.ClusterResult.parcels
+
+*attribute* · *instance attribute*
+
+```python
+parcels: dict
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L19-L19)
+
+### particula.dynamics._parcel_experiment.ClusterResult.schedule
+
+*attribute* · *instance attribute*
+
+```python
+schedule: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L23-L23)
+
+### particula.dynamics._parcel_experiment.ClusterResult.time
+
+*attribute* · *instance attribute*
+
+```python
+time: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L18-L18)
+
+### particula.dynamics._parcel_experiment.ClusterResult.totals
+
+*attribute* · *instance attribute*
+
+```python
+totals: dict
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L22-L22)
+
+### particula.dynamics._parcel_experiment.ClusterResult.transfers
+
+*attribute* · *instance attribute*
+
+```python
+transfers: dict
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L20-L20)
+
+### particula.dynamics._parcel_experiment.ClusterResult.__init__
+
+*method*
+
+```python
+def __init__(time: np.ndarray, parcels: dict, transfers: dict, inventories_transferred: dict, totals: dict, schedule: np.ndarray, flow_gradient: float | None) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L0-L0)
+
+## particula.dynamics._parcel_experiment._exchange_schedule
+
+*function*
+
+```python
+def _exchange_schedule(ids, connections, steps, volumes)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L140-L168)
+
+## particula.dynamics._parcel_experiment._experiment_times
+
+*function*
+
+```python
+def _experiment_times(traces, connections, max_step, amplitude, species, checkpoint, stop_index)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L291-L322)
+
+## particula.dynamics._parcel_experiment._face_ledgers
+
+*function*
+
+```python
+def _face_ledgers(fluxes, obs, pairs, edges, dry, traces)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L190-L218)
+
+## particula.dynamics._parcel_experiment._forcing
+
+*function*
+
+```python
+def _forcing(trace, steps, amplitude)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L61-L100)
+
+## particula.dynamics._parcel_experiment._initial
+
+*function*
+
+```python
+def _initial(traces, bins)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L103-L117)
+
+## particula.dynamics._parcel_experiment._observation
+
+*function*
+
+```python
+def _observation(ids, pairs, humidity_target, flow_target)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L171-L187)
+
+## particula.dynamics._parcel_experiment._parcel_result
+
+*function*
+
+```python
+def _parcel_result(t, s, times, volume, vapor, species, end, max_step, amplitude, humidity_gradient)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L221-L288)
+
+## particula.dynamics._parcel_experiment._restore
+
+*function*
+
+```python
+def _restore(trace, species, checkpoint, max_step, amplitude)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L120-L137)
+
+## particula.dynamics._parcel_experiment._restore_inventory
+
+*function*
+
+```python
+def _restore_inventory(checkpoint, initial)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L325-L335)
+
+## particula.dynamics._parcel_experiment._schedule
+
+*function*
+
+```python
+def _schedule(traces, start, end, max_step, contacts=())
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L27-L58)
+
+## particula.dynamics._parcel_experiment.integrate
+
+*function*
+
+```python
+def integrate(trace_map, *, connections=(), max_step, device, amplitude=0.0, flow_target=None, humidity_target=None, checkpoint=None, stop_index=None, species=None)
+```
+
+Integrate local growth and exchange on a recorded fixed mesh.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/_parcel_experiment.py#L338-L512)
 
 ---
 
@@ -41491,6 +41710,1834 @@ Advance a single parcel under constant signed vertical velocity.
 - `ValueError` — Invalid state, backend, integration interval or trajectory.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L331-L448)
+
+---
+
+# particula.dynamics.parcel_cluster
+
+*module*
+
+Parcel geometry and directed, conservative exchange under prescribed flow.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L1-L1)
+
+## particula.dynamics.parcel_cluster.Connection
+
+*class* · *dataclass*
+
+```python
+class Connection
+```
+
+Directed flow (m³/s) of organic gas, particle bins or water.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L13-L35)
+
+### particula.dynamics.parcel_cluster.Connection.active_intervals
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+active_intervals: tuple[tuple[float, float], ...] = ()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L23-L23)
+
+### particula.dynamics.parcel_cluster.Connection.donor
+
+*attribute* · *instance attribute*
+
+```python
+donor: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L17-L17)
+
+### particula.dynamics.parcel_cluster.Connection.flow
+
+*attribute* · *instance attribute*
+
+```python
+flow: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L19-L19)
+
+### particula.dynamics.parcel_cluster.Connection.gas
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+gas: bool = True
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L20-L20)
+
+### particula.dynamics.parcel_cluster.Connection.particles
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+particles: bool = False
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L21-L21)
+
+### particula.dynamics.parcel_cluster.Connection.receiver
+
+*attribute* · *instance attribute*
+
+```python
+receiver: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L18-L18)
+
+### particula.dynamics.parcel_cluster.Connection.water
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+water: bool = False
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L22-L22)
+
+### particula.dynamics.parcel_cluster.Connection.__init__
+
+*method*
+
+```python
+def __init__(donor: str, receiver: str, flow: float, gas: bool = True, particles: bool = False, water: bool = False, active_intervals: tuple[tuple[float, float], ...] = ()) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L0-L0)
+
+### particula.dynamics.parcel_cluster.Connection.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Validate half-open contact intervals in absolute seconds.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L25-L35)
+
+## particula.dynamics.parcel_cluster.ParcelCluster
+
+*class* · *dataclass*
+
+```python
+class ParcelCluster
+```
+
+Traces keyed by stable ID, with centers and cell bounds in metres.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L38-L108)
+
+### particula.dynamics.parcel_cluster.ParcelCluster.bounds
+
+*attribute* · *instance attribute*
+
+```python
+bounds: dict
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L45-L45)
+
+### particula.dynamics.parcel_cluster.ParcelCluster.centers
+
+*attribute* · *instance attribute*
+
+```python
+centers: dict
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L43-L43)
+
+### particula.dynamics.parcel_cluster.ParcelCluster.connections
+
+*attribute* · *instance attribute*
+
+```python
+connections: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L44-L44)
+
+### particula.dynamics.parcel_cluster.ParcelCluster.faces
+
+*attribute* · *instance attribute*
+
+```python
+faces: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L46-L46)
+
+### particula.dynamics.parcel_cluster.ParcelCluster.traces
+
+*attribute* · *instance attribute*
+
+```python
+traces: dict[str, ParcelTrace]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L42-L42)
+
+### particula.dynamics.parcel_cluster.ParcelCluster.geometric_volumes
+
+*property*
+
+```python
+geometric_volumes
+```
+
+Return bounding-cell volumes in m³ for particle location.
+
+Prescribed gas exchange uses the thermodynamic volumes in the traces.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L49-L57)
+
+### particula.dynamics.parcel_cluster.ParcelCluster.__init__
+
+*method*
+
+```python
+def __init__(traces: dict[str, ParcelTrace], centers: dict, connections: tuple, bounds: dict, faces: tuple) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L0-L0)
+
+### particula.dynamics.parcel_cluster.ParcelCluster.custom
+
+*method* · *classmethod*
+
+```python
+def custom(traces, *, centers, connections=(), bounds=None)
+```
+
+Declare exchange and optional boxes for geometric crossings.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L59-L80)
+
+### particula.dynamics.parcel_cluster.ParcelCluster.regular
+
+*method* · *classmethod*
+
+```python
+def regular(traces, *, shape, widths, connections=())
+```
+
+Build a regular grid from counts, widths and ordered traces.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L82-L108)
+
+## particula.dynamics.parcel_cluster._connections
+
+*function*
+
+```python
+def _connections(traces, connections)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L111-L139)
+
+## particula.dynamics.parcel_cluster._geometry
+
+*function*
+
+```python
+def _geometry(ids, xyz, bounds)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L142-L177)
+
+## particula.dynamics.parcel_cluster._independent_groups
+
+*function*
+
+```python
+def _independent_groups(cluster, max_step, device, amplitude, humidity_cell)
+```
+
+Batch common forcing schedules and preserve independent step meshes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L219-L263)
+
+## particula.dynamics.parcel_cluster.run_cluster
+
+*function*
+
+```python
+def run_cluster(cluster, *, max_step, device='cpu', gradient=None, humidity_amplitude=0.0)
+```
+
+Advance all parcels across the union of their forcing records.
+
+A gradient tuple (donor, receiver, observation_cell[, 'gas']) selects
+a flow rate and terminal organic particle mass (or gas mass).
+("humidity", parcel_id) observes terminal liquid in that parcel as all
+histories undergo the same fractional vapor perturbation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_cluster.py#L180-L216)
+
+---
+
+# particula.dynamics.parcel_motion
+
+*module*
+
+Resolved Stokes settling with event-time migration in a translating mesh.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L1-L1)
+
+## particula.dynamics.parcel_motion.Crossing
+
+*class* · *dataclass*
+
+```python
+class Crossing
+```
+
+Face event at absolute seconds with its represented inventory.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L66-L76)
+
+### particula.dynamics.parcel_motion.Crossing.axis
+
+*attribute* · *instance attribute*
+
+```python
+axis: int
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L74-L74)
+
+### particula.dynamics.parcel_motion.Crossing.destination
+
+*attribute* · *instance attribute*
+
+```python
+destination: str | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L73-L73)
+
+### particula.dynamics.parcel_motion.Crossing.kind
+
+*attribute* · *instance attribute*
+
+```python
+kind: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L75-L75)
+
+### particula.dynamics.parcel_motion.Crossing.particle
+
+*attribute* · *instance attribute*
+
+```python
+particle: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L71-L71)
+
+### particula.dynamics.parcel_motion.Crossing.record
+
+*attribute* · *instance attribute*
+
+```python
+record: Particle
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L76-L76)
+
+### particula.dynamics.parcel_motion.Crossing.source
+
+*attribute* · *instance attribute*
+
+```python
+source: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L72-L72)
+
+### particula.dynamics.parcel_motion.Crossing.time
+
+*attribute* · *instance attribute*
+
+```python
+time: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L70-L70)
+
+### particula.dynamics.parcel_motion.Crossing.__init__
+
+*method*
+
+```python
+def __init__(time: float, particle: str, source: str, destination: str | None, axis: int, kind: str, record: Particle) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L0-L0)
+
+## particula.dynamics.parcel_motion.MotionState
+
+*class* · *dataclass*
+
+```python
+class MotionState
+```
+
+Restart boundary with world coordinates and cumulative events.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L79-L130)
+
+### particula.dynamics.parcel_motion.MotionState.events
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+events: tuple[Crossing, ...] = ()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L85-L85)
+
+### particula.dynamics.parcel_motion.MotionState.geometry
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+geometry: str = ''
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L86-L86)
+
+### particula.dynamics.parcel_motion.MotionState.particles
+
+*attribute* · *instance attribute*
+
+```python
+particles: tuple[Particle, ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L84-L84)
+
+### particula.dynamics.parcel_motion.MotionState.retained
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+retained: tuple = ()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L87-L87)
+
+### particula.dynamics.parcel_motion.MotionState.time
+
+*attribute* · *instance attribute*
+
+```python
+time: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L83-L83)
+
+### particula.dynamics.parcel_motion.MotionState.__init__
+
+*method*
+
+```python
+def __init__(time: float, particles: tuple[Particle, ...], events: tuple[Crossing, ...] = (), geometry: str = '', retained: tuple = ()) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L0-L0)
+
+### particula.dynamics.parcel_motion.MotionState.load
+
+*method* · *classmethod*
+
+```python
+def load(path)
+```
+
+Read a checkpoint for validation at continuation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L93-L108)
+
+### particula.dynamics.parcel_motion.MotionState.rebind_geometry
+
+*method*
+
+```python
+def rebind_geometry(cluster, *, mesh_velocity=(0.0, 0.0, 0.0), boundaries=None)
+```
+
+Adopt explicitly updated bounds at a completed motion boundary.
+
+Each live particle must still lie in its declared cell at this time.
+Subsequent crossings use the new shared faces and boundary policies.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L110-L130)
+
+### particula.dynamics.parcel_motion.MotionState.save
+
+*method*
+
+```python
+def save(path)
+```
+
+Write the completed checkpoint to JSON.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L89-L91)
+
+## particula.dynamics.parcel_motion.Particle
+
+*class* · *dataclass*
+
+```python
+class Particle
+```
+
+Stable ID, world position (m), radius (m), density (kg/m³) and inventory.
+
+Count is represented number, masses are kg per particle, and charge is
+elementary charges per particle. Cell IDs are independent of storage slots.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L22-L63)
+
+### particula.dynamics.parcel_motion.Particle.cell
+
+*attribute* · *instance attribute*
+
+```python
+cell: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L31-L31)
+
+### particula.dynamics.parcel_motion.Particle.charge
+
+*attribute* · *instance attribute*
+
+```python
+charge: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L37-L37)
+
+### particula.dynamics.parcel_motion.Particle.count
+
+*attribute* · *instance attribute*
+
+```python
+count: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L35-L35)
+
+### particula.dynamics.parcel_motion.Particle.density
+
+*attribute* · *instance attribute*
+
+```python
+density: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L34-L34)
+
+### particula.dynamics.parcel_motion.Particle.id
+
+*attribute* · *instance attribute*
+
+```python
+id: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L30-L30)
+
+### particula.dynamics.parcel_motion.Particle.masses
+
+*attribute* · *instance attribute*
+
+```python
+masses: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L36-L36)
+
+### particula.dynamics.parcel_motion.Particle.position
+
+*attribute* · *instance attribute*
+
+```python
+position: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L32-L32)
+
+### particula.dynamics.parcel_motion.Particle.radius
+
+*attribute* · *instance attribute*
+
+```python
+radius: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L33-L33)
+
+### particula.dynamics.parcel_motion.Particle.__init__
+
+*method*
+
+```python
+def __init__(id: str, cell: str, position: tuple, radius: float, density: float, count: float, masses: tuple, charge: float) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L0-L0)
+
+### particula.dynamics.parcel_motion.Particle.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Validate the physical inputs and retain owned values.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L39-L63)
+
+## particula.dynamics.parcel_motion._advance_to_face
+
+*function*
+
+```python
+def _advance_to_face(keys, live, positions, boxes, v, now, finish, opts, device)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L215-L248)
+
+## particula.dynamics.parcel_motion._boundary_rules
+
+*function*
+
+```python
+def _boundary_rules(boxes, mesh, boundaries)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L351-L369)
+
+## particula.dynamics.parcel_motion._cross_faces
+
+*function*
+
+```python
+def _cross_faces(cluster, hits, keys, live, v, positions, boxes, policies, blocked, occupancy, mesh, now, limits, events, velocity, speed)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L283-L348)
+
+## particula.dynamics.parcel_motion._destination
+
+*function*
+
+```python
+def _destination(cluster, cell, axis, sign, x, boxes, periodic=False)
+```
+
+Find an oriented face patch containing the trajectory intersection.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L140-L163)
+
+## particula.dynamics.parcel_motion._face_rule
+
+*function*
+
+```python
+def _face_rule(cluster, cell, a, sign, x, boxes, policies)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L251-L260)
+
+## particula.dynamics.parcel_motion._initial_motion
+
+*function*
+
+```python
+def _initial_motion(state, boxes, air_velocity, mesh, capacity, temperature, pressure)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L166-L212)
+
+## particula.dynamics.parcel_motion._relative_velocity
+
+*function*
+
+```python
+def _relative_velocity(air, mesh, settling)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L372-L373)
+
+## particula.dynamics.parcel_motion._retained_contacts
+
+*function*
+
+```python
+def _retained_contacts(retained, live, velocity, mesh, speed)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L376-L384)
+
+## particula.dynamics.parcel_motion._update_wall_contacts
+
+*function*
+
+```python
+def _update_wall_contacts(blocked, record, dst, relative, position, cluster, boxes, policies)
+```
+
+Keep a sliding contact where the destination continues its wall.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L263-L280)
+
+## particula.dynamics.parcel_motion._vector
+
+*function*
+
+```python
+def _vector(v)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L133-L137)
+
+## particula.dynamics.parcel_motion.advance_motion
+
+*function*
+
+```python
+def advance_motion(cluster, state, *, duration, air_velocity, capacity, device='cpu', mesh_velocity=(0.0, 0.0, 0.0), boundaries=None, temperature=288.15, pressure=101325.0, gradient=False)
+```
+
+Advance constant air velocity per cell in a uniformly translating mesh.
+
+Bounds are at time zero. Boundary keys are (cell, axis, sign), with
+axis 0/1/2 and sign −1/+1. Modes are retain, periodic, open and deposit.
+Coincident arrivals are resolved by axis then stable ID. Capacity is per
+destination cell. A rejected call leaves its input checkpoint intact.
+CPU or native CUDA computes arrival times and displacements; the host
+reserves slots and records events at each crossing boundary.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_motion.py#L387-L483)
+
+---
+
+# particula.dynamics.parcel_replay
+
+*module*
+
+Replay parcel forcing and checkpoint extensive species inventories.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L1-L1)
+
+## particula.dynamics.parcel_replay.OrganicForcing
+
+*class* · *dataclass*
+
+```python
+class OrganicForcing
+```
+
+Re-exported from: `particula.dynamics.parcel_trace`
+
+Dilute tracer uptake with a prescribed first-order rate (1/s).
+
+Gas and particulate inventories are in kg. Rates (kg/s) and totals (kg)
+are keyed to successive trace intervals. Organic uptake is a passive
+tracer experiment and does not change the water-equilibrium curve.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L45-L76)
+
+### particula.dynamics.parcel_replay.OrganicForcing.initial_gas
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+initial_gas: float = 0.0
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L55-L55)
+
+### particula.dynamics.parcel_replay.OrganicForcing.name
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+name: str = 'organic'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L54-L54)
+
+### particula.dynamics.parcel_replay.OrganicForcing.rates
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+rates: tuple[float, ...] = ()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L57-L57)
+
+### particula.dynamics.parcel_replay.OrganicForcing.totals
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+totals: tuple[float, ...] = ()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L58-L58)
+
+### particula.dynamics.parcel_replay.OrganicForcing.uptake_rate
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+uptake_rate: float = 0.0
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L56-L56)
+
+### particula.dynamics.parcel_replay.OrganicForcing.__init__
+
+*method*
+
+```python
+def __init__(name: str = 'organic', initial_gas: float = 0.0, uptake_rate: float = 0.0, rates: tuple[float, ...] = (), totals: tuple[float, ...] = ()) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L0-L0)
+
+### particula.dynamics.parcel_replay.OrganicForcing.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Validate the physical inputs and retain owned values.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L60-L76)
+
+## particula.dynamics.parcel_replay.ParcelTrace
+
+*class* · *dataclass*
+
+```python
+class ParcelTrace
+```
+
+Re-exported from: `particula.dynamics.parcel_trace`
+
+One forcing history with optional wet-radius and liquid references.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L79-L359)
+
+### particula.dynamics.parcel_replay.ParcelTrace.dry_density
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+dry_density: float | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L96-L96)
+
+### particula.dynamics.parcel_replay.ParcelTrace.height
+
+*attribute* · *instance attribute*
+
+```python
+height: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L86-L86)
+
+### particula.dynamics.parcel_replay.ParcelTrace.initial
+
+*attribute* · *instance attribute*
+
+```python
+initial: ParcelInitialState
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L91-L91)
+
+### particula.dynamics.parcel_replay.ParcelTrace.initial_wet
+
+*attribute* · *instance attribute*
+
+```python
+initial_wet: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L92-L92)
+
+### particula.dynamics.parcel_replay.ParcelTrace.organic
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+organic: OrganicForcing = OrganicForcing()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L93-L93)
+
+### particula.dynamics.parcel_replay.ParcelTrace.parcel_id
+
+*attribute* · *instance attribute*
+
+```python
+parcel_id: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L83-L83)
+
+### particula.dynamics.parcel_replay.ParcelTrace.pressure
+
+*attribute* · *instance attribute*
+
+```python
+pressure: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L88-L88)
+
+### particula.dynamics.parcel_replay.ParcelTrace.provenance
+
+*attribute* · *instance attribute*
+
+```python
+provenance: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L84-L84)
+
+### particula.dynamics.parcel_replay.ParcelTrace.reference_liquid
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+reference_liquid: np.ndarray | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L95-L95)
+
+### particula.dynamics.parcel_replay.ParcelTrace.reference_radius
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+reference_radius: np.ndarray | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L94-L94)
+
+### particula.dynamics.parcel_replay.ParcelTrace.temperature
+
+*attribute* · *instance attribute*
+
+```python
+temperature: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L87-L87)
+
+### particula.dynamics.parcel_replay.ParcelTrace.time
+
+*attribute* · *instance attribute*
+
+```python
+time: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L85-L85)
+
+### particula.dynamics.parcel_replay.ParcelTrace.vapor
+
+*attribute* · *instance attribute*
+
+```python
+vapor: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L90-L90)
+
+### particula.dynamics.parcel_replay.ParcelTrace.volume
+
+*attribute* · *instance attribute*
+
+```python
+volume: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L89-L89)
+
+### particula.dynamics.parcel_replay.ParcelTrace.__init__
+
+*method*
+
+```python
+def __init__(parcel_id: str, provenance: str, time: np.ndarray, height: np.ndarray, temperature: np.ndarray, pressure: np.ndarray, volume: np.ndarray, vapor: np.ndarray, initial: ParcelInitialState, initial_wet: np.ndarray, organic: OrganicForcing = OrganicForcing(), reference_radius: np.ndarray | None = None, reference_liquid: np.ndarray | None = None, dry_density: float | None = None) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L0-L0)
+
+### particula.dynamics.parcel_replay.ParcelTrace.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Validate the physical inputs and retain owned values.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L98-L138)
+
+### particula.dynamics.parcel_replay.ParcelTrace._metadata
+
+*method*
+
+```python
+def _metadata()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L253-L266)
+
+### particula.dynamics.parcel_replay.ParcelTrace._validate_initial_state
+
+*method*
+
+```python
+def _validate_initial_state()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L157-L197)
+
+### particula.dynamics.parcel_replay.ParcelTrace._validate_reference_outputs
+
+*method*
+
+```python
+def _validate_reference_outputs()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L140-L155)
+
+### particula.dynamics.parcel_replay.ParcelTrace.identity
+
+*method*
+
+```python
+def identity()
+```
+
+Digest of forcing, owners and initial state for continuation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L268-L282)
+
+### particula.dynamics.parcel_replay.ParcelTrace.load
+
+*method* · *classmethod*
+
+```python
+def load(path)
+```
+
+Read one trajectory and verify its declared units and owners.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L318-L359)
+
+### particula.dynamics.parcel_replay.ParcelTrace.record
+
+*method* · *classmethod*
+
+```python
+def record(trajectory, parcel_id='ascent', provenance='Particula-generated ascent')
+```
+
+Record actual output times, including the initial wet spectrum.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L199-L221)
+
+### particula.dynamics.parcel_replay.ParcelTrace.sample_every
+
+*method*
+
+```python
+def sample_every(stride)
+```
+
+Thin forcing records and retain both endpoints.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L223-L251)
+
+### particula.dynamics.parcel_replay.ParcelTrace.save
+
+*method*
+
+```python
+def save(path)
+```
+
+Write CSV forcing and sibling JSON with metadata and comparisons.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L284-L316)
+
+## particula.dynamics.parcel_replay.ReplayCheckpoint
+
+*class* · *dataclass*
+
+```python
+class ReplayCheckpoint
+```
+
+Portable, immutable continuation at a completed forcing record.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L20-L47)
+
+### particula.dynamics.parcel_replay.ReplayCheckpoint.humidity_amplitude
+
+*attribute* · *instance attribute*
+
+```python
+humidity_amplitude: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L30-L30)
+
+### particula.dynamics.parcel_replay.ReplayCheckpoint.index
+
+*attribute* · *instance attribute*
+
+```python
+index: int
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L27-L27)
+
+### particula.dynamics.parcel_replay.ReplayCheckpoint.inventory
+
+*attribute* · *instance attribute*
+
+```python
+inventory: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L31-L31)
+
+### particula.dynamics.parcel_replay.ReplayCheckpoint.max_step
+
+*attribute* · *instance attribute*
+
+```python
+max_step: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L29-L29)
+
+### particula.dynamics.parcel_replay.ReplayCheckpoint.parcel_id
+
+*attribute* · *instance attribute*
+
+```python
+parcel_id: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L25-L25)
+
+### particula.dynamics.parcel_replay.ReplayCheckpoint.species
+
+*attribute* · *instance attribute*
+
+```python
+species: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L26-L26)
+
+### particula.dynamics.parcel_replay.ReplayCheckpoint.time
+
+*attribute* · *instance attribute*
+
+```python
+time: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L28-L28)
+
+### particula.dynamics.parcel_replay.ReplayCheckpoint.trace_id
+
+*attribute* · *instance attribute*
+
+```python
+trace_id: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L24-L24)
+
+### particula.dynamics.parcel_replay.ReplayCheckpoint.__init__
+
+*method*
+
+```python
+def __init__(trace_id: str, parcel_id: str, species: tuple, index: int, time: float, max_step: float, humidity_amplitude: float, inventory: tuple) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L0-L0)
+
+### particula.dynamics.parcel_replay.ReplayCheckpoint.load
+
+*method* · *classmethod*
+
+```python
+def load(path)
+```
+
+Read a checkpoint for validation at continuation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L37-L47)
+
+### particula.dynamics.parcel_replay.ReplayCheckpoint.save
+
+*method*
+
+```python
+def save(path)
+```
+
+Write the completed checkpoint to JSON.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L33-L35)
+
+## particula.dynamics.parcel_replay.ReplayResult
+
+*class* · *dataclass*
+
+```python
+class ReplayResult
+```
+
+Record-time outputs. Water and organic budgets are extensive kg.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L50-L71)
+
+### particula.dynamics.parcel_replay.ReplayResult.bin_organic
+
+*attribute* · *instance attribute*
+
+```python
+bin_organic: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L66-L66)
+
+### particula.dynamics.parcel_replay.ReplayResult.bin_water
+
+*attribute* · *instance attribute*
+
+```python
+bin_water: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L65-L65)
+
+### particula.dynamics.parcel_replay.ReplayResult.checkpoint
+
+*attribute* · *instance attribute*
+
+```python
+checkpoint: ReplayCheckpoint | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L71-L71)
+
+### particula.dynamics.parcel_replay.ReplayResult.dry_mass
+
+*attribute* · *instance attribute*
+
+```python
+dry_mass: np.ndarray | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L69-L69)
+
+### particula.dynamics.parcel_replay.ReplayResult.gas_masses
+
+*attribute* · *instance attribute*
+
+```python
+gas_masses: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L68-L68)
+
+### particula.dynamics.parcel_replay.ReplayResult.gas_species
+
+*attribute* · *instance attribute*
+
+```python
+gas_species: tuple[str, ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L67-L67)
+
+### particula.dynamics.parcel_replay.ReplayResult.humidity_gradient
+
+*attribute* · *instance attribute*
+
+```python
+humidity_gradient: float | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L70-L70)
+
+### particula.dynamics.parcel_replay.ReplayResult.liquid
+
+*attribute* · *instance attribute*
+
+```python
+liquid: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L57-L57)
+
+### particula.dynamics.parcel_replay.ReplayResult.number
+
+*attribute* · *instance attribute*
+
+```python
+number: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L64-L64)
+
+### particula.dynamics.parcel_replay.ReplayResult.organic_added
+
+*attribute* · *instance attribute*
+
+```python
+organic_added: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L63-L63)
+
+### particula.dynamics.parcel_replay.ReplayResult.organic_gas
+
+*attribute* · *instance attribute*
+
+```python
+organic_gas: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L61-L61)
+
+### particula.dynamics.parcel_replay.ReplayResult.organic_particle
+
+*attribute* · *instance attribute*
+
+```python
+organic_particle: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L62-L62)
+
+### particula.dynamics.parcel_replay.ReplayResult.supersaturation
+
+*attribute* · *instance attribute*
+
+```python
+supersaturation: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L58-L58)
+
+### particula.dynamics.parcel_replay.ReplayResult.time
+
+*attribute* · *instance attribute*
+
+```python
+time: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L54-L54)
+
+### particula.dynamics.parcel_replay.ReplayResult.volume
+
+*attribute* · *instance attribute*
+
+```python
+volume: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L55-L55)
+
+### particula.dynamics.parcel_replay.ReplayResult.water_exchange
+
+*attribute* · *instance attribute*
+
+```python
+water_exchange: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L59-L59)
+
+### particula.dynamics.parcel_replay.ReplayResult.water_restored
+
+*attribute* · *instance attribute*
+
+```python
+water_restored: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L60-L60)
+
+### particula.dynamics.parcel_replay.ReplayResult.wet_radius
+
+*attribute* · *instance attribute*
+
+```python
+wet_radius: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L56-L56)
+
+### particula.dynamics.parcel_replay.ReplayResult.__init__
+
+*method*
+
+```python
+def __init__(time: np.ndarray, volume: np.ndarray, wet_radius: np.ndarray, liquid: np.ndarray, supersaturation: np.ndarray, water_exchange: np.ndarray, water_restored: np.ndarray, organic_gas: np.ndarray, organic_particle: np.ndarray, organic_added: np.ndarray, number: np.ndarray, bin_water: np.ndarray, bin_organic: np.ndarray, gas_species: tuple[str, ...], gas_masses: np.ndarray, dry_mass: np.ndarray | None, humidity_gradient: float | None, checkpoint: ReplayCheckpoint | None) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L0-L0)
+
+## particula.dynamics.parcel_replay.replay
+
+*function*
+
+```python
+def replay(trace, *, max_step, device='cpu', humidity_amplitude=0.0, gradient=False, species=None, stop_index=None, checkpoint=None)
+```
+
+Integrate prescribed humid air and a first-order organic uptake tracer.
+
+The humidity perturbation multiplies vapor by 1 + amplitude × normalized
+elapsed time. A reverse pass gives d(terminal liquid kg)/d(amplitude).
+Sources use interval rates and one impulse at the right endpoint.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_replay.py#L74-L109)
+
+---
+
+# particula.dynamics.parcel_trace
+
+*module*
+
+Offline warm-parcel forcing with SI units and extensive inventories.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L1-L1)
+
+## particula.dynamics.parcel_trace.COLUMNS
+
+*attribute* · *module attribute*
+
+```python
+COLUMNS = ('parcel_id', 'time_s', 'height_m', 'temperature_K', 'pressure_Pa', 'volume_m3', 'water_kg_per_kg_dry_air')
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L16-L24)
+
+## particula.dynamics.parcel_trace.CONVENTIONS
+
+*attribute* · *module attribute*
+
+```python
+CONVENTIONS = {'schema': 1, 'columns': list(COLUMNS), 'humidity': 'prescribed water vapor mass per dry-air mass', 'sampling': 'linear state interpolation at recorded times', 'coordinates': 'height in metres, positive upward', 'interval_forcing': 'rates in kg/s throughout interval; totals in kg at its end'}
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L25-L34)
+
+## particula.dynamics.parcel_trace.OrganicForcing
+
+*class* · *dataclass*
+
+```python
+class OrganicForcing
+```
+
+Dilute tracer uptake with a prescribed first-order rate (1/s).
+
+Gas and particulate inventories are in kg. Rates (kg/s) and totals (kg)
+are keyed to successive trace intervals. Organic uptake is a passive
+tracer experiment and does not change the water-equilibrium curve.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L45-L76)
+
+### particula.dynamics.parcel_trace.OrganicForcing.initial_gas
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+initial_gas: float = 0.0
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L55-L55)
+
+### particula.dynamics.parcel_trace.OrganicForcing.name
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+name: str = 'organic'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L54-L54)
+
+### particula.dynamics.parcel_trace.OrganicForcing.rates
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+rates: tuple[float, ...] = ()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L57-L57)
+
+### particula.dynamics.parcel_trace.OrganicForcing.totals
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+totals: tuple[float, ...] = ()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L58-L58)
+
+### particula.dynamics.parcel_trace.OrganicForcing.uptake_rate
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+uptake_rate: float = 0.0
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L56-L56)
+
+### particula.dynamics.parcel_trace.OrganicForcing.__init__
+
+*method*
+
+```python
+def __init__(name: str = 'organic', initial_gas: float = 0.0, uptake_rate: float = 0.0, rates: tuple[float, ...] = (), totals: tuple[float, ...] = ()) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L0-L0)
+
+### particula.dynamics.parcel_trace.OrganicForcing.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Validate the physical inputs and retain owned values.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L60-L76)
+
+## particula.dynamics.parcel_trace.ParcelTrace
+
+*class* · *dataclass*
+
+```python
+class ParcelTrace
+```
+
+One forcing history with optional wet-radius and liquid references.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L79-L359)
+
+### particula.dynamics.parcel_trace.ParcelTrace.dry_density
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+dry_density: float | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L96-L96)
+
+### particula.dynamics.parcel_trace.ParcelTrace.height
+
+*attribute* · *instance attribute*
+
+```python
+height: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L86-L86)
+
+### particula.dynamics.parcel_trace.ParcelTrace.initial
+
+*attribute* · *instance attribute*
+
+```python
+initial: ParcelInitialState
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L91-L91)
+
+### particula.dynamics.parcel_trace.ParcelTrace.initial_wet
+
+*attribute* · *instance attribute*
+
+```python
+initial_wet: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L92-L92)
+
+### particula.dynamics.parcel_trace.ParcelTrace.organic
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+organic: OrganicForcing = OrganicForcing()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L93-L93)
+
+### particula.dynamics.parcel_trace.ParcelTrace.parcel_id
+
+*attribute* · *instance attribute*
+
+```python
+parcel_id: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L83-L83)
+
+### particula.dynamics.parcel_trace.ParcelTrace.pressure
+
+*attribute* · *instance attribute*
+
+```python
+pressure: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L88-L88)
+
+### particula.dynamics.parcel_trace.ParcelTrace.provenance
+
+*attribute* · *instance attribute*
+
+```python
+provenance: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L84-L84)
+
+### particula.dynamics.parcel_trace.ParcelTrace.reference_liquid
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+reference_liquid: np.ndarray | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L95-L95)
+
+### particula.dynamics.parcel_trace.ParcelTrace.reference_radius
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+reference_radius: np.ndarray | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L94-L94)
+
+### particula.dynamics.parcel_trace.ParcelTrace.temperature
+
+*attribute* · *instance attribute*
+
+```python
+temperature: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L87-L87)
+
+### particula.dynamics.parcel_trace.ParcelTrace.time
+
+*attribute* · *instance attribute*
+
+```python
+time: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L85-L85)
+
+### particula.dynamics.parcel_trace.ParcelTrace.vapor
+
+*attribute* · *instance attribute*
+
+```python
+vapor: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L90-L90)
+
+### particula.dynamics.parcel_trace.ParcelTrace.volume
+
+*attribute* · *instance attribute*
+
+```python
+volume: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L89-L89)
+
+### particula.dynamics.parcel_trace.ParcelTrace.__init__
+
+*method*
+
+```python
+def __init__(parcel_id: str, provenance: str, time: np.ndarray, height: np.ndarray, temperature: np.ndarray, pressure: np.ndarray, volume: np.ndarray, vapor: np.ndarray, initial: ParcelInitialState, initial_wet: np.ndarray, organic: OrganicForcing = OrganicForcing(), reference_radius: np.ndarray | None = None, reference_liquid: np.ndarray | None = None, dry_density: float | None = None) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L0-L0)
+
+### particula.dynamics.parcel_trace.ParcelTrace.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Validate the physical inputs and retain owned values.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L98-L138)
+
+### particula.dynamics.parcel_trace.ParcelTrace._metadata
+
+*method*
+
+```python
+def _metadata()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L253-L266)
+
+### particula.dynamics.parcel_trace.ParcelTrace._validate_initial_state
+
+*method*
+
+```python
+def _validate_initial_state()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L157-L197)
+
+### particula.dynamics.parcel_trace.ParcelTrace._validate_reference_outputs
+
+*method*
+
+```python
+def _validate_reference_outputs()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L140-L155)
+
+### particula.dynamics.parcel_trace.ParcelTrace.identity
+
+*method*
+
+```python
+def identity()
+```
+
+Digest of forcing, owners and initial state for continuation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L268-L282)
+
+### particula.dynamics.parcel_trace.ParcelTrace.load
+
+*method* · *classmethod*
+
+```python
+def load(path)
+```
+
+Read one trajectory and verify its declared units and owners.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L318-L359)
+
+### particula.dynamics.parcel_trace.ParcelTrace.record
+
+*method* · *classmethod*
+
+```python
+def record(trajectory, parcel_id='ascent', provenance='Particula-generated ascent')
+```
+
+Record actual output times, including the initial wet spectrum.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L199-L221)
+
+### particula.dynamics.parcel_trace.ParcelTrace.sample_every
+
+*method*
+
+```python
+def sample_every(stride)
+```
+
+Thin forcing records and retain both endpoints.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L223-L251)
+
+### particula.dynamics.parcel_trace.ParcelTrace.save
+
+*method*
+
+```python
+def save(path)
+```
+
+Write CSV forcing and sibling JSON with metadata and comparisons.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L284-L316)
+
+## particula.dynamics.parcel_trace._vector
+
+*function*
+
+```python
+def _vector(value, name)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel_trace.py#L37-L42)
 
 ---
 
@@ -106074,6 +108121,8 @@ Lazily resolve a supported public direct-kernel entry point.
 - `particula.gpu.kernels.ion_source`
 - `particula.gpu.kernels.nucleation`
 - `particula.gpu.kernels.parcel`
+- `particula.gpu.kernels.parcel_motion`
+- `particula.gpu.kernels.parcel_replay`
 - `particula.gpu.kernels.parcel_rk23`
 - `particula.gpu.kernels.parcel_ros3`
 - `particula.gpu.kernels.slot_management`
@@ -117520,7 +119569,7 @@ T_REF = wp.constant(F(273.15))
 def _advance(previous: FloatVector, liquid: FloatVector, speed: FloatVector, total_water: F, dry_mass: F, dt: F, result: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L123-L152)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L132-L161)
 
 ## particula.gpu.kernels.parcel._es
 
@@ -117540,7 +119589,19 @@ def _es(t: F)
 def _grow(previous: FloatVector, radius: FloatVector, dry: FloatVector, kappa: F, dt: F, active: bool, result: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L64-L103)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L93-L112)
+
+## particula.gpu.kernels.parcel._grown_radius
+
+*function*
+
+```python
+def _grown_radius(r: F, d: F, kappa: F, t: F, p: F, rh: F, dt: F, bound_dry: bool)
+```
+
+One linearly implicit water-growth step, shared with forced replay.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L64-L90)
 
 ## particula.gpu.kernels.parcel._growth_resistance
 
@@ -117560,7 +119621,7 @@ def _growth_resistance(t: F, p: F, es: F)
 def _liquid_water(wet: FloatVector, dry: FloatVector, weights: FloatVector, result: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L106-L120)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L115-L129)
 
 ## particula.gpu.kernels.parcel._observe
 
@@ -117570,7 +119631,7 @@ def _liquid_water(wet: FloatVector, dry: FloatVector, weights: FloatVector, resu
 def _observe(state: FloatVector, loss: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L155-L157)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L164-L166)
 
 ## particula.gpu.kernels.parcel._resistance_terms
 
@@ -117594,7 +119655,151 @@ def run_warp_parcel(initial, wet, time, updraft, device, gradient, phase_exchang
 
 Advance from equilibrated radii, reading host outputs after the tape.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L160-L241)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L169-L250)
+
+---
+
+# particula.gpu.kernels.parcel_motion
+
+*module*
+
+Compute straight-line particle trajectories and face arrival times.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_motion.py#L1-L1)
+
+## particula.gpu.kernels.parcel_motion.F
+
+*attribute* · *module attribute*
+
+```python
+F = wp.float64
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_motion.py#L7-L7)
+
+## particula.gpu.kernels.parcel_motion.arrivals
+
+*function*
+
+```python
+def arrivals(position: Matrix, velocity: Matrix, lower: Matrix, upper: Matrix, until: F, times: Matrix)
+```
+
+Compute time to the first outward face on each axis, in seconds.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_motion.py#L10-L27)
+
+## particula.gpu.kernels.parcel_motion.displace
+
+*function*
+
+```python
+def displace(position: Matrix, velocity: Matrix, dt: F, output: Matrix)
+```
+
+Advance all positions by the accepted duration.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_motion.py#L30-L34)
+
+---
+
+# particula.gpu.kernels.parcel_replay
+
+*module*
+
+Batched float64 replay on a fixed schedule using extensive inventories.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_replay.py#L1-L1)
+
+## particula.gpu.kernels.parcel_replay.FIRST_BIN
+
+*attribute* · *module attribute*
+
+```python
+FIRST_BIN = 4
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_replay.py#L22-L22)
+
+## particula.gpu.kernels.parcel_replay.Indices
+
+*attribute* · *module attribute*
+
+```python
+Indices = Any
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_replay.py#L15-L15)
+
+## particula.gpu.kernels.parcel_replay.WATER_MASS_FACTOR
+
+*attribute* · *module attribute*
+
+```python
+WATER_MASS_FACTOR = wp.constant(F(WATER_FACTOR))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_replay.py#L12-L12)
+
+## particula.gpu.kernels.parcel_replay.exchange
+
+*function*
+
+```python
+def exchange(previous: Matrix, volume: Vector, edges: Indices, flows: Vector, enabled: Vector, vapor: Vector, dt: F, flux: Matrix)
+```
+
+Compute each transfer from the same unmodified donor inventory.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_replay.py#L25-L50)
+
+## particula.gpu.kernels.parcel_replay.gather
+
+*function*
+
+```python
+def gather(previous: Matrix, edges: Indices, flux: Matrix, result: Matrix)
+```
+
+Apply signed incoming and outgoing transfers to each lane.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_replay.py#L53-L63)
+
+## particula.gpu.kernels.parcel_replay.local
+
+*function*
+
+```python
+def local(previous: Matrix, forcing: Matrix, dry: Matrix, kappa: Vector, uptake: Vector, counts: Vector, dt: F, amplitude: Vector, result: Matrix)
+```
+
+Advance water growth, organic uptake and source ledgers in each cell.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_replay.py#L77-L133)
+
+## particula.gpu.kernels.parcel_replay.observe
+
+*function*
+
+```python
+def observe(state: Matrix, cell: int, lane: int, result: Vector)
+```
+
+Reduce the selected terminal inventory to a scalar Warp loss.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_replay.py#L136-L145)
+
+## particula.gpu.kernels.parcel_replay.population_count
+
+*function*
+
+```python
+def population_count(previous: Matrix, count: Vector)
+```
+
+Save total represented count for uptake and its reverse pass.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_replay.py#L66-L74)
 
 ---
 
