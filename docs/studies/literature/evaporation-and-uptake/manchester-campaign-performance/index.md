@@ -1,6 +1,6 @@
 # Twelve of 15 Manchester runs improved, yet the average joint error rose
 
-![Change in fitted trajectory error across the Manchester campaign. Run 1 has the largest increase in joint error, outweighing smaller decreases in 12 runs.](../../../../images/manchester-soa/campaign-performance.png)
+![Schematic of the illuminated Manchester aerosol chamber. Moving from 38 to 40 channels, run 1 added 0.59 percentage points to the mean joint error and the other 14 runs together subtracted 0.46 points. The mean rose from 16.35% to 16.47%.](../../../../images/manchester-soa/campaign-performance-toc.svg)
 
 Did the larger Particula reaction network give a better account of aerosol formation across the Manchester chamber campaign? Across 15 experiments, the 40-channel calibration reduced the median error in suspended organic mass from 17.64% to 14.74%. Mean particle-count error stayed close to 12.55%. To ask how well each fit reproduced *both* measurements, we took the larger of its mass and count errors in each run. That joint error fell in 12 experiments. In run 1, however, the mass error more than doubled and became the limiting measurement. That single change was large enough to raise the campaign mean joint error from 16.35% to 16.47%, even as the worst individual score declined. The benefit is clearest for mass in a typical fitted experiment.
 
@@ -25,6 +25,8 @@ The preceding study fitted both histories over five hours in the 15 experiments 
 Each run contributes one mass score and one count score. Each score is a root mean square error over that instrument's sampling times. Mass uses the measured peak concentration as its denominator, with a 1 µg m⁻³ floor. Counts use the initial particle number. We compute the joint score inside each run before averaging, so an improvement in the better-fitting observable alone can leave that run’s joint score unchanged. Each run has equal weight regardless of how frequently an instrument sampled it. [Instrument-time predictions](../../../../../studies/voliotis-2022/joint/milestone2/instrument_fits.csv.gz)
 
 Mass error fell in 11 runs, increased in two and remained effectively zero in the two isoprene-only runs with zero recorded organic mass. Count error fell in nine runs and increased in six. Run 24 illustrates how the limiting observable can switch. Its mass error fell from 17.74% to 12.62%, but a count error of 16.86% limited the selected fit. The 5.12-point mass gain therefore reduced its joint score by only 0.88 points. [All 15 run scores](../../../../../studies/voliotis-2022/joint/milestone2/scorecard.csv)
+
+![Change in fitted trajectory error across the Manchester campaign. Run 1 has the largest increase in joint error, outweighing smaller decreases in 12 runs.](../../../../images/manchester-soa/campaign-performance.png)
 
 ## Run 1 reversed the direction of the campaign mean
 
