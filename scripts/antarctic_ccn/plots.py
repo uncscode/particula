@@ -39,15 +39,52 @@ def spectrum(report):
         ],
         strict=False,
     ):
-        for j, (key, name, color, mark) in enumerate(STYLE):
-            rows = data[
-                (data["sample"] == sample) & (data.model == key)
-            ].set_index("metric")
-            x = np.arange(1, 6) * 0.2 + (j - 1.5) * 0.011
-            rows = rows.loc[["C2", "C4", "C6", "C8", "C10"]]
-            ax.plot(x, rows["mean"], color=color, lw=0.85, alpha=0.7)
-            for i, (_, r) in enumerate(rows.iterrows()):
-                whisker(ax, x[i], r, color, mark, name if i == 0 else None)
+        settings = np.arange(1, 6) * 0.2
+        panel = data[data["sample"] == sample].pivot(
+            index="model", columns="metric", values=["mean", "lo95", "hi95"]
+        )
+        metrics = ["C2", "C4", "C6", "C8", "C10"]
+        observed = panel.loc["measured"]
+        measured = observed["mean"][metrics].to_numpy()
+        ax.errorbar(
+            settings,
+            measured,
+            yerr=[
+                measured - observed["lo95"][metrics].to_numpy(),
+                observed["hi95"][metrics].to_numpy() - measured,
+            ],
+            fmt="o",
+            color=INK,
+            markerfacecolor="white",
+            markeredgewidth=1.5,
+            markersize=6,
+            elinewidth=1.4,
+            capsize=3,
+            zorder=5,
+            label="Observed",
+        )
+        for (key, name, color, _), linestyle in zip(
+            STYLE[1:], ["--", "-.", "-"], strict=True
+        ):
+            model = panel.loc[key]
+            ax.fill_between(
+                settings,
+                model["lo95"][metrics],
+                model["hi95"][metrics],
+                color=color,
+                alpha=0.13,
+                linewidth=0,
+                zorder=1,
+            )
+            ax.plot(
+                settings,
+                model["mean"][metrics],
+                color=color,
+                linestyle=linestyle,
+                linewidth=2,
+                label=name,
+                zorder=3,
+            )
         ax.set(
             title=title,
             xlabel="Nominal supersaturation (%)",
