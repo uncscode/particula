@@ -6,6 +6,7 @@
   --sl-color-gray-2: #e0e5e8;
   --sl-font: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --sl-content-width: 52rem;
+  --toc-corner-radius: .85rem;
 }
 :root[data-theme='light'] {
   --sl-color-accent-low: #e0f5ef;
@@ -135,6 +136,7 @@ pre.mermaid svg { display: block; margin: auto; max-width: 100%; }
   width: 40%;
   margin: 0 0 .65rem clamp(1.25rem, 4cqi, 2rem);
 }
+.study-intro img, .study-figures img { border-radius: var(--toc-corner-radius); }
 .study-intro img { display: block; width: 100%; height: auto; }
 @container study-body (max-width: 38rem) {
   .study-intro { display: flex; flex-direction: column; gap: 1.25rem; }
