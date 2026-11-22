@@ -19,13 +19,14 @@ def render():
     )
     with plt.style.context("particula.toc"):
         fig = plt.figure()
-        fig.text(0.07, 0.91, "King Sejong Station", weight="bold", fontsize=13)
-        fig.text(0.07, 0.84, "Antarctica  ·  26 held-out dates", fontsize=8.6)
+        fig.text(0.07, 0.90, "King Sejong Station", weight="bold", fontsize=13)
+        fig.text(0.07, 0.835, "Antarctica  ·  26 held-out dates", fontsize=8.6)
         add_toc_logo(fig, corner="top right")
-        ax = fig.add_axes([0.09, 0.235, 0.86, 0.465])
+        ax = fig.add_axes([0.09, 0.17, 0.86, 0.56])
         ax.set_title(
             "Difference from measured CCN",
             loc="left",
+            pad=4,
             weight="bold",
             fontsize=9,
         )
@@ -47,7 +48,7 @@ def render():
             ax.annotate(
                 label,
                 (pair_center, y),
-                xytext=(0, 7 if i == 0 else 4),
+                xytext=(0, 6),
                 textcoords="offset points",
                 ha="center",
                 va="bottom",
@@ -65,7 +66,7 @@ def render():
                 ]
             ):
                 r = df.loc[mod, key]
-                pos = y - 0.28 * j
+                pos = y - 0.26 * j
                 ax.plot([r.lo95, r.hi95], [pos, pos], color=color, lw=1.15)
                 ax.plot(
                     r["mean"],
@@ -96,7 +97,7 @@ def render():
             ax.spines[side].set_visible(False)
         fig.text(
             0.08,
-            0.12,
+            0.055,
             "Lines show 95% paired date intervals cm⁻³",
             fontsize=7.3,
         )
