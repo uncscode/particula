@@ -47,6 +47,115 @@ In α-pinene/o-cresol run 16, measured suspended mass fell 30.89 µg m⁻³ from
 
 The unrestricted network gave the smallest worst mass error. For mass and number together, the literature-family-supported network gave 17.75% and remained stable under reaction-order reversal. Fragment retention also mattered. At 15 s the full network’s worst mass error was 10.22% when half the fragmented mass stayed suspended. Retaining one-quarter raised it to 12.74%, and retaining three-quarters gave 11.90%, with rates held fixed and doses reselected. [Phase-split and numerical sensitivities](https://github.com/uncscode/particula/blob/5217db718619e0daff74bd2031143bfc586a2dd1/studies/voliotis-2022/joint/results/chains/sensitivity.csv) · [Resolution-checked mechanism](https://github.com/uncscode/particula/blob/5217db718619e0daff74bd2031143bfc586a2dd1/studies/voliotis-2022/joint/results/chains/resolution_checked_mechanism.json)
 
+### Which reactions and products did Particula track?
+
+The precursors have known molecular structures. Downstream, the model tracks how much organic material each precursor contributes to gas and particle pools. For example, two α-pinene-derived particle intermediates can form a dimer pool. That material can oxidize and remain suspended, or fragment and release a daughter into the gas. In a partial fragmentation step the reference model sends half the transferred mass to the gas and retains half in particles. Manchester’s bulk mass and number records leave the molecular structures of these daughters unresolved.
+
+![Skeletal structures of α-pinene, o-cresol and isoprene, a tentative pinic acid assignment from the Manchester campaign, and the fitted α-pinene dimer oxidation and fragmentation pathway.](../../../../images/manchester-soa/reaction-network.svg)
+
+Shao and colleagues tentatively assigned a C₉H₁₄O₄ signal in the α-pinene/isoprene aerosol to pinic acid from its fragmentation pattern. The structure in the figure illustrates that assignment. The model allows one pool to contain many compounds, so it cannot determine whether pinic acid belongs to a particular branch. [Shao et al., Figure 6a and supplement Figure S3](https://acp.copernicus.org/articles/22/9799/2022/#section3)
+
+The same downstream network applies to five families. These comprise dimers from α-pinene, o-cresol or isoprene, the mixed α-pinene/o-cresol product, and material formed by uptake of α-pinene-derived vapor. Each arrow below has a separately fitted rate for each family.
+
+| Starting material | Possible modeled fates |
+|---|---|
+| Initial particle product (D) | Oxidize to W, cleave to L, split between L and U, or convert to F |
+| Oxidized particle product (W) | Cleave to L or split between L and U |
+| Retained particle fragment (L) | Oxidize to W or convert to F |
+| Released vapor (U) | Form oxidized material that returns to the particle (W), or fragment to terminal volatiles (F) |
+
+The two lists below give all **70 candidate channels** in their archived order. The mass fit and the particle-resolved refit allowed all 70. The bulk mass-and-number fit used in the yield comparison allowed 38. A fitted coefficient can also reach zero. The full inventory gives each channel’s rate law, units, fitted coefficients and inclusion in each calibration. [Annotated reaction inventory](https://github.com/uncscode/particula/blob/77f5e551f0b33da56e121b8f8fd7936859e4d770/studies/voliotis-2022/joint/REACTION_NETWORK.md) · [70-channel CSV](https://github.com/uncscode/particula/blob/77f5e551f0b33da56e121b8f8fd7936859e4d770/studies/voliotis-2022/joint/reaction_network.csv)
+
+<details>
+<summary>20 channels for precursor-derived intermediates</summary>
+
+The subscripts A, C and I identify α-pinene, o-cresol and isoprene. G is a gas intermediate, V an oxygenated vapor, P an exchangeable particle product, S a stabilized particle product and F terminal volatile material. D labels material routed into one of the five aging families.
+
+| Channel | Effective equation | Proposed process |
+|---:|---|---|
+| 1 | `G_A + G_C → D_AC` | Gas-phase cross-accretion |
+| 2 | `2 P_A → D_AA` | Coupling within the particle |
+| 3 | `P_A → F` | Photochemical loss from the particle |
+| 4 | `P_I → F` | Photochemical loss from the particle |
+| 5 | `V_A → D_AU` | Reactive uptake of oxygenated vapor |
+| 6 | `G_C → V_C` | Ring opening to carbonyl vapor |
+| 7 | `2 G_C → D_CC` | Gas-phase self-accretion |
+| 8 | `2 G_I → D_II` | Gas-phase self-accretion |
+| 9 | `V_I → S` | Reactive uptake of oxygenated vapor |
+| 10 | `V_A → S` | Gas-phase oxidation to condensable material |
+| 11 | `P_C → F` | Photochemical loss from the particle |
+| 12 | `V_C → S` | Gas-phase oxidation to condensable material |
+| 13 | `2 G_A → D_AA` | Gas-phase self-accretion |
+| 14 | `2 P_I → D_II` | Coupling within the particle |
+| 15 | `V_C → S` | Reactive uptake of oxygenated vapor |
+| 16 | `G_A → V_A` | Formation of carbonyl vapor |
+| 17 | `V_A → F` | Gas-phase fragmentation |
+| 18 | `G_A + G_I → F` | Mixed termination to volatile products |
+| 19 | `G_I → V_I` | Formation of carbonyl vapor |
+| 20 | `2 P_C → D_CC` | Coupling within the particle |
+
+</details>
+
+<details>
+<summary>50 subsequent transfers across five product families</summary>
+
+AA, AC, AU, CC and II label the five product families. Within each family, D is the initial particle product, W its oxidized particle product, L a retained particle fragment and U a gas-phase daughter. F is a shared terminal volatile pool. The ½ coefficients divide organic mass between phases. Each family has its own fitted rates for the ten transfers.
+
+| Channel | Family | Effective equation | Proposed process |
+|---:|---|---|---|
+| 21 | α-pinene dimer | `D_AA → W_AA` | Oxidation within the particle |
+| 22 | α-pinene/o-cresol cross-product | `D_AC → W_AC` | Oxidation within the particle |
+| 23 | α-pinene uptake product | `D_AU → W_AU` | Oxidation within the particle |
+| 24 | o-cresol dimer | `D_CC → W_CC` | Oxidation within the particle |
+| 25 | isoprene dimer | `D_II → W_II` | Oxidation within the particle |
+| 26 | α-pinene dimer | `W_AA → ½ U_AA + ½ L_AA` | Fragmentation of the oxidized product |
+| 27 | α-pinene/o-cresol cross-product | `W_AC → ½ U_AC + ½ L_AC` | Fragmentation of the oxidized product |
+| 28 | α-pinene uptake product | `W_AU → ½ U_AU + ½ L_AU` | Fragmentation of the oxidized product |
+| 29 | o-cresol dimer | `W_CC → ½ U_CC + ½ L_CC` | Fragmentation of the oxidized product |
+| 30 | isoprene dimer | `W_II → ½ U_II + ½ L_II` | Fragmentation of the oxidized product |
+| 31 | α-pinene dimer | `D_AA → ½ U_AA + ½ L_AA` | Fragmentation with partial evaporation |
+| 32 | α-pinene/o-cresol cross-product | `D_AC → ½ U_AC + ½ L_AC` | Fragmentation with partial evaporation |
+| 33 | α-pinene uptake product | `D_AU → ½ U_AU + ½ L_AU` | Fragmentation with partial evaporation |
+| 34 | o-cresol dimer | `D_CC → ½ U_CC + ½ L_CC` | Fragmentation with partial evaporation |
+| 35 | isoprene dimer | `D_II → ½ U_II + ½ L_II` | Fragmentation with partial evaporation |
+| 36 | α-pinene dimer | `U_AA → W_AA` | Vapor aging and return to the particle |
+| 37 | α-pinene/o-cresol cross-product | `U_AC → W_AC` | Vapor aging and return to the particle |
+| 38 | α-pinene uptake product | `U_AU → W_AU` | Vapor aging and return to the particle |
+| 39 | o-cresol dimer | `U_CC → W_CC` | Vapor aging and return to the particle |
+| 40 | isoprene dimer | `U_II → W_II` | Vapor aging and return to the particle |
+| 41 | α-pinene dimer | `D_AA → L_AA` | Cleavage with material retained |
+| 42 | α-pinene dimer | `L_AA → F` | Loss of retained fragment to volatiles |
+| 43 | α-pinene/o-cresol cross-product | `D_AC → L_AC` | Cleavage with material retained |
+| 44 | α-pinene/o-cresol cross-product | `L_AC → F` | Loss of retained fragment to volatiles |
+| 45 | α-pinene uptake product | `D_AU → L_AU` | Cleavage with material retained |
+| 46 | α-pinene uptake product | `L_AU → F` | Loss of retained fragment to volatiles |
+| 47 | o-cresol dimer | `D_CC → L_CC` | Cleavage with material retained |
+| 48 | o-cresol dimer | `L_CC → F` | Loss of retained fragment to volatiles |
+| 49 | isoprene dimer | `D_II → L_II` | Cleavage with material retained |
+| 50 | isoprene dimer | `L_II → F` | Loss of retained fragment to volatiles |
+| 51 | α-pinene dimer | `D_AA → F` | Conversion to terminal volatiles |
+| 52 | α-pinene/o-cresol cross-product | `D_AC → F` | Conversion to terminal volatiles |
+| 53 | α-pinene uptake product | `D_AU → F` | Conversion to terminal volatiles |
+| 54 | o-cresol dimer | `D_CC → F` | Conversion to terminal volatiles |
+| 55 | isoprene dimer | `D_II → F` | Conversion to terminal volatiles |
+| 56 | α-pinene dimer | `U_AA → F` | Fragmentation in the gas phase |
+| 57 | α-pinene/o-cresol cross-product | `U_AC → F` | Fragmentation in the gas phase |
+| 58 | α-pinene uptake product | `U_AU → F` | Fragmentation in the gas phase |
+| 59 | o-cresol dimer | `U_CC → F` | Fragmentation in the gas phase |
+| 60 | isoprene dimer | `U_II → F` | Fragmentation in the gas phase |
+| 61 | α-pinene dimer | `W_AA → L_AA` | Cleavage of oxidized product within the particle |
+| 62 | α-pinene dimer | `L_AA → W_AA` | Further oxidation of retained fragment |
+| 63 | α-pinene/o-cresol cross-product | `W_AC → L_AC` | Cleavage of oxidized product within the particle |
+| 64 | α-pinene/o-cresol cross-product | `L_AC → W_AC` | Further oxidation of retained fragment |
+| 65 | α-pinene uptake product | `W_AU → L_AU` | Cleavage of oxidized product within the particle |
+| 66 | α-pinene uptake product | `L_AU → W_AU` | Further oxidation of retained fragment |
+| 67 | o-cresol dimer | `W_CC → L_CC` | Cleavage of oxidized product within the particle |
+| 68 | o-cresol dimer | `L_CC → W_CC` | Further oxidation of retained fragment |
+| 69 | isoprene dimer | `W_II → L_II` | Cleavage of oxidized product within the particle |
+| 70 | isoprene dimer | `L_II → W_II` | Further oxidation of retained fragment |
+
+</details>
+
 ## The fitted chemistry against mixture yields and water uptake
 
 ### Matching one α-pinene/o-cresol yield leaves the rest of the curve unresolved
