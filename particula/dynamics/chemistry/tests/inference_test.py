@@ -72,3 +72,56 @@ def test_evaluation_budget(gradient):
     assert fit.evaluations == (1,)
     assert fit.converged == (False,)
     np.testing.assert_allclose(fit.parameters, [0.1])
+
+
+@pytest.mark.parametrize("gradient", [False, True])
+def test_fixed_parameters_score_without_optimization(gradient):
+    """A profile point with every parameter fixed needs one loss evaluation."""
+    calls = []
+
+    def measure(x, need_gradient):
+        calls.append((x.copy(), need_gradient))
+        return float(x @ x), 2 * x if need_gradient else None
+
+    fit = fit_experiments(
+        [ExperimentLoss((1, 0), measure)],
+        [(2, 2), (3, 3)],
+        [np.array([2, 3])],
+        gradient=gradient,
+    )
+    assert len(calls) == 1
+    np.testing.assert_array_equal(calls[0][0], [3, 2])
+    assert calls[0][1] == gradient
+    np.testing.assert_array_equal(fit.parameters, [2, 3])
+    assert fit.loss == 13
+    assert fit.evaluations == (1,)
+    assert fit.converged == (True,)
+
+
+@pytest.mark.parametrize(
+    ("bounds", "start", "message"),
+    [
+        ([(1, 0)], [0.5], "ordered bounds"),
+        ([(0, np.inf)], [1], "ordered bounds"),
+        ([(0, 1)], [1.1], "feasible starts"),
+    ],
+)
+def test_invalid_calibration_domain(bounds, start, message):
+    """Reject infeasible starts and invalid parameter bounds before fitting."""
+    with pytest.raises(ValueError, match=message):
+        fit_experiments([experiment((0,), [0.5])], bounds, [np.array(start)])
+
+
+@pytest.mark.parametrize(
+    ("loss", "derivative", "message"),
+    [
+        (np.inf, [0], "Nonfinite experiment loss"),
+        (0, [np.nan], "Invalid experiment gradient"),
+        (0, [1, 2], "Invalid experiment gradient"),
+    ],
+)
+def test_invalid_experiment_output(loss, derivative, message):
+    """Reject nonfinite losses and malformed local sensitivities."""
+    objective = ExperimentLoss((0,), lambda x, grad: (loss, derivative))
+    with pytest.raises(ValueError, match=message):
+        fit_experiments([objective], [(0, 1)], [np.array([0.5])])

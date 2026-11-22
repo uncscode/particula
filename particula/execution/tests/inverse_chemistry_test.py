@@ -109,3 +109,68 @@ def test_elemental_balance_and_duplicate_exchange():
     data["species"]["gas:V"]["elements"] = {"Y": 1}
     with pytest.raises(ValueError, match="different elemental"):
         _compile(replace(model, mechanism=ReactionMechanism(data)))
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    "device", ["cpu", pytest.param("cuda:0", marks=pytest.mark.cuda)]
+)
+def test_wall_only_decay_preserves_diameter_and_bin_fractions(device):
+    """A monodisperse inert cohort loses number and mass at the same rate."""
+    from scipy.special import ndtr
+
+    if device.startswith("cuda") and not wp.is_cuda_available():
+        pytest.skip("CUDA unavailable")
+    model = coupled_case()
+    times = np.array([0.0, 0.7, 2.0])
+    number, diameter, wall_rate = 1e10, 100e-9, 0.4
+    result = simulate_chamber(
+        model,
+        times,
+        dose=[1e-7, 0],
+        rates=[0, 0],
+        saturation=[0],
+        seed=[number, diameter, 1.0, wall_rate],
+        max_step=0.01,
+        device=device,
+    )
+    surviving = number * np.exp(-wall_rate * times)
+    initial_organic_per_particle = np.pi / 6 * diameter**3 * 0.05 * 1000
+    cdf = ndtr(
+        np.log(np.asarray(model.edges_m) / diameter) / model.log_response_width
+    )
+    fractions = np.diff(np.r_[0, cdf, 1])
+    np.testing.assert_allclose(result.predictions[:, 0], 1e-8, rtol=1e-12)
+    np.testing.assert_array_equal(result.predictions[:, 1], 0)
+    np.testing.assert_allclose(
+        result.predictions[:, 2],
+        surviving * initial_organic_per_particle,
+        rtol=3e-6,
+    )
+    np.testing.assert_allclose(
+        result.predictions[:, 3:], surviving[:, None] * fractions, rtol=3e-6
+    )
+
+
+@pytest.mark.warp
+@pytest.mark.parametrize(
+    "device", ["cpu", pytest.param("cuda:0", marks=pytest.mark.cuda)]
+)
+def test_unstable_chemistry_stage_requires_smaller_step(device):
+    """An overlarge explicit step must flag a negative precursor inventory."""
+    if device.startswith("cuda") and not wp.is_cuda_available():
+        pytest.skip("CUDA unavailable")
+    model = coupled_case()
+    params = dict(
+        dose=[1e-7, 0],
+        rates=[4, 0],
+        saturation=[0],
+        seed=[1e10, 100e-9, 1, 0],
+        device=device,
+    )
+    with pytest.raises(ValueError, match="reduce max_step"):
+        simulate_chamber(model, [0, 1], max_step=1, **params)
+    stable = simulate_chamber(model, [0, 1], max_step=0.01, **params)
+    np.testing.assert_allclose(
+        stable.predictions[-1, 0], 1e-8 * np.exp(-4), rtol=0.002, atol=0
+    )
