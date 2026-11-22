@@ -1,0 +1,10 @@
+observable,temperature_K,RH_percent,acid_cm-3,ammonia_cm-3,published_value,units,source,interpretation
+binary_acid_dimer_evaporation,208,20,,,0.15,s-1,Kuerten2015_Table2,inferred_from_monomer_dimer_system
+binary_acid_dimer_evaporation,223,20,,,3.9,s-1,Kuerten2015_Table2,inferred_from_monomer_dimer_system
+acid_ammonia_adduct_evaporation,210,25,,,0.11,s-1,Kuerten2015_Table4,temperature_evaluation_of_thermodynamic_fit
+acid_ammonia_adduct_evaporation,248,25,,,36,s-1,Kuerten2015_Table4,temperature_evaluation_of_thermodynamic_fit
+acid_ammonia_adduct_evaporation,300,25,,,9800,s-1,Kuerten2015_Table4,extrapolated_temperature_evaluation
+total_acid_dimer,265,10,1.9e9,3.8e9,1.1e7,cm-3,Kuerten2015_Table3,externally_measured_by_Hanson_Eisele2002
+total_acid_trimer,265,10,1.9e9,3.8e9,6.5e6,cm-3,Kuerten2015_Table3,externally_measured_by_Hanson_Eisele2002
+total_acid_tetramer,265,10,1.9e9,3.8e9,6.6e6,cm-3,Kuerten2015_Table3,externally_measured_by_Hanson_Eisele2002
+total_acid_pentamer,265,10,1.9e9,3.8e9,4e6,cm-3,Kuerten2015_Table3,approximate_external_measurement_Hanson_Eisele2002
