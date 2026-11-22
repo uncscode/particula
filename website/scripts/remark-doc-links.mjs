@@ -21,7 +21,8 @@ function groupStudyIntro(tree, figureUrl) {
   tree.children.splice(index, 2, {
     type: 'studyIntro',
     data: { hName: 'section', hProperties: { className: ['study-intro'], ariaLabel: 'Study summary' } },
-    children: [abstract, figure],
+    // Place the float first so the paragraph can flow beneath it.
+    children: [figure, abstract],
   });
 }
 
