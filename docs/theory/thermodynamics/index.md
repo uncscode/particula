@@ -1,6 +1,6 @@
-# Activity Calculations
+# Aerosol thermodynamics
 
-This section covers the theoretical foundations for activity calculations in particula, including the Binary Activity Thermodynamics (BAT) model and liquid-vapor partitioning. These concepts are essential for understanding how particula models organic aerosol thermodynamics and gas-particle equilibria.
+Activity and phase equilibrium determine how water and organic vapors partition into particles. In a rising air parcel, cooling changes saturation while condensation releases heat. Follow the derivation for the quantity you want to predict.
 
 Activity calculations determine how chemical species behave in mixtures, accounting for non-ideal interactions between molecules. In aerosol science, accurate activity models are critical for predicting:
 
@@ -12,6 +12,13 @@ Activity calculations determine how chemical species behave in mixtures, account
 ## Topics
 
 <div class="grid cards" markdown>
+
+-   __[Water, aerosol, and motion in a parcel](parcel-dynamics.md)__
+
+    ---
+
+    Derive the water budget of a rising parcel and follow gas and particles
+    across a shared face.
 
 -   __[Activity Theory](activity-theory.md)__
 

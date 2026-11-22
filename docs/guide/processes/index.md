@@ -8,6 +8,7 @@ Choose a process guide for practical setup and an executable example:
 - [Native gas reaction mechanisms](gas-chemistry.md)
 - [React gas and particle materials in a resolved box](resolved-chemistry.md)
 - [Condensation](condensation.md)
+- [Run a parcel experiment](parcels.md)
 - [Numerical integration and process splitting](numerical-integration.md)
 - [Coagulation](coagulation.md)
 - [Wall loss](wall-loss.md)

@@ -78,30 +78,12 @@ to updraft speed.
 
 ### Replay forcing and exchange between parcels
 
-Use `ParcelTrace.record()` to record a trajectory and `ParcelTrace.load()` to
-read the CSV with its sibling JSON metadata. Each trace has one stable parcel
-ID. Times are seconds, gas pressure is Pa, and water vapor is kg per kg of dry
-air. The comparison radii and liquid water are optional. The initial wet radii
-seed the first step. An organic source rate acts throughout its stated
-interval and a step total enters at its right endpoint. A replay checkpoint
-continues from a completed record. [Single-parcel example](../../studies/examples/thermodynamics/parcel-experiments/parcel_replay.py)
-
-Use `ParcelCluster.regular()` or `ParcelCluster.custom()` to bind traces by ID.
-For exchange, supply directed volumetric flows in m³/s. The donor concentration
-uses its trace's physical volume. Optional contact intervals specify when a
-connection is active. Binned particle exchange requires matching dry classes,
-hygroscopicity and an explicit common dry density in kg/m³. Read each parcel's
-`gas_species` and `gas_masses` together for named inventories in kg.
-Disconnected histories retain their native records and cluster totals use their
-common observation times. Connected histories also sample contact boundaries.
-
-`run_cluster()` accepts a named flow derivative or a `("humidity", parcel_id)`
-liquid-water observation for a shared humidity perturbation. Fixed connectivity
-supports the reverse pass. For resolved particles, `advance_motion()` updates
-world positions using velocity relative to the faces. Return its checkpoint to
-the next interval. Axis-aligned bounds can translate together or be rebound
-explicitly at a completed boundary. Particle radius and density are prescribed
-throughout each motion interval. [CUDA exchange and settling example](../../studies/examples/thermodynamics/parcel-experiments/parcel_cluster.py) · [Stacks, periodic rows and moving parcel groups](../../studies/examples/thermodynamics/parcel-experiments/cluster_lofting.py)
+In a closed ascent, water condensed onto droplets comes from the parcel's
+vapor inventory. When a trace prescribes vapor, check the water supplied or
+removed by the external reservoir as well as the liquid gained by droplets.
+The parcel guide shows how to record an ascent, replay it, and exchange a
+named vapor between cells. [Run a parcel experiment](parcels.md) ·
+[Derive the parcel water budget](../../theory/thermodynamics/parcel-dynamics.md#replaying-prescribed-water-vapor)
 
 ## Native data contract (v0.3.0)
 

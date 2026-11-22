@@ -8,7 +8,7 @@ particles through a vertical stack, around a periodic horizontal row, and across
 a grid traveling with the air. The saved histories show how many particles and
 how much of each species reach each parcel group or leave the domain.
 
-The ascent replay and two-cell exchange studies also measure sensitivities on CUDA.
+For the model assumptions, start with [parcel theory](../../../../theory/thermodynamics/parcel-dynamics.md). To build a trace or choose a transport mode, follow [Run a parcel experiment](../../../../guide/processes/parcels.md). The ascent replay and two-cell exchange studies also measure sensitivities on CUDA.
 
 <!-- STUDY_LIST_START -->
 - [Can a recorded ascent reproduce droplet growth and close two gas budgets?](parcel_replay.py)
