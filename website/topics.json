@@ -5429,6 +5429,39 @@
       "start_here": false
     },
     {
+      "source": "docs/studies/validation/optics/wet-bisulfate/wet_bisulfate.py",
+      "title": "Calculate scattering as a salt droplet takes up water",
+      "topic": "optics",
+      "also": [
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/validation/optics/wet-bisulfate/index.md",
+      "title": "Match wet size and refractive index when a salt droplet takes up water",
+      "topic": "optics",
+      "also": [
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "wet-bisulfate",
+        "runs": [
+          "wet-bisulfate"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/optics/index.md",
+            "label": "Optical inputs and units"
+          }
+        ]
+      }
+    },
+    {
       "source": "docs/studies/validation/chemistry/simba-discovery/index.md",
       "title": "Can vapor and aerosol measurements distinguish a reaction mechanism?",
       "topic": "verification-scientific",
@@ -5716,12 +5749,16 @@
       "reason": "Collection of prescribed parcel replay and cluster experiments."
     },
     {
+      "source": "docs/studies/validation/optics/index.md",
+      "reason": "Browsing directory for optical validation studies."
+    },
+    {
       "source": "docs/studies/validation/chemistry/index.md",
       "reason": "Browsing directory for mechanism discovery validation."
     }
   ],
   "study_group_exceptions": {
     "docs/studies/literature": "Six primary choices cover distinct measurement or process families. The seventh is a cross-listed validation against wall loss theory.",
-    "docs/studies/validation": "Mechanism discovery qualifies inference across chemistry, partitioning and instrument response. Its own navigation entry distinguishes these tests from forward condensation, coagulation, material property and workflow qualifications."
+    "docs/studies/validation": "Eight study collections distinguish mechanism inference and optical validation from the existing physical-process and workflow qualifications."
   }
 }

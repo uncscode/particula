@@ -1841,5 +1841,24 @@
     ],
     "data_expression": "report",
     "full_canvas": true
+  },
+  "wet-bisulfate": {
+    "title": "Calculate scattering as a salt droplet takes up water",
+    "source": "docs/studies/validation/optics/wet-bisulfate/wet_bisulfate.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 120,
+    "inputs": [
+      "docs/data/wet-bisulfate/bulk.csv",
+      "docs/data/wet-bisulfate/cuda-reference.csv"
+    ],
+    "invoke": "report = simulate()\nfigure = plot_results(report)\nplt.show()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nfigure = plot_results(report)\nplt.show()",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": false
   }
 }
