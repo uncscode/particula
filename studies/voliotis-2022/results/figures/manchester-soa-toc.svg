@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+<title id="title">Measured and modeled post-peak organic aerosol decline in Manchester chamber experiment 16</title>
+<desc id="desc">An illuminated aerosol chamber above three bars with a common scale. Suspended secondary organic aerosol fell 30.89 micrograms per cubic metre between the measured peak and last sample. The Particula fit with 20 reaction channels fell 0.32 and the fit with 70 reaction channels fell 13.72.</desc>
+<rect width="300" height="300" fill="#FBF2E3"/>
+<g stroke-linejoin="round" stroke-linecap="round">
+<!-- Schematic chamber enclosure, illumination and aerosol. -->
+<path d="M21 39 L45 26 L124 26 L100 39 Z" fill="#EFD1A5" stroke="#243E43" stroke-width="2"/>
+<path d="M100 39 L124 26 L124 88 L100 102 Z" fill="#CAD9D2" stroke="#243E43" stroke-width="2"/>
+<path d="M21 39 L100 39 L100 102 L21 102 Z" fill="#FBF2E3" stroke="#243E43" stroke-width="2"/>
+<path d="M27 44 L32 93 L91 96 L95 44" fill="#CAD9D2" fill-opacity=".51" stroke="#617679" stroke-width="1"/>
+<path d="M38 29 L52 22 L104 22 L91 29 Z" fill="#FBF2E3" stroke="#243E43" stroke-width="1.6"/>
+<path d="M46 45 l-3 8 M62 45 l-3 8 M78 45 l-3 8" stroke="#A44D21" stroke-width="1.6"/>
+<path d="M32 103 v5 M90 103 v5 M119 92 v4" stroke="#243E43" stroke-width="2"/>
+<circle cx="39" cy="71" r="2.5" fill="#135963"/>
+<circle cx="50" cy="58" r="1.6" fill="#135963"/>
+<circle cx="59" cy="79" r="3.2" fill="#135963"/>
+<circle cx="70" cy="64" r="2.1" fill="#135963"/>
+<circle cx="82" cy="84" r="2.7" fill="#135963"/>
+<circle cx="86" cy="57" r="1.5" fill="#135963"/>
+<circle cx="46" cy="87" r="1.4" fill="#135963"/>
+<circle cx="72" cy="90" r="1.25" fill="#135963"/>
+<circle cx="52" cy="68" r="1" fill="#135963"/>
+<circle cx="81" cy="73" r="1.1" fill="#135963"/>
+</g><g font-family="Liberation Sans, Arial, sans-serif" fill="#243E43">
+<text x="142" y="44" font-size="18" font-weight="bold">Manchester</text>
+<text x="142" y="64" font-size="18" font-weight="bold">chamber</text>
+<text x="142" y="86" font-size="12.5">α-pinene + o-cresol</text>
+<text x="142" y="102" font-size="12.5">Experiment 16</text>
+<path d="M19 120 H281" stroke="#617679" stroke-width=".8"/>
+<text x="19" y="146" font-size="19" font-weight="bold">Decline in suspended SOA</text>
+<text x="20" y="163" font-size="13">Peak to final sample (µg m⁻³)</text>
+<text x="20" y="188" font-size="14" font-weight="bold">Chamber measurement</text>
+<rect x="20" y="193" width="210.052" height="8" fill="#243E43"/>
+<text x="236.05" y="202" font-weight="bold" font-size="14" fill="#243E43">30.89</text>
+<text x="20" y="228" font-size="14" font-weight="bold">Particula · 70 reaction channels</text>
+<rect x="20" y="233" width="93.310" height="8" fill="#135963"/>
+<text x="119.31" y="242" font-weight="bold" font-size="14" fill="#135963">13.72</text>
+<text x="20" y="268" font-size="14" font-weight="bold">Particula · 20 reaction channels</text>
+<rect x="20" y="273" width="2.205" height="8" fill="#A44D21"/>
+<text x="28.20" y="282" font-weight="bold" font-size="14" fill="#A44D21">0.32</text>
+</g></svg>
