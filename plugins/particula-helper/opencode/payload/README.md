@@ -1,7 +1,7 @@
 # Particula Helper
 
-Eight researcher skills for environment setup, aerosol science guidance, simulation
-design, execution, analysis, TOC graphics, debugging and issue reporting, plus six repository
+Ten researcher skills for environment setup, aerosol science guidance, simulation
+design, chamber fitting, reaction discovery, execution, analysis, TOC graphics, debugging and issue reporting, plus six repository
 development skills. The host supplies filesystem and
 Python execution tools. Installing this plugin does not install Particula,
 change Python environments, start a server, or run simulations.
@@ -38,6 +38,12 @@ installs include local guides, theory, contributor guidance, Python examples,
 and data/images; editable installs point to the maintained repository docs.
 See `references/sources.md` for search commands and older-version fallback.
 
+## Fit a chamber experiment or discover a reaction network
+
+Use [particula-chamber-analysis](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-chamber-analysis/SKILL.md) to screen total SOA yield, carry competing fits into size-resolved comparisons, and determine which chemistry or microphysics the measurements constrain.
+
+Use [particula-reaction-discovery](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-reaction-discovery/SKILL.md) to propose multigeneration reactions, fit continuous rates with automatic differentiation, and compare literature-supported pathways in CUDA replays. It includes a runnable synthetic two-reaction example.
+
 ## Analyze a study or write a literature comparison
 
 Use [particula-studies-literature](https://github.com/uncscode/particula/blob/main/plugins/particula-helper/skills/particula-studies-literature/SKILL.md) to check simulation outputs, compare them with published measurements and write a report whose title states the scientific finding.
@@ -61,7 +67,7 @@ GitHub access, it provides copyable Markdown.
 ## Repository development skills
 
 Use these in a selected Particula source checkout. They do not apply to every
-Python project or replace the eight researcher-oriented skills.
+Python project or replace the ten researcher-oriented skills.
 
 | Skill | Use |
 | --- | --- |

@@ -1,0 +1,3 @@
+interface:
+  display_name: "Particula Chamber Analysis"
+  short_description: "Fit chamber yields and particle microphysics"

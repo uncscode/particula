@@ -20,12 +20,12 @@
         "displayName": "Particula Helper",
         "logo": "./assets/icon.png",
         "logoDark": "./assets/icon-dark.png",
-        "longDescription": "Eight researcher workflows for setup, guidance, simulation design, execution, analysis, TOC figure design, debugging and issue reporting, plus six Particula repository skills for planning, development, testing, documentation, illustrated example authoring and review. Uses the selected checkout and environment. Reports require researcher review before posting. No hosted service, automatic Python installation or MCP server is included.",
+        "longDescription": "Ten researcher workflows for setup, guidance, simulation design, chamber analysis, reaction discovery, execution, analysis, TOC figure design, debugging and issue reporting, plus six Particula repository skills for planning, development, testing, documentation, illustrated example authoring and review. Uses the selected checkout and environment. Reports require researcher review before posting. No hosted service, automatic Python installation or MCP server is included.",
         "shortDescription": "Learn, run, analyze aerosols"
       },
       "requires_local_executor": true,
       "publication": {
-        "release_notes": "Literature studies lead with the strongest supported finding and revisit their TOC figure after revision. The TOC guidance adds a shared palette and examples for showing the study setting, identifying measured and modeled quantities, and labeling bars and particles at thumbnail size."
+        "release_notes": "Adds chamber analysis and reaction-network discovery skills for fitting yields and particle microphysics. Includes a CUDA automatic-differentiation example for testing competing aging reactions."
       }
     }
   },
@@ -37,7 +37,7 @@
     "scientific-computing"
   ],
   "name": "particula-helper",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "license": "MIT",
   "homepage": "https://uncscode.github.io/particula/guide/agent-plugins/",
   "repository": "https://github.com/uncscode/particula"

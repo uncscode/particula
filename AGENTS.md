@@ -31,6 +31,8 @@ For using Particula in a scientific study, the plugin separately provides
 [setup](plugins/particula-helper/skills/particula-setup/SKILL.md),
 [science guidance](plugins/particula-helper/skills/particula-guide/SKILL.md),
 [simulation design](plugins/particula-helper/skills/particula-build/SKILL.md),
+[chamber fitting and microphysics](plugins/particula-helper/skills/particula-chamber-analysis/SKILL.md),
+[reaction-network discovery with CUDA and AD](plugins/particula-helper/skills/particula-reaction-discovery/SKILL.md),
 [execution](plugins/particula-helper/skills/particula-run/SKILL.md),
 [study analysis and literature reports](plugins/particula-helper/skills/particula-studies-literature/SKILL.md),
 [debugging](plugins/particula-helper/skills/particula-debug/SKILL.md), and

@@ -23,6 +23,8 @@ SKILLS = {
     "particula-setup",
     "particula-guide",
     "particula-build",
+    "particula-chamber-analysis",
+    "particula-reaction-discovery",
     "particula-run",
     "particula-studies-literature",
     "particula-debug",
