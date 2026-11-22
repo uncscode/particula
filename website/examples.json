@@ -1778,9 +1778,10 @@
     "inputs": [],
     "invoke": "report = run_example()",
     "data_expression": "report",
-    "replot_invoke": "report = saved_data\nplot_results(report)",
+    "replot_invoke": "report = saved_data\nplot_results(report)\nplot_composition(report)",
     "render_functions": [
-      "plot_results"
+      "plot_results",
+      "plot_composition"
     ],
     "plot_inputs": [],
     "full_canvas": true
