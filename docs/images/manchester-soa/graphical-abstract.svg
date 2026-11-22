@@ -1,28 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
-  <title id="title">Manchester chamber perturbations retaining lower error than the frozen model</title>
-  <desc id="desc">An illuminated aerosol chamber and two grids of 48 parameter sets. A filled dot means the error averaged across two stochastic realizations was lower than with the earlier frozen parameters. All 48 sets improved mean absolute modal-diameter error across seven experiments. None improved mean normalized organic-mass error across 15 experiments.</desc>
-  <defs>
-    <g id="row">
-      <circle cx="0" cy="0" r="3.2"/>
-      <circle cx="10" cy="0" r="3.2"/>
-      <circle cx="20" cy="0" r="3.2"/>
-      <circle cx="30" cy="0" r="3.2"/>
-      <circle cx="40" cy="0" r="3.2"/>
-      <circle cx="50" cy="0" r="3.2"/>
-      <circle cx="60" cy="0" r="3.2"/>
-      <circle cx="70" cy="0" r="3.2"/>
-      <circle cx="80" cy="0" r="3.2"/>
-      <circle cx="90" cy="0" r="3.2"/>
-      <circle cx="100" cy="0" r="3.2"/>
-      <circle cx="110" cy="0" r="3.2"/>
-    </g>
-    <g id="draws">
-      <use href="#row" xlink:href="#row" y="0"/>
-      <use href="#row" xlink:href="#row" y="8"/>
-      <use href="#row" xlink:href="#row" y="16"/>
-      <use href="#row" xlink:href="#row" y="24"/>
-    </g>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Measured and fitted α-pinene and o-cresol aerosol yield in the Manchester chamber</title>
+  <desc id="desc">At approximately 299 micrograms per cubic metre of total precursor consumed, the measured particle-wall-corrected organic aerosol yield was 27.4 percent in Voliotis et al. Figure 5. Averaged across the two eligible Manchester runs, Particula gave 15.1 percent with the organic-mass fit and 27.5 percent with the mass-and-particle-number fit. The bars use a common zero and scale.</desc>
   <rect width="300" height="300" fill="#FBF2E3"/>
   <g transform="translate(3 -6) scale(.78)" stroke-linejoin="round" stroke-linecap="round">
 <path d="M21 39 L45 26 L124 26 L100 39 Z" fill="#EFD1A5" stroke="#243E43" stroke-width="2"/>
@@ -44,17 +22,20 @@
 <circle cx="81" cy="73" r="1.1" fill="#135963"/>
   </g>
   <g font-family="Liberation Sans, Arial, sans-serif" fill="#243E43">
-    <text x="118" y="38" font-weight="bold" font-size="22">Manchester</text>
-    <text x="118" y="64" font-weight="bold" font-size="22">chamber</text>
-    <path d="M20 89 H280" stroke="#617679" stroke-width="1"/>
-    <text x="20" y="114" font-size="16" font-weight="bold">Joint perturbations with lower</text>
-    <text x="20" y="133" font-size="16" font-weight="bold">error than the frozen model</text>
-    <text x="20" y="168" font-size="17">Modal diameter</text>
-    <use href="#draws" xlink:href="#draws" x="24" y="182" fill="#135963" stroke="#135963" stroke-width="1.1"/>
-    <text x="280" y="204" text-anchor="end" font-size="38" font-weight="bold" fill="#135963">48/48</text>
-    <path d="M20 223 H280" stroke="#617679" stroke-width=".7"/>
-    <text x="20" y="247" font-size="17">Organic aerosol mass</text>
-    <use href="#draws" xlink:href="#draws" x="24" y="261" fill="#FBF2E3" stroke="#617679" stroke-width="1.1"/>
-    <text x="280" y="283" text-anchor="end" font-size="38" font-weight="bold">0/48</text>
+    <text x="113" y="34" font-size="18" font-weight="bold">Manchester</text>
+    <text x="113" y="54" font-size="18" font-weight="bold">chamber</text>
+    <text x="113" y="74" font-size="14.5">α-pinene + o-cresol</text>
+    <path d="M20 87 H280" stroke="#617679" stroke-width=".8"/>
+    <text x="20" y="111" font-size="20" font-weight="bold">Wall-corrected SOA yield</text>
+    <text x="20" y="130" font-size="14">At ≈299 µg m⁻³ of precursor consumed</text>
+    <text x="20" y="157" font-size="16" font-weight="bold">Manchester measurement</text>
+    <rect x="20" y="164" width="197.504" height="11" fill="#243E43"/>
+    <text x="224.504" y="176" font-size="17" font-weight="bold" fill="#243E43">27.4%</text>
+    <text x="20" y="210" font-size="16" font-weight="bold">Particula · mass fit</text>
+    <rect x="20" y="217" width="108.559" height="11" fill="#135963"/>
+    <text x="135.559" y="229" font-size="17" font-weight="bold" fill="#135963">15.1%</text>
+    <text x="20" y="263" font-size="16" font-weight="bold">Particula · mass + number fit</text>
+    <rect x="20" y="270" width="198.190" height="11" fill="#135963"/>
+    <text x="225.190" y="282" font-size="17" font-weight="bold" fill="#135963">27.5%</text>
   </g>
 </svg>

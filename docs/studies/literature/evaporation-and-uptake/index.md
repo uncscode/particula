@@ -4,6 +4,6 @@ These studies follow organic material as it moves between gas and condensed phas
 
 <!-- STUDY_LIST_START -->
 - [After glyoxal dilution, two models predict rising organic mass per sulfate as measurements fall](glyoxal_chamber.py)
-- [Manchester chamber simulations retain their particle-size improvement across 48 joint perturbations](manchester-soa/index.md)
+- [How well does Particula reproduce organic aerosol formation in the Manchester chamber?](manchester-soa/index.md)
 - [Modeled convection supplies only a third of the heat needed for the reported pentane drop evaporation rate](pendant-drop/index.md)
 <!-- STUDY_LIST_END -->
