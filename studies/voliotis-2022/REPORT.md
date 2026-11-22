@@ -1,5 +1,7 @@
 # An α-pinene chamber fit predicts 77 µg m⁻³ of suspended organic aerosol in a second run that reached 109
 
+The follow-up tracks dimers and their oxidation and fragmentation products through 40 additional reaction-chain trials. [Product-chain study](PRODUCT_CHAINS.md)
+
 The 20-reaction follow-up compares each fitted equation with published chemistry and tests whether evaporation gives the same observed response. [Sequential reaction study](REACTION_DISCOVERY.md)
 
 The final campaign assessment quantifies chemistry and wall-loss uncertainty across the 15 paired experiments. [Read the wall and chemistry assessment](ASSESSMENT.md) · [Explore the additional chemical pathways](CHEMICAL_PATHWAYS.md)

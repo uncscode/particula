@@ -1,5 +1,7 @@
 # Twenty added reactions improve the SOA mass fit, while particle counts still limit joint reproduction
 
+The follow-up tracks dimers and their oxidation and fragmentation products through 40 additional reaction-chain trials. [Product-chain study](PRODUCT_CHAINS.md)
+
 For the 15 Manchester chamber experiments with paired precursor, organic aerosol and particle-number records, adding 20 literature-matched reaction channels lowered the **worst mass trajectory error from 15.87% to 12.09%**. That is a 3.78 percentage point reduction, or 24% of the previous worst error. The **joint mass-and-number error moved from 18.04% to 17.93%**, reaching **17.92%** in a further refit with one reaction turned off. The two objectives have separate calibrations. Every experiment within a calibration shares the same chemistry and size-dependent wall-loss coefficient. Each run supplies its own measured precursor decay, seed conditions and bounded dose. These numbers measure reproduction of the fitted experiments. [Voliotis et al. chamber measurements](https://acp.copernicus.org/articles/22/14147/2022/) · [Data coverage](joint/data/CAMPAIGN_SERIES.md) · [Final scores](joint/results/discovery/final_scores.csv)
 
 ![Worst errors during the 20 reaction additions and retrospective refits; right, changes in each experiment's mass error.](joint/results/discovery/reaction-discovery.png)

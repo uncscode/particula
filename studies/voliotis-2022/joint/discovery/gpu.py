@@ -18,8 +18,14 @@ from wall_campaign import (
     rectangle_wall_loss_coefficient_from_transport_wp,
 )
 
-State = wp.types.vector(length=11, dtype=F64)
+State = wp.types.vector(length=31, dtype=F64)
 PI = wp.constant(F64(np.pi))
+
+
+@wp.func
+def labelled_solid(pool: int):
+    """Identify particle inventories counted within the stable bulk mass."""
+    return pool >= 11 and pool < 26
 
 
 @wp.func
@@ -72,6 +78,8 @@ def network(  # noqa: C901 - fused split integration and tracer bookkeeping
     channels: wp.array2d(dtype=wp.int32),
     active: wp.array(dtype=wp.int32),
     n_active: int,
+    extended: int,
+    split_residue: F64,
     sub: int,
     vapor_share: F64,
     mw: V3,
@@ -171,6 +179,14 @@ def network(  # noqa: C901 - fused split integration and tracer bookkeeping
                 x[10] += before - x[s + 3]
                 emitted += supply[s] + extra[s]
             x[9] *= keep
+            if extended:
+                # x[9] includes the labelled solid inventories.
+                for q in range(11, 26):
+                    x[q] *= keep
+                for q in range(26, 31):
+                    lost = x[q] * (F64(1.0) - vkeep)
+                    x[q] -= lost
+                    x[10] += lost
             if diagnostic == 2:
                 for tag_slot in range(n_active):
                     htag = active[tag_slot]
@@ -200,7 +216,23 @@ def network(  # noqa: C901 - fused split integration and tracer bookkeeping
                         dh,
                         mw,
                     )
-                    if diagnostic > 0:
+                    if extended:
+                        a = channels[h, 0]
+                        dest = channels[h, 2]
+                        split = channels[h, 4]
+                        if labelled_solid(a):
+                            x[9] -= moved
+                        if labelled_solid(dest):
+                            x[9] += moved
+                        if split >= 0:
+                            secondary = split_residue * moved
+                            x[dest] -= secondary
+                            x[split] += secondary
+                            if labelled_solid(dest):
+                                x[9] -= secondary
+                            if labelled_solid(split):
+                                x[9] += secondary
+                    if diagnostic == 1 or diagnostic == 2:
                         flux[i, r, d, h] += moved
                     if diagnostic == 2:
                         for tag_slot in range(n_active):
@@ -222,8 +254,23 @@ def network(  # noqa: C901 - fused split integration and tracer bookkeeping
             )
             seed *= keep
         if diagnostic > 0:
-            for q in range(11):
+            for q in range(11 + 20 * extended):
                 small = wp.min(small, x[q])
+            if extended:
+                unlabelled = x[9]
+                for q in range(11, 26):
+                    unlabelled -= x[q]
+                small = wp.min(small, unlabelled)
+        if diagnostic == 3 and j % 5 == 4:
+            col = (j // 5) * 8
+            flux[i, r, d, col] = total_soa(x)
+            flux[i, r, d, col + 1] = count / initial[r, 1]
+            flux[i, r, d, col + 2] = x[11]
+            flux[i, r, d, col + 3] = x[16]
+            flux[i, r, d, col + 4] = x[21]
+            flux[i, r, d, col + 5] = x[26]
+            flux[i, r, d, col + 6] = x[12]
+            flux[i, r, d, col + 7] = x[13]
         if obs[r, j, 0] >= F64(0.0):
             pred = old + (total_soa(x) - old) * obs[r, j, 0]
             peak = wp.max(peak, pred)
@@ -235,6 +282,9 @@ def network(  # noqa: C901 - fused split integration and tracer bookkeeping
     stock = F64(0.0)
     for q in range(11):
         stock += x[q]
+    if extended:
+        for q in range(26, 31):
+            stock += x[q]
     result[i, r, d, 0] = wp.sqrt(ms / initial[r, 3])
     result[i, r, d, 1] = wp.sqrt(ns / initial[r, 4])
     result[i, r, d, 2] = wp.abs(emitted - deposited - stock)
@@ -257,8 +307,21 @@ class Model(Campaign):
         """Upload kinetic definitions for the requested network."""
         if not reactions or len({r.key for r in reactions}) != len(reactions):
             raise ValueError("Provide distinct labelled reaction channels")
+        self.extended = int(
+            any(
+                max(r.dest, r.a, getattr(r, "split", -1)) > 10
+                for r in reactions
+            )
+        )
         for r in reactions:
-            if not (0 <= r.a < 9 and -1 <= r.b < 9 and 0 <= r.dest < 11):
+            split = getattr(r, "split", -1)
+            if not (
+                (0 <= r.a < 9 or 11 <= r.a < 31)
+                and -1 <= r.b < 9
+                and 0 <= r.dest < 31
+                and (r.a < 9 or r.b == -1)
+                and (split == -1 or (11 <= split < 31 and split != r.dest))
+            ):
                 raise ValueError(f"Invalid source or product pool in {r.key}")
             if r.dest in (r.a, r.b):
                 raise ValueError(
@@ -273,7 +336,10 @@ class Model(Campaign):
         super().__init__()
         self.n_reactions = len(reactions)
         self.channels = wp.array(
-            [[r.a, r.b, r.dest, int(r.area_scaled)] for r in reactions],
+            [
+                [r.a, r.b, r.dest, int(r.area_scaled), getattr(r, "split", -1)]
+                for r in reactions
+            ],
             dtype=wp.int32,
             device="cuda:0",
         )
@@ -289,8 +355,15 @@ class Model(Campaign):
         diagnostics=False,
         share=0.1,
         reverse=False,
+        split_residue=0.5,
     ):
         """Run the supplied rates and profile the dose for each experiment."""
+        if not 0 <= split_residue <= 1:
+            raise ValueError("Residue mass fraction must be between 0 and 1")
+        if self.extended and diagnostics == 2:
+            raise ValueError(
+                "Split-product networks support gross flux diagnostics"
+            )
         rates = np.atleast_2d(rates)
         if rates.shape[1] != self.n_reactions or np.any(rates < 0):
             raise ValueError("Supply one nonnegative coefficient per reaction")
@@ -310,10 +383,9 @@ class Model(Campaign):
             )
 
         out = wp.empty((*shape, 8), dtype=F64, device="cuda:0")
+        width = 480 if diagnostics == 3 else self.n_reactions * int(diagnostics)
         flux = wp.zeros(
-            (*shape, self.n_reactions * int(diagnostics))
-            if diagnostics
-            else (1, 1, 1, 1),
+            (*shape, width) if diagnostics else (1, 1, 1, 1),
             dtype=F64,
             device="cuda:0",
         )
@@ -328,6 +400,8 @@ class Model(Campaign):
                 self.channels,
                 upload(ids or [0], wp.int32),
                 len(ids),
+                self.extended,
+                split_residue,
                 sub,
                 share,
                 self.masses,

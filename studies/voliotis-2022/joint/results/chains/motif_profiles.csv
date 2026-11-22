@@ -1,0 +1,321 @@
+iteration,objective,family,motif,rate_h_inv,score,max_gross_last_step_ug_m3
+1,mass,AA,Retained oxidation,0.0,0.12093535391579224,0.0
+1,mass,AA,Retained oxidation,0.03,0.12093535391579224,15.801556317278926
+1,mass,AA,Retained oxidation,0.3,0.12093535391579224,105.31456493365354
+1,mass,AA,Retained oxidation,1.5,0.12093535391579224,178.88064306965978
+1,joint,AA,Retained oxidation,0.0,0.17917011006187442,0.0
+1,joint,AA,Retained oxidation,0.03,0.17917011006187442,1.2194131243390606e-15
+1,joint,AA,Retained oxidation,0.3,0.17917011006187442,8.813562527161487e-15
+1,joint,AA,Retained oxidation,1.5,0.17917011006187442,1.7605895671776015e-14
+2,mass,AC,Retained oxidation,0.0,0.1208533004880887,0.0
+2,mass,AC,Retained oxidation,0.03,0.1208533004880887,5.575012984556119
+2,mass,AC,Retained oxidation,0.3,0.1208533004880887,38.274764106941525
+2,mass,AC,Retained oxidation,1.5,0.1208533004880887,68.68280715686436
+2,joint,AC,Retained oxidation,0.0,0.17915911881145355,0.0
+2,joint,AC,Retained oxidation,0.03,0.17915911881145355,0.0011732932837964772
+2,joint,AC,Retained oxidation,0.3,0.17915911881145355,0.0074092885027502945
+2,joint,AC,Retained oxidation,1.5,0.17915911881145355,0.011554723476197477
+3,mass,AU,Retained oxidation,0.0,0.12065278912464143,0.0
+3,mass,AU,Retained oxidation,0.03,0.12065278912464143,7.904742420859175
+3,mass,AU,Retained oxidation,0.3,0.12065278912464143,53.10268316194216
+3,mass,AU,Retained oxidation,1.5,0.12065278912464143,92.89483512092117
+3,joint,AU,Retained oxidation,0.0,0.17915873531287116,0.0
+3,joint,AU,Retained oxidation,0.03,0.17915873531287116,4.399324735422852
+3,joint,AU,Retained oxidation,0.3,0.17915873531287116,30.22438400514401
+3,joint,AU,Retained oxidation,1.5,0.17915873531287116,54.6836879931384
+4,mass,CC,Retained oxidation,0.0,0.12065278912464143,0.0
+4,mass,CC,Retained oxidation,0.03,0.12065278912464143,1.133052682892726e-19
+4,mass,CC,Retained oxidation,0.3,0.12065278912464143,9.56250256106326e-19
+4,mass,CC,Retained oxidation,1.5,0.12065278912464143,2.7468538956764595e-18
+4,joint,CC,Retained oxidation,0.0,0.17915873531287116,0.0
+4,joint,CC,Retained oxidation,0.03,0.17915873531287116,0.0003496360855110778
+4,joint,CC,Retained oxidation,0.3,0.17915873531287116,0.002547152831345998
+4,joint,CC,Retained oxidation,1.5,0.17915873531287116,0.005196881082593441
+5,mass,II,Retained oxidation,0.0,0.12065278912464143,0.0
+5,mass,II,Retained oxidation,0.03,0.12065278912464143,8.876401555162013e-17
+5,mass,II,Retained oxidation,0.3,0.12065278912464143,6.13885047164707e-16
+5,mass,II,Retained oxidation,1.5,0.12065278912464143,1.1185496246851219e-15
+5,joint,II,Retained oxidation,0.0,0.1791585391679783,0.0
+5,joint,II,Retained oxidation,0.03,0.1791585391679783,3.0032694134395813e-06
+5,joint,II,Retained oxidation,0.3,0.1791585391679783,1.9391400553112456e-05
+5,joint,II,Retained oxidation,1.5,0.1791585391679783,3.166853198687323e-05
+6,mass,AA,Oxidation then fragmentation,0.0,0.12065278912464143,0.0
+6,mass,AA,Oxidation then fragmentation,0.03,0.12064791886586322,0.7999989522843887
+6,mass,AA,Oxidation then fragmentation,0.3,0.12392697179351353,43.29358118462248
+6,mass,AA,Oxidation then fragmentation,1.5,0.16027317298431024,159.80083334616359
+6,joint,AA,Oxidation then fragmentation,0.0,0.1791585391679783,0.0
+6,joint,AA,Oxidation then fragmentation,0.03,0.17915854101914003,0.0059136460638489945
+6,joint,AA,Oxidation then fragmentation,0.3,0.17915868539483046,0.29673463573307113
+6,joint,AA,Oxidation then fragmentation,1.5,0.17916007278644375,0.9218300543922252
+7,mass,AC,Oxidation then fragmentation,0.0,0.12064791886586322,0.0
+7,mass,AC,Oxidation then fragmentation,0.03,0.12064716553475532,0.25526312742648016
+7,mass,AC,Oxidation then fragmentation,0.3,0.12340610004005484,14.369624126958877
+7,mass,AC,Oxidation then fragmentation,1.5,0.15222858773869435,58.87557391710859
+7,joint,AC,Oxidation then fragmentation,0.0,0.1791585391679783,0.0
+7,joint,AC,Oxidation then fragmentation,0.03,0.17915853965061074,0.00020476662089090488
+7,joint,AC,Oxidation then fragmentation,0.3,0.17915857680995614,0.010329199059743182
+7,joint,AC,Oxidation then fragmentation,1.5,0.1791589207568645,0.03264891495255753
+8,mass,AU,Oxidation then fragmentation,0.0,0.12064314570246817,0.0
+8,mass,AU,Oxidation then fragmentation,0.03,0.12060926803540373,0.3885442020431439
+8,mass,AU,Oxidation then fragmentation,0.3,0.12114772955415941,20.967001445897235
+8,mass,AU,Oxidation then fragmentation,1.5,0.2452850129564632,77.4762244803442
+8,joint,AU,Oxidation then fragmentation,0.0,0.1791585391679783,0.0
+8,joint,AU,Oxidation then fragmentation,0.03,0.1791585493083449,0.20314063638452803
+8,joint,AU,Oxidation then fragmentation,0.3,0.18096781278668775,11.342071344491522
+8,joint,AU,Oxidation then fragmentation,1.5,0.1937310458812664,45.593168787320224
+9,mass,CC,Oxidation then fragmentation,0.0,0.12053729406248875,0.0
+9,mass,CC,Oxidation then fragmentation,0.03,0.12053729406248875,2.2838137021594545e-21
+9,mass,CC,Oxidation then fragmentation,0.3,0.12053729406248875,1.6906136127512488e-19
+9,mass,CC,Oxidation then fragmentation,1.5,0.12053729406248875,1.5077106689690895e-18
+9,joint,CC,Oxidation then fragmentation,0.0,0.1791585391679783,0.0
+9,joint,CC,Oxidation then fragmentation,0.03,0.17915853937993353,8.64092786900035e-05
+9,joint,CC,Oxidation then fragmentation,0.3,0.17915855570521202,0.004991634824123169
+9,joint,CC,Oxidation then fragmentation,1.5,0.17915870672629583,0.0251510973171387
+10,mass,II,Oxidation then fragmentation,0.0,0.12050316413002048,0.0
+10,mass,II,Oxidation then fragmentation,0.03,0.12050316413002048,3.4397845363587407e-18
+10,mass,II,Oxidation then fragmentation,0.3,0.12050316413002048,1.9523976732665014e-16
+10,mass,II,Oxidation then fragmentation,1.5,0.12050316413002048,8.2400160190945605e-16
+10,joint,II,Oxidation then fragmentation,0.0,0.1791585391679783,0.0
+10,joint,II,Oxidation then fragmentation,0.03,0.1791585391679783,0.00018316582177582986
+10,joint,II,Oxidation then fragmentation,0.3,0.1791585391679783,0.00944668017587695
+10,joint,II,Oxidation then fragmentation,1.5,0.1791585391679783,0.031948881607649145
+11,mass,AA,Direct partial fragmentation,0.0,0.12050316413002048,0.0
+11,mass,AA,Direct partial fragmentation,0.03,0.12228477193658761,14.94115905492843
+11,mass,AA,Direct partial fragmentation,0.3,0.14148718867701482,100.4607159348924
+11,mass,AA,Direct partial fragmentation,1.5,0.19612070204334758,175.40791712244334
+11,joint,AA,Direct partial fragmentation,0.0,0.1791585391679783,0.0
+11,joint,AA,Direct partial fragmentation,0.03,0.17915860262340783,0.019546008780312107
+11,joint,AA,Direct partial fragmentation,0.3,0.1791591240014458,0.16797694430540258
+11,joint,AA,Direct partial fragmentation,1.5,0.17916070311817806,0.51614170764651
+12,mass,AC,Direct partial fragmentation,0.0,0.12050316413002048,0.0
+12,mass,AC,Direct partial fragmentation,0.03,0.12161551134546893,3.7904654990732314
+12,mass,AC,Direct partial fragmentation,0.3,0.1349905505758498,27.84057429581538
+12,mass,AC,Direct partial fragmentation,1.5,0.16370025418102263,58.81381163648348
+12,joint,AC,Direct partial fragmentation,0.0,0.1791585391679783,0.0
+12,joint,AC,Direct partial fragmentation,0.03,0.1791585546445335,0.0006925296650328135
+12,joint,AC,Direct partial fragmentation,0.3,0.17915868158537687,0.00595140394153263
+12,joint,AC,Direct partial fragmentation,1.5,0.17915906404267876,0.018278134720890675
+13,mass,AU,Direct partial fragmentation,0.0,0.12050316413002048,0.0
+13,mass,AU,Direct partial fragmentation,0.03,0.12050292830827787,5.68245928018411
+13,mass,AU,Direct partial fragmentation,0.3,0.14813079588924755,40.308063586097326
+13,mass,AU,Direct partial fragmentation,1.5,0.25651369260607276,79.7454901071736
+13,joint,AU,Direct partial fragmentation,0.0,0.1791585391679783,0.0
+13,joint,AU,Direct partial fragmentation,0.03,0.17989352316434948,4.391479965411555
+13,joint,AU,Direct partial fragmentation,0.3,0.1877915818738936,29.72383106658268
+13,joint,AU,Direct partial fragmentation,1.5,0.22284527136453197,52.07782805051464
+14,mass,CC,Direct partial fragmentation,0.0,0.12050292830827787,0.0
+14,mass,CC,Direct partial fragmentation,0.03,0.12050292830827787,1.1174059981172725e-19
+14,mass,CC,Direct partial fragmentation,0.3,0.12050292830827787,9.432581889399014e-19
+14,mass,CC,Direct partial fragmentation,1.5,0.12050292830827787,2.7111846762521877e-18
+14,joint,CC,Direct partial fragmentation,0.0,0.1791585391679783,0.0
+14,joint,CC,Direct partial fragmentation,0.03,0.1791585459602347,0.0006248202517974286
+14,joint,CC,Direct partial fragmentation,0.3,0.17915860166864486,0.005476250653532533
+14,joint,CC,Direct partial fragmentation,1.5,0.17915876951335907,0.01755304772911456
+15,mass,II,Direct partial fragmentation,0.0,0.12050239513778936,0.0
+15,mass,II,Direct partial fragmentation,0.03,0.12050239513778936,7.619577075506474e-17
+15,mass,II,Direct partial fragmentation,0.3,0.12050239513778936,5.274102312286313e-16
+15,mass,II,Direct partial fragmentation,1.5,0.12050239513778936,9.625545944668503e-16
+15,joint,II,Direct partial fragmentation,0.0,0.1791585391679783,0.0
+15,joint,II,Direct partial fragmentation,0.03,0.1791585391679783,0.0006970030329056475
+15,joint,II,Direct partial fragmentation,0.3,0.1791585391679783,0.006012986016071856
+15,joint,II,Direct partial fragmentation,1.5,0.1791585391679783,0.01865686128953108
+16,mass,AA,Oxidation of released vapor,0.0,0.12050239513778936,0.0
+16,mass,AA,Oxidation of released vapor,0.03,0.12282050770251225,0.18321338119609362
+16,mass,AA,Oxidation of released vapor,0.3,0.13857615932948814,10.199540431816573
+16,mass,AA,Oxidation of released vapor,1.5,0.15129517726469394,53.05789810782189
+16,joint,AA,Oxidation of released vapor,0.0,0.1791585391679783,0.0
+16,joint,AA,Oxidation of released vapor,0.03,0.17915860189252522,0.0002725081801268551
+16,joint,AA,Oxidation of released vapor,0.3,0.17915906246903693,0.018993641225605335
+16,joint,AA,Oxidation of released vapor,1.5,0.17915988976068054,0.1545124894293231
+17,mass,AC,Oxidation of released vapor,0.0,0.12050239513778936,0.0
+17,mass,AC,Oxidation of released vapor,0.03,0.12214883927046562,0.06445684295350498
+17,mass,AC,Oxidation of released vapor,0.3,0.1331909297327953,2.890205195759775
+17,mass,AC,Oxidation of released vapor,1.5,0.14165891859886173,17.506824523835355
+17,joint,AC,Oxidation of released vapor,0.0,0.1791585391679783,0.0
+17,joint,AC,Oxidation of released vapor,0.03,0.17915855446152618,9.512920000409388e-06
+17,joint,AC,Oxidation of released vapor,0.3,0.17915866626221957,0.0006656234260554974
+17,joint,AC,Oxidation of released vapor,1.5,0.1791588644887692,0.005446958976650646
+18,mass,AU,Oxidation of released vapor,0.0,0.12118379134805363,0.0
+18,mass,AU,Oxidation of released vapor,0.03,0.12028159898671237,0.2541389126305477
+18,mass,AU,Oxidation of released vapor,0.3,0.12614605121717423,5.59632841442015
+18,mass,AU,Oxidation of released vapor,1.5,0.13758619941996333,29.345272853148437
+18,joint,AU,Oxidation of released vapor,0.0,0.1791585391679783,0.0
+18,joint,AU,Oxidation of released vapor,0.03,0.17987458916049814,0.047066525920947434
+18,joint,AU,Oxidation of released vapor,0.3,0.18640754516936908,2.838029761144011
+18,joint,AU,Oxidation of released vapor,1.5,0.189674357486626,15.348814225585084
+19,mass,CC,Oxidation of released vapor,0.0,0.12026983296707563,0.0
+19,mass,CC,Oxidation of released vapor,0.03,0.12027028255938668,0.00043661734518159857
+19,mass,CC,Oxidation of released vapor,0.3,0.12027303245861634,0.03124169849981222
+19,mass,CC,Oxidation of released vapor,1.5,0.12027497889589134,0.25673828262630904
+19,joint,CC,Oxidation of released vapor,0.0,0.1791064268812413,0.0
+19,joint,CC,Oxidation of released vapor,0.03,0.17910643667619464,2.8111613144115957e-05
+19,joint,CC,Oxidation of released vapor,0.3,0.17910650825235083,0.0009201303334026326
+19,joint,CC,Oxidation of released vapor,1.5,0.17910663485180242,0.007674850684417996
+20,mass,II,Oxidation of released vapor,0.0,0.12026986838944481,0.0
+20,mass,II,Oxidation of released vapor,0.03,0.12026986838944481,7.644854003444778e-19
+20,mass,II,Oxidation of released vapor,0.3,0.12026986838944481,4.7009463680707287e-17
+20,mass,II,Oxidation of released vapor,1.5,0.12026986838944481,2.5984237558578594e-16
+20,joint,II,Oxidation of released vapor,0.0,0.17908699228694142,0.0
+20,joint,II,Oxidation of released vapor,0.03,0.17908699228694142,3.000237025059959e-05
+20,joint,II,Oxidation of released vapor,0.3,0.17908699228694142,0.0006571898897838265
+20,joint,II,Oxidation of released vapor,1.5,0.17908699228694142,0.004395743773230004
+21,mass,AA,Retained cleavage then fragment loss,0.0,0.12026986838944481,0.0
+21,mass,AA,Retained cleavage then fragment loss,0.03,0.12038838083042473,0.8257698722185253
+21,mass,AA,Retained cleavage then fragment loss,0.3,0.12950813862504446,41.115516529044456
+21,mass,AA,Retained cleavage then fragment loss,1.5,0.3041683030861156,153.60150748801797
+21,joint,AA,Retained cleavage then fragment loss,0.0,0.17907089045317615,0.0
+21,joint,AA,Retained cleavage then fragment loss,0.03,0.17907089528183615,0.008938319634840682
+21,joint,AA,Retained cleavage then fragment loss,0.3,0.17907121017438968,0.20895334506972088
+21,joint,AA,Retained cleavage then fragment loss,1.5,0.17929745991165497,0.908210587661872
+22,mass,AC,Retained cleavage then fragment loss,0.0,0.12026986838944481,0.0
+22,mass,AC,Retained cleavage then fragment loss,0.03,0.12036013384407784,0.24908373905771494
+22,mass,AC,Retained cleavage then fragment loss,0.3,0.12715852197897684,11.449954944474156
+22,mass,AC,Retained cleavage then fragment loss,1.5,0.1845636744425316,51.21605088069025
+22,joint,AC,Retained cleavage then fragment loss,0.0,0.17905796215339462,0.0
+22,joint,AC,Retained cleavage then fragment loss,0.03,0.1790579637346809,0.0004439608207946646
+22,joint,AC,Retained cleavage then fragment loss,0.3,0.1790580570286574,0.008975762994896252
+22,joint,AC,Retained cleavage then fragment loss,1.5,0.17905904314158416,0.038505632917244494
+23,mass,AU,Retained cleavage then fragment loss,0.0,0.12026986838944481,0.0
+23,mass,AU,Retained cleavage then fragment loss,0.03,0.12030668361878688,0.8088848491718226
+23,mass,AU,Retained cleavage then fragment loss,0.3,0.13854427199342154,20.068829376347356
+23,mass,AU,Retained cleavage then fragment loss,1.5,0.40730200183257215,71.94991378073529
+23,joint,AU,Retained cleavage then fragment loss,0.0,0.17905318785996593,0.0
+23,joint,AU,Retained cleavage then fragment loss,0.03,0.1791499195792336,1.3311700076910213
+23,joint,AU,Retained cleavage then fragment loss,0.3,0.1841482187072697,17.190458363520396
+23,joint,AU,Retained cleavage then fragment loss,1.5,0.2902914770918821,53.000690099224016
+24,mass,CC,Retained cleavage then fragment loss,0.0,0.12026986838944481,0.0
+24,mass,CC,Retained cleavage then fragment loss,0.03,0.12026989240286531,0.0016520425459439724
+24,mass,CC,Retained cleavage then fragment loss,0.3,0.12027155670656545,0.10624522646293305
+24,mass,CC,Retained cleavage then fragment loss,1.5,0.12028272337621854,0.7382650242670354
+24,joint,CC,Retained cleavage then fragment loss,0.0,0.17904613194041968,0.0
+24,joint,CC,Retained cleavage then fragment loss,0.03,0.17904613274745282,0.00023781875504508965
+24,joint,CC,Retained cleavage then fragment loss,0.3,0.17904617876162382,0.005796865776825548
+24,joint,CC,Retained cleavage then fragment loss,1.5,0.17905123465660114,0.03538057207206039
+25,mass,II,Retained cleavage then fragment loss,0.0,0.12026986838944481,0.0
+25,mass,II,Retained cleavage then fragment loss,0.03,0.12026986838944481,3.194534393985316e-18
+25,mass,II,Retained cleavage then fragment loss,0.3,0.12026986838944481,1.813418077378352e-16
+25,mass,II,Retained cleavage then fragment loss,1.5,0.12026986838944481,7.655622790635017e-16
+25,joint,II,Retained cleavage then fragment loss,0.0,0.17904185605496034,0.0
+25,joint,II,Retained cleavage then fragment loss,0.03,0.17904185605496034,0.00014451861068103807
+25,joint,II,Retained cleavage then fragment loss,0.3,0.17904185605496034,0.002376674314211681
+25,joint,II,Retained cleavage then fragment loss,1.5,0.17904214400653615,0.009784414154655145
+26,mass,AA,Extensive fragmentation,0.0,0.12026986838944481,0.0
+26,mass,AA,Extensive fragmentation,0.03,0.12487669233378265,14.564031590115162
+26,mass,AA,Extensive fragmentation,0.3,0.18658695919782536,98.01378650968162
+26,mass,AA,Extensive fragmentation,1.5,0.37574174605679106,172.13739456262246
+26,joint,AA,Extensive fragmentation,0.0,0.1790345854385706,0.0
+26,joint,AA,Extensive fragmentation,0.03,0.17903945231023224,0.05095408174010869
+26,joint,AA,Extensive fragmentation,0.3,0.17926722989489682,0.4325798737967321
+26,joint,AA,Extensive fragmentation,1.5,0.1798308812279966,1.2911125793861136
+27,mass,AC,Extensive fragmentation,0.0,0.12026986838944481,0.0
+27,mass,AC,Extensive fragmentation,0.03,0.12366960133271644,3.7559247915095932
+27,mass,AC,Extensive fragmentation,0.3,0.15269682670052354,27.631647881518425
+27,mass,AC,Extensive fragmentation,1.5,0.21492468750619276,58.65142709691156
+27,joint,AC,Extensive fragmentation,0.0,0.17903024102497467,0.0
+27,joint,AC,Extensive fragmentation,0.03,0.1790303186000214,0.0016728357926759504
+27,joint,AC,Extensive fragmentation,0.3,0.17903095898998006,0.014641627718782977
+27,joint,AC,Extensive fragmentation,1.5,0.17903293533166048,0.047059506984510904
+28,mass,AU,Extensive fragmentation,0.0,0.12026986838944481,0.0
+28,mass,AU,Extensive fragmentation,0.03,0.12141324123538215,5.547722290509437
+28,mass,AU,Extensive fragmentation,0.3,0.23803409693253108,38.89676362137958
+28,mass,AU,Extensive fragmentation,1.5,0.4759925420971861,74.17974541783938
+28,joint,AU,Extensive fragmentation,0.0,0.17902590535956656,0.0
+28,joint,AU,Extensive fragmentation,0.03,0.18094925476882814,3.4851806672090495
+28,joint,AU,Extensive fragmentation,0.3,0.19504629451670416,25.715924784414717
+28,joint,AU,Extensive fragmentation,1.5,0.3350755880164142,54.96240658814407
+29,mass,CC,Extensive fragmentation,0.0,0.12026986838944481,0.0
+29,mass,CC,Extensive fragmentation,0.03,0.12027083521609991,0.056475417440601985
+29,mass,CC,Extensive fragmentation,0.3,0.12027773066292642,0.4496922784767929
+29,mass,CC,Extensive fragmentation,1.5,0.12029034341605523,1.1182311990263718
+29,joint,CC,Extensive fragmentation,0.0,0.17902590535956656,0.0
+29,joint,CC,Extensive fragmentation,0.03,0.1790259411255932,0.0016171145201415475
+29,joint,CC,Extensive fragmentation,0.3,0.17902623645710022,0.014373055342445068
+29,joint,CC,Extensive fragmentation,1.5,0.17902714898595815,0.047866220051425906
+30,mass,II,Extensive fragmentation,0.0,0.12026986838944481,0.0
+30,mass,II,Extensive fragmentation,0.03,0.12026986838944481,7.081445872973299e-17
+30,mass,II,Extensive fragmentation,0.3,0.12026986838944481,4.901574682460463e-16
+30,mass,II,Extensive fragmentation,1.5,0.12026986838944481,8.944895940572086e-16
+30,joint,II,Extensive fragmentation,0.0,0.17902144141982412,0.0
+30,joint,II,Extensive fragmentation,0.03,0.17902144141982412,0.00030151362100163304
+30,joint,II,Extensive fragmentation,0.3,0.17902144141982412,0.002620287871256513
+30,joint,II,Extensive fragmentation,1.5,0.17902144141982412,0.008279403354192258
+31,mass,AA,Released vapor fragmentation,0.0,0.12029727124252854,0.0
+31,mass,AA,Released vapor fragmentation,0.03,0.1222418732835447,0.18246963623223306
+31,mass,AA,Released vapor fragmentation,0.3,0.14084031774925093,9.988254986604597
+31,mass,AA,Released vapor fragmentation,1.5,0.19046209284656246,51.11207618300986
+31,joint,AA,Released vapor fragmentation,0.0,0.17902046022005866,0.0
+31,joint,AA,Released vapor fragmentation,0.03,0.17902929128797931,0.007718401454241564
+31,joint,AA,Released vapor fragmentation,0.3,0.17915630770903943,0.10525966613102603
+31,joint,AA,Released vapor fragmentation,1.5,0.1794664409757693,0.5182402361770654
+32,mass,AC,Released vapor fragmentation,0.0,0.12026108341911548,0.0
+32,mass,AC,Released vapor fragmentation,0.03,0.12172914698167753,0.06683187752054179
+32,mass,AC,Released vapor fragmentation,0.3,0.13512975879935085,2.8901423563137896
+32,mass,AC,Released vapor fragmentation,1.5,0.16390953621000096,17.20576961753274
+32,joint,AC,Released vapor fragmentation,0.0,0.17902144141982412,0.0
+32,joint,AC,Released vapor fragmentation,0.03,0.17902144141982412,0.00031899753795116545
+32,joint,AC,Released vapor fragmentation,0.3,0.17902144141982412,0.003937296922660976
+32,joint,AC,Released vapor fragmentation,1.5,0.17902197653413293,0.019078262379667556
+33,mass,AU,Released vapor fragmentation,0.0,0.12055740283509657,0.0
+33,mass,AU,Released vapor fragmentation,0.03,0.1202642326776164,0.2549212923334679
+33,mass,AU,Released vapor fragmentation,0.3,0.14795193028689102,5.365630601091877
+33,mass,AU,Released vapor fragmentation,1.5,0.2563234749663457,25.240605104632184
+33,joint,AU,Released vapor fragmentation,0.0,0.19076766338201884,0.0
+33,joint,AU,Released vapor fragmentation,0.03,0.18893248230416412,0.06222149583730378
+33,joint,AU,Released vapor fragmentation,0.3,0.1801729043839418,3.7473323940196295
+33,joint,AU,Released vapor fragmentation,1.5,0.1935785899949673,20.089718702516773
+34,mass,CC,Released vapor fragmentation,0.0,0.12026538650074736,0.0
+34,mass,CC,Released vapor fragmentation,0.03,0.12026536549578741,0.0006374200132369157
+34,mass,CC,Released vapor fragmentation,0.3,0.12026519657994408,0.04664191372684654
+34,mass,CC,Released vapor fragmentation,1.5,0.12026472831110208,0.41032262885450416
+34,joint,CC,Released vapor fragmentation,0.0,0.17902144141982412,0.0
+34,joint,CC,Released vapor fragmentation,0.03,0.17902144141982412,0.00015884077890928054
+34,joint,CC,Released vapor fragmentation,0.3,0.17902144141982412,0.002514135107359153
+34,joint,CC,Released vapor fragmentation,1.5,0.17902156557557244,0.016126958366740524
+35,mass,II,Released vapor fragmentation,0.0,0.12026472831110208,0.0
+35,mass,II,Released vapor fragmentation,0.03,0.12026472831110208,7.076437215606053e-19
+35,mass,II,Released vapor fragmentation,0.3,0.12026472831110208,4.351023506905877e-17
+35,mass,II,Released vapor fragmentation,1.5,0.12026472831110208,2.4045008200086106e-16
+35,joint,II,Released vapor fragmentation,0.0,0.17902144141982412,0.0
+35,joint,II,Released vapor fragmentation,0.03,0.17902144141982412,6.168981057373855e-05
+35,joint,II,Released vapor fragmentation,0.3,0.17902144141982412,0.0008570349128803091
+35,joint,II,Released vapor fragmentation,1.5,0.17902144141982412,0.005081488200604266
+36,mass,AA,Oxidized residue and further aging,0.0,0.1192700638234494,0.0
+36,mass,AA,Oxidized residue and further aging,0.03,0.11927074007046361,0.527481761899374
+36,mass,AA,Oxidized residue and further aging,0.3,0.11927415398410679,7.7579744469859415
+36,mass,AA,Oxidized residue and further aging,1.5,0.11927680702402502,50.8758051206089
+36,joint,AA,Oxidized residue and further aging,0.0,0.17902144141982412,0.0
+36,joint,AA,Oxidized residue and further aging,0.03,0.17902109608455827,0.025197338972323787
+36,joint,AA,Oxidized residue and further aging,0.3,0.17902108435870198,0.6457105795418726
+36,joint,AA,Oxidized residue and further aging,1.5,0.1790210620979497,4.662570192632338
+37,mass,AC,Oxidized residue and further aging,0.0,0.11877170766246488,0.0
+37,mass,AC,Oxidized residue and further aging,0.03,0.11877181517326228,0.2282249731632314
+37,mass,AC,Oxidized residue and further aging,0.3,0.11877236605090515,6.156294185662261
+37,mass,AC,Oxidized residue and further aging,1.5,0.1187728436665164,50.12816546955557
+37,joint,AC,Oxidized residue and further aging,0.0,0.17901969797915993,0.0
+37,joint,AC,Oxidized residue and further aging,0.03,0.17901969797915993,0.0016223239714426147
+37,joint,AC,Oxidized residue and further aging,0.3,0.17901969797915993,0.03009984519167085
+37,joint,AC,Oxidized residue and further aging,1.5,0.17901969797915993,0.19932932915931625
+38,mass,AU,Oxidized residue and further aging,0.0,0.11877170766246488,0.0
+38,mass,AU,Oxidized residue and further aging,0.03,0.11881497484569568,0.7419418518550385
+38,mass,AU,Oxidized residue and further aging,0.3,0.11907748241746291,10.777964700199336
+38,mass,AU,Oxidized residue and further aging,1.5,0.11937897584801757,70.70986030376878
+38,joint,AU,Oxidized residue and further aging,0.0,0.17901969797915993,0.0
+38,joint,AU,Oxidized residue and further aging,0.03,0.17902486124705383,1.3840500157365103
+38,joint,AU,Oxidized residue and further aging,0.3,0.17905683615437246,11.356555884821654
+38,joint,AU,Oxidized residue and further aging,1.5,0.1790987246045856,44.47816847123809
+39,mass,CC,Oxidized residue and further aging,0.0,0.11877170766246488,0.0
+39,mass,CC,Oxidized residue and further aging,0.03,0.11877170794856862,0.08736477399386174
+39,mass,CC,Oxidized residue and further aging,0.3,0.11877170996417817,0.7596658232575372
+39,mass,CC,Oxidized residue and further aging,1.5,0.11877171404056268,2.9271644398764236
+39,joint,CC,Oxidized residue and further aging,0.0,0.17901969797915993,0.0
+39,joint,CC,Oxidized residue and further aging,0.03,0.17901969797915993,0.000756573489530608
+39,joint,CC,Oxidized residue and further aging,0.3,0.17901969797915993,0.014207326270252906
+39,joint,CC,Oxidized residue and further aging,1.5,0.17901969797915993,0.10509124049904393
+40,mass,II,Oxidized residue and further aging,0.0,0.11877170766246488,0.0
+40,mass,II,Oxidized residue and further aging,0.03,0.11877170809618137,0.0012820466492161503
+40,mass,II,Oxidized residue and further aging,0.3,0.11877171093652711,0.01037641489729123
+40,mass,II,Oxidized residue and further aging,1.5,0.11877171507855558,0.0393498923012707
+40,joint,II,Oxidized residue and further aging,0.0,0.17901969797915993,0.0
+40,joint,II,Oxidized residue and further aging,0.03,0.17901969797915993,0.00023346793592941392
+40,joint,II,Oxidized residue and further aging,0.3,0.17901969797915993,0.005154987893573345
+40,joint,II,Oxidized residue and further aging,1.5,0.17901969797915993,0.035925833796777475

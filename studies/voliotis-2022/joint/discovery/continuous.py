@@ -11,34 +11,35 @@ from smoke import DOSES, OUT
 from gpu import Model
 
 
-def optimize(m, obj, ids, state):
+def optimize(m, obj, ids, state, caps=UPPER, sub=2, maxiter=65):
     """Solve the minimax problem and reprofile on the shared dose grid."""
     p = np.asarray(state["p"])
     base = list(range(9)) + ([9] if obj == "joint" else []) + [12]
     sizes = len(base)
     low = np.r_[[1 / 12] * 3, [0] * 6, 2.818, 0, 0, 0, 0, 0, 0][base]
     high = np.r_[[4] * 3, [2] * 6, 16.5515, 0, 0, 100, 0, 0, 0][base]
-    init = sized(state["k"])
+    init = np.zeros(len(caps))
+    init[: len(state["k"])] = state["k"]
     dose = np.array(state["dose"])
 
     def make(x):
         a = np.atleast_2d(x)
         par = np.tile(p, (len(a), 1))
         par[:, base] = low + a[:, :sizes] * (high - low)
-        k = np.zeros((len(a), len(UPPER)))
-        k[:, ids] = UPPER[ids] * np.expm1(4.0 * a[:, sizes:]) / np.expm1(4.0)
+        k = np.zeros((len(a), len(caps)))
+        k[:, ids] = caps[ids] * np.expm1(4.0 * a[:, sizes:]) / np.expm1(4.0)
         return par, k
 
     x0 = np.r_[
         (p[base] - low) / (high - low),
-        np.log1p(init[ids] / UPPER[ids] * np.expm1(4.0)) / 4.0,
+        np.log1p(init[ids] / caps[ids] * np.expm1(4.0)) / 4.0,
     ]
     nc = len(x0)
 
     def errors(x, z):
         par, rates = make(x)
         d = (0.85 + 0.3 * z)[:, None]
-        _, err, _, _ = m.run(par, rates, ids, d, obj, sub=2)
+        _, err, _, _ = m.run(par, rates, ids, d, obj, sub=sub)
         return err[:, :, :2] if obj == "joint" else err[:, :, :1]
 
     def constraints(x):
@@ -76,11 +77,11 @@ def optimize(m, obj, ids, state):
         bounds=[(0.0, 1.0)] * (len(start) - 1) + [(0.0, 3.0)],
         constraints=[dict(type="ineq", fun=constraints, jac=jac)],
         callback=record,
-        options=dict(ftol=2e-8, maxiter=65),
+        options=dict(ftol=2e-8, maxiter=maxiter),
     )
     trials = np.vstack([start, *history[::3], result.x])
     par, k = make(trials[:, :nc])
-    out = m.run(par, k, ids, DOSES, obj, sub=2)
+    out = m.run(par, k, ids, DOSES, obj, sub=sub)
     i = out[0].argmin()
     return encode(par[i], k[i], out, i), dict(
         status=int(result.status), iterations=int(result.nit)
