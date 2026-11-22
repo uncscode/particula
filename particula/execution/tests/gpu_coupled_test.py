@@ -18,6 +18,7 @@ from particula.execution.gpu_coupled_restart import (
     save_coupled_checkpoint,
 )
 from particula.execution.tests.condensation_ode_test import case
+from particula.execution.tests.gpu_study_cases import StudyCase, build_case
 from particula.execution.tests.prepared_restart_capture_test import (
     canonical_equal,
 )
@@ -115,8 +116,6 @@ def test_order_matches_explicit_flows_and_independent_budget(device, order):
 
 def test_rejection_cannot_repeat_stochastic_events(device, monkeypatch):
     """Rejected condensation trials leave the fixed event RNG schedule intact."""
-    from scripts.gpu_studies.cases import StudyCase, build_case
-
     initial, _, processes = build_case(
         StudyCase("test", "full", 2, 64, occupancy=0.75, time_step=1)
     )
@@ -169,8 +168,6 @@ def test_disk_restart_preserves_events_physics_and_random_words(
     device, capture, tmp_path
 ):
     """A complete cycle checkpoint preserves stochastic continuation exactly."""
-    from scripts.gpu_studies.cases import StudyCase, build_case
-
     if capture and device == "cpu":
         pytest.skip("native CUDA graph test")
     initial, _, processes = build_case(

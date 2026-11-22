@@ -31,6 +31,7 @@ DOMAINS = (
     "particles/",
     "integration_tests/",
     "execution/",
+    "gpu/",
 )
 
 
@@ -110,7 +111,9 @@ def test_package_staging_does_not_require_example_inputs(release, tmp_path):
     assert not (destination / "docs").exists()
 
 
-def test_coupled_cpu_stages_only_test_and_study_fixture(release, tmp_path):
+def test_coupled_cpu_needs_only_package_test_and_configuration(
+    release, tmp_path
+):
     """Exercise the original feedstock boundary without checkout imports."""
     destination = tmp_path / "inputs"
     release.stage_test_inputs(SCRIPTS.parent, destination, "coupled-cpu")
@@ -121,7 +124,6 @@ def test_coupled_cpu_stages_only_test_and_study_fixture(release, tmp_path):
     } == {
         "conftest.py",
         "pyproject.toml",
-        "scripts/gpu_studies/cases.py",
         "particula/execution/tests/gpu_coupled_test.py",
     }
 
@@ -346,7 +348,10 @@ def test_installed_pytest_selects_only_its_suite(
             assert not any(arg.startswith("--ignore=") for arg in args)
         else:
             assert args[-1] == "particula"
-            assert "--ignore=particula/gpu" in args
+            assert not any(arg.startswith("--ignore") for arg in args)
+            assert args[args.index("-m") + 1] == (
+                "not slow and not performance and not benchmark"
+            )
         return 6
 
     monkeypatch.setattr(release.subprocess, "run", pip_check)

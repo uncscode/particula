@@ -13,7 +13,8 @@ on:
       - conda/**
       - scripts/**
       - website/examples.json
-      - particula/execution/tests/gpu_coupled_test.py
+      - "particula/**/tests/**"
+      - "particula/**/integration_tests/**"
       - docs/**
       - examples_tests/dilution_example_test.py
       - examples_tests/nucleation_example_test.py
