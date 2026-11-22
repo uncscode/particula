@@ -132,6 +132,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [What crosses a shared parcel face?](examples/thermodynamics/parcel-experiments/parcel_cluster.py)
 - [What survives a data transfer?](tutorials/building-an-aerosol/containers/data_containers.py)
 - [When a size-distribution plot hides a composition error](examples/coupled-populations/emissions/organic_partitioning_and_coagulation.py)
+- [Where does a particle group travel in wind and updraft?](examples/thermodynamics/parcel-experiments/cluster_lofting.py)
 - [Which coagulation processes matter in three atmospheric regimes?](literature/mam4xx-coagulation/regimes.py)
 - [Which composition rule controls equilibrium pressure?](examples/thermodynamics/particle-properties/activity_tutorial.py)
 - [Which parcel solver reaches the same accuracy targets faster?](examples/thermodynamics/adaptive_moist_parcel.py)

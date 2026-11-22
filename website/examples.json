@@ -1768,5 +1768,21 @@
     ],
     "plot_inputs": [],
     "full_canvas": true
+  },
+  "cluster-lofting": {
+    "title": "Where does a particle group travel in wind and updraft?",
+    "source": "docs/studies/examples/thermodynamics/parcel-experiments/cluster_lofting.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 180,
+    "inputs": [],
+    "invoke": "report = run_example()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nplot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
   }
 }

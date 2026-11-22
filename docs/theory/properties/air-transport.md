@@ -10,6 +10,8 @@ $$
 
 Here $\mu_0$ is the reference viscosity in Pa s, and $T$, $T_0$, and the Sutherland constant $C$ are in kelvin. Particula's air correlation uses an implementation-defined $C$. Its value at $T=T_0$ is $\mu_0$. [Evaluate the viscosity at 298.15 K](../../studies/examples/gas-transport/dynamic-viscosity.py).
 
+In the [cluster lofting example](../../studies/examples/thermodynamics/parcel-experiments/cluster_lofting.py), air viscosity enters the terminal settling speed. Subtracting that speed from the updraft gives the particle’s vertical velocity in the ground frame.
+
 ## Molecular mean free path
 
 For an ideal gas, viscosity $\mu$ in Pa s, pressure $p$ in Pa, molar mass $M$ in kg/mol and temperature $T$ in kelvin give

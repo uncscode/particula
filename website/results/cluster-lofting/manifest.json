@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 8.377410246059299,
+  "package_source_sha256": "669aaafcf3fd5ba28ac463b35c348ca769a6ca07c9d7e6294329419ae7ae4ba8",
+  "scientific_source_sha256": "def7afeb9de5d9964ac68de5937f09b33801988d2c537d540fdc31da1c4ed510",
+  "input_sha256": {},
+  "example": "cluster-lofting",
+  "fingerprint": "a9fd260a4418f7b852b632c2e7d2048cdf5e30b31cf8625634afa4f622c24d98",
+  "source": "docs/studies/examples/thermodynamics/parcel-experiments/cluster_lofting.py",
+  "revision": "e561084f5fa72713d741ec43ca7e8fbdbd500541",
+  "package_dirty": false,
+  "executed_at": "2026-11-22T01:59:03.569119+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.parcel_motion 0cae867 load on device 'cpu' took 2.21 ms  (cached)\n"
+      },
+      {
+        "text": "stack: 10 represented group-boundary passages, 18 top exits\n  1 \u00b5m radius: east 4.481 m, world height change +0.140 m, mesh height change +0.140 m\n  10 \u00b5m radius: east 7.379 m, world height change +0.104 m, mesh height change +0.104 m\n  all represented particles: east 5.061 m, world height change +0.133 m, mesh height change +0.133 m\nrow: 200 represented group-boundary passages, 0 top exits\n  1 \u00b5m radius: east 9.800 m, world height change +0.306 m, mesh height change +0.306 m\n  10 \u00b5m radius: east 9.800 m, world height change +0.138 m, mesh height change +0.138 m\n  all represented particles: east 9.800 m, world height change +0.273 m, mesh height change +0.273 m\nblock: 2 represented group-boundary passages, 0 top exits\n  1 \u00b5m radius: east 9.800 m, world height change +0.306 m, mesh height change -0.002 m\n  10 \u00b5m radius: east 9.800 m, world height change +0.138 m, mesh height change -0.170 m\n  all represented particles: east 9.800 m, world height change +0.273 m, mesh height change -0.035 m\n"
+      },
+      {
+        "image": "figure-6-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "bd8fc76549e7b7f0e56f3d8ea86f35fc272797e819b0cf1b69b0145a54435be5",
+    "data.json": "1a9c8da325b9dcd6a37a25bfc02e0b3746aedcb3a16237b724326ee362b41c5f",
+    "figure-6-1.png": "701601cfa25661aeab99690bc87c2445afdbee340e5b83549e26994dfbb1ceac"
+  },
+  "simulation_fingerprint": "c7aa76435d1a154aa4b689c5b222f128fd323290186f4b8439d9577787f89218"
+}
