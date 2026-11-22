@@ -14,8 +14,8 @@ GAUSS_X, GAUSS_W = np.polynomial.legendre.leggauss(56)
 
 
 def _slip_diameter_squared(d):
-    """Return d² times the slip factor in Eqs. 8 and 67 (nm²)."""
-    return d * (d + 2 * MFP_NM * (2.514 + 0.800 * np.exp(-0.55 * d / MFP_NM)))
+    """Return d² Cc(d) in nm² using Kn = 2λ/d and the Davies coefficients."""
+    return d * (d + MFP_NM * (2.514 + 0.800 * np.exp(-0.55 * d / MFP_NM)))
 
 
 def _rescale_density(d, ratio):
@@ -24,7 +24,7 @@ def _rescale_density(d, ratio):
     a = 0.55 / MFP_NM
     x = d * np.sqrt(ratio)
     for _ in range(7):
-        derivative = 2 * x + 2 * MFP_NM * (
+        derivative = 2 * x + MFP_NM * (
             2.514 + 0.8 * np.exp(-a * x) * (1 - a * x)
         )
         x = x - (_slip_diameter_squared(x) - goal) / derivative

@@ -37,40 +37,40 @@ split,parent,False,34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,862.4379995493297
 split,parent,False,35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,924.3736145376448,1.8005934829967623
 split,parent,False,36,aerosol,Reference,count,,14.7,1.9,True,6.903536467748175,-4.1034018590799075
 split,parent,False,37,aerosol,Reference,number_gmd,,203.0,30.45,True,206.16977730870755,0.10409777696904933
-split,parent,False,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,171.5519454907272,-1.3343601390870254
+split,parent,False,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,171.55194549057546,-1.3343601390902677
 split,parent,False,39,aerosol,Reference,smps_mass,,278.0,55.6,True,160.87320477130956,-2.106597036487238
-split,parent,False,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,396.3367026730255,0.05660225060263806
+split,parent,False,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,396.3240816679777,0.056388153824897036
 split,parent,False,41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,373.59751705440806,1.3936896883367433
 split,parent,False,42,aerosol,No SO2,count,,3.0,0.48,True,4.423705943694267,2.9660540493630556
 split,parent,False,43,aerosol,No SO2,number_gmd,,155.0,23.25,True,244.44039396681293,3.846898665239266
-split,parent,False,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,186.67405415586555,-0.5341135369410156
+split,parent,False,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,186.6740542134342,-0.5341135355637749
 split,parent,False,45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,157.3004565578999,0.5387484703485882
-split,parent,False,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,486.41400836193964,0.44464924505759706
+split,parent,False,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,486.69911959611017,0.44881753795482704
 split,parent,False,47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,418.1966509603254,-0.13744494987782313
 split,parent,False,48,aerosol,High SO2,count,,29.2,4.8,True,21.645064585002057,-1.5739448781245713
 split,parent,False,49,aerosol,High SO2,number_gmd,,145.0,21.75,True,123.09202920729412,-1.0072630249519945
-split,parent,False,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,144.7698637511909,-1.3068912308369665
+split,parent,False,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,144.76986368970492,-1.3068912324054867
 split,parent,False,51,aerosol,High SO2,smps_mass,,283.0,56.6,True,132.35566922624201,-2.6615606143773496
-split,parent,False,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,273.6245066495621,-0.6858031333429053
+split,parent,False,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,271.743406697712,-0.726920072181159
 split,parent,False,53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,256.6459795505284,0.37437529631079314
-split,parent,False,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,34.518751358320024,-0.09624972833599514
+split,parent,False,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,34.5187513442229,-0.0962497311554202
 split,parent,False,55,aerosol,Low O2,count,,2.8,0.63,True,5.486118521037976,4.263680192123771
 split,parent,False,56,aerosol,Low O2,number_gmd,,290.0,43.5,True,231.08323542799513,-1.354408380965629
-split,parent,False,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,174.97158545653141,-0.029216322257630264
+split,parent,False,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,174.97158545654904,-0.029216322257129654
 split,parent,False,58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,162.3800824971905,1.1507607006511553
-split,parent,False,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,419.6699932718547,2.049221044067595
+split,parent,False,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,419.73072883204463,2.0504824264183723
 split,parent,False,60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,392.926923621744,-0.308625831363366
 split,parent,False,61,aerosol,High O2,count,,32.1,1.7,False,8.201736397741639,-14.057802118975507
 split,parent,False,62,aerosol,High O2,number_gmd,,140.0,21.0,False,186.49195420086312,2.213902580993482
-split,parent,False,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,169.63250785037704,-1.1621604558738226
+split,parent,False,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,169.6325078488676,-1.162160455907973
 split,parent,False,64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,159.70032840047057,-0.660317163030691
-split,parent,False,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,383.8651913117108,0.8380291556541705
+split,parent,False,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,383.8119632570471,0.8369885289745284
 split,parent,False,66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,362.7553255546947,4.52948535662638
 split,parent,False,67,aerosol,High KCl,count,,18.3,4.1,False,4.4467413829618625,-3.3788435651312536
 split,parent,False,68,aerosol,High KCl,number_gmd,,249.0,37.35,False,286.93287929084346,1.0156058712407887
-split,parent,False,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,290.55427761149724,0.28280504748176805
+split,parent,False,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,290.5542776132568,0.2828050475137595
 split,parent,False,70,aerosol,High KCl,smps_mass,,501.0,100.2,False,236.77529887773989,-2.636973065092416
-split,parent,False,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,535.1750145801817,4.517764150056044
+split,parent,False,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,535.2323332522022,4.518962032438918
 split,parent,False,72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,462.03999553330186,1.8189163550652319
 split,parent,False,73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,34.51570651786531,-0.5057673804862874
 split,parent,False,74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,92.46244200777613,-3.065639288540248
@@ -122,40 +122,40 @@ split,parent,True,34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,862.4397932319175,
 split,parent,True,35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,924.3746543347987,1.8006330039832277
 split,parent,True,36,aerosol,Reference,count,,14.7,1.9,True,11.811367403022057,-1.5203329457778643
 split,parent,True,37,aerosol,Reference,number_gmd,,203.0,30.45,True,159.44603229824585,-1.4303437668884778
-split,parent,True,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,182.9354579978772,-1.0911226923530513
+split,parent,True,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,182.9354579953969,-1.0911226924060493
 split,parent,True,39,aerosol,Reference,smps_mass,,278.0,55.6,True,172.2005820318811,-1.902867229642426
-split,parent,True,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,365.6085854820669,-0.4646550384721471
+split,parent,True,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,365.1966557517158,-0.47164282015749265
 split,parent,True,41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,347.5278661266048,0.8312376726344078
 split,parent,True,42,aerosol,No SO2,count,,3.0,0.48,True,4.39895750599644,2.9144948041592493
 split,parent,True,43,aerosol,No SO2,number_gmd,,155.0,23.25,True,250.5562705324704,4.109947119676146
-split,parent,True,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,184.3790493323269,-0.5890179585567726
+split,parent,True,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,184.37904934265015,-0.589017958309805
 split,parent,True,45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,159.41840729666026,0.613324200586629
-split,parent,True,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,472.3079036686927,0.2384196442791329
+split,parent,True,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,472.5895363571276,0.24253708124455559
 split,parent,True,47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,415.2696762392455,-0.1831432281148246
 split,parent,True,48,aerosol,High SO2,count,,29.2,4.8,True,23.453711843666785,-1.197143365902753
 split,parent,True,49,aerosol,High SO2,number_gmd,,145.0,21.75,True,127.24083048144345,-0.8165135410830596
-split,parent,True,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,169.79005082974243,-0.6686211523024891
+split,parent,True,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,169.7900508055769,-0.6686211529189566
 split,parent,True,51,aerosol,High SO2,smps_mass,,283.0,56.6,True,154.90990675060362,-2.2630758524628334
-split,parent,True,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,279.0396929577843,-0.5674384052943316
+split,parent,True,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,277.0829992599247,-0.6102076664497336
 split,parent,True,53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,261.46567899546886,0.5066029902734942
-split,parent,True,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,35.46841102686795,0.09368220537358951
+split,parent,True,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,35.468411023369,0.09368220467380013
 split,parent,True,55,aerosol,Low O2,count,,2.8,0.63,True,5.001555063364652,3.494531846610559
 split,parent,True,56,aerosol,Low O2,number_gmd,,290.0,43.5,True,245.18309744103945,-1.0302736220450701
-split,parent,True,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,181.87938726004538,0.16702804716038
+split,parent,True,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,181.87938726006672,0.1670280471609864
 split,parent,True,58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,167.16959226979304,1.3321815253709486
-split,parent,True,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,432.4339254837054,2.314307902049957
+split,parent,True,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,432.3189924879729,2.311920923945439
 split,parent,True,60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,402.3800490702927,-0.1556626364030303
 split,parent,True,61,aerosol,High O2,count,,32.1,1.7,False,42.36011323667484,6.035360727455789
 split,parent,True,62,aerosol,High O2,number_gmd,,140.0,21.0,False,80.93355114074812,-2.8126880409167563
-split,parent,True,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,183.48755057179739,-0.8486979508643125
+split,parent,True,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,183.48754698236962,-0.8486980320730854
 split,parent,True,64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,173.0255467333873,-0.2982188387666494
-split,parent,True,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,325.27547307284664,-0.30741988127377057
+split,parent,True,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,324.76886091622856,-0.31732432226337126
 split,parent,True,66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,310.06870008970714,2.9033549410403436
 split,parent,True,67,aerosol,High KCl,count,,18.3,4.1,False,6.9616013356449855,-2.7654630888670773
 split,parent,True,68,aerosol,High KCl,number_gmd,,249.0,37.35,False,240.177193437433,-0.23621972055065582
-split,parent,True,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,303.733094713813,0.5224199038875089
+split,parent,True,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,303.73309471403195,0.52241990389149
 split,parent,True,70,aerosol,High KCl,smps_mass,,501.0,100.2,False,258.2428468761664,-2.4227260790801752
-split,parent,True,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,487.70565395758854,3.5257189959788615
+split,parent,True,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,487.459847384048,3.52058197249839
 split,parent,True,72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,430.9635282565349,1.2481823371264449
 split,parent,True,73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,36.16101118013186,-0.2915350025869975
 split,parent,True,74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,91.38440913289507,-3.0881922775544957
@@ -207,40 +207,40 @@ split,binary,False,34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,862.4379995493297
 split,binary,False,35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,924.3736145376448,1.8005934829967623
 split,binary,False,36,aerosol,Reference,count,,14.7,1.9,True,6.7960626107401385,-4.159967046978874
 split,binary,False,37,aerosol,Reference,number_gmd,,203.0,30.45,True,209.0962420525523,0.20020499351567483
-split,binary,False,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,164.49290140600675,-1.485194414401565
+split,binary,False,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,164.49290140596173,-1.4851944144025269
 split,binary,False,39,aerosol,Reference,smps_mass,,278.0,55.6,True,156.30908182203794,-2.188685578740325
-split,binary,False,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,386.0555408335997,-0.11780253038846977
+split,binary,False,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,386.1461910283576,-0.11626478323396816
 split,binary,False,41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,367.7000825652007,1.2664526982783326
 split,binary,False,42,aerosol,No SO2,count,,3.0,0.48,True,4.423705943694267,2.9660540493630556
 split,binary,False,43,aerosol,No SO2,number_gmd,,155.0,23.25,True,244.44039396681293,3.846898665239266
-split,binary,False,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,186.67405415586555,-0.5341135369410156
+split,binary,False,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,186.6740542134342,-0.5341135355637749
 split,binary,False,45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,157.3004565578999,0.5387484703485882
-split,binary,False,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,486.41400836193964,0.44464924505759706
+split,binary,False,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,486.69911959611017,0.44881753795482704
 split,binary,False,47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,418.1966509603254,-0.13744494987782313
 split,binary,False,48,aerosol,High SO2,count,,29.2,4.8,True,26.603175655262408,-0.5410050718203315
 split,binary,False,49,aerosol,High SO2,number_gmd,,145.0,21.75,True,136.79275988556975,-0.3773443730772528
-split,binary,False,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,205.987379704517,0.2547800945029846
+split,binary,False,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,205.9873796988567,0.2547800943585892
 split,binary,False,51,aerosol,High SO2,smps_mass,,283.0,56.6,True,186.57589145837454,-1.7036061579792483
-split,binary,False,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,277.4450298464517,-0.6022944295857554
+split,binary,False,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,275.3227067442091,-0.6486840055910582
 split,binary,False,53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,258.46175745140897,0.42419087658186483
-split,binary,False,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,37.7302510902872,0.5460502180574395
+split,binary,False,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,37.730251089812164,0.5460502179624328
 split,binary,False,55,aerosol,Low O2,count,,2.8,0.63,True,5.616723752940602,4.470990084032701
 split,binary,False,56,aerosol,Low O2,number_gmd,,290.0,43.5,True,227.25652172697812,-1.4423788108740663
-split,binary,False,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,169.16278336605234,-0.19423910891896765
+split,binary,False,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,169.16278336606112,-0.19423910891871815
 split,binary,False,58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,158.49009330846914,1.0034126253208007
-split,binary,False,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,411.0562798911133,1.8703277235952922
+split,binary,False,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,411.1993204801639,1.873298452339853
 split,binary,False,60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,387.44157800557105,-0.3973854691655171
 split,binary,False,61,aerosol,High O2,count,,32.1,1.7,False,7.838681030655427,-14.271364099614457
 split,binary,False,62,aerosol,High O2,number_gmd,,140.0,21.0,False,194.7777025388239,2.6084620256582802
-split,binary,False,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,161.88845995170394,-1.3373651594637117
+split,binary,False,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,161.88845995135625,-1.3373651594715779
 split,binary,False,64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,154.78491178274712,-0.7938882667731761
-split,binary,False,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,371.45457631143773,0.5953973863428688
+split,binary,False,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,371.5133444349414,0.5965463232637618
 split,binary,False,66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,355.4762759396078,4.304823331469376
 split,binary,False,67,aerosol,High KCl,count,,18.3,4.1,False,4.165550929925254,-3.4474266024572557
 split,binary,False,68,aerosol,High KCl,number_gmd,,249.0,37.35,False,292.8891153587687,1.1750767164328975
-split,binary,False,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,281.34294833703274,0.11532633340059523
+split,binary,False,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,281.3429483383653,0.11532633342482396
 split,binary,False,70,aerosol,High KCl,smps_mass,,501.0,100.2,False,230.13854064716136,-2.7032081771740386
-split,binary,False,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,536.2863298572543,4.540989129723182
+split,binary,False,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,536.4295819303089,4.543982903454732
 split,binary,False,72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,464.74579385959913,1.868609620929277
 split,binary,False,73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,34.51570651786531,-0.5057673804862874
 split,binary,False,74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,92.46244200777613,-3.065639288540248
@@ -292,40 +292,40 @@ split,binary,True,34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,862.4397932319175,
 split,binary,True,35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,924.3746543347987,1.8006330039832277
 split,binary,True,36,aerosol,Reference,count,,14.7,1.9,True,11.811367403022057,-1.5203329457778643
 split,binary,True,37,aerosol,Reference,number_gmd,,203.0,30.45,True,159.44603229824585,-1.4303437668884778
-split,binary,True,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,182.9354579978772,-1.0911226923530513
+split,binary,True,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,182.9354579953969,-1.0911226924060493
 split,binary,True,39,aerosol,Reference,smps_mass,,278.0,55.6,True,172.2005820318811,-1.902867229642426
-split,binary,True,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,365.6085854820669,-0.4646550384721471
+split,binary,True,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,365.1966557517158,-0.47164282015749265
 split,binary,True,41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,347.5278661266048,0.8312376726344078
 split,binary,True,42,aerosol,No SO2,count,,3.0,0.48,True,4.39895750599644,2.9144948041592493
 split,binary,True,43,aerosol,No SO2,number_gmd,,155.0,23.25,True,250.5562705324704,4.109947119676146
-split,binary,True,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,184.3790493323269,-0.5890179585567726
+split,binary,True,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,184.37904934265015,-0.589017958309805
 split,binary,True,45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,159.41840729666026,0.613324200586629
-split,binary,True,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,472.3079036686927,0.2384196442791329
+split,binary,True,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,472.5895363571276,0.24253708124455559
 split,binary,True,47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,415.2696762392455,-0.1831432281148246
 split,binary,True,48,aerosol,High SO2,count,,29.2,4.8,True,23.453711843666785,-1.197143365902753
 split,binary,True,49,aerosol,High SO2,number_gmd,,145.0,21.75,True,127.24083048144345,-0.8165135410830596
-split,binary,True,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,169.79005082974243,-0.6686211523024891
+split,binary,True,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,169.7900508055769,-0.6686211529189566
 split,binary,True,51,aerosol,High SO2,smps_mass,,283.0,56.6,True,154.90990675060362,-2.2630758524628334
-split,binary,True,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,279.0396929577843,-0.5674384052943316
+split,binary,True,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,277.0829992599247,-0.6102076664497336
 split,binary,True,53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,261.46567899546886,0.5066029902734942
-split,binary,True,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,35.46841102686795,0.09368220537358951
+split,binary,True,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,35.468411023369,0.09368220467380013
 split,binary,True,55,aerosol,Low O2,count,,2.8,0.63,True,5.001555063364652,3.494531846610559
 split,binary,True,56,aerosol,Low O2,number_gmd,,290.0,43.5,True,245.18309744103945,-1.0302736220450701
-split,binary,True,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,181.87938726004538,0.16702804716038
+split,binary,True,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,181.87938726006672,0.1670280471609864
 split,binary,True,58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,167.16959226979304,1.3321815253709486
-split,binary,True,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,432.4339254837054,2.314307902049957
+split,binary,True,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,432.3189924879729,2.311920923945439
 split,binary,True,60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,402.3800490702927,-0.1556626364030303
 split,binary,True,61,aerosol,High O2,count,,32.1,1.7,False,42.36011323667484,6.035360727455789
 split,binary,True,62,aerosol,High O2,number_gmd,,140.0,21.0,False,80.93355114074812,-2.8126880409167563
-split,binary,True,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,183.48755057179739,-0.8486979508643125
+split,binary,True,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,183.48754698236962,-0.8486980320730854
 split,binary,True,64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,173.0255467333873,-0.2982188387666494
-split,binary,True,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,325.27547307284664,-0.30741988127377057
+split,binary,True,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,324.76886091622856,-0.31732432226337126
 split,binary,True,66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,310.06870008970714,2.9033549410403436
 split,binary,True,67,aerosol,High KCl,count,,18.3,4.1,False,6.9616013356449855,-2.7654630888670773
 split,binary,True,68,aerosol,High KCl,number_gmd,,249.0,37.35,False,240.177193437433,-0.23621972055065582
-split,binary,True,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,303.733094713813,0.5224199038875089
+split,binary,True,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,303.73309471403195,0.52241990389149
 split,binary,True,70,aerosol,High KCl,smps_mass,,501.0,100.2,False,258.2428468761664,-2.4227260790801752
-split,binary,True,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,487.70565395758854,3.5257189959788615
+split,binary,True,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,487.459847384048,3.52058197249839
 split,binary,True,72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,430.9635282565349,1.2481823371264449
 split,binary,True,73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,36.16101118013186,-0.2915350025869975
 split,binary,True,74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,91.38440913289507,-3.0881922775544957
@@ -377,40 +377,40 @@ split,ternary,False,34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,862.437999549329
 split,ternary,False,35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,924.3736145376448,1.8005934829967623
 split,ternary,False,36,aerosol,Reference,count,,14.7,1.9,True,6.903536467748175,-4.1034018590799075
 split,ternary,False,37,aerosol,Reference,number_gmd,,203.0,30.45,True,206.16977730870755,0.10409777696904933
-split,ternary,False,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,171.5519454907272,-1.3343601390870254
+split,ternary,False,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,171.55194549057546,-1.3343601390902677
 split,ternary,False,39,aerosol,Reference,smps_mass,,278.0,55.6,True,160.87320477130956,-2.106597036487238
-split,ternary,False,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,396.3367026730255,0.05660225060263806
+split,ternary,False,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,396.3240816679777,0.056388153824897036
 split,ternary,False,41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,373.59751705440806,1.3936896883367433
 split,ternary,False,42,aerosol,No SO2,count,,3.0,0.48,True,4.423705943694267,2.9660540493630556
 split,ternary,False,43,aerosol,No SO2,number_gmd,,155.0,23.25,True,244.44039396681293,3.846898665239266
-split,ternary,False,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,186.67405415586555,-0.5341135369410156
+split,ternary,False,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,186.6740542134342,-0.5341135355637749
 split,ternary,False,45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,157.3004565578999,0.5387484703485882
-split,ternary,False,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,486.41400836193964,0.44464924505759706
+split,ternary,False,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,486.69911959611017,0.44881753795482704
 split,ternary,False,47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,418.1966509603254,-0.13744494987782313
 split,ternary,False,48,aerosol,High SO2,count,,29.2,4.8,True,21.645064585002057,-1.5739448781245713
 split,ternary,False,49,aerosol,High SO2,number_gmd,,145.0,21.75,True,123.09202920729412,-1.0072630249519945
-split,ternary,False,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,144.7698637511909,-1.3068912308369665
+split,ternary,False,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,144.76986368970492,-1.3068912324054867
 split,ternary,False,51,aerosol,High SO2,smps_mass,,283.0,56.6,True,132.35566922624201,-2.6615606143773496
-split,ternary,False,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,273.6245066495621,-0.6858031333429053
+split,ternary,False,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,271.743406697712,-0.726920072181159
 split,ternary,False,53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,256.6459795505284,0.37437529631079314
-split,ternary,False,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,34.518751358320024,-0.09624972833599514
+split,ternary,False,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,34.5187513442229,-0.0962497311554202
 split,ternary,False,55,aerosol,Low O2,count,,2.8,0.63,True,5.486118521037976,4.263680192123771
 split,ternary,False,56,aerosol,Low O2,number_gmd,,290.0,43.5,True,231.08323542799513,-1.354408380965629
-split,ternary,False,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,174.97158545653141,-0.029216322257630264
+split,ternary,False,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,174.97158545654904,-0.029216322257129654
 split,ternary,False,58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,162.3800824971905,1.1507607006511553
-split,ternary,False,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,419.6699932718547,2.049221044067595
+split,ternary,False,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,419.73072883204463,2.0504824264183723
 split,ternary,False,60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,392.926923621744,-0.308625831363366
 split,ternary,False,61,aerosol,High O2,count,,32.1,1.7,False,8.201736397741639,-14.057802118975507
 split,ternary,False,62,aerosol,High O2,number_gmd,,140.0,21.0,False,186.49195420086312,2.213902580993482
-split,ternary,False,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,169.63250785037704,-1.1621604558738226
+split,ternary,False,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,169.6325078488676,-1.162160455907973
 split,ternary,False,64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,159.70032840047057,-0.660317163030691
-split,ternary,False,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,383.8651913117108,0.8380291556541705
+split,ternary,False,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,383.8119632570471,0.8369885289745284
 split,ternary,False,66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,362.7553255546947,4.52948535662638
 split,ternary,False,67,aerosol,High KCl,count,,18.3,4.1,False,4.4467413829618625,-3.3788435651312536
 split,ternary,False,68,aerosol,High KCl,number_gmd,,249.0,37.35,False,286.93287929084346,1.0156058712407887
-split,ternary,False,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,290.55427761149724,0.28280504748176805
+split,ternary,False,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,290.5542776132568,0.2828050475137595
 split,ternary,False,70,aerosol,High KCl,smps_mass,,501.0,100.2,False,236.77529887773989,-2.636973065092416
-split,ternary,False,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,535.1750145801817,4.517764150056044
+split,ternary,False,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,535.2323332522022,4.518962032438918
 split,ternary,False,72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,462.03999553330186,1.8189163550652319
 split,ternary,False,73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,34.51570651786531,-0.5057673804862874
 split,ternary,False,74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,92.46244200777613,-3.065639288540248
@@ -462,40 +462,40 @@ split,ternary,True,34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,862.4397932319175
 split,ternary,True,35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,924.3746543347987,1.8006330039832277
 split,ternary,True,36,aerosol,Reference,count,,14.7,1.9,True,11.811367403022057,-1.5203329457778643
 split,ternary,True,37,aerosol,Reference,number_gmd,,203.0,30.45,True,159.44603229824585,-1.4303437668884778
-split,ternary,True,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,182.9354579978772,-1.0911226923530513
+split,ternary,True,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,182.9354579953969,-1.0911226924060493
 split,ternary,True,39,aerosol,Reference,smps_mass,,278.0,55.6,True,172.2005820318811,-1.902867229642426
-split,ternary,True,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,365.6085854820669,-0.4646550384721471
+split,ternary,True,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,365.1966557517158,-0.47164282015749265
 split,ternary,True,41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,347.5278661266048,0.8312376726344078
 split,ternary,True,42,aerosol,No SO2,count,,3.0,0.48,True,4.39895750599644,2.9144948041592493
 split,ternary,True,43,aerosol,No SO2,number_gmd,,155.0,23.25,True,250.5562705324704,4.109947119676146
-split,ternary,True,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,184.3790493323269,-0.5890179585567726
+split,ternary,True,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,184.37904934265015,-0.589017958309805
 split,ternary,True,45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,159.41840729666026,0.613324200586629
-split,ternary,True,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,472.3079036686927,0.2384196442791329
+split,ternary,True,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,472.5895363571276,0.24253708124455559
 split,ternary,True,47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,415.2696762392455,-0.1831432281148246
 split,ternary,True,48,aerosol,High SO2,count,,29.2,4.8,True,23.453711843666785,-1.197143365902753
 split,ternary,True,49,aerosol,High SO2,number_gmd,,145.0,21.75,True,127.24083048144345,-0.8165135410830596
-split,ternary,True,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,169.79005082974243,-0.6686211523024891
+split,ternary,True,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,169.7900508055769,-0.6686211529189566
 split,ternary,True,51,aerosol,High SO2,smps_mass,,283.0,56.6,True,154.90990675060362,-2.2630758524628334
-split,ternary,True,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,279.0396929577843,-0.5674384052943316
+split,ternary,True,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,277.0829992599247,-0.6102076664497336
 split,ternary,True,53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,261.46567899546886,0.5066029902734942
-split,ternary,True,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,35.46841102686795,0.09368220537358951
+split,ternary,True,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,35.468411023369,0.09368220467380013
 split,ternary,True,55,aerosol,Low O2,count,,2.8,0.63,True,5.001555063364652,3.494531846610559
 split,ternary,True,56,aerosol,Low O2,number_gmd,,290.0,43.5,True,245.18309744103945,-1.0302736220450701
-split,ternary,True,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,181.87938726004538,0.16702804716038
+split,ternary,True,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,181.87938726006672,0.1670280471609864
 split,ternary,True,58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,167.16959226979304,1.3321815253709486
-split,ternary,True,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,432.4339254837054,2.314307902049957
+split,ternary,True,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,432.3189924879729,2.311920923945439
 split,ternary,True,60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,402.3800490702927,-0.1556626364030303
 split,ternary,True,61,aerosol,High O2,count,,32.1,1.7,False,42.36011323667484,6.035360727455789
 split,ternary,True,62,aerosol,High O2,number_gmd,,140.0,21.0,False,80.93355114074812,-2.8126880409167563
-split,ternary,True,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,183.48755057179739,-0.8486979508643125
+split,ternary,True,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,183.48754698236962,-0.8486980320730854
 split,ternary,True,64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,173.0255467333873,-0.2982188387666494
-split,ternary,True,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,325.27547307284664,-0.30741988127377057
+split,ternary,True,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,324.76886091622856,-0.31732432226337126
 split,ternary,True,66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,310.06870008970714,2.9033549410403436
 split,ternary,True,67,aerosol,High KCl,count,,18.3,4.1,False,6.9616013356449855,-2.7654630888670773
 split,ternary,True,68,aerosol,High KCl,number_gmd,,249.0,37.35,False,240.177193437433,-0.23621972055065582
-split,ternary,True,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,303.733094713813,0.5224199038875089
+split,ternary,True,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,303.73309471403195,0.52241990389149
 split,ternary,True,70,aerosol,High KCl,smps_mass,,501.0,100.2,False,258.2428468761664,-2.4227260790801752
-split,ternary,True,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,487.70565395758854,3.5257189959788615
+split,ternary,True,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,487.459847384048,3.52058197249839
 split,ternary,True,72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,430.9635282565349,1.2481823371264449
 split,ternary,True,73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,36.16101118013186,-0.2915350025869975
 split,ternary,True,74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,91.38440913289507,-3.0881922775544957
@@ -547,40 +547,40 @@ split,ion,False,34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,862.4379995493297,1.
 split,ion,False,35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,924.3736145376448,1.8005934829967623
 split,ion,False,36,aerosol,Reference,count,,14.7,1.9,True,6.903536467748175,-4.1034018590799075
 split,ion,False,37,aerosol,Reference,number_gmd,,203.0,30.45,True,206.16977730870755,0.10409777696904933
-split,ion,False,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,171.5519454907272,-1.3343601390870254
+split,ion,False,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,171.55194549057546,-1.3343601390902677
 split,ion,False,39,aerosol,Reference,smps_mass,,278.0,55.6,True,160.87320477130956,-2.106597036487238
-split,ion,False,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,396.3367026730255,0.05660225060263806
+split,ion,False,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,396.3240816679777,0.056388153824897036
 split,ion,False,41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,373.59751705440806,1.3936896883367433
 split,ion,False,42,aerosol,No SO2,count,,3.0,0.48,True,4.423705943694267,2.9660540493630556
 split,ion,False,43,aerosol,No SO2,number_gmd,,155.0,23.25,True,244.44039396681293,3.846898665239266
-split,ion,False,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,186.67405415586555,-0.5341135369410156
+split,ion,False,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,186.6740542134342,-0.5341135355637749
 split,ion,False,45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,157.3004565578999,0.5387484703485882
-split,ion,False,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,486.41400836193964,0.44464924505759706
+split,ion,False,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,486.69911959611017,0.44881753795482704
 split,ion,False,47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,418.1966509603254,-0.13744494987782313
 split,ion,False,48,aerosol,High SO2,count,,29.2,4.8,True,21.645064585002057,-1.5739448781245713
 split,ion,False,49,aerosol,High SO2,number_gmd,,145.0,21.75,True,123.09202920729412,-1.0072630249519945
-split,ion,False,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,144.7698637511909,-1.3068912308369665
+split,ion,False,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,144.76986368970492,-1.3068912324054867
 split,ion,False,51,aerosol,High SO2,smps_mass,,283.0,56.6,True,132.35566922624201,-2.6615606143773496
-split,ion,False,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,273.6245066495621,-0.6858031333429053
+split,ion,False,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,271.743406697712,-0.726920072181159
 split,ion,False,53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,256.6459795505284,0.37437529631079314
-split,ion,False,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,34.518751358320024,-0.09624972833599514
+split,ion,False,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,34.5187513442229,-0.0962497311554202
 split,ion,False,55,aerosol,Low O2,count,,2.8,0.63,True,5.486118521037976,4.263680192123771
 split,ion,False,56,aerosol,Low O2,number_gmd,,290.0,43.5,True,231.08323542799513,-1.354408380965629
-split,ion,False,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,174.97158545653141,-0.029216322257630264
+split,ion,False,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,174.97158545654904,-0.029216322257129654
 split,ion,False,58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,162.3800824971905,1.1507607006511553
-split,ion,False,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,419.6699932718547,2.049221044067595
+split,ion,False,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,419.73072883204463,2.0504824264183723
 split,ion,False,60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,392.926923621744,-0.308625831363366
 split,ion,False,61,aerosol,High O2,count,,32.1,1.7,False,8.201736397741639,-14.057802118975507
 split,ion,False,62,aerosol,High O2,number_gmd,,140.0,21.0,False,186.49195420086312,2.213902580993482
-split,ion,False,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,169.63250785037704,-1.1621604558738226
+split,ion,False,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,169.6325078488676,-1.162160455907973
 split,ion,False,64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,159.70032840047057,-0.660317163030691
-split,ion,False,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,383.8651913117108,0.8380291556541705
+split,ion,False,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,383.8119632570471,0.8369885289745284
 split,ion,False,66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,362.7553255546947,4.52948535662638
 split,ion,False,67,aerosol,High KCl,count,,18.3,4.1,False,4.4467413829618625,-3.3788435651312536
 split,ion,False,68,aerosol,High KCl,number_gmd,,249.0,37.35,False,286.93287929084346,1.0156058712407887
-split,ion,False,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,290.55427761149724,0.28280504748176805
+split,ion,False,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,290.5542776132568,0.2828050475137595
 split,ion,False,70,aerosol,High KCl,smps_mass,,501.0,100.2,False,236.77529887773989,-2.636973065092416
-split,ion,False,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,535.1750145801817,4.517764150056044
+split,ion,False,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,535.2323332522022,4.518962032438918
 split,ion,False,72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,462.03999553330186,1.8189163550652319
 split,ion,False,73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,34.51570651786531,-0.5057673804862874
 split,ion,False,74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,92.46244200777613,-3.065639288540248
@@ -632,40 +632,40 @@ split,ion,True,34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,862.4397932319175,1.2
 split,ion,True,35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,924.3746543347987,1.8006330039832277
 split,ion,True,36,aerosol,Reference,count,,14.7,1.9,True,11.811367403022057,-1.5203329457778643
 split,ion,True,37,aerosol,Reference,number_gmd,,203.0,30.45,True,159.44603229824585,-1.4303437668884778
-split,ion,True,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,182.9354579978772,-1.0911226923530513
+split,ion,True,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,182.9354579953969,-1.0911226924060493
 split,ion,True,39,aerosol,Reference,smps_mass,,278.0,55.6,True,172.2005820318811,-1.902867229642426
-split,ion,True,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,365.6085854820669,-0.4646550384721471
+split,ion,True,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,365.1966557517158,-0.47164282015749265
 split,ion,True,41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,347.5278661266048,0.8312376726344078
 split,ion,True,42,aerosol,No SO2,count,,3.0,0.48,True,4.39895750599644,2.9144948041592493
 split,ion,True,43,aerosol,No SO2,number_gmd,,155.0,23.25,True,250.5562705324704,4.109947119676146
-split,ion,True,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,184.3790493323269,-0.5890179585567726
+split,ion,True,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,184.37904934265015,-0.589017958309805
 split,ion,True,45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,159.41840729666026,0.613324200586629
-split,ion,True,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,472.3079036686927,0.2384196442791329
+split,ion,True,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,472.5895363571276,0.24253708124455559
 split,ion,True,47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,415.2696762392455,-0.1831432281148246
 split,ion,True,48,aerosol,High SO2,count,,29.2,4.8,True,23.453711843666785,-1.197143365902753
 split,ion,True,49,aerosol,High SO2,number_gmd,,145.0,21.75,True,127.24083048144345,-0.8165135410830596
-split,ion,True,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,169.79005082974243,-0.6686211523024891
+split,ion,True,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,169.7900508055769,-0.6686211529189566
 split,ion,True,51,aerosol,High SO2,smps_mass,,283.0,56.6,True,154.90990675060362,-2.2630758524628334
-split,ion,True,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,279.0396929577843,-0.5674384052943316
+split,ion,True,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,277.0829992599247,-0.6102076664497336
 split,ion,True,53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,261.46567899546886,0.5066029902734942
-split,ion,True,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,35.46841102686795,0.09368220537358951
+split,ion,True,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,35.468411023369,0.09368220467380013
 split,ion,True,55,aerosol,Low O2,count,,2.8,0.63,True,5.001555063364652,3.494531846610559
 split,ion,True,56,aerosol,Low O2,number_gmd,,290.0,43.5,True,245.18309744103945,-1.0302736220450701
-split,ion,True,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,181.87938726004538,0.16702804716038
+split,ion,True,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,181.87938726006672,0.1670280471609864
 split,ion,True,58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,167.16959226979304,1.3321815253709486
-split,ion,True,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,432.4339254837054,2.314307902049957
+split,ion,True,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,432.3189924879729,2.311920923945439
 split,ion,True,60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,402.3800490702927,-0.1556626364030303
 split,ion,True,61,aerosol,High O2,count,,32.1,1.7,False,42.36011323667484,6.035360727455789
 split,ion,True,62,aerosol,High O2,number_gmd,,140.0,21.0,False,80.93355114074812,-2.8126880409167563
-split,ion,True,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,183.48755057179739,-0.8486979508643125
+split,ion,True,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,183.48754698236962,-0.8486980320730854
 split,ion,True,64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,173.0255467333873,-0.2982188387666494
-split,ion,True,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,325.27547307284664,-0.30741988127377057
+split,ion,True,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,324.76886091622856,-0.31732432226337126
 split,ion,True,66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,310.06870008970714,2.9033549410403436
 split,ion,True,67,aerosol,High KCl,count,,18.3,4.1,False,6.9616013356449855,-2.7654630888670773
 split,ion,True,68,aerosol,High KCl,number_gmd,,249.0,37.35,False,240.177193437433,-0.23621972055065582
-split,ion,True,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,303.733094713813,0.5224199038875089
+split,ion,True,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,303.73309471403195,0.52241990389149
 split,ion,True,70,aerosol,High KCl,smps_mass,,501.0,100.2,False,258.2428468761664,-2.4227260790801752
-split,ion,True,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,487.70565395758854,3.5257189959788615
+split,ion,True,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,487.459847384048,3.52058197249839
 split,ion,True,72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,430.9635282565349,1.2481823371264449
 split,ion,True,73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,36.16101118013186,-0.2915350025869975
 split,ion,True,74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,91.38440913289507,-3.0881922775544957
@@ -717,40 +717,40 @@ split,combined,False,34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,862.43799954932
 split,combined,False,35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,924.3736145376448,1.8005934829967623
 split,combined,False,36,aerosol,Reference,count,,14.7,1.9,True,6.796062614430268,-4.1599670450367014
 split,combined,False,37,aerosol,Reference,number_gmd,,203.0,30.45,True,209.09624202100346,0.20020499247958826
-split,combined,False,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,164.49290147032534,-1.4851944130272363
+split,combined,False,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,164.49290147028034,-1.4851944130281975
 split,combined,False,39,aerosol,Reference,smps_mass,,278.0,55.6,True,156.30908187138706,-2.1886855778527505
-split,combined,False,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,386.05554083823176,-0.11780253030989375
+split,combined,False,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,386.14619103076177,-0.11626478319318458
 split,combined,False,41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,367.7000825550247,1.2664526980587858
 split,combined,False,42,aerosol,No SO2,count,,3.0,0.48,True,4.423705943694267,2.9660540493630556
 split,combined,False,43,aerosol,No SO2,number_gmd,,155.0,23.25,True,244.44039396681293,3.846898665239266
-split,combined,False,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,186.67405415586555,-0.5341135369410156
+split,combined,False,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,186.6740542134342,-0.5341135355637749
 split,combined,False,45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,157.3004565578999,0.5387484703485882
-split,combined,False,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,486.41400836193964,0.44464924505759706
+split,combined,False,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,486.69911959611017,0.44881753795482704
 split,combined,False,47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,418.1966509603254,-0.13744494987782313
 split,combined,False,48,aerosol,High SO2,count,,29.2,4.8,True,26.603164822958092,-0.5410073285503973
 split,combined,False,49,aerosol,High SO2,number_gmd,,145.0,21.75,True,136.79278597535998,-0.37734317354666774
-split,combined,False,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,205.98739030852747,0.25478036501345575
+split,combined,False,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,205.98739030286714,0.2547803648690597
 split,combined,False,51,aerosol,High SO2,smps_mass,,283.0,56.6,True,186.57590060011174,-1.703605996464457
-split,combined,False,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,277.445062251157,-0.6022937212861852
+split,combined,False,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,275.32273906007686,-0.6486832992332928
 split,combined,False,53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,258.46178636616224,0.42419166985355955
-split,combined,False,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,37.73025094111892,0.5460501882237836
+split,combined,False,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,37.730250940643884,0.5460501881287769
 split,combined,False,55,aerosol,Low O2,count,,2.8,0.63,True,5.616723753404393,4.470990084768878
 split,combined,False,56,aerosol,Low O2,number_gmd,,290.0,43.5,True,227.25652173248363,-1.4423788107475026
-split,combined,False,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,169.16278340159292,-0.19423910790929208
+split,combined,False,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,169.1627834016017,-0.19423910790904259
 split,combined,False,58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,158.4900933333655,1.003412626263845
-split,combined,False,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,411.05627991538205,1.8703277240993157
+split,combined,False,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,411.19932050330345,1.8732984528204248
 split,combined,False,60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,387.44157801452803,-0.39738546902058197
 split,combined,False,61,aerosol,High O2,count,,32.1,1.7,False,7.838681029024667,-14.271364100573727
 split,combined,False,62,aerosol,High O2,number_gmd,,140.0,21.0,False,194.77770260472516,2.608462028796436
-split,combined,False,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,161.88846004822665,-1.33736515727994
+split,combined,False,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,161.8884600478789,-1.3373651572878074
 split,combined,False,64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,154.7849118583739,-0.7938882647181004
-split,combined,False,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,371.4545763719955,0.5953973875267932
+split,combined,False,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,371.51334449241494,0.596546324387389
 split,combined,False,66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,355.47627598116395,4.304823332751974
 split,combined,False,67,aerosol,High KCl,count,,18.3,4.1,False,4.165550931599661,-3.4474266020488638
 split,combined,False,68,aerosol,High KCl,number_gmd,,249.0,37.35,False,292.88911533349244,1.1750767157561564
-split,combined,False,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,281.3429483788099,0.1153263341601804
+split,combined,False,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,281.3429483801425,0.11532633418440913
 split,combined,False,70,aerosol,High KCl,smps_mass,,501.0,100.2,False,230.13854069018697,-2.7032081767446408
-split,combined,False,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,536.28632981806,4.540989128904076
+split,combined,False,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,536.429581890328,4.5439829026191845
 split,combined,False,72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,464.7457938344057,1.8686096204665874
 split,combined,False,73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,34.51570651786531,-0.5057673804862874
 split,combined,False,74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,92.46244200777613,-3.065639288540248
@@ -802,40 +802,40 @@ split,combined,True,34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,862.439793231917
 split,combined,True,35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,924.3746543347987,1.8006330039832277
 split,combined,True,36,aerosol,Reference,count,,14.7,1.9,True,11.811367403022057,-1.5203329457778643
 split,combined,True,37,aerosol,Reference,number_gmd,,203.0,30.45,True,159.44603229824585,-1.4303437668884778
-split,combined,True,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,182.9354579978772,-1.0911226923530513
+split,combined,True,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,182.9354579953969,-1.0911226924060493
 split,combined,True,39,aerosol,Reference,smps_mass,,278.0,55.6,True,172.2005820318811,-1.902867229642426
-split,combined,True,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,365.6085854820669,-0.4646550384721471
+split,combined,True,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,365.1966557517158,-0.47164282015749265
 split,combined,True,41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,347.5278661266048,0.8312376726344078
 split,combined,True,42,aerosol,No SO2,count,,3.0,0.48,True,4.39895750599644,2.9144948041592493
 split,combined,True,43,aerosol,No SO2,number_gmd,,155.0,23.25,True,250.5562705324704,4.109947119676146
-split,combined,True,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,184.3790493323269,-0.5890179585567726
+split,combined,True,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,184.37904934265015,-0.589017958309805
 split,combined,True,45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,159.41840729666026,0.613324200586629
-split,combined,True,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,472.3079036686927,0.2384196442791329
+split,combined,True,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,472.5895363571276,0.24253708124455559
 split,combined,True,47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,415.2696762392455,-0.1831432281148246
 split,combined,True,48,aerosol,High SO2,count,,29.2,4.8,True,23.453711843666785,-1.197143365902753
 split,combined,True,49,aerosol,High SO2,number_gmd,,145.0,21.75,True,127.24083048144345,-0.8165135410830596
-split,combined,True,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,169.79005082974243,-0.6686211523024891
+split,combined,True,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,169.7900508055769,-0.6686211529189566
 split,combined,True,51,aerosol,High SO2,smps_mass,,283.0,56.6,True,154.90990675060362,-2.2630758524628334
-split,combined,True,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,279.0396929577843,-0.5674384052943316
+split,combined,True,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,277.0829992599247,-0.6102076664497336
 split,combined,True,53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,261.46567899546886,0.5066029902734942
-split,combined,True,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,35.46841102686795,0.09368220537358951
+split,combined,True,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,35.468411023369,0.09368220467380013
 split,combined,True,55,aerosol,Low O2,count,,2.8,0.63,True,5.001555063364652,3.494531846610559
 split,combined,True,56,aerosol,Low O2,number_gmd,,290.0,43.5,True,245.18309744103945,-1.0302736220450701
-split,combined,True,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,181.87938726004538,0.16702804716038
+split,combined,True,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,181.87938726006672,0.1670280471609864
 split,combined,True,58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,167.16959226979304,1.3321815253709486
-split,combined,True,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,432.4339254837054,2.314307902049957
+split,combined,True,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,432.3189924879729,2.311920923945439
 split,combined,True,60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,402.3800490702927,-0.1556626364030303
 split,combined,True,61,aerosol,High O2,count,,32.1,1.7,False,42.36011323667484,6.035360727455789
 split,combined,True,62,aerosol,High O2,number_gmd,,140.0,21.0,False,80.93355114074812,-2.8126880409167563
-split,combined,True,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,183.48755057179739,-0.8486979508643125
+split,combined,True,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,183.48754698236962,-0.8486980320730854
 split,combined,True,64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,173.0255467333873,-0.2982188387666494
-split,combined,True,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,325.27547307284664,-0.30741988127377057
+split,combined,True,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,324.76886091622856,-0.31732432226337126
 split,combined,True,66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,310.06870008970714,2.9033549410403436
 split,combined,True,67,aerosol,High KCl,count,,18.3,4.1,False,6.9616013356449855,-2.7654630888670773
 split,combined,True,68,aerosol,High KCl,number_gmd,,249.0,37.35,False,240.177193437433,-0.23621972055065582
-split,combined,True,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,303.733094713813,0.5224199038875089
+split,combined,True,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,303.73309471403195,0.52241990389149
 split,combined,True,70,aerosol,High KCl,smps_mass,,501.0,100.2,False,258.2428468761664,-2.4227260790801752
-split,combined,True,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,487.70565395758854,3.5257189959788615
+split,combined,True,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,487.459847384048,3.52058197249839
 split,combined,True,72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,430.9635282565349,1.2481823371264449
 split,combined,True,73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,36.16101118013186,-0.2915350025869975
 split,combined,True,74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,91.38440913289507,-3.0881922775544957
@@ -887,40 +887,40 @@ all,parent,False,34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,867.2940488585914,1
 all,parent,False,35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,927.8432517177376,1.9324687083898764
 all,parent,False,36,aerosol,Reference,count,,14.7,1.9,True,18.19409256015663,1.8389960842929636
 all,parent,False,37,aerosol,Reference,number_gmd,,203.0,30.45,True,146.948960322925,-1.8407566396412154
-all,parent,False,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,192.47746377270067,-0.8872336800704983
+all,parent,False,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,192.47746377234927,-0.8872336800780071
 all,parent,False,39,aerosol,Reference,smps_mass,,278.0,55.6,True,189.3877696008561,-1.593745151063739
-all,parent,False,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,311.89814496018255,-1.3757736223887609
+all,parent,False,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,311.7798703125841,-1.3777799777339428
 all,parent,False,41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,307.6924853642938,-0.028209593003369664
 all,parent,False,42,aerosol,No SO2,count,,3.0,0.48,True,5.245972097697434,4.679108536869655
 all,parent,False,43,aerosol,No SO2,number_gmd,,155.0,23.25,True,265.51804567883795,4.7534643302726
-all,parent,False,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,212.137117059135,0.07505064734772711
+all,parent,False,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,212.137117059136,0.07505064734775091
 all,parent,False,45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,197.25577295988796,1.945625808446759
-all,parent,False,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,432.8442978737101,-0.3385336568171038
+all,parent,False,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,433.11566694855145,-0.3345662726819964
 all,parent,False,47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,406.28223477380135,-0.3234623766775746
 all,parent,False,48,aerosol,High SO2,count,,29.2,4.8,True,21.473396227597597,-1.6097091192505006
 all,parent,False,49,aerosol,High SO2,number_gmd,,145.0,21.75,True,146.1086446407056,0.05097216738876283
-all,parent,False,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,175.1420569699817,-0.5320903834188343
+all,parent,False,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,175.14205696996777,-0.5320903834191896
 all,parent,False,51,aerosol,High SO2,smps_mass,,283.0,56.6,True,160.7304926031597,-2.1602386465872847
-all,parent,False,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,264.8975190581152,-0.8765569604783559
+all,parent,False,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,262.89538310472676,-0.9203194949786501
 all,parent,False,53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,250.95213159397292,0.21816547582916113
-all,parent,False,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,35.21865663101479,0.04373132620295763
+all,parent,False,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,35.218656631010944,0.04373132620218882
 all,parent,False,55,aerosol,Low O2,count,,2.8,0.63,True,6.567076823779971,5.97948702187297
 all,parent,False,56,aerosol,Low O2,number_gmd,,290.0,43.5,True,249.83725437335943,-0.923281508658404
 all,parent,False,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,200.45129713669317,0.6946391232015104
 all,parent,False,58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,196.2458069201918,2.4335532924315073
-all,parent,False,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,378.47323089951465,1.1936288868019658
+all,parent,False,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,378.50573866038394,1.1943040220225118
 all,parent,False,60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,371.21880794400164,-0.6598898390938246
 all,parent,False,61,aerosol,High O2,count,,32.1,1.7,False,53.5204678104579,12.600275182622294
 all,parent,False,62,aerosol,High O2,number_gmd,,140.0,21.0,False,83.50692141771121,-2.690146599156609
-all,parent,False,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,186.51527854597157,-0.7801973179644441
+all,parent,False,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,186.51527792245253,-0.7801973320712098
 all,parent,False,64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,183.49138607342076,-0.013821030613566411
-all,parent,False,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,277.98065900610885,-1.2320496772999248
+all,parent,False,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,277.79703781382165,-1.2356395344316393
 all,parent,False,66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,274.82876400106505,1.8157025926254646
 all,parent,False,67,aerosol,High KCl,count,,18.3,4.1,False,25.873770055289015,1.8472609890948817
 all,parent,False,68,aerosol,High KCl,number_gmd,,249.0,37.35,False,138.59098229457038,-2.956064731069066
-all,parent,False,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,316.08731814878115,0.7470421481596573
+all,parent,False,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,316.08731814830116,0.7470421481509303
 all,parent,False,70,aerosol,High KCl,smps_mass,,501.0,100.2,False,294.57279563802115,-2.0601517401395095
-all,parent,False,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,382.693373001821,1.3311049739147542
+all,parent,False,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,382.6329991884146,1.3298432432270553
 all,parent,False,72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,359.2356053317008,-0.06913488830668851
 all,parent,False,73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,28.781902040927147,-1.2523565050876109
 all,parent,False,74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,99.43522666229967,-2.9197651325878726
@@ -972,40 +972,40 @@ all,parent,True,34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,867.3103130830273,1.
 all,parent,True,35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,927.8493705762377,1.9327012761777909
 all,parent,True,36,aerosol,Reference,count,,14.7,1.9,True,12.383208024496959,-1.2193641976331793
 all,parent,True,37,aerosol,Reference,number_gmd,,203.0,30.45,True,185.75739355671135,-0.5662596533099721
-all,parent,True,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,194.55743534383265,-0.8427898430804989
+all,parent,True,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,194.5574353438323,-0.8427898430805061
 all,parent,True,39,aerosol,Reference,smps_mass,,278.0,55.6,True,191.1901873193019,-1.5613275661996058
-all,parent,True,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,321.67181255237614,-1.2099777344804727
+all,parent,True,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,321.3852363173546,-1.2148390785860117
 all,parent,True,41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,318.0938939070082,0.19620051579305675
 all,parent,True,42,aerosol,No SO2,count,,3.0,0.48,True,5.237685165974413,4.661844095780027
 all,parent,True,43,aerosol,No SO2,number_gmd,,155.0,23.25,True,267.3426052420884,4.831940010412404
-all,parent,True,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,202.64433192716663,-0.15204947542663558
+all,parent,True,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,202.64433192716672,-0.15204947542663352
 all,parent,True,45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,190.0348183211706,1.6913668422947394
-all,parent,True,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,420.18009323216353,-0.5236828474829894
+all,parent,True,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,420.44863276211646,-0.5197568309632097
 all,parent,True,47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,396.45397645928836,-0.476909032641868
 all,parent,True,48,aerosol,High SO2,count,,29.2,4.8,True,22.968186813875597,-1.2982944137759171
 all,parent,True,49,aerosol,High SO2,number_gmd,,145.0,21.75,True,137.05415593469178,-0.3653261639222171
-all,parent,True,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,182.79738387457567,-0.3368014317710287
+all,parent,True,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,182.79738387455933,-0.33680143177144567
 all,parent,True,51,aerosol,High SO2,smps_mass,,283.0,56.6,True,167.92914981621212,-2.0330538901729307
-all,parent,True,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,272.13801229238896,-0.7182948132811156
+all,parent,True,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,270.13841400261964,-0.7620018797241609
 all,parent,True,53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,258.53016873632293,0.4260677293915758
-all,parent,True,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,34.9301484765868,-0.013970304682639777
+all,parent,True,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,34.93014847658268,-0.013970304683464007
 all,parent,True,55,aerosol,Low O2,count,,2.8,0.63,True,5.688860417281266,4.585492725843279
 all,parent,True,56,aerosol,Low O2,number_gmd,,290.0,43.5,True,261.8605832431152,-0.6468831438364329
-all,parent,True,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,199.59098264913803,0.6701983707141485
+all,parent,True,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,199.59098264913806,0.6701983707141492
 all,parent,True,58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,191.71649136428033,2.2619883092530424
-all,parent,True,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,399.33937010416065,1.6269858796295047
+all,parent,True,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,399.32575318238554,1.6267030775157953
 all,parent,True,60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,384.8677854384305,-0.4390325980836493
 all,parent,True,61,aerosol,High O2,count,,32.1,1.7,False,32.96002046051029,0.5058943885354658
 all,parent,True,62,aerosol,High O2,number_gmd,,140.0,21.0,False,107.15316547910551,-1.5641349771854518
-all,parent,True,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,190.14528677490014,-0.6980704349570103
+all,parent,True,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,190.14528677080042,-0.6980704350497641
 all,parent,True,64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,186.29815081824353,0.06244975049574803
-all,parent,True,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,287.7493238176402,-1.0410689380715508
+all,parent,True,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,287.341086767263,-1.04905011207697
 all,parent,True,66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,285.1889822745073,2.1354624158798545
 all,parent,True,67,aerosol,High KCl,count,,18.3,4.1,False,14.704155195163896,-0.8770353182527086
 all,parent,True,68,aerosol,High KCl,number_gmd,,249.0,37.35,False,188.33713362636118,-1.6241731291469563
-all,parent,True,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,319.4562696173135,0.8082958112238823
+all,parent,True,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,319.45626961731335,0.8082958112238792
 all,parent,True,70,aerosol,High KCl,smps_mass,,501.0,100.2,False,301.57168115606567,-1.9903025832727976
-all,parent,True,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,396.4871783975785,1.6193767690194039
+all,parent,True,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,396.2510182215633,1.6144413421434336
 all,parent,True,72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,379.02818918492807,0.29436527428701686
 all,parent,True,73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,31.860837457165005,-0.8514534560983066
 all,parent,True,74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,97.09326376134412,-2.968760172356817
@@ -1057,40 +1057,40 @@ all,binary,False,34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,867.2940488585914,1
 all,binary,False,35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,927.8432517177376,1.9324687083898764
 all,binary,False,36,aerosol,Reference,count,,14.7,1.9,True,18.19409256015663,1.8389960842929636
 all,binary,False,37,aerosol,Reference,number_gmd,,203.0,30.45,True,146.948960322925,-1.8407566396412154
-all,binary,False,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,192.47746377270067,-0.8872336800704983
+all,binary,False,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,192.47746377234927,-0.8872336800780071
 all,binary,False,39,aerosol,Reference,smps_mass,,278.0,55.6,True,189.3877696008561,-1.593745151063739
-all,binary,False,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,311.89814496018255,-1.3757736223887609
+all,binary,False,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,311.7798703125841,-1.3777799777339428
 all,binary,False,41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,307.6924853642938,-0.028209593003369664
 all,binary,False,42,aerosol,No SO2,count,,3.0,0.48,True,5.245972097697434,4.679108536869655
 all,binary,False,43,aerosol,No SO2,number_gmd,,155.0,23.25,True,265.51804567883795,4.7534643302726
-all,binary,False,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,212.137117059135,0.07505064734772711
+all,binary,False,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,212.137117059136,0.07505064734775091
 all,binary,False,45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,197.25577295988796,1.945625808446759
-all,binary,False,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,432.8442978737101,-0.3385336568171038
+all,binary,False,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,433.11566694855145,-0.3345662726819964
 all,binary,False,47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,406.28223477380135,-0.3234623766775746
 all,binary,False,48,aerosol,High SO2,count,,29.2,4.8,True,21.473396227597597,-1.6097091192505006
 all,binary,False,49,aerosol,High SO2,number_gmd,,145.0,21.75,True,146.1086446407056,0.05097216738876283
-all,binary,False,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,175.1420569699817,-0.5320903834188343
+all,binary,False,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,175.14205696996777,-0.5320903834191896
 all,binary,False,51,aerosol,High SO2,smps_mass,,283.0,56.6,True,160.7304926031597,-2.1602386465872847
-all,binary,False,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,264.8975190581152,-0.8765569604783559
+all,binary,False,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,262.89538310472676,-0.9203194949786501
 all,binary,False,53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,250.95213159397292,0.21816547582916113
-all,binary,False,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,35.21865663101479,0.04373132620295763
+all,binary,False,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,35.218656631010944,0.04373132620218882
 all,binary,False,55,aerosol,Low O2,count,,2.8,0.63,True,6.567076823779971,5.97948702187297
 all,binary,False,56,aerosol,Low O2,number_gmd,,290.0,43.5,True,249.83725437335943,-0.923281508658404
 all,binary,False,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,200.45129713669317,0.6946391232015104
 all,binary,False,58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,196.2458069201918,2.4335532924315073
-all,binary,False,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,378.47323089951465,1.1936288868019658
+all,binary,False,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,378.50573866038394,1.1943040220225118
 all,binary,False,60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,371.21880794400164,-0.6598898390938246
 all,binary,False,61,aerosol,High O2,count,,32.1,1.7,False,53.5204678104579,12.600275182622294
 all,binary,False,62,aerosol,High O2,number_gmd,,140.0,21.0,False,83.50692141771121,-2.690146599156609
-all,binary,False,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,186.51527854597157,-0.7801973179644441
+all,binary,False,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,186.51527792245253,-0.7801973320712098
 all,binary,False,64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,183.49138607342076,-0.013821030613566411
-all,binary,False,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,277.98065900610885,-1.2320496772999248
+all,binary,False,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,277.79703781382165,-1.2356395344316393
 all,binary,False,66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,274.82876400106505,1.8157025926254646
 all,binary,False,67,aerosol,High KCl,count,,18.3,4.1,False,25.873770055289015,1.8472609890948817
 all,binary,False,68,aerosol,High KCl,number_gmd,,249.0,37.35,False,138.59098229457038,-2.956064731069066
-all,binary,False,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,316.08731814878115,0.7470421481596573
+all,binary,False,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,316.08731814830116,0.7470421481509303
 all,binary,False,70,aerosol,High KCl,smps_mass,,501.0,100.2,False,294.57279563802115,-2.0601517401395095
-all,binary,False,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,382.693373001821,1.3311049739147542
+all,binary,False,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,382.6329991884146,1.3298432432270553
 all,binary,False,72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,359.2356053317008,-0.06913488830668851
 all,binary,False,73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,28.781902040927147,-1.2523565050876109
 all,binary,False,74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,99.43522666229967,-2.9197651325878726
@@ -1142,40 +1142,40 @@ all,binary,True,34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,867.3102814770496,1.
 all,binary,True,35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,927.8493627618799,1.9327009791668526
 all,binary,True,36,aerosol,Reference,count,,14.7,1.9,True,12.307118657132655,-1.259411233088076
 all,binary,True,37,aerosol,Reference,number_gmd,,203.0,30.45,True,185.06064109777432,-0.5891415074622555
-all,binary,True,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,191.99222957834533,-0.8976019320866382
+all,binary,True,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,191.99222957834513,-0.8976019320866424
 all,binary,True,39,aerosol,Reference,smps_mass,,278.0,55.6,True,191.15665854219958,-1.5619306017590002
-all,binary,True,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,320.9387216410347,-1.2224135429849925
+all,binary,True,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,320.9710298181226,-1.2218654823049604
 all,binary,True,41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,319.86760888190025,0.23446836854153727
 all,binary,True,42,aerosol,No SO2,count,,3.0,0.48,True,5.206606320890165,4.5970965018545105
 all,binary,True,43,aerosol,No SO2,number_gmd,,155.0,23.25,True,269.1174083981035,4.908275630025958
 all,binary,True,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,198.44209336048863,-0.2525814985529036
 all,binary,True,45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,186.61146375102376,1.5708261884163295
-all,binary,True,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,414.5670385746894,-0.6057450500776408
+all,binary,True,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,414.83430772714456,-0.601837606328296
 all,binary,True,47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,391.74790771517905,-0.5503839544858852
 all,binary,True,48,aerosol,High SO2,count,,29.2,4.8,True,27.80290968957358,-0.2910604813388377
 all,binary,True,49,aerosol,High SO2,number_gmd,,145.0,21.75,True,141.30665511369068,-0.16980896029008363
-all,binary,True,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,234.45137391186344,0.9809023957108021
+all,binary,True,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,234.45137391186287,0.9809023957107875
 all,binary,True,51,aerosol,High SO2,smps_mass,,283.0,56.6,True,215.1105444942593,-1.1994603446243939
-all,binary,True,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,280.36183980991467,-0.5385390205483133
+all,binary,True,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,278.1964179072008,-0.5858706468371414
 all,binary,True,53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,267.9959132503227,0.6857589369087161
-all,binary,True,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,34.97130842172295,-0.005738315655409565
+all,binary,True,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,34.971308421722846,-0.005738315655430881
 all,binary,True,55,aerosol,Low O2,count,,2.8,0.63,True,5.578247125011131,4.409916071446241
 all,binary,True,56,aerosol,Low O2,number_gmd,,290.0,43.5,True,266.11673435142256,-0.5490405896224698
 all,binary,True,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,194.75076991476178,0.532692327123914
 all,binary,True,58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,190.21190674436838,2.204996467589711
-all,binary,True,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,391.04278032067305,1.4546787190170933
+all,binary,True,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,391.23468531464255,1.458664284831621
 all,binary,True,60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,382.23039504789244,-0.48170881799526793
 all,binary,True,61,aerosol,High O2,count,,32.1,1.7,False,32.69291877689649,0.348775751115582
 all,binary,True,62,aerosol,High O2,number_gmd,,140.0,21.0,False,107.48677894655634,-1.548248621592555
-all,binary,True,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,189.75618158383816,-0.7068737198226661
+all,binary,True,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,189.75618158146176,-0.7068737198764308
 all,binary,True,64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,188.47836753629812,0.12169477000810115
-all,binary,True,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,291.2321579204522,-0.9729783397761054
+all,binary,True,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,291.1648232800007,-0.9742947550341996
 all,binary,True,66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,290.54750863318594,2.300849031888455
 all,binary,True,67,aerosol,High KCl,count,,18.3,4.1,False,15.9393455723052,-0.575769372608488
 all,binary,True,68,aerosol,High KCl,number_gmd,,249.0,37.35,False,178.75305233844963,-1.880775037792513
-all,binary,True,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,313.0230822012304,0.6913287672950983
+all,binary,True,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,313.0230822012302,0.6913287672950942
 all,binary,True,70,aerosol,High KCl,smps_mass,,501.0,100.2,False,299.27634130760157,-2.0132101665908024
-all,binary,True,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,392.97808268361734,1.5460414353943017
+all,binary,True,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,393.0362262247503,1.5472565564211138
 all,binary,True,72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,378.464081658567,0.2840051727927826
 all,binary,True,73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,33.27925205398607,-0.6667640554705636
 all,binary,True,74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,96.02598433878418,-2.9910881937492846
@@ -1227,40 +1227,40 @@ all,ternary,False,34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,867.2940488585914,
 all,ternary,False,35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,927.8432517177376,1.9324687083898764
 all,ternary,False,36,aerosol,Reference,count,,14.7,1.9,True,18.19409256015663,1.8389960842929636
 all,ternary,False,37,aerosol,Reference,number_gmd,,203.0,30.45,True,146.948960322925,-1.8407566396412154
-all,ternary,False,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,192.47746377270067,-0.8872336800704983
+all,ternary,False,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,192.47746377234927,-0.8872336800780071
 all,ternary,False,39,aerosol,Reference,smps_mass,,278.0,55.6,True,189.3877696008561,-1.593745151063739
-all,ternary,False,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,311.89814496018255,-1.3757736223887609
+all,ternary,False,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,311.7798703125841,-1.3777799777339428
 all,ternary,False,41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,307.6924853642938,-0.028209593003369664
 all,ternary,False,42,aerosol,No SO2,count,,3.0,0.48,True,5.245972097697434,4.679108536869655
 all,ternary,False,43,aerosol,No SO2,number_gmd,,155.0,23.25,True,265.51804567883795,4.7534643302726
-all,ternary,False,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,212.137117059135,0.07505064734772711
+all,ternary,False,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,212.137117059136,0.07505064734775091
 all,ternary,False,45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,197.25577295988796,1.945625808446759
-all,ternary,False,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,432.8442978737101,-0.3385336568171038
+all,ternary,False,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,433.11566694855145,-0.3345662726819964
 all,ternary,False,47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,406.28223477380135,-0.3234623766775746
 all,ternary,False,48,aerosol,High SO2,count,,29.2,4.8,True,21.473396227597597,-1.6097091192505006
 all,ternary,False,49,aerosol,High SO2,number_gmd,,145.0,21.75,True,146.1086446407056,0.05097216738876283
-all,ternary,False,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,175.1420569699817,-0.5320903834188343
+all,ternary,False,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,175.14205696996777,-0.5320903834191896
 all,ternary,False,51,aerosol,High SO2,smps_mass,,283.0,56.6,True,160.7304926031597,-2.1602386465872847
-all,ternary,False,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,264.8975190581152,-0.8765569604783559
+all,ternary,False,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,262.89538310472676,-0.9203194949786501
 all,ternary,False,53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,250.95213159397292,0.21816547582916113
-all,ternary,False,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,35.21865663101479,0.04373132620295763
+all,ternary,False,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,35.218656631010944,0.04373132620218882
 all,ternary,False,55,aerosol,Low O2,count,,2.8,0.63,True,6.567076823779971,5.97948702187297
 all,ternary,False,56,aerosol,Low O2,number_gmd,,290.0,43.5,True,249.83725437335943,-0.923281508658404
 all,ternary,False,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,200.45129713669317,0.6946391232015104
 all,ternary,False,58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,196.2458069201918,2.4335532924315073
-all,ternary,False,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,378.47323089951465,1.1936288868019658
+all,ternary,False,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,378.50573866038394,1.1943040220225118
 all,ternary,False,60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,371.21880794400164,-0.6598898390938246
 all,ternary,False,61,aerosol,High O2,count,,32.1,1.7,False,53.5204678104579,12.600275182622294
 all,ternary,False,62,aerosol,High O2,number_gmd,,140.0,21.0,False,83.50692141771121,-2.690146599156609
-all,ternary,False,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,186.51527854597157,-0.7801973179644441
+all,ternary,False,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,186.51527792245253,-0.7801973320712098
 all,ternary,False,64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,183.49138607342076,-0.013821030613566411
-all,ternary,False,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,277.98065900610885,-1.2320496772999248
+all,ternary,False,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,277.79703781382165,-1.2356395344316393
 all,ternary,False,66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,274.82876400106505,1.8157025926254646
 all,ternary,False,67,aerosol,High KCl,count,,18.3,4.1,False,25.873770055289015,1.8472609890948817
 all,ternary,False,68,aerosol,High KCl,number_gmd,,249.0,37.35,False,138.59098229457038,-2.956064731069066
-all,ternary,False,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,316.08731814878115,0.7470421481596573
+all,ternary,False,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,316.08731814830116,0.7470421481509303
 all,ternary,False,70,aerosol,High KCl,smps_mass,,501.0,100.2,False,294.57279563802115,-2.0601517401395095
-all,ternary,False,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,382.693373001821,1.3311049739147542
+all,ternary,False,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,382.6329991884146,1.3298432432270553
 all,ternary,False,72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,359.2356053317008,-0.06913488830668851
 all,ternary,False,73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,28.781902040927147,-1.2523565050876109
 all,ternary,False,74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,99.43522666229967,-2.9197651325878726
@@ -1312,40 +1312,40 @@ all,ternary,True,34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,867.3103130830273,1
 all,ternary,True,35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,927.8493705762377,1.9327012761777909
 all,ternary,True,36,aerosol,Reference,count,,14.7,1.9,True,12.383208024496959,-1.2193641976331793
 all,ternary,True,37,aerosol,Reference,number_gmd,,203.0,30.45,True,185.75739355671135,-0.5662596533099721
-all,ternary,True,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,194.55743534383265,-0.8427898430804989
+all,ternary,True,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,194.5574353438323,-0.8427898430805061
 all,ternary,True,39,aerosol,Reference,smps_mass,,278.0,55.6,True,191.1901873193019,-1.5613275661996058
-all,ternary,True,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,321.67181255237614,-1.2099777344804727
+all,ternary,True,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,321.3852363173546,-1.2148390785860117
 all,ternary,True,41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,318.0938939070082,0.19620051579305675
 all,ternary,True,42,aerosol,No SO2,count,,3.0,0.48,True,5.237685165974413,4.661844095780027
 all,ternary,True,43,aerosol,No SO2,number_gmd,,155.0,23.25,True,267.3426052420884,4.831940010412404
-all,ternary,True,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,202.64433192716663,-0.15204947542663558
+all,ternary,True,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,202.64433192716672,-0.15204947542663352
 all,ternary,True,45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,190.0348183211706,1.6913668422947394
-all,ternary,True,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,420.18009323216353,-0.5236828474829894
+all,ternary,True,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,420.44863276211646,-0.5197568309632097
 all,ternary,True,47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,396.45397645928836,-0.476909032641868
 all,ternary,True,48,aerosol,High SO2,count,,29.2,4.8,True,22.968186813875597,-1.2982944137759171
 all,ternary,True,49,aerosol,High SO2,number_gmd,,145.0,21.75,True,137.05415593469178,-0.3653261639222171
-all,ternary,True,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,182.79738387457567,-0.3368014317710287
+all,ternary,True,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,182.79738387455933,-0.33680143177144567
 all,ternary,True,51,aerosol,High SO2,smps_mass,,283.0,56.6,True,167.92914981621212,-2.0330538901729307
-all,ternary,True,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,272.13801229238896,-0.7182948132811156
+all,ternary,True,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,270.13841400261964,-0.7620018797241609
 all,ternary,True,53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,258.53016873632293,0.4260677293915758
-all,ternary,True,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,34.9301484765868,-0.013970304682639777
+all,ternary,True,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,34.93014847658268,-0.013970304683464007
 all,ternary,True,55,aerosol,Low O2,count,,2.8,0.63,True,5.688860417281266,4.585492725843279
 all,ternary,True,56,aerosol,Low O2,number_gmd,,290.0,43.5,True,261.8605832431152,-0.6468831438364329
-all,ternary,True,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,199.59098264913803,0.6701983707141485
+all,ternary,True,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,199.59098264913806,0.6701983707141492
 all,ternary,True,58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,191.71649136428033,2.2619883092530424
-all,ternary,True,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,399.33937010416065,1.6269858796295047
+all,ternary,True,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,399.32575318238554,1.6267030775157953
 all,ternary,True,60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,384.8677854384305,-0.4390325980836493
 all,ternary,True,61,aerosol,High O2,count,,32.1,1.7,False,32.96002046051029,0.5058943885354658
 all,ternary,True,62,aerosol,High O2,number_gmd,,140.0,21.0,False,107.15316547910551,-1.5641349771854518
-all,ternary,True,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,190.14528677490014,-0.6980704349570103
+all,ternary,True,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,190.14528677080042,-0.6980704350497641
 all,ternary,True,64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,186.29815081824353,0.06244975049574803
-all,ternary,True,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,287.7493238176402,-1.0410689380715508
+all,ternary,True,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,287.341086767263,-1.04905011207697
 all,ternary,True,66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,285.1889822745073,2.1354624158798545
 all,ternary,True,67,aerosol,High KCl,count,,18.3,4.1,False,14.704155195163896,-0.8770353182527086
 all,ternary,True,68,aerosol,High KCl,number_gmd,,249.0,37.35,False,188.33713362636118,-1.6241731291469563
-all,ternary,True,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,319.4562696173135,0.8082958112238823
+all,ternary,True,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,319.45626961731335,0.8082958112238792
 all,ternary,True,70,aerosol,High KCl,smps_mass,,501.0,100.2,False,301.57168115606567,-1.9903025832727976
-all,ternary,True,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,396.4871783975785,1.6193767690194039
+all,ternary,True,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,396.2510182215633,1.6144413421434336
 all,ternary,True,72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,379.02818918492807,0.29436527428701686
 all,ternary,True,73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,31.860837457165005,-0.8514534560983066
 all,ternary,True,74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,97.09326376134412,-2.968760172356817
@@ -1397,40 +1397,40 @@ all,ion,False,34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,867.2940488585914,1.45
 all,ion,False,35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,927.8432517177376,1.9324687083898764
 all,ion,False,36,aerosol,Reference,count,,14.7,1.9,True,18.19409256015663,1.8389960842929636
 all,ion,False,37,aerosol,Reference,number_gmd,,203.0,30.45,True,146.948960322925,-1.8407566396412154
-all,ion,False,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,192.47746377270067,-0.8872336800704983
+all,ion,False,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,192.47746377234927,-0.8872336800780071
 all,ion,False,39,aerosol,Reference,smps_mass,,278.0,55.6,True,189.3877696008561,-1.593745151063739
-all,ion,False,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,311.89814496018255,-1.3757736223887609
+all,ion,False,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,311.7798703125841,-1.3777799777339428
 all,ion,False,41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,307.6924853642938,-0.028209593003369664
 all,ion,False,42,aerosol,No SO2,count,,3.0,0.48,True,5.245972097697434,4.679108536869655
 all,ion,False,43,aerosol,No SO2,number_gmd,,155.0,23.25,True,265.51804567883795,4.7534643302726
-all,ion,False,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,212.137117059135,0.07505064734772711
+all,ion,False,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,212.137117059136,0.07505064734775091
 all,ion,False,45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,197.25577295988796,1.945625808446759
-all,ion,False,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,432.8442978737101,-0.3385336568171038
+all,ion,False,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,433.11566694855145,-0.3345662726819964
 all,ion,False,47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,406.28223477380135,-0.3234623766775746
 all,ion,False,48,aerosol,High SO2,count,,29.2,4.8,True,21.473396227597597,-1.6097091192505006
 all,ion,False,49,aerosol,High SO2,number_gmd,,145.0,21.75,True,146.1086446407056,0.05097216738876283
-all,ion,False,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,175.1420569699817,-0.5320903834188343
+all,ion,False,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,175.14205696996777,-0.5320903834191896
 all,ion,False,51,aerosol,High SO2,smps_mass,,283.0,56.6,True,160.7304926031597,-2.1602386465872847
-all,ion,False,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,264.8975190581152,-0.8765569604783559
+all,ion,False,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,262.89538310472676,-0.9203194949786501
 all,ion,False,53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,250.95213159397292,0.21816547582916113
-all,ion,False,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,35.21865663101479,0.04373132620295763
+all,ion,False,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,35.218656631010944,0.04373132620218882
 all,ion,False,55,aerosol,Low O2,count,,2.8,0.63,True,6.567076823779971,5.97948702187297
 all,ion,False,56,aerosol,Low O2,number_gmd,,290.0,43.5,True,249.83725437335943,-0.923281508658404
 all,ion,False,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,200.45129713669317,0.6946391232015104
 all,ion,False,58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,196.2458069201918,2.4335532924315073
-all,ion,False,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,378.47323089951465,1.1936288868019658
+all,ion,False,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,378.50573866038394,1.1943040220225118
 all,ion,False,60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,371.21880794400164,-0.6598898390938246
 all,ion,False,61,aerosol,High O2,count,,32.1,1.7,False,53.5204678104579,12.600275182622294
 all,ion,False,62,aerosol,High O2,number_gmd,,140.0,21.0,False,83.50692141771121,-2.690146599156609
-all,ion,False,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,186.51527854597157,-0.7801973179644441
+all,ion,False,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,186.51527792245253,-0.7801973320712098
 all,ion,False,64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,183.49138607342076,-0.013821030613566411
-all,ion,False,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,277.98065900610885,-1.2320496772999248
+all,ion,False,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,277.79703781382165,-1.2356395344316393
 all,ion,False,66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,274.82876400106505,1.8157025926254646
 all,ion,False,67,aerosol,High KCl,count,,18.3,4.1,False,25.873770055289015,1.8472609890948817
 all,ion,False,68,aerosol,High KCl,number_gmd,,249.0,37.35,False,138.59098229457038,-2.956064731069066
-all,ion,False,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,316.08731814878115,0.7470421481596573
+all,ion,False,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,316.08731814830116,0.7470421481509303
 all,ion,False,70,aerosol,High KCl,smps_mass,,501.0,100.2,False,294.57279563802115,-2.0601517401395095
-all,ion,False,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,382.693373001821,1.3311049739147542
+all,ion,False,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,382.6329991884146,1.3298432432270553
 all,ion,False,72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,359.2356053317008,-0.06913488830668851
 all,ion,False,73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,28.781902040927147,-1.2523565050876109
 all,ion,False,74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,99.43522666229967,-2.9197651325878726
@@ -1482,40 +1482,40 @@ all,ion,True,34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,867.3103130830273,1.456
 all,ion,True,35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,927.8493705762377,1.9327012761777909
 all,ion,True,36,aerosol,Reference,count,,14.7,1.9,True,12.383208024496959,-1.2193641976331793
 all,ion,True,37,aerosol,Reference,number_gmd,,203.0,30.45,True,185.75739355671135,-0.5662596533099721
-all,ion,True,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,194.55743534383265,-0.8427898430804989
+all,ion,True,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,194.5574353438323,-0.8427898430805061
 all,ion,True,39,aerosol,Reference,smps_mass,,278.0,55.6,True,191.1901873193019,-1.5613275661996058
-all,ion,True,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,321.67181255237614,-1.2099777344804727
+all,ion,True,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,321.3852363173546,-1.2148390785860117
 all,ion,True,41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,318.0938939070082,0.19620051579305675
 all,ion,True,42,aerosol,No SO2,count,,3.0,0.48,True,5.237685165974413,4.661844095780027
 all,ion,True,43,aerosol,No SO2,number_gmd,,155.0,23.25,True,267.3426052420884,4.831940010412404
-all,ion,True,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,202.64433192716663,-0.15204947542663558
+all,ion,True,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,202.64433192716672,-0.15204947542663352
 all,ion,True,45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,190.0348183211706,1.6913668422947394
-all,ion,True,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,420.18009323216353,-0.5236828474829894
+all,ion,True,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,420.44863276211646,-0.5197568309632097
 all,ion,True,47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,396.45397645928836,-0.476909032641868
 all,ion,True,48,aerosol,High SO2,count,,29.2,4.8,True,22.968186813875597,-1.2982944137759171
 all,ion,True,49,aerosol,High SO2,number_gmd,,145.0,21.75,True,137.05415593469178,-0.3653261639222171
-all,ion,True,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,182.79738387457567,-0.3368014317710287
+all,ion,True,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,182.79738387455933,-0.33680143177144567
 all,ion,True,51,aerosol,High SO2,smps_mass,,283.0,56.6,True,167.92914981621212,-2.0330538901729307
-all,ion,True,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,272.13801229238896,-0.7182948132811156
+all,ion,True,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,270.13841400261964,-0.7620018797241609
 all,ion,True,53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,258.53016873632293,0.4260677293915758
-all,ion,True,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,34.9301484765868,-0.013970304682639777
+all,ion,True,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,34.93014847658268,-0.013970304683464007
 all,ion,True,55,aerosol,Low O2,count,,2.8,0.63,True,5.688860417281266,4.585492725843279
 all,ion,True,56,aerosol,Low O2,number_gmd,,290.0,43.5,True,261.8605832431152,-0.6468831438364329
-all,ion,True,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,199.59098264913803,0.6701983707141485
+all,ion,True,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,199.59098264913806,0.6701983707141492
 all,ion,True,58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,191.71649136428033,2.2619883092530424
-all,ion,True,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,399.33937010416065,1.6269858796295047
+all,ion,True,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,399.32575318238554,1.6267030775157953
 all,ion,True,60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,384.8677854384305,-0.4390325980836493
 all,ion,True,61,aerosol,High O2,count,,32.1,1.7,False,32.96002046051029,0.5058943885354658
 all,ion,True,62,aerosol,High O2,number_gmd,,140.0,21.0,False,107.15316547910551,-1.5641349771854518
-all,ion,True,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,190.14528677490014,-0.6980704349570103
+all,ion,True,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,190.14528677080042,-0.6980704350497641
 all,ion,True,64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,186.29815081824353,0.06244975049574803
-all,ion,True,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,287.7493238176402,-1.0410689380715508
+all,ion,True,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,287.341086767263,-1.04905011207697
 all,ion,True,66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,285.1889822745073,2.1354624158798545
 all,ion,True,67,aerosol,High KCl,count,,18.3,4.1,False,14.704155195163896,-0.8770353182527086
 all,ion,True,68,aerosol,High KCl,number_gmd,,249.0,37.35,False,188.33713362636118,-1.6241731291469563
-all,ion,True,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,319.4562696173135,0.8082958112238823
+all,ion,True,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,319.45626961731335,0.8082958112238792
 all,ion,True,70,aerosol,High KCl,smps_mass,,501.0,100.2,False,301.57168115606567,-1.9903025832727976
-all,ion,True,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,396.4871783975785,1.6193767690194039
+all,ion,True,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,396.2510182215633,1.6144413421434336
 all,ion,True,72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,379.02818918492807,0.29436527428701686
 all,ion,True,73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,31.860837457165005,-0.8514534560983066
 all,ion,True,74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,97.09326376134412,-2.968760172356817
@@ -1567,40 +1567,40 @@ all,combined,False,34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,867.2940488585914
 all,combined,False,35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,927.8432517177376,1.9324687083898764
 all,combined,False,36,aerosol,Reference,count,,14.7,1.9,True,18.19409256015663,1.8389960842929636
 all,combined,False,37,aerosol,Reference,number_gmd,,203.0,30.45,True,146.948960322925,-1.8407566396412154
-all,combined,False,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,192.47746377270067,-0.8872336800704983
+all,combined,False,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,192.47746377234927,-0.8872336800780071
 all,combined,False,39,aerosol,Reference,smps_mass,,278.0,55.6,True,189.3877696008561,-1.593745151063739
-all,combined,False,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,311.89814496018255,-1.3757736223887609
+all,combined,False,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,311.7798703125841,-1.3777799777339428
 all,combined,False,41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,307.6924853642938,-0.028209593003369664
 all,combined,False,42,aerosol,No SO2,count,,3.0,0.48,True,5.245972097697434,4.679108536869655
 all,combined,False,43,aerosol,No SO2,number_gmd,,155.0,23.25,True,265.51804567883795,4.7534643302726
-all,combined,False,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,212.137117059135,0.07505064734772711
+all,combined,False,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,212.137117059136,0.07505064734775091
 all,combined,False,45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,197.25577295988796,1.945625808446759
-all,combined,False,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,432.8442978737101,-0.3385336568171038
+all,combined,False,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,433.11566694855145,-0.3345662726819964
 all,combined,False,47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,406.28223477380135,-0.3234623766775746
 all,combined,False,48,aerosol,High SO2,count,,29.2,4.8,True,21.473396227597597,-1.6097091192505006
 all,combined,False,49,aerosol,High SO2,number_gmd,,145.0,21.75,True,146.1086446407056,0.05097216738876283
-all,combined,False,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,175.1420569699817,-0.5320903834188343
+all,combined,False,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,175.14205696996777,-0.5320903834191896
 all,combined,False,51,aerosol,High SO2,smps_mass,,283.0,56.6,True,160.7304926031597,-2.1602386465872847
-all,combined,False,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,264.8975190581152,-0.8765569604783559
+all,combined,False,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,262.89538310472676,-0.9203194949786501
 all,combined,False,53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,250.95213159397292,0.21816547582916113
-all,combined,False,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,35.21865663101479,0.04373132620295763
+all,combined,False,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,35.218656631010944,0.04373132620218882
 all,combined,False,55,aerosol,Low O2,count,,2.8,0.63,True,6.567076823779971,5.97948702187297
 all,combined,False,56,aerosol,Low O2,number_gmd,,290.0,43.5,True,249.83725437335943,-0.923281508658404
 all,combined,False,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,200.45129713669317,0.6946391232015104
 all,combined,False,58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,196.2458069201918,2.4335532924315073
-all,combined,False,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,378.47323089951465,1.1936288868019658
+all,combined,False,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,378.50573866038394,1.1943040220225118
 all,combined,False,60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,371.21880794400164,-0.6598898390938246
 all,combined,False,61,aerosol,High O2,count,,32.1,1.7,False,53.5204678104579,12.600275182622294
 all,combined,False,62,aerosol,High O2,number_gmd,,140.0,21.0,False,83.50692141771121,-2.690146599156609
-all,combined,False,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,186.51527854597157,-0.7801973179644441
+all,combined,False,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,186.51527792245253,-0.7801973320712098
 all,combined,False,64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,183.49138607342076,-0.013821030613566411
-all,combined,False,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,277.98065900610885,-1.2320496772999248
+all,combined,False,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,277.79703781382165,-1.2356395344316393
 all,combined,False,66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,274.82876400106505,1.8157025926254646
 all,combined,False,67,aerosol,High KCl,count,,18.3,4.1,False,25.873770055289015,1.8472609890948817
 all,combined,False,68,aerosol,High KCl,number_gmd,,249.0,37.35,False,138.59098229457038,-2.956064731069066
-all,combined,False,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,316.08731814878115,0.7470421481596573
+all,combined,False,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,316.08731814830116,0.7470421481509303
 all,combined,False,70,aerosol,High KCl,smps_mass,,501.0,100.2,False,294.57279563802115,-2.0601517401395095
-all,combined,False,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,382.693373001821,1.3311049739147542
+all,combined,False,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,382.6329991884146,1.3298432432270553
 all,combined,False,72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,359.2356053317008,-0.06913488830668851
 all,combined,False,73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,28.781902040927147,-1.2523565050876109
 all,combined,False,74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,99.43522666229967,-2.9197651325878726
@@ -1652,40 +1652,40 @@ all,combined,True,34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,867.3102814770496,
 all,combined,True,35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,927.8493627618799,1.9327009791668526
 all,combined,True,36,aerosol,Reference,count,,14.7,1.9,True,12.307118604132723,-1.2594112609827768
 all,combined,True,37,aerosol,Reference,number_gmd,,203.0,30.45,True,185.06064163867035,-0.5891414896988392
-all,combined,True,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,191.9922296793243,-0.8976019299289676
+all,combined,True,38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,191.9922296793241,-0.8976019299289719
 all,combined,True,39,aerosol,Reference,smps_mass,,278.0,55.6,True,191.15665862100957,-1.5619306003415545
-all,combined,True,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,320.93872179168864,-1.2224135404293701
+all,combined,True,40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,320.97102996538155,-1.2218654798069288
 all,combined,True,41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,319.8676090188962,0.2344683714972209
 all,combined,True,42,aerosol,No SO2,count,,3.0,0.48,True,5.206606320890165,4.5970965018545105
 all,combined,True,43,aerosol,No SO2,number_gmd,,155.0,23.25,True,269.1174083981035,4.908275630025958
 all,combined,True,44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,198.44209336048863,-0.2525814985529036
 all,combined,True,45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,186.61146375102376,1.5708261884163295
-all,combined,True,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,414.5670385746894,-0.6057450500776408
+all,combined,True,46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,414.83430772714456,-0.601837606328296
 all,combined,True,47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,391.74790771517905,-0.5503839544858852
 all,combined,True,48,aerosol,High SO2,count,,29.2,4.8,True,27.824703211750943,-0.2865201642185533
 all,combined,True,49,aerosol,High SO2,number_gmd,,145.0,21.75,True,141.25311130067354,-0.17227074479661894
-all,combined,True,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,234.45701934254413,0.9810464117995951
+all,combined,True,50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,234.45701934254356,0.9810464117995805
 all,combined,True,51,aerosol,High SO2,smps_mass,,283.0,56.6,True,215.11597639096908,-1.1993643747178608
-all,combined,True,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,280.33120913366224,-0.5392085435265084
+all,combined,True,52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,278.16590974728945,-0.5865374918625258
 all,combined,True,53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,267.968825480441,0.685015788215117
-all,combined,True,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,34.970917694082196,-0.005816461183560761
+all,combined,True,54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,34.9709176940821,-0.005816461183580657
 all,combined,True,55,aerosol,Low O2,count,,2.8,0.63,True,5.57824712322601,4.409916068612715
 all,combined,True,56,aerosol,Low O2,number_gmd,,290.0,43.5,True,266.1167343467663,-0.5490405897295105
 all,combined,True,57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,194.75076990945655,0.5326923269731975
 all,combined,True,58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,190.2119067097463,2.204996466278269
-all,combined,True,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,391.04278042554154,1.4546787211950476
+all,combined,True,59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,391.2346854197801,1.4586642870151627
 all,combined,True,60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,382.23039509674896,-0.4817088172047093
 all,combined,True,61,aerosol,High O2,count,,32.1,1.7,False,32.69291167119355,0.34877157129032227
 all,combined,True,62,aerosol,High O2,number_gmd,,140.0,21.0,False,107.48679622189384,-1.5482477989574361
-all,combined,True,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,189.75618970270872,-0.7068735361378117
+all,combined,True,63,aerosol,High O2,lpi_mass,,221.0,44.2,False,189.75618970033236,-0.7068735361915756
 all,combined,True,64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,188.47837384136125,0.12169494134133821
-all,combined,True,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,291.23215807956575,-0.9729783366653812
+all,combined,True,65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,291.1648231537995,-0.9742947575014763
 all,combined,True,66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,290.5475084998071,2.3008490277718248
 all,combined,True,67,aerosol,High KCl,count,,18.3,4.1,False,15.939345496885512,-0.575769391003534
 all,combined,True,68,aerosol,High KCl,number_gmd,,249.0,37.35,False,178.75305276790263,-1.880775026294441
-all,combined,True,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,313.02308218163023,0.6913287669387315
+all,combined,True,69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,313.02308218163,0.6913287669387274
 all,combined,True,70,aerosol,High KCl,smps_mass,,501.0,100.2,False,299.27634129378737,-2.013210166728669
-all,combined,True,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,392.97808286715406,1.5460414392299697
+all,combined,True,71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,393.03622640894184,1.5472565602704669
 all,combined,True,72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,378.4640818437684,0.2840051761940934
 all,combined,True,73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,33.27925205398607,-0.6667640554705636
 all,combined,True,74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,96.02598433878418,-2.9910881937492846

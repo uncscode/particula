@@ -29,6 +29,8 @@ rows, diagnostics = run_replay(device="cpu", fits=("split_combined",))
 
 The split combined selection lands on the chemistry control with inactive auxiliary cluster formation. In the all-data combined selection, the chosen path mask enables binary and third-species pathways. The sulfate birth, KCl birth, vapor deposition, wall reservoirs and gas reaction network remain present in the chemistry controls. The archive reproduces these four forward predictions. The distinct 525-channel neutral KCl model, signed charged-cluster study and optimization histories have different state spaces.
 
+The impactor conversion solves ρ₁d₁²Cc(d₁) = ρ₂d₂²Cc(d₂) for compact spheres using the room-temperature mean free path λ = 66 nm and Kn = 2λ/d. With Cc = 1 + Kn [1.257 + 0.4 exp(−1.1/Kn)], a 100 nm particle has Cc = 2.8887. The archived predictions include this correction. All 58 previously selected or retained candidate vectors were rescored on the original calibration masks. A paired detector-only sensitivity test froze each of the four published reactor models and fitted the shared geometric standard deviation (1.10–2.80) and relative mode diameter (0.28–3.60) by bounded least squares. It used the same family-weighted residuals as the reactor fit and excluded held-out rows from the training-only objective.
+
 ## Input map and provenance
 
 | Input | Role in the calculation |
