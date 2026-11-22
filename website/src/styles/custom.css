@@ -128,17 +128,23 @@ pre.mermaid svg { display: block; margin: auto; max-width: 100%; }
 .study-path span { margin-inline: .25rem; }
 
 .sl-markdown-content:has(> .study-intro) { container: study-body / inline-size; }
-.study-intro {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) min(36%, 18rem);
-  gap: clamp(1.25rem, 4cqi, 2rem);
-  align-items: start;
-}
+.study-intro { display: flow-root; }
 .sl-markdown-content .study-intro > p { margin: 0; }
+.sl-markdown-content .study-intro > p:first-child {
+  float: right;
+  width: 40%;
+  margin: 0 0 .65rem clamp(1.25rem, 4cqi, 2rem);
+}
 .study-intro img { display: block; width: 100%; height: auto; }
 @container study-body (max-width: 38rem) {
-  .study-intro { grid-template-columns: minmax(0, 1fr); }
-  .study-intro > p:last-child { width: min(100%, 18rem); justify-self: center; }
+  .study-intro { display: flex; flex-direction: column; gap: 1.25rem; }
+  .sl-markdown-content .study-intro > p:first-child {
+    float: none;
+    order: 1;
+    width: min(100%, 18rem);
+    margin: 0;
+    align-self: center;
+  }
 }
 
 .study-figures {

@@ -28,7 +28,7 @@ test('groups the registered study image with its abstract, preserving footnotes 
   const [figure, abstract, heading] = tree.children;
   processor.runSync(tree, { path: '/site/src/content/docs/studies/literature/pi-chamber-lidar/index.md' });
   assert.equal(tree.children[0].data.hName, 'section');
-  assert.deepEqual(tree.children[0].children, [abstract, figure]);
+  assert.deepEqual(tree.children[0].children, [figure, abstract]);
   assert.equal(tree.children[1], heading);
 });
 

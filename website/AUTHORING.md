@@ -216,7 +216,8 @@ For an illustrated study, set its resource entry’s `tocFigure` to the file pat
 relative to `docs/images/`. Put that image, with descriptive alt text, in its
 own paragraph and follow it immediately with the study’s opening paragraph.
 For a Python study, use the same order in its opening Markdown cell. The page
-template places the paragraph on the left and the TOC on the right. Narrow
+template places the TOC in the right 40% of the reading column. The paragraph
+starts on the left and continues across the full width beneath the figure. Narrow
 reading columns stack the paragraph above the centered figure.
 The Studies and matching topic carousels reuse that
 resource’s title and destination. The home carousel selects study IDs in
