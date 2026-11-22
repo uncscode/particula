@@ -18,7 +18,7 @@ from particula.execution.gpu_coupled_restart import (
     save_coupled_checkpoint,
 )
 from particula.execution.tests.condensation_ode_test import case
-from particula.execution.tests.gpu_study_cases import StudyCase, build_case
+from particula.execution.tests.coupled_event_case import coupled_event_case
 from particula.execution.tests.prepared_restart_capture_test import (
     canonical_equal,
 )
@@ -116,10 +116,7 @@ def test_order_matches_explicit_flows_and_independent_budget(device, order):
 
 def test_rejection_cannot_repeat_stochastic_events(device, monkeypatch):
     """Rejected condensation trials leave the fixed event RNG schedule intact."""
-    initial, _, processes = build_case(
-        StudyCase("test", "full", 2, 64, occupancy=0.75, time_step=1)
-    )
-    source, collision, condensation = processes[:3]
+    initial, source, collision, strategy = coupled_event_case()
     events = (source, collision)
     called = 0
     original = GPUCondensationODE._trial
@@ -139,7 +136,7 @@ def test_rejection_cannot_repeat_stochastic_events(device, monkeypatch):
     with GPUCoupledSimulation(
         initial,
         events,
-        condensation.condensation_strategy,
+        strategy,
         device=device,
         time_step=1,
         root_seed=17,
@@ -170,10 +167,7 @@ def test_disk_restart_preserves_events_physics_and_random_words(
     """A complete cycle checkpoint preserves stochastic continuation exactly."""
     if capture and device == "cpu":
         pytest.skip("native CUDA graph test")
-    initial, _, processes = build_case(
-        StudyCase("test", "full", 2, 64, occupancy=0.75, time_step=1)
-    )
-    source, collision, condensation = processes[:3]
+    initial, source, collision, strategy = coupled_event_case()
     # Deliver the same two integral source events in the first 0.01 s pulse;
     # the precursor is explicitly disabled immediately after that pulse.
     source.source_config = replace(
@@ -181,7 +175,6 @@ def test_disk_restart_preserves_events_physics_and_random_words(
         strategy=replace(source.source_config.strategy, coefficient=25.0),
     )
     events = (source, collision)
-    strategy = condensation.condensation_strategy
     # Resolve the growing-population collision demand explicitly, preserving
     # the original 1 s checkpoint and 3 s final physical observation times.
     with GPUCoupledSimulation(
