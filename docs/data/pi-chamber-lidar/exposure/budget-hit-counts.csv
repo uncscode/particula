@@ -1,0 +1,10 @@
+mechanism,clocks,draws,within_10pct,meets_polluted_inventory,meets_inventory_and_loses_water
+closed,independent,4096,0,0,0
+closed,paired,4096,0,0,0
+closed,shared,4096,0,0,0
+fresh,independent,4096,0,0,0
+fresh,paired,4096,0,0,0
+fresh,shared,4096,0,0,0
+stored,independent,4096,1,230,191
+stored,paired,4096,4,237,196
+stored,shared,4096,4,191,191

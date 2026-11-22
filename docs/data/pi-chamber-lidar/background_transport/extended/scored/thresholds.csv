@@ -1,0 +1,7 @@
+geometry,tolerance,draws,spectra_both,lidar_both,bulk_both,instruments_both,all
+distributed,0.1,256,0,0,0,0,0
+distributed,0.25,256,0,0,0,0,0
+distributed,0.35,256,0,15,0,0,0
+side,0.1,256,0,0,0,0,0
+side,0.25,256,0,0,0,0,0
+side,0.35,256,0,15,0,0,0

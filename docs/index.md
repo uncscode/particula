@@ -7,6 +7,7 @@ import { CardGrid, LinkCard } from '@astrojs/starlight/components';
 <StudyCarousel
   label="Featured studies"
   featured={[
+    "pi-chamber-lidar",
     "cloud-ion-humidity",
     "examples-simulations-cloud-chamber-multi-cycle",
     "pendant-drop-evaporation",
