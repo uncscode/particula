@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
-<title id="title">How run 1 shifted the Manchester campaign mean</title>
-<desc id="desc">A schematic of the illuminated aerosol chamber accompanies a zero-centred comparison of the frozen 40-channel and 38-channel fits. Each of the 15 runs has equal weight. Run 1 added 0.588 percentage points to the mean joint error. The other fourteen together subtracted 0.464 points. The net increase of 0.124 points took the mean from 16.35% to 16.47%. Joint error is the larger of the fitted mass and particle count errors.</desc>
+<title id="title">Two vapor return pathways in the fitted Manchester network</title>
+<desc id="desc">The 38-channel network grew to 40. In the fitted model, α-pinene-derived vapor returns to labile particle material and secondary vapor from the o-cresol dimer family returns to retained particle material. Of the 0.05057 percentage-point reduction in worst joint error, approximately 90% came from refitting and 10% from adding channels. Joint error fell in 12 of 15 runs, while its campaign mean rose slightly.</desc>
 <rect width="300" height="300" fill="#FBF2E3"/>
-<g transform="translate(-6 -14) scale(1.27)" stroke-linecap="round" stroke-linejoin="round"><path d="M21 39 L45 26 L124 26 L100 39 Z" fill="#EFD1A5" stroke="#243E43" stroke-width="2"/>
+<g transform="translate(190 -5) scale(.75)" stroke-linecap="round" stroke-linejoin="round"><path d="M21 39 L45 26 L124 26 L100 39 Z" fill="#EFD1A5" stroke="#243E43" stroke-width="2"/>
 <path d="M100 39 L124 26 L124 88 L100 102 Z" fill="#CAD9D2" stroke="#243E43" stroke-width="2"/>
 <path d="M21 39 L100 39 L100 102 L21 102 Z" fill="#FBF2E3" stroke="#243E43" stroke-width="2"/>
 <path d="M27 44 L32 93 L91 96 L95 44" fill="#CAD9D2" fill-opacity=".51" stroke="#617679" stroke-width="1"/>
@@ -21,28 +21,38 @@
 <circle cx="81" cy="73" r="1.1" fill="#135963"/>
 </g>
 <g font-family="Liberation Sans, Arial, sans-serif" fill="#243E43">
-  <g font-size="21" font-weight="bold">
-    <text x="159" y="52">Manchester</text>
-    <text x="159" y="76">chamber</text>
-  </g>
-  <text x="160" y="99" font-size="14">38 → 40 channels</text>
-  <path d="M16 132H284" stroke="#617679" stroke-width="1"/>
-  <text x="16" y="156" font-size="17" font-weight="bold">Change in mean joint error</text>
-  <text x="16" y="175" font-size="13">Contribution in percentage points</text>
-  <path d="M144 188V248" stroke="#617679" stroke-dasharray="2 2"/>
-  <g font-size="14" font-weight="bold">
-    <text x="144" y="205" dx="-8" text-anchor="end">Run 1</text>
-    <text x="152" y="242">Other 14 runs</text>
-  </g>
-  <!-- Both arrows start at zero. One percentage point spans 170 units. -->
-  <path d="M144 193H236V189L244 199L236 209V205H144Z" fill="#A44D21"/>
-  <path d="M144 230H73V226L65.1 236L73 246V242H144Z" fill="#135963"/>
+  <text x="15" y="29" font-size="15">Manchester chamber</text>
+  <text x="14" y="59" font-size="29" font-weight="bold">38 → 40</text>
+  <text x="16" y="78" font-size="14">fitted reaction channels</text>
+  <path d="M15 91H285" stroke="#617679"/>
   <g font-size="13" font-weight="bold">
-    <text x="248" y="204" fill="#A44D21">+0.59</text>
-    <text x="60" y="241" text-anchor="end" fill="#135963">−0.46</text>
+    <text x="16" y="114">Modeled vapor</text>
+    <text x="183" y="114">Particle pools</text>
   </g>
-  <path d="M16 259H284" stroke="#617679" stroke-width="1"/>
-  <text x="16" y="282" font-size="14">Campaign mean</text>
-  <text x="284" y="282" font-size="20" font-weight="bold" text-anchor="end">16.35% → 16.47%</text>
+  <!-- Distinct endpoints are effective model reservoirs, not molecular species. -->
+  <g font-size="15">
+    <text x="16" y="141">α-pinene vapor</text>
+    <text x="16" y="167">o-cresol dimer</text>
+    <text x="16" y="183">family vapor</text>
+    <text x="203" y="141">Labile</text>
+    <text x="203" y="173">Retained</text>
+  </g>
+  <g stroke="#135963" stroke-width="2.4" fill="none">
+    <path d="M125 136H174m-7 -5 7 5 -7 5"/>
+    <path d="M125 168H174m-7 -5 7 5 -7 5"/>
+  </g>
+  <circle cx="188" cy="136" r="7" fill="#CAD9D2" stroke="#135963" stroke-width="2"/>
+  <circle cx="188" cy="168" r="7" fill="#135963"/>
+  <path d="M15 195H285" stroke="#617679"/>
+  <text x="15" y="216" font-size="15" font-weight="bold">Share of worst joint error reduction</text>
+  <rect x="15" y="225" width="243.6" height="14" fill="#135963"/>
+  <rect x="258.6" y="225" width="26.4" height="14" fill="#EFD1A5"/>
+  <rect x="15" y="225" width="270" height="14" stroke="#243E43" fill="none"/>
+  <path d="M258.6 225v14" stroke="#243E43"/>
+  <g font-size="13">
+    <text x="15" y="256">90% refitting</text>
+    <text x="285" y="256" text-anchor="end">10% added channels</text>
+  </g>
+  <text x="15" y="283" font-size="15" font-weight="bold">Joint error fell in 12 of 15 runs.</text>
 </g>
 </svg>
