@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Heat supply falls short at the fed pentane drop</title>
+  <desc id="desc">Warm air passes a liquid drop suspended from a feed tube. Two bars on a common heat-flux scale show that the modeled convective supply is about one third of the latent heat required by the reported evaporation rate.</desc>
+  <rect width="300" height="300" fill="#fbf2e3"/>
+  <!-- The feed tube holds the drop at steady size. The streamlines indicate air flow. -->
+  <g fill="none" stroke="#a44d21" stroke-width="4" stroke-linecap="round">
+    <path d="M30 67 C75 67 84 52 108 52"/>
+    <path d="M19 87 H101 M95 82l7 5-7 5"/>
+    <path d="M30 107 C67 107 76 125 108 125"/>
+  </g>
+  <path d="M139 15h22v48h-22z" fill="#cad9d2" stroke="#243e43" stroke-width="3"/>
+  <path d="M136 62h28" stroke="#243e43" stroke-width="5" stroke-linecap="round"/>
+  <path d="M141 65 C140 82 121 93 121 112 C121 130 134 143 151 143 C170 143 183 130 183 112 C183 94 162 81 159 65Z" fill="#135963"/>
+  <path d="M132 111c0 10 5 17 13 20" fill="none" stroke="#cad9d2" stroke-width="4" stroke-linecap="round"/>
+  <!-- Both bars start at x=32. Lengths represent the approximate 5:15 heat-flux ratio. -->
+  <g fill="#243e43" font-family="sans-serif" font-size="18" font-weight="600">
+    <text x="32" y="182">Heat supplied</text>
+    <text x="32" y="244">Heat required</text>
+  </g>
+  <rect x="32" y="192" width="77" height="15" rx="3" fill="#135963"/>
+  <rect x="32" y="254" width="231" height="15" rx="3" fill="#243e43"/>
+<g transform="translate(264 13)">$dots</g>
+</svg>

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Terminal speed of a 0.20 mm water drop in still air</title>
+  <desc id="desc">A schematic spherical water drop falls through still air. Bars share a zero and scale. The tabulated measurement is 0.72 metres per second, Particula sphere drag predicts 0.706 and Stokes predicts 1.20.</desc>
+  <rect width="300" height="300" fill="#FBF2E3"/>
+  <g transform="translate(47 46)" stroke-linecap="round">
+    <path d="M-22 -22v11 M-12 -35v13 M4 -37v8" fill="none" stroke="#617679" stroke-width="2"/>
+    <circle r="19" fill="#CAD9D2" stroke="#243E43" stroke-width="2.5"/>
+    <path d="M-11 -3a12 12 0 0 1 10 -9" fill="none" stroke="#FBF2E3" stroke-width="3"/>
+    <path d="M0 23v19m-5 -6 5 6 5 -6" fill="none" stroke="#135963" stroke-width="2.6" stroke-linejoin="round"/>
+  </g>
+  <g font-family="DejaVu Sans, sans-serif" fill="#243E43">
+    <text x="84" y="40" font-size="21" font-weight="bold">0.20 mm drop</text>
+    <text x="85" y="65" font-size="17">falling in still air</text>
+    <path d="M20 96H280" stroke="#617679" stroke-width="1"/>
+    <text x="20" y="122" font-size="17" font-weight="bold">Terminal speed (m/s)</text>
+    <text x="20" y="151" font-size="16">Measured</text>
+    <rect x="20" y="159" width="122.4" height="12" fill="#243E43"/>
+    <text x="150" y="171" font-size="16" font-weight="bold">0.72</text>
+    <text x="20" y="201" font-size="16">Particula sphere drag</text>
+    <rect x="20" y="209" width="120.0" height="12" fill="#135963"/>
+    <text x="148" y="221" font-size="16" font-weight="bold">0.706</text>
+    <text x="20" y="251" font-size="16">Stokes’ law</text>
+    <rect x="20" y="259" width="204.0" height="12" fill="#A44D21"/>
+    <text x="232" y="271" font-size="16" font-weight="bold">1.20</text>
+  </g>
+<g transform="translate(264 13)">$dots</g>
+</svg>

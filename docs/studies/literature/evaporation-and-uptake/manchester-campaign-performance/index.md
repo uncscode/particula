@@ -40,4 +40,6 @@ For a typical Manchester experiment, median mass error captures an improvement t
 
 ## Reproducibility
 
+The [study-card renderer](../../../../../studies/voliotis-2022/joint/campaign_performance/toc.py) redraws the graphical abstract from the archived fits.
+
 The table and per-run examples use the archived 0.9375 s forward replay. The numerical sensitivity check uses that step and 0.46875 s, each with both reaction orders. All summaries use unrounded scores before converting them to percent. Paired differences are selected minus archived, in percentage points. From the repository root, run `python studies/voliotis-2022/joint/campaign_performance/study.py` in the Particula environment to regenerate the campaign comparison from the saved scores. [Analysis script](../../../../../studies/voliotis-2022/joint/campaign_performance/study.py) · [Frozen calibrations](../../../../../studies/voliotis-2022/joint/milestone2/size_inputs.json) · [Paired run changes and omission results](../../../../../studies/voliotis-2022/joint/campaign_performance/paired_changes.csv) · [Campaign scores by numerical setting](../../../../../studies/voliotis-2022/joint/campaign_performance/campaign_scores.csv)

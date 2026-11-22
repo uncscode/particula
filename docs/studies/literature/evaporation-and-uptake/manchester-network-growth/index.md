@@ -1,6 +1,6 @@
 # Manchester’s ternary aerosol declined while the fitted reaction network still predicted growth
 
-![Change in suspended organic mass between the observed peak and last reading, measured and predicted for runs 16 and 24. Positive bars show growth and negative bars show loss.](../../../../images/manchester-soa/milestone2-late-loss.png)
+![From the measured peak to the final sample, measured and fitted binary aerosol mass fell by 30.9 and 32.5 µg m⁻³. Ternary mass fell by 10.2 µg m⁻³ while the fit gained 7.6 µg m⁻³.](../../../../images/manchester-soa/network-growth-toc.png)
 
 The ternary Manchester chamber experiment provides a test that a single overall error can hide. After its organic aerosol concentration peaked at 3.42 hours, the instrument recorded a 10.23 µg m⁻³ decline. Over that same interval the selected network predicted a rise of 7.6 µg m⁻³. We tested whether additional reactions could resolve this discrepancy while fitting suspended mass and particle counts across all 15 experiments. Two additional vapor-to-particle transfers brought the network from 38 to 40 channels. The worst normalized trajectory error moved from 17.751% to 17.701%. With size measurements reserved from fitting, the model predicted a five-hour ternary geometric mean diameter of 216.6–216.8 nm against 222.5 nm measured, yet its spectrum showed too many particles near the two-hour peak. Similar final mean diameters can follow different histories of organic mass and particle growth.
 
@@ -135,5 +135,7 @@ The 40-channel network reproduced most of the binary late loss. From the measure
 The [campaign-wide follow-on study](../manchester-campaign-performance/index.md) measures how much each experiment contributed to the change in average mass and count error.
 
 ## Reproducibility
+
+The [study-card renderer](../../../../../studies/voliotis-2022/joint/milestone2/toc.py) reads the archived peak-to-last changes for runs 16 and 24.
 
 All campaign calculations used double precision on an NVIDIA GeForce RTX 5060. Numerical checks retain the five-hour duration and observed sampling times while reducing the integration step and reversing channel order. The frozen replay records suspended and deposited organic mass separately. Wall-corrected yield uses their sum divided by modeled precursor consumption and is a separate diagnostic. The companion size replay includes a 1,024-particle, 30 s calculation and two 2,048-particle, 15 s realizations. A compact-channel control checks the particle solver against the original padded representation. [Study scripts and execution order](../../../../../studies/voliotis-2022/joint/milestone2/README.md) · [Per-run campaign scores](../../../../../studies/voliotis-2022/joint/milestone2/scorecard.csv) · [Size results and numerical settings](../../../../../studies/voliotis-2022/joint/milestone2/size_results/summary.csv)

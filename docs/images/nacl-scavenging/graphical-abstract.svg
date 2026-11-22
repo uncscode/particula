@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
   <title id="title">Polarization has a large pair effect and a small scan effect</title>
   <desc id="desc">On a common horizontal scale, adding dielectric polarization to the dispersion calculation raises capture by 35.46% for a singly charged 4 nm tracer and a neutral 100 nm collector. The same comparison increases the modeled apparent capture coefficient by 0.064% for the recorded 4 nm chamber scan. The schematic dotted path leads to a small plus-marked tracer approaching a larger, cube-shaped neutral salt collector.</desc>
-  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
+  <rect width="300" height="300" fill="#fbf2e3"/>
   <!-- Schematic approach path; the particle sizes are enlarged for recognition. -->
   <path d="M28 78q23-23 45-7t39-4" fill="none" stroke="#a44d21"
         stroke-width="3" stroke-linecap="round" stroke-dasharray="3 6"/>
@@ -24,4 +24,5 @@
   <circle cx="248.76" cy="173" r="8" fill="#135963"/>
   <path d="M36 244h.386" fill="none" stroke="#a44d21" stroke-width="7"/>
   <path d="m36.386 237 7 7-7 7-7-7Z" fill="#a44d21"/>
+<g transform="translate(264 270)"><image width="22.5" height="17.1" aria-hidden="true" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMyIgZGF0YS1uYW1lPSJMYXllciAzIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OC45MyAzNy4xMSI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogIzExNWY1YTsKICAgICAgfQogICAgPC9zdHlsZT4KICA8L2RlZnM+CiAgPGNpcmNsZSBjbGFzcz0iY2xzLTEiIGN4PSI0LjU5IiBjeT0iNC41OSIgcj0iNC41OSIvPgogIDxjaXJjbGUgY2xhc3M9ImNscy0xIiBjeD0iMTguMzQiIGN5PSI0LjU5IiByPSI0LjU5Ii8+CiAgPGNpcmNsZSBjbGFzcz0iY2xzLTEiIGN4PSI0LjU5IiBjeT0iMTguMzQiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjMxLjU2IiBjeT0iMzIuNTMiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjQ0LjI4IiBjeT0iMTguNzgiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjQ0LjI4IiBjeT0iNS4wMiIgcj0iNC41OSIvPgogIDxjaXJjbGUgY2xhc3M9ImNscy0xIiBjeD0iNC41OSIgY3k9IjMyLjA5IiByPSI0LjU5Ii8+Cjwvc3ZnPg=="/></g>
 </svg>

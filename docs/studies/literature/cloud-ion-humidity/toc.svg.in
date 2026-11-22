@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Ion concentrations diverge in humid air</title>
+  <desc id="desc">A narrow particle beam enters from the right, creating positive and negative ions in the chamber air. The vertical axis increases upward in ions per cubic centimetre per polarity. The horizontal axis runs from dry on the left to humid on the right. Both traces start at the dry condition. Inside a droplet representing higher humidity, the open circle for the CLOUD measurement rises farther than the diamond for the Particula prediction. The connecting strokes show the comparison between conditions.</desc>
+  <defs>
+    <path id="drop" d="M181 23 C163 62 96 119 90 174 C84 230 123 268 177 269 C232 270 271 230 269 178 C267 128 209 67 181 23Z"/>
+    <clipPath id="humid"><use href="#drop"/></clipPath>
+    <linearGradient id="beam" gradientUnits="userSpaceOnUse" x1="120" y1="0" x2="264" y2="0">
+      <stop stop-color="#d4d8ff" stop-opacity="0"/>
+      <stop offset=".42" stop-color="#d4d8ff" stop-opacity=".75"/>
+      <stop offset="1" stop-color="#dde1ff"/>
+    </linearGradient>
+    <path id="observed" d="M34 215 L211 109"/>
+    <path id="modeled" d="M34 215 L211 162"/>
+  </defs>
+  <rect width="300" height="300" fill="#fbf2e3"/>
+  <!-- Qualitative axes: the two traces compare dry and humid endpoints. -->
+  <g fill="none" stroke="#53656a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M34 195V89m-4 6 4-6 4 6"/>
+    <path d="M57 282H175m-6-4 6 4-6 4"/>
+  </g>
+  <g font-family="sans-serif" font-size="17" font-weight="600" fill="#344d58">
+    <text transform="translate(25 146) rotate(-90)" text-anchor="middle">ions/cm³</text>
+    <text x="34" y="287" text-anchor="middle">Dry</text>
+    <text x="211" y="287" text-anchor="middle">Humid</text>
+  </g>
+  <use href="#drop" fill="#114d5a"/>
+  <!-- Beam port and one symbolic ion pair, below the concentration traces. -->
+  <path d="M120 219 H265" fill="none" stroke="url(#beam)" stroke-width="4"/>
+  <g fill="#62747d" stroke="#344d58" stroke-width="2" stroke-linejoin="round">
+    <path d="M264 214 H284 V224 H264 Z"/>
+    <rect x="260" y="209" width="6" height="20" rx="1.5"/>
+  </g>
+  <g fill="#c7dce3">
+    <circle cx="160" cy="203" r="12"/>
+    <circle cx="182" cy="237" r="12"/>
+  </g>
+  <path d="M154 203h12 M160 197v12 M176 237h12" fill="none"
+        stroke="#163e46" stroke-width="3.5" stroke-linecap="round"/>
+  <g fill="none" stroke-linecap="round" stroke-width="6">
+    <use href="#observed" stroke="#163e46"/>
+    <use href="#modeled" stroke="#a84625" stroke-dasharray="11 8"/>
+    <g clip-path="url(#humid)">
+      <use href="#observed" stroke="#fff6df"/>
+      <use href="#modeled" stroke="#ffaf71" stroke-dasharray="11 8"/>
+    </g>
+  </g>
+  <circle cx="34" cy="215" r="7.5" fill="#fbf2e3" stroke="#163e46" stroke-width="4.5"/>
+  <circle cx="211" cy="109" r="11" fill="#114d5a" stroke="#fff6df" stroke-width="6"/>
+  <path d="M211 150 L223 162 L211 174 L199 162Z" fill="#ffaf71"/>
+  <g font-family="sans-serif" font-size="17" font-weight="600">
+    <text x="184" y="91" text-anchor="middle" fill="#fff6df">CLOUD</text>
+    <text x="210" y="194" text-anchor="middle" fill="#ffcfac">Particula</text>
+    <text x="292" y="249" text-anchor="end" fill="#344d58">Beam</text>
+  </g>
+<g transform="translate(264 270)">$dots</g>
+</svg>

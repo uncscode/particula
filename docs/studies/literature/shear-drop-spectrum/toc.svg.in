@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Size-dependent shear gives six times as many drops at twice the initial radius</title>
+  <desc id="desc">A schematic cloud contains curling eddies and two spherical drops meeting between them. The two bars show predicted counts for drops of exactly twice the initial radius after 133 minutes, per million starting drops. Turbulent shear gives 610 and a constant rate fitted to the same mean mass gives 102.</desc>
+  <defs>
+    <marker id="flow" viewBox="0 0 8 8" refX="6.5" refY="4" markerWidth="3.6" markerHeight="3.6" orient="auto">
+      <path d="M0 0 8 4 0 8 2.2 4Z" fill="#617679"/>
+    </marker>
+  </defs>
+  <rect width="300" height="300" fill="#fbf2e3"/>
+  <!-- An idealized cloud and two flow paths converging on a droplet encounter. -->
+  <path d="M56 105C37 105 25 95 25 80c0-14 10-25 24-27 2-19 21-31 39-24 12-20 37-25 55-11 17-12 40-7 49 10 18-5 37 5 42 21 20-2 38 11 39 29 1 16-12 27-31 27Z"
+        fill="#cad9d2" stroke="#617679" stroke-width="2.4"/>
+  <g fill="none" stroke="#617679" stroke-width="2.5" stroke-linecap="round" marker-end="url(#flow)">
+    <path d="M83 64c-7 6-17-3-13-12 5-12 24-13 33-3 9 10 12 18 30 21"/>
+    <path d="M207 60c9-4 15 6 10 13-8 11-24 8-33 2-7-5-12-7-19-5"/>
+  </g>
+  <g fill="#135963" stroke="#243e43" stroke-width="1.4">
+    <circle cx="142.5" cy="70.5" r="5.8"/><circle cx="155.1" cy="70.5" r="6.8"/>
+    <circle cx="48" cy="81" r="3"/><circle cx="95" cy="87" r="4"/>
+    <circle cx="126" cy="36" r="3.5"/><circle cx="174" cy="44" r="4.5"/>
+    <circle cx="243" cy="81" r="3.5"/>
+  </g>
+  <!-- Both predictions have the same mean mass; bar heights share one zero. -->
+  <g font-family="sans-serif" fill="#243e43" text-anchor="middle">
+    <path d="M28 255h244" fill="none" stroke="#617679" stroke-width="2"/>
+    <rect x="52" y="163.45" width="58" height="91.55" fill="#135963"/>
+    <rect x="188" y="239.75" width="58" height="15.25" fill="#a44d21"/>
+    <g font-size="17">
+      <text x="81" y="281">Shear</text>
+      <text x="217" y="281">Constant rate</text>
+    </g>
+  </g>
+<g transform="translate(264 13)">$dots</g>
+</svg>

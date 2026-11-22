@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
   <title id="title">After glyoxal dilution, two models predict rising organic mass per sulfate as measurements fall</title>
   <desc id="desc">Change in organic mass per sulfate after dilution: the chamber measurement and growth-calibrated fit fall below their starting values. The reversible-pool model and its imidazole-producing variant (IC) both rise.</desc>
-  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
+  <rect width="300" height="300" fill="#fbf2e3"/>
   <g font-family="sans-serif" font-weight="600">
     <text x="25" y="44" font-size="23" text-anchor="start" fill="#243e43">Δ organic/sulfate</text>
     <line x1="144.00" y1="66.00" x2="144.00" y2="241.00" stroke="#617679" stroke-width="1.6" />
@@ -15,4 +15,5 @@
     <line x1="144.00" y1="219.00" x2="267.50" y2="219.00" stroke="#135963" stroke-width="10" />
     <text x="144" y="264" font-size="17" text-anchor="middle" fill="#243e43">0</text>
   </g>
+<g transform="translate(264 270)"><image width="22.5" height="17.1" aria-hidden="true" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMyIgZGF0YS1uYW1lPSJMYXllciAzIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OC45MyAzNy4xMSI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogIzExNWY1YTsKICAgICAgfQogICAgPC9zdHlsZT4KICA8L2RlZnM+CiAgPGNpcmNsZSBjbGFzcz0iY2xzLTEiIGN4PSI0LjU5IiBjeT0iNC41OSIgcj0iNC41OSIvPgogIDxjaXJjbGUgY2xhc3M9ImNscy0xIiBjeD0iMTguMzQiIGN5PSI0LjU5IiByPSI0LjU5Ii8+CiAgPGNpcmNsZSBjbGFzcz0iY2xzLTEiIGN4PSI0LjU5IiBjeT0iMTguMzQiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjMxLjU2IiBjeT0iMzIuNTMiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjQ0LjI4IiBjeT0iMTguNzgiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjQ0LjI4IiBjeT0iNS4wMiIgcj0iNC41OSIvPgogIDxjaXJjbGUgY2xhc3M9ImNscy0xIiBjeD0iNC41OSIgY3k9IjMyLjA5IiByPSI0LjU5Ii8+Cjwvc3ZnPg=="/></g>
 </svg>

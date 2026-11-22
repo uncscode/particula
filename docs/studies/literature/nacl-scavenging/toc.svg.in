@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Polarization has a large pair effect and a small scan effect</title>
+  <desc id="desc">On a common horizontal scale, adding dielectric polarization to the dispersion calculation raises capture by 35.46% for a singly charged 4 nm tracer and a neutral 100 nm collector. The same comparison increases the modeled apparent capture coefficient by 0.064% for the recorded 4 nm chamber scan. The schematic dotted path leads to a small plus-marked tracer approaching a larger, cube-shaped neutral salt collector.</desc>
+  <rect width="300" height="300" fill="#fbf2e3"/>
+  <!-- Schematic approach path; the particle sizes are enlarged for recognition. -->
+  <path d="M28 78q23-23 45-7t39-4" fill="none" stroke="#a44d21"
+        stroke-width="3" stroke-linecap="round" stroke-dasharray="3 6"/>
+  <path d="m119 57 12-6 12 6v15l-12 6-12-6z" fill="#efd1a5"
+        stroke="#a44d21" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M125 64.5h12m-6-6v12" fill="none" stroke="#243e43"
+        stroke-width="2.6" stroke-linecap="round"/>
+  <g stroke="#243e43" stroke-width="2.3" stroke-linejoin="round">
+    <path d="m173 43 43-22 44 22-44 23z" fill="#cad9d2"/>
+    <path d="m173 43 43 23v46l-43-23z" fill="#135963"/>
+    <path d="m216 66 44-23v46l-44 23z" fill="#617679"/>
+  </g>
+  <g font-family="sans-serif" fill="#243e43">
+    <text x="32" y="143" font-size="19" font-weight="bold">Pair capture gain</text>
+    <text x="32" y="222" font-size="19" font-weight="bold">Chamber scan</text>
+  </g>
+  <!-- The common baseline is x=36. One percentage point occupies 6 SVG units. -->
+  <path d="M36 155v36m0 54v36" fill="none" stroke="#617679" stroke-width="2"/>
+  <path d="M36 173H248.76" fill="none" stroke="#135963" stroke-width="7"/>
+  <circle cx="248.76" cy="173" r="8" fill="#135963"/>
+  <path d="M36 244h.386" fill="none" stroke="#a44d21" stroke-width="7"/>
+  <path d="m36.386 237 7 7-7 7-7-7Z" fill="#a44d21"/>
+<g transform="translate(264 270)">$dots</g>
+</svg>

@@ -1,4 +1,9 @@
 import path from 'node:path';
+import topics from '../topics.json' with { type: 'json' };
+
+const tocImages = new Set(topics.resources
+  .filter((resource) => resource.tocFigure)
+  .map((resource) => '/particula/images/' + resource.tocFigure));
 
 // Resolve Markdown links (including multiline labels and reference definitions)
 // against their generated source location. Code nodes are deliberately untouched.
@@ -22,6 +27,12 @@ export default function remarkDocLinks() {
           target = target.replace(/(?:^|\/)index\.(?:md|mdx)$/, '').replace(/\.(?:md|mdx|ipynb)$/, '');
           node.url = '/particula/' + target.replace(/^\/+|\/+$/g, '') + '/' + match[2];
         }
+      }
+      // Display a 300 dpi PNG at the same three-inch width as a vector TOC.
+      if (node.type === 'image' && tocImages.has(node.url)) {
+        node.data ??= {};
+        node.data.hProperties ??= {};
+        Object.assign(node.data.hProperties, { width: 288, height: 288 });
       }
       node.children?.forEach(visit);
     }
