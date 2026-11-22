@@ -1733,5 +1733,40 @@
       "docs/data/pi-chamber-lidar/observations/microphysics.csv"
     ],
     "data_expression": "report"
+  },
+  "parcel-replay": {
+    "title": "Can a recorded ascent reproduce droplet growth and close two gas budgets?",
+    "source": "docs/studies/examples/thermodynamics/parcel-experiments/parcel_replay.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1800,
+    "inputs": [
+      "docs/data/parcel-replay/ascent.csv",
+      "docs/data/parcel-replay/ascent.json"
+    ],
+    "invoke": "report = run_example()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nplot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
+  },
+  "parcel-cluster": {
+    "title": "What crosses a shared parcel face?",
+    "source": "docs/studies/examples/thermodynamics/parcel-experiments/parcel_cluster.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1800,
+    "inputs": [],
+    "invoke": "report = run_example()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nplot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
   }
 }

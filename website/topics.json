@@ -5144,6 +5144,66 @@
         ]
       },
       "tocFigure": "pi-chamber-lidar/graphical-abstract.svg"
+    },
+    {
+      "source": "docs/studies/examples/thermodynamics/parcel-experiments/parcel_replay.py",
+      "title": "Can a recorded ascent reproduce droplet growth and close two gas budgets?",
+      "topic": "condensation-energy",
+      "also": [
+        "atmosphere",
+        "activity-kappa",
+        "gpu"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "parcel-replay",
+        "runs": [
+          "parcel-replay"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/condensation.md",
+            "label": "Water vapor and the condensation budget"
+          },
+          {
+            "target": "docs/theory/dynamics/condensation-equations.md",
+            "fragment": "kelvin-effect-correction-factor",
+            "label": "Curvature correction to the equilibrium vapor pressure"
+          }
+        ]
+      }
+    },
+    {
+      "source": "docs/studies/examples/thermodynamics/parcel-experiments/parcel_cluster.py",
+      "title": "What crosses a shared parcel face?",
+      "topic": "condensation-energy",
+      "also": [
+        "atmosphere",
+        "activity-kappa",
+        "gpu"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "parcel-cluster",
+        "runs": [
+          "parcel-cluster"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/condensation.md",
+            "label": "Water vapor and the condensation budget"
+          },
+          {
+            "target": "docs/theory/dynamics/condensation-equations.md",
+            "fragment": "kelvin-effect-correction-factor",
+            "label": "Curvature correction to the equilibrium vapor pressure"
+          }
+        ]
+      }
     }
   ],
   "supporting": [
@@ -5402,6 +5462,10 @@
     {
       "source": "docs/studies/literature/evaporation-and-uptake/index.md",
       "reason": "Landing page for literature comparisons of evaporation and reactive uptake."
+    },
+    {
+      "source": "docs/studies/examples/thermodynamics/parcel-experiments/index.md",
+      "reason": "Collection of prescribed parcel replay and cluster experiments."
     }
   ],
   "study_group_exceptions": {
