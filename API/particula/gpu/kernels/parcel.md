@@ -128,7 +128,7 @@ T_REF = wp.constant(F(273.15))
 def _advance(previous: FloatVector, liquid: FloatVector, speed: FloatVector, total_water: F, dry_mass: F, dt: F, result: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L112-L141)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L123-L152)
 
 ## particula.gpu.kernels.parcel._es
 
@@ -148,7 +148,17 @@ def _es(t: F)
 def _grow(previous: FloatVector, radius: FloatVector, dry: FloatVector, kappa: F, dt: F, active: bool, result: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L48-L92)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L64-L103)
+
+## particula.gpu.kernels.parcel._growth_resistance
+
+*function*
+
+```python
+def _growth_resistance(t: F, p: F, es: F)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L58-L61)
 
 ## particula.gpu.kernels.parcel._liquid_water
 
@@ -158,7 +168,7 @@ def _grow(previous: FloatVector, radius: FloatVector, dry: FloatVector, kappa: F
 def _liquid_water(wet: FloatVector, dry: FloatVector, weights: FloatVector, result: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L95-L109)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L106-L120)
 
 ## particula.gpu.kernels.parcel._observe
 
@@ -168,7 +178,19 @@ def _liquid_water(wet: FloatVector, dry: FloatVector, weights: FloatVector, resu
 def _observe(state: FloatVector, loss: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L144-L146)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L155-L157)
+
+## particula.gpu.kernels.parcel._resistance_terms
+
+*function*
+
+```python
+def _resistance_terms(t: F, p: F, es: F)
+```
+
+Diffusive and thermal components before multiplying by water density.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L48-L55)
 
 ## particula.gpu.kernels.parcel.run_warp_parcel
 
@@ -180,4 +202,4 @@ def run_warp_parcel(initial, wet, time, updraft, device, gradient, phase_exchang
 
 Advance from equilibrated radii, reading host outputs after the tape.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L149-L230)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L160-L241)

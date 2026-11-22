@@ -40953,6 +40953,239 @@ def __init__(dry_radius: FloatArray, number: FloatArray, kappa: float, pressure:
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L0-L0)
 
+## particula.dynamics.parcel.ParcelRK23
+
+*class* · *dataclass*
+
+```python
+class ParcelRK23(_ParcelAdaptiveControls)
+```
+
+Bases: `particula.dynamics.parcel._ParcelAdaptiveControls`
+
+Adaptive Warp controls for the embedded Bogacki–Shampine 3(2) pair.
+
+rtol controls pressure, each class's liquid volume, vapor and temperature.
+The relative scales include floors of 1e-8 in normalized pressure and
+liquid/dry class volume, and 1e-12 kg/kg dry air for vapor.
+min_step is the smallest permitted retry in seconds. max_trials bounds
+all evaluated trials, including unused speculative Warp trials. A linearized
+droplet relaxation limit also protects sensitivities near equilibrium.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L90-L100)
+
+### particula.dynamics.parcel.ParcelRK23.max_trials
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+max_trials: int = 100000
+```
+
+Inherited from: `particula.dynamics.parcel._ParcelAdaptiveControls`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L74-L74)
+
+### particula.dynamics.parcel.ParcelRK23.min_step
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+min_step: float = 1e-09
+```
+
+Inherited from: `particula.dynamics.parcel._ParcelAdaptiveControls`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L73-L73)
+
+### particula.dynamics.parcel.ParcelRK23.rtol
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+rtol: float = 1e-05
+```
+
+Inherited from: `particula.dynamics.parcel._ParcelAdaptiveControls`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L72-L72)
+
+### particula.dynamics.parcel.ParcelRK23.__init__
+
+*method*
+
+```python
+def __init__(rtol: float = 1e-05, min_step: float = 1e-09, max_trials: int = 100000) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L0-L0)
+
+### particula.dynamics.parcel.ParcelRK23.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Inherited from: `particula.dynamics.parcel._ParcelAdaptiveControls`
+
+Reject invalid controller settings before device allocation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L76-L87)
+
+## particula.dynamics.parcel.ParcelROS3
+
+*class* · *dataclass*
+
+```python
+class ParcelROS3(_ParcelAdaptiveControls)
+```
+
+Bases: `particula.dynamics.parcel._ParcelAdaptiveControls`
+
+Adaptive third-order Rosenbrock solver with a second-order estimator.
+
+Uses the coupled parcel Jacobian and explicit time derivative at each
+trial. rtol, min_step (s) and max_trials use the ParcelRK23 scales.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L103-L109)
+
+### particula.dynamics.parcel.ParcelROS3.max_trials
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+max_trials: int = 100000
+```
+
+Inherited from: `particula.dynamics.parcel._ParcelAdaptiveControls`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L74-L74)
+
+### particula.dynamics.parcel.ParcelROS3.min_step
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+min_step: float = 1e-09
+```
+
+Inherited from: `particula.dynamics.parcel._ParcelAdaptiveControls`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L73-L73)
+
+### particula.dynamics.parcel.ParcelROS3.rtol
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+rtol: float = 1e-05
+```
+
+Inherited from: `particula.dynamics.parcel._ParcelAdaptiveControls`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L72-L72)
+
+### particula.dynamics.parcel.ParcelROS3.__init__
+
+*method*
+
+```python
+def __init__(rtol: float = 1e-05, min_step: float = 1e-09, max_trials: int = 100000) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L0-L0)
+
+### particula.dynamics.parcel.ParcelROS3.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Inherited from: `particula.dynamics.parcel._ParcelAdaptiveControls`
+
+Reject invalid controller settings before device allocation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L76-L87)
+
+## particula.dynamics.parcel.ParcelStepStatistics
+
+*class* · *dataclass*
+
+```python
+class ParcelStepStatistics
+```
+
+Controller counts and smallest/largest accepted timestep (s).
+
+evaluated_trials includes speculative candidates discarded after the
+controller changes step size. rejected_steps counts controller rejections.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L112-L124)
+
+### particula.dynamics.parcel.ParcelStepStatistics.accepted_steps
+
+*attribute* · *instance attribute*
+
+```python
+accepted_steps: int
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L120-L120)
+
+### particula.dynamics.parcel.ParcelStepStatistics.evaluated_trials
+
+*attribute* · *instance attribute*
+
+```python
+evaluated_trials: int
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L124-L124)
+
+### particula.dynamics.parcel.ParcelStepStatistics.maximum_step
+
+*attribute* · *instance attribute*
+
+```python
+maximum_step: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L123-L123)
+
+### particula.dynamics.parcel.ParcelStepStatistics.minimum_step
+
+*attribute* · *instance attribute*
+
+```python
+minimum_step: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L122-L122)
+
+### particula.dynamics.parcel.ParcelStepStatistics.rejected_steps
+
+*attribute* · *instance attribute*
+
+```python
+rejected_steps: int
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L121-L121)
+
+### particula.dynamics.parcel.ParcelStepStatistics.__init__
+
+*method*
+
+```python
+def __init__(accepted_steps: int, rejected_steps: int, minimum_step: float, maximum_step: float, evaluated_trials: int) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L0-L0)
+
 ## particula.dynamics.parcel.ParcelTrajectory
 
 *class* · *dataclass*
@@ -40967,9 +41200,10 @@ time (s), height (m), pressure (Pa), temperature (K), volume (m³),
 vapor and liquid (kg/kg dry air), and supersaturation (fraction above
 saturation) each have one entry per time. wet_radius (m) has axes time
 and class. updraft_gradient is the terminal liquid mixing ratio derivative
-per m/s at fixed elapsed time, or None when unrequested.
+per m/s at fixed elapsed time, or None when unrequested. statistics
+contains work counts and step extrema for adaptive Warp execution.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L68-L128)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L127-L189)
 
 ### particula.dynamics.parcel.ParcelTrajectory.height
 
@@ -40979,7 +41213,7 @@ per m/s at fixed elapsed time, or None when unrequested.
 height: FloatArray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L80-L80)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L140-L140)
 
 ### particula.dynamics.parcel.ParcelTrajectory.initial
 
@@ -40989,7 +41223,7 @@ height: FloatArray
 initial: ParcelInitialState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L89-L89)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L149-L149)
 
 ### particula.dynamics.parcel.ParcelTrajectory.liquid
 
@@ -40999,7 +41233,7 @@ initial: ParcelInitialState
 liquid: FloatArray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L85-L85)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L145-L145)
 
 ### particula.dynamics.parcel.ParcelTrajectory.pressure
 
@@ -41009,7 +41243,17 @@ liquid: FloatArray
 pressure: FloatArray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L81-L81)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L141-L141)
+
+### particula.dynamics.parcel.ParcelTrajectory.statistics
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+statistics: ParcelStepStatistics | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L150-L150)
 
 ### particula.dynamics.parcel.ParcelTrajectory.supersaturation
 
@@ -41019,7 +41263,7 @@ pressure: FloatArray
 supersaturation: FloatArray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L86-L86)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L146-L146)
 
 ### particula.dynamics.parcel.ParcelTrajectory.temperature
 
@@ -41029,7 +41273,7 @@ supersaturation: FloatArray
 temperature: FloatArray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L82-L82)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L142-L142)
 
 ### particula.dynamics.parcel.ParcelTrajectory.time
 
@@ -41039,7 +41283,7 @@ temperature: FloatArray
 time: FloatArray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L79-L79)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L139-L139)
 
 ### particula.dynamics.parcel.ParcelTrajectory.updraft_gradient
 
@@ -41049,7 +41293,7 @@ time: FloatArray
 updraft_gradient: float | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L88-L88)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L148-L148)
 
 ### particula.dynamics.parcel.ParcelTrajectory.vapor
 
@@ -41059,7 +41303,7 @@ updraft_gradient: float | None
 vapor: FloatArray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L84-L84)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L144-L144)
 
 ### particula.dynamics.parcel.ParcelTrajectory.volume
 
@@ -41069,7 +41313,7 @@ vapor: FloatArray
 volume: FloatArray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L83-L83)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L143-L143)
 
 ### particula.dynamics.parcel.ParcelTrajectory.wet_radius
 
@@ -41079,14 +41323,14 @@ volume: FloatArray
 wet_radius: FloatArray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L87-L87)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L147-L147)
 
 ### particula.dynamics.parcel.ParcelTrajectory.__init__
 
 *method*
 
 ```python
-def __init__(time: FloatArray, height: FloatArray, pressure: FloatArray, temperature: FloatArray, volume: FloatArray, vapor: FloatArray, liquid: FloatArray, supersaturation: FloatArray, wet_radius: FloatArray, updraft_gradient: float | None, initial: ParcelInitialState) -> None
+def __init__(time: FloatArray, height: FloatArray, pressure: FloatArray, temperature: FloatArray, volume: FloatArray, vapor: FloatArray, liquid: FloatArray, supersaturation: FloatArray, wet_radius: FloatArray, updraft_gradient: float | None, initial: ParcelInitialState, statistics: ParcelStepStatistics | None = None) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L0-L0)
@@ -41107,7 +41351,71 @@ to mass. Gas holds water vapor in kg/m³. The native discrete volume
 is 1 m³. Multiply its density inventories by the physical parcel
 volume at this sample to recover extensive quantities.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L91-L128)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L152-L189)
+
+## particula.dynamics.parcel._ParcelAdaptiveControls
+
+*class* · *dataclass*
+
+```python
+class _ParcelAdaptiveControls
+```
+
+Shared local error tolerance and adaptive trial limits.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L68-L87)
+
+### particula.dynamics.parcel._ParcelAdaptiveControls.max_trials
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+max_trials: int = 100000
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L74-L74)
+
+### particula.dynamics.parcel._ParcelAdaptiveControls.min_step
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+min_step: float = 1e-09
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L73-L73)
+
+### particula.dynamics.parcel._ParcelAdaptiveControls.rtol
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+rtol: float = 1e-05
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L72-L72)
+
+### particula.dynamics.parcel._ParcelAdaptiveControls.__init__
+
+*method*
+
+```python
+def __init__(rtol: float = 1e-05, min_step: float = 1e-09, max_trials: int = 100000) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L0-L0)
+
+### particula.dynamics.parcel._ParcelAdaptiveControls.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Reject invalid controller settings before device allocation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L76-L87)
 
 ## particula.dynamics.parcel._cpu_reference
 
@@ -41119,7 +41427,7 @@ def _cpu_reference(initial, wet, time, updraft, phase_exchange)
 
 Integrate pressure, temperature, vapor and squared radii.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L201-L267)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L262-L328)
 
 ## particula.dynamics.parcel._equilibrium
 
@@ -41129,7 +41437,7 @@ Integrate pressure, temperature, vapor and squared radii.
 def _equilibrium(radius, dry_radius, temperature, kappa)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L136-L141)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L197-L202)
 
 ## particula.dynamics.parcel._initial_radii
 
@@ -41139,7 +41447,7 @@ def _equilibrium(radius, dry_radius, temperature, kappa)
 def _initial_radii(initial)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L144-L198)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L205-L259)
 
 ## particula.dynamics.parcel._saturation_pressure
 
@@ -41151,14 +41459,14 @@ def _saturation_pressure(temperature)
 
 Liquid-water saturation pressure (Pa), constant-L Clausius-Clapeyron.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L131-L133)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L192-L194)
 
 ## particula.dynamics.parcel.run_parcel
 
 *function*
 
 ```python
-def run_parcel(initial: ParcelInitialState, *, updraft: float, timestep: float, steps: int, device: str = 'cpu', gradient: bool = False, phase_exchange: bool = True) -> ParcelTrajectory
+def run_parcel(initial: ParcelInitialState, *, updraft: float, timestep: float, steps: int, device: str = 'cpu', gradient: bool = False, phase_exchange: bool = True, adaptive: ParcelRK23 | ParcelROS3 | None = None) -> ParcelTrajectory
 ```
 
 Advance a single parcel under constant signed vertical velocity.
@@ -41167,11 +41475,12 @@ Advance a single parcel under constant signed vertical velocity.
 
 - `initial` (`ParcelInitialState`) — Subsaturated state including any equilibrium aerosol water.
 - `updraft` (`float`) — Vertical velocity in m/s, positive upward.
-- `timestep` (`float`) — Output spacing in seconds and Warp integration step.
+- `timestep` (`float`) — Output spacing (s). Also the fixed Warp step by default.
 - `steps` (`int`) — Positive number of intervals.
-- `device` (`str`) (default: `'cpu'`) — 'cpu' selects the independent SciPy Radau reference. 'warp:cpu' or a CUDA device selects fixed-step Warp execution.
+- `device` (`str`) (default: `'cpu'`) — 'cpu' selects the independent SciPy Radau reference. 'warp:cpu' or a CUDA device selects Warp execution.
 - `gradient` (`bool`) (default: `False`) — Use Warp reverse mode for terminal liquid versus updraft.
 - `phase_exchange` (`bool`) (default: `True`) — Enable signed condensation and latent feedback. A passive run retains the initial equilibrium water on each class.
+- `adaptive` (`ParcelRK23 | ParcelROS3 | None`) (default: `None`) — Optional Warp RK23 or ROS3 controls. Internal steps end at the requested output times. The gradient follows the accepted discrete schedule.
 
 **Returns**
 
@@ -41181,7 +41490,7 @@ Advance a single parcel under constant signed vertical velocity.
 
 - `ValueError` — Invalid state, backend, integration interval or trajectory.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L270-L360)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L331-L448)
 
 ---
 
@@ -105765,6 +106074,8 @@ Lazily resolve a supported public direct-kernel entry point.
 - `particula.gpu.kernels.ion_source`
 - `particula.gpu.kernels.nucleation`
 - `particula.gpu.kernels.parcel`
+- `particula.gpu.kernels.parcel_rk23`
+- `particula.gpu.kernels.parcel_ros3`
 - `particula.gpu.kernels.slot_management`
 - `particula.gpu.kernels.thermodynamics`
 - `particula.gpu.kernels.wall_loss`
@@ -117209,7 +117520,7 @@ T_REF = wp.constant(F(273.15))
 def _advance(previous: FloatVector, liquid: FloatVector, speed: FloatVector, total_water: F, dry_mass: F, dt: F, result: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L112-L141)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L123-L152)
 
 ## particula.gpu.kernels.parcel._es
 
@@ -117229,7 +117540,17 @@ def _es(t: F)
 def _grow(previous: FloatVector, radius: FloatVector, dry: FloatVector, kappa: F, dt: F, active: bool, result: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L48-L92)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L64-L103)
+
+## particula.gpu.kernels.parcel._growth_resistance
+
+*function*
+
+```python
+def _growth_resistance(t: F, p: F, es: F)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L58-L61)
 
 ## particula.gpu.kernels.parcel._liquid_water
 
@@ -117239,7 +117560,7 @@ def _grow(previous: FloatVector, radius: FloatVector, dry: FloatVector, kappa: F
 def _liquid_water(wet: FloatVector, dry: FloatVector, weights: FloatVector, result: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L95-L109)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L106-L120)
 
 ## particula.gpu.kernels.parcel._observe
 
@@ -117249,7 +117570,19 @@ def _liquid_water(wet: FloatVector, dry: FloatVector, weights: FloatVector, resu
 def _observe(state: FloatVector, loss: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L144-L146)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L155-L157)
+
+## particula.gpu.kernels.parcel._resistance_terms
+
+*function*
+
+```python
+def _resistance_terms(t: F, p: F, es: F)
+```
+
+Diffusive and thermal components before multiplying by water density.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L48-L55)
 
 ## particula.gpu.kernels.parcel.run_warp_parcel
 
@@ -117261,7 +117594,1609 @@ def run_warp_parcel(initial, wet, time, updraft, device, gradient, phase_exchang
 
 Advance from equilibrated radii, reading host outputs after the tape.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L149-L230)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel.py#L160-L241)
+
+---
+
+# particula.gpu.kernels.parcel_rk23
+
+*module*
+
+Shared adaptive warm-parcel integration and explicit RK3(2) stages.
+
+The independent coordinates are p/p0 and liquid volume / dry volume per
+class. At every stage total water and the parcel first law determine vapor
+and temperature. Only scalar trial errors cross to the host during integration.
+The accepted trajectory uses the selected third-order method on replay.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L1-L1)
+
+## particula.gpu.kernels.parcel_rk23._BATCH_CAPACITY
+
+*attribute* · *module attribute*
+
+```python
+_BATCH_CAPACITY = 32
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L39-L39)
+
+## particula.gpu.kernels.parcel_rk23._Parcel
+
+*class*
+
+```python
+class _Parcel
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L42-L51)
+
+### particula.gpu.kernels.parcel_rk23._Parcel.dry_mass
+
+*attribute* · *instance attribute*
+
+```python
+dry_mass: F
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L49-L49)
+
+### particula.gpu.kernels.parcel_rk23._Parcel.exchange
+
+*attribute* · *instance attribute*
+
+```python
+exchange: bool
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L51-L51)
+
+### particula.gpu.kernels.parcel_rk23._Parcel.height
+
+*attribute* · *instance attribute*
+
+```python
+height: F
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L50-L50)
+
+### particula.gpu.kernels.parcel_rk23._Parcel.kappa
+
+*attribute* · *instance attribute*
+
+```python
+kappa: F
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L48-L48)
+
+### particula.gpu.kernels.parcel_rk23._Parcel.liquid
+
+*attribute* · *instance attribute*
+
+```python
+liquid: F
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L47-L47)
+
+### particula.gpu.kernels.parcel_rk23._Parcel.pressure
+
+*attribute* · *instance attribute*
+
+```python
+pressure: F
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L45-L45)
+
+### particula.gpu.kernels.parcel_rk23._Parcel.temperature
+
+*attribute* · *instance attribute*
+
+```python
+temperature: F
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L44-L44)
+
+### particula.gpu.kernels.parcel_rk23._Parcel.vapor
+
+*attribute* · *instance attribute*
+
+```python
+vapor: F
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L46-L46)
+
+## particula.gpu.kernels.parcel_rk23._ParcelStepper
+
+*class*
+
+```python
+class _ParcelStepper
+```
+
+Shared physical rates and accepted-step reverse replay.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L271-L345)
+
+### particula.gpu.kernels.parcel_rk23._ParcelStepper.device
+
+*attribute* · *instance attribute*
+
+```python
+device = device
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L275-L275)
+
+### particula.gpu.kernels.parcel_rk23._ParcelStepper.dry
+
+*attribute* · *instance attribute*
+
+```python
+dry = self.array(initial.dry_radius)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L278-L278)
+
+### particula.gpu.kernels.parcel_rk23._ParcelStepper.initial_state
+
+*attribute* · *instance attribute*
+
+```python
+initial_state = self.array(np.r_[1.0, water])
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L283-L283)
+
+### particula.gpu.kernels.parcel_rk23._ParcelStepper.parcel
+
+*attribute* · *instance attribute*
+
+```python
+parcel = _Parcel()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L285-L285)
+
+### particula.gpu.kernels.parcel_rk23._ParcelStepper.seed
+
+*attribute* · *instance attribute*
+
+```python
+seed = self.array(np.r_[0.0, weights]) if gradient else None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L284-L284)
+
+### particula.gpu.kernels.parcel_rk23._ParcelStepper.speed
+
+*attribute* · *instance attribute*
+
+```python
+speed = self.array([speed], grad=gradient)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L277-L277)
+
+### particula.gpu.kernels.parcel_rk23._ParcelStepper.weights
+
+*attribute* · *instance attribute*
+
+```python
+weights = self.array(weights)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L281-L281)
+
+### particula.gpu.kernels.parcel_rk23._ParcelStepper.width
+
+*attribute* · *instance attribute*
+
+```python
+width = len(wet) + 1
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L276-L276)
+
+### particula.gpu.kernels.parcel_rk23._ParcelStepper.__init__
+
+*method*
+
+```python
+def __init__(initial, wet, speed, device, gradient, exchange)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L274-L298)
+
+### particula.gpu.kernels.parcel_rk23._ParcelStepper.advance
+
+*method*
+
+```python
+def advance(state, t, h, out, work)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L320-L321)
+
+### particula.gpu.kernels.parcel_rk23._ParcelStepper.array
+
+*method*
+
+```python
+def array(values, grad=False)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L300-L301)
+
+### particula.gpu.kernels.parcel_rk23._ParcelStepper.empty
+
+*method*
+
+```python
+def empty(shape, grad=False)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L303-L304)
+
+### particula.gpu.kernels.parcel_rk23._ParcelStepper.launch
+
+*method*
+
+```python
+def launch(kernel, dim, args, out)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L306-L309)
+
+### particula.gpu.kernels.parcel_rk23._ParcelStepper.rate
+
+*method*
+
+```python
+def rate(state, t, derivative, liquid)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L311-L318)
+
+### particula.gpu.kernels.parcel_rk23._ParcelStepper.record_step
+
+*method* · *staticmethod*
+
+```python
+def record_step(checkpoints, accepted, start, t, h)
+```
+
+Keep one device checkpoint for each block of accepted intervals.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L326-L331)
+
+### particula.gpu.kernels.parcel_rk23._ParcelStepper.reverse
+
+*method*
+
+```python
+def reverse(checkpoints)
+```
+
+Bound tape storage by replaying at most 32 accepted steps at once.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L333-L345)
+
+### particula.gpu.kernels.parcel_rk23._ParcelStepper.scratch
+
+*method*
+
+```python
+def scratch(grad=False)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L323-L324)
+
+## particula.gpu.kernels.parcel_rk23._RK23Stepper
+
+*class*
+
+```python
+class _RK23Stepper(_ParcelStepper)
+```
+
+Bases: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L348-L370)
+
+### particula.gpu.kernels.parcel_rk23._RK23Stepper.device
+
+*attribute* · *instance attribute*
+
+```python
+device = device
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L275-L275)
+
+### particula.gpu.kernels.parcel_rk23._RK23Stepper.dry
+
+*attribute* · *instance attribute*
+
+```python
+dry = self.array(initial.dry_radius)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L278-L278)
+
+### particula.gpu.kernels.parcel_rk23._RK23Stepper.initial_state
+
+*attribute* · *instance attribute*
+
+```python
+initial_state = self.array(np.r_[1.0, water])
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L283-L283)
+
+### particula.gpu.kernels.parcel_rk23._RK23Stepper.parcel
+
+*attribute* · *instance attribute*
+
+```python
+parcel = _Parcel()
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L285-L285)
+
+### particula.gpu.kernels.parcel_rk23._RK23Stepper.seed
+
+*attribute* · *instance attribute*
+
+```python
+seed = self.array(np.r_[0.0, weights]) if gradient else None
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L284-L284)
+
+### particula.gpu.kernels.parcel_rk23._RK23Stepper.speed
+
+*attribute* · *instance attribute*
+
+```python
+speed = self.array([speed], grad=gradient)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L277-L277)
+
+### particula.gpu.kernels.parcel_rk23._RK23Stepper.weights
+
+*attribute* · *instance attribute*
+
+```python
+weights = self.array(weights)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L281-L281)
+
+### particula.gpu.kernels.parcel_rk23._RK23Stepper.width
+
+*attribute* · *instance attribute*
+
+```python
+width = len(wet) + 1
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L276-L276)
+
+### particula.gpu.kernels.parcel_rk23._RK23Stepper.advance
+
+*method*
+
+```python
+def advance(state, t, h, out, work, *, reuse_first=False)
+```
+
+Write third-order result, retaining distinct stage values for AD.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L349-L364)
+
+### particula.gpu.kernels.parcel_rk23._RK23Stepper.scratch
+
+*method*
+
+```python
+def scratch(grad=False)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L366-L370)
+
+### particula.gpu.kernels.parcel_rk23._RK23Stepper.__init__
+
+*method*
+
+```python
+def __init__(initial, wet, speed, device, gradient, exchange)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L274-L298)
+
+### particula.gpu.kernels.parcel_rk23._RK23Stepper.array
+
+*method*
+
+```python
+def array(values, grad=False)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L300-L301)
+
+### particula.gpu.kernels.parcel_rk23._RK23Stepper.empty
+
+*method*
+
+```python
+def empty(shape, grad=False)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L303-L304)
+
+### particula.gpu.kernels.parcel_rk23._RK23Stepper.launch
+
+*method*
+
+```python
+def launch(kernel, dim, args, out)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L306-L309)
+
+### particula.gpu.kernels.parcel_rk23._RK23Stepper.rate
+
+*method*
+
+```python
+def rate(state, t, derivative, liquid)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L311-L318)
+
+### particula.gpu.kernels.parcel_rk23._RK23Stepper.record_step
+
+*method* · *staticmethod*
+
+```python
+def record_step(checkpoints, accepted, start, t, h)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+Keep one device checkpoint for each block of accepted intervals.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L326-L331)
+
+### particula.gpu.kernels.parcel_rk23._RK23Stepper.reverse
+
+*method*
+
+```python
+def reverse(checkpoints)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+Bound tape storage by replaying at most 32 accepted steps at once.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L333-L345)
+
+## particula.gpu.kernels.parcel_rk23._RK23Trials
+
+*class*
+
+```python
+class _RK23Trials(_TrialBatch)
+```
+
+Bases: `particula.gpu.kernels.parcel_rk23._TrialBatch`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L425-L471)
+
+### particula.gpu.kernels.parcel_rk23._RK23Trials.atol
+
+*attribute* · *instance attribute*
+
+```python
+atol = solver.array(np.full(solver.width, tolerance * 1e-08))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L429-L429)
+
+### particula.gpu.kernels.parcel_rk23._RK23Trials.k4
+
+*attribute* · *instance attribute*
+
+```python
+k4 = solver.empty(solver.width)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L431-L431)
+
+### particula.gpu.kernels.parcel_rk23._RK23Trials.ql
+
+*attribute* · *instance attribute*
+
+```python
+ql = solver.empty(1)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L432-L432)
+
+### particula.gpu.kernels.parcel_rk23._RK23Trials.rtol
+
+*attribute* · *instance attribute*
+
+```python
+rtol = solver.array(np.full(solver.width, tolerance))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L428-L428)
+
+### particula.gpu.kernels.parcel_rk23._RK23Trials.work
+
+*attribute* · *instance attribute*
+
+```python
+work = solver.scratch()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L430-L430)
+
+### particula.gpu.kernels.parcel_rk23._RK23Trials.capacity
+
+*attribute* · *instance attribute*
+
+```python
+capacity = _BATCH_CAPACITY
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._TrialBatch`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L381-L381)
+
+### particula.gpu.kernels.parcel_rk23._RK23Trials.errors
+
+*attribute* · *instance attribute*
+
+```python
+errors = solver.empty((self.capacity, 1))
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._TrialBatch`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L383-L383)
+
+### particula.gpu.kernels.parcel_rk23._RK23Trials.solver
+
+*attribute* · *instance attribute*
+
+```python
+solver = solver
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._TrialBatch`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L377-L377)
+
+### particula.gpu.kernels.parcel_rk23._RK23Trials.states
+
+*attribute* · *instance attribute*
+
+```python
+states = [solver.empty(solver.width) for _ in range(self.capacity)]
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._TrialBatch`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L382-L382)
+
+### particula.gpu.kernels.parcel_rk23._RK23Trials.tolerance
+
+*attribute* · *instance attribute*
+
+```python
+tolerance = tolerance
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._TrialBatch`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L378-L378)
+
+### particula.gpu.kernels.parcel_rk23._RK23Trials.__init__
+
+*method*
+
+```python
+def __init__(solver, tolerance)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L426-L432)
+
+### particula.gpu.kernels.parcel_rk23._RK23Trials.reuse_endpoint
+
+*method*
+
+```python
+def reuse_endpoint()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L467-L471)
+
+### particula.gpu.kernels.parcel_rk23._RK23Trials.start
+
+*method*
+
+```python
+def start(state, t)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L434-L435)
+
+### particula.gpu.kernels.parcel_rk23._RK23Trials.trial
+
+*method*
+
+```python
+def trial(state, t, h, out, error)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L437-L465)
+
+### particula.gpu.kernels.parcel_rk23._RK23Trials.evaluate
+
+*method*
+
+```python
+def evaluate(initial, start, target, proposed, count)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._TrialBatch`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L385-L413)
+
+## particula.gpu.kernels.parcel_rk23._Stages
+
+*class* · *dataclass*
+
+```python
+class _Stages
+```
+
+Three slope vectors, two stage states and their saved water sums.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L257-L268)
+
+### particula.gpu.kernels.parcel_rk23._Stages.k1
+
+*attribute* · *instance attribute*
+
+```python
+k1: FloatVector
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L261-L261)
+
+### particula.gpu.kernels.parcel_rk23._Stages.k2
+
+*attribute* · *instance attribute*
+
+```python
+k2: FloatVector
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L262-L262)
+
+### particula.gpu.kernels.parcel_rk23._Stages.k3
+
+*attribute* · *instance attribute*
+
+```python
+k3: FloatVector
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L263-L263)
+
+### particula.gpu.kernels.parcel_rk23._Stages.q1
+
+*attribute* · *instance attribute*
+
+```python
+q1: FloatVector
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L266-L266)
+
+### particula.gpu.kernels.parcel_rk23._Stages.q2
+
+*attribute* · *instance attribute*
+
+```python
+q2: FloatVector
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L267-L267)
+
+### particula.gpu.kernels.parcel_rk23._Stages.q3
+
+*attribute* · *instance attribute*
+
+```python
+q3: FloatVector
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L268-L268)
+
+### particula.gpu.kernels.parcel_rk23._Stages.s2
+
+*attribute* · *instance attribute*
+
+```python
+s2: FloatVector
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L264-L264)
+
+### particula.gpu.kernels.parcel_rk23._Stages.s3
+
+*attribute* · *instance attribute*
+
+```python
+s3: FloatVector
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L265-L265)
+
+### particula.gpu.kernels.parcel_rk23._Stages.__init__
+
+*method*
+
+```python
+def __init__(k1: FloatVector, k2: FloatVector, k3: FloatVector, s2: FloatVector, s3: FloatVector, q1: FloatVector, q2: FloatVector, q3: FloatVector) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L0-L0)
+
+## particula.gpu.kernels.parcel_rk23._TrialBatch
+
+*class*
+
+```python
+class _TrialBatch
+```
+
+Stage speculative candidates in disjoint rows until the next decision.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L373-L422)
+
+### particula.gpu.kernels.parcel_rk23._TrialBatch.capacity
+
+*attribute* · *instance attribute*
+
+```python
+capacity = _BATCH_CAPACITY
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L381-L381)
+
+### particula.gpu.kernels.parcel_rk23._TrialBatch.errors
+
+*attribute* · *instance attribute*
+
+```python
+errors = solver.empty((self.capacity, 1))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L383-L383)
+
+### particula.gpu.kernels.parcel_rk23._TrialBatch.solver
+
+*attribute* · *instance attribute*
+
+```python
+solver = solver
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L377-L377)
+
+### particula.gpu.kernels.parcel_rk23._TrialBatch.states
+
+*attribute* · *instance attribute*
+
+```python
+states = [solver.empty(solver.width) for _ in range(self.capacity)]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L382-L382)
+
+### particula.gpu.kernels.parcel_rk23._TrialBatch.tolerance
+
+*attribute* · *instance attribute*
+
+```python
+tolerance = tolerance
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L378-L378)
+
+### particula.gpu.kernels.parcel_rk23._TrialBatch.__init__
+
+*method*
+
+```python
+def __init__(solver, tolerance)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L376-L383)
+
+### particula.gpu.kernels.parcel_rk23._TrialBatch.evaluate
+
+*method*
+
+```python
+def evaluate(initial, start, target, proposed, count)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L385-L413)
+
+### particula.gpu.kernels.parcel_rk23._TrialBatch.reuse_endpoint
+
+*method*
+
+```python
+def reuse_endpoint()
+```
+
+Carry endpoint derivatives into the next candidate if available.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L421-L422)
+
+### particula.gpu.kernels.parcel_rk23._TrialBatch.start
+
+*method*
+
+```python
+def start(state, t)
+```
+
+Prepare any reusable first-stage derivative.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L415-L416)
+
+### particula.gpu.kernels.parcel_rk23._TrialBatch.trial
+
+*method*
+
+```python
+def trial(state, t, h, out, error)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L418-L419)
+
+## particula.gpu.kernels.parcel_rk23._adaptive_method
+
+*function*
+
+```python
+def _adaptive_method(controls)
+```
+
+Select the concrete Warp stepper and its error estimate.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L474-L480)
+
+## particula.gpu.kernels.parcel_rk23._rate
+
+*function*
+
+```python
+def _rate(state: FloatVector, liquid: FloatVector, dry: FloatVector, speed: FloatVector, parcel: _Parcel, time: F, result: FloatVector)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L71-L124)
+
+## particula.gpu.kernels.parcel_rk23._relaxation_rate
+
+*function*
+
+```python
+def _relaxation_rate(state: FloatVector, dry: FloatVector, weights: FloatVector, vapor: F, temp: F, pressure: F, kappa: F)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L127-L162)
+
+## particula.gpu.kernels.parcel_rk23._reservoir_error
+
+*function*
+
+```python
+def _reservoir_error(state: FloatVector, dry: FloatVector, weights: FloatVector, k1: FloatVector, k2: FloatVector, k3: FloatVector, k4: FloatVector, old_liquid: FloatVector, new_liquid: FloatVector, speed: FloatVector, parcel: _Parcel, time: F, h: F, rtol: F, norm: FloatVector)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L165-L225)
+
+## particula.gpu.kernels.parcel_rk23._sample
+
+*function*
+
+```python
+def _sample(state: FloatVector, liquid: FloatVector, dry: FloatVector, speed: FloatVector, parcel: _Parcel, time: F, air: FloatVector, wet: FloatVector)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L228-L254)
+
+## particula.gpu.kernels.parcel_rk23._sum_water
+
+*function*
+
+```python
+def _sum_water(state: FloatVector, weights: FloatVector, liquid: FloatVector)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L62-L68)
+
+## particula.gpu.kernels.parcel_rk23._temperature
+
+*function*
+
+```python
+def _temperature(parcel: _Parcel, liquid: F, dz: F)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L54-L59)
+
+## particula.gpu.kernels.parcel_rk23.run_adaptive_parcel
+
+*function*
+
+```python
+def run_adaptive_parcel(initial, wet, time, updraft, device, gradient, phase_exchange, controls)
+```
+
+Integrate to fixed observations with an embedded componentwise error.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L483-L567)
+
+---
+
+# particula.gpu.kernels.parcel_ros3
+
+*module*
+
+Linearly implicit ROS3(2) for the closed warm parcel.
+
+In normalized coordinates each row depends on local water, pressure and the
+weighted sum of class water. Eliminating pressure and solving for that sum
+gives an O(classes) solve for each of the three Rosenbrock increments. Warp
+differentiates the factorization as well as the stages on accepted-step replay.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L1-L1)
+
+## particula.gpu.kernels.parcel_ros3._ROS3Stages
+
+*class* · *dataclass*
+
+```python
+class _ROS3Stages
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L230-L243)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stages.base_rate
+
+*attribute* · *instance attribute*
+
+```python
+base_rate: FloatVector
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L236-L236)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stages.dl
+
+*attribute* · *instance attribute*
+
+```python
+dl: FloatVector
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L234-L234)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stages.dp
+
+*attribute* · *instance attribute*
+
+```python
+dp: FloatVector
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L233-L233)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stages.ft
+
+*attribute* · *instance attribute*
+
+```python
+ft: FloatVector
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L235-L235)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stages.increments
+
+*attribute* · *instance attribute*
+
+```python
+increments: list
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L243-L243)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stages.inverse
+
+*attribute* · *instance attribute*
+
+```python
+inverse: FloatVector
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L232-L232)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stages.old_liquid
+
+*attribute* · *instance attribute*
+
+```python
+old_liquid: FloatVector
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L239-L239)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stages.rhs
+
+*attribute* · *instance attribute*
+
+```python
+rhs: list
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L241-L241)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stages.stage
+
+*attribute* · *instance attribute*
+
+```python
+stage: FloatVector
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L238-L238)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stages.stage_liquid
+
+*attribute* · *instance attribute*
+
+```python
+stage_liquid: FloatVector
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L240-L240)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stages.stage_rate
+
+*attribute* · *instance attribute*
+
+```python
+stage_rate: FloatVector
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L237-L237)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stages.water
+
+*attribute* · *instance attribute*
+
+```python
+water: list
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L242-L242)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stages.__init__
+
+*method*
+
+```python
+def __init__(inverse: FloatVector, dp: FloatVector, dl: FloatVector, ft: FloatVector, base_rate: FloatVector, stage_rate: FloatVector, stage: FloatVector, old_liquid: FloatVector, stage_liquid: FloatVector, rhs: list, water: list, increments: list) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L0-L0)
+
+## particula.gpu.kernels.parcel_ros3._ROS3Stepper
+
+*class*
+
+```python
+class _ROS3Stepper(_ParcelStepper)
+```
+
+Bases: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+Three solves with one parcel linearization per trial or replay.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L246-L316)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stepper.device
+
+*attribute* · *instance attribute*
+
+```python
+device = device
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L275-L275)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stepper.dry
+
+*attribute* · *instance attribute*
+
+```python
+dry = self.array(initial.dry_radius)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L278-L278)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stepper.initial_state
+
+*attribute* · *instance attribute*
+
+```python
+initial_state = self.array(np.r_[1.0, water])
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L283-L283)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stepper.parcel
+
+*attribute* · *instance attribute*
+
+```python
+parcel = _Parcel()
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L285-L285)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stepper.seed
+
+*attribute* · *instance attribute*
+
+```python
+seed = self.array(np.r_[0.0, weights]) if gradient else None
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L284-L284)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stepper.speed
+
+*attribute* · *instance attribute*
+
+```python
+speed = self.array([speed], grad=gradient)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L277-L277)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stepper.weights
+
+*attribute* · *instance attribute*
+
+```python
+weights = self.array(weights)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L281-L281)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stepper.width
+
+*attribute* · *instance attribute*
+
+```python
+width = len(wet) + 1
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L276-L276)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stepper.advance
+
+*method*
+
+```python
+def advance(state, t, h, out, work)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L259-L316)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stepper.scratch
+
+*method*
+
+```python
+def scratch(grad=False)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L249-L257)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stepper.__init__
+
+*method*
+
+```python
+def __init__(initial, wet, speed, device, gradient, exchange)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L274-L298)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stepper.array
+
+*method*
+
+```python
+def array(values, grad=False)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L300-L301)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stepper.empty
+
+*method*
+
+```python
+def empty(shape, grad=False)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L303-L304)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stepper.launch
+
+*method*
+
+```python
+def launch(kernel, dim, args, out)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L306-L309)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stepper.rate
+
+*method*
+
+```python
+def rate(state, t, derivative, liquid)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L311-L318)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stepper.record_step
+
+*method* · *staticmethod*
+
+```python
+def record_step(checkpoints, accepted, start, t, h)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+Keep one device checkpoint for each block of accepted intervals.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L326-L331)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Stepper.reverse
+
+*method*
+
+```python
+def reverse(checkpoints)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._ParcelStepper`
+
+Bound tape storage by replaying at most 32 accepted steps at once.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L333-L345)
+
+## particula.gpu.kernels.parcel_ros3._ROS3Trials
+
+*class*
+
+```python
+class _ROS3Trials(_TrialBatch)
+```
+
+Bases: `particula.gpu.kernels.parcel_rk23._TrialBatch`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L319-L355)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Trials.embedded
+
+*attribute* · *instance attribute*
+
+```python
+embedded = solver.empty(solver.width)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L323-L323)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Trials.error_water
+
+*attribute* · *instance attribute*
+
+```python
+error_water = solver.empty(1)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L324-L324)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Trials.new_water
+
+*attribute* · *instance attribute*
+
+```python
+new_water = solver.empty(1)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L325-L325)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Trials.work
+
+*attribute* · *instance attribute*
+
+```python
+work = solver.scratch()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L322-L322)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Trials.capacity
+
+*attribute* · *instance attribute*
+
+```python
+capacity = _BATCH_CAPACITY
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._TrialBatch`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L381-L381)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Trials.errors
+
+*attribute* · *instance attribute*
+
+```python
+errors = solver.empty((self.capacity, 1))
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._TrialBatch`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L383-L383)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Trials.solver
+
+*attribute* · *instance attribute*
+
+```python
+solver = solver
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._TrialBatch`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L377-L377)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Trials.states
+
+*attribute* · *instance attribute*
+
+```python
+states = [solver.empty(solver.width) for _ in range(self.capacity)]
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._TrialBatch`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L382-L382)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Trials.tolerance
+
+*attribute* · *instance attribute*
+
+```python
+tolerance = tolerance
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._TrialBatch`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L378-L378)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Trials.__init__
+
+*method*
+
+```python
+def __init__(solver, tolerance)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L320-L325)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Trials.trial
+
+*method*
+
+```python
+def trial(state, t, h, out, error)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L327-L355)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Trials.evaluate
+
+*method*
+
+```python
+def evaluate(initial, start, target, proposed, count)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._TrialBatch`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L385-L413)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Trials.reuse_endpoint
+
+*method*
+
+```python
+def reuse_endpoint()
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._TrialBatch`
+
+Carry endpoint derivatives into the next candidate if available.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L421-L422)
+
+### particula.gpu.kernels.parcel_ros3._ROS3Trials.start
+
+*method*
+
+```python
+def start(state, t)
+```
+
+Inherited from: `particula.gpu.kernels.parcel_rk23._TrialBatch`
+
+Prepare any reusable first-stage derivative.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_rk23.py#L415-L416)
+
+## particula.gpu.kernels.parcel_ros3._back_substitute
+
+*function*
+
+```python
+def _back_substitute(rhs: FloatVector, inv: FloatVector, dp: FloatVector, dl: FloatVector, liquid: FloatVector, result: FloatVector)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L144-L156)
+
+## particula.gpu.kernels.parcel_ros3._error
+
+*function*
+
+```python
+def _error(state: FloatVector, candidate: FloatVector, first: FloatVector, second: FloatVector, third: FloatVector, rtol: F, embedded: FloatVector, norm: FloatVector)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L171-L195)
+
+## particula.gpu.kernels.parcel_ros3._finish
+
+*function*
+
+```python
+def _finish(state: FloatVector, first: FloatVector, second: FloatVector, third: FloatVector, out: FloatVector)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L159-L168)
+
+## particula.gpu.kernels.parcel_ros3._linearize
+
+*function*
+
+```python
+def _linearize(state: FloatVector, liquid: FloatVector, rate: FloatVector, dry: FloatVector, speed: FloatVector, parcel: _Parcel, time: F, h: F, inverse_diagonal: FloatVector, pressure_column: FloatVector, liquid_column: FloatVector, partial_time: FloatVector)
+```
+
+Form the local, pressure, shared-water and explicit time derivatives.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L42-L119)
+
+## particula.gpu.kernels.parcel_ros3._reservoir_norm
+
+*function*
+
+```python
+def _reservoir_norm(old: FloatVector, new_liquid: FloatVector, error: FloatVector, speed: FloatVector, parcel: _Parcel, t: F, h: F, rtol: F, norm: FloatVector)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L198-L227)
+
+## particula.gpu.kernels.parcel_ros3._water_increment
+
+*function*
+
+```python
+def _water_increment(rhs: FloatVector, inv: FloatVector, dp: FloatVector, dl: FloatVector, weights: FloatVector, result: FloatVector)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/parcel_ros3.py#L122-L141)
 
 ---
 
