@@ -107,7 +107,7 @@ def test_package_staging_does_not_require_example_inputs(release, tmp_path):
         (source / relative).write_text("")
     destination = tmp_path / "inputs"
     release.stage_test_inputs(source, destination)
-    assert (destination / "particula/tests/runtime_test.py").is_file()
+    assert not (destination / "particula").exists()
     assert not (destination / "docs").exists()
 
 
@@ -331,6 +331,10 @@ def test_installed_pytest_selects_only_its_suite(
 ):
     """The worker executes explicit targets with the corresponding count guard."""
     workspace = tmp_path / "inputs"
+    release.stage_test_inputs(source, workspace, suite)
+    package = Path(installed_package.__file__).parent
+    (package / "tests").mkdir(parents=True)
+    (package / "tests/runtime_test.py").touch()
     calls = []
 
     def pip_check(command, **kwargs):
@@ -347,8 +351,10 @@ def test_installed_pytest_selects_only_its_suite(
             assert args[-3:] == list(EXAMPLE_TESTS)
             assert not any(arg.startswith("--ignore=") for arg in args)
         else:
-            assert args[-1] == "particula"
-            assert not any(arg.startswith("--ignore") for arg in args)
+            assert args[-1] == str(package)
+            assert [arg for arg in args if arg.startswith("--ignore")] == [
+                f"--ignore={package / 'docs'}"
+            ]
             assert args[args.index("-m") + 1] == (
                 "not slow and not performance and not benchmark"
             )

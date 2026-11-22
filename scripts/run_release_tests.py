@@ -49,21 +49,6 @@ def stage_test_inputs(
     """Copy explicit inputs without copying importable application sources."""
     if suite not in SUITES:
         raise ValueError(f"Unknown release suite: {suite}")
-    if suite == "package":
-        if not (source / "particula").is_dir():
-            raise FileNotFoundError(source / "particula")
-        for path in (source / "particula").rglob("*"):
-            relative = path.relative_to(source)
-            if not path.is_file() or "__pycache__" in relative.parts:
-                continue
-            if (
-                not {"tests", "integration_tests"}.intersection(relative.parts)
-                and path.name != "conftest.py"
-            ):
-                continue
-            target = destination / relative
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(path, target)
     inputs = {
         "package": (),
         "examples": (*CPU_EXAMPLES, *CPU_EXAMPLE_TESTS),
@@ -73,6 +58,21 @@ def stage_test_inputs(
         target = destination / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source / relative, target)
+
+
+def check_installed_test_inputs(source: Path, installed: Path) -> None:
+    """Require package test modules, data and conftests in the distribution."""
+    if not source.is_dir():
+        raise FileNotFoundError(source)
+    for path in source.rglob("*"):
+        relative = path.relative_to(source)
+        if "__pycache__" in relative.parts or not path.is_file():
+            continue
+        if (
+            {"tests", "integration_tests"}.intersection(relative.parts)
+            or path.name == "conftest.py"
+        ) and not (installed / relative).is_file():
+            raise FileNotFoundError(installed / relative)
 
 
 class Report:
@@ -134,6 +134,7 @@ def installed_test_main(
 ) -> int:
     """Validate package provenance, then collect and run the release suite."""
     import importlib.metadata
+    import importlib.util
 
     import particula
     import pytest
@@ -156,15 +157,30 @@ def installed_test_main(
         [sys.executable, "-m", "pip", "check"], check=True
     )
 
+    plugins: list[object] = [Report(suite)]
+    package = origin.parent
+    if suite == "package":
+        # A wheel that omits a new test or fixture must fail before collection.
+        check_installed_test_inputs(source / "particula", package)
+        # The installed tree is outside the checkout conftest's scope. Load
+        # its warnings and marker hooks explicitly for this pytest session.
+        spec = importlib.util.spec_from_file_location(
+            "release_test_bootstrap", workspace / "conftest.py"
+        )
+        if spec is None or spec.loader is None:
+            raise RuntimeError("Unable to load release test configuration")
+        bootstrap = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(bootstrap)
+        plugins.append(bootstrap)
+
     selections = {
-        # This workspace contains only package tests. Include every subtree,
-        # including wall-loss tests excluded by the source checkout config.
         "package": [
             "-o",
             "norecursedirs=__pycache__",
+            f"--ignore={package / 'docs'}",
             "-m",
             RELEASE_MARKERS,
-            "particula",
+            str(package),
         ],
         "examples": ["-m", RELEASE_MARKERS, *CPU_EXAMPLE_TESTS],
         "coupled-cpu": list(COUPLED_CPU_NODES),
@@ -184,7 +200,7 @@ def installed_test_main(
                 "-Werror",
                 *selections[suite],
             ],
-            plugins=[Report(suite)],
+            plugins=plugins,
         )
     )
 
