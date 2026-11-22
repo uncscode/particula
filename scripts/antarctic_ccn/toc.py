@@ -96,7 +96,7 @@ def render():
             ax.spines[side].set_visible(False)
         fig.text(
             0.08,
-            0.055,
+            0.12,
             "Lines show 95% paired date intervals cm⁻³",
             fontsize=7.3,
         )
