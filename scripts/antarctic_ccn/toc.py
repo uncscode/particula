@@ -29,7 +29,7 @@ def render():
             weight="bold",
             fontsize=9,
         )
-        ax = fig.add_axes([0.09, 0.245, 0.86, 0.405])
+        ax = fig.add_axes([0.09, 0.18, 0.86, 0.50])
         ax.axvline(0, ls=":", lw=0.85, color=INK)
         for i, (key, label) in enumerate(
             [
@@ -39,12 +39,33 @@ def render():
             ]
         ):
             y = 2 - i
-            ax.text(-22, y + 0.27, label, fontsize=7.7)
-            for j, (mod, color, marker) in enumerate(
-                [("salt", TEAL, "o"), ("maximum", RUST, "D")]
+            pair_center = (
+                df.xs(key, level="metric")
+                .loc[["salt", "maximum"], "mean"]
+                .mean()
+            )
+            ax.annotate(
+                label,
+                (pair_center, y),
+                xytext=(0, 4),
+                textcoords="offset points",
+                ha="center",
+                va="bottom",
+                fontsize=7.7,
+                bbox={
+                    "facecolor": fig.get_facecolor(),
+                    "edgecolor": "none",
+                    "pad": 0.3,
+                },
+            )
+            for j, (mod, name, color, marker) in enumerate(
+                [
+                    ("salt", "Separate salts", TEAL, "o"),
+                    ("maximum", "Full coating", RUST, "D"),
+                ]
             ):
                 r = df.loc[mod, key]
-                pos = y - 0.20 * j
+                pos = y - 0.28 * j
                 ax.plot([r.lo95, r.hi95], [pos, pos], color=color, lw=1.15)
                 ax.plot(
                     r["mean"],
@@ -54,17 +75,26 @@ def render():
                     mfc=color if j else "#fbf2e3",
                     mec=color,
                 )
+                if i == 0:
+                    ax.annotate(
+                        name,
+                        (r.hi95, pos),
+                        xytext=(3, 0),
+                        textcoords="offset points",
+                        va="center",
+                        color=color,
+                        fontsize=7.8,
+                        backgroundcolor=fig.get_facecolor(),
+                    )
         ax.set(
             xlim=(-23, 13),
-            ylim=(-0.40, 2.55),
+            ylim=(-0.50, 2.55),
             xticks=[-20, -10, 0, 10],
             yticks=[],
         )
         ax.grid(False)
         for side in ["left", "top", "right"]:
             ax.spines[side].set_visible(False)
-        fig.text(0.08, 0.12, "○ Separate salts", color=TEAL, fontsize=8.6)
-        fig.text(0.55, 0.12, "◆ Full coating", color=RUST, fontsize=8.6)
         fig.text(
             0.08, 0.055, "Lines show 95% paired date intervals", fontsize=7.3
         )
