@@ -25,7 +25,7 @@
       },
       "requires_local_executor": true,
       "publication": {
-        "release_notes": "Adds chamber analysis and reaction-network discovery skills for fitting yields and particle microphysics. Includes a CUDA automatic-differentiation example for testing competing aging reactions."
+        "release_notes": "The TOC figure skill now uses a shared Matplotlib style and the Particula dots logo. It explains how to commit an editable generator with each literature figure and how to place the figure beside a wrapping study abstract."
       }
     }
   },
@@ -37,7 +37,7 @@
     "scientific-computing"
   ],
   "name": "particula-helper",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "license": "MIT",
   "homepage": "https://uncscode.github.io/particula/guide/agent-plugins/",
   "repository": "https://github.com/uncscode/particula"
