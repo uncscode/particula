@@ -22,15 +22,9 @@ def render():
         fig.text(0.07, 0.91, "King Sejong Station", weight="bold", fontsize=13)
         fig.text(0.07, 0.84, "Antarctica  ·  26 held-out dates", fontsize=8.6)
         add_toc_logo(fig, corner="top right")
-        fig.text(
-            0.07,
-            0.74,
-            "Difference from measured CCN (cm⁻³)",
-            weight="bold",
-            fontsize=9,
-        )
-        ax = fig.add_axes([0.09, 0.18, 0.86, 0.50])
-        ax.axvline(0, ls=":", lw=0.85, color=INK)
+        ax = fig.add_axes([0.09, 0.235, 0.86, 0.55])
+        # End the zero guide below the directly labelled intervals.
+        ax.vlines(0, -0.50, 1.54, ls=":", lw=0.85, color=INK)
         for i, (key, label) in enumerate(
             [
                 ("C4", "Count at 0.4%"),
@@ -47,7 +41,7 @@ def render():
             ax.annotate(
                 label,
                 (pair_center, y),
-                xytext=(0, 4),
+                xytext=(0, 7 if i == 0 else 4),
                 textcoords="offset points",
                 ha="center",
                 va="bottom",
@@ -84,7 +78,6 @@ def render():
                         va="center",
                         color=color,
                         fontsize=7.8,
-                        backgroundcolor=fig.get_facecolor(),
                     )
         ax.set(
             xlim=(-23, 13),
@@ -92,6 +85,7 @@ def render():
             xticks=[-20, -10, 0, 10],
             yticks=[],
         )
+        ax.set_xlabel("Difference from measured CCN (cm⁻³)", fontsize=9)
         ax.grid(False)
         for side in ["left", "top", "right"]:
             ax.spines[side].set_visible(False)
