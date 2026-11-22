@@ -3,6 +3,7 @@
 import json
 import runpy
 import sys
+from importlib.resources import files
 from pathlib import Path
 
 import numpy as np
@@ -90,3 +91,19 @@ if __name__ == "__main__":
             for saturation in (0.98, 1.02):
                 workflow["trajectory"](saturation)
             workflow["trajectory"](1.02, permuted=True)
+            examples = files("particula").joinpath(
+                "docs/studies/examples/thermodynamics"
+            )
+            cuda = "cuda" in sys.argv[2:]
+            box = runpy.run_path(
+                str(examples.joinpath("activity/aiomfac_closed_box.py"))
+            )
+            box["simulate"](cuda=cuda)
+            parcel = runpy.run_path(
+                str(
+                    examples.joinpath(
+                        "parcel-experiments/aiomfac_multivapor_parcel.py"
+                    )
+                )
+            )
+            parcel["simulate"](device="cuda:0" if cuda else "cpu")

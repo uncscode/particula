@@ -22,10 +22,10 @@ class TestWorkflow(unittest.TestCase):
         )
 
     def test_permuted_pressure_and_flux(self):
-        from particula.util.constants import GAS_CONSTANT
         from particula.gas.properties.mean_free_path import (
             get_molecule_mean_free_path,
         )
+        from particula.util.constants import GAS_CONSTANT
 
         for permuted in (False, True):
             proc, particle, gas, source, water, expected = self.demo["setup"](
@@ -107,8 +107,22 @@ class TestWorkflow(unittest.TestCase):
         np.testing.assert_array_equal(before[0], particle.masses)
         np.testing.assert_array_equal(before[1], gas.concentration)
 
+    def test_provider_reports_native_slot_after_skipping_vacancies(self):
+        proc, particle, _, _, water, _ = self.demo["setup"](0.98, True)
+        masses = particle.masses[0].copy()
+        masses[2, 1] = 1e-15  # inert-only occupied slot
+        provider = proc.activity_strategy
+        active = np.array([False, True, True])
+        with self.assertRaisesRegex(
+            provider.trial_failure_types, r"batch index \(2,\)"
+        ):
+            provider.neutral_activities(
+                masses, np.array([289.0, 298.0, 301.0]), [water], active
+            )
+
     def test_sulfate_refresh_and_failed_step(self):
         from unittest.mock import patch
+
         from particula_aiomfac import ConvergenceError
 
         proc, p, gas, source, water, _ = self.demo["setup"](
@@ -158,11 +172,11 @@ class TestWorkflow(unittest.TestCase):
         np.testing.assert_array_equal(gas.concentration, initial[1])
 
     def test_layout_admission(self):
-        from particula_aiomfac import MixtureSpec
-        from particula_aiomfac.adapter import AIOMFACActivity
         from particula.dynamics.condensation.species_mapping import (
             CondensationSpeciesMap,
         )
+        from particula_aiomfac import MixtureSpec
+        from particula_aiomfac.adapter import AIOMFACActivity
 
         spec = MixtureSpec({"water": {16: 1}, "salt": {202: 1, 242: 1}})
         for mapping, inert in [
@@ -180,11 +194,11 @@ class TestWorkflow(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "neutral target"):
                 proc.mass_transfer_rate(p, gas, 298.0, 101325.0)
 
-    def test_prepared_gpu_rejects_direct_provider(self):
+    def test_prepared_gpu_binds_direct_provider(self):
         from particula.execution.prepared_condensation import _activity_plan
 
         process, particle, gas, source, water, _ = self.demo["setup"](1.02)
-        with self.assertRaisesRegex(ValueError, "no prepared GPU translation"):
-            _activity_plan(
-                process.activity_strategy, particle, gas, ((source, water),), ()
-            )
+        mode, *_ = _activity_plan(
+            process.activity_strategy, particle, gas, ((source, water),), ()
+        )
+        self.assertEqual(mode, 3)

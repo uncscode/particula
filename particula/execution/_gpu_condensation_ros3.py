@@ -183,6 +183,9 @@ class ROS3Stages:
                 owner._norm,
             ],
         )
-        owner._unpack_trial(owner._candidate)
+        if owner._provider is None:
+            owner._unpack_trial(owner._candidate)
+        else:
+            owner._rate(owner.time + h, owner._candidate, owner._rates[1])
         owner.control_readbacks += 1
         return float(owner._norm.numpy()[0])

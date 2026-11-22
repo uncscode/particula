@@ -80,6 +80,7 @@ class ThermodynamicsConfig:
     modes: Any
     parameters: Any
     molar_mass_reference: Any
+    allow_zero_pressure: bool = False
 
 
 def _validate_array_metadata(
@@ -232,7 +233,9 @@ def validate_thermodynamics_config(
             f"gas.molar_mass must be finite and positive in {caller_name}."
         )
     constant = modes == int(THERMODYNAMICS_MODE_CONSTANT)
-    if np.any(parameters[constant, 0] <= 0.0):
+    if not thermodynamics.allow_zero_pressure and np.any(
+        parameters[constant, 0] <= 0.0
+    ):
         raise ValueError(
             "constant vapor-pressure parameters must be positive in "
             f"{caller_name}."

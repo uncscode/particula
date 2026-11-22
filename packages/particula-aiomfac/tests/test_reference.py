@@ -2,10 +2,10 @@
 
 import hashlib
 import json
+import tomllib
 import unittest
 from pathlib import Path
 
-import tomllib
 from particula_aiomfac import UPSTREAM_REVISION, UPSTREAM_VERSION, __version__
 
 REF = Path(__file__).resolve().parents[1] / "reference"
@@ -16,7 +16,7 @@ class TestFixtures(unittest.TestCase):
         pin = tomllib.loads((REF / "upstream.toml").read_text())
         self.assertEqual(
             (__version__, UPSTREAM_REVISION, UPSTREAM_VERSION),
-            ("0.1.2", pin["revision"], pin["version"]),
+            ("0.1.3", pin["revision"], pin["version"]),
         )
 
     def test_inventory(self):

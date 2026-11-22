@@ -8,6 +8,11 @@ on:
       - '_particula_build.py'
       - 'particula/particles/activity_*.py'
       - 'particula/dynamics/condensation/condensation_strategies.py'
+      - 'particula/dynamics/*parcel.py'
+      - 'particula/execution/*condensation*.py'
+      - 'particula/execution/*parcel*.py'
+      - 'particula/particles/prepared_activity.py'
+      - 'docs/studies/examples/thermodynamics/**/aiomfac_*.py'
       - '.github/workflows/aiomfac-reference.yml'
   push:
     branches: [main]
@@ -17,6 +22,11 @@ on:
       - '_particula_build.py'
       - 'particula/particles/activity_*.py'
       - 'particula/dynamics/condensation/condensation_strategies.py'
+      - 'particula/dynamics/*parcel.py'
+      - 'particula/execution/*condensation*.py'
+      - 'particula/execution/*parcel*.py'
+      - 'particula/particles/prepared_activity.py'
+      - 'docs/studies/examples/thermodynamics/**/aiomfac_*.py'
       - '.github/workflows/aiomfac-reference.yml'
 permissions:
   contents: read
@@ -28,8 +38,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install build . ./packages/particula-aiomfac
-      - run: python -m unittest discover -s packages/particula-aiomfac/tests
+      - run: python -m pip install build pytest . ./packages/particula-aiomfac
+      - run: python -m pytest -q packages/particula-aiomfac/tests particula/dynamics/tests/multivapor_parcel_test.py
       - run: python packages/particula-aiomfac/tools/qualify_packages.py
   reproduce:
     runs-on: ubuntu-24.04

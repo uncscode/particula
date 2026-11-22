@@ -101,6 +101,12 @@ def _freeze(value):
         return ("array", value.dtype.str, value.shape, value.tobytes())
     if type(value) in (tuple, list):
         return tuple(_freeze(item) for item in value)
+    if isinstance(value, ac.ActivityStrategy):
+        from particula.particles.prepared_activity import provider_identity
+
+        identity = provider_identity(value)
+        if identity is not None:
+            return _freeze(identity)
     if type(value) in _CONFIGURATION_TYPES:
         # CPUExecutionContext owns stochastic draws, and latent energy is an
         # output diagnostic. Neither identifies the physical configuration.

@@ -83,6 +83,25 @@ def _batch(
     )
 
 
+@wp.kernel(enable_backward=False)
+def _masked_batch(
+    layout: wp.array(dtype=wp.int32),
+    parameters: wp.array(dtype=wp.float64),
+    masses: wp.array2d(dtype=wp.float64),
+    temperature: wp.array(dtype=wp.float64),
+    out: wp.array2d(dtype=wp.float64),
+    status: wp.array(dtype=wp.int32),
+    scratch: wp.array2d(dtype=wp.float64),
+    active: wp.array(dtype=wp.int32),
+):
+    if active[wp.tid()] == 0:
+        status[wp.tid()] = 0
+        return
+    _calculate(
+        wp.tid(), layout, parameters, masses, temperature, out, status, scratch
+    )
+
+
 class CudaModel:
     """A prepared mixture on one CUDA device. Columns are in output_slices order."""
 
@@ -212,7 +231,15 @@ class CudaModel:
         wp.synchronize_stream(self.stream)
 
     def evaluate_into(
-        self, masses, temperature, out, status, workspace, *, stream
+        self,
+        masses,
+        temperature,
+        out,
+        status,
+        workspace,
+        *,
+        stream,
+        active=None,
     ):
         """Enqueue contiguous float64 rows with status 0=fixed, 1=converged, negative=failure."""
         rows = masses.shape[0]
@@ -238,11 +265,23 @@ class CudaModel:
                 raise ValueError(
                     "CUDA array device, shape, dtype or stride mismatch"
                 )
+        if active is not None and (
+            active.shape != (rows,)
+            or active.device != self.device
+            or active.dtype != wp.int32
+            or not active.is_contiguous
+        ):
+            raise ValueError("invalid CUDA occupancy mask")
         if rows:
             wp.launch(
-                _batch,
+                _batch if active is None else _masked_batch,
                 dim=rows,
-                inputs=[self.layout, self.parameters, *args],
+                inputs=[
+                    self.layout,
+                    self.parameters,
+                    *args,
+                    *([] if active is None else [active]),
+                ],
                 device=self.device,
                 stream=stream,
             )

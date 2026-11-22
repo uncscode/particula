@@ -541,6 +541,17 @@ class CondensationStrategy(ABC):
             sources,
             targets,
         )
+        if (
+            getattr(self.activity_strategy, "prepared_provider_version", None)
+            == 1
+        ):
+            # Validate the candidate before either inventory becomes visible.
+            active = particle.concentration[0] > 0
+            if particle.distribution_type == "particle_resolved":
+                active &= np.any(new_masses > 0, axis=1)
+            self.activity_strategy.neutral_activities(
+                new_masses, temperature, targets, active
+            )
         heat = self._native_latent_heat_values(gas, temperature)
         energy = 0.0
         if heat is not None:

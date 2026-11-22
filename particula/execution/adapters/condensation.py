@@ -963,6 +963,9 @@ class WarpCondensationExecutionAdapter:
         """
         binding = self.prepare(cast(WarpCondensationExecutionState, state))
         value = binding.execute()
+        provider = getattr(binding.prepared, "provider", None)
+        if provider is not None and int(binding.prepared.failure.numpy()[0]):
+            raise ValueError(provider.failure_message())
         return ExecutionResult(
             state,
             (),
@@ -1002,7 +1005,7 @@ def _validate_selected_warp_sidecars(
         )
 
     requires_activity_surface = (
-        configuration.activity_mode.value in ("kappa", "bat")
+        configuration.activity_mode.value in ("kappa", "bat", "prepared")
         or configuration.surface_mode.value == "composition_weighted"
     )
     sidecar = state.activity_surface
@@ -1017,7 +1020,7 @@ def _validate_selected_warp_sidecars(
     ):
         raise ValueError("activity_surface must provide profile selectors.")
     sidecar = cast(Any, sidecar)
-    expected_activity = {"ideal": 0, "kappa": 1, "bat": 2}[
+    expected_activity = {"ideal": 0, "kappa": 1, "bat": 2, "prepared": 3}[
         configuration.activity_mode.value
     ]
     expected_surface = (

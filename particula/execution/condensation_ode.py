@@ -125,7 +125,20 @@ class CondensationODE:
             + [gas_tol[index] for index in self._gas_indices]
         )
         self.problem = ODEProblem(
-            self._rate, self._admissible, self._jacobian, self._partial_time
+            self._rate,
+            self._admissible,
+            self._jacobian,
+            self._partial_time,
+            validate_candidate=(
+                self._rate
+                if getattr(
+                    self._strategy.activity_strategy,
+                    "prepared_provider_version",
+                    None,
+                )
+                == 1
+                else None
+            ),
         )
         self.solver = AdaptiveSolver(
             self.problem,
@@ -213,15 +226,23 @@ class CondensationODE:
         gas_rate = np.zeros_like(state.gas.concentration)
         for box, pairs in enumerate(self._maps):
             view = _cpu_batch.box_view(state, box)
-            rate = self._strategy.mass_transfer_rate(
-                view.particles,
-                view.gas,
-                float(view.environment.temperature[0]),
-                float(view.environment.pressure[0]),
-                None
-                if self._viscosity is None
-                else float(self._viscosity[box]),
-            )
+            try:
+                rate = self._strategy.mass_transfer_rate(
+                    view.particles,
+                    view.gas,
+                    float(view.environment.temperature[0]),
+                    float(view.environment.pressure[0]),
+                    None
+                    if self._viscosity is None
+                    else float(self._viscosity[box]),
+                )
+            except getattr(
+                self._strategy.activity_strategy, "trial_failure_types", ()
+            ) as error:
+                raise TrialDomainError(
+                    f"condensation activity at box {box}, "
+                    f"rate at t={time:g}: {error}"
+                ) from error
             mass_rate[box] = rate
             if self._strategy.update_gases:
                 for source, target in pairs:

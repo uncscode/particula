@@ -37,7 +37,7 @@ repository = "https://github.com/uncscode/particula"
 particula-docs = "particula_docs:main"
 
 [project.optional-dependencies]
-aiomfac = ["particula-aiomfac>=0.1.2,<0.2"]
+aiomfac = ["particula-aiomfac>=0.1.3,<0.2"]
 plot = ["matplotlib>=3.8"]
 dev = [
     "pytest", "pytest-cov", "jupyterlab", "nbclient", "nbconvert",

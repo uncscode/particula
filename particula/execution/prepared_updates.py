@@ -65,13 +65,13 @@ def compose_operations(context: BuiltinPreparationContext, plans, operations):
         prepared.thermodynamics_modes,
         prepared.thermodynamics_parameters,
         prepared.refresh_temperature,
-        prepared.gas_vapor_pressure,
+        context.gas.vapor_pressure,
         failure,
     ]
     ratio_inputs = [
-        prepared.gas_concentration,
+        context.gas.concentration,
         prepared.gas_molar_mass,
-        prepared.gas_vapor_pressure,
+        context.gas.vapor_pressure,
         prepared.refresh_temperature,
         saturation,
         failure,

@@ -1,6 +1,6 @@
 # particula-aiomfac
 
-Version 0.1.2 evaluates liquid-phase activities with bundled AIOMFAC-web 3.15
+Version 0.1.3 evaluates liquid-phase activities with bundled AIOMFAC-web 3.15
 parameters. NumPy and SciPy provide CPU evaluation. The optional Warp backend
 evaluates the same chemistry in float64 on NVIDIA CUDA devices. It runs independently of Particula.
 Each component is a neutral molecule described by explicit subgroup counts or a
@@ -91,6 +91,17 @@ The [closed-water example](examples/closed_water.py) selects the provider with
 each dissolved component once and lists inert lanes separately. The gas map
 chooses the exchanging neutral species. Publish the compatible backend before
 releasing the public Particula extra.
+
+Backend 0.1.3 also binds the full dissolved composition to Particula’s
+fixed-step and adaptive CUDA solvers. The two-vapor box exchanges water and
+1,4-butanediol. The rising parcel adds pressure, temperature, a shared surface
+heat balance and a vapor reservoir for each species. Both examples have CPU
+references and restartable CUDA RK23 and ROS3 runs. Run the installed examples
+with the GPU package check from the Particula repository root.
+
+```sh
+python packages/particula-aiomfac/tools/qualify_packages.py --cuda
+```
 
 The [Fortran reference guide](reference/README.md) describes the pinned
 source, table generation, and numerical qualification. The backend wheel includes

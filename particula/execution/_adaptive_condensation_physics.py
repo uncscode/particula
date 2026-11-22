@@ -30,7 +30,7 @@ def material_rates(
     references: FloatVector,
     activity_density: FloatVector,
     kappas: FloatVector,
-    bat_table: FloatVector,
+    activity_parameters: FloatVector,
     activity_mode: wp.int32,
     water: wp.int32,
     accommodation: FloatVector,
@@ -77,10 +77,14 @@ def material_rates(
         activity = physics.water_activity_kappa_wp(
             masses, activity_density, kappas, box, slot, int(water)
         )
+    elif activity_mode == 3:
+        activity = activity_parameters[
+            (box * masses.shape[1] + slot) * masses.shape[2] + material
+        ]
     elif activity_mode == 2:
         organic_fraction = masses[box, slot, 1] / references[1] / amount
         activity = physics.binary_activity_wp(
-            bat_table, organic_fraction, material
+            activity_parameters, organic_fraction, material
         )
     radius = wp.max(
         physics.particle_radius_from_volume_wp(volume), wp.float64(1e-10)

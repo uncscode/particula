@@ -9,8 +9,8 @@ from ._terms import electrolyte_terms, short_range
 CARBONATE_EVALUATIONS_PER_DIMENSION = 500
 
 
-class ConvergenceError(ValueError):
-    """A physical root could not be verified at the reported batch index."""
+class ActivityDomainError(ValueError):
+    """An indexed composition or equilibrium failure during evaluation."""
 
     def __init__(self, reason, batch_index=None):
         self.reason = reason
@@ -20,6 +20,10 @@ class ConvergenceError(ValueError):
             if batch_index is None
             else f"{reason} at batch index {batch_index}"
         )
+
+
+class ConvergenceError(ActivityDomainError):
+    """A physical root could not be verified at the reported batch index."""
 
 
 def log_constants(t):

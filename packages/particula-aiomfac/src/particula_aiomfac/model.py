@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 import numpy as np
 
 from . import UPSTREAM_REVISION, UPSTREAM_VERSION
-from ._equilibrium import ConvergenceError, solve
+from ._equilibrium import ActivityDomainError, ConvergenceError, solve
 from ._terms import electrolyte_terms, short_range
 
 
@@ -180,7 +180,7 @@ class PreparedModel:
                     idx = tuple(
                         map(int, np.unravel_index(start + where[0], shape))
                     )
-                    raise ValueError(f"{reason} at batch index {idx}")
+                    raise ActivityDomainError(reason, batch_index=idx)
 
             reject(~np.isfinite(tk) | (tk <= 0), "invalid temperature")
             reject(

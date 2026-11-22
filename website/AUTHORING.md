@@ -189,7 +189,10 @@ Declare every imported local helper and data file in `inputs`. These bytes
 participate in freshness checks and are included in the downloadable ZIP with
 `example.py`, preserving their relative import paths (or `input_destinations`).
 The plain Python download remains available; use the ZIP when helpers or data
-are needed. Test extracted bundles independently before publication.
+are needed. Test extracted bundles independently before publication. For a
+separately installed optional model, declare its source and parameter files
+in `science_inputs`. These paths participate in the scientific fingerprint
+and saved hash inventory while the model ships in its own distribution.
 
 ## Maintain the LLM documentation index
 

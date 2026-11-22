@@ -58,6 +58,11 @@ def executable_signature(source):
     ]
 
 
+def scientific_inputs(config):
+    """Include installed science code when hashing study dependencies."""
+    return [*config.get("inputs", []), *config.get("science_inputs", [])]
+
+
 def fingerprint(config, root=ROOT):
     """Hash executable semantics, settings, and declared input bytes."""
     payload = {
@@ -68,7 +73,7 @@ def fingerprint(config, root=ROOT):
         "input_destinations": config.get("input_destinations", {}),
         "inputs": {
             name: hashlib.sha256((root / name).read_bytes()).hexdigest()
-            for name in config.get("inputs", [])
+            for name in scientific_inputs(config)
         },
     }
     if config.get("full_canvas"):
@@ -575,7 +580,7 @@ def refresh(
             "scientific_source_sha256": initial_science_hash,
             "input_sha256": {
                 name: hashlib.sha256((root / name).read_bytes()).hexdigest()
-                for name in config.get("inputs", [])
+                for name in scientific_inputs(config)
             },
             "example": example_id,
             "fingerprint": initial_fingerprint,
@@ -661,7 +666,7 @@ def simulation_fingerprint(config, root=ROOT):
         "input_destinations": config.get("input_destinations", {}),
         "inputs": {
             name: hashlib.sha256((root / name).read_bytes()).hexdigest()
-            for name in config.get("inputs", [])
+            for name in scientific_inputs(config)
             if name not in config.get("plot_inputs", [])
         },
     }
@@ -743,7 +748,7 @@ def selected_changed(configs, base, root=ROOT):
     )
     selected = []
     for key, config in configs.items():
-        dependencies = set(config.get("inputs", []))
+        dependencies = set(scientific_inputs(config))
         if config.get("full_canvas"):
             dependencies.update(STYLE_INPUTS)
         if all_changed or changed.intersection(dependencies):

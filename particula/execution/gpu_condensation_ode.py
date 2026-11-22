@@ -239,6 +239,13 @@ class GPUCondensationODE:
                 forward[target], reverse[source] = source, target
         self._forward = self._array(forward, wp.int32)
         self._reverse = self._array(reverse, wp.int32)
+        self._provider = None
+        if config["activity_mode"] == 3:
+            self._provider = self._strategy.activity_strategy.bind_device(
+                self._shape, np.flatnonzero(forward >= 0), self.device
+            )
+            self._bat_table = self._provider.values.flatten()
+            self._provider_stage = 0
 
     def _check_ready(self):
         if self._faulted:
@@ -257,8 +264,14 @@ class GPUCondensationODE:
         self.control_readbacks += 1
         if self._invalid.numpy()[0]:
             raise TrialDomainError(
-                "GPU trial leaves the physical inventory domain"
+                self._activity_failure()
+                or "GPU trial leaves the physical inventory domain"
             )
+
+    def _activity_failure(self):
+        if self._provider is not None:
+            return self._provider.failure_message()
+        return ""
 
     def _environment(self, time):
         if self._forcing is None:
@@ -332,6 +345,16 @@ class GPUCondensationODE:
                 self._mean_free_path,
             ],
         )
+        if self._provider is not None:
+            self._provider.evaluate(
+                self._masses,
+                self._counts,
+                self._temperature,
+                self._invalid,
+                stage=self._provider_stage,
+            )
+            self._provider_stage += 1
+            self._status()
         self.statistics.rate_calls += 1
         self._launch(
             material_rates,
@@ -419,7 +442,13 @@ class GPUCondensationODE:
             ],
         )
 
+    def _begin_activity_trial(self):
+        if self._provider is not None:
+            self._provider.detail.zero_()
+            self._provider_stage = 0
+
     def _trial(self, h):
+        self._begin_activity_trial()
         if self._ros3 is not None:
             return self._ros3.trial(self, h)
         k1, k2, k3, k4 = self._rates
@@ -472,7 +501,10 @@ class GPUCondensationODE:
         floor = min(self.min_step, bound - self.time)
         for _ in range(self.max_trials):
             if h < floor or self.time + h == self.time:
-                raise RuntimeError("accuracy requires a step below min_step")
+                raise RuntimeError(
+                    self._activity_failure()
+                    or "accuracy requires a step below min_step"
+                )
             domain_failure = False
             try:
                 norm = self._trial(h)
@@ -504,7 +536,8 @@ class GPUCondensationODE:
                 else max(0.1, min(0.5, 0.9 * norm ** (-1 / 3)))
             )
         raise RuntimeError(
-            "maximum trial count exceeded without accepting a step"
+            self._activity_failure()
+            or "maximum trial count exceeded without accepting a step"
         )
 
     def snapshot(self):

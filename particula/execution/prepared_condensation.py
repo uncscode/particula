@@ -131,7 +131,16 @@ def _activity_plan(activity, particles, gas, pairs, vapor):  # noqa: C901
         ActivityIdealVolume,
         ActivityKappaParameter,
     )
+    from particula.particles.prepared_activity import provider_identity
 
+    if provider_identity(activity) is not None:
+        activity.validate_material_layout(
+            particles.n_species, tuple(t for _, t in pairs)
+        )
+        references = np.ones(particles.n_species)
+        for source, target in pairs:
+            references[target] = gas.molar_mass[source]
+        return 3, 0, (0.0,) * particles.n_species, tuple(references), None
     if type(activity) is ActivityBAT:
         if particles.n_species != 2:
             raise ValueError("BAT requires [water, organic] material order")
@@ -244,10 +253,14 @@ def plan_condensation(
     pairs = tuple(
         (int(s), int(t)) for s, t in zip(sources, targets, strict=True)
     )
+    prepared_activity = (
+        getattr(strategy.activity_strategy, "prepared_provider_version", None)
+        == 1
+    )
     vapor = _vapor_plan(
         strategy.vapor_pressure_strategy,
         len(aerosol.gas.name),
-        allow_zero=allow_zero_vapor,
+        allow_zero=allow_zero_vapor or prepared_activity,
     )
     tensions, surface_mode, kelvin_density = _surface_plan(
         strategy.surface_strategy, aerosol.particles
@@ -290,6 +303,11 @@ def plan_condensation(
                     else {}
                 ),
                 activity_mode=activity_mode,
+                **(
+                    {"provider": strategy.activity_strategy.prepared_identity()}
+                    if activity_mode == 3
+                    else {}
+                ),
                 water=water,
                 kappas=kappas,
                 **({"bat_table": bat_table} if bat_table is not None else {}),
@@ -339,7 +357,17 @@ def compile_condensation(
         array([mode for mode, _ in config["vapor"]], wp.int32),
         array(pressure_parameters),
         array(config["molar_mass"]),
+        allow_zero_pressure="provider" in config,
     )
+    provider = None
+    if "provider" in config:
+        from particula.particles.prepared_activity import restore_provider
+
+        provider = restore_provider(config["provider"]).bind_device(
+            context.particles.masses.shape,
+            tuple(t for _, t in config["pairs"]),
+            context.device.native,
+        )
     activity = CondensationActivitySurfaceConfig(
         config["activity_mode"],
         config["surface_mode"],
@@ -347,6 +375,7 @@ def compile_condensation(
         array(config["kappas"]),
         array(config["references"]),
         array(config["bat_table"]) if "bat_table" in config else None,
+        provider,
     )
     resources = context.registry.acquire_condensation()
     species_binding = prepare_condensation_species_map(
@@ -364,6 +393,7 @@ def compile_condensation(
             CondensationActivityMode.IDEAL,
             CondensationActivityMode.KAPPA,
             CondensationActivityMode.BAT,
+            CondensationActivityMode.PREPARED,
         )[config["activity_mode"]],
         CondensationSurfaceMode.COMPOSITION_WEIGHTED
         if config["surface_mode"]
