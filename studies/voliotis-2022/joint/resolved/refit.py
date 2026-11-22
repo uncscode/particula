@@ -18,21 +18,8 @@ def write_json(name, record):
     )
 
 
-def run():
-    """Fit kinetics and score stochastic particle replays."""
-    RESULTS.mkdir(exist_ok=True)
-    c = Chamber()
-    data = Targets(c)
-
-    def measure(points, seed=17, n=256, dt=30, snapshot=False, details=False):
-        result = c.run(
-            points[:, :-2], c.ids, n=n, dt=dt, rng=seed, snapshot=snapshot
-        )
-        score, d = data.evaluate(result, points, c.ids, details)
-        return score, result, d
-
-    base = np.r_[c.baseline(), 0.046, 0.0]
-    joint = np.r_[c.baseline("joint"), 0.046, 0.0]
+def parameter_bounds():
+    """Physical limits used for fitting and perturbation replays."""
     caps = np.array([x["upper"] for x in ARCHIVE["reactions"]])
     lows = np.r_[
         [1 / 12] * 3,
@@ -70,22 +57,13 @@ def run():
         0.30,
         0.30,
     ]
-    # Deliberately leave unused predecessor knobs frozen.
-    frozen = np.array([10, 11, 13, 14, 15])
-    seed = 19
-    start = time.monotonic()
-    initial, result, _ = measure(
-        np.array([base]), seed=seed, n=1024, snapshot=True
-    )
-    shadow, info = conditional_chemistry(
-        c, result[0][0], c.gas_history, base, caps
-    )
-    first = np.stack([base, joint, shadow])
-    initial_small, *_ = measure(first)
-    center = first[initial_small.loss.argmin()].copy()
-    history = []
+    return lows, highs
+
+
+def parameter_steps(center, caps):
+    """Absolute perturbation scales in the fitted parameter coordinates."""
     rate_scales = np.minimum(caps * 0.1, np.maximum(center[16:86] * 0.3, 0.08))
-    scales = np.r_[
+    return np.r_[
         np.maximum(0.08, center[:3] * 0.25),
         np.full(6, 0.15),
         1.8,
@@ -103,6 +81,39 @@ def run():
         0.065,
         0.065,
     ]
+
+
+def run():
+    """Fit kinetics and score stochastic particle replays."""
+    RESULTS.mkdir(exist_ok=True)
+    c = Chamber()
+    data = Targets(c)
+
+    def measure(points, seed=17, n=256, dt=30, snapshot=False, details=False):
+        result = c.run(
+            points[:, :-2], c.ids, n=n, dt=dt, rng=seed, snapshot=snapshot
+        )
+        score, d = data.evaluate(result, points, c.ids, details)
+        return score, result, d
+
+    base = np.r_[c.baseline(), 0.046, 0.0]
+    joint = np.r_[c.baseline("joint"), 0.046, 0.0]
+    lows, highs = parameter_bounds()
+    caps = highs[16:86]
+    frozen = np.array([10, 11, 13, 14, 15])
+    seed = 19
+    start = time.monotonic()
+    initial, result, _ = measure(
+        np.array([base]), seed=seed, n=1024, snapshot=True
+    )
+    shadow, info = conditional_chemistry(
+        c, result[0][0], c.gas_history, base, caps
+    )
+    first = np.stack([base, joint, shadow])
+    initial_small, *_ = measure(first)
+    center = first[initial_small.loss.argmin()].copy()
+    history = []
+    scales = parameter_steps(center, caps)
     dims = np.flatnonzero(scales > 0)
     rng = np.random.default_rng(321)
     # Exact baselines stay candidates. Interior center allows two-sided
