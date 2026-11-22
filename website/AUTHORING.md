@@ -213,7 +213,12 @@ Use the [documentation guide](https://uncscode.github.io/particula/contribute/do
 placement and the shared scientific narrative framework. The topic registry is
 `website/topics.json`; local SVGs live in `website/public/topic-icons/`.
 For an illustrated study, set its resource entry’s `tocFigure` to the file path
-relative to `docs/images/`. The Studies and matching topic carousels reuse that
+relative to `docs/images/`. Put that image, with descriptive alt text, in its
+own paragraph and follow it immediately with the study’s opening paragraph.
+For a Python study, use the same order in its opening Markdown cell. The page
+template places the paragraph on the left and the TOC on the right. Narrow
+reading columns stack the paragraph above the centered figure.
+The Studies and matching topic carousels reuse that
 resource’s title and destination. The home carousel selects study IDs in
 `docs/index.md`.
 
