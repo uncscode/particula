@@ -7,7 +7,7 @@
   "input_sha256": {
     "scripts/antarctic_ccn/analysis.py": "72e3ca4552b6e940b52e3f7236a732fa1e6d0ffedb38c92dfe0b846ccb6b7b74",
     "scripts/antarctic_ccn/model.py": "e35ffd449964ebcafb81667d0037b9a7c681ea3b33aa8a6cd804e6b3a17e12c6",
-    "scripts/antarctic_ccn/plots.py": "0e5d121114a2dfc302fa2a9c2fb4bda785e855956e677aec41df5320c5c56a3b",
+    "scripts/antarctic_ccn/plots.py": "6a052b501934b6d1ddbc0a22084b13e6a5864a1546e291dd855a21b1d2d4fe61",
     "docs/data/antarctic-ccn/inputs.npz": "b780eab89377eb2482e65df56f79c92a2ac6d19e55d680a6184b58a9838111bb",
     "docs/data/antarctic-ccn/activities.csv": "42533196582d9fa5ca807601601a09cd334e2f9a0be3a6e1694a10496dd537c1",
     "docs/data/antarctic-ccn/water-activity.csv": "004fedd60893a64a31a8d44aabfc74247abdad0bb73eb4a00b64bd9a684fe379",
@@ -17,7 +17,7 @@
     "docs/data/antarctic-ccn/synthetic-decisions.csv.gz": "6b4876d8c23cc5e9b36561a826f62fb072e64edc3e49ca404a5ab0f16f804be2"
   },
   "example": "antarctic-ccn-uncertainty",
-  "fingerprint": "bc378d3b076f3588324d65bba585997b725a169c785ba268e791ce574aadb452",
+  "fingerprint": "9ca1531f913846044acde0f475e175be559be5e927105d74d181d914116d0a52",
   "source": "docs/studies/literature/antarctic-ccn/uncertainty.py",
   "revision": "0eaa6a73f4b2366ff050111ab699e13ee04a7e90",
   "package_dirty": false,
@@ -55,10 +55,10 @@
   "files": {
     "figure-4-1.png": "dca6d419689e7b81b24e970904f12d1cd7a165b16c41fcc1119a9091688079f8",
     "figure-3-1.png": "42bfa38e17dee8dc508755c17715dc0427af8e626f4a6a9a7482e383d6ecfa12",
-    "figure-2-1.png": "6ec9d64e23ff25e1f74065e4825edda5a62c44bd365b6147cd6dff0fa645c5e7",
+    "figure-2-1.png": "8f8844c2aed1f3c0e2d3536353d6d5e35673f14abc3065e5c577dccbe36adfc7",
     "executed_source.py": "19dd3bbb1b88cd3a5c7a734e2825bf7c9cabe700aba08abd75c888e4fa24a4d8",
     "data.json": "5f4f69cbcddf26f7257250cedfa95a2fd8ca44363ebb12b58c335f4d33e401a5",
-    "source.py": "19dd3bbb1b88cd3a5c7a734e2825bf7c9cabe700aba08abd75c888e4fa24a4d8"
+    "source.py": "427a3e99980b4b836b38e5eeb9c4fc38e3593d4e120c62cea76097cbd72dc098"
   },
   "simulation_fingerprint": "c0b5587979831cfc72edbb3cb06f4c59b8cd2dbc96561872627817246ca30c53",
   "render_versions": {
@@ -84,7 +84,7 @@
     "scripts/antarctic_ccn/recovery.py": "65cea0045a6530eceaa07abadb150d76d2ee64af545cf50d803071ae6a9d88f8",
     "docs/data/antarctic-ccn/synthetic-decisions.csv.gz": "6b4876d8c23cc5e9b36561a826f62fb072e64edc3e49ca404a5ab0f16f804be2"
   },
-  "rendered_at": "2026-11-22T22:54:14.477292+00:00",
-  "render_revision": "0eaa6a73f4b2366ff050111ab699e13ee04a7e90",
-  "render_elapsed_seconds": 2.092894210945815
+  "rendered_at": "2026-11-22T23:00:50.162505+00:00",
+  "render_revision": "31fad13cc6c276789f34262447093eb6e2162781",
+  "render_elapsed_seconds": 2.0071573990862817
 }

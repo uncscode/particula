@@ -19,9 +19,10 @@ else:
 # %% [markdown]
 # ### The measured and predicted rises
 #
-# Points are hourly-weighted means. The whiskers resample whole dates and
-# refit the common film fraction. The lower right panel instead describes
-# the range of hourly concentrations in the retrospective test set.
+# Open circles show observed means. Colored lines show modeled means.
+# The observation bars and model shading are pointwise 95% intervals
+# from whole-date resampling and refitting. The lower right panel shows
+# the 10th–90th percentile spread of the individual held-out hours.
 # %%
 spectrum(report)
 plt.show()
