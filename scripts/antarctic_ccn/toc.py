@@ -91,12 +91,14 @@ def render():
             xticks=[-20, -10, 0, 10],
             yticks=[],
         )
-        ax.set_xlabel("cm⁻³", fontsize=9)
         ax.grid(False)
         for side in ["left", "top", "right"]:
             ax.spines[side].set_visible(False)
         fig.text(
-            0.08, 0.055, "Lines show 95% paired date intervals", fontsize=7.3
+            0.08,
+            0.055,
+            "Lines show 95% paired date intervals cm⁻³",
+            fontsize=7.3,
         )
         fig.savefig(IMAGES / "graphical-abstract.png", dpi=300)
         plt.close(fig)
