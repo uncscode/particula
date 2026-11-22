@@ -44,3 +44,42 @@ def test_balanced_dimer_search():
         (-2, 1, 0),
         (2, -1, 0),
     )
+
+
+def test_discovered_bimolecular_reaction_executes():
+    """Execute the generated A+B→C candidate and check its analytic decay."""
+    import numpy as np
+    from particula.dynamics.chemistry.discovery import (
+        balanced_steps,
+        compile_network,
+    )
+    from particula.dynamics.chemistry.process import (
+        ChemistrySolver,
+        GasChemistry,
+    )
+    from particula.dynamics.chemistry.tests.process_test import (
+        state_and_process,
+    )
+
+    state, _ = state_and_process("arrhenius", "rk23")
+    formulas = [(1, 0), (0, 1), (1, 1)]
+    steps = balanced_steps(["gas"] * 3, formulas)
+    found = enumerate_networks(
+        steps,
+        [True, True, False],
+        [2],
+        net=(-1, -1, 1),
+        max_steps=1,
+        max_trials=10,
+        max_candidates=2,
+    )
+    (candidate,) = found.networks
+    mechanism = compile_network(
+        candidate, {f"gas:{s}": {} for s in "ABC"}, [2.0]
+    )
+    model = GasChemistry(mechanism.bind(state.gas), ChemistrySolver(rtol=1e-8))
+    model.execute(state, time_step=0.5)
+    # Equimolar reactants, c(t) = c0 / (1 + k c0 t).
+    np.testing.assert_allclose(
+        state.gas.concentration[:, 0] / 0.01, [0.5, 2 / 3], rtol=2e-6
+    )

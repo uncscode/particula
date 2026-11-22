@@ -11,6 +11,8 @@ from dataclasses import dataclass
 from itertools import combinations, permutations
 from operator import index
 
+from particula.dynamics.chemistry.mechanism import ReactionMechanism
+
 Step = tuple[int, ...]
 Network = tuple[Step, ...]
 
@@ -175,3 +177,50 @@ def balanced_steps(
                     )
                 )
     return tuple(sorted(steps))
+
+
+def compile_network(
+    network: Network,
+    species: dict[str, dict],
+    rates: Sequence[float],
+) -> ReactionMechanism:
+    """Build a native mechanism from elementary steps and rate coefficients.
+
+    The insertion order of the phase-qualified species catalog is the matrix
+    column order. Each rate is in inverse seconds for a unimolecular step or
+    cubic metres per mole per second for a bimolecular step. Gas and particle
+    rates use their respective phase volumes. Binding the returned mechanism
+    to an aerosol state performs the native mass and elemental balance checks.
+    """
+    names = tuple(species)
+    resolved = any(name.startswith("particle:") for name in names)
+    reactions = []
+    for number, (row, rate) in enumerate(zip(network, rates, strict=True)):
+        terms = dict(zip(names, map(index, row), strict=True))
+        left = {name: -n for name, n in terms.items() if n < 0}
+        right = {name: n for name, n in terms.items() if n > 0}
+        order = sum(left.values())
+        if order not in (1, 2) or sum(right.values()) not in (1, 2):
+            raise ValueError(
+                "Discovery requires elementary uni/bimolecular steps"
+            )
+        reactions.append(
+            {
+                "id": f"r{number}",
+                "reactants": left,
+                "products": right,
+                "rate": {
+                    "type": "constant",
+                    "k": float(rate),
+                    "units": "1/s" if order == 1 else "m^3/mol/s",
+                },
+            }
+        )
+    return ReactionMechanism.from_dict(
+        {
+            "version": 2 if resolved else 1,
+            "basis": "mol/m^3-phase" if resolved else "mol/m^3-air",
+            "species": species,
+            "reactions": reactions,
+        }
+    )
