@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">After glyoxal dilution, two models predict rising organic mass per sulfate as measurements fall</title>
+  <desc id="desc">Change in organic mass per sulfate after dilution: the chamber measurement and growth-calibrated fit fall below their starting values. The reversible-pool model and its imidazole-producing variant (IC) both rise.</desc>
+  <rect width="300" height="300" fill="#fbf2e3"/>
+  <g font-family="sans-serif" font-weight="600">
+    <text x="25" y="44" font-size="23" text-anchor="start" fill="#243e43">Δ organic/sulfate</text>
+    <line x1="144.00" y1="66.00" x2="144.00" y2="241.00" stroke="#617679" stroke-width="1.6" />
+    <text x="18" y="95" font-size="16" text-anchor="start" fill="#243e43">Measured</text>
+    <line x1="144.00" y1="90.00" x2="129.52" y2="90.00" stroke="#243e43" stroke-width="10" />
+    <text x="18" y="138" font-size="16" text-anchor="start" fill="#243e43">Fitted</text>
+    <line x1="144.00" y1="133.00" x2="134.47" y2="133.00" stroke="#a44d21" stroke-width="10" />
+    <text x="18" y="181" font-size="16" text-anchor="start" fill="#243e43">Reversible</text>
+    <line x1="144.00" y1="176.00" x2="189.62" y2="176.00" stroke="#135963" stroke-width="10" />
+    <text x="18" y="224" font-size="16" text-anchor="start" fill="#243e43">With IC</text>
+    <line x1="144.00" y1="219.00" x2="267.50" y2="219.00" stroke="#135963" stroke-width="10" />
+    <text x="144" y="264" font-size="17" text-anchor="middle" fill="#243e43">0</text>
+  </g>
+<g transform="translate(264 270)">$dots</g>
+</svg>

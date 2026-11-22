@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Cloud droplets over fresh and salt water in the Π Chamber</title>
+  <desc id="desc">The Π Chamber’s two-cloud emblem identifies the facility. Measured cloud droplet concentration rises from the fresh-water to the salt-water experiment. Fitting humidity separately to each haze population predicts a decline on the same scale. Beside the salt-water endpoints, a denser cluster of solid droplets represents the measurement and a sparser cluster of outlined droplets represents the simulation.</desc>
+  <defs>
+    <path id="droplet" d="M0-6.5C-1.6-3.5-4.5-.8-4.5 2a4.5 4.5 0 0 0 9 0C4.5-.8 1.6-3.5 0-6.5Z"/>
+  </defs>
+  <rect width="300" height="300" fill="#fbf2e3"/>
+  <!-- Two-cloud motif adapted from the Pi Chamber emblem, credited on the study page. -->
+  <g stroke="#243e43" stroke-width="2.5" stroke-linejoin="round" fill="#fbf2e3">
+    <path d="M56 49a8 8 0 0 1-1-16 10 10 0 0 1 18-2 6.5 6.5 0 0 1 8 5 6.5 6.5 0 0 1-1 13Z"/>
+    <path d="M28 43a8 8 0 0 1-1-16 9 9 0 0 1 10-7 11 11 0 0 1 21 2 8 8 0 0 1 4 6 7.5 7.5 0 0 1-2 15Z"/>
+  </g>
+  <text x="43" y="38" text-anchor="middle" font-family="serif" font-size="21" fill="#243e43">π</text>
+
+  <!-- Common linear y scale. Measured fresh/salt: 771/1038. Separate haze fits: 734/462. -->
+  <path d="M52 140 214 81" stroke="#243e43" stroke-width="4.5" fill="none"/>
+  <g fill="#243e43"><circle cx="52" cy="140" r="5"/><circle cx="214" cy="81" r="5"/></g>
+  <path d="M52 148 214 208" stroke="#135963" stroke-width="4" stroke-dasharray="8 5" fill="none"/>
+  <path d="m52 143 5 5-5 5-5-5z m162 60 5 5-5 5-5-5z" fill="#fbf2e3" stroke="#135963" stroke-width="2.5"/>
+  <g font-family="sans-serif" font-size="17" font-weight="bold" text-anchor="end">
+    <text x="218" y="67" fill="#243e43">Measured</text>
+    <text x="218" y="175" fill="#135963">Modeled</text>
+  </g>
+  <!-- Equal-sized icons show relative abundance at the salt-water endpoints. -->
+  <g fill="#243e43" stroke="#243e43" stroke-width="1.2">
+    <use href="#droplet" x="241" y="67"/><use href="#droplet" x="258" y="67"/>
+    <use href="#droplet" x="233" y="82"/><use href="#droplet" x="250" y="82"/><use href="#droplet" x="267" y="82"/>
+    <use href="#droplet" x="241" y="97"/><use href="#droplet" x="258" y="97"/>
+  </g>
+  <g fill="#fbf2e3" stroke="#135963" stroke-width="1.9">
+    <use href="#droplet" x="241" y="201"/><use href="#droplet" x="258" y="201"/>
+    <use href="#droplet" x="250" y="217"/>
+  </g>
+  <path d="M34 238h236 M52 238v6 M214 238v6" fill="none" stroke="#617679" stroke-width="2"/>
+  <g fill="#243e43" font-family="sans-serif" font-size="18" text-anchor="middle">
+    <text x="52" y="271">Freshwater</text>
+    <text x="214" y="271">Saltwater</text>
+  </g>
+<g transform="translate(264 270)">$dots</g>
+</svg>

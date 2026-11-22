@@ -6,6 +6,7 @@ from collections import Counter
 from pathlib import Path
 
 import docs_studies
+from render_literature_tocs import is_literature_study
 
 ROOT = Path(__file__).resolve().parents[1]
 ROLES = {"Guide", "Studies", "Theory", "API", "Contribute"}
@@ -102,21 +103,37 @@ def check_paths(by_id):
     return errors
 
 
+def check_toc(resource, root):
+    """Check the exported card and the source that regenerates it."""
+    errors = []
+    source = resource["source"]
+    images = (root / "docs/images").resolve()
+    image = images / resource["tocFigure"]
+    if (
+        resource["role"] != "Studies"
+        or not image.resolve().is_relative_to(images)
+        or not image.is_file()
+    ):
+        errors.append(f"{source}: invalid study TOC figure")
+    if is_literature_study(resource):
+        renderer = root / resource.get("tocSource", "")
+        if (
+            not renderer.resolve().is_relative_to(root.resolve())
+            or not renderer.is_file()
+            or not renderer.name.endswith((".py", ".svg.in"))
+        ):
+            errors.append(f"{source}: missing or invalid TOC source")
+    return errors
+
+
 def check_resources(data, root, by_id):
     """Classify each authored page once with valid topic assignments."""
     errors, covered = [], []
-    images = (root / "docs/images").resolve()
     for resource in data["resources"]:
         source = resource["source"]
         covered.append(source.split("#", 1)[0])
         if "tocFigure" in resource:
-            image = images / resource["tocFigure"]
-            if (
-                resource["role"] != "Studies"
-                or not image.resolve().is_relative_to(images)
-                or not image.is_file()
-            ):
-                errors.append(f"{source}: invalid study TOC figure")
+            errors.extend(check_toc(resource, root))
         assignments = [resource["topic"], *resource["also"]]
         if len(set(assignments)) != len(assignments):
             errors.append(f"{source}: duplicate topic association")

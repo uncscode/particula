@@ -2943,7 +2943,8 @@
         "companions": [],
         "relations": []
       },
-      "tocFigure": "dunne-cloud/formation-overview.png"
+      "tocFigure": "dunne-cloud/formation-toc.png",
+      "tocSource": "studies/dunne-cloud/monte-carlo/toc.py"
     },
     {
       "source": "docs/studies/literature/evaporation-and-uptake/manchester-soa/index.md",
@@ -2967,7 +2968,8 @@
           }
         ]
       },
-      "tocFigure": "manchester-soa/graphical-abstract.svg"
+      "tocFigure": "manchester-soa/graphical-abstract.svg",
+      "tocSource": "studies/voliotis-2022/toc.py"
     },
     {
       "source": "docs/studies/literature/evaporation-and-uptake/manchester-network-growth/index.md",
@@ -2995,7 +2997,8 @@
           }
         ]
       },
-      "tocFigure": "manchester-soa/milestone2-late-loss.png"
+      "tocFigure": "manchester-soa/network-growth-toc.png",
+      "tocSource": "studies/voliotis-2022/joint/milestone2/toc.py"
     },
     {
       "source": "docs/studies/literature/evaporation-and-uptake/manchester-campaign-performance/index.md",
@@ -3019,7 +3022,8 @@
           }
         ]
       },
-      "tocFigure": "manchester-soa/campaign-performance-toc.svg"
+      "tocFigure": "manchester-soa/campaign-performance-toc.svg",
+      "tocSource": "studies/voliotis-2022/joint/campaign_performance/toc.py"
     },
     {
       "source": "docs/studies/literature/pi-chamber/seed-chemistry.md",
@@ -3043,7 +3047,8 @@
           }
         ]
       },
-      "tocFigure": "pi-chamber/seed-optical-cutoff.svg"
+      "tocFigure": "pi-chamber/seed-optical-cutoff.svg",
+      "tocSource": "docs/studies/literature/pi-chamber/seed-chemistry.toc.svg.in"
     },
     {
       "source": "docs/studies/literature/pi-chamber/haze-and-cloud/index.md",
@@ -3070,7 +3075,8 @@
           }
         ]
       },
-      "tocFigure": "pi-chamber/graphical-abstract.svg"
+      "tocFigure": "pi-chamber/graphical-abstract.svg",
+      "tocSource": "docs/studies/literature/pi-chamber/haze-and-cloud/toc.svg.in"
     },
     {
       "source": "docs/studies/examples/coupled-populations/chambers/cloud_chamber_single_cycle.py",
@@ -3680,7 +3686,8 @@
           }
         ]
       },
-      "tocFigure": "dry-psl-mobility/graphical-abstract.svg"
+      "tocFigure": "dry-psl-mobility/graphical-abstract.svg",
+      "tocSource": "docs/studies/literature/dry-psl-mobility/toc.svg.in"
     },
     {
       "source": "docs/guide/processes/ccn-retrieval.md",
@@ -3726,7 +3733,8 @@
           }
         ]
       },
-      "tocFigure": "ccn-kappa-retrieval/graphical-abstract.svg"
+      "tocFigure": "ccn-kappa-retrieval/graphical-abstract.svg",
+      "tocSource": "docs/studies/literature/particle-water-uptake/ccn-retrieval/toc.svg.in"
     },
     {
       "source": "docs/guide/processes/activity.md",
@@ -4115,7 +4123,8 @@
           }
         ]
       },
-      "tocFigure": "citric-acid-activity/graphical-abstract.svg"
+      "tocFigure": "citric-acid-activity/graphical-abstract.svg",
+      "tocSource": "docs/studies/literature/particle-water-uptake/citric-acid/toc.svg.in"
     },
     {
       "source": "docs/studies/validation/material-properties/process-references/qualification.md",
@@ -4369,7 +4378,8 @@
           }
         ]
       },
-      "tocFigure": "bat-ccn/graphical-abstract.svg"
+      "tocFigure": "bat-ccn/graphical-abstract.svg",
+      "tocSource": "docs/studies/literature/particle-water-uptake/bat-ccn.toc.svg.in"
     },
     {
       "source": "docs/theory/dynamics/interparticle-forces.md",
@@ -4471,7 +4481,8 @@
           }
         ]
       },
-      "tocFigure": "nacl-scavenging/graphical-abstract.svg"
+      "tocFigure": "nacl-scavenging/graphical-abstract.svg",
+      "tocSource": "docs/studies/literature/nacl-scavenging/toc.svg.in"
     },
     {
       "source": "docs/studies/validation/wall-loss/spherical_wall_loss_theory.py",
@@ -4512,7 +4523,8 @@
         ],
         "secondary_category": "literature"
       },
-      "tocFigure": "spherical-wall-loss/graphical-abstract.svg"
+      "tocFigure": "spherical-wall-loss/graphical-abstract.svg",
+      "tocSource": "docs/studies/validation/wall-loss/toc.svg.in"
     },
     {
       "source": "docs/studies/validation/condensation/initial-size/infer_initial_radius.py",
@@ -4904,7 +4916,8 @@
           }
         ]
       },
-      "tocFigure": "glyoxal-chamber/graphical-abstract.svg"
+      "tocFigure": "glyoxal-chamber/graphical-abstract.svg",
+      "tocSource": "docs/studies/literature/evaporation-and-uptake/glyoxal_chamber.toc.svg.in"
     },
     {
       "source": "docs/studies/literature/evaporation-and-uptake/pendant-drop/pendant_drop_evaporation.py",
@@ -4939,7 +4952,8 @@
           }
         ]
       },
-      "tocFigure": "pendant-evaporation/graphical-abstract.svg"
+      "tocFigure": "pendant-evaporation/graphical-abstract.svg",
+      "tocSource": "docs/studies/literature/evaporation-and-uptake/pendant-drop/toc.svg.in"
     },
     {
       "source": "docs/studies/literature/cloud-ion-humidity/cloud_ion_humidity.py",
@@ -4973,7 +4987,8 @@
           }
         ]
       },
-      "tocFigure": "cloud-ion-humidity/graphical-abstract.svg"
+      "tocFigure": "cloud-ion-humidity/graphical-abstract.svg",
+      "tocSource": "docs/studies/literature/cloud-ion-humidity/toc.svg.in"
     },
     {
       "source": "docs/studies/literature/particle-water-uptake/mt-hua/mt_hua_salts.py",
@@ -5006,7 +5021,8 @@
           }
         ]
       },
-      "tocFigure": "mt-hua-salts/graphical-abstract.svg"
+      "tocFigure": "mt-hua-salts/graphical-abstract.svg",
+      "tocSource": "docs/studies/literature/particle-water-uptake/mt-hua/toc.svg.in"
     },
     {
       "source": "docs/studies/literature/particle-water-uptake/mt-hua/mixture_activity.py",
@@ -5048,7 +5064,8 @@
           }
         ]
       },
-      "tocFigure": "mam4xx-coagulation/graphical-abstract.svg"
+      "tocFigure": "mam4xx-coagulation/graphical-abstract.svg",
+      "tocSource": "docs/studies/literature/mam4xx-coagulation/toc.svg.in"
     },
     {
       "source": "docs/studies/literature/mam4xx-coagulation/regimes.py",
@@ -5097,7 +5114,8 @@
           }
         ]
       },
-      "tocFigure": "pinic-isomers/graphical-abstract.svg"
+      "tocFigure": "pinic-isomers/graphical-abstract.svg",
+      "tocSource": "docs/studies/literature/pinic-isomers/toc.svg.in"
     },
     {
       "source": "docs/studies/literature/pinic-isomers/isomer_history.py",
@@ -5138,7 +5156,8 @@
           }
         ]
       },
-      "tocFigure": "sea2cloud-events/graphical-abstract.svg"
+      "tocFigure": "sea2cloud-events/graphical-abstract.svg",
+      "tocSource": "scripts/sea2cloud_events/toc.py"
     },
     {
       "source": "docs/studies/literature/sea2cloud-events/marine_history.py",
@@ -5181,7 +5200,8 @@
           }
         ]
       },
-      "tocFigure": "shear-drop-spectrum/graphical-abstract.svg"
+      "tocFigure": "shear-drop-spectrum/graphical-abstract.svg",
+      "tocSource": "docs/studies/literature/shear-drop-spectrum/toc.svg.in"
     },
     {
       "source": "docs/studies/literature/drizzle-settling/drizzle_settling.py",
@@ -5223,7 +5243,8 @@
           }
         ]
       },
-      "tocFigure": "drizzle-settling.svg"
+      "tocFigure": "drizzle-settling.svg",
+      "tocSource": "docs/studies/literature/drizzle-settling/toc.svg.in"
     },
     {
       "source": "docs/studies/examples/thermodynamics/moist_parcel.py",
@@ -5350,7 +5371,8 @@
           }
         ]
       },
-      "tocFigure": "pi-chamber-lidar/graphical-abstract.svg"
+      "tocFigure": "pi-chamber-lidar/graphical-abstract.svg",
+      "tocSource": "docs/studies/literature/pi-chamber-lidar/toc.svg.in"
     },
     {
       "source": "docs/studies/examples/thermodynamics/parcel-experiments/parcel_replay.py",
@@ -5486,7 +5508,8 @@
           }
         ]
       },
-      "tocFigure": "straw-combustion/toc.png"
+      "tocFigure": "straw-combustion/toc.png",
+      "tocSource": "scripts/straw_combustion/toc.py"
     },
     {
       "source": "docs/studies/literature/straw-combustion/straw_combustion.py",

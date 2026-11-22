@@ -1,0 +1,30 @@
+# The complete canvas is three inches square, including margins and branding.
+figure.figsize: 3, 3
+savefig.dpi: 300
+savefig.bbox: standard
+savefig.transparent: False
+figure.facecolor: FBF2E3
+axes.facecolor: FBF2E3
+savefig.facecolor: FBF2E3
+font.family: DejaVu Sans
+font.size: 9
+text.color: 243E43
+axes.labelcolor: 243E43
+axes.titlesize: 12
+axes.titleweight: bold
+axes.titlelocation: left
+axes.edgecolor: 617679
+axes.spines.top: False
+axes.spines.right: False
+axes.grid: False
+xtick.color: 243E43
+ytick.color: 243E43
+xtick.labelsize: 8
+ytick.labelsize: 8
+axes.prop_cycle: cycler('color', ['135963', 'A44D21', '243E43', '617679'])
+lines.linewidth: 1.6
+lines.markersize: 5
+lines.solid_capstyle: round
+patch.linewidth: 0.8
+legend.frameon: False
+pdf.fonttype: 42

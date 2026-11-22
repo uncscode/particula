@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Cloud activation measurements and BAT rank two organic acids in opposite order</title>
+  <desc id="desc">A dry aerosol particle growing into a cloud droplet illustrates activation. Higher hygroscopicity (κ) means less supersaturation is needed for activation at the same dry size. Measured κ is 0.248 for pinic acid and 0.051 for phthalic acid. The BAT model predicts 0.114 and 0.155, respectively. Each line connects a measurement to the prediction for the same acid.</desc>
+  <rect width="300" height="300" fill="#fbf2e3"/>
+  <!-- Schematic dry particle and activated cloud droplet. -->
+  <circle cx="23" cy="37" r="5" fill="#efd1a5" stroke="#243e43" stroke-width="2"/>
+  <path d="M34 37h20m-5-5 5 5-5 5" fill="none" stroke="#617679" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="78" cy="37" r="17" fill="#cad9d2" stroke="#135963" stroke-width="2.4"/>
+  <path d="M68 36q1-6 6-8" fill="none" stroke="#fbf2e3" stroke-width="2.8" stroke-linecap="round"/>
+  <g font-family="sans-serif" fill="#243e43">
+    <text x="107" y="44" font-size="21" font-weight="bold">Cloud activation</text>
+    <text x="17" y="84" font-size="17">Hygroscopicity (κ)</text>
+    <!-- Shared vertical scale for all four endpoints: y = 248 − 540κ. -->
+    <g fill="none" stroke="#617679" stroke-width="1.2">
+      <path d="M52 101v147h123"/>
+      <path d="M48 140h118 M48 194h118" stroke-dasharray="2 5"/>
+    </g>
+    <g text-anchor="end" font-size="14">
+      <text x="44" y="145">0.2</text><text x="44" y="199">0.1</text><text x="44" y="253">0</text>
+    </g>
+    <path d="M69 114.08L166 186.39" fill="none" stroke="#135963" stroke-width="3.8"/>
+    <g fill="#135963">
+      <circle cx="69" cy="114.08" r="5.5"/><circle cx="166" cy="186.39" r="5.5"/>
+    </g>
+    <path d="M69 220.46L166 164.19" fill="none" stroke="#a44d21" stroke-width="3.8" stroke-dasharray="7 4"/>
+    <g fill="#fbf2e3" stroke="#a44d21" stroke-width="2.5">
+      <path d="M69 214.46l6 6-6 6-6-6z"/><path d="M166 158.19l6 6-6 6-6-6z"/>
+    </g>
+    <g font-size="16" font-weight="bold">
+      <text x="180" y="163" fill="#a44d21">Phthalic acid</text>
+      <text x="180" y="195" fill="#135963">Pinic acid</text>
+    </g>
+    <g text-anchor="middle" font-size="16">
+      <text x="69" y="275">Measured</text><text x="166" y="275">BAT model</text>
+    </g>
+  </g>
+<g transform="translate(264 270)">$dots</g>
+</svg>

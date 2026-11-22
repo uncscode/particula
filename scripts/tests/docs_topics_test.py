@@ -177,3 +177,14 @@ def test_toc_figure_must_belong_to_a_study_and_exist():
     assert f"{resource['source']}: invalid study TOC figure" in (
         docs_topics.validate(data)
     )
+
+
+def test_literature_card_requires_its_renderer():
+    """A published illustration must retain an editable source in its study."""
+    graph = docs_topics.load()
+    resource = next(r for r in graph["resources"] if "tocSource" in r)
+    del resource["tocSource"]
+    assert any(
+        "missing or invalid TOC source" in e
+        for e in docs_topics.validate(graph)
+    )

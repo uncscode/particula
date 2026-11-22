@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Similar droplet gains from different polluted Π Chamber backgrounds</title>
+  <desc id="desc">The two-cloud Π Chamber emblem accompanies a schematic of dry air entering from above. Bars on a common zero-based scale show cloud droplets per cubic centimetre. Yeom and colleagues measured 1,562 before dry-air entrainment and a gain of 72. One localized-inlet Particula simulation predicted 456 before entrainment and a gain of 73. Hatched ends mark the gains.</desc>
+  <defs>
+    <pattern id="gain" width="5" height="5" patternUnits="userSpaceOnUse">
+      <rect width="5" height="5" fill="#FBF2E3"/>
+      <path d="M-1 1L1 -1 M0 5L5 0 M4 6L6 4" stroke="#A44D21" stroke-width="1.6"/>
+    </pattern>
+  </defs>
+  <rect width="300" height="300" fill="#FBF2E3"/>
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <path d="M23 35 C23 19 104 19 104 35 L104 71 C104 88 23 88 23 71 Z" fill="#CAD9D2" stroke="#243E43" stroke-width="2.3"/>
+    <ellipse cx="63.5" cy="35" rx="40.5" ry="10.8" fill="#FBF2E3" stroke="#243E43" stroke-width="2.3"/>
+    <path d="M23 66 C30 78 96 78 104 66" fill="none" stroke="#617679" stroke-width="1.3"/>
+    <path d="M57 10 L70 10 L70 27 Q64 30 57 27Z" fill="#EFD1A5" stroke="#243E43" stroke-width="1.6"/>
+    <path d="M63.5 30 L63.5 50 M60 46 L63.5 51 L67 46" fill="none" stroke="#A44D21" stroke-width="2.5"/>
+    <g fill="#135963">
+      <circle cx="36" cy="52" r="2.8"/><circle cx="48" cy="61" r="2"/>
+      <circle cx="59" cy="69" r="2.9"/><circle cx="69" cy="58" r="2.3"/>
+      <circle cx="81" cy="64" r="3"/><circle cx="91" cy="52" r="2.2"/>
+      <circle cx="35" cy="65" r="1.6"/><circle cx="52" cy="52" r="1.5"/>
+    </g>
+  </g>
+  <!-- Two-cloud emblem reused from the haze-and-cloud study. -->
+  <g transform="translate(196 -2) scale(.96)">
+    <g stroke="#243e43" stroke-width="2.5" stroke-linejoin="round" fill="#fbf2e3">
+      <path d="M56 49a8 8 0 0 1-1-16 10 10 0 0 1 18-2 6.5 6.5 0 0 1 8 5 6.5 6.5 0 0 1-1 13Z"/>
+      <path d="M28 43a8 8 0 0 1-1-16 9 9 0 0 1 10-7 11 11 0 0 1 21 2 8 8 0 0 1 4 6 7.5 7.5 0 0 1-2 15Z"/>
+    </g>
+    <text x="43" y="38" text-anchor="middle" font-family="serif" font-size="21" fill="#243e43">π</text>
+  </g>
+  <g fill="#243E43" font-family="DejaVu Sans, sans-serif">
+    <text x="120" y="44" font-size="19" font-weight="700">Polluted</text>
+    <text x="120" y="69" font-size="22" font-weight="700">Π Chamber</text>
+    <path d="M18 95 H282" stroke="#617679" stroke-opacity=".55"/>
+    <text x="18" y="118" font-size="15" font-weight="700">Cloud droplets per cm³</text>
+    <text x="18" y="151" font-size="15">Measured</text>
+    <text x="265" y="151" text-anchor="middle" font-size="17" font-weight="700" fill="#923D1B">+72</text>
+    <path d="M265 155 L265 162" stroke="#923D1B" fill="none"/>
+    <!-- Common scale, 0.155 drawing units per droplet per cubic centimetre. -->
+    <rect x="18" y="162" width="242.11" height="26" fill="#243E43"/>
+    <rect x="260.11" y="162" width="11.16" height="26" fill="url(#gain)" stroke="#A44D21"/>
+    <text x="26" y="180" font-size="15" font-weight="700" fill="#FBF2E3">1,562</text>
+    <text x="18" y="214" font-size="15">Particula</text>
+    <text x="107" y="214" font-size="17" font-weight="700" fill="#923D1B">+73</text>
+    <path d="M104 211 L94.3 219 L94.3 225" stroke="#923D1B" fill="none"/>
+    <rect x="18" y="225" width="70.68" height="26" fill="#135963"/>
+    <rect x="88.68" y="225" width="11.32" height="26" fill="url(#gain)" stroke="#A44D21"/>
+    <text x="26" y="243" font-size="15" font-weight="700" fill="#FBF2E3">456</text>
+    <rect x="18" y="272" width="13" height="13" fill="#243E43"/>
+    <text x="37" y="284" font-size="12.8">Background</text>
+    <rect x="132" y="272" width="13" height="13" fill="url(#gain)" stroke="#A44D21"/>
+    <text x="151" y="284" font-size="12.8">Gain with dry air</text>
+  </g>
+<g transform="translate(264 270)">$dots</g>
+</svg>

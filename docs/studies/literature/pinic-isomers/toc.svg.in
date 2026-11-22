@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Two isomer signals from an α-pinene oxidation chamber</title>
+  <desc id="desc">A schematic batch chamber contains aerosol formed during α-pinene oxidation. In the sampled particles, cis-pinic acid reached half its late signal 20.7 minutes after the unidentified isomer. Fits at 80 nm effective radius predict a gap of 0.11 minutes for a common source and 19.11 minutes for a delayed cis-pinic source. All three lengths use the same time scale.</desc>
+  <rect width="300" height="300" fill="#fbf2e3"/>
+  <!-- Flexible chamber walls, aerosol and sampling line are schematic. -->
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <path d="M24 27 Q60 31 96 27 L106 39 Q102 60 106 80 L96 91 Q61 87 25 91 L16 80 Q20 60 16 39Z" fill="#cad9d2" stroke="#243e43" stroke-width="2.6"/>
+    <path d="m18 40 8 5m78-5-9 5m9 34-9-5m-77 5 9-5" fill="none" stroke="#617679" stroke-width="1.8"/>
+    <path d="M105 60h17v17h10" fill="none" stroke="#243e43" stroke-width="3"/>
+    <g fill="#135963">
+      <circle cx="39" cy="56" r="3"/><circle cx="56" cy="43" r="2.6"/><circle cx="76" cy="52" r="3.4"/>
+      <circle cx="57" cy="65" r="3.4"/><circle cx="37" cy="77" r="2.6"/><circle cx="83" cy="72" r="3"/>
+    </g>
+  </g>
+  <g font-family="sans-serif" fill="#243e43">
+    <text x="144" y="47" font-size="19" font-weight="bold">α-pinene</text>
+    <text x="144" y="69" font-size="16">oxidation chamber</text>
+    <text x="22" y="122" font-size="18" font-weight="bold">Time between half-signals</text>
+    <g font-size="16">
+      <text x="24" y="151">Measured</text>
+      <text x="24" y="201">Common source</text>
+      <text x="24" y="251">Delayed source</text>
+    </g>
+    <!-- All lengths start at x=24 and use 9 SVG units per minute. -->
+    <path d="M24 159v20m0 30v20m0 30v20" fill="none" stroke="#617679" stroke-width="1.5"/>
+    <path d="M24 169h186.3" stroke="#243e43" stroke-width="6"/>
+    <circle cx="210.3" cy="169" r="5.5" fill="#243e43"/>
+    <path d="M24 219h0.99" stroke="#a44d21" stroke-width="5"/>
+    <path d="m24.99 213 6 6-6 6-6-6Z" fill="#a44d21"/>
+    <path d="M24 269h171.99" stroke="#135963" stroke-width="5"/>
+    <path d="m195.99 263 6 6-6 6-6-6Z" fill="#135963"/>
+    <text x="223" y="174" font-size="15">20.7 min</text>
+  </g>
+<g transform="translate(264 270)">$dots</g>
+</svg>

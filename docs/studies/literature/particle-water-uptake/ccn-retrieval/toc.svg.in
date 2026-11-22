@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Two predictions for water uptake by the same dry organic particle</title>
+  <desc id="desc">Starting with the same 100 nm dry organic particle, BAT predicts a wet diameter of 127.7 nm at 95% relative humidity. A κ fitted to BAT’s cloud activation threshold predicts 137.6 nm. The particle diameters share one scale. The bars compare only the condensed water volume, with the BAT prediction set to one.</desc>
+  <rect width="300" height="300" fill="#fbf2e3"/>
+  <g font-family="sans-serif" text-anchor="middle" fill="#243e43">
+    <text x="150" y="28" font-size="19" font-weight="bold">100 nm dry organic</text>
+    <circle cx="150" cy="57" r="21" fill="#efd1a5" stroke="#243e43" stroke-width="2.4"/>
+    <g fill="none" stroke="#617679" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M150 82v9 M150 91H73v18m-4-4 4 4 4-4 M150 91h77v18m-4-4 4 4 4-4"/>
+    </g>
+    <text x="150" y="118" font-size="16">95% RH</text>
+    <!-- Each radius is 0.21 SVG units per nanometre of particle diameter. -->
+    <g fill="#cad9d2" stroke="#135963" stroke-width="2.4">
+      <circle cx="73" cy="147" r="26.809"/><circle cx="227" cy="147" r="28.895"/>
+    </g>
+    <path d="M54 145q1-9 10-14 M206 145q2-10 12-16" fill="none" stroke="#fbf2e3" stroke-width="3" stroke-linecap="round"/>
+    <g font-size="17" font-weight="bold">
+      <text x="73" y="199">BAT</text>
+      <text x="227" y="199">Activation-fit κ</text>
+    </g>
+    <path d="M21 212h258" stroke="#617679" stroke-width="1"/>
+    <text x="150" y="236" font-size="17" font-weight="bold">Condensed water volume</text>
+    <!-- Bar lengths are relative to the BAT water volume at 95% RH. -->
+    <rect x="38" y="249" width="70" height="10" fill="#135963"/>
+    <rect x="175.0104" y="249" width="103.9793" height="10" fill="#135963"/>
+    <g font-size="16">
+      <text x="73" y="281">1×</text><text x="227" y="281">1.49×</text>
+    </g>
+  </g>
+<g transform="translate(264 270)">$dots</g>
+</svg>

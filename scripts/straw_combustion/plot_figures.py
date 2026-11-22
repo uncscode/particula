@@ -5,6 +5,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle, FancyBboxPatch, Rectangle
+from particula.plotting.toc import add_toc_logo
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "website/public/study-data/straw-combustion/measurements.csv"
@@ -15,6 +16,7 @@ PAPER = "#FBF2E3"
 SLATE = "#617679"
 
 
+@plt.style.context("particula.toc")
 def draw_toc(rows):
     """Compare measured counts and calibrated counts for the three SO2 feeds."""
     counts = {
@@ -22,7 +24,7 @@ def draw_toc(rows):
         for row in rows
         if row["dataset"] == "aerosol" and row["target"] == "count"
     }
-    figure = plt.figure(figsize=(3, 3), facecolor=PAPER)
+    figure = plt.figure()
     diagram = figure.add_axes(
         (0, 0, 1, 1), xlim=(0, 100), ylim=(0, 100), aspect="equal"
     )
@@ -151,7 +153,8 @@ def draw_toc(rows):
     chart.yaxis.grid(True, color="#DAD9CA", lw=0.6)
     chart.set_axisbelow(True)
     label(53, 6.4, "Sulfur dioxide in the feed (ppm)", 8, weight="bold")
-    figure.savefig(IMAGES / "toc.png", dpi=300, facecolor=PAPER)
+    add_toc_logo(figure, corner="bottom left")
+    figure.savefig(IMAGES / "toc.png")
     plt.close(figure)
 
 
@@ -199,14 +202,19 @@ def draw_pure_kcl(rows):
     plt.close(figure)
 
 
-if __name__ == "__main__":
+def selected_rows():
+    """Load the archived joint fit for the study figures."""
     with DATA.open(encoding="utf-8", newline="") as stream:
-        selected = [
+        return [
             r
             for r in csv.DictReader(stream)
             if r["tag"] == "all"
             and r["model"] == "combined"
             and r["chemistry_free"] == "True"
         ]
+
+
+if __name__ == "__main__":
+    selected = selected_rows()
     draw_toc(selected)
     draw_pure_kcl(selected)

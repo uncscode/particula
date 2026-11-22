@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Equal dry seeds grow to opposite sides of the optical detection limit</title>
+  <desc id="desc">Two 130 nm dry seeds are shown above their modeled wet sizes at 99.55% relative humidity. Starting from a common baseline, the ammonium sulfate droplet reaches 544 nm, below the dashed 600 nm optical limit. The sodium chloride droplet reaches 723 nm, within the counter’s size range. All particle diameters use the same scale.</desc>
+  <rect width="300" height="300" fill="#fbf2e3"/>
+  <g font-family="sans-serif" text-anchor="middle" fill="#243e43">
+    <text x="150" y="28" font-size="18" font-weight="bold">Same dry size</text>
+    <!-- All diameters use 0.18 SVG units per nanometre. -->
+    <circle cx="76" cy="53" r="11.7" fill="#efd1a5" stroke="#a44d21" stroke-width="2"/>
+    <circle cx="219" cy="53" r="11.7" fill="#cad9d2" stroke="#135963" stroke-width="2"/>
+    <path d="M76 72v18m-5-5 5 5 5-5 M219 72v18m-5-5 5 5 5-5" fill="none" stroke="#617679" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Wet diameters extend up from y=238. The 600 nm lower limit is y=130. -->
+    <circle cx="76" cy="189.04" r="48.96" fill="#efd1a5" stroke="#a44d21" stroke-width="2.5"/>
+    <circle cx="219" cy="172.93" r="65.07" fill="#cad9d2" stroke="#135963" stroke-width="2.5"/>
+    <path d="M42 182q3-15 16-23 M170 168q3-18 20-30" fill="none" stroke="#fbf2e3" stroke-width="4" stroke-linecap="round"/>
+    <path d="M15 238h271" fill="none" stroke="#617679" stroke-width="1.5"/>
+    <path d="M15 130h271" fill="none" stroke="#243e43" stroke-width="2.5" stroke-dasharray="6 4"/>
+    <text x="16" y="121" text-anchor="start" font-size="16" font-weight="bold">600 nm optical limit</text>
+    <g font-size="17" font-weight="bold">
+      <text x="76" y="261">Ammonium<tspan x="76" dy="19"> sulfate</tspan></text>
+      <text x="219" y="261">Sodium<tspan x="219" dy="19"> chloride</tspan></text>
+    </g>
+  </g>
+<g transform="translate(264 270)">$dots</g>
+</svg>

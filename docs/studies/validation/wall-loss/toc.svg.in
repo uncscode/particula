@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Airborne particles after one hour in a spherical chamber</title>
+  <desc id="desc">A cutaway of a spherical aerosol chamber shows particles suspended inside and some touching its wall. The sketch represents the same idealized vessel for both predictions. Of the initial 1 µm particles, 68.4% remain airborne under coupled theory and 58.2% when the settling and diffusion loss rates are added. Both bars share a zero-to-100% scale.</desc>
+  <rect width="300" height="300" fill="#fbf2e3"/>
+  <!-- Schematic chamber cross-section. Particle symbols illustrate locations. -->
+  <g stroke="#243e43" stroke-linejoin="round">
+    <path d="m103 130-10 24h10l13-18m57-6 14 24h-10l-14-18" fill="#cad9d2" stroke-width="2.5"/>
+    <circle cx="140" cy="84" r="59" fill="#fbf2e3" stroke-width="3.5"/>
+    <path d="M128 26V17h24v9" fill="#cad9d2" stroke-width="2.7"/>
+    <rect x="122" y="12" width="36" height="6" rx="1.5" fill="#617679" stroke-width="2"/>
+  </g>
+  <g fill="#135963">
+    <circle cx="109" cy="61" r="3.4"/><circle cx="144" cy="49" r="3.4"/>
+    <circle cx="168" cy="64" r="3.4"/><circle cx="126" cy="79" r="3.4"/>
+    <circle cx="153" cy="88" r="3.4"/><circle cx="103" cy="99" r="3.4"/>
+    <circle cx="132" cy="112" r="3.4"/><circle cx="173" cy="103" r="3.4"/>
+  </g>
+  <g fill="#243e43">
+    <circle cx="86" cy="82" r="3.4"/><circle cx="120" cy="134" r="3.4"/>
+    <circle cx="150" cy="137" r="3.4"/><circle cx="185" cy="114" r="3.4"/>
+  </g>
+  <path d="M91 155h99" stroke="#617679" stroke-width="2" stroke-linecap="round"/>
+  <g fill="#243e43" font-family="sans-serif">
+    <text x="21" y="184" font-size="20" font-weight="bold">Airborne after 1 h</text>
+    <g font-size="16">
+      <text x="21" y="210">Coupled</text>
+      <text x="21" y="259">Additive</text>
+    </g>
+    <g text-anchor="end" font-size="16" font-weight="bold">
+      <text x="279" y="210">68%</text>
+      <text x="279" y="259">58%</text>
+    </g>
+  </g>
+  <!-- The full tracks represent 100% of the initial airborne population. -->
+  <g fill="#cad9d2">
+    <rect x="21" y="218" width="258" height="11"/>
+    <rect x="21" y="267" width="258" height="11"/>
+  </g>
+  <rect x="21" y="218" width="176.472" height="11" fill="#135963"/>
+  <rect x="21" y="267" width="150.156" height="11" fill="#a44d21"/>
+<g transform="translate(264 13)">$dots</g>
+</svg>

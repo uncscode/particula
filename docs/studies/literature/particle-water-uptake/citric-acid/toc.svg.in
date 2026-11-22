@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">BAT and AIOMFAC both overpredict water activity at all 12 measured citric acid concentrations</title>
+  <desc id="desc">Water activity declines as citric acid mass fraction rises. The BAT line and AIOMFAC ticks sit close together and above all 12 measured points. The largest separation from the measurements occurs toward concentrated acid.</desc>
+  <rect width="300" height="300" fill="#fbf2e3"/>
+  <g font-family="sans-serif" font-weight="600">
+    <text x="31" y="36" font-size="21" text-anchor="start" fill="#243e43">Water activity</text>
+    <line x1="30.00" y1="239.00" x2="272.00" y2="239.00" stroke="#617679" stroke-width="2" />
+    <line x1="30.00" y1="239.00" x2="30.00" y2="68.00" stroke="#617679" stroke-width="2" />
+    <path d="M44.0 79.2 L110.3 89.4 L154.9 101.9 L169.7 108.0 L197.8 123.5 L203.2 127.4 L217.4 139.1 L221.2 142.7 L231.6 153.9 L240.1 164.6 L247.6 175.5 L256.0 189.3" fill="none" stroke="#135963" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="256.00" cy="222.77" r="3.80" fill="#fbf2e3" stroke="#243e43" stroke-width="2"/>
+    <circle cx="247.63" cy="204.58" r="3.80" fill="#fbf2e3" stroke="#243e43" stroke-width="2"/>
+    <circle cx="240.06" cy="194.30" r="3.80" fill="#fbf2e3" stroke="#243e43" stroke-width="2"/>
+    <circle cx="231.61" cy="177.32" r="3.80" fill="#fbf2e3" stroke="#243e43" stroke-width="2"/>
+    <circle cx="221.21" cy="163.53" r="3.80" fill="#fbf2e3" stroke="#243e43" stroke-width="2"/>
+    <circle cx="217.40" cy="157.78" r="3.80" fill="#fbf2e3" stroke="#243e43" stroke-width="2"/>
+    <circle cx="203.24" cy="140.08" r="3.80" fill="#fbf2e3" stroke="#243e43" stroke-width="2"/>
+    <circle cx="197.85" cy="132.22" r="3.80" fill="#fbf2e3" stroke="#243e43" stroke-width="2"/>
+    <circle cx="169.72" cy="115.35" r="3.80" fill="#fbf2e3" stroke="#243e43" stroke-width="2"/>
+    <circle cx="154.88" cy="106.36" r="3.80" fill="#fbf2e3" stroke="#243e43" stroke-width="2"/>
+    <circle cx="110.28" cy="92.17" r="3.80" fill="#fbf2e3" stroke="#243e43" stroke-width="2"/>
+    <circle cx="44.00" cy="80.34" r="3.80" fill="#fbf2e3" stroke="#243e43" stroke-width="2"/>
+    <line x1="41.20" y1="79.21" x2="46.80" y2="79.21" stroke="#a44d21" stroke-width="2" />
+    <line x1="107.48" y1="88.85" x2="113.08" y2="88.85" stroke="#a44d21" stroke-width="2" />
+    <line x1="152.08" y1="100.85" x2="157.68" y2="100.85" stroke="#a44d21" stroke-width="2" />
+    <line x1="166.92" y1="106.79" x2="172.52" y2="106.79" stroke="#a44d21" stroke-width="2" />
+    <line x1="195.05" y1="122.42" x2="200.65" y2="122.42" stroke="#a44d21" stroke-width="2" />
+    <line x1="200.44" y1="126.29" x2="206.04" y2="126.29" stroke="#a44d21" stroke-width="2" />
+    <line x1="214.60" y1="138.18" x2="220.20" y2="138.18" stroke="#a44d21" stroke-width="2" />
+    <line x1="218.41" y1="141.87" x2="224.01" y2="141.87" stroke="#a44d21" stroke-width="2" />
+    <line x1="228.81" y1="153.21" x2="234.41" y2="153.21" stroke="#a44d21" stroke-width="2" />
+    <line x1="237.26" y1="163.94" x2="242.86" y2="163.94" stroke="#a44d21" stroke-width="2" />
+    <line x1="244.83" y1="174.90" x2="250.43" y2="174.90" stroke="#a44d21" stroke-width="2" />
+    <line x1="253.20" y1="188.69" x2="258.80" y2="188.69" stroke="#a44d21" stroke-width="2" />
+    <text x="265" y="91" font-size="16" text-anchor="end" fill="#135963">BAT<tspan fill="#243e43">/</tspan><tspan fill="#a44d21">AIOMFAC</tspan></text>
+    <text x="196" y="221" font-size="17" text-anchor="end" fill="#243e43">Measured</text>
+    <text x="150" y="273" font-size="19" text-anchor="middle" fill="#243e43">Acid fraction</text>
+  </g>
+<g transform="translate(264 270)">$dots</g>
+</svg>

@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+<title id="title">Two vapor return pathways in the fitted Manchester network</title>
+<desc id="desc">The ${inherited}-channel network grew to ${final}. In the fitted model, α-pinene-derived vapor returns to labile particle material and secondary vapor from the o-cresol dimer family returns to retained particle material. Of the $gain percentage-point reduction in worst joint error, approximately $refit_pct% came from refitting and $channel_pct% from adding channels. Joint error fell in $improved of $runs runs, while its campaign mean rose slightly.</desc>
+<rect width="300" height="300" fill="#FBF2E3"/>
+<g transform="translate(190 -5) scale(.75)" stroke-linecap="round" stroke-linejoin="round"><path d="M21 39 L45 26 L124 26 L100 39 Z" fill="#EFD1A5" stroke="#243E43" stroke-width="2"/>
+<path d="M100 39 L124 26 L124 88 L100 102 Z" fill="#CAD9D2" stroke="#243E43" stroke-width="2"/>
+<path d="M21 39 L100 39 L100 102 L21 102 Z" fill="#FBF2E3" stroke="#243E43" stroke-width="2"/>
+<path d="M27 44 L32 93 L91 96 L95 44" fill="#CAD9D2" fill-opacity=".51" stroke="#617679" stroke-width="1"/>
+<path d="M38 29 L52 22 L104 22 L91 29 Z" fill="#FBF2E3" stroke="#243E43" stroke-width="1.6"/>
+<path d="M46 45 l-3 8 M62 45 l-3 8 M78 45 l-3 8" stroke="#A44D21" stroke-width="1.6"/>
+<path d="M32 103 v5 M90 103 v5 M119 92 v4" stroke="#243E43" stroke-width="2"/>
+<circle cx="39" cy="71" r="2.5" fill="#135963"/>
+<circle cx="50" cy="58" r="1.6" fill="#135963"/>
+<circle cx="59" cy="79" r="3.2" fill="#135963"/>
+<circle cx="70" cy="64" r="2.1" fill="#135963"/>
+<circle cx="82" cy="84" r="2.7" fill="#135963"/>
+<circle cx="86" cy="57" r="1.5" fill="#135963"/>
+<circle cx="46" cy="87" r="1.4" fill="#135963"/>
+<circle cx="72" cy="90" r="1.25" fill="#135963"/>
+<circle cx="52" cy="68" r="1" fill="#135963"/>
+<circle cx="81" cy="73" r="1.1" fill="#135963"/>
+</g>
+<g font-family="Liberation Sans, Arial, sans-serif" fill="#243E43">
+  <text x="15" y="29" font-size="15">Manchester chamber</text>
+  <text x="14" y="59" font-size="29" font-weight="bold">$inherited → $final</text>
+  <text x="16" y="78" font-size="14">fitted reaction channels</text>
+  <path d="M15 91H285" stroke="#617679"/>
+  <g font-size="13" font-weight="bold">
+    <text x="16" y="114">Modeled vapor</text>
+    <text x="183" y="114">Particle pools</text>
+  </g>
+  <!-- Distinct endpoints are effective model reservoirs, not molecular species. -->
+  <g font-size="15">
+    <text x="16" y="141">α-pinene vapor</text>
+    <text x="16" y="167">o-cresol dimer</text>
+    <text x="16" y="183">family vapor</text>
+    <text x="203" y="141">Labile</text>
+    <text x="203" y="173">Retained</text>
+  </g>
+  <g stroke="#135963" stroke-width="2.4" fill="none">
+    <path d="M125 136H174m-7 -5 7 5 -7 5"/>
+    <path d="M125 168H174m-7 -5 7 5 -7 5"/>
+  </g>
+  <circle cx="188" cy="136" r="7" fill="#CAD9D2" stroke="#135963" stroke-width="2"/>
+  <circle cx="188" cy="168" r="7" fill="#135963"/>
+  <path d="M15 195H285" stroke="#617679"/>
+  <text x="15" y="216" font-size="15" font-weight="bold">Share of worst joint error reduction</text>
+  <rect x="15" y="225" width="$refit_width" height="14" fill="#135963"/>
+  <rect x="$split" y="225" width="$channel_width" height="14" fill="#EFD1A5"/>
+  <rect x="15" y="225" width="270" height="14" stroke="#243E43" fill="none"/>
+  <path d="M$split 225v14" stroke="#243E43"/>
+  <g font-size="13">
+    <text x="15" y="256">$refit_pct% refitting</text>
+    <text x="285" y="256" text-anchor="end">$channel_pct% added channels</text>
+  </g>
+  <text x="15" y="283" font-size="15" font-weight="bold">Joint error fell in $improved of $runs runs.</text>
+</g>
+<g transform="translate(264 270)">$dots</g>
+</svg>
