@@ -66,10 +66,12 @@ uses the original analytical mole fractions, including the trace bicarbonate. A 
 - `equilibrium.sulfate` samples the final signed log-K residual and initial and
   final sulfur molality in the sulfate routine. The closed carbonate vector
   samples the final DiffK_carb_sulf call, including MINPACK's return status.
-  Its first three entries are log-equilibrium residuals and its last two are
+  Its first three entries are log-equilibrium residuals. Coupled cases add
+  the bisulfate log-equilibrium residual as the fourth entry. Its last two are
   upstream-scaled mole balances for hydrogen and carbon. The independent
   normalized carbon balance uses the solver's initial carbon and summed final
-  species amounts. Each relative balance uses its conserved initial amount.
+  species amounts. Coupled cases also record the final dissolved sulfur against
+  the initial dissolved inventory after any upstream CaSO₄ removal. Each relative balance uses its conserved initial amount.
 - `status`, `errors` and `warning` distinguish input rejected by Python,
   rejected upstream subgroup definitions (code 13), temperature extrapolation
   (code 10) and successful activity evaluation. Upstream warning 16 records
@@ -117,3 +119,15 @@ little-endian C-order bytes after restoring the original array shape.
 The source manifest identifies the Fortran modules. The short-range dataset
 uses only the A interaction matrix. Mixture-specific PEG overrides and the
 water reference terms are applied during preparation and evaluation.
+
+
+## CPU and CUDA equilibrium qualification
+
+Run the backend corpus with `python -m unittest discover -s packages/particula-aiomfac/tests`.
+For physical CUDA qualification install the backend CUDA extra and set
+`AIOMFAC_TEST_CUDA=1` for the same command. An unavailable device fails this
+requested run. Use `python packages/particula-aiomfac/tools/qualify_packages.py --cuda`
+to exercise the installed standalone and combined CUDA wheels outside the checkout.
+The coupled fixtures include simultaneous carbon and sulfur inventories and a
+calcium-containing system. The reference driver starts each canonical state in a
+fresh process. The production solvers cold-start each row.

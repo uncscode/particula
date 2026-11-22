@@ -46,6 +46,13 @@ def scientific_checks(name, case, state):
         raise ValueError(
             f"{name}: {state['status']} instead of {case['expected_status']}"
         )
+    if "expected_solver_error" in case:
+        solver=state["equilibrium"]["carbonate"]
+        if case["expected_solver_error"] not in state["errors"] or solver["minpack_info"] == 1:
+            raise ValueError(f"{name}: expected Fortran convergence failure, got {state['errors']}")
+        if max(map(abs, solver["residual_vector"])) <= 1e-8:
+            raise ValueError(f"{name}: expected a measurable equilibrium discrepancy")
+        return
     if "species" not in state:
         return
     if state["mixed_solvent_reference"]:

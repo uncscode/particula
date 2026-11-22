@@ -34,8 +34,8 @@ DENSITY = 1000.0
 SIGMA = 0.072
 
 
-def setup(saturation, permuted=False):
-    case = json.loads((REF / "cases/mixed.json").read_text())
+def setup(saturation, permuted=False, case_id="mixed"):
+    case = json.loads((REF / f"cases/{case_id}.json").read_text())
     groups = json.loads((REF / "cases/components.json").read_text())
     mixture = MixtureSpec(
         {
@@ -74,9 +74,10 @@ def setup(saturation, permuted=False):
         volume=np.ones(1),
         distribution_type="particle_resolved",
     )
-    reference = json.loads((REF / "expected/mixed.json").read_text())
+    reference = json.loads((REF / f"expected/{case_id}.json").read_text())
     aw = reference["neutrals"]["water"]["activity"]
-    curvature = 2 * SIGMA * MOLAR_MASS / (GAS_CONSTANT * TEMPERATURE * DENSITY)
+    temperature = case["temperature_K"]
+    curvature = 2 * SIGMA * MOLAR_MASS / (GAS_CONSTANT * temperature * DENSITY)
     expected = PURE_PRESSURE * aw * np.exp(curvature / particle.radii[0, 0])
     gas_names = ["inert", "water"] if permuted else ["water"]
     source = gas_names.index("water")
@@ -90,7 +91,7 @@ def setup(saturation, permuted=False):
                     saturation
                     * expected
                     * MOLAR_MASS
-                    / (GAS_CONSTANT * TEMPERATURE)
+                    / (GAS_CONSTANT * temperature)
                     if k == "water"
                     else 0
                     for k in gas_names

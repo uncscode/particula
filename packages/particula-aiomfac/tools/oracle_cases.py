@@ -172,6 +172,8 @@ def parse(stdout, case):
                 "minpack_info": int(v[0]),
                 "residual_vector": list(map(float, v[1:])),
             }
+        elif kind == "sulfur":
+            state["equilibrium"]["sulfur"] = fields("input_sulfur final_sulfur", v)
         elif kind == "carbon":
             state["equilibrium"]["carbon"] = fields("input_carbon final_carbon", v)
         else:
@@ -185,7 +187,7 @@ def parse(stdout, case):
         state["relative_charge_residual"] = (
             math.fsum(charges) / math.fsum(map(abs, charges)) if any(charges) else 0.0
         )
-        for element, system in [("sulfur", "sulfate"), ("carbon", "carbon")]:
+        for element, system in [("sulfur", "sulfate"), ("sulfur", "sulfur"), ("carbon", "carbon")]:
             if system in state["equilibrium"]:
                 record = state["equilibrium"][system]
                 initial = record["input_" + element]

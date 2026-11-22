@@ -70,6 +70,17 @@
       ],
       "sha256": "aeeed6a6a5d4d4a14de6ba43b94a3da60e803f83cb94de4b67c7b89b4d0dea1a"
     },
+    "lambdaIN": {
+      "shape": [
+        65
+      ],
+      "dtype": "<f8",
+      "units": "kg/mol",
+      "index_offset": [
+        201
+      ],
+      "sha256": "64650061878a1d8132785968a89f9e4622cf077fe2dca6bac2df9364b417efc1"
+    },
     "Ioncharge": {
       "shape": [
         65

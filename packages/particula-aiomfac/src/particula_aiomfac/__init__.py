@@ -1,12 +1,13 @@
-"""Direct NumPy activities for the pinned AIOMFAC-web model."""
+"""CPU and CUDA activities for the pinned AIOMFAC-web model."""
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 UPSTREAM_VERSION = "3.15"
 UPSTREAM_REVISION = "24041a1b0db090de1285008814a5285b4b9b746b"
 
 from .model import (
     AIOMFACModel,
     ActivityResult,
+    ConvergenceError,
     MixtureSpec,
     SpeciationRequiredError,
 )
@@ -14,6 +15,7 @@ from .model import (
 __all__ = [
     "AIOMFACModel",
     "ActivityResult",
+    "ConvergenceError",
     "MixtureSpec",
     "SpeciationRequiredError",
 ]

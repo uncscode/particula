@@ -1,16 +1,21 @@
-"""Prepared direct CPU activity calculations for fixed-dissociation mixtures."""
+"""Prepared direct activities for analytical dissolved-component mixtures."""
 
 import json
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import lru_cache
 from importlib.resources import files
 from math import gcd
 from types import MappingProxyType
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ._cuda import CudaModel
 
 import numpy as np
 
 from . import UPSTREAM_REVISION, UPSTREAM_VERSION
+from ._equilibrium import ConvergenceError, solve
 from ._terms import electrolyte_terms, short_range
 
 
@@ -48,6 +53,10 @@ class ActivityResult:
     Diagnostics SR/MR/LR follow neutral_ids then ion_ids. Ion molalities are
     mol/kg solvent. Ionic coefficients and products use unit standard molality.
     Undefined log coefficients and means are NaN and absent activities zero.
+    Final species amounts are mol per kg of analytical input, in neutral then
+    ion order. Solver status is zero for fixed or degenerate inventories and
+    one for a verified equilibrium. Residual diagnostics give maximum absolute
+    log mass-action error, normalized charge, carbon and sulfur errors.
     """
 
     neutral_ids: tuple
@@ -65,6 +74,8 @@ class ActivityResult:
     electrolyte_defined: np.ndarray
     warnings: np.ndarray
     diagnostics: dict | None
+    species_moles_per_kg_input: np.ndarray
+    solver_status: np.ndarray
     model_identity: tuple = (UPSTREAM_VERSION, UPSTREAM_REVISION)
 
 
@@ -108,6 +119,13 @@ class PreparedModel:
     like: np.ndarray
     three: np.ndarray
 
+    sulfate: bool = False
+    carbonate: bool = False
+    water: int = -1
+    co2: int = -1
+    co2_lambda: np.ndarray | None = None
+    virtual_count: int = 0
+
     def evaluate(self, masses, temperature_K, *, diagnostics=False):
         """Calculate activities for scalar or batched masses in common mass units."""
         mass = np.asarray(masses, dtype=np.float64)
@@ -127,9 +145,18 @@ class PreparedModel:
         mean, iap = output(s), output(s)
         nm, im, sm = (output(k, bool) for k in (n, i, s))
         warnings = np.empty(temp.size, dtype=int)
+        species_moles = output(n + i)
+        status = np.zeros(temp.size, dtype=np.int32)
         terms = None
         if diagnostics:
             terms = {key: output(n + i) for key in ("sr", "mr", "lr")}
+            if self.sulfate or self.carbonate:
+                terms["equilibrium_residuals"] = output(4)
+                terms["precipitated_caso4_mol_per_kg_input"] = np.empty(
+                    temp.size
+                )
+                terms["evaluations"] = np.empty(temp.size, dtype=int)
+                terms["retries"] = np.empty(temp.size, dtype=int)
             terms.update(
                 ionic_strength=np.empty(temp.size),
                 molality_conversion=np.empty(temp.size),
@@ -164,6 +191,8 @@ class PreparedModel:
             )
             fractions = values / values.max(axis=1, keepdims=True)
             fractions /= fractions.sum(axis=1, keepdims=True)
+            if self.virtual_count:
+                fractions = np.pad(fractions, ((0, 0), (0, self.virtual_count)))
             solvent = fractions[:, self.neutral_indices]
             solvent_mass = solvent.sum(axis=1, keepdims=True)
             reject(solvent_mass[:, 0] <= 0, "zero solvent mass")
@@ -171,7 +200,39 @@ class PreparedModel:
             ion_moles = (
                 fractions[:, self.salt_indices] / self.salt_mw
             ) @ self.stoich
+            if self.sulfate or self.carbonate:
+                reject(
+                    neutral_moles[:, self.water] <= 0,
+                    "zero water in aqueous equilibrium",
+                )
+                for j in range(len(tk)):
+                    try:
+                        residuals, calls, retries, solid = solve(
+                            self, neutral_moles[j], ion_moles[j], tk[j]
+                        )
+                    except (
+                        ValueError,
+                        RuntimeError,
+                        FloatingPointError,
+                    ) as error:
+                        index = tuple(
+                            map(int, np.unravel_index(start + j, shape))
+                        )
+                        raise ConvergenceError(
+                            str(error), batch_index=index
+                        ) from error
+                    status[start + j] = int(calls > 0)
+                    if diagnostics:
+                        terms["equilibrium_residuals"][start + j] = residuals
+                        terms["precipitated_caso4_mol_per_kg_input"][
+                            start + j
+                        ] = solid
+                        terms["evaluations"][start + j] = calls
+                        terms["retries"][start + j] = retries
+                solvent = neutral_moles * self.neutral_mw
+                solvent_mass = solvent.sum(axis=1, keepdims=True)
             x = np.column_stack((neutral_moles, ion_moles))
+            species_moles[rows] = x
             x /= x.sum(axis=1, keepdims=True)
             mol[rows] = ion_moles / solvent_mass
             sr = np.empty_like(x)
@@ -184,6 +245,9 @@ class PreparedModel:
                 mol[rows],
                 tk,
             )
+            if self.carbonate:
+                sr[:, self.co2] = lr[:, self.co2] = 0.0
+                mr[:, self.co2] = 2 * (mol[rows] @ self.co2_lambda)
             coeff = sr + mr + lr
             reject(
                 ~np.isfinite(coeff).all(axis=1) | ~np.isfinite(scale),
@@ -241,7 +305,13 @@ class PreparedModel:
             warnings,
         )
         return ActivityResult(
-            self.neutrals, self.ions, self.pairs, *map(restore, arrays), terms
+            self.neutrals,
+            self.ions,
+            self.pairs,
+            *map(restore, arrays),
+            terms,
+            restore(species_moles),
+            restore(status),
         )
 
 
@@ -257,26 +327,81 @@ def _exp(value, fraction):
 
 
 class AIOMFACModel:
-    """Pinned v3.15 activity model using resident host-side NumPy tables."""
+    """Prepare a v3.15 analytical mixture for CPU or CUDA activity evaluation."""
+
+    capabilities = frozenset({"direct_cpu", "direct_cuda", "closed_speciation"})
 
     @staticmethod
-    def prepare(mixture: MixtureSpec, *, execution="cpu") -> PreparedModel:
-        if execution != "cpu":
-            raise ValueError(
-                f"unsupported AIOMFAC execution {execution!r}; select cpu"
+    def prepare(
+        mixture: MixtureSpec, *, execution="cpu", device=None
+    ) -> "PreparedModel | CudaModel":
+        """Bind analytical and internal species to one requested device."""
+        if execution not in ("cpu", "cuda"):
+            raise ValueError(f"unsupported AIOMFAC execution {execution!r}")
+        comp = dict(mixture.components)
+        original = len(comp)
+        ids = set().union(*comp.values())
+        sulfate = 248 in ids or 261 in ids and bool(ids & {205, 250})
+        carbonate = 250 in ids or 262 in ids and bool(ids & {205, 248})
+
+        def include(name, groups):
+            if groups not in comp.values():
+                if name in comp:
+                    raise ValueError(f"implicit species name collision: {name}")
+                comp[name] = groups
+
+        if sulfate:
+            include("implicit H2SO4", {205: 2, 261: 1})
+            include("implicit HHSO4", {205: 1, 248: 1})
+        if carbonate:
+            include("CO2(aq)", {173: 1})
+            include("implicit H2CO3", {205: 2, 262: 1})
+            include("implicit HHCO3", {205: 1, 250: 1})
+            include("implicit HOH", {205: 1, 247: 1})
+        prepared = _prepare_fixed(comp)
+        if sulfate or carbonate:
+            waters = [
+                j for j, k in enumerate(prepared.neutrals) if comp[k] == {16: 1}
+            ]
+            if len(waters) != 1:
+                raise ValueError(
+                    "aqueous equilibrium requires one water component"
+                )
+            co2_indices = [
+                j
+                for j, k in enumerate(prepared.neutrals)
+                if comp[k] == {173: 1}
+            ]
+            if len(co2_indices) > 1:
+                raise ValueError(
+                    "aqueous equilibrium accepts one dissolved CO2 component"
+                )
+            co2 = co2_indices[0] if co2_indices else -1
+            lambdas = _tables()["lambdaIN"][np.asarray(prepared.ions) - 201]
+            lambdas.setflags(write=False)
+            prepared = replace(
+                prepared,
+                sulfate=sulfate,
+                carbonate=carbonate,
+                water=waters[0],
+                co2=co2,
+                co2_lambda=lambdas,
+                ncomponents=original,
+                virtual_count=len(comp) - original,
             )
-        comp = mixture.components
-        all_ids = set().union(*comp.values())
-        triggers = all_ids & {248, 250}
-        for combination in ({205, 261}, {205, 262}, {250, 261}, {248, 262}):
-            if combination <= all_ids:
-                triggers.update(combination)
-        if triggers:
-            names = [k for k in comp if triggers.intersection(comp[k])]
-            raise SpeciationRequiredError(
-                f"equilibrium speciation required for {names}"
-            )
-        return _prepare_fixed(comp)
+        if execution == "cuda":
+            try:
+                from ._cuda import CudaModel
+            except ModuleNotFoundError as error:
+                if error.name != "warp":
+                    raise
+                raise ImportError(
+                    'CUDA requires pip install "particula-aiomfac[cuda]"'
+                ) from error
+            return CudaModel(prepared, device or "cuda:0")
+        if device not in (None, "cpu"):
+            raise ValueError("device must match CPU execution")
+        return prepared
 
 
 def _prepare_fixed(comp):

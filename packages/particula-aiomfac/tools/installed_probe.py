@@ -46,20 +46,20 @@ def base_activities():
         raise AssertionError("unexpected optional backend")
 
 
-def mixed():
+def calculate(case_id, execution):
     from particula_aiomfac import AIOMFACModel, MixtureSpec
 
     ref = PACKAGE / "reference"
     groups = json.loads((ref / "cases/components.json").read_text())
-    case = json.loads((ref / "cases/mixed.json").read_text())
-    expected = json.loads((ref / "expected/mixed.json").read_text())
+    case = json.loads((ref / f"cases/{case_id}.json").read_text())
+    expected = json.loads((ref / f"expected/{case_id}.json").read_text())
     mixture = MixtureSpec(
         {
             k: {int(g): v for g, v in groups[k].items()}
             for k in case["components"]
         }
     )
-    model = AIOMFACModel.prepare(mixture)
+    model = AIOMFACModel.prepare(mixture, execution=execution)
     r = model.evaluate(case["fractions"], case["temperature_K"])
     np.testing.assert_allclose(
         r.neutral_activities[0],
@@ -67,6 +67,9 @@ def mixed():
         atol=1e-10,
         rtol=1e-8,
     )
+    if case_id != "mixed":
+        assert r.solver_status == 1
+        return
     np.testing.assert_allclose(
         r.mean_electrolyte_coefficients[0],
         expected["salts"]["202/242"]["gamma_mean"],
@@ -79,7 +82,9 @@ if __name__ == "__main__":
     if sys.argv[1] == "base":
         base_activities()
     else:
-        mixed()
+        for device in ("cpu", "cuda") if "cuda" in sys.argv[2:] else ("cpu",):
+            for case in ("mixed", "sulfate", "coupled-carbonate-sulfate"):
+                calculate(case, device)
         if sys.argv[1] == "combined":
             workflow = runpy.run_path(str(PACKAGE / "examples/closed_water.py"))
             for saturation in (0.98, 1.02):

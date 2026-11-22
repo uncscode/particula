@@ -1,13 +1,14 @@
 """Parity with independent, full-precision Fortran activity calculations."""
 
 import json
+import os
 import unittest
 from pathlib import Path
 
 import numpy as np
 from numpy.testing import assert_allclose
 
-from particula_aiomfac import AIOMFACModel, MixtureSpec, SpeciationRequiredError
+from particula_aiomfac import AIOMFACModel, ConvergenceError, MixtureSpec
 from particula_aiomfac._terms import electrolyte_terms
 from particula_aiomfac.model import _prepare_fixed
 
@@ -27,6 +28,15 @@ def spec(names):
 
 class TestDirect(unittest.TestCase):
     def test_fortran(self):
+        self.compare_fortran("cpu")
+
+    @unittest.skipUnless(
+        os.environ.get("AIOMFAC_TEST_CUDA") == "1", "requires NVIDIA device"
+    )
+    def test_fortran_cuda(self):
+        self.compare_fortran("cuda")
+
+    def compare_fortran(self, execution):
         for path in sorted((REF / "cases").glob("*.json")):
             name = path.stem
             if name == "components":
@@ -34,14 +44,10 @@ class TestDirect(unittest.TestCase):
             with self.subTest(case=name):
                 case, expected = read("cases", name), read("expected", name)
                 mixture = spec(case["components"])
-                if name in {
-                    "sulfate",
-                    "carbonate",
-                    "carbonate-implicit",
-                    "carbonate-rich",
-                }:
-                    with self.assertRaises(SpeciationRequiredError):
-                        AIOMFACModel.prepare(mixture)
+                if "expected_solver_error" in case:
+                    model = AIOMFACModel.prepare(mixture, execution=execution)
+                    with self.assertRaises(ConvergenceError):
+                        model.evaluate(case["fractions"], case["temperature_K"])
                     continue
                 if expected["status"].startswith("upstream_error"):
                     pattern = {
@@ -54,13 +60,48 @@ class TestDirect(unittest.TestCase):
                 model = AIOMFACModel.prepare(mixture)
                 if name == "analog":
                     self.assertEqual(model.estimated_pairs, ((221, 247),))
+                calculator = (
+                    model
+                    if execution == "cpu"
+                    else AIOMFACModel.prepare(mixture, execution=execution)
+                )
                 if name == "negative-input":
                     with self.assertRaisesRegex(ValueError, "batch index"):
-                        model.evaluate(case["fractions"], case["temperature_K"])
+                        calculator.evaluate(
+                            case["fractions"], case["temperature_K"]
+                        )
                     continue
-                result = model.evaluate(
-                    case["fractions"], case["temperature_K"], diagnostics=True
+                mass = np.array(case["fractions"])
+                if case["basis"] == "mole":
+                    mw = np.empty(model.ncomponents + model.virtual_count)
+                    mw[model.neutral_indices] = model.neutral_mw
+                    mw[model.salt_indices] = model.salt_mw
+                    mass *= mw[: model.ncomponents]
+                result = calculator.evaluate(
+                    mass, case["temperature_K"], diagnostics=True
                 )
+                if model.sulfate or model.carbonate:
+                    self.assertEqual(result.solver_status, 1)
+                    errors = result.diagnostics["equilibrium_residuals"]
+                    self.assertLessEqual(errors[0], 1e-8)
+                    self.assertLessEqual(max(errors[1:]), 1e-10)
+                    for j, key in enumerate(result.ion_ids):
+                        oracle = expected["ions"][str(key)]["molality"]
+                        if oracle > 0:
+                            assert_allclose(
+                                np.log(result.ion_molalities[j]),
+                                np.log(oracle),
+                                atol=1e-8,
+                                rtol=0,
+                            )
+                    if model.carbonate:
+                        actual = result.neutral_mole_fractions[model.co2]
+                        target = expected["neutrals"][
+                            model.neutrals[model.co2]
+                        ]["x"]
+                        assert_allclose(
+                            np.log(actual), np.log(target), atol=1e-8, rtol=0
+                        )
                 self.assertEqual(result.warnings, expected["warning"])
                 for scope, ids, defined, quantities in [
                     (
@@ -191,8 +232,12 @@ class TestDirect(unittest.TestCase):
             broken[1, 2] = bad
             with self.assertRaisesRegex(ValueError, r"\(1, 2\)"):
                 model.evaluate(broken, 298)
-        with self.assertRaisesRegex(SpeciationRequiredError, "Na2SO4"):
-            AIOMFACModel.prepare(spec(["water", "Na2SO4", "HCl"]))
-        for execution in ("cuda", "resident", "hybrid"):
+        self.assertTrue(
+            AIOMFACModel.prepare(spec(["water", "Na2SO4", "HCl"])).sulfate
+        )
+        self.assertFalse(
+            AIOMFACModel.prepare(spec(["water", "Na2SO4"])).sulfate
+        )
+        for execution in ("resident", "hybrid"):
             with self.assertRaisesRegex(ValueError, "execution"):
                 AIOMFACModel.prepare(spec(["water"]), execution=execution)

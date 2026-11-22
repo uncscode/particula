@@ -6,7 +6,7 @@ from types import MappingProxyType
 import numpy as np
 from particula.particles.activity_strategies import ActivityStrategy
 
-from . import AIOMFACModel
+from . import AIOMFACModel, ConvergenceError
 
 
 class AIOMFACActivity(ActivityStrategy):
@@ -18,6 +18,8 @@ class AIOMFACActivity(ActivityStrategy):
     def __init__(
         self, mixture, material_mapping, inert_indices=(), execution="cpu"
     ):
+        if execution != "cpu":
+            raise ValueError("native condensation requires CPU execution")
         self.prepared = AIOMFACModel.prepare(mixture, execution=execution)
         names = tuple(mixture.components)
         inert = tuple(inert_indices)
@@ -40,7 +42,7 @@ class AIOMFACActivity(ActivityStrategy):
             {
                 by_name[k]: i
                 for i, k in enumerate(self.prepared.neutrals)
-                if mixture.components[k] != {173: 1}
+                if k in by_name and mixture.components[k] != {173: 1}
             }
         )
 
@@ -65,7 +67,12 @@ class AIOMFACActivity(ActivityStrategy):
         result = np.zeros((len(masses), len(targets)))
         if np.any(active):
             dissolved = masses[np.ix_(active, self.material_order)]
-            result[active] = self.prepared.evaluate(
-                dissolved, temperature
-            ).neutral_activities[:, selected]
+            try:
+                evaluation = self.prepared.evaluate(dissolved, temperature)
+            except ConvergenceError as error:
+                slot = int(np.flatnonzero(active)[error.batch_index[0]])
+                raise ConvergenceError(
+                    error.reason, batch_index=(slot,)
+                ) from error
+            result[active] = evaluation.neutral_activities[:, selected]
         return result

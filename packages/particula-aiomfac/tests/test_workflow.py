@@ -107,6 +107,56 @@ class TestWorkflow(unittest.TestCase):
         np.testing.assert_array_equal(before[0], particle.masses)
         np.testing.assert_array_equal(before[1], gas.concentration)
 
+    def test_sulfate_refresh_and_failed_step(self):
+        from unittest.mock import patch
+        from particula_aiomfac import ConvergenceError
+
+        proc, p, gas, source, water, _ = self.demo["setup"](
+            1.02, case_id="sulfate"
+        )
+        dry = p.masses[..., 1].copy()
+
+        def evaluate():
+            return proc.activity_strategy.prepared.evaluate(p.masses[0], 298.15)
+
+        before = evaluate()
+        np.testing.assert_allclose(
+            before.neutral_activities[0, water],
+            0.9602314418143285,
+            atol=1e-10,
+            rtol=0,
+        )
+        water_budget = (
+            gas.concentration[0, source]
+            + p.concentration[0] @ p.masses[0, :, water]
+        )
+        proc.step(p, gas, 298.15, 101325.0, time_step=1e-4)
+        after = evaluate()
+        self.assertGreater(
+            after.neutral_activities[0, water],
+            before.neutral_activities[0, water],
+        )
+        self.assertLess(
+            after.ion_molalities[0, after.ion_ids.index(261)],
+            before.ion_molalities[0, before.ion_ids.index(261)],
+        )
+        np.testing.assert_array_equal(p.masses[..., 1], dry)
+        np.testing.assert_allclose(
+            gas.concentration[0, source]
+            + p.concentration[0] @ p.masses[0, :, water],
+            water_budget,
+            rtol=1e-12,
+        )
+        initial = p.masses.copy(), gas.concentration.copy()
+        with patch(
+            "particula_aiomfac.model.solve",
+            side_effect=ConvergenceError("forced exhaustion"),
+        ):
+            with self.assertRaisesRegex(ConvergenceError, "batch index"):
+                proc.step(p, gas, 298.15, 101325.0, time_step=1e-4)
+        np.testing.assert_array_equal(p.masses, initial[0])
+        np.testing.assert_array_equal(gas.concentration, initial[1])
+
     def test_layout_admission(self):
         from particula_aiomfac import MixtureSpec
         from particula_aiomfac.adapter import AIOMFACActivity

@@ -27,6 +27,7 @@ register("NKTAB SR_RR SR_QQ", [1], "1")
 register("GroupMW", [1], "g/mol")
 register("SMWC", [201], "g/mol")
 register("SMWA", [241], "g/mol")
+register("lambdaIN", [201], "kg/mol")
 register("Ioncharge", [201], "elementary charge")
 register("ARR", [1, 1], "K")
 register("bTABnc cTABnc", [1, 201], "kg/mol")
@@ -46,7 +47,7 @@ def export(update=False):
             if name.startswith("FortranCode/"):
                 shutil.copyfile(SOURCE / name, src / Path(name).name)
         mr = src / "ModMRpart.f90"
-        for name in ("RccTAB", "qcca1TAB"):
+        for name in ("RccTAB", "qcca1TAB", "lambdaIN"):
             anchor = next(
                 line
                 for line in mr.read_text().splitlines()

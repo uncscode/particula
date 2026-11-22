@@ -58,6 +58,10 @@ def check_archives(dist, backend):
             "particula_aiomfac/data/parameters.npz",
             "particula_aiomfac/data/manifest.json",
         } <= wheel_files
+        assert all(
+            "particula_aiomfac/kernels/" + name + ".inc" in wheel_files
+            for name in ("activity", "equilibrium", "output")
+        )
         for notice in ("LICENSE", "NOTICE"):
             assert any(
                 p.endswith(".dist-info/licenses/" + notice) for p in wheel_files
@@ -126,6 +130,11 @@ def main():
         type=Path,
         help="retain audited artifacts in base/ and backend/",
     )
+    parser.add_argument(
+        "--cuda",
+        action="store_true",
+        help="exercise standalone and combined wheels on an NVIDIA GPU",
+    )
     args = parser.parse_args()
     cache = ROOT / ".artifacts/aiomfac-packages"
     cache.mkdir(parents=True, exist_ok=True)
@@ -151,6 +160,7 @@ def main():
             ("base", str(base)),
             ("backend", str(backend)),
             ("combined", str(base) + "[aiomfac]"),
+            *([("backend-cuda", str(backend) + "[cuda]")] if args.cuda else []),
         ]:
             env = work / ("env-" + label)
             venv.EnvBuilder(with_pip=True).create(env)
@@ -189,18 +199,30 @@ for name,wanted in zip(("particula","particula_aiomfac"),sys.argv[1:],strict=Tru
                     "-I",
                     "-c",
                     probe,
-                    "no" if label == "backend" else "yes",
+                    "no" if label.startswith("backend") else "yes",
                     "no" if label == "base" else "yes",
                 ],
                 cwd=work,
                 check=True,
             )
             subprocess.run(
-                [python, "-I", unpacked / "tools/installed_probe.py", label],
+                [
+                    python,
+                    "-I",
+                    unpacked / "tools/installed_probe.py",
+                    label,
+                    *(
+                        ["cuda"]
+                        if args.cuda and label in {"combined", "backend-cuda"}
+                        else []
+                    ),
+                ],
                 cwd=work,
                 check=True,
             )
-        print("Verified both archive pairs and three isolated installs.")
+        print(
+            "Verified both archive pairs and all requested isolated installs."
+        )
 
 
 if __name__ == "__main__":

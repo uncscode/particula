@@ -1,5 +1,7 @@
 # Milestones 2 and 3 — Direct CPU activities and native water condensation
 
+[Milestones 4 and 5](aiomfac-speciation-and-cuda.md) extend this baseline to closed equilibrium systems and direct CUDA activities.
+
 ## Delivery and scope
 
 One prepared float64 model evaluates independent liquid mixtures in bounded

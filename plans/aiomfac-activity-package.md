@@ -1,6 +1,6 @@
 # AIOMFAC activity package for Particula
 
-Status: the reference, direct fixed-dissociation CPU calculator and native isothermal condensation workflow are implemented and qualified locally. [Milestones 2 and 3 implementation and evidence](aiomfac-cpu-activity.md). Build a standalone activity calculator in the Particula repository and expose it through `pip install "particula[aiomfac]"`. Deliver direct float64 CPU and NVIDIA CUDA calculations, integrate them into kinetic condensation including resident execution and restart, and then qualify optional sparse tables. Viscosity is deferred.
+The reference, direct activities on CPU and CUDA, closed CPU and CUDA speciation, and native CPU isothermal condensation are implemented locally. [Milestones 4 and 5 qualification](aiomfac-speciation-and-cuda.md). [Milestones 2 and 3 implementation and evidence](aiomfac-cpu-activity.md). Build a standalone activity calculator in the Particula repository and expose it through `pip install "particula[aiomfac]"`. Deliver direct float64 CPU and NVIDIA CUDA calculations, integrate them into kinetic condensation including resident execution and restart, and then qualify optional sparse tables. Viscosity is deferred.
 
 ## Milestone 1 qualification — 2026-11-22
 
@@ -122,8 +122,8 @@ Benchmark direct and hybrid CPU and CUDA across batch size, material count, acti
 | 1. Reference and provenance | Reproducible activity-only harness, case corpus, parameter manifest, and license inventory. | 2–3 |
 | 2. Package and provider | Isolated archives, standalone import, lazy extra, and temperature-aware compatibility tests. | 2–3 |
 | 3. CPU activity terms | Neutral and electrolyte contributions and final outputs pass pinned comparisons. | 3–5 |
-| 4. CPU speciation | Closed-system cases converge reproducibly with checked residuals and explicit failures. | 3–5 |
-| 5. Direct CUDA | Real-device parity across supported chemistry, including bounded device speciation. | 3–5 |
+| [4. CPU speciation](aiomfac-speciation-and-cuda.md#milestone-4--cpu-equilibrium) | Closed-system cases converge reproducibly with checked residuals and explicit failures. | 3–5 |
+| [5. Direct CUDA](aiomfac-speciation-and-cuda.md#milestone-5--direct-cuda-activities) | Real-device parity across supported chemistry, including bounded device speciation. | 3–5 |
 | 6. Condensation integration | Fixed, adaptive, and resident workflows pass stage refresh, event, capture, and restart tests. | 4–6 |
 | 7. Sparse tables | Fixed-dry and bounded variable-composition domains pass independent fixed-step/RK23 and fallback tests. | 3–5 |
 | 8. Release qualification | Isolated packages, installation matrix, performance report, user guide, and reproducible examples. | 2–3 |

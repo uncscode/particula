@@ -106,7 +106,8 @@ def instrument(src):
     replace(
         diss,
         anchor,
-        "        write(*,*) 'REF carbon ', nCarbmax, nCarb+nCO2+nHCO3\n" + anchor,
+        "        write(*,*) 'REF carbon ', nCarbmax, nCarb+nCO2+nHCO3\n"
+        "        if (bisulfsyst) write(*,*) 'REF sulfur ', nSulfmax, nSulf+nHSO4\n" + anchor,
     )
     main = src / "Main_IO_driver.f90"
     anchor = "            call AIOMFAC_inout("

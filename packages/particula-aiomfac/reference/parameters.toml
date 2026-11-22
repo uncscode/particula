@@ -24,3 +24,4 @@ carbonate_gas_equilibration = false
 carbonate_solver = "Mod_MINPACK.f90: hybrd1, HighPrecSolving=true, upstream seeded retries"
 sulfate_solver = "brent.f90 and zerobracket_inwards.f90"
 canonical_initialization = "fresh process per input state"
+co2_ion_parameters = "ModMRpart.f90: lambdaIN, ion subgroup ID minus 201, kg/mol"

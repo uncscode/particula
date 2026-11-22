@@ -1,0 +1,17 @@
+{
+  "components": [
+    "water",
+    "NH4HSO4",
+    "KHCO3"
+  ],
+  "fractions": [
+    0.999999998,
+    1e-09,
+    1e-09
+  ],
+  "temperature_K": 295.0,
+  "basis": "mass",
+  "source": "Stress the closed-system hydroxide inventory bound at trace analytical loading",
+  "expected_status": "upstream_error",
+  "expected_solver_error": 17
+}
