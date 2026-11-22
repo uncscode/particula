@@ -1,0 +1,5 @@
+case,haze_number_cm3,cloud_number_cm3,relative_dispersion,liquid_water_mg_m3,mean_cloud_diameter_um
+clean-B,11,140,0.45,136.7,10.45
+clean-E,13,142,0.474,85.3,8.73
+polluted-B,305,1562,0.486,306.9,5.89
+polluted-E,440,1634,0.477,207.1,5.09

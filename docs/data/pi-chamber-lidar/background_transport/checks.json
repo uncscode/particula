@@ -1,0 +1,35 @@
+{
+  "main": {
+    "scenarios": 1024,
+    "stable_scenarios": 862,
+    "stable_source_pairs": 350,
+    "stable_matched_draws": 172,
+    "joint_hit": 0,
+    "stable_joint_hit": 0,
+    "maximum_optical_averaging_difference_relative_to_combined_mean": 0.0002667479236727879,
+    "max_number_residual_cm3": 7.297785487025976e-08,
+    "max_water_residual_mg_m3": 2.627857611514628e-07
+  },
+  "extended": {
+    "scenarios": 1024,
+    "stable_scenarios": 942,
+    "stable_source_pairs": 430,
+    "stable_matched_draws": 206,
+    "joint_hit": 0,
+    "stable_joint_hit": 0,
+    "maximum_optical_averaging_difference_relative_to_combined_mean": 7.362940076020411e-05,
+    "max_number_residual_cm3": 3.6439450923353444e-07,
+    "max_water_residual_mg_m3": 5.011752364225686e-07
+  },
+  "refined": {
+    "scenarios": 136,
+    "stable_scenarios": 110,
+    "stable_source_pairs": 42,
+    "stable_matched_draws": 20,
+    "joint_hit": 0,
+    "stable_joint_hit": 0,
+    "maximum_optical_averaging_difference_relative_to_combined_mean": 0.0004291840285430523,
+    "max_number_residual_cm3": 1.3159733498468995e-06,
+    "max_water_residual_mg_m3": 9.795039659366012e-07
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 6.870105755049735,
+  "package_source_sha256": "c4d232f44a8d5af6e73efde644c2f3813d62b3da1a55d0169edda55f0b6aa9a8",
+  "scientific_source_sha256": "866c0c5d2fe6b5c2a4d6d09e229ef68c46e81aaf10e2104c95222dbf23f9cebd",
+  "input_sha256": {
+    "scripts/pi_chamber_lidar/replay.py": "2b03fbc81d982cad165651926ea2df766097124441ff879e5619e3bb21cce4db",
+    "scripts/pi_chamber_lidar/chamber.cu": "ff3d129166c36d2e179b3103e446f26e0d7814467a2ec42268e8cf03164b5088",
+    "docs/data/pi-chamber-lidar/four-second-kinetics.npz": "7c22adcd4de0898b618ed4876bda2b8d99439dc85bb9033bc6691ab3690597c3",
+    "docs/data/pi-chamber-lidar/maintained/matched-example.csv": "a245b868cd71db8948342331e69e7deab5e8ec92281e7a3bba0e6b265d10f0cc",
+    "docs/data/pi-chamber-lidar/observations/microphysics.csv": "82c31aca8c70bc1197417017766f9585f80efa44f443951975c3ab8de2fe22cf"
+  },
+  "example": "pi-chamber-lidar",
+  "fingerprint": "67f2602980a612b35bbf9132e59bb0d702f639b31b5c438e203a21b4587f254a",
+  "source": "docs/studies/literature/pi-chamber-lidar/closure.py",
+  "revision": "086319330529c374631fe1a10a08a14c042d4a28",
+  "package_dirty": false,
+  "executed_at": "2026-11-22T00:31:16.009178+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\n"
+      },
+      {
+        "text": "CUDA device: NVIDIA GeForce RTX 5060\nclean-B: 11.3 cloud droplets/cm\u00b3, 70.8 mg/m\u00b3 visible liquid water\npolluted-B: 455.7 cloud droplets/cm\u00b3, 332.9 mg/m\u00b3 visible liquid water\nclean-E: 16.4 cloud droplets/cm\u00b3, 54.7 mg/m\u00b3 visible liquid water\npolluted-E: 528.7 cloud droplets/cm\u00b3, 222.6 mg/m\u00b3 visible liquid water\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-2-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "ae5d4ab989f8db66bdc0c06fef949476871001fe8a86ee051b3a8027af49de4c",
+    "data.json": "298c9e4d8bcf7730d8e874caa63751457c7466efb9644bd1068e96ae25f7a39c",
+    "figure-2-1.png": "5220f1a722ef56b6f28326d775ad1931841bb38e84e849da6890c48c4e41a60e"
+  },
+  "simulation_fingerprint": "c10d4d33e6e85ceb45a76a9d22a51d8a87e41451b9cd621b1827775219c3fd78"
+}

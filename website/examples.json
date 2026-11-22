@@ -1718,5 +1718,20 @@
     ],
     "plot_inputs": [],
     "full_canvas": true
+  },
+  "pi-chamber-lidar": {
+    "title": "Replay the Π Chamber droplet gain and background count",
+    "source": "docs/studies/literature/pi-chamber-lidar/closure.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 300,
+    "inputs": [
+      "scripts/pi_chamber_lidar/replay.py",
+      "scripts/pi_chamber_lidar/chamber.cu",
+      "docs/data/pi-chamber-lidar/four-second-kinetics.npz",
+      "docs/data/pi-chamber-lidar/maintained/matched-example.csv",
+      "docs/data/pi-chamber-lidar/observations/microphysics.csv"
+    ],
+    "data_expression": "report"
   }
 }

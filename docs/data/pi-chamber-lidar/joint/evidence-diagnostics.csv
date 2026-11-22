@@ -1,0 +1,5 @@
+case,activated_dispersion_paper,activated_dispersion_from_bins,mie_extinction_m1,published_extinction_m1,shared_minimax_scale,scaled_anchor_relative_residual,interior_gates,interior_monotone_min_nrmse,all_gates,all_monotone_min_nrmse,undiluted_total_deficit_cm3,undiluted_max_tail_deficit_cm3,undiluted_worst_threshold_um,undiluted_minimum_l1_fraction_from_total,diluted_1pct_total_deficit_cm3,diluted_1pct_max_tail_deficit_cm3,diluted_1pct_worst_threshold_um,diluted_1pct_minimum_l1_fraction_from_total
+clean-B,0.45,0.452154472,0.0304865723,0.0477,1.76453599,0.127770526,33,0.0402644815,51,0.265982623,,,,,,,,
+clean-E,0.474,0.476531347,0.0220863598,0.03698,1.76453599,0.0538717372,46,0.0647781192,66,0.378676253,4,4.23983689,0.96196471,0.0258064516,5.51,5.71814269,0.96196471,0.0355483871
+polluted-B,0.486,0.490219445,0.114588412,0.21952,1.76453599,-0.0789204715,47,0.0177151373,67,0.25201112,,,,,,,,
+polluted-E,0.477,0.484129104,0.0904836205,0.18305,1.76453599,-0.127770526,47,0.019615867,67,0.34516706,207,207,0.583,0.099807136,225.67,225.67,0.583,0.108809065

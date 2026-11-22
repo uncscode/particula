@@ -1,0 +1,14 @@
+test,replicate,selected_by,n,agreement,screen_accuracy,refined_accuracy,screen_median_size,screen_median_lidar,refined_median_size,refined_median_lidar,median_dry_s,median_abs_change,max_abs_change
+synthetic_8_12_to_12_24,0,size_error,64,0.953125,0.8125,0.796875,,,,,,,
+synthetic_8_12_to_12_24,0,lidar_error,64,0.96875,0.9375,0.9375,,,,,,,
+synthetic_8_12_to_12_24,0,joint_score,64,1,0.859375,0.859375,,,,,,,
+published_top24_8_12_to_12_24,0,size_error,24,,,,0.211399608,0.405581143,0.211308037,0.405614301,0.275469946,,
+published_top24_8_12_to_12_24,0,lidar_error,24,,,,0.346776221,0.344591262,0.341970305,0.344605152,12.1334512,,
+synthetic_8_12_to_12_24,1,size_error,64,0.984375,0.75,0.734375,,,,,,,
+synthetic_8_12_to_12_24,1,lidar_error,64,0.984375,0.890625,0.875,,,,,,,
+synthetic_8_12_to_12_24,1,joint_score,64,0.984375,0.796875,0.8125,,,,,,,
+published_top24_8_12_to_12_24,1,size_error,24,,,,0.21103752,0.405195417,0.211138622,0.405202752,0.286573099,,
+published_top24_8_12_to_12_24,1,lidar_error,24,,,,0.344722878,0.344981459,0.342803358,0.34469894,11.8353884,,
+published_finalists_8_12_to_20_32,,size_error,33,,,,,,,,,0.0047436129,0.0286101741
+published_finalists_8_12_to_20_32,,lidar_error,33,,,,,,,,,0.0003448453,0.0012020763
+published_finalists_8_12_to_20_32,,joint_score,33,,,,,,,,,0.001924027,0.0172690548

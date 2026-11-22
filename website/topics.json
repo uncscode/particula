@@ -5103,6 +5103,47 @@
           }
         ]
       }
+    },
+    {
+      "source": "docs/studies/literature/pi-chamber-lidar/closure.py",
+      "title": "Replay the Π Chamber droplet gain and background count",
+      "topic": "chambers",
+      "also": [
+        "condensation",
+        "gpu"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/pi-chamber-lidar/index.md",
+      "title": "Particula reproduces the polluted Π Chamber’s droplet gain but underestimates the background count",
+      "topic": "chambers",
+      "also": [
+        "optics",
+        "condensation",
+        "losses-deposition"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "pi-chamber-lidar",
+        "runs": [
+          "pi-chamber-lidar"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/studies/literature/pi-chamber/haze-and-cloud/index.md",
+            "label": "Haze and cloud counts over fresh-water and salt-water floors"
+          },
+          {
+            "target": "docs/guide/processes/condensation.md",
+            "label": "Condensation and evaporation"
+          }
+        ]
+      },
+      "tocFigure": "pi-chamber-lidar/graphical-abstract.svg"
     }
   ],
   "supporting": [
