@@ -1,0 +1,37 @@
+{
+  "inputs_sha256": "dc64ad3762616c400c4dbd4f4931bbbbf02f68d35606ef5fb686d06a40e27db6",
+  "device": "NVIDIA GeForce RTX 5060",
+  "compact_network_control": {
+    "run": 24,
+    "minutes": 30,
+    "seed": 201,
+    "n": 512,
+    "step_s": 15,
+    "compact_channels": 38,
+    "padded_channels": 70,
+    "max_count_bin_difference": 0.0
+  },
+  "warp": "1.11.1",
+  "particle_settings": [
+    1.5,
+    0.0,
+    0.0
+  ],
+  "resolutions": [
+    [
+      1024,
+      30,
+      201
+    ],
+    [
+      2048,
+      15,
+      201
+    ],
+    [
+      2048,
+      15,
+      202
+    ]
+  ]
+}

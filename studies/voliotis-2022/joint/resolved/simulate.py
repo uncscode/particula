@@ -50,9 +50,11 @@ def launch(kernel, dim, args):
 class Chamber:
     """Simulate particle ensembles for multiple kinetic parameter vectors."""
 
-    def __init__(self):
+    def __init__(self, bank=BANK):
         """Reuse the archived chamber initial states and precursor histories."""
-        model = Model(BANK)
+        self.bank = tuple(bank)
+        model = Model(self.bank)
+        self.rate_end = 16 + len(self.bank)
         self.runs = model.runs
         self.initial = model.initial
         self.instruments = model.instruments
@@ -64,9 +66,10 @@ class Chamber:
     def baseline(self, fit="mass"):
         """Load the previously calibrated reaction rates and injection doses."""
         prev = ARCHIVE["fits"][fit]["fit"]
-        # 16 inherited variables, 70 rates, 15 doses, GSD, area/volume mix,
-        # Jmax.
-        return np.r_[prev["x"], prev["dose"], 1.5, 0.0, 0.0]
+        # Archived rates transfer by reaction identity. New channels start off.
+        inherited = dict(zip(BANK, prev["x"][16:], strict=True))
+        rates = [inherited.get(channel, 0.0) for channel in self.bank]
+        return np.r_[prev["x"][:16], rates, prev["dose"], 1.5, 0.0, 0.0]
 
     def run(
         self,
@@ -87,8 +90,13 @@ class Chamber:
             raise ValueError(
                 "Use divisors of 60 seconds, even seeds and five-minute windows"
             )
+        vectors = np.atleast_2d(vectors)
         indices = np.tile([self.ids.index(k) for k in run_ids], len(vectors))
-        v = np.repeat(np.atleast_2d(vectors), len(run_ids), axis=0)
+        v = np.repeat(vectors, len(run_ids), axis=0)
+        if v.shape[1] != self.rate_end + len(self.ids) + 3:
+            raise ValueError(
+                "Inconsistent source, rate, dose or particle parameter count"
+            )
         rows = len(indices)
         init = self.initial[indices]
         sample_air = n / init[:, 1]
@@ -102,7 +110,8 @@ class Chamber:
         particles = upload(x, State)
         air = upload(sample_air)
         source = (
-            self.source[indices] * v[np.arange(rows), 86 + indices, None, None]
+            self.source[indices]
+            * v[np.arange(rows), self.rate_end + indices, None, None]
         )
         gross = (
             source[:, :, :3] * v[:, None, 3:6]
@@ -116,7 +125,8 @@ class Chamber:
         supplied = (retained + diverted)[:, :minutes, :].sum(axis=(1, 2))
         feed, extra = upload(retained), upload(diverted)
         params, rates, eddy, alloc, jmax = map(
-            upload, (v[:, :16], v[:, 16:86], v[:, 9], v[:, -2], v[:, -1])
+            upload,
+            (v[:, :16], v[:, 16 : self.rate_end], v[:, 9], v[:, -2], v[:, -1]),
         )
         props = zeros((rows, cap, 6))
         gas, arrivals = zeros(rows, State), zeros(rows, State)

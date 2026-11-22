@@ -271,10 +271,12 @@ def network(  # noqa: C901 - fused split integration and tracer bookkeeping
             flux[i, r, d, col + 5] = x[26]
             flux[i, r, d, col + 6] = x[12]
             flux[i, r, d, col + 7] = x[13]
-        if diagnostic == 4:
+        if diagnostic == 4 or diagnostic == 5:
             flux[i, r, d, 3 * j] = total_soa(x)
             flux[i, r, d, 3 * j + 1] = deposited
             flux[i, r, d, 3 * j + 2] = seed
+            if diagnostic == 5:
+                flux[i, r, d, 3 * j + 2] = count / initial[r, 1]
         if obs[r, j, 0] >= F64(0.0):
             pred = old + (total_soa(x) - old) * obs[r, j, 0]
             peak = wp.max(peak, pred)
@@ -388,8 +390,9 @@ class Model(Campaign):
 
         out = wp.empty((*shape, 8), dtype=F64, device="cuda:0")
         width = 480 if diagnostics == 3 else self.n_reactions * int(diagnostics)
-        if diagnostics == 4:
-            width = 300 * 3  # Minute-resolved organic mass, wall mass and seed.
+        if diagnostics in (4, 5):
+            # Organic mass, wall mass, and either seed or relative count.
+            width = 300 * 3
         flux = wp.zeros(
             (*shape, width) if diagnostics else (1, 1, 1, 1),
             dtype=F64,
