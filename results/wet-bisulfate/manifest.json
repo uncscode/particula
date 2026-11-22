@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 4.555846024071798,
+  "package_source_sha256": "2c33767fef48d92331e9e5853226e754554709242cd4a74e511d8b1e58bea9f8",
+  "scientific_source_sha256": "32297ef40e50c6bee10a3f283f93bc61199207f6a7948487444666daa09e6472",
+  "input_sha256": {
+    "docs/data/wet-bisulfate/bulk.csv": "602e9fd21a27e8106f0f23b9e74a73b255f887856d8ca6eafe0dc344c6bec3e8",
+    "docs/data/wet-bisulfate/cuda-reference.csv": "72e725b7fcaef5e3210202b2903ceaeec6dab14ea9f2dc8b163d276e1c56cbc2"
+  },
+  "example": "wet-bisulfate",
+  "fingerprint": "40ab5742d7d4e182140336ca99897af5286c8ba01b671d18dc6ea69225ca0a3c",
+  "source": "docs/studies/validation/optics/wet-bisulfate/wet_bisulfate.py",
+  "revision": "77b383cdb32d45f78567e1388becbf39f70d23b7",
+  "package_dirty": false,
+  "executed_at": "2026-11-22T12:25:28.847193+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Wet diameter growth factor: 1.629\n200 nm: wet index 7.31x, fixed index 9.66x\n800 nm: wet index 2.34x, fixed index 2.12x\n"
+      },
+      {
+        "image": "figure-5-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-5-1.png": "0358c552bdcaa5f72e561ee75b93b2c8ebd9ef52ead39c13f0990990819dd857",
+    "data.json": "8fd1e8b540f93f4a651e561e88ec2781102b9b4a15c3cd7aa35fd1ec89319e01",
+    "source.py": "2bbb4d933278f48daf92a5d3948ff210aeae66b7464edace460b466a2d229fec"
+  },
+  "simulation_fingerprint": "ea5c328184dcd7ba1698215d0283b3bfb585cef4bb90e671a215f6381f7f099b"
+}
