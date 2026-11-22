@@ -1,0 +1,12 @@
+# Local optimizer state and candidate search outputs
+/*.json
+!/baselines.json
+!/diagnostics.json
+!/size_inputs.json
+!/final_omission.json
+!/search_summary.json
+!/selection.json
+!/ad_observation_jacobian.json
+/channel_catalog.csv
+/lineage_rates.csv
+/flux_response.csv

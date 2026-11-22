@@ -1,0 +1,18 @@
+{
+ "incumbent": {
+  "trajectory_step_seconds": 0.9375,
+  "num_channels": 38,
+  "appreciable": 20,
+  "max_closure_ug_m3": 2.829665390891023e-10,
+  "archived_export_check": {
+   "max_organic_or_wall_ug_m3": 0.0,
+   "max_relative_count": 0.0
+  }
+ },
+ "selected": {
+  "trajectory_step_seconds": 0.9375,
+  "num_channels": 40,
+  "appreciable": 19,
+  "max_closure_ug_m3": 1.016132955555804e-09
+ }
+}

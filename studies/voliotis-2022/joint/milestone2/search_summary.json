@@ -1,0 +1,72 @@
+{
+  "channel_cap": 1000,
+  "bank_channels": 104,
+  "inherited": 38,
+  "distinct_additional_channels_screened": 66,
+  "rounds": [
+    {
+      "round": 1,
+      "tested_channels": 66,
+      "direct_motifs": 64,
+      "positive_direct_motifs": 38,
+      "warmed_routes": 37,
+      "distinct_motifs_screened": 75,
+      "verified": true,
+      "distinct_motifs_refitted": 12,
+      "admitted": [
+        "a_return"
+      ],
+      "retained_channel_count": 39,
+      "validation_step_seconds": 0.9375,
+      "previous_percent": 17.751442763669704,
+      "refitted_parent_percent": 17.705922376419494,
+      "selected_percent": 17.702604624874034,
+      "parent_refit_gain_percentage_points": 0.04552038725021035,
+      "growth_gain_percentage_points": 0.0033177515454596573,
+      "selected_fit": "ad_adjudicated_0_child"
+    },
+    {
+      "round": 2,
+      "tested_channels": 65,
+      "direct_motifs": 63,
+      "positive_direct_motifs": 44,
+      "warmed_routes": 31,
+      "distinct_motifs_screened": 74,
+      "verified": true,
+      "distinct_motifs_refitted": 12,
+      "admitted": [
+        "CC_29_24"
+      ],
+      "retained_channel_count": 40,
+      "validation_step_seconds": 0.9375,
+      "previous_percent": 17.702604624874034,
+      "refitted_parent_percent": 17.702500925239644,
+      "selected_percent": 17.70087177433657,
+      "parent_refit_gain_percentage_points": 0.00010369963439060825,
+      "growth_gain_percentage_points": 0.0016291509030743612,
+      "selected_fit": "ad_adjudicated_0_child"
+    },
+    {
+      "round": 3,
+      "tested_channels": 64,
+      "direct_motifs": 61,
+      "positive_direct_motifs": 35,
+      "warmed_routes": 30,
+      "distinct_motifs_screened": 72,
+      "verified": true,
+      "distinct_motifs_refitted": 5,
+      "admitted": [],
+      "retained_channel_count": 40,
+      "validation_step_seconds": 0.9375,
+      "previous_percent": 17.70087177433657,
+      "refitted_parent_percent": 17.70086953568081,
+      "selected_percent": 17.70086953568081,
+      "parent_refit_gain_percentage_points": 2.238655760322672e-06,
+      "growth_gain_percentage_points": 0.0,
+      "selected_fit": "ad_fine_0_parent"
+    }
+  ],
+  "final_channels": 40,
+  "appreciable": 19,
+  "appreciable_definition": "Gross transfer >= 1 ug/m3 in any run."
+}

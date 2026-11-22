@@ -215,6 +215,8 @@ For chemistry, the missing observable is the time history of an identified produ
 
 ![In an isolated α-pinene dimer chain, reversing the slow and fast rates leaves total suspended mass unchanged but separates the modeled oxidized-dimer concentrations in run 1.](../../../../images/manchester-soa/dimer-rate-swap.png)
 
+The [follow-up network discovery study](../manchester-network-growth/index.md) tests additional reactions against a fresh fit of the earlier chemistry and checks the selected fit against the measured size distributions.
+
 ## Reproduce the search and particle-resolved comparisons
 
 The calculations used Particula 0.3.3, Python 3.12 and Warp 1.11.1 on an NVIDIA GeForce RTX 5060. The precursor and aerosol time series are reformatted AERIS/EUROCHAMP records deposited by Gordon McFiggans, Aristeidis Voliotis and the Manchester team under CC BY 4.0. The study includes the source DOIs and checksums, literature evidence for the reactions, selected parameter sets, and scores behind the figures. Replaying the final calibrations requires only the published files. [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) · [Instrument data and attribution](https://github.com/uncscode/particula/blob/7d4fefbfcc593d6e5aafb9d6ecb4e8aa2f4d3645/studies/voliotis-2022/data/README.md) · [Study archive](https://github.com/uncscode/particula/tree/7d4fefbfcc593d6e5aafb9d6ecb4e8aa2f4d3645/studies/voliotis-2022) · [Complete fitting and replay instructions](https://github.com/uncscode/particula/blob/7d4fefbfcc593d6e5aafb9d6ecb4e8aa2f4d3645/studies/voliotis-2022/joint/chains/METHODS.md)

@@ -1,0 +1,17 @@
+{
+ "chosen_channel": "a_return",
+ "channel_id": 76,
+ "fixed_omissions": {
+  "a_return": 0.5918839829722168,
+  "CC_29_24": 0.24604351019786685
+ },
+ "intact_fixed_error": 0.17700869535680808,
+ "validated_step_s": 0.9375,
+ "calls_per_start": 100,
+ "fitted_step_s": 1.875,
+ "inputs_sha256": "dc64ad3762616c400c4dbd4f4931bbbbf02f68d35606ef5fb686d06a40e27db6",
+ "best_validation_errors": {
+  "intact": 0.17700869535680808,
+  "removed": 0.1770288537442062
+ }
+}

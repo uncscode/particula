@@ -2951,6 +2951,58 @@
       "tocFigure": "manchester-soa/graphical-abstract.svg"
     },
     {
+      "source": "docs/studies/literature/evaporation-and-uptake/manchester-network-growth/index.md",
+      "title": "Manchester’s ternary aerosol declined while the fitted reaction network still predicted growth",
+      "topic": "chambers",
+      "also": [
+        "condensation",
+        "losses-deposition",
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "manchester-network-growth",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/studies/literature/evaporation-and-uptake/manchester-soa/index.md",
+            "label": "Original Manchester campaign analysis"
+          },
+          {
+            "target": "docs/studies/literature/evaporation-and-uptake/manchester-campaign-performance/index.md",
+            "label": "Campaign performance across all 15 experiments"
+          }
+        ]
+      },
+      "tocFigure": "manchester-soa/milestone2-late-loss.png"
+    },
+    {
+      "source": "docs/studies/literature/evaporation-and-uptake/manchester-campaign-performance/index.md",
+      "title": "Twelve of 15 Manchester runs improved, yet the average joint error rose",
+      "topic": "chambers",
+      "also": [
+        "condensation",
+        "losses-deposition",
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "manchester-campaign-performance",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/studies/literature/evaporation-and-uptake/manchester-network-growth/index.md",
+            "label": "Manchester reaction network and size validation"
+          }
+        ]
+      },
+      "tocFigure": "manchester-soa/campaign-performance.png"
+    },
+    {
       "source": "docs/studies/literature/pi-chamber/seed-chemistry.md",
       "title": "At the inferred Π Chamber humidity, modeled sulfate haze falls below the optical detection limit",
       "topic": "chambers",
