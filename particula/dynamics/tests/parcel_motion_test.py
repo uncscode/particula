@@ -149,3 +149,41 @@ def test_retained_contact_restart_and_separating_geometry(trace, device):
     rebound = later.rebind_geometry(separated)
     end = advance_motion(separated, rebound, duration=0.25, **opts)
     assert end.particles[0].position[0] == 2.1
+
+
+@pytest.mark.parametrize(
+    ("destination_wind", "boundary", "final_x", "events"),
+    [
+        (-1.0, "retain", 0.75, ["retain", "cross"]),
+        (1.0, "retain", 1.0, ["retain", "cross"]),
+        (1.0, "open", None, ["retain", "cross", "open"]),
+    ],
+)
+def test_sliding_contact_across_cells(
+    trace, device, destination_wind, boundary, final_x, events
+):
+    """A sliding particle obeys the velocity and wall policy of its new cell."""
+    cluster = column(trace, (1, 2, 1))
+    start = MotionState(0.0, (tracer("A", "0", (0.75, 0.5, 0.5)),))
+    opts = dict(
+        air_velocity={"0": (1.0, 1.0, 0.0), "1": (destination_wind, 1.0, 0.0)},
+        boundaries={("1", 0, 1): boundary},
+        capacity=1,
+        device=device,
+    )
+    full = advance_motion(cluster, start, duration=0.75, **opts)
+    at_face = advance_motion(cluster, start, duration=0.5, **opts)
+    resumed = advance_motion(cluster, at_face, duration=0.25, **opts)
+    assert [e.kind for e in full.events] == events
+    assert full.events == resumed.events
+    assert full.retained == resumed.retained
+    if final_x is None:
+        assert full.particles == resumed.particles == ()
+        assert full.events[-1].time == 0.5
+    else:
+        np.testing.assert_allclose(
+            full.particles[0].position,
+            resumed.particles[0].position,
+            atol=1e-15,
+        )
+        assert full.particles[0].position[:2] == (final_x, 1.25)

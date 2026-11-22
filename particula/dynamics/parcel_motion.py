@@ -260,6 +260,26 @@ def _face_rule(cluster, cell, a, sign, x, boxes, policies):
     return dst, face, kind
 
 
+def _update_wall_contacts(
+    blocked, record, dst, relative, position, cluster, boxes, policies
+):
+    """Keep a sliding contact where the destination continues its wall."""
+    for axis in range(3):
+        key = (record.id, axis)
+        sign = blocked.get(key)
+        if sign is None:
+            continue
+        side = int(sign > 0)
+        same_wall = boxes[record.cell][side, axis] == boxes[dst][side, axis]
+        if same_wall and sign * relative[axis] > 0:
+            _, _, rule = _face_rule(
+                cluster, dst, axis, sign, position, boxes, policies
+            )
+            if rule == "retain":
+                continue
+        del blocked[key]
+
+
 def _cross_faces(
     cluster,
     hits,
@@ -292,7 +312,7 @@ def _cross_faces(
             cluster, p.cell, a, sign, x, boxes, policies
         )
         if kind == "retain":
-            blocked.add((k, a))
+            blocked[k, a] = sign
         if dst != p.cell:
             next_occupancy[p.cell] -= 1
             if dst is not None:
@@ -310,15 +330,21 @@ def _cross_faces(
             live[k] = replace(record, cell=dst)
             if kind == "periodic":
                 positions[k][a] = face
-            if (
-                kind in ("cross", "periodic")
-                and sign
-                * (velocity[dst][a] - mesh[a] - (speed[k] if a == 2 else 0))
-                < 0
-            ):
+            relative = _relative_velocity(velocity[dst], mesh, speed[k])
+            if sign * relative[a] < 0:
                 raise ValueError(
                     "discontinuous air velocities reverse at shared face"
                 )
+            _update_wall_contacts(
+                blocked,
+                record,
+                dst,
+                relative,
+                positions[k],
+                cluster,
+                boxes,
+                policies,
+            )
     return occupancy
 
 
@@ -343,17 +369,18 @@ def _boundary_rules(boxes, mesh, boundaries):
     return policies, digest
 
 
+def _relative_velocity(air, mesh, settling):
+    return air - mesh - [0, 0, settling]
+
+
 def _retained_contacts(retained, live, velocity, mesh, speed):
-    contacts = dict(((k, a), sign) for k, a, sign in retained)
-    blocked = set()
-    for (k, a), sign in contacts.items():
+    blocked = {}
+    for k, a, sign in retained:
         if k not in live or a not in range(3) or sign not in (-1, 1):
             raise ValueError("invalid retained contact in checkpoint")
-        rel = (
-            velocity[live[k].cell][a] - mesh[a] - (speed[k] if a == 2 else 0.0)
-        )
+        rel = _relative_velocity(velocity[live[k].cell], mesh, speed[k])[a]
         if sign * rel > 0:
-            blocked.add((k, a))
+            blocked[k, a] = sign
     return blocked
 
 
@@ -408,7 +435,10 @@ def advance_motion(
     while live:
         keys = sorted(live)
         v = np.stack(
-            [velocity[live[k].cell] - mesh - [0, 0, speed[k]] for k in keys]
+            [
+                _relative_velocity(velocity[live[k].cell], mesh, speed[k])
+                for k in keys
+            ]
         )
         for i, k in enumerate(keys):
             for a in range(3):
@@ -446,8 +476,8 @@ def advance_motion(
         tuple(events),
         digest,
         tuple(
-            (k, a, 1 if positions[k][a] == boxes[live[k].cell][1, a] else -1)
-            for k, a in sorted(blocked)
+            (k, a, sign)
+            for (k, a), sign in sorted(blocked.items())
             if k in live
         ),
     )

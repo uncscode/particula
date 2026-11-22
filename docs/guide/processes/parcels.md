@@ -114,7 +114,9 @@ Use `advance_motion` with a `MotionState` when the observable is a crossing
 time or an individual's destination. Supply cell bounds, a stable ID and
 world position for each particle, an air velocity and per-cell capacity.
 Each returned event identifies the particle, time, source, destination and
-boundary action. The default exterior face retains the particle. Periodic
+boundary action. At a retaining wall a particle can slide along the face.
+On entering a neighboring cell it moves inward if the local velocity points
+away from the wall. Exterior faces retain particles by default. Periodic
 faces wrap, open faces register departures, and depositing faces record
 deposition. In a translating mesh, compare height both above ground and
 relative to the moving cells. Carry the returned state into the next interval
