@@ -4,7 +4,7 @@
   <defs>
     <path id="droplet" d="M0-6.5C-1.6-3.5-4.5-.8-4.5 2a4.5 4.5 0 0 0 9 0C4.5-.8 1.6-3.5 0-6.5Z"/>
   </defs>
-  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
+  <rect width="300" height="300" fill="#fbf2e3"/>
   <!-- Two-cloud motif adapted from the Pi Chamber emblem, credited on the study page. -->
   <g stroke="#243e43" stroke-width="2.5" stroke-linejoin="round" fill="#fbf2e3">
     <path d="M56 49a8 8 0 0 1-1-16 10 10 0 0 1 18-2 6.5 6.5 0 0 1 8 5 6.5 6.5 0 0 1-1 13Z"/>
@@ -36,4 +36,5 @@
     <text x="52" y="271">Freshwater</text>
     <text x="214" y="271">Saltwater</text>
   </g>
+<g transform="translate(264 270)"><image width="22.5" height="17.1" aria-hidden="true" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMyIgZGF0YS1uYW1lPSJMYXllciAzIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OC45MyAzNy4xMSI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogIzExNWY1YTsKICAgICAgfQogICAgPC9zdHlsZT4KICA8L2RlZnM+CiAgPGNpcmNsZSBjbGFzcz0iY2xzLTEiIGN4PSI0LjU5IiBjeT0iNC41OSIgcj0iNC41OSIvPgogIDxjaXJjbGUgY2xhc3M9ImNscy0xIiBjeD0iMTguMzQiIGN5PSI0LjU5IiByPSI0LjU5Ii8+CiAgPGNpcmNsZSBjbGFzcz0iY2xzLTEiIGN4PSI0LjU5IiBjeT0iMTguMzQiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjMxLjU2IiBjeT0iMzIuNTMiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjQ0LjI4IiBjeT0iMTguNzgiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjQ0LjI4IiBjeT0iNS4wMiIgcj0iNC41OSIvPgogIDxjaXJjbGUgY2xhc3M9ImNscy0xIiBjeD0iNC41OSIgY3k9IjMyLjA5IiByPSI0LjU5Ii8+Cjwvc3ZnPg=="/></g>
 </svg>

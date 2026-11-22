@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
   <title id="title">Airborne particles after one hour in a spherical chamber</title>
   <desc id="desc">A cutaway of a spherical aerosol chamber shows particles suspended inside and some touching its wall. The sketch represents the same idealized vessel for both predictions. Of the initial 1 µm particles, 68.4% remain airborne under coupled theory and 58.2% when the settling and diffusion loss rates are added. Both bars share a zero-to-100% scale.</desc>
-  <rect width="300" height="300" rx="16" fill="#fbf2e3"/>
+  <rect width="300" height="300" fill="#fbf2e3"/>
   <!-- Schematic chamber cross-section. Particle symbols illustrate locations. -->
   <g stroke="#243e43" stroke-linejoin="round">
     <path d="m103 130-10 24h10l13-18m57-6 14 24h-10l-14-18" fill="#cad9d2" stroke-width="2.5"/>
@@ -38,4 +38,5 @@
   </g>
   <rect x="21" y="218" width="176.472" height="11" fill="#135963"/>
   <rect x="21" y="267" width="150.156" height="11" fill="#a44d21"/>
+<g transform="translate(264 13)"><image width="22.5" height="17.1" aria-hidden="true" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMyIgZGF0YS1uYW1lPSJMYXllciAzIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OC45MyAzNy4xMSI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogIzExNWY1YTsKICAgICAgfQogICAgPC9zdHlsZT4KICA8L2RlZnM+CiAgPGNpcmNsZSBjbGFzcz0iY2xzLTEiIGN4PSI0LjU5IiBjeT0iNC41OSIgcj0iNC41OSIvPgogIDxjaXJjbGUgY2xhc3M9ImNscy0xIiBjeD0iMTguMzQiIGN5PSI0LjU5IiByPSI0LjU5Ii8+CiAgPGNpcmNsZSBjbGFzcz0iY2xzLTEiIGN4PSI0LjU5IiBjeT0iMTguMzQiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjMxLjU2IiBjeT0iMzIuNTMiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjQ0LjI4IiBjeT0iMTguNzgiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjQ0LjI4IiBjeT0iNS4wMiIgcj0iNC41OSIvPgogIDxjaXJjbGUgY2xhc3M9ImNscy0xIiBjeD0iNC41OSIgY3k9IjMyLjA5IiByPSI0LjU5Ii8+Cjwvc3ZnPg=="/></g>
 </svg>

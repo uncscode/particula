@@ -217,3 +217,7 @@ Create an equal-panel grid. Finish with fit() after adding artists.
 - A Matplotlib figure and its axes with ordinary subplots semantics.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/plotting/__init__.py#L37-L60)
+
+**Modules**
+
+- `particula.plotting.toc`

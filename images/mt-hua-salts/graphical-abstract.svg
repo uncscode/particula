@@ -2,7 +2,7 @@
   <title id="title">Wet particle sizes for Mt. Hua winter foothill extracts</title>
   <desc id="desc">Above the Mt. Hua ridge, circles compare mean wet diameters for 18 winter foothill extracts. Starting from 100 nm dry particles at 90% relative humidity, the measured mean is 157 nm. The pure-salt and liquid-mixture models predict 212 and 229 nm. All three diameters share one scale. The inner dashed rings repeat the measured diameter.</desc>
   <defs>
-    <clipPath id="card"><rect width="300" height="300" rx="16"/></clipPath>
+    <clipPath id="card"><rect width="300" height="300"/></clipPath>
   </defs>
   <g clip-path="url(#card)">
     <rect width="300" height="300" fill="#fbf2e3"/>
@@ -11,7 +11,7 @@
     <path d="m0 278 71-62 37 29 57-53 42 37 37-21 56 42v50H0Z" fill="#135963"/>
   </g>
   <g font-family="sans-serif" fill="#243e43" text-anchor="middle">
-    <text x="150" y="28" font-size="19" font-weight="bold">Wet diameter at 90% RH</text>
+    <text x="138" y="28" font-size="19" font-weight="bold">Wet diameter at 90% RH</text>
     <!-- Radius in SVG units = 18 times the mean diameter growth factor. -->
     <circle cx="47" cy="88" r="28.321" fill="#cad9d2" stroke="#243e43" stroke-width="2.5"/>
     <circle cx="145" cy="88" r="38.085" fill="#efd1a5" stroke="#a44d21" stroke-width="2.5"/>
@@ -27,4 +27,5 @@
     </g>
     <text x="150" y="278" fill="#fbf2e3" font-size="19" font-weight="bold">Mt. Hua · winter foothill</text>
   </g>
+<g transform="translate(264 13)"><image width="22.5" height="17.1" aria-hidden="true" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMyIgZGF0YS1uYW1lPSJMYXllciAzIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OC45MyAzNy4xMSI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogIzExNWY1YTsKICAgICAgfQogICAgPC9zdHlsZT4KICA8L2RlZnM+CiAgPGNpcmNsZSBjbGFzcz0iY2xzLTEiIGN4PSI0LjU5IiBjeT0iNC41OSIgcj0iNC41OSIvPgogIDxjaXJjbGUgY2xhc3M9ImNscy0xIiBjeD0iMTguMzQiIGN5PSI0LjU5IiByPSI0LjU5Ii8+CiAgPGNpcmNsZSBjbGFzcz0iY2xzLTEiIGN4PSI0LjU5IiBjeT0iMTguMzQiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjMxLjU2IiBjeT0iMzIuNTMiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjQ0LjI4IiBjeT0iMTguNzgiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjQ0LjI4IiBjeT0iNS4wMiIgcj0iNC41OSIvPgogIDxjaXJjbGUgY2xhc3M9ImNscy0xIiBjeD0iNC41OSIgY3k9IjMyLjA5IiByPSI0LjU5Ii8+Cjwvc3ZnPg=="/></g>
 </svg>
