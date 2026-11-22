@@ -33,7 +33,7 @@ TABLES = {
 }
 
 
-def refit(task):
+def refit(task, *, initial_override=None, data_override=None, upper=10.0):
     """Fit jointly and estimate one noise variance per channel."""
     path, case, iteration, generator_convention = task
     reaction, published_aic = TABLES[case][iteration - 1]
@@ -51,6 +51,8 @@ def refit(task):
     ]
     initial = np.zeros((len(initials), len(names)))
     initial[:, :observed] = np.array(initials)[:, :observed]
+    if initial_override is not None:
+        initial[3, :observed] = initial_override
     times = np.linspace(0, duration, 30)
     with tarfile.open(path) as source:
         data = np.stack(
@@ -66,6 +68,9 @@ def refit(task):
             ],
             axis=1,
         )
+
+    if data_override is not None:
+        data[:, 3, :] = data_override
 
     def predict(rates):
         def tendency(flat, time):
@@ -85,7 +90,7 @@ def refit(task):
         least_squares(
             residual,
             np.full(len(sides), start),
-            bounds=(0.0, 10.0),
+            bounds=(0.0, upper),
             diff_step=1e-4,
             max_nfev=160,
         )

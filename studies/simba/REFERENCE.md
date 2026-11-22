@@ -115,3 +115,25 @@ PYTHONPATH=. python studies/simba/enumeration.py /tmp/enumeration.json
 PYTHONPATH=. python studies/simba/native_parity.py /tmp/native_parity.json
 PYTHONPATH=. python studies/simba/heldout_recovery.py cuda:0 /tmp/recovery.json
 ```
+
+### Sensitivity of the fructose comparison
+
+The [authors' archived execution log](https://github.com/OptiMaL-PSE-Lab/auto_react_mech_construct/blob/4514fa0/output_fruc_to_hmf2.log)
+contains the paper's three AIC scores to rounding. At that same revision
+the fitting script declares [4, 0, 1] for experiment four and bounds rates
+between 0.0001 and 3. The archived CSV reproduces from [6, 0, 0]. Using the
+printed initial condition to fit that CSV raises the best AIC from −171.45
+to 914.83. Regenerating experiment four from the printed condition with the
+original random seed gives −172.10, −166.02 and −168.76 across iterations.
+Reducing the upper rate bound from 10 to 3 on the archived observations also
+leaves iteration one first. These checks identify a material input discrepancy
+and rule out those individual corrections as explanations of the paper's
+ranking. The archived log does not contain the per-iteration parameter vectors
+or predictions required to replay the reported scores at fixed parameters.
+
+```bash
+python studies/simba/fructose_sensitivity.py /tmp/simba-source.tar.gz /tmp/hmf.json
+```
+
+[Matched sensitivity fits](fructose_sensitivity.json) ·
+[Contemporaneous estimator](https://github.com/OptiMaL-PSE-Lab/auto_react_mech_construct/blob/4514fa0/parameter_estimation.py)
