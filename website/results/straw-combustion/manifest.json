@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 6.937566826120019,
+  "package_source_sha256": "c4d232f44a8d5af6e73efde644c2f3813d62b3da1a55d0169edda55f0b6aa9a8",
+  "scientific_source_sha256": "866c0c5d2fe6b5c2a4d6d09e229ef68c46e81aaf10e2104c95222dbf23f9cebd",
+  "input_sha256": {
+    "scripts/straw_combustion/replay.py": "6b6cd3c187c05379478d0b27253fafa4683ffe9d343ed7ee63b757257a3315c9",
+    "scripts/straw_combustion/forward/__init__.py": "b47fde8fd96a8144113a32858286cd6bb5a96949325637bf034fe22f9587a35d",
+    "scripts/straw_combustion/forward/common.py": "7a6b35e546f04c4d497f9d8a00595977e4e4dab669fc2cff786b0f9fe625f406",
+    "scripts/straw_combustion/forward/dry.py": "24dc8325f487e967b04ce3c3586aada2c133c95343b65ebc4da0eee18163a807",
+    "scripts/straw_combustion/forward/drylink.py": "0620089bd22af8f14e3c993b267ff1f099be61ce5a1964f913a9cf550be563c6",
+    "scripts/straw_combustion/forward/gas.py": "1e5b45a7285ccd42679ae61a55d115887e79ce8db335d7c118531ac5362bdd14",
+    "scripts/straw_combustion/forward/kernels.py": "9452a82ec709e5dba1c33fe06f4413e7003a345076f4437a9af4b47202e47ef1",
+    "scripts/straw_combustion/forward/ladders.py": "871bb79b8d4030506161cc59b15abc7e776b6aa92ea269f22f5d74d4d6646eb5",
+    "scripts/straw_combustion/forward/observations.py": "67fe03eb01b8499a88a6315189f0284fc5346a9c5de28f2887358366b81ad753",
+    "scripts/straw_combustion/forward/particle_rates.py": "43b356f8aef9d0308eb90993aa2cc4546d1d6e09101be4426043868fce71efcc",
+    "scripts/straw_combustion/forward/readout.py": "cd6efdb502e3d78ec9346a143e249d2755c029225a977452ce365c5e9654531c",
+    "scripts/straw_combustion/forward/stiff_pair.py": "4b2d415d9552ef116f64455ce53354e4e785938ac8d88f46fd67067f55f38b3a",
+    "scripts/straw_combustion/forward/thermal.py": "b9091b05bed70f786ecb982ed8167838810bd86e1d855f852f4b78fc864077a8",
+    "scripts/straw_combustion/forward/wet_equilibrium.py": "7132627f79333015eda734904e97fa517f2485f5bddfe673ce6ae3b031adf13f",
+    "scripts/straw_combustion/forward/wet_literature.py": "92eaf1919d48c77e518728325e1b6e62a8d473f68d19ecbf9778c264328d323d",
+    "scripts/straw_combustion/forward/wet_network.py": "2e49e35a8040d51c6638597434a9a93eb0cd0ba1e766dee46fe2999be24754c5",
+    "scripts/straw_combustion/forward/wet_prompt.py": "94abb8106be04649b914f92a1e84aaa3c1b6d08277d9e36c53185a39a649c63d",
+    "scripts/straw_combustion/forward/wet_stiff.py": "ffa871483ffcc31236ca132c6ad99055a63f2694639fdc434874257b46bcb4c6",
+    "scripts/straw_combustion/inputs/aerosol_feeds.csv": "94d3809c8e5c40056d55111b75cc1fcf2aba6dddb97207c993aaf3c8ff6710ff",
+    "scripts/straw_combustion/inputs/dry_equilibrium.csv": "82abae30b18cbc729fceb85ab0822b9ed77c0d8b7dec73de180051d9c99da378",
+    "scripts/straw_combustion/inputs/dry_feeds.csv": "d82245087d02a2820f4aee292ca34d94b6cd01fa2bf8f85d546cbba300ff0a5d",
+    "scripts/straw_combustion/inputs/observations.csv": "0080dd9bcf748dd37e24bf26c32cd2a64ef58e826da207e4ffc40a86989c6d93",
+    "scripts/straw_combustion/inputs/parameter_map.csv": "6a570ad6ccf3fe9210844151b40cd64121cd8c807232aad9edba651e804b8366",
+    "scripts/straw_combustion/inputs/parameters.json": "e853c25b907f6fd5ed61f2b36ac8ad2a636e629f7e8136de0346cc6ea3cce199",
+    "scripts/straw_combustion/inputs/reference_predictions.csv": "d73ad3717cd9ef1ef680cb958711e5391d3deb9d2a5c7a0fb70d7e3d98578ed3",
+    "scripts/straw_combustion/inputs/salt_vapor.csv": "5b6e78c8f4af44a3cd709dc95a6b5b6358f13a75cbbb244bc30fe26663df7eae",
+    "scripts/straw_combustion/inputs/temperature_center.csv": "52a2fcdddb4543486a50f8f460bb6c04b8858926ea2854ef87110a45c8215848",
+    "scripts/straw_combustion/inputs/temperature_wall.csv": "a0ed29cc87dbc1b2f2e3277a5fec7d096d4f393467eeb21d3ff35f7167b90fbb",
+    "scripts/straw_combustion/README.md": "966f1b99995873fe05f4f96ff18586112e81e574dd223feba7f231b30d20e0cd"
+  },
+  "example": "straw-combustion",
+  "fingerprint": "2f1a4fa0412566c5eb17dea2a0dc619b8b8f5ed42093658e1ff3666942a18a8a",
+  "source": "docs/studies/literature/straw-combustion/straw_combustion.py",
+  "revision": "12a8a3132f82c2a0b05f10bfba4b72849dcca9eb",
+  "package_dirty": false,
+  "executed_at": "2026-11-22T02:37:10.986087+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\n"
+      },
+      {
+        "text": "Module scripts.straw_combustion.forward.ladders d310fa3 load on device 'cpu' took 1546.31 ms  (compiled)\n"
+      },
+      {
+        "text": "Module scripts.straw_combustion.forward.dry a0c9356 load on device 'cpu' took 1864.74 ms  (compiled)\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-2-1.png"
+      }
+    ],
+    [
+      {
+        "text": "All-data calibration: 49/85 in band\n56-reading calibration: 13/29 withheld in band\n"
+      }
+    ]
+  ],
+  "files": {
+    "figure-2-1.png": "62ede7b5e79daf76c06cc42631eac1a6741085ffad97e5db519da09b7a372f2e",
+    "data.json": "58536d41650dfcd67a765e0ca6c52c1a1ad35b868d39afc0dc787225114f2f58",
+    "source.py": "e24109a0ee1966ccbd8dc40763161db94395497a45e3d4ef6d1552cb7534027a"
+  },
+  "simulation_fingerprint": "ffe536c7b81790ba7759539f1af7c0b34c2efda93a4f22e40d1f5cffa495e5d1"
+}

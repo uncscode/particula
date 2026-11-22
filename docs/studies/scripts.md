@@ -107,6 +107,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Recorded GPU benchmark viewer](benchmarks/historical-coagulation/gpu_benchmarks.py)
 - [Recovering initial particle sizes after condensation](validation/condensation/initial-size/infer_initial_radius.py)
 - [Repeated source pulses in a cooling and warming aerosol](examples/coupled-populations/chambers/gpu_prepared_cyclic_chamber.py)
+- [Replay the measured sulfur response in a cooling flue gas](literature/straw-combustion/straw_combustion.py)
 - [Replay the Π Chamber droplet gain and background count](literature/pi-chamber-lidar/closure.py)
 - [Reproduce the CLOUD ion balance and clearing test](literature/cloud-ion-humidity/cloud_ion_humidity.py)
 - [Reproduce the turbulent shear drop spectrum](literature/shear-drop-spectrum/shear_drop_spectrum.py)
