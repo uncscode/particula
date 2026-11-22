@@ -12,11 +12,37 @@ from particula.particles.activity_builders import (
     ActivityNonIdealBinaryBuilder,
 )
 from particula.particles.activity_strategies import (
-    ActivityIdealMass,
-    ActivityIdealMolar,
-    ActivityKappaParameter,
-    ActivityNonIdealBinary,
+    ActivityStrategy,
 )
+
+
+class _AIOMFACBuilder:
+    """Load the optional provider on explicit selection."""
+
+    def __init__(self):
+        self.parameters = {}
+
+    def set_parameters(self, parameters):
+        self.parameters = dict(parameters)
+
+    def build(self):
+        try:
+            from particula_aiomfac.adapter import AIOMFACActivity
+        except ModuleNotFoundError as error:
+            if error.name != "particula_aiomfac":
+                raise
+            raise ImportError(
+                'To select AIOMFAC, run pip install "particula[aiomfac]"'
+            ) from error
+
+        if (
+            AIOMFACActivity.provider_interface_version
+            != ActivityStrategy.provider_interface_version
+        ):
+            raise ValueError(
+                "incompatible AIOMFAC activity provider interface version"
+            )
+        return AIOMFACActivity(**self.parameters)
 
 
 # There is a bit of work in the constructor, but it is necessary to set the
@@ -28,13 +54,9 @@ class ActivityFactory(
             ActivityIdealMolarBuilder,
             ActivityKappaParameterBuilder,
             ActivityNonIdealBinaryBuilder,
+            _AIOMFACBuilder,
         ],
-        Union[
-            ActivityIdealMass,
-            ActivityIdealMolar,
-            ActivityKappaParameter,
-            ActivityNonIdealBinary,
-        ],
+        ActivityStrategy,
     ]
 ):
     """Factory for creating activity strategy builders for liquid mixtures.
@@ -91,6 +113,7 @@ class ActivityFactory(
             result (dict): to a builder instance.
 
         Supported types:
+            - "aiomfac": Optional direct CPU liquid-mixture provider
             - "mass_ideal": ActivityIdealMassBuilder (Raoult's Law, mass)
             - "molar_ideal": ActivityIdealMolarBuilder (Raoult's Law, mole)
             - "kappa_parameter": ActivityKappaParameterBuilder (kappa model)
@@ -107,6 +130,7 @@ class ActivityFactory(
             ```
         """
         return {
+            "aiomfac": _AIOMFACBuilder(),
             "mass_ideal": ActivityIdealMassBuilder(),
             "molar_ideal": ActivityIdealMolarBuilder(),
             "kappa_parameter": ActivityKappaParameterBuilder(),

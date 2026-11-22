@@ -125,6 +125,33 @@ def _partial_pressure_from_strategy(
     )
 
 
+def _native_neutral_activities(activity, particle, temperature, targets):
+    """Evaluate full material composition and verify the selected lanes."""
+    args = (
+        particle.masses[0],
+        temperature,
+        targets,
+        particle.concentration[0] > 0,
+    )
+    hook = getattr(activity, "neutral_activities", None)
+    if hook is None:
+        # Legacy duck-typed pressure strategies predate the provider hook.
+        fractions = ActivityStrategy.neutral_activities(activity, *args)
+    else:
+        if (
+            getattr(activity, "provider_interface_version", None)
+            != ActivityStrategy.provider_interface_version
+        ):
+            raise ValueError("incompatible activity provider interface version")
+        fractions = hook(*args)
+    fractions = np.asarray(fractions, dtype=np.float64)
+    if fractions.shape != (particle.n_particles, len(targets)):
+        raise ValueError("particle activity must follow requested target order")
+    if not np.all(np.isfinite(fractions)) or np.any(fractions < 0):
+        raise ValueError("particle activity must be finite and nonnegative")
+    return fractions
+
+
 def _native_kelvin_lane(
     kelvin: NDArray[np.float64],
     particle: ParticleData,
@@ -257,6 +284,14 @@ class CondensationStrategy(ABC):
             pressure,
             self.skip_partitioning_indices,
         )
+        validate_layout = getattr(
+            self.activity_strategy, "validate_material_layout", None
+        )
+        if validate_layout is not None:
+            validate_layout(
+                particle.n_species,
+                tuple(target for _, target in self.species_map.gas_to_particle),
+            )
         width = len(gas.name)
         parameters = []
         for value, label in (
@@ -316,24 +351,18 @@ class CondensationStrategy(ABC):
             raise ValueError("partial pressure must follow full gas order")
         if not np.all(np.isfinite(partial_gas)):
             raise ValueError("partial gas pressure must be finite")
-        # Evaluate activity using ALL material, including particle-only lanes.
-        fractions = np.asarray(
-            activity.partial_pressure(
-                pure_vapor_pressure=np.ones(particle.n_species),
-                mass_concentration=particle.masses[0],
-            ),
-            dtype=np.float64,
+        fractions = _native_neutral_activities(
+            activity, particle, temperature, targets
         )
-        fractions = np.broadcast_to(fractions, particle.masses[0].shape)
-        if not np.all(np.isfinite(fractions)) or np.any(fractions < 0):
-            raise ValueError("particle activity must be finite and nonnegative")
         delta = np.zeros_like(particle.masses[0])
         equilibrium = np.zeros_like(delta)
         if particle.n_particles == 0:
             # Gas and activity configuration were validated above. There are
             # no material radii on which to evaluate the Kelvin correction.
             return delta, equilibrium
-        for source, target in zip(sources, targets, strict=True):
+        for lane, (source, target) in enumerate(
+            zip(sources, targets, strict=True)
+        ):
             kelvin = np.asarray(
                 surface.kelvin_term(
                     radius=radius,
@@ -344,9 +373,7 @@ class CondensationStrategy(ABC):
                 dtype=np.float64,
             )
             kelvin = _native_kelvin_lane(kelvin, particle, int(target))
-            equilibrium[:, target] = (
-                pure[source] * fractions[:, target] * kelvin
-            )
+            equilibrium[:, target] = pure[source] * fractions[:, lane] * kelvin
             delta[:, target] = partial_gas[source] - equilibrium[:, target]
         return delta, equilibrium
 

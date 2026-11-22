@@ -53,6 +53,26 @@ class ActivityStrategy(ABC):
         [Wikipedia](https://en.wikipedia.org/wiki/Vapor_pressure).
     """
 
+    provider_interface_version = 1
+
+    def neutral_activities(
+        self, masses, temperature, targets, active
+    ) -> NDArray[np.float64]:
+        """Return dimensionless activity in requested material order.
+
+        Version 1 receives full particle-by-material masses (kg), the current
+        temperature in K and a boolean particle occupancy mask. Existing
+        strategies retain their full-composition unit-pressure evaluation.
+        """
+        fractions = self.partial_pressure(
+            pure_vapor_pressure=np.ones(masses.shape[-1]),
+            mass_concentration=masses,
+        )
+        full = np.broadcast_to(fractions, masses.shape)
+        if not np.all(np.isfinite(full)) or np.any(full < 0):
+            raise ValueError("particle activity must be finite and nonnegative")
+        return full[:, targets]
+
     @abstractmethod
     def activity(
         self, mass_concentration: Union[float, NDArray[np.float64]]

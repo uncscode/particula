@@ -16,7 +16,7 @@ class TestFixtures(unittest.TestCase):
         pin = tomllib.loads((REF / "upstream.toml").read_text())
         self.assertEqual(
             (__version__, UPSTREAM_REVISION, UPSTREAM_VERSION),
-            ("0.1.0", pin["revision"], pin["version"]),
+            ("0.1.1", pin["revision"], pin["version"]),
         )
 
     def test_inventory(self):

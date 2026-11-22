@@ -1,0 +1,14 @@
+{
+  "components": [
+    "water",
+    "CaOH2"
+  ],
+  "fractions": [
+    0.995,
+    0.005
+  ],
+  "temperature_K": 298,
+  "basis": "mass",
+  "source": "Particula fixed-dissociation qualification",
+  "expected_status": "ok"
+}

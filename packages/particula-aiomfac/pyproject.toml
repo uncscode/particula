@@ -4,13 +4,14 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "particula-aiomfac"
-description = "Pinned AIOMFAC activity reference for Particula"
+description = "Direct CPU AIOMFAC activities for dissolved aerosol mixtures"
 dynamic = ["version"]
 readme = "README.md"
 requires-python = ">=3.12"
+dependencies = ["numpy>=1.26"]
 license = "GPL-3.0-or-later"
 license-files = ["LICENSE", "NOTICE"]
 
 [tool.flit.sdist]
-include = ["reference/", "tools/", "tests/"]
+include = ["reference/", "tools/", "tests/", "examples/"]
 exclude = ["**/__pycache__/", "**/*.pyc", ".pytest_cache/"]

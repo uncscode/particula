@@ -1,0 +1,18 @@
+{
+  "components": [
+    "water",
+    "vanillic_acid",
+    "butanediol",
+    "NaCl"
+  ],
+  "fractions": [
+    0.977,
+    0.001,
+    0.002,
+    0.02
+  ],
+  "temperature_K": 308,
+  "basis": "mass",
+  "source": "Particula fixed-dissociation qualification",
+  "expected_status": "ok"
+}

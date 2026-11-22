@@ -23,12 +23,18 @@ def check_archives(dist, backend):
         metadata = email.message_from_bytes(archive.read(meta))
         wheel_files = set(names)
     with tarfile.open(sdist) as archive:
-        source_files = {p.split("/", 1)[1] for p in archive.getnames() if "/" in p}
+        source_files = {
+            p.split("/", 1)[1] for p in archive.getnames() if "/" in p
+        }
     if backend:
         required = {
             "LICENSE",
             "NOTICE",
             "tools/reference.py",
+            "tools/export_parameters.py",
+            "examples/closed_water.py",
+            "src/particula_aiomfac/data/parameters.npz",
+            "src/particula_aiomfac/data/manifest.json",
             "reference/upstream.toml",
             "reference/cases/mixed.json",
             "reference/expected/mixed.json",
@@ -43,12 +49,19 @@ def check_archives(dist, backend):
         )
         assert all(
             not any(
-                segment in {"reference", "tools", "tests"} for segment in Path(p).parts
+                segment in {"reference", "tools", "tests"}
+                for segment in Path(p).parts
             )
             for p in wheel_files
         )
+        assert {
+            "particula_aiomfac/data/parameters.npz",
+            "particula_aiomfac/data/manifest.json",
+        } <= wheel_files
         for notice in ("LICENSE", "NOTICE"):
-            assert any(p.endswith(".dist-info/licenses/" + notice) for p in wheel_files)
+            assert any(
+                p.endswith(".dist-info/licenses/" + notice) for p in wheel_files
+            )
         assert metadata["License-Expression"] == "GPL-3.0-or-later"
         assert not any(
             p.endswith((".f90", ".out")) or ".artifacts/" in p
@@ -86,13 +99,16 @@ def check_archives(dist, backend):
             for info in archive.infolist():
                 if not info.is_dir():
                     assert (
-                        hashlib.sha256(archive.read(info)).digest() not in protected
+                        hashlib.sha256(archive.read(info)).digest()
+                        not in protected
                     ), info.filename
         with tarfile.open(sdist) as archive:
             for member in archive:
                 if member.isfile():
                     assert (
-                        hashlib.sha256(archive.extractfile(member).read()).digest()
+                        hashlib.sha256(
+                            archive.extractfile(member).read()
+                        ).digest()
                         not in protected
                     ), member.name
     return wheel
@@ -105,6 +121,11 @@ def main():
         action="store_true",
         help="use already installed build and flit_core",
     )
+    parser.add_argument(
+        "--dist-dir",
+        type=Path,
+        help="retain audited artifacts in base/ and backend/",
+    )
     args = parser.parse_args()
     cache = ROOT / ".artifacts/aiomfac-packages"
     cache.mkdir(parents=True, exist_ok=True)
@@ -112,13 +133,17 @@ def main():
         work = Path(work)
         wheels = []
         for name, project in (("base", ROOT), ("backend", PACKAGE)):
-            dist = work / name
+            dist = (args.dist_dir.resolve() if args.dist_dir else work) / name
             cmd = [sys.executable, "-m", "build", "--outdir", str(dist)]
             if args.no_isolation:
                 cmd.append("--no-isolation")
             subprocess.run([*cmd, str(project)], cwd=work, check=True)
             wheels.append(check_archives(dist, name == "backend"))
         base, backend = wheels
+        [archive] = backend.parent.glob("*.tar.gz")
+        with tarfile.open(archive) as sdist:
+            sdist.extractall(work / "source", filter="data")
+        [unpacked] = (work / "source").iterdir()
         # Constrain the extra to this exact local build while exercising pip dependency resolution.
         constraint = work / "local-backend.txt"
         constraint.write_text(f"particula-aiomfac @ {backend.as_uri()}\n")
@@ -167,6 +192,11 @@ for name,wanted in zip(("particula","particula_aiomfac"),sys.argv[1:],strict=Tru
                     "no" if label == "backend" else "yes",
                     "no" if label == "base" else "yes",
                 ],
+                cwd=work,
+                check=True,
+            )
+            subprocess.run(
+                [python, "-I", unpacked / "tools/installed_probe.py", label],
                 cwd=work,
                 check=True,
             )

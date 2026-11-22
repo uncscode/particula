@@ -1,0 +1,16 @@
+{
+  "components": [
+    "water",
+    "NaCl",
+    "ammonium_sulfate"
+  ],
+  "fractions": [
+    0.965,
+    0.02,
+    0.015
+  ],
+  "temperature_K": 298,
+  "basis": "mass",
+  "source": "Particula fixed-dissociation qualification",
+  "expected_status": "ok"
+}

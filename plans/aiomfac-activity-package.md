@@ -1,6 +1,6 @@
 # AIOMFAC activity package for Particula
 
-Status: milestone 1 implemented and qualified locally; the CPU and CUDA activity ports are planned. Build a standalone activity calculator in the Particula repository and expose it through `pip install "particula[aiomfac]"`. Deliver direct float64 CPU and NVIDIA CUDA calculations, integrate them into kinetic condensation including resident execution and restart, and then qualify optional sparse tables. Viscosity is deferred.
+Status: the reference, direct fixed-dissociation CPU calculator and native isothermal condensation workflow are implemented and qualified locally. [Milestones 2 and 3 implementation and evidence](aiomfac-cpu-activity.md). Build a standalone activity calculator in the Particula repository and expose it through `pip install "particula[aiomfac]"`. Deliver direct float64 CPU and NVIDIA CUDA calculations, integrate them into kinetic condensation including resident execution and restart, and then qualify optional sparse tables. Viscosity is deferred.
 
 ## Milestone 1 qualification — 2026-11-22
 

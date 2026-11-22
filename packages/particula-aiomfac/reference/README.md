@@ -42,7 +42,7 @@ geometric-mean relation for a 1:1 electrolyte.
 The components registry maps stable names to upstream integer subgroup IDs and
 counts, including salt stoichiometry. Each case states the component order,
 temperature in K, source, independent-component mass or mole fractions and
-expected status. The upstream text format implies water by complement. The
+expected status. The upstream text format implies the first component by complement. The
 harness checks the complete composition first. The carbonate example deliberately
 uses the original analytical mole fractions, including the trace bicarbonate. A second case omits the zero CO₂ input and checks that upstream’s implicitly added aqueous CO₂ gives the same named results.
 
@@ -95,3 +95,25 @@ ordinary Particula dependencies via an index or wheel cache. Use
 fixture tests with `python -m unittest discover -s packages/particula-aiomfac/tests`
 in an environment with the backend installed. Computational reference tests use
 the commands above. The base version is controlled independently by Particula.
+
+## Reproducing the installed parameter tables
+
+From the repository root, fetch the pinned sources as above. With NumPy in the
+developer environment, run the following commands. The exporter builds an
+isolated Fortran driver, runs SRdata and MRdata, reads Fortran-order arrays, and
+compares their inventory, shapes, dtypes, values and SHA-256 hashes. Add
+`--update` to deliberately replace the runtime bundle.
+
+```sh
+python packages/particula-aiomfac/tools/export_parameters.py
+python -m unittest discover -s packages/particula-aiomfac/tests
+OPENBLAS_NUM_THREADS=1 python packages/particula-aiomfac/tools/benchmark_cpu.py
+```
+
+The runtime [manifest](../src/particula_aiomfac/data/manifest.json) gives the
+offset to subtract from upstream IDs along each axis, the physical units,
+the active dataset, and explicitly identified analog salt pairs. Hashes cover
+little-endian C-order bytes after restoring the original array shape.
+The source manifest identifies the Fortran modules. The short-range dataset
+uses only the A interaction matrix. Mixture-specific PEG overrides and the
+water reference terms are applied during preparation and evaluation.

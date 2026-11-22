@@ -1,6 +1,6 @@
 # Activity System
 
-> Strategy-based activity calculations for aerosol thermodynamics using ideal, kappa-Kohler, and BAT models.
+> Strategy-based activity calculations for aerosol thermodynamics using ideal, kappa-Kohler, BAT, and optional AIOMFAC models.
 
 ## Overview
 
@@ -25,6 +25,22 @@ Integration with equilibria calculations is provided through `particula.equilibr
 Pass `ActivityBAT(molar_mass=0.2, oxygen2carbon=0.5, density=1243.493333)` as the condensation strategy's `activity_strategy` for the miscible reference organic. The molar mass is in kg/mol and the density in kg/m³. Particle materials must be ordered as water then organic. The gas species map can put either vapor in a different lane or leave a material involatile. At each rate evaluation the current particle masses determine the two activities. Kelvin curvature and the pure-species vapor pressures then determine the surface pressures that drive kinetic transfer.
 
 Use this profile for a single homogeneous liquid. The model supplies a constrained liquid curve even at descriptors that permit demixing. A phase-separated droplet needs phase amounts and a choice of surface composition. The CPU evaluates the binary function directly and the GPU uses a prepared one-dimensional table. [Matched CPU and CUDA humidity change](../../studies/benchmarks/bat-humidity-pulse/bat_humidity_pulse.py) · [Reference curves and supported phase assumptions](../../studies/validation/material-properties/binary-bat.md)
+
+### AIOMFAC in native isothermal condensation
+
+The development extra `particula[aiomfac]` pairs Particula with the separate
+`particula-aiomfac` distribution. Select `ActivityFactory().get_strategy("aiomfac", parameters)`
+with a backend `MixtureSpec`, a `material_mapping` from native material indices
+to component names, and any `inert_indices`. Declare all dissolved organics
+and fully dissociated salts, including those that stay in the particle. Use the
+gas species map to select the exchanging neutral material. Each CPU rate call
+uses its current liquid composition and temperature in kelvin.
+
+The standalone calculator returns neutral activities on the mole-fraction
+scale and ion coefficients on the molality scale. Systems that activate
+bisulfate or closed carbonate equilibrium require a speciation solver.
+The backend source distribution includes the executable closed-water example
+and instructions for installing the paired development wheels.
 
 ## Key Benefits
 
