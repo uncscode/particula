@@ -1,9 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
-  <title id="title">Measured and fitted α-pinene and o-cresol aerosol yield in the Manchester chamber</title>
-  <desc id="desc">At approximately 299 micrograms per cubic metre of total precursor consumed, the measured particle-wall-corrected organic aerosol yield was 27.4 percent in Voliotis et al. Figure 5. Averaged across the two eligible Manchester runs, Particula gave 15.1 percent with the organic-mass fit and 27.5 percent with the mass-and-particle-number fit. The bars use a common zero and scale.</desc>
-  <rect width="300" height="300" fill="#FBF2E3"/>
-  <g transform="translate(3 -6) scale(.78)" stroke-linejoin="round" stroke-linecap="round">
-<path d="M21 39 L45 26 L124 26 L100 39 Z" fill="#EFD1A5" stroke="#243E43" stroke-width="2"/>
+<title id="title">Aerosol yield and particle sizes in the Manchester ternary mixture</title>
+<desc id="desc">Run 24 contains α-pinene, o-cresol and isoprene. At 461 µg/m³ total precursor consumed, the digitized wall-corrected yield is 11.7%. The additive estimate from Voliotis et al.’s single-precursor fits is 16.1% using the run 24 modeled precursor split. The bulk Particula mass-and-number fit gives 13.8%. Separately, at two hours the Manchester number spectrum read from Wang et al. Figure S1a and the Particula refit both peak in the 126–158 nm bin. Both curves use the Particula particle-resolved model. The dashed curve retains the earlier bulk mass-fit chemistry and initial particle parameters. It peaks higher, in the next larger bin. The solid curve refits chemistry and particle parameters using size distributions alongside mass, counts and water uptake. Points are read from the published heatmap, with a contour interval of approximately 5,000 particles per cubic centimetre per decade of diameter. Lines connect model bin means. The refit used this spectrum for calibration.</desc>
+<rect width="300" height="300" fill="#FBF2E3"/>
+<g font-family="Liberation Sans, Arial, sans-serif" fill="#243E43">
+<text x="14.00" y="28.00" font-size="20" font-weight="700" fill="#243E43" text-anchor="start">Manchester chamber</text>
+<text x="14.00" y="48.00" font-size="12" font-weight="400" fill="#243E43" text-anchor="start">α-pinene + o-cresol + isoprene</text>
+<g transform="translate(215 -6) scale(.56)" stroke-linecap="round" stroke-linejoin="round"><path d="M21 39 L45 26 L124 26 L100 39 Z" fill="#EFD1A5" stroke="#243E43" stroke-width="2"/>
 <path d="M100 39 L124 26 L124 88 L100 102 Z" fill="#CAD9D2" stroke="#243E43" stroke-width="2"/>
 <path d="M21 39 L100 39 L100 102 L21 102 Z" fill="#FBF2E3" stroke="#243E43" stroke-width="2"/>
 <path d="M27 44 L32 93 L91 96 L95 44" fill="#CAD9D2" fill-opacity=".51" stroke="#617679" stroke-width="1"/>
@@ -20,22 +22,59 @@
 <circle cx="72" cy="90" r="1.25" fill="#135963"/>
 <circle cx="52" cy="68" r="1" fill="#135963"/>
 <circle cx="81" cy="73" r="1.1" fill="#135963"/>
-  </g>
-  <g font-family="Liberation Sans, Arial, sans-serif" fill="#243E43">
-    <text x="113" y="34" font-size="18" font-weight="bold">Manchester</text>
-    <text x="113" y="54" font-size="18" font-weight="bold">chamber</text>
-    <text x="113" y="74" font-size="14.5">α-pinene + o-cresol</text>
-    <path d="M20 87 H280" stroke="#617679" stroke-width=".8"/>
-    <text x="20" y="111" font-size="20" font-weight="bold">Wall-corrected SOA yield</text>
-    <text x="20" y="130" font-size="14">At ≈299 µg m⁻³ of precursor consumed</text>
-    <text x="20" y="157" font-size="16" font-weight="bold">Manchester measurement</text>
-    <rect x="20" y="164" width="197.504" height="11" fill="#243E43"/>
-    <text x="224.504" y="176" font-size="17" font-weight="bold" fill="#243E43">27.4%</text>
-    <text x="20" y="210" font-size="16" font-weight="bold">Particula · mass fit</text>
-    <rect x="20" y="217" width="108.559" height="11" fill="#135963"/>
-    <text x="135.559" y="229" font-size="17" font-weight="bold" fill="#135963">15.1%</text>
-    <text x="20" y="263" font-size="16" font-weight="bold">Particula · mass + number fit</text>
-    <rect x="20" y="270" width="198.190" height="11" fill="#135963"/>
-    <text x="225.190" y="282" font-size="17" font-weight="bold" fill="#135963">27.5%</text>
-  </g>
+</g>
+<text x="14" y="74" font-size="13" font-weight="700" fill="#243E43" text-anchor="start">Wall-corrected yield</text>
+<text x="286" y="74" font-size="11" font-weight="400" fill="#243E43" text-anchor="end">at 461 µg/m³ consumed</text>
+<text x="44" y="98" font-size="19" font-weight="700" fill="#243E43" text-anchor="middle">11.7%</text>
+<text x="44" y="112" font-size="11" font-weight="400" fill="#243E43" text-anchor="middle">Chamber</text>
+<text x="146" y="98" font-size="19" font-weight="700" fill="#243E43" text-anchor="middle">16.1%</text>
+<text x="146" y="112" font-size="11" font-weight="400" fill="#243E43" text-anchor="middle">Single-precursor fits</text>
+<text x="248" y="98" font-size="19" font-weight="700" fill="#135963" text-anchor="middle">13.8%</text>
+<text x="248" y="112" font-size="11" font-weight="400" fill="#135963" text-anchor="middle">Particula bulk fit</text>
+<text transform="translate(16 196) rotate(-90)" font-size="12" text-anchor="middle">Particles/cm³ per decade</text>
+<g transform="translate(13 0)">
+<line x1="40.00" y1="245.00" x2="271.00" y2="245.00" stroke="#CFD1C7" stroke-width="0.8" stroke-dasharray="none"/>
+<text x="32.00" y="249.00" font-size="11" font-weight="400" fill="#243E43" text-anchor="end">0</text>
+<line x1="40.00" y1="197.00" x2="271.00" y2="197.00" stroke="#CFD1C7" stroke-width="0.8" stroke-dasharray="none"/>
+<text x="32.00" y="201.00" font-size="11" font-weight="400" fill="#243E43" text-anchor="end">20k</text>
+<line x1="40.00" y1="149.00" x2="271.00" y2="149.00" stroke="#CFD1C7" stroke-width="0.8" stroke-dasharray="none"/>
+<text x="32.00" y="153.00" font-size="11" font-weight="400" fill="#243E43" text-anchor="end">40k</text>
+<line x1="54.06" y1="245.00" x2="54.06" y2="249.00" stroke="#243E43" stroke-width="0.85" stroke-dasharray="none"/>
+<text x="54.06" y="262.00" font-size="11" font-weight="400" fill="#243E43" text-anchor="middle">30</text>
+<line x1="93.45" y1="245.00" x2="93.45" y2="249.00" stroke="#243E43" stroke-width="0.85" stroke-dasharray="none"/>
+<text x="93.45" y="262.00" font-size="11" font-weight="400" fill="#243E43" text-anchor="middle">50</text>
+<line x1="146.90" y1="245.00" x2="146.90" y2="249.00" stroke="#243E43" stroke-width="0.85" stroke-dasharray="none"/>
+<text x="146.90" y="262.00" font-size="11" font-weight="400" fill="#243E43" text-anchor="middle">100</text>
+<line x1="200.35" y1="245.00" x2="200.35" y2="249.00" stroke="#243E43" stroke-width="0.85" stroke-dasharray="none"/>
+<text x="200.35" y="262.00" font-size="11" font-weight="400" fill="#243E43" text-anchor="middle">200</text>
+<line x1="253.79" y1="245.00" x2="253.79" y2="249.00" stroke="#243E43" stroke-width="0.85" stroke-dasharray="none"/>
+<text x="253.79" y="262.00" font-size="11" font-weight="400" fill="#243E43" text-anchor="middle">400</text>
+<text x="154.00" y="282.00" font-size="14" font-weight="700" fill="#243E43" text-anchor="middle">Particle diameter at 2 h (nm)</text>
+<polyline points="49.24,245.00 67.00,245.00 84.75,245.00 102.51,245.00 120.26,245.00 138.02,244.57 155.77,219.69 173.53,154.62 191.28,140.63 209.04,185.06 226.79,224.56 244.55,241.45 262.31,244.56" fill="none" stroke="#A44D21" stroke-width="2.25" stroke-linejoin="round" stroke-dasharray="4 3"/>
+<polyline points="49.24,245.00 67.00,245.00 84.75,244.72 102.51,244.62 120.26,234.47 138.02,211.76 155.77,190.90 173.53,180.44 191.28,191.18 209.04,206.90 226.79,225.62 244.55,235.90 262.31,241.26" fill="none" stroke="#135963" stroke-width="2.25" stroke-linejoin="round" stroke-dasharray="none"/>
+<circle cx="49.24" cy="245.00" r="2.8" fill="#243E43" stroke="#FBF2E3" stroke-width=".7"/>
+<circle cx="67.00" cy="245.00" r="2.8" fill="#243E43" stroke="#FBF2E3" stroke-width=".7"/>
+<circle cx="84.75" cy="245.00" r="2.8" fill="#243E43" stroke="#FBF2E3" stroke-width=".7"/>
+<circle cx="102.51" cy="245.00" r="2.8" fill="#243E43" stroke="#FBF2E3" stroke-width=".7"/>
+<circle cx="120.26" cy="236.79" r="2.8" fill="#243E43" stroke="#FBF2E3" stroke-width=".7"/>
+<circle cx="138.02" cy="217.84" r="2.8" fill="#243E43" stroke="#FBF2E3" stroke-width=".7"/>
+<circle cx="155.77" cy="201.42" r="2.8" fill="#243E43" stroke="#FBF2E3" stroke-width=".7"/>
+<circle cx="173.53" cy="185.71" r="2.8" fill="#243E43" stroke="#FBF2E3" stroke-width=".7"/>
+<circle cx="191.28" cy="194.47" r="2.8" fill="#243E43" stroke="#FBF2E3" stroke-width=".7"/>
+<circle cx="209.04" cy="211.67" r="2.8" fill="#243E43" stroke="#FBF2E3" stroke-width=".7"/>
+<circle cx="226.79" cy="230.47" r="2.8" fill="#243E43" stroke="#FBF2E3" stroke-width=".7"/>
+<circle cx="244.55" cy="245.00" r="2.8" fill="#243E43" stroke="#FBF2E3" stroke-width=".7"/>
+<circle cx="262.31" cy="245.00" r="2.8" fill="#243E43" stroke="#FBF2E3" stroke-width=".7"/>
+<rect x="43" y="125" width="112" height="46" fill="#FBF2E3"/>
+<g transform="translate(0 -19)">
+<text x="44" y="155" font-size="11" font-weight="700">Particula</text>
+<line x1="45.00" y1="169.00" x2="59.00" y2="169.00" stroke="#A44D21" stroke-width="2" stroke-dasharray="4 3"/>
+<text x="62" y="173" font-size="11" font-weight="400" fill="#A44D21" text-anchor="start">Bulk-fit chemistry</text>
+<line x1="45.00" y1="183" x2="58" y2="183" stroke="#135963" stroke-width="2.3" stroke-dasharray="none"/>
+<text x="62" y="187" font-size="11" font-weight="400" fill="#135963" text-anchor="start">Particle-level refit</text>
+</g>
+<text x="46" y="222" font-size="11" fill="#243E43">Measurements</text>
+<path d="M106 225 L118 234" fill="none" stroke="#617679" stroke-width=".85"/>
+</g>
+</g>
 </svg>
