@@ -5,7 +5,7 @@ checkout with conda-build on Linux and tests it in a clean Python 3.12 conda
 environment using conda-forge packages. It runs automatically for PRs to
 `main` that change the literal `__version__` value in `particula/__init__.py`
 or release infrastructure: `conda/`, release runners and their tests, this
-workflow, pytest configuration/bootstrap, or the three declared CPU examples
+workflow, package tests and fixtures, pytest configuration/bootstrap, or the three declared CPU examples
 and their tests.
 Other initializer-only edits run just the inexpensive change gate. The gate
 uses the PR merge base, so subsequent updates to a qualifying PR rebuild its
@@ -30,6 +30,25 @@ All 13 source example test modules live in `examples_tests/`, with their
 existing basenames. The marker-policy regression lives in
 `scripts/tests/pytest_marker_policy_test.py`, not in the package suite.
 
+## Installed-package checks from 0.3.4
+
+The package release suite collects all package test directories, including Warp
+CPU and CUDA-marked tests, from an isolated workspace. It runs ordinary tests
+with the installed runtime dependencies. Slow, performance and benchmark tests
+have separate execution policies. Tests that require CUDA can skip on CPU
+builders. Actual CUDA execution requires a CUDA-capable runner.
+
+Keep package test helpers and their data in the installed package. Study scripts
+can import a shared case from `particula.execution.tests`. A source CI regression
+also checks package tests for imports from checkout-only directories, including
+imports inside CUDA-only branches.
+
+The current recipe runs the package suite and the three CPU examples. For
+feedstock updates, sync the runtime requirements (including Warp and PyYAML),
+test inputs and commands from `conda/recipe/meta.yaml` to the bot's release
+recipe, preserving its archive URL and checksum. The version-specific handoff
+below is for the older archive.
+
 ## Conda-forge handoff for 0.3.3
 
 Conda-forge is skipping 0.3.2. In [feedstock PR #58](https://github.com/conda-forge/particula-feedstock/pull/58),
@@ -49,7 +68,8 @@ From the feedstock checkout, with `PARTICULA_SRC` pointing to this repository:
 ```bash
 git apply --check "$PARTICULA_SRC/conda/feedstock-v0.3.3.patch"
 git apply "$PARTICULA_SRC/conda/feedstock-v0.3.3.patch"
-python "$PARTICULA_SRC/scripts/check_feedstock_contract.py" --external-recipe recipe/meta.yaml
+git -C "$PARTICULA_SRC" show v0.3.3:conda/recipe/meta.yaml > /tmp/particula-0.3.3-meta.yaml
+python "$PARTICULA_SRC/scripts/check_feedstock_contract.py" --mirror /tmp/particula-0.3.3-meta.yaml --external-recipe recipe/meta.yaml
 ```
 
 Confirm the external Linux build passes against the published 0.3.3 archive
@@ -118,7 +138,8 @@ With `conda-build` installed in the active conda environment:
 python scripts/conda_feedstock.py
 ```
 
-For installed-wheel checks without conda, run the three suites:
+For installed-wheel checks without conda, run the package and example suites.
+Use the third command for a focused coupled CPU rerun.
 
 ```bash
 python scripts/run_release_tests.py
@@ -150,7 +171,7 @@ python scripts/run_release_tests.py --installed --suite examples
 
 ## 0.2.x release selection
 
-The shared command is defined in `scripts/run_release_tests.py`:
+The 0.2.x release runner used the following marker selection:
 
 ```text
 not slow and not performance and not benchmark

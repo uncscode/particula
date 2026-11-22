@@ -92,6 +92,8 @@ def test_version_gate_writes_action_output(runner, monkeypatch, tmp_path):
         "scripts/run_release_tests.py",
         "scripts/gpu_studies/cases.py",
         "particula/execution/tests/gpu_coupled_test.py",
+        "particula/example/tests/future_fixture.py",
+        "particula/integration_tests/future_test.py",
         "scripts/check_feedstock_contract.py",
         "scripts/tests/new_test.py",
         ".github/workflows/conda-feedstock.yml",
@@ -181,7 +183,6 @@ def test_recipe_declared_inputs_exist_in_staged_source(runner, tmp_path):
         "scripts/study_downloads.py",
         "website/examples.json",
         "scripts/run_release_tests.py",
-        runner.COUPLED_FIXTURE,
         *runner.CPU_EXAMPLES,
         *runner.CPU_EXAMPLE_TESTS,
     )

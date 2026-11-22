@@ -21,8 +21,6 @@ import tempfile
 from pathlib import Path
 
 from run_release_tests import (
-    COUPLED_FIXTURE,
-    COUPLED_TEST,
     CPU_EXAMPLE_TESTS,
     CPU_EXAMPLES,
 )
@@ -43,8 +41,6 @@ RELEASE_PATHS = {
     "particula_docs.py",
     "conftest.py",
     "particula/conftest.py",
-    COUPLED_FIXTURE,
-    COUPLED_TEST,
     *CPU_EXAMPLES,
     *CPU_EXAMPLE_TESTS,
 }
@@ -65,6 +61,10 @@ def release_inputs_changed(paths: list[str]) -> bool:
     required = RELEASE_PATHS | study_inputs(ROOT)
     return any(
         path in required
+        or (
+            path.startswith("particula/")
+            and {"tests", "integration_tests"}.intersection(Path(path).parts)
+        )
         or path.startswith(("conda/", "scripts/tests/", "docs/"))
         for path in paths
     )
@@ -158,7 +158,6 @@ def stage_source(source: Path, destination: Path) -> None:
         "scripts/study_downloads.py",
         "website/examples.json",
         *sorted(study_inputs(source)),
-        COUPLED_FIXTURE,
         *CPU_EXAMPLES,
         *CPU_EXAMPLE_TESTS,
     ):

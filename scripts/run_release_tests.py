@@ -1,10 +1,10 @@
-"""Run the CPU-focused release suites against an installed package.
+"""Run the package and example release suites against an installed package.
 
 By default, build a wheel and test it in a fresh virtual environment. Conda
 recipes use ``--installed`` to validate their already-installed package instead.
 The default package workspace contains no documentation. ``--suite examples``
-separately stages three CPU examples. The coupled-cpu suite exercises Warp
-CPU rejection and restart using its study fixture.
+separately stages three CPU examples. The package suite includes Warp CPU tests.
+The coupled-cpu suite remains available for focused restart checks.
 """
 
 from __future__ import annotations
@@ -30,7 +30,6 @@ CPU_EXAMPLE_TESTS = (
     "examples_tests/condensation_latent_heat_example_test.py",
 )
 COUPLED_TEST = "particula/execution/tests/gpu_coupled_test.py"
-COUPLED_FIXTURE = "scripts/gpu_studies/cases.py"
 COUPLED_RESTART = (
     f"{COUPLED_TEST}::"
     "test_disk_restart_preserves_events_physics_and_random_words"
@@ -41,18 +40,7 @@ COUPLED_CPU_NODES = (
     f"{COUPLED_RESTART}[cpu-True]",
 )
 SUITES = ("package", "examples", "coupled-cpu")
-RELEASE_MARKERS = (
-    "not slow and not performance and not benchmark "
-    "and not warp and not cuda and not gpu_parity"
-)
-# These modules/subtrees include GPU helpers or eager Warp imports. Exclude
-# them before import, not just after collection. Mixed CPU execution and
-# integration suites remain selected and use per-test GPU markers.
-RELEASE_IGNORES = (
-    "particula/gpu",
-    "particula/execution/tests/diagnostics_test.py",
-    "particula/execution/tests/gpu_resources_test.py",
-)
+RELEASE_MARKERS = "not slow and not performance and not benchmark"
 
 
 def stage_test_inputs(
@@ -79,7 +67,7 @@ def stage_test_inputs(
     inputs = {
         "package": (),
         "examples": (*CPU_EXAMPLES, *CPU_EXAMPLE_TESTS),
-        "coupled-cpu": (COUPLED_FIXTURE, COUPLED_TEST),
+        "coupled-cpu": (COUPLED_TEST,),
     }[suite]
     for relative in ("conftest.py", "pyproject.toml", *inputs):
         target = destination / relative
@@ -121,6 +109,7 @@ class Report:
                 "particles/",
                 "integration_tests/",
                 "execution/",
+                "gpu/",
             ),
         }[self.suite]
         for domain in domains:
@@ -168,16 +157,17 @@ def installed_test_main(
     )
 
     selections = {
+        # This workspace contains only package tests. Include every subtree,
+        # including wall-loss tests excluded by the source checkout config.
         "package": [
+            "-o",
+            "norecursedirs=__pycache__",
             "-m",
             RELEASE_MARKERS,
-            *(f"--ignore={path}" for path in RELEASE_IGNORES),
             "particula",
         ],
         "examples": ["-m", RELEASE_MARKERS, *CPU_EXAMPLE_TESTS],
-        # Only test inputs live here. The isolated interpreter has already
-        # verified that particula resolves to the installed distribution.
-        "coupled-cpu": ["-o", f"pythonpath={workspace}", *COUPLED_CPU_NODES],
+        "coupled-cpu": list(COUPLED_CPU_NODES),
     }
     # Configuration and warning bootstrap stay identical to source CI.
     return int(
