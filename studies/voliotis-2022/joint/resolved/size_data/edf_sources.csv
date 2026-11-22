@@ -1,0 +1,8 @@
+run,doi,file,mode_header,url,sha256
+1,10.25326/ffte-ed96,20190328_UMAN_DMPS.edf,mode_onl,https://eurochamp.ipsl.upmc.fr/datacenter-rest/data/30464bc7-365f-42eb-99eb-5f8d7fb78400/20190328_UMAN_DMPS.edf,5aeadc57f333bf70c0e705f4465ebfc914ad445830ad6292d2557c433dfea2bd
+5,10.25326/ah45-9f95,UMAN_apinene155ppb_DMPS.edf,mode_onl,https://eurochamp.ipsl.upmc.fr/datacenter-rest/data/03a05e5b-55af-4b4e-9769-c48104e565fa/UMAN_apinene155ppb_DMPS.edf,0f844c8522bbb938a89a6a57b49f5374bad982c6112d16fb0d0bfdd5cd19802b
+8,10.25326/4rkz-h076,UMAN_cresol400ppb_DMPS.edf,mode_onl,https://eurochamp.ipsl.upmc.fr/datacenter-rest/data/5f61b358-9cfe-4d90-aad8-23f7ada7e88f/UMAN_cresol400ppb_DMPS.edf,96a9b0ce543c39fca9ccf7373857fbdff393041abd2d2a57a1c2bfb872d65779
+10,10.25326/y275-k605,UMAN_cresol200ppb_DMPS.edf,mode_onl,https://eurochamp.ipsl.upmc.fr/datacenter-rest/data/1ff06fed-b5b3-4241-b3b7-fcd6cdb67095/UMAN_cresol200ppb_DMPS.edf,73352e53bea872edf7ddd3374e4a7eb98bbb9495baad2b992cb77165a481bfc3
+12,10.25326/jdms-zr65,UMAN_isoprene164ppb_DMPS.edf,mode_onl,https://eurochamp.ipsl.upmc.fr/datacenter-rest/data/0029d892-064f-4775-917b-723e80883c19/UMAN_isoprene164ppb_DMPS.edf,94a2c95078c32fa696c1a84747c02ed2f1410b5baf8872aa125e7f654d4db59f
+18,10.25326/4kh1-4152,20190423_UMan_DMPS.edf,mode,https://eurochamp.ipsl.upmc.fr/datacenter-rest/data/6a48acd6-a43a-4bd3-908c-5712d2547fe4/20190423_UMan_DMPS.edf,03cd0433770cf9daaab45b0363f970420fa70baaea07654fe0b0b75c62870da2
+24,10.25326/1d6d-tq82,20190730_UMAN_DMPS.edf,mode,https://eurochamp.ipsl.upmc.fr/datacenter-rest/data/878d0942-4982-45be-ae3c-863b61ad0538/20190730_UMAN_DMPS.edf,9574e963d9261215df44596a9f3b1e662285628fe0079b4c3c4a382e4a275e38
