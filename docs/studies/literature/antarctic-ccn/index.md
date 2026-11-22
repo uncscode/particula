@@ -12,7 +12,7 @@ Across the 373 hours on 104 dates with matched clean-sector observations, the me
 
 ![Five-setting CCN spectra on all matched hours and on the retrospective test dates, with uncertainty in the simulated means and the spread among individual held-out hours.](../../../../website/results/antarctic-ccn-uncertainty/figure-2-1.png)
 
-*Figure 1.* Each model samples the same dates and size distributions as the observations in its panel. Pointwise 95% intervals describe uncertainty in a mean when whole dates are resampled. The separate 10th–90th percentile range describes variability across individual hours on the 26 test dates, holding the nominal fit fixed. A busy aerosol day can be far from the campaign mean even when the mean is well estimated.
+*Figure 1.* Each model samples the same dates and size distributions as the observations in its panel. Pointwise 95% intervals describe uncertainty in a mean when whole dates are resampled. The separate 10th–90th percentile range describes variability across individual hours on the 26 test dates, holding the nominal fit fixed. For the fitted film at 0.4%, the mean was 81.1 CCN/cm³ (95% date interval 62.8–113.1). The middle 80% of individual simulated hours ranged from 36.2 to 123.7 CCN/cm³. Markers are offset slightly along the supersaturation axis for readability.
 
 ## Which dry particles could change the bend?
 
