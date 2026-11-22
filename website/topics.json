@@ -2927,6 +2927,25 @@
       "start_here": false
     },
     {
+      "source": "docs/studies/literature/dunne-cloud/index.md",
+      "title": "At 248 K, similar CLOUD formation rates admit different chemical pathways",
+      "topic": "nucleation",
+      "also": [
+        "chambers",
+        "condensation",
+        "losses-deposition"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "dunne-cloud",
+        "runs": [],
+        "companions": [],
+        "relations": []
+      },
+      "tocFigure": "dunne-cloud/formation-overview.png"
+    },
+    {
       "source": "docs/studies/literature/evaporation-and-uptake/manchester-soa/index.md",
       "title": "How well does Particula reproduce organic aerosol formation in the Manchester chamber?",
       "topic": "chambers",

@@ -4,6 +4,9 @@ Follow comparisons with published measurements, reference calculations and datas
 
 <div class="study-figures">
 
+[![Formation-rate ranges for the two pathway models overlap at 248.3 K and 0.38 pptv ammonia.](../../images/dunne-cloud/formation-overview.png)\
+At 248 K, similar CLOUD formation rates admit different chemical pathways](dunne-cloud/index.md)
+
 [![After a cooling tube, measured and fitted particle counts rise from 3.0 and 5.2 million per cm³ at zero added sulfur dioxide to 29.2 and 27.8 million per cm³ at 500 ppm.](../../images/straw-combustion/toc.png)\
 Particula fits the measured rise in particle number with sulfur dioxide in a straw-combustion analogue](straw-combustion/index.md)
 
@@ -67,6 +70,7 @@ At the inferred Π Chamber humidity, modeled sulfate haze falls below the optica
 - [A 35% polarization effect for a charged 4 nm NaCl tracer shrinks to 0.06% in the modeled chamber scan](nacl-scavenging/index.md)
 - [A delayed source predicts 19 minutes of the 21-minute gap between two chamber isomer signals](pinic-isomers/index.md)
 - [After a day in simulated polluted air, archived MAM4xx retains nearly three times the sub-100 nm count predicted by two models with attraction](mam4xx-coagulation/index.md)
+- [At 248 K, similar CLOUD formation rates admit different chemical pathways](dunne-cloud/index.md)
 - [At low ion production, CLOUD’s 70% humidity measurement exceeds the ceiling set by the reported wall loss](cloud-ion-humidity/index.md)
 - [Evaporation and reactive uptake](evaporation-and-uptake/index.md)
 - [Fitting mean drop mass with a constant collision rate leaves a sixfold shortfall in counts at twice the starting radius](shear-drop-spectrum/index.md)
