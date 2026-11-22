@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
   <title id="title">Similar droplet gains from different polluted Π Chamber backgrounds</title>
-  <desc id="desc">A chamber schematic shows dry air entering from above. Bars on a common zero-based scale show cloud droplets per cubic centimetre. Yeom and colleagues measured 1,562 before dry-air entrainment and a gain of 72. One localized-inlet Particula simulation predicted 456 before entrainment and a gain of 73. Hatched ends mark the gains.</desc>
+  <desc id="desc">The two-cloud Π Chamber emblem accompanies a schematic of dry air entering from above. Bars on a common zero-based scale show cloud droplets per cubic centimetre. Yeom and colleagues measured 1,562 before dry-air entrainment and a gain of 72. One localized-inlet Particula simulation predicted 456 before entrainment and a gain of 73. Hatched ends mark the gains.</desc>
   <defs>
     <pattern id="gain" width="5" height="5" patternUnits="userSpaceOnUse">
       <rect width="5" height="5" fill="#FBF2E3"/>
@@ -20,6 +20,14 @@
       <circle cx="81" cy="64" r="3"/><circle cx="91" cy="52" r="2.2"/>
       <circle cx="35" cy="65" r="1.6"/><circle cx="52" cy="52" r="1.5"/>
     </g>
+  </g>
+  <!-- Two-cloud emblem reused from the haze-and-cloud study. -->
+  <g transform="translate(196 -2) scale(.96)">
+    <g stroke="#243e43" stroke-width="2.5" stroke-linejoin="round" fill="#fbf2e3">
+      <path d="M56 49a8 8 0 0 1-1-16 10 10 0 0 1 18-2 6.5 6.5 0 0 1 8 5 6.5 6.5 0 0 1-1 13Z"/>
+      <path d="M28 43a8 8 0 0 1-1-16 9 9 0 0 1 10-7 11 11 0 0 1 21 2 8 8 0 0 1 4 6 7.5 7.5 0 0 1-2 15Z"/>
+    </g>
+    <text x="43" y="38" text-anchor="middle" font-family="serif" font-size="21" fill="#243e43">π</text>
   </g>
   <g fill="#243E43" font-family="DejaVu Sans, sans-serif">
     <text x="120" y="44" font-size="19" font-weight="700">Polluted</text>
