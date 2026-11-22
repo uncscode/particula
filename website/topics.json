@@ -4671,6 +4671,27 @@
       "start_here": true
     },
     {
+      "source": "docs/studies/examples/custom-processes/discover_hidden_intermediate.py",
+      "title": "Can a delayed product reveal a hidden intermediate?",
+      "topic": "custom",
+      "also": [],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "simba-hidden-intermediate",
+        "runs": [
+          "simba-hidden-intermediate"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/gas-chemistry.md",
+            "label": "How to use this"
+          }
+        ]
+      }
+    },
+    {
       "source": "docs/studies/examples/custom-processes/native_gas_chemistry.py",
       "title": "Track a gas reaction through a chamber pulse",
       "topic": "custom",
@@ -5439,6 +5460,31 @@
           }
         ]
       }
+    },
+    {
+      "source": "docs/studies/validation/chemistry/simba-discovery/index.md",
+      "title": "Can vapor and aerosol measurements distinguish a reaction mechanism?",
+      "topic": "verification-scientific",
+      "also": [
+        "condensation-reservoirs"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "simba-discovery-validation",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/resolved-chemistry.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/guide/processes/gas-chemistry.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     }
   ],
   "supporting": [
@@ -5705,10 +5751,14 @@
     {
       "source": "docs/studies/validation/optics/index.md",
       "reason": "Browsing directory for optical validation studies."
+    },
+    {
+      "source": "docs/studies/validation/chemistry/index.md",
+      "reason": "Browsing directory for mechanism discovery validation."
     }
   ],
   "study_group_exceptions": {
     "docs/studies/literature": "Six primary choices cover distinct measurement or process families. The seventh is a cross-listed validation against wall loss theory.",
-    "docs/studies/validation": "Seven entries keep optics visible alongside the existing physical-process and workflow collections."
+    "docs/studies/validation": "Eight study collections distinguish mechanism inference and optical validation from the existing physical-process and workflow qualifications."
   }
 }

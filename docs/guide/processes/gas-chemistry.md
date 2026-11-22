@@ -152,3 +152,73 @@ solver, and adapter. Both profiles resume at completed outer steps. The
 covers irreversible gas reactions at prescribed temperature. For bulk
 particle reactions and shared gas uptake, see the [resolved chemistry
 guide](resolved-chemistry.md).
+
+## Search for a hidden intermediate
+
+Does conversion from A to P require a delay while an intermediate accumulates?
+A SiMBA-style search proposes reaction networks, and their predicted
+concentration histories can be compared with observations. Give each species a
+fixed column and supply the elementary steps allowed by the physical hypothesis.
+Here A, I, and P are hypothetical isomers with identical molar masses. The
+three rows below specify direct conversion and the two steps of a delayed route.
+[SiMBA method](https://doi.org/10.1039/D5SC01473E)
+
+```python
+from particula.dynamics.chemistry.discovery import compile_network, enumerate_networks
+
+catalog = {
+    name: {"molar_mass_kg_per_mol": 0.1, "elements": {"X": 1}}
+    for name in ("gas:A", "gas:I", "gas:P")
+}
+search = enumerate_networks(
+    [(-1, 0, 1), (-1, 1, 0), (0, -1, 1)],
+    initial=(True, False, False),
+    products=(2,),
+    net=(-1, 0, 1),
+    max_steps=2,
+    max_trials=10,
+    max_candidates=10,
+)
+mechanisms = [
+    compile_network(network, catalog, rates=[0.5] * len(network))
+    for network in search.networks
+]
+```
+
+The search returns two mechanisms. Each supplied rate here is an initial
+first-order coefficient in s⁻¹. Bimolecular coefficients use m³ mol⁻¹ s⁻¹.
+The catalog's insertion order defines the columns when compiling. For a known
+overall reaction, `net` requires the selected rows to sum to its stoichiometry
+with each step counted once. Omit it to explore competing branches. For a larger
+bank, `balanced_steps(phases, composition)` generates single-phase steps with
+one or two molecules on each side and a conserved element or pool budget.
+Use `interchangeable` only for hidden species with equivalent physical
+properties. Record `search.examined` and `search.limit` alongside fitted
+results. A trial or candidate limit means eligible alternatives may remain.
+
+For a fixed candidate, wrap each run's objective in an `ExperimentLoss` and
+call `fit_experiments` from `particula.dynamics.chemistry.inference`. Reuse
+a parameter index across runs to share a rate, and assign a different index
+to each run-specific dose. Supply finite physical bounds and feasible starting
+vectors. The fitter minimizes summed loss with bounded multistart L-BFGS-B
+and accepts an analytical or AD gradient, or three-point finite differences.
+Equal lower and upper bounds fix a coefficient for a profile or a zero-rate
+control. Compare candidates with the same observations, error model, and refit
+budget. Inspect each start's convergence and retain observational ties.
+If an experiment measures only total conserved mass, every rate in both
+example networks gives the same prediction. Time-resolved P adds information
+about the lag. [Worked hidden-intermediate comparison](../../studies/examples/custom-processes/discover_hidden_intermediate.py)
+
+For a coupled chamber, pass gas–particle column pairs to `exchange_pairs`.
+A particle product can then age after its vapor precursor condenses, even
+when its initial inventory is zero. Set `max_intermediates` to bound how
+many noninitial, nonproduct columns a candidate can use.
+
+To rank a search result, use `fit_networks(search, prepare, criterion=...,
+tolerance=...)` from the inference module. The supplied `prepare(network)`
+returns a `CandidateFit` with training experiments, bounds, starts and any
+held-out experiments. With `criterion="held_out"`, choose the tolerance in
+held-out loss units. With `criterion="aic"`, supply comparable negative log
+likelihoods and choose the tolerance in AIC units. Each result carries its
+score, gap, fitted parameters and competitive flag. Inspect all competitive
+networks and the search's stopping reason before assigning an intermediate.

@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.8907090229913592,
+  "package_source_sha256": "58653cc1ace28c24a23da1aa7db16c8237bad1fda784736d33f4da9fa2f97716",
+  "scientific_source_sha256": "1e4843d410b74476fe64a3440959e787e8ddbeb10e1544264d6589941c4d18ac",
+  "input_sha256": {},
+  "example": "simba-hidden-intermediate",
+  "fingerprint": "e5600d88a3a1b8a1a64370285f88f9d2abc2a6cfbde553e64b5500998ce1d0ce",
+  "source": "docs/studies/examples/custom-processes/discover_hidden_intermediate.py",
+  "revision": "2b5d2df5a81b80d7e463306f70c966853336b6bc",
+  "package_dirty": false,
+  "executed_at": "2026-11-22T12:59:59.524709+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "image": "figure-5-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-5-1.png": "5e1ae7c25c08aa2355ac6ae0acfed4851f306deec34468def3e89b1fff125ff6",
+    "data.json": "4f6c36998778c1bd7847f902bd37820f910dec18b41acb2cc797fc654732232c",
+    "source.py": "0d7ad725f1842cf0df84c786aead435946674d290227f23cfffdf1c5709dbb34"
+  },
+  "simulation_fingerprint": "4dd616b62087ca3aebe63e91a73fcec2cd51d9ba71734e4ebb47d42530acbbe2"
+}

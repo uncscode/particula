@@ -1,0 +1,70 @@
+{
+  "source_revision": "8f0d16357193d79ea73f517540571fc6997f0941",
+  "experiments": {
+    "exp_data_hypoth/exp_1.csv": {
+      "sha256": "458908ff0fc7a53c51b9786c995b6ab2d50139ebf0c4eaa8a11150873772a361",
+      "max_absolute_difference": 8.881784197001252e-16,
+      "max_stoichiometry_effect_noiseless": 2.4481078457664918
+    },
+    "exp_data_hypoth/exp_2.csv": {
+      "sha256": "002d5750f238d604f892da1be6811aa27d8d3ef446731c8c07453858b83f011b",
+      "max_absolute_difference": 3.552713678800501e-15,
+      "max_stoichiometry_effect_noiseless": 2.448053852419082
+    },
+    "exp_data_hypoth/exp_3.csv": {
+      "sha256": "9feb549a57100906e4854e8197ba25bd7f0e6bad656fde8ad0d45b319ab3e6f2",
+      "max_absolute_difference": 1.7763568394002505e-15,
+      "max_stoichiometry_effect_noiseless": 2.448051593883667
+    },
+    "exp_data_hypoth/exp_4.csv": {
+      "sha256": "a86884dac7150db32bb26d715aba74b3502e7c7662b26a839616071f9bed49f0",
+      "max_absolute_difference": 3.1030733538273125e-14,
+      "max_stoichiometry_effect_noiseless": 0.8157689782279673
+    },
+    "exp_data_hypoth/exp_5.csv": {
+      "sha256": "37152ecb1fe2164a565cc651e41f19a8ec11736348aa882617f414ec3ba4cd66",
+      "max_absolute_difference": 1.7763568394002505e-15,
+      "max_stoichiometry_effect_noiseless": 2.448090166149921
+    },
+    "exp_data_aldol_condensation/exp_1.csv": {
+      "sha256": "e40ecea0b8fb8650e689d299143644649a2bc0fbf05864fb1aa77bb8388e7bf5",
+      "max_absolute_difference": 2.6645352591003757e-15
+    },
+    "exp_data_aldol_condensation/exp_2.csv": {
+      "sha256": "6acc85f1737f01dcc7e5ae116cc48f01378a4c4424b98bc9fe2d40b91e3dbba4",
+      "max_absolute_difference": 1.7763568394002505e-15
+    },
+    "exp_data_aldol_condensation/exp_3.csv": {
+      "sha256": "8d56122ce9ff365f09a57c129a16f3390e9aef532eea7d28bdafd198cc90e9ef",
+      "max_absolute_difference": 3.552713678800501e-15
+    },
+    "exp_data_aldol_condensation/exp_4.csv": {
+      "sha256": "4a7c821f2148d8ccb1589d9067573b2571bec45a96a73fd3891eecfff82a58ae",
+      "max_absolute_difference": 1.7763568394002505e-15
+    },
+    "exp_data_aldol_condensation/exp_5.csv": {
+      "sha256": "41985511dc4c91a06819b07a330431608f6f3ac0e027784ee9261e56ef200394",
+      "max_absolute_difference": 3.552713678800501e-15
+    },
+    "exp_data_fruc_HMF2/exp_1.csv": {
+      "sha256": "1f25fa50abf9810181112a8abd7049aeb8583df1dc4692bf8e1af7204ab2bdfb",
+      "max_absolute_difference": 6.838973831690964e-14
+    },
+    "exp_data_fruc_HMF2/exp_2.csv": {
+      "sha256": "829aee965805261174fbab9b66b16be6c6ca66d8ad017b71721c95f7501f03ce",
+      "max_absolute_difference": 5.329070518200751e-15
+    },
+    "exp_data_fruc_HMF2/exp_3.csv": {
+      "sha256": "c0b871a9f9a4539fea51e3c6d751cec14451b2a85c5f3963a26d79b9cc3b7ac3",
+      "max_absolute_difference": 7.105427357601002e-15
+    },
+    "exp_data_fruc_HMF2/exp_4.csv": {
+      "sha256": "d8dbc7ef45eeb6761f178f9e3c387846220ba2aade24b04edfb2cd1907a953e4",
+      "max_absolute_difference": 3.552713678800501e-15
+    },
+    "exp_data_fruc_HMF2/exp_5.csv": {
+      "sha256": "dc644900db729ee5c13a84fc063c1252827068b653b5dbe9daba66fa1e03592d",
+      "max_absolute_difference": 1.4210854715202004e-14
+    }
+  }
+}

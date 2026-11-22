@@ -1,0 +1,359 @@
+[
+  {
+    "case": "hypoth",
+    "iteration": 1,
+    "species_budgets": [
+      [
+        1
+      ],
+      [
+        2
+      ],
+      [
+        2
+      ]
+    ],
+    "allowed_steps": 2,
+    "networks_returned": 1,
+    "examined": 3,
+    "stopped_at": null,
+    "table_finalist_found": true
+  },
+  {
+    "case": "hypoth",
+    "iteration": 2,
+    "species_budgets": [
+      [
+        1
+      ],
+      [
+        2
+      ],
+      [
+        2
+      ],
+      [
+        2
+      ]
+    ],
+    "allowed_steps": 8,
+    "networks_returned": 3,
+    "examined": 92,
+    "stopped_at": null,
+    "table_finalist_found": true
+  },
+  {
+    "case": "hypoth",
+    "iteration": 3,
+    "species_budgets": [
+      [
+        1
+      ],
+      [
+        2
+      ],
+      [
+        2
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "allowed_steps": 23,
+    "networks_returned": 88,
+    "examined": 10902,
+    "stopped_at": null,
+    "table_finalist_found": true
+  },
+  {
+    "case": "hypoth",
+    "iteration": 4,
+    "species_budgets": [
+      [
+        1
+      ],
+      [
+        2
+      ],
+      [
+        2
+      ],
+      [
+        2
+      ],
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "allowed_steps": 45,
+    "networks_returned": 1655,
+    "examined": 1385979,
+    "stopped_at": null,
+    "table_finalist_found": true
+  },
+  {
+    "case": "aldol_condensation",
+    "iteration": 1,
+    "species_budgets": [
+      [
+        8,
+        8,
+        1
+      ],
+      [
+        7,
+        6,
+        1
+      ],
+      [
+        15,
+        12,
+        1
+      ],
+      [
+        0,
+        2,
+        1
+      ]
+    ],
+    "allowed_steps": 1,
+    "networks_returned": 1,
+    "examined": 1,
+    "stopped_at": null,
+    "table_finalist_found": true
+  },
+  {
+    "case": "aldol_condensation",
+    "iteration": 2,
+    "species_budgets": [
+      [
+        8,
+        8,
+        1
+      ],
+      [
+        7,
+        6,
+        1
+      ],
+      [
+        15,
+        12,
+        1
+      ],
+      [
+        0,
+        2,
+        1
+      ],
+      [
+        8,
+        8,
+        1
+      ]
+    ],
+    "allowed_steps": 4,
+    "networks_returned": 2,
+    "examined": 10,
+    "stopped_at": null,
+    "table_finalist_found": true
+  },
+  {
+    "case": "aldol_condensation",
+    "iteration": 3,
+    "species_budgets": [
+      [
+        8,
+        8,
+        1
+      ],
+      [
+        7,
+        6,
+        1
+      ],
+      [
+        15,
+        12,
+        1
+      ],
+      [
+        0,
+        2,
+        1
+      ],
+      [
+        8,
+        8,
+        1
+      ],
+      [
+        15,
+        14,
+        2
+      ]
+    ],
+    "allowed_steps": 7,
+    "networks_returned": 4,
+    "examined": 63,
+    "stopped_at": null,
+    "table_finalist_found": true
+  },
+  {
+    "case": "aldol_condensation",
+    "iteration": 4,
+    "species_budgets": [
+      [
+        8,
+        8,
+        1
+      ],
+      [
+        7,
+        6,
+        1
+      ],
+      [
+        15,
+        12,
+        1
+      ],
+      [
+        0,
+        2,
+        1
+      ],
+      [
+        8,
+        8,
+        1
+      ],
+      [
+        15,
+        12,
+        1
+      ],
+      [
+        0,
+        2,
+        1
+      ]
+    ],
+    "allowed_steps": 17,
+    "networks_returned": 10,
+    "examined": 3213,
+    "stopped_at": null,
+    "table_finalist_found": true
+  },
+  {
+    "case": "fruc_HMF2",
+    "iteration": 1,
+    "species_budgets": [
+      [
+        1,
+        3
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "allowed_steps": 5,
+    "networks_returned": 1,
+    "examined": 25,
+    "stopped_at": null,
+    "table_finalist_found": true
+  },
+  {
+    "case": "fruc_HMF2",
+    "iteration": 2,
+    "species_budgets": [
+      [
+        1,
+        3
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "allowed_steps": 11,
+    "networks_returned": 4,
+    "examined": 561,
+    "stopped_at": null,
+    "table_finalist_found": true
+  },
+  {
+    "case": "fruc_HMF2",
+    "iteration": 3,
+    "species_budgets": [
+      [
+        1,
+        3
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "allowed_steps": 25,
+    "networks_returned": 103,
+    "examined": 68405,
+    "stopped_at": null,
+    "table_finalist_found": true
+  }
+]
