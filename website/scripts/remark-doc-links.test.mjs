@@ -20,3 +20,24 @@ test('gives registered TOCs their print size and leaves report plots at native s
   assert.deepEqual(tree.children[0].children[0].data.hProperties, { width: 288, height: 288 });
   assert.equal(tree.children[1].children[0].data, undefined);
 });
+
+test('groups the registered study image with its abstract, preserving footnotes and links', () => {
+  const processor = unified().use(remarkParse).use(remarkDocLinks);
+  const value = '![Droplets](/particula/images/pi-chamber-lidar/graphical-abstract.svg)[^emblem]\n\nRead the [measured gain](#gain).\n\n## Next\n\n[^emblem]: Attribution';
+  const tree = processor.parse(value);
+  const [figure, abstract, heading] = tree.children;
+  processor.runSync(tree, { path: '/site/src/content/docs/studies/literature/pi-chamber-lidar/index.md' });
+  assert.equal(tree.children[0].data.hName, 'section');
+  assert.deepEqual(tree.children[0].children, [abstract, figure]);
+  assert.equal(tree.children[1], heading);
+});
+
+test('pairs a Python study after its execution banner, only on its own page', () => {
+  const processor = unified().use(remarkParse).use(remarkDocLinks);
+  const value = 'Archived run.\n\n## Comparison\n\n![Growth](/particula/images/glyoxal-chamber/graphical-abstract.svg)\n\nMeasured growth.\n\nSecond paragraph.';
+  const study = 'studies/literature/evaporation-and-uptake/glyoxal_chamber.md';
+  const render = (source, page) => processor.runSync(processor.parse(source), { path: '/site/src/content/docs/' + page });
+  assert.deepEqual(render(value, study).children.map(n => n.type), ['paragraph', 'heading', 'studyIntro', 'paragraph']);
+  assert.ok(render(value, 'studies/literature/index.md').children.every(n => n.type !== 'studyIntro'));
+  assert.ok(render(value.replace('Measured growth.', '## Heading'), study).children.every(n => n.type !== 'studyIntro'));
+});

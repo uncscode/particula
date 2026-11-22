@@ -1,9 +1,29 @@
 import path from 'node:path';
 import topics from '../topics.json' with { type: 'json' };
 
-const tocImages = new Set(topics.resources
+const studyFigures = new Map(topics.resources
   .filter((resource) => resource.tocFigure)
-  .map((resource) => '/particula/images/' + resource.tocFigure));
+  .map(({ source, tocFigure }) => [
+    source.replace(/^docs\//, '').replace(/\.py$/, '.md'),
+    '/particula/images/' + tocFigure,
+  ]));
+const tocImages = new Set(studyFigures.values());
+
+// Python examples can have an execution banner before their authored opening.
+function groupStudyIntro(tree, figureUrl) {
+  if (!figureUrl) return;
+  const index = tree.children.findIndex(node => node.type === 'paragraph'
+    && node.children[0]?.type === 'image' && node.children[0].url === figureUrl);
+  if (index < 0) return;
+  const figure = tree.children[index];
+  const abstract = tree.children[index + 1];
+  if (abstract?.type !== 'paragraph' || abstract.children[0]?.type === 'image') return;
+  tree.children.splice(index, 2, {
+    type: 'studyIntro',
+    data: { hName: 'section', hProperties: { className: ['study-intro'], ariaLabel: 'Study summary' } },
+    children: [abstract, figure],
+  });
+}
 
 // Resolve Markdown links (including multiline labels and reference definitions)
 // against their generated source location. Code nodes are deliberately untouched.
@@ -37,6 +57,7 @@ export default function remarkDocLinks() {
       node.children?.forEach(visit);
     }
     visit(tree);
+    groupStudyIntro(tree, studyFigures.get(source));
     // MkDocs stripped emoji spacing and collapsed punctuation separators in
     // these published headings; retain their existing relocation destinations.
     const legacy = new Set([
