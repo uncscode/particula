@@ -1,0 +1,4 @@
+temperature_K,RH_percent_label,approx_NH3_pptv_from_color,approx_total_acid_monomer_cm-3,approx_total_acid_dimer_cm-3,center_x_px,center_y_px
+248,11,7.3,1.42e7,1.98e4,1384,2797
+248,28,4.4,1.93e7,1.65e4,1449,2822
+248,11,2.3,3.24e7,2.36e4,1560,2773

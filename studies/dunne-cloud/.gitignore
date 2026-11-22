@@ -1,0 +1,16 @@
+# Local author inputs, fit results, numerical histories and compiled kernels.
+/raw/
+/results/
+/figures/
+**/*.csv
+!sources.csv
+!companion/sources.csv
+!rate_sources/coefficients.csv
+!rate_sources/kurten_fig9_248K_dimers.csv
+!rate_sources/cluster_benchmarks.csv
+*.npz
+*.pdf
+*.zip
+*.png
+*.json
+*.so

@@ -1,0 +1,12 @@
+filename,download_url,bytes,sha256_local,md5_publisher
+kuerten2015-correction.pdf,https://acp.copernicus.org/articles/15/4063/2015/acp-15-4063-2015.pdf,3980846,d3bc8834fe0dfc5a0bca3e322e442b058ed254edfe7e30988636a3cffdadc24e,
+kuerten2016.pdf,https://eprints.whiterose.ac.uk/id/eprint/109003/1/K-rten_et_al-2016-Journal_of_Geophysical_Research__Atmospheres.pdf,3003690,31f0c836290d70652a75b7254e5dfc4f564f0f789e2e90b22cf9f363f2632a46,
+kuerten2019.pdf,https://acp.copernicus.org/articles/19/5033/2019/acp-19-5033-2019.pdf,1903808,94f8b2f6ffe2ce2c7b8a273023718aa31aef2203701d106ecf103ff0489ba1fa,
+kuerten2019-supplement.pdf,https://acp.copernicus.org/articles/19/5033/2019/acp-19-5033-2019-supplement.pdf,452771,54a2263e6cc0e77276ecd6a50ade3bc0e9ff894e43b7aa3acaa4b97594e002e3,
+kuerten2019-data.zip,https://zenodo.org/api/records/2634985/files/Data_K%C3%BCrten_2019_ACP.zip/content,164274,3dc6c6c65ea91a2175a72742baaa96348f58e195bad04b5227833414812bd6ce,1d96e9534be574b2b062ce264a4c981f
+stolzenburg2020.pdf,https://acp.copernicus.org/articles/20/7359/2020/acp-20-7359-2020.pdf,1176992,c98d124a21cb51e0aef25fc93d2dcf1308e0ae55c34c67aa0944fb5caf59fa08,
+stolzenburg2020-supplement.pdf,https://acp.copernicus.org/articles/20/7359/2020/acp-20-7359-2020-supplement.pdf,1064713,a1a46f0ab74af9277c8bf8c1e1df25e3f8a1ede9681946ca208c8280912c2815,
+donahue2026.pdf,https://amt.copernicus.org/articles/19/3363/2026/amt-19-3363-2026.pdf,13870876,d55a4aa865cf01916d867fdda061acbb1b22ebc337e0b120e9975f922f128513,
+donahue2026-supplement.pdf,https://amt.copernicus.org/articles/19/3363/2026/amt-19-3363-2026-supplement.pdf,1565501,a7995fc807b81c2587be6dc19ecb2114ffff12295bf4632c91c654655d0690f0,
+donahue2026-figure-data.zip,https://zenodo.org/api/records/19695085/files/archive.zip/content,136654898,5f6f48d653a989a57b633472908ebbddffad10a014db73032dc9f940912d4c85,b2d281aa2d86868cf5c2fb4fdc85ac1a
+donahue2026-parsed.rxns,https://zenodo.org/api/records/19695085/files/parsed.rxns/content,3948,9e517d897613ebec12eba7d29d9a1912df9715eef2432c22d21d743d95a63b6a,1f82f7b7fdf9d1f766ab426f22b44f7a
