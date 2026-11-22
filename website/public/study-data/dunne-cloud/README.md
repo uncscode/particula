@@ -1,6 +1,6 @@
 # Dunne CLOUD figure data
 
-Each UTF-8 CSV contains the values drawn in the PNG with the same name. To redraw the figures, place the eight CSVs and `replot.py` in one directory and run `python replot.py --output figures` there with NumPy, pandas and Matplotlib installed. The script reads the CSVs beside it and writes eight PNGs. These files preserve plotted observations, reference values and simulation summaries. They support replotting without a new fit or chamber simulation.
+Each UTF-8 CSV contains the values drawn in the PNG with the same name. To redraw the figures, place the eight CSVs and `replot.py` in one directory and run `python replot.py --output figures` there with NumPy, pandas and Matplotlib installed. The script reads the CSVs beside it and writes eight PNGs. For the calculations that produced the CSVs, follow the [simulation source and figure-by-figure guide](https://github.com/uncscode/particula/tree/41371efa56187bc096994d6d92efb39214ee9e44/studies/dunne-cloud). These files preserve plotted observations, reference values and simulation summaries. They support replotting without a new fit or chamber simulation.
 
 | CSV | Quantities and units |
 | --- | --- |
