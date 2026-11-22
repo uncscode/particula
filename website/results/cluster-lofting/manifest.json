@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 8.595742587000132,
+  "package_source_sha256": "669aaafcf3fd5ba28ac463b35c348ca769a6ca07c9d7e6294329419ae7ae4ba8",
+  "scientific_source_sha256": "def7afeb9de5d9964ac68de5937f09b33801988d2c537d540fdc31da1c4ed510",
+  "input_sha256": {},
+  "example": "cluster-lofting",
+  "fingerprint": "f5f74ce8867bbd17ee318f492b36d851d7746afd0dbd02800a21dfe3bf696fc9",
+  "source": "docs/studies/examples/thermodynamics/parcel-experiments/cluster_lofting.py",
+  "revision": "3dbeb41cae236cc0bc69e9b3619b7e7859533bd6",
+  "package_dirty": false,
+  "executed_at": "2026-11-22T02:10:43.401140+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.parcel_motion 0cae867 load on device 'cpu' took 1.35 ms  (cached)\n"
+      },
+      {
+        "text": "stack: 1024 physical particles, 408 group passages, 704 top exits.\n  Mean travel east 6.251 m; world and mesh height changes +9.66 and +9.66 cm.\nrow: 1024 physical particles, 9984 group passages, 0 top exits.\n  Mean travel east 9.800 m; world and mesh height changes +19.34 and +19.34 cm.\nblock: 1024 physical particles, 256 group passages, 0 top exits.\n  Mean travel east 9.800 m; world and mesh height changes +19.34 and -11.46 cm.\nPeriodic A to B cumulative mass (\u00b5g), sulfate salt / NaCl / sucrose: [4.029 4.752 3.225]\nB1-3-1-0-0 (Sodium chloride) ends in A1 with world height change -5.92 cm.\nB1-3-2-0-0 (Sucrose) ends in A1 with world height change +3.88 cm.\n"
+      },
+      {
+        "image": "figure-8-1.png"
+      },
+      {
+        "image": "figure-8-2.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "ab6e1f58bb1118da38fe97cf1e1ea1adad9c15aa090974cad92a189aa461ddeb",
+    "data.json": "38d9ee10318abc3d7b9bc3320d0065d1e7096b1f87bd89d27a6667b6031dd718",
+    "figure-8-1.png": "4e3c8fddcf33382e38fe20b69ae87a015994cb9cc2a49fe5afeb492228564345",
+    "figure-8-2.png": "ce9606ad3d0c99f19c6f98a1d17732900769cce5ab42b5cf10b51087d88a640e"
+  },
+  "simulation_fingerprint": "e0fa90acfb87b618d0790877df5b0fe9d1a438fd948da772840919ca0725f7e8"
+}

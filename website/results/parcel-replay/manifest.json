@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 32.15068358602002,
+  "package_source_sha256": "669aaafcf3fd5ba28ac463b35c348ca769a6ca07c9d7e6294329419ae7ae4ba8",
+  "scientific_source_sha256": "def7afeb9de5d9964ac68de5937f09b33801988d2c537d540fdc31da1c4ed510",
+  "input_sha256": {
+    "docs/data/parcel-replay/ascent.csv": "641b05a573e1702140e7007fdc57f3d7b11dc7a4b9bada4f844af3051877f8d8",
+    "docs/data/parcel-replay/ascent.json": "fe3dbbc3a2069510d5732e8dd843beafe0f33bce4bcee0d3bf08744304805b69"
+  },
+  "example": "parcel-replay",
+  "fingerprint": "e2bb4dfacdb400986aaacd8c5cf8fb60fa65c7793ac72396b0220436e0ba382c",
+  "source": "docs/studies/examples/thermodynamics/parcel-experiments/parcel_replay.py",
+  "revision": "17f2f23911e2b971d9e357b8a5e90a9cfca2f84e",
+  "package_dirty": false,
+  "executed_at": "2026-11-22T01:39:41.634853+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.parcel_replay ce03a29 load on device 'cuda:0' took 17.02 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.parcel_replay e9ca152 load on device 'cpu' took 1.69 ms  (cached)\n"
+      },
+      {
+        "text": "Forcing 0.050 s, growth \u2264 0.0250 s: radius errors [2.373 0.774 0.812] nm; water restored at 100 s -1.961e-08 kg.\nForcing 0.050 s, growth \u2264 0.0125 s: radius errors [1.18  0.384 0.403] nm; water restored at 100 s -9.804e-09 kg.\nForcing 0.100 s, growth \u2264 0.0250 s: radius errors [2.383 0.78  0.813] nm; water restored at 100 s -1.994e-08 kg.\nForcing 0.100 s, growth \u2264 0.0125 s: radius errors [1.19  0.39  0.403] nm; water restored at 100 s -1.013e-08 kg.\nForcing 0.200 s, growth \u2264 0.0250 s: radius errors [2.425 0.805 0.815] nm; water restored at 100 s -2.126e-08 kg.\nForcing 0.200 s, growth \u2264 0.0125 s: radius errors [1.232 0.417 0.406] nm; water restored at 100 s -1.145e-08 kg.\nMaximum organic budget residual 1.615e-21 kg.\nMaximum restart difference 0.000e+00 kg.\nCUDA humidity sensitivity +0.0347441 kg/unit.\nRefined CPU sensitivity +0.0347446 kg/unit.\n"
+      },
+      {
+        "image": "figure-7-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "c90f7b1bb3dd9e5e4a1347d5591d9c47b8efc70f018f5475692ddb2da2192a7a",
+    "data.json": "7d04ee0bd8490791916bb3504f6cdeb7ad7e2f4ac4c1f89c1926eaea1e39701c",
+    "figure-7-1.png": "0c65cd8242af0607b75ab3bf9a58d49723603dc56050226ddd60b1e9e0f93a30"
+  },
+  "simulation_fingerprint": "3e07139a7d70f77782bab85ec6da0e29e650184ff87779a4ade911d1c256d358"
+}

@@ -649,7 +649,7 @@
     {
       "id": "atmosphere",
       "label": "Atmospheric processes",
-      "description": "Explore environmental sweeps and coupled processes while keeping model assumptions visible.",
+      "description": "Follow aerosol through changing air or compare its response across prescribed environments.",
       "parent": "applications",
       "order": 1,
       "icon": "atmosphere",
@@ -666,8 +666,54 @@
       "related": [
         "charged"
       ],
-      "context": "Environmental sweeps reveal how a modeled response changes across prescribed conditions. They are not automatically trajectories of a moving air parcel or forecasts. Distinguish variables varied independently from those constrained by an atmospheric scenario, and keep material and charging assumptions visible.",
-      "investigation": "Does a trend persist when temperature, pressure, and humidity follow a physically justified path instead of an independently chosen parameter sweep?"
+      "context": "Temperature, pressure and humidity can be sampled along a parcel’s path or specified independently across a set of experiments. Following a parcel keeps track of its water and particle inventories through time. Sampling many environments reveals which combinations change an aerosol response.",
+      "investigation": "How does a rise through cloud base compare with separate experiments at the same temperatures and pressures, and which differences come from the aerosol’s earlier history?"
+    },
+    {
+      "id": "parcels",
+      "label": "Parcels",
+      "description": "Track water and particles in a rising air parcel or across the faces of a parcel cluster.",
+      "parent": "atmosphere",
+      "order": 0,
+      "icon": "parcels",
+      "aliases": [
+        "Air parcels"
+      ],
+      "search_phrases": [
+        "cloud parcel model",
+        "moist ascent",
+        "forcing history",
+        "parcel replay",
+        "parcel cluster",
+        "particle lofting"
+      ],
+      "prerequisites": [
+        "gas"
+      ],
+      "related": [],
+      "context": "In a rising parcel, cooling and condensation change how much water remains as vapor and how much enters droplets. Replaying the same air history under prescribed humidity lets you measure the water supplied or removed by that constraint. In a cluster, tracking each face crossing shows which parcel gained or lost material and how particles moved relative to the air.",
+      "investigation": "When an updraft lifts a group of parcels, which particles rise above their original altitude while settling into the group below?"
+    },
+    {
+      "id": "atmospheric-environment-sweeps",
+      "label": "Atmospheric environment sweeps",
+      "description": "Compare aerosol growth and charging across prescribed temperature, pressure, humidity and ion conditions.",
+      "parent": "atmosphere",
+      "order": 1,
+      "icon": "atmospheric-environment-sweeps",
+      "aliases": [],
+      "search_phrases": [
+        "environment sweep",
+        "humid environments",
+        "mesopause",
+        "charged aerosol scenarios"
+      ],
+      "prerequisites": [
+        "gas"
+      ],
+      "related": [],
+      "context": "Separate runs expose the same initial aerosol to different gas conditions. Compare final size distributions and particle charge across dry and humid cases. Each result depends on the environmental variables varied together and the assumed ion supply.",
+      "investigation": "When the initial aerosol and ion supply are held fixed, how much does changing the environment alter the final size and charge distributions?"
     },
     {
       "id": "emissions",
@@ -1329,14 +1375,15 @@
     {
       "source": "docs/studies/examples/coupled-populations/environment/index.md",
       "title": "Dry aerosols and humid air with ions",
-      "topic": "verification-scientific",
+      "topic": "atmospheric-environment-sweeps",
       "also": [
+        "verification-scientific",
         "atmosphere",
         "gpu",
         "charged"
       ],
       "role": "Studies",
-      "start_here": false,
+      "start_here": true,
       "study": {
         "id": "environment-sweep",
         "runs": [
@@ -1896,8 +1943,9 @@
     {
       "source": "docs/studies/examples/coupled-populations/environment/gpu_dry_environment_sweep.py",
       "title": "Dry charged aerosols: ground level, mesopause and pressurized chambers",
-      "topic": "atmosphere",
+      "topic": "atmospheric-environment-sweeps",
       "also": [
+        "atmosphere",
         "gpu",
         "charged"
       ],
@@ -1908,13 +1956,14 @@
     {
       "source": "docs/studies/examples/coupled-populations/environment/gpu_environment_sweep.py",
       "title": "Charged aerosols and ions across sixteen humid environments",
-      "topic": "atmosphere",
+      "topic": "atmospheric-environment-sweeps",
       "also": [
+        "atmosphere",
         "gpu",
         "charged"
       ],
       "role": "Studies",
-      "start_here": true
+      "start_here": false
     },
     {
       "source": "docs/studies/validation/coagulation/charged-aerosols/gpu_ion_balance.py",
@@ -3609,6 +3658,16 @@
       "start_here": false
     },
     {
+      "source": "docs/guide/processes/parcels.md",
+      "title": "Run a parcel experiment",
+      "topic": "parcels",
+      "also": [
+        "atmosphere"
+      ],
+      "role": "Guide",
+      "start_here": true
+    },
+    {
       "source": "docs/guide/processes/dilution.md",
       "title": "Dilution Strategy System",
       "topic": "losses-dilution",
@@ -3893,8 +3952,18 @@
       "start_here": false
     },
     {
+      "source": "docs/theory/thermodynamics/parcel-dynamics.md",
+      "title": "Water, aerosol, and motion in a parcel",
+      "topic": "parcels",
+      "also": [
+        "atmosphere"
+      ],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
       "source": "docs/theory/thermodynamics/index.md",
-      "title": "Activity Calculations",
+      "title": "Aerosol thermodynamics",
       "topic": "activity",
       "also": [],
       "role": "Theory",
@@ -5043,14 +5112,15 @@
     {
       "source": "docs/studies/examples/thermodynamics/moist_parcel.py",
       "title": "How does a faster updraft change cloud water at a fixed time?",
-      "topic": "condensation-energy",
+      "topic": "parcels",
       "also": [
+        "condensation-energy",
         "atmosphere",
         "activity-kappa",
         "gpu"
       ],
       "role": "Studies",
-      "start_here": false,
+      "start_here": true,
       "study": {
         "id": "moist-parcel-updraft",
         "runs": [
@@ -5058,6 +5128,16 @@
         ],
         "companions": [],
         "relations": [
+          {
+            "target": "docs/guide/processes/parcels.md",
+            "label": "Set up a closed ascent",
+            "fragment": "record-a-closed-ascent-and-replay-it"
+          },
+          {
+            "target": "docs/theory/thermodynamics/parcel-dynamics.md",
+            "fragment": "cooling-and-droplet-growth",
+            "label": "Expansion cooling, droplet growth and latent heating"
+          },
           {
             "target": "docs/guide/processes/condensation.md",
             "label": "Water vapor and the condensation budget"
@@ -5075,6 +5155,7 @@
       "title": "Which parcel solver reaches the same accuracy targets faster?",
       "topic": "condensation-adaptive",
       "also": [
+        "parcels",
         "condensation-energy",
         "atmosphere",
         "gpu"
@@ -5088,6 +5169,16 @@
         ],
         "companions": [],
         "relations": [
+          {
+            "target": "docs/guide/processes/parcels.md",
+            "label": "Set up the reference ascent",
+            "fragment": "record-a-closed-ascent-and-replay-it"
+          },
+          {
+            "target": "docs/theory/thermodynamics/parcel-dynamics.md",
+            "fragment": "sensitivities-at-a-fixed-time",
+            "label": "Parcel sensitivities on the accepted time mesh"
+          },
           {
             "target": "docs/guide/processes/numerical-integration.md",
             "label": "Embedded error and solver choice"
@@ -5144,6 +5235,117 @@
         ]
       },
       "tocFigure": "pi-chamber-lidar/graphical-abstract.svg"
+    },
+    {
+      "source": "docs/studies/examples/thermodynamics/parcel-experiments/parcel_replay.py",
+      "title": "Can a recorded ascent reproduce droplet growth and close two gas budgets?",
+      "topic": "parcels",
+      "also": [
+        "condensation-energy",
+        "atmosphere",
+        "activity-kappa",
+        "gpu"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "parcel-replay",
+        "runs": [
+          "parcel-replay"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/parcels.md",
+            "label": "Load forcing records and replay the ascent",
+            "fragment": "read-or-supply-a-trace"
+          },
+          {
+            "target": "docs/theory/thermodynamics/parcel-dynamics.md",
+            "fragment": "replaying-prescribed-water-vapor",
+            "label": "Account for water restored by a prescribed trace"
+          },
+          {
+            "target": "docs/guide/processes/condensation.md",
+            "label": "Water vapor and the condensation budget"
+          },
+          {
+            "target": "docs/theory/dynamics/condensation-equations.md",
+            "fragment": "kelvin-effect-correction-factor",
+            "label": "Curvature correction to the equilibrium vapor pressure"
+          }
+        ]
+      }
+    },
+    {
+      "source": "docs/studies/examples/thermodynamics/parcel-experiments/parcel_cluster.py",
+      "title": "What crosses a shared parcel face?",
+      "topic": "parcels",
+      "also": [
+        "atmosphere",
+        "transport",
+        "gpu"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "parcel-cluster",
+        "runs": [
+          "parcel-cluster"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/parcels.md",
+            "label": "Define cell connections and move a named vapor",
+            "fragment": "move-a-named-vapor-between-cells"
+          },
+          {
+            "target": "docs/theory/thermodynamics/parcel-dynamics.md",
+            "fragment": "exchange-between-parcels",
+            "label": "Convert donor concentration to a conservative face transfer"
+          }
+        ]
+      }
+    },
+    {
+      "source": "docs/studies/examples/thermodynamics/parcel-experiments/cluster_lofting.py",
+      "title": "Where does a particle group travel in wind and updraft?",
+      "topic": "parcels",
+      "also": [
+        "atmosphere",
+        "transport"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "cluster-lofting",
+        "runs": [
+          "cluster-lofting"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/parcels.md",
+            "label": "Track particles through a moving mesh",
+            "fragment": "follow-individual-particles"
+          },
+          {
+            "target": "docs/theory/thermodynamics/parcel-dynamics.md",
+            "fragment": "settling-relative-to-a-moving-face",
+            "label": "Resolve settling in the world and moving parcel frames"
+          },
+          {
+            "target": "docs/studies/examples/thermodynamics/parcel-experiments/parcel_cluster.py",
+            "label": "Two-cell settling and conservative exchange"
+          },
+          {
+            "target": "docs/theory/properties/air-transport.md",
+            "fragment": "air-viscosity",
+            "label": "Air viscosity used in the settling speed"
+          }
+        ]
+      }
     },
     {
       "source": "docs/studies/literature/straw-combustion/index.md",
@@ -5438,6 +5640,10 @@
     {
       "source": "docs/studies/literature/evaporation-and-uptake/index.md",
       "reason": "Landing page for literature comparisons of evaporation and reactive uptake."
+    },
+    {
+      "source": "docs/studies/examples/thermodynamics/parcel-experiments/index.md",
+      "reason": "Collection of prescribed parcel replay and cluster experiments."
     }
   ],
   "study_group_exceptions": {

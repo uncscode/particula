@@ -61,6 +61,35 @@ def _growth_resistance(t: F, p: F, es: F):
     return F(RHO_W) * (mass + heat_scale * (LATENT_OVER_RV / t - F(1.0)))
 
 
+@wp.func
+def _grown_radius(
+    r: F, d: F, kappa: F, t: F, p: F, rh: F, dt: F, bound_dry: bool
+):
+    """One linearly implicit water-growth step, shared with forced replay."""
+    es = _es(t)
+    water = (r - d) * (r * r + r * d + d * d)
+    solute = kappa * d * d * d
+    denom = water + solute
+    activity = water / denom
+    kelvin_length = KELVIN_T / t
+    curvature = wp.exp(kelvin_length / r)
+    eq = activity * curvature
+    resistance = _growth_resistance(t, p, es)
+    # Linearize equilibrium about the old r² on its restoring branch.
+    deq_dr = curvature * (
+        F(3.0) * r * r * solute / (denom * denom)
+        - activity * kelvin_length / (r * r)
+    )
+    relaxation = wp.max(deq_dr / (r * resistance), F(0.0))
+    delta_r2 = (
+        F(2.0) * dt * (rh - eq) / (resistance * (F(1.0) + dt * relaxation))
+    )
+    squared = r * r + delta_r2
+    if bound_dry:
+        squared = wp.max(squared, d * d)
+    return wp.sqrt(squared)
+
+
 @wp.kernel
 def _grow(
     previous: FloatVector,
@@ -77,29 +106,9 @@ def _grow(
     if active:
         t = previous[TEMP]
         p = previous[PRESSURE]
-        es = _es(t)
-        d = dry[j]
-        water = (r - d) * (r * r + r * d + d * d)
-        solute = kappa * d * d * d
-        denom = water + solute
-        activity = water / denom
-        kelvin_length = KELVIN_T / t
-        curvature = wp.exp(kelvin_length / r)
-        eq = activity * curvature
-        resistance = _growth_resistance(t, p, es)
-        # Linearize equilibrium about the old r² on its restoring branch.
-        deq_dr = curvature * (
-            F(3.0) * r * r * solute / (denom * denom)
-            - activity * kelvin_length / (r * r)
+        new_radius = _grown_radius(
+            r, dry[j], kappa, t, p, previous[SUPERSAT] + F(1.0), dt, False
         )
-        relaxation = wp.max(deq_dr / (r * resistance), F(0.0))
-        delta_r2 = (
-            F(2.0)
-            * dt
-            * (previous[SUPERSAT] + F(1.0) - eq)
-            / (resistance * (F(1.0) + dt * relaxation))
-        )
-        new_radius = wp.sqrt(r * r + delta_r2)
     result[j] = new_radius
 
 

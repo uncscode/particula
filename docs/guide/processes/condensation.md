@@ -76,6 +76,15 @@ advances parcel temperature, vapor and physical volume together during
 ascent and differentiates the final liquid-water mixing ratio with respect
 to updraft speed.
 
+### Replay forcing and exchange between parcels
+
+In a closed ascent, water condensed onto droplets comes from the parcel's
+vapor inventory. When a trace prescribes vapor, check the water supplied or
+removed by the external reservoir as well as the liquid gained by droplets.
+The parcel guide shows how to record an ascent, replay it, and exchange a
+named vapor between cells. [Run a parcel experiment](parcels.md) ·
+[Derive the parcel water budget](../../theory/thermodynamics/parcel-dynamics.md#replaying-prescribed-water-vapor)
+
 ## Native data contract (v0.3.0)
 
 Direct native calls to `CondensationIsothermal`,
