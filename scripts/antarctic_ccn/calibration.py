@@ -68,13 +68,40 @@ def sweep(output):
                         )
                         uplift = (pred - salt)[test, 1].mean()
                         residual = (observed - pred)[test, 1].mean()
-                        scores.append((case, name, loss, uplift, residual))
+                        scores.append(
+                            (
+                                case,
+                                name,
+                                loss,
+                                uplift,
+                                residual,
+                                gf,
+                                rh,
+                                diameter,
+                                number,
+                                gain,
+                                offset,
+                            )
+                        )
                     inc = np.diff(organic[:, test].mean(1))
                     for i, (lo, hi) in enumerate(BANDS):
                         bands.append((case, lo, hi, *inc[i, :2]))
                     case += 1
     frame = pd.DataFrame(
-        scores, columns=["case", "model", "train_rmse", "uplift", "unexplained"]
+        scores,
+        columns=[
+            "case",
+            "model",
+            "train_rmse",
+            "uplift",
+            "unexplained",
+            "gf_factor",
+            "rh",
+            "diameter",
+            "number",
+            "ss_gain",
+            "ss_offset",
+        ],
     )
     accepted = frame[frame.train_rmse <= frame.train_rmse.min() + 1]
     common = accepted[accepted.model == "film_common"]
