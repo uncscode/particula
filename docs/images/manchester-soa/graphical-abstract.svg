@@ -1,9 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
-<title id="title">Measured and modeled post-peak organic aerosol decline in Manchester chamber experiment 16</title>
-<desc id="desc">An illuminated aerosol chamber above three bars with a common scale. Suspended secondary organic aerosol fell 30.89 micrograms per cubic metre between the measured peak and last sample. The Particula fit with 20 reaction channels fell 0.32 and the fit with 70 reaction channels fell 13.72.</desc>
-<rect width="300" height="300" fill="#FBF2E3"/>
-<g stroke-linejoin="round" stroke-linecap="round">
-<!-- Schematic chamber enclosure, illumination and aerosol. -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Manchester chamber perturbations retaining lower error than the frozen model</title>
+  <desc id="desc">An illuminated aerosol chamber and two grids of 48 parameter sets. A filled dot means the error averaged across two stochastic realizations was lower than with the earlier frozen parameters. All 48 sets improved mean absolute modal-diameter error across seven experiments. None improved mean normalized organic-mass error across 15 experiments.</desc>
+  <defs>
+    <g id="row">
+      <circle cx="0" cy="0" r="3.2"/>
+      <circle cx="10" cy="0" r="3.2"/>
+      <circle cx="20" cy="0" r="3.2"/>
+      <circle cx="30" cy="0" r="3.2"/>
+      <circle cx="40" cy="0" r="3.2"/>
+      <circle cx="50" cy="0" r="3.2"/>
+      <circle cx="60" cy="0" r="3.2"/>
+      <circle cx="70" cy="0" r="3.2"/>
+      <circle cx="80" cy="0" r="3.2"/>
+      <circle cx="90" cy="0" r="3.2"/>
+      <circle cx="100" cy="0" r="3.2"/>
+      <circle cx="110" cy="0" r="3.2"/>
+    </g>
+    <g id="draws">
+      <use href="#row" xlink:href="#row" y="0"/>
+      <use href="#row" xlink:href="#row" y="8"/>
+      <use href="#row" xlink:href="#row" y="16"/>
+      <use href="#row" xlink:href="#row" y="24"/>
+    </g>
+  </defs>
+  <rect width="300" height="300" fill="#FBF2E3"/>
+  <g transform="translate(3 -6) scale(.78)" stroke-linejoin="round" stroke-linecap="round">
 <path d="M21 39 L45 26 L124 26 L100 39 Z" fill="#EFD1A5" stroke="#243E43" stroke-width="2"/>
 <path d="M100 39 L124 26 L124 88 L100 102 Z" fill="#CAD9D2" stroke="#243E43" stroke-width="2"/>
 <path d="M21 39 L100 39 L100 102 L21 102 Z" fill="#FBF2E3" stroke="#243E43" stroke-width="2"/>
@@ -21,21 +42,19 @@
 <circle cx="72" cy="90" r="1.25" fill="#135963"/>
 <circle cx="52" cy="68" r="1" fill="#135963"/>
 <circle cx="81" cy="73" r="1.1" fill="#135963"/>
-</g><g font-family="Liberation Sans, Arial, sans-serif" fill="#243E43">
-<text x="142" y="44" font-size="18" font-weight="bold">Manchester</text>
-<text x="142" y="64" font-size="18" font-weight="bold">chamber</text>
-<text x="142" y="86" font-size="12.5">α-pinene + o-cresol</text>
-<text x="142" y="102" font-size="12.5">Experiment 16</text>
-<path d="M19 120 H281" stroke="#617679" stroke-width=".8"/>
-<text x="19" y="146" font-size="19" font-weight="bold">Decline in suspended SOA</text>
-<text x="20" y="163" font-size="13">Peak to final sample (µg m⁻³)</text>
-<text x="20" y="188" font-size="14" font-weight="bold">Chamber measurement</text>
-<rect x="20" y="193" width="210.052" height="8" fill="#243E43"/>
-<text x="236.05" y="202" font-weight="bold" font-size="14" fill="#243E43">30.89</text>
-<text x="20" y="228" font-size="14" font-weight="bold">Particula · 70 reaction channels</text>
-<rect x="20" y="233" width="93.310" height="8" fill="#135963"/>
-<text x="119.31" y="242" font-weight="bold" font-size="14" fill="#135963">13.72</text>
-<text x="20" y="268" font-size="14" font-weight="bold">Particula · 20 reaction channels</text>
-<rect x="20" y="273" width="2.205" height="8" fill="#A44D21"/>
-<text x="28.20" y="282" font-weight="bold" font-size="14" fill="#A44D21">0.32</text>
-</g></svg>
+  </g>
+  <g font-family="Liberation Sans, Arial, sans-serif" fill="#243E43">
+    <text x="118" y="38" font-weight="bold" font-size="22">Manchester</text>
+    <text x="118" y="64" font-weight="bold" font-size="22">chamber</text>
+    <path d="M20 89 H280" stroke="#617679" stroke-width="1"/>
+    <text x="20" y="114" font-size="16" font-weight="bold">Joint perturbations with lower</text>
+    <text x="20" y="133" font-size="16" font-weight="bold">error than the frozen model</text>
+    <text x="20" y="168" font-size="17">Modal diameter</text>
+    <use href="#draws" xlink:href="#draws" x="24" y="182" fill="#135963" stroke="#135963" stroke-width="1.1"/>
+    <text x="280" y="204" text-anchor="end" font-size="38" font-weight="bold" fill="#135963">48/48</text>
+    <path d="M20 223 H280" stroke="#617679" stroke-width=".7"/>
+    <text x="20" y="247" font-size="17">Organic aerosol mass</text>
+    <use href="#draws" xlink:href="#draws" x="24" y="261" fill="#FBF2E3" stroke="#617679" stroke-width="1.1"/>
+    <text x="280" y="283" text-anchor="end" font-size="38" font-weight="bold">0/48</text>
+  </g>
+</svg>
