@@ -4,6 +4,7 @@ Scientific equations, assumptions, and validation comparisons for aerosol work.
 Use the [Guide](../guide/index.md) for APIs and [Studies](../studies/index.md)
 for runnable workflows.
 
+- [Water, aerosol, and motion in a parcel](thermodynamics/parcel-dynamics.md)
 - [Activity and equilibria](thermodynamics/index.md)
 - [Condensation](dynamics/condensation-equations.md)
 - [Nucleation](dynamics/nucleation-equations.md)

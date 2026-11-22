@@ -10,7 +10,7 @@ when reading the documentation offline.
 - **Describe an aerosol:** [population representations](../data-model/index.md), [size distributions](../../studies/tutorials/building-an-aerosol/particles/aerosol_distributions.py), [activity](../processes/activity.md), [optical properties](../optics/index.md).
 - **Understand processes:** [condensation](../processes/condensation.md), [coagulation](../processes/coagulation.md), [sources and losses](../processes/index.md).
 - **Numerical modeling:** [numerical methods](../processes/numerical-integration.md), [CPU simulation](../getting-started/first-simulation.md), [GPU execution](../gpu/index.md), [verification and comparison](../../studies/validation/index.md).
-- **Explore applications:** [scientific simulations](../../studies/examples/coupled-populations/index.md), [environmental sweeps](../../studies/examples/coupled-populations/environment/gpu_environment_sweep.py).
+- **Explore applications:** [parcel experiments](../processes/parcels.md), [scientific simulations](../../studies/examples/coupled-populations/index.md), [environmental sweeps](../../studies/examples/coupled-populations/environment/gpu_environment_sweep.py).
 
 Population representations live under Describe an aerosol and remain related
 to Numerical modeling: choices about counts, weights and resolution affect

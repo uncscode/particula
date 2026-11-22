@@ -150,6 +150,10 @@
             "slug": "guide/processes/condensation"
           },
           {
+            "label": "Run a parcel experiment",
+            "slug": "guide/processes/parcels"
+          },
+          {
             "label": "Native gas mechanisms",
             "slug": "guide/processes/gas-chemistry"
           },
@@ -321,6 +325,10 @@
           {
             "label": "Equilibria Theory",
             "slug": "theory/thermodynamics/equilibria-theory"
+          },
+          {
+            "label": "Water, aerosol, and motion in a parcel",
+            "slug": "theory/thermodynamics/parcel-dynamics"
           }
         ]
       },
