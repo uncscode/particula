@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 9.666878959164023,
+  "package_source_sha256": "669aaafcf3fd5ba28ac463b35c348ca769a6ca07c9d7e6294329419ae7ae4ba8",
+  "scientific_source_sha256": "def7afeb9de5d9964ac68de5937f09b33801988d2c537d540fdc31da1c4ed510",
+  "input_sha256": {},
+  "example": "parcel-cluster",
+  "fingerprint": "b32cde0982b1c52dd1aa140834964f30a5c4a18979da6716aba9ddda2af988dd",
+  "source": "docs/studies/examples/thermodynamics/parcel-experiments/parcel_cluster.py",
+  "revision": "17f2f23911e2b971d9e357b8a5e90a9cfca2f84e",
+  "package_dirty": false,
+  "executed_at": "2026-11-22T01:37:40.718783+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.3",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.parcel_replay ce03a29 load on device 'cuda:0' took 13.19 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.parcel_replay e9ca152 load on device 'cpu' took 1.80 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.parcel_motion 0cae867 load on device 'cpu' took 0.40 ms  (cached)\nModule particula.gpu.kernels.parcel_motion f309b2b load on device 'cuda:0' took 12.01 ms  (cached)\n"
+      },
+      {
+        "text": "Donor maximum organic budget error = 1.4e-23 kg\nReceiver maximum organic budget error = 3.1e-25 kg\nReceiver particle-mass sensitivity = +1.48845e-08 kg s/m\u00b3\ncpu crossing = 1.6685702 s, error = -1.08e-13 s\ncuda:0 crossing = 1.6685702 s, error = -1.08e-13 s\n"
+      },
+      {
+        "image": "figure-7-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "e244a12ae007e74e3beac0af6e9e53a5420364cfdf6993dcbdd0ddb219d29b49",
+    "data.json": "d70de1be84a47fb62ec27bbd213bbd40dcb5bc01dc3a779ff16ef9c7c1b629dd",
+    "figure-7-1.png": "b2740bc8585f911c2e22af4ab52bda81733d508a54e99f9cee3266b41627f28d"
+  },
+  "simulation_fingerprint": "886009337b43e9722d2cef1d790e4c0ad7ce1eda6b5f4af05ef2ecc03f4c2605"
+}
