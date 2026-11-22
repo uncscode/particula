@@ -1,6 +1,6 @@
 # University and laboratory sources for published aerosol and cloud data
 
-Use this catalog with the [literature selection plan](literature-scheduler.md) to find a paper, its data, and a specific quantity to compare. On November 20, 2026, the CERN CLOUD CSV and a sample of the Melpitz activation table were read directly. The other entries draw on repository records, instrument listings and publications. For a selected study, check the files and their units before fitting a model or reporting a result.
+Use this catalog to find a paper, its data, and a specific quantity to compare. On November 20, 2026, the CERN CLOUD CSV and a sample of the Melpitz activation table were read directly. The other entries draw on repository records, instrument listings and publications. For a selected study, check the files and their units before fitting a model or reporting a result.
 
 ## University data collections
 

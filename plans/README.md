@@ -66,11 +66,10 @@ capture for resolved chemistry. [PR #1687](https://github.com/uncscode/particula
 
 ## Continuous literature discovery, outside the stages
 
-The proposed [literature scheduler](literature-scheduler.md) uses an automated
-agent to conduct independent aerosol research alongside the stages. Each
-run starts in a fresh project chat, shortlists up to three papers, and takes
-on at most one new study. Selection rotates across aerosol processes and favors
-questions that benefit from multiple high-fidelity GPU simulations. Each
+Twice daily, a discovery run ranks candidate comparisons. An hour later,
+a study run resumes interrupted work or selects the highest-ranked eligible
+comparison. Each run takes on at most one new study. Selection rotates across
+aerosol processes and favors questions that benefit from multiple GPU simulations. Each
 study has a fresh worktree and branch. Drafts live in the main checkout's
 `.artifacts/literature/` for researcher review. Approved comparisons become
 documented examples in individual PRs. Diagnosed Particula gaps go through
