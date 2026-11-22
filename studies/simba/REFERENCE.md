@@ -69,3 +69,33 @@ differences limit attribution of the exact score discrepancies.
 [Rate fits and per-species RMSE](published_rankings.json) ·
 [Predicted concentrations](published_rankings.json.gz), one array per fit
 in the same order, with axes time, experiment, measured species.
+
+## Coupled chamber trajectory
+
+The synthetic box starts with three fixed lognormal seed cohorts. A gas
+precursor converts to a semivolatile vapor, the vapor exchanges reversibly
+with each seed, and its condensed material ages. Deterministic deposition
+moves each particle constituent to its own wall inventory. Time-dependent
+observations include two speciated gas mass concentrations, suspended organic
+mass and three number channels including the two detector tails.
+
+Run the qualification on a CUDA-equipped host from the checkout root.
+
+```bash
+PYTHONPATH=. python studies/simba/qualify_trajectory.py /tmp/trajectory_qualification.json
+```
+
+An independent SciPy Radau implementation evolves moles per physical
+particle and surviving cohort weights. Warp evolves suspended and deposited
+molar concentrations per air volume. The two initial vapor conditions give
+initial evaporation and condensation, respectively. At 0.025 s, the maximum
+difference across the six channels and both experiments was less than
+0.002% of each channel's peak. The saved report compares all nine input
+derivatives against the Radau reference at three finite-difference
+increments, including a one-sided difference at zero initial vapor. It
+includes hard-bin predictions alongside the finite-width response. Gas
+chemistry, particle aging, gas exchange, volume, seed shape and deposition
+all participate in the differentiated trajectory. The wall coefficient is
+defined for an inverse-diameter synthetic deposition law at 100 nm.
+
+[CPU and CUDA qualification](trajectory_qualification.json)
