@@ -5204,6 +5204,34 @@
           }
         ]
       }
+    },
+    {
+      "source": "docs/studies/examples/thermodynamics/parcel-experiments/cluster_lofting.py",
+      "title": "Where does a particle group travel in wind and updraft?",
+      "topic": "atmosphere",
+      "also": [
+        "transport"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "cluster-lofting",
+        "runs": [
+          "cluster-lofting"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/studies/examples/thermodynamics/parcel-experiments/parcel_cluster.py",
+            "label": "Two-cell settling and conservative exchange"
+          },
+          {
+            "target": "docs/theory/properties/air-transport.md",
+            "fragment": "air-viscosity",
+            "label": "Air viscosity used in the settling speed"
+          }
+        ]
+      }
     }
   ],
   "supporting": [

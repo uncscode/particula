@@ -101,7 +101,7 @@ supports the reverse pass. For resolved particles, `advance_motion()` updates
 world positions using velocity relative to the faces. Return its checkpoint to
 the next interval. Axis-aligned bounds can translate together or be rebound
 explicitly at a completed boundary. Particle radius and density are prescribed
-throughout each motion interval. [CUDA exchange and settling example](../../studies/examples/thermodynamics/parcel-experiments/parcel_cluster.py)
+throughout each motion interval. [CUDA exchange and settling example](../../studies/examples/thermodynamics/parcel-experiments/parcel_cluster.py) · [Stacks, periodic rows and moving parcel groups](../../studies/examples/thermodynamics/parcel-experiments/cluster_lofting.py)
 
 ## Native data contract (v0.3.0)
 
