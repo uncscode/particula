@@ -5406,6 +5406,39 @@
       ],
       "role": "Studies",
       "start_here": false
+    },
+    {
+      "source": "docs/studies/validation/optics/wet-bisulfate/wet_bisulfate.py",
+      "title": "Calculate scattering as a salt droplet takes up water",
+      "topic": "optics",
+      "also": [
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/validation/optics/wet-bisulfate/index.md",
+      "title": "Match wet size and refractive index when a salt droplet takes up water",
+      "topic": "optics",
+      "also": [
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "wet-bisulfate",
+        "runs": [
+          "wet-bisulfate"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/optics/index.md",
+            "label": "Optical inputs and units"
+          }
+        ]
+      }
     }
   ],
   "supporting": [
@@ -5668,9 +5701,14 @@
     {
       "source": "docs/studies/examples/thermodynamics/parcel-experiments/index.md",
       "reason": "Collection of prescribed parcel replay and cluster experiments."
+    },
+    {
+      "source": "docs/studies/validation/optics/index.md",
+      "reason": "Browsing directory for optical validation studies."
     }
   ],
   "study_group_exceptions": {
-    "docs/studies/literature": "Six primary choices cover distinct measurement or process families. The seventh is a cross-listed validation against wall loss theory."
+    "docs/studies/literature": "Six primary choices cover distinct measurement or process families. The seventh is a cross-listed validation against wall loss theory.",
+    "docs/studies/validation": "Seven entries keep optics visible alongside the existing physical-process and workflow collections."
   }
 }
