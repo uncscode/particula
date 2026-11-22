@@ -13,9 +13,8 @@ Create a dedicated worktree and `codex/stage-03b-scientific-comparisons` branch
 when starting the selected study. Develop and validate there, then commit,
 push, and create a PR when the plan's acceptance criteria are met. Follow the shared
 [worktree, branch, and PR workflow](README.md#worktree-branch-and-pr-workflow).
-The [literature scheduler](literature-scheduler.md) reuses this stage's
-scientific criteria for up to three new comparisons per invocation. Each has its own
-worktree and branch. The automated agent keeps the draft in the main
+Scheduled literature studies use the same scientific criteria. Each new
+comparison has its own worktree and branch. The agent keeps the draft in the main
 checkout's `.artifacts/literature/<iteration-id>/` for researcher review.
 An approved study becomes a documented example in its own PR. The independent
 AIOMFAC calculation below belongs to the citric-acid case; each later study
@@ -35,9 +34,8 @@ coupling. Screening can start immediately; a study using current supported
 physics can proceed without 3A. A study needing new coupling waits for that
 specific qualified capability, not every proposed thermodynamics extension.
 
-This plan executes selected studies. Recurring paper discovery is managed
-separately by the [literature scheduler](literature-scheduler.md), outside the
-stage sequence.
+Recurring paper discovery and selection follow the
+[literature workflow](README.md#continuous-literature-discovery-outside-the-stages).
 
 ## First deliverable: select and specify a case
 
