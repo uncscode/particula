@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 626" width="900" height="626" role="img" aria-labelledby="title desc">
+  <title id="title">How sulfur enters potassium sulfate aerosol in the reactor model</title>
+  <desc id="desc">A dry reactor constrains sulfur oxide and radical chemistry. In the humid reactor, potassium hydroxide captures sulfur dioxide to make bisulfite or sulfur trioxide to make bisulfate. Potassium chloride captures sulfur trioxide to make chlorosulfate. Bisulfite oxidation and chlorosulfate hydrolysis both yield bisulfate. A second potassium reactant produces sulfate vapor. Three additional cluster hypotheses compete with neutral salt nucleation and vapor growth. Binary clustering accounts for almost all of the gain in the all-data two-path fit.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#34575a"/></marker>
+    <style>
+      text {font-family:DejaVu Sans,Arial,sans-serif;fill:#213b3e}
+      .head {font-size:21px;font-weight:700}
+      .detail {font-size:16px}
+      .small {font-size:14px}
+      .salt {font-size:23px;font-weight:650}
+      .group {fill:#f6f8f5;stroke:#c8d8d1}
+      .species {fill:#e0efea;stroke:#64978e;stroke-width:1.3}
+      .source {fill:#fff;stroke:#b4c5bd;stroke-width:1.3}
+      .path {fill:none;stroke:#34575a;stroke-width:2;marker-end:url(#arrow)}
+      .reaction {font-size:14px;fill:#315b5a}
+      .candidate {fill:#fffaf1;stroke:#a9774e;stroke-width:1.4;stroke-dasharray:6 3}
+    </style>
+  </defs>
+  <rect width="900" height="626" fill="white"/>
+  <rect x="10" y="10" width="880" height="78" rx="11" fill="#eff3f6" stroke="#c8d4d8"/>
+  <text x="30" y="40" class="head">Dry quartz reactor</text>
+  <text x="248" y="40" class="detail">SO₃ + N₂ ⇌ SO₂ + O + N₂</text>
+  <text x="545" y="40" class="detail">SO₃ + O ⇌ SO₂ + O₂</text>
+  <text x="30" y="67" class="detail">O, OH and HO₂ reactions recycle radicals. The dry outlet measurement is SO₂.</text>
+  <rect x="10" y="100" width="880" height="330" rx="11" class="group"/>
+  <text x="30" y="130" class="head">Humid reactor</text>
+  <text x="215" y="130" class="detail">KCl + H₂O ⇌ KOH + HCl (R10 pair)</text>
+  <text x="30" y="157" class="small">Selected forward reactions. SO₃ can form from the inlet SO₂.</text>
+
+  <g class="source">
+    <rect x="30" y="177" width="145" height="46" rx="7"/><rect x="30" y="262" width="145" height="46" rx="7"/>
+    <rect x="30" y="347" width="145" height="46" rx="7"/>
+  </g>
+  <g class="salt" text-anchor="middle">
+    <text x="102" y="208">KOH + SO₂</text><text x="102" y="293">KOH + SO₃</text><text x="102" y="378">KCl + SO₃</text>
+  </g>
+  <path class="path" d="M175 200H241"/><path class="path" d="M175 285H492"/><path class="path" d="M175 370H241"/>
+  <g class="reaction" text-anchor="middle">
+    <text x="208" y="190">R11</text><text x="340" y="274">R12</text><text x="208" y="360">R13</text>
+  </g>
+  <g class="species">
+    <rect x="245" y="177" width="116" height="46" rx="7"/><rect x="245" y="347" width="116" height="46" rx="7"/>
+    <rect x="496" y="256" width="117" height="58" rx="7"/>
+  </g>
+  <rect x="743" y="256" width="122" height="58" rx="7" fill="#135963"/>
+  <g text-anchor="middle">
+    <text x="303" y="207" class="salt">KHSO₃</text><text x="303" y="378" class="salt">KClSO₃</text>
+    <text x="555" y="282" class="salt">KHSO₄</text><text x="555" y="302" class="small">bisulfate</text>
+    <text x="804" y="282" class="salt" style="fill:white">K₂SO₄</text><text x="804" y="302" class="small" style="fill:white">vapor</text>
+  </g>
+  <path class="path" d="M361 200C425 200 440 244 492 269"/>
+  <path class="path" d="M361 370C420 370 440 326 492 301"/>
+  <path class="path" d="M613 285H739"/>
+  <path class="path" d="M361 380C431 380 438 405 500 405H775Q804 405 804 376V318"/>
+  <g class="reaction">
+    <text x="400" y="197">R17b · + O₂</text>
+    <text x="413" y="374">R20 · + H₂O</text>
+    <text x="677" y="270" text-anchor="middle">R19 · + KCl</text>
+    <text x="677" y="305" text-anchor="middle">R18 · + KOH</text>
+    <text x="607" y="397">R21 · + KOH</text>
+  </g>
+  <rect x="10" y="442" width="880" height="174" rx="11" fill="#fcf6eb" stroke="#ddd0bb"/>
+  <text x="30" y="472" class="head">As the salts cool</text>
+  <text x="252" y="472" class="detail">KCl and K₂SO₄ can nucleate or condense onto particles.</text>
+  <text x="30" y="500" class="small">Three additional first-contact routes tested against this baseline</text>
+  <g class="candidate">
+    <rect x="30" y="514" width="246" height="55" rx="7"/><rect x="293" y="514" width="280" height="55" rx="7"/>
+    <rect x="590" y="514" width="275" height="55" rx="7"/>
+  </g>
+  <g text-anchor="middle">
+    <text x="153" y="536" class="detail" font-weight="bold">Mixed pair</text><text x="153" y="557" class="detail">KCl + K₂SO₄</text>
+    <text x="433" y="536" class="detail" font-weight="bold">Bisulfate-assisted</text><text x="433" y="557" class="detail">KCl + KHSO₄, then K₂SO₄</text>
+    <text x="727" y="536" class="detail" font-weight="bold">Ion-assisted</text><text x="727" y="557" class="detail">ion + K₂SO₄</text>
+  </g>
+  <text x="30" y="597" class="detail">Each cluster can grow or evaporate. Surviving clusters enter the particle population.</text>
+</svg>
