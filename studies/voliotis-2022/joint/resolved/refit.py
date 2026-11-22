@@ -112,7 +112,6 @@ def run():
     first = np.stack([base, joint, shadow])
     initial_small, *_ = measure(first)
     center = first[initial_small.loss.argmin()].copy()
-    history = []
     scales = parameter_steps(center, caps)
     dims = np.flatnonzero(scales > 0)
     rng = np.random.default_rng(321)
@@ -150,16 +149,6 @@ def run():
         winner = int(check.loss.argmin())
         saved = pool[winner].copy()
         center = saved.copy()
-        history.append(
-            dict(
-                iteration=iteration + 1,
-                search_loss=float(scored.loss.min()),
-                paired_candidates=check.loss.tolist(),
-                selected=winner,
-                score=float(check.loss.min()),
-                gradient_norm=float(np.linalg.norm(grad)),
-            )
-        )
         print(
             "round",
             iteration + 1,
@@ -180,7 +169,6 @@ def run():
                 local_AD=shadow.tolist(),
                 selected=saved.tolist(),
                 conditional_AD=info,
-                history=history,
             ),
         )
     return c, data, base, saved

@@ -81,6 +81,7 @@ for cstar, accom in itertools.product((1.0, 10.0, 100.0), (0.03, 0.3)):
     print("Count-conditioned training", cstar, accom, flush=True)
 grid = pd.DataFrame(rows).sort_values("rmse", kind="stable")
 grid.to_csv(OUT / "number_calibration.csv", index=False)
+grid.head(1).to_csv(OUT / "number_selected.csv", index=False)
 best = grid.iloc[0]
 rows = []
 traces = []

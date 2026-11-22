@@ -58,7 +58,6 @@ if __name__ == "__main__":
     coarse = Engine(dt=6)
     rows = []
     hist = []
-    search = []
     native = []
     paths = {}
     for family in FAMILIES:
@@ -83,16 +82,6 @@ if __name__ == "__main__":
             )
             for sec, oa in zip(TIMES, h[i], strict=True):
                 hist.append(dict(family=family, run=r, time_s=sec, soa=oa))
-        for rec in fit["restarts"]:
-            search.append(
-                dict(
-                    family=family,
-                    seed=rec["seed"],
-                    worst_nrmse=rec["objective"],
-                    generations=rec["generations"],
-                    candidates=rec["sampled"],
-                )
-            )
         for file in sorted(
             file
             for device in ("cuda0", "numpy", "cpu")
@@ -181,7 +170,6 @@ if __name__ == "__main__":
     )
     pd.DataFrame(rows).to_csv(RESULT / "scores.csv", index=False)
     pd.DataFrame(hist).to_csv(RESULT / "trajectories.csv", index=False)
-    pd.DataFrame(search).to_csv(RESULT / "restarts.csv", index=False)
     pd.DataFrame(native).to_csv(RESULT / "native_checks.csv", index=False)
     plt.rcParams.update(
         {

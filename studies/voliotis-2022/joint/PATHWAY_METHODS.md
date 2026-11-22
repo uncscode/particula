@@ -31,7 +31,7 @@ Across 256 independent reservoir tests the maximum discrepancy from a matrix exp
 
 ## Reproduce the experiments
 
-From the study worktree root, using the local Particula environment and a CUDA device, run the following. The figure reads the saved numerical results.
+For a fresh fit, first run the [wall-loss calibrations](WALL_LOSS.md) to generate the starting vectors. From the study worktree root, using the local Particula environment and a CUDA device, run the following. The figure reads the saved numerical results.
 
 ```bash
 export PYTHONPATH="$PWD"

@@ -43,23 +43,7 @@ R=studies/voliotis-2022/joint/results/discovery
 "$PY" "$J/replay.py" "$R/mechanism.json"
 "$PY" "$J/replay.py" "$R/best_seen_mechanism.json"
 "$PY" "$J/checks.py"
-```
-
-To repeat the selection from the saved literature decisions, specify an empty output directory for the fit checkpoints. The driver checks that each archived decision belongs to the exact newly proposed equation. With a new evidence source, each proposal awaits its own matching decision before the next round. The order among numerically tied candidates can vary across hardware or numerical libraries. Archived per-round states can also be re-evaluated directly with `audit.py`.
-
-```bash
-"$PY" "$J/fit.py" --output /tmp/voliotis-reaction-rebuild --evidence-source "$R"
-```
-
-For the full retrospective assessment of the archived rounds, run the commands below in order. The random seeds are embedded in the search scripts. The reference environment uses Python 3.12, Particula 0.3.3 and Warp 1.11.1 on a GeForce RTX 5060. [Numerical controls](../results/discovery/numerical_checks.json)
-
-```bash
-"$PY" "$J/paired.py"
-"$PY" "$J/finish.py" --polish-only
-"$PY" "$J/continuous.py"
-"$PY" "$J/prefixes.py"
-"$PY" "$J/finish.py" --refined
-"$PY" "$J/audit.py"
-"$PY" "$J/alternatives.py"
 "$PY" "$J/summarize.py"
 ```
+
+The exported mechanisms can be replayed independently of the search. The [evidence table](../results/discovery/REACTION_EVIDENCE.md) records the literature analogue and limits for each selected equation. The [paired scores](../results/discovery/rounds.csv) give the numerical comparisons. A fresh search with `fit.py` writes local proposals and waits for a matching literature decision at each round. Continuing the historical search at an intermediate round requires its original checkpoint.

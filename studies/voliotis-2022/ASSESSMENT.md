@@ -43,7 +43,7 @@ Both columns reselect the bounded dose in each experiment. Several relatively lo
 
 ## Reproduce the uncertainty analysis
 
-From the study worktree root with the Particula environment and a CUDA device, run the following commands. The first reconstructs the conditional fit vectors from the archived starting fits. The ensemble scripts include the criteria used for the tables. The figure uses the saved results.
+From the study worktree root with the Particula environment and a CUDA device, run the following commands. To rerun the optimization, first regenerate the wall-fit starting vectors using the [wall-loss commands](joint/WALL_LOSS.md). The first command below then reconstructs the conditional fits. The ensemble scripts include the criteria used for the tables. The figure uses the saved results.
 
 ```bash
 export PYTHONPATH="$PWD"

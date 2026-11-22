@@ -1,0 +1,2 @@
+fraction,vapor_wall_h,particle_wall_h,lag_min,wall_share,cstar,accommodation,seed_access,carbon_rel,mass_rel,forcing_fraction_abs,rmse,mae,bias,obs_peak,model_peak,model_peak_h,obs_peak_h,n
+0.2,4.5,0.0,5.0,1.0,1.0,0.3,1.0,5.329070518200751e-15,4.6629367034256575e-15,1.0935696792557792e-14,4.9679453786778565,4.324025688190915,1.2171017679750893,68.47,71.58469300845768,3.5,3.18,84

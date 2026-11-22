@@ -53,9 +53,14 @@ def main():
                     round(p[12], 2),
                     flush=True,
                 )
-            (OUT / "wider_bounds.json").write_text(
-                json.dumps(rows, indent=2) + "\n"
-            )
+    best = {}
+    for row in rows:
+        key = (row["upper_bound"], row["objective"])
+        if key not in best or row["score"] < best[key]["score"]:
+            best[key] = row
+    (OUT / "wider_bounds.json").write_text(
+        json.dumps(list(best.values()), indent=2) + "\n"
+    )
 
 
 if __name__ == "__main__":

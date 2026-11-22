@@ -284,7 +284,6 @@ def fit(family, coarse, fine, score):
         family=family,
         coordinates_names=NAMES,
         active=[NAMES[j] for j in active],
-        restarts=records,
         seconds=time.monotonic() - start,
         dt_s=fine.dt,
         coarse_dt_s=coarse.dt,

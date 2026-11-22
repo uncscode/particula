@@ -1,5 +1,6 @@
 """Build the twenty-round audit table, literature crosswalk and study figure."""
 
+import argparse
 import json
 from pathlib import Path
 
@@ -10,7 +11,7 @@ import pandas as pd
 OUT = Path(__file__).resolve().parents[1] / "results/discovery"
 
 
-def main():
+def summarize_search():
     """Publish fit chronology, molecular analogues and per-run comparison."""
     records = [
         json.loads(f.read_text()) for f in sorted(OUT.glob("round_*.json"))
@@ -85,6 +86,11 @@ def main():
         "identities, rates or conditions the cited paper "
         "establishes.\n\n" + "\n\n".join(paragraphs) + "\n"
     )
+
+
+def plot():
+    """Draw the comparison from the published scores."""
+    table = pd.read_csv(OUT / "rounds.csv")
     fig, (ax, bx) = plt.subplots(1, 2, figsize=(11, 4.3), layout="constrained")
     base = json.loads((OUT / "baseline.json").read_text())
     score = pd.read_csv(OUT / "final_scores.csv")
@@ -158,4 +164,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--from-checkpoints", action="store_true")
+    if parser.parse_args().from_checkpoints:
+        summarize_search()
+    plot()

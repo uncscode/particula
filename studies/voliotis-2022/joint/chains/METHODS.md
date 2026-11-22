@@ -26,7 +26,7 @@ The motif order was specified before inspecting the 40 scores. Candidate rates a
 
 Each added motif competes against a refit of the immediately preceding network from the same incumbent. A parallel control spends all 40 rounds optimizing only the original 20 reactions. The previous solution and both controls remain eligible at every round. The two-step fit gives null and expanded models the same number of local tangent refinements, with extra kinetic starts for the added channels. This is an ordered, bounded search among explicit mechanisms. The result depends on topology, initial conditions and optimizer effort. [Search implementation](search.py) · [All 40 paired outcomes](../results/chains/rounds.csv)
 
-After selection we independently optimize four networks: the original 20; those 20 plus the α-pinene dimer candidates; the union of steps from the literature-family-supported motifs; and all candidates. We project retained round fits into each network and profile each starting point. Two bounded SLSQP starts then vary shared chemistry, 15 continuous doses, and the minimax error bound, for up to 45 iterations per start. Because several starts reached their iteration cap, we gave each network and objective one further 60-iteration start, including the improved narrower solutions when they were nested. We retain both optimizer checkpoints. [Initial two starts](../results/chains/comparisons.json) · [Further matched optimization](../results/chains/continued.json)
+After selection we independently optimize four networks: the original 20; those 20 plus the α-pinene dimer candidates; the union of steps from the literature-family-supported motifs; and all candidates. We project retained round fits into each network and profile each starting point. Two bounded SLSQP starts then vary shared chemistry, 15 continuous doses, and the minimax error bound, for up to 45 iterations per start. Because several starts reached their iteration cap, we gave each network and objective one further 60-iteration start, including the improved narrower solutions when they were nested. The [final parameters for the four matched comparisons](../results/chains/continued.json) are available for both objectives.
 
 The final comparisons again profile the same 61-point dose grid from 0.85 to 1.15. Broader networks can retain a narrower network as an exact zero-rate control. Time-step sensitivity was checked at 15, 7.5, 3.75 and 1.875 s; forward and reversed chemical process order were compared at 15, 3.75 and 1.875 s. Rates remained fixed. Omission and branching perturbations freeze chemical rates. The branching and order tests reprofile doses. Single-family omissions, dimer perturbations and the two-rate interchange hold doses fixed. These diagnostics measure sensitivity around the fitted solutions. [Optimization controls](compare.py) · [Branching and step sensitivity](../results/chains/sensitivity.csv) · [Dimer perturbations](../results/chains/counterfactuals.csv)
 
@@ -42,12 +42,12 @@ From the study worktree root, set the source checkout on the Python import path 
 export PYTHONPATH="$PWD" OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MPLBACKEND=Agg
 PY=/home/kyle/Code/particula/.venv/bin/python
 J=studies/voliotis-2022/joint/chains
-"$PY" "$J/replay_chain.py"
+"$PY" "$J/replay_chain.py" "$J/../results/chains/resolution_checked_mechanism.json"
 ```
 
 For the full calculation, run the following sequence. The motif profiles hold the entering chemistry and doses fixed and set all steps in a proposed motif to the same nonzero rate, providing a direct check of the response to each individual proposal. [Rate probes for all 40 motifs](../results/chains/motif_profiles.csv)
 
-The search resumes completed iteration files in the output directory. To rebuild all 40 from scratch, use a fresh working copy without the archived iteration files in its results/chains directory.
+A fresh checkout starts at the first motif. The search saves local checkpoints in `results/chains` and resumes from them if interrupted.
 
 ```bash
 "$PY" "$J/chain_checks.py"

@@ -9,7 +9,7 @@ from study import FORCING, OUT, case_from, replay, settings
 
 number = pd.read_csv(OUT / "number_check.csv")
 curves = {run: (g.time_s, g.conditioned) for run, g in number.groupby("run")}
-count_fit = pd.read_csv(OUT / "number_calibration.csv").iloc[0]
+count_fit = pd.read_csv(OUT / "number_selected.csv").iloc[0]
 envelope = pd.read_csv(OUT / "run5_fit_envelope.csv").sort_values("model_peak")
 out = []
 for label, row, number_forcing in [
