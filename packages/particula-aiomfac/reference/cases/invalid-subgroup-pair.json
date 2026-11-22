@@ -1,0 +1,14 @@
+{
+  "components": [
+    "water",
+    "unpaired_CH2OH"
+  ],
+  "fractions": [
+    0.8,
+    0.2
+  ],
+  "temperature_K": 298.15,
+  "basis": "mass",
+  "source": "Particula reference suite",
+  "expected_status": "upstream_error_13"
+}

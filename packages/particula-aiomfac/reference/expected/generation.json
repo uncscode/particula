@@ -1,0 +1,27 @@
+{
+  "case_hashes": {
+    "carbonate-implicit.json": "546ee557d759e12689ebf01f65d8e0f0b0b2653f58e6cd3b9363d55b5ddd7afe",
+    "carbonate-rich.json": "7c5cfc4ce5bc41e852dc2ebcd7aa622c0fd956ce52e64ad45f46e9ad49557480",
+    "carbonate.json": "f1c54d62420a2ecc60374611fcd0aa890dbb75e5c8345984ffaa4f286a482976",
+    "components.json": "53ad6dc9982deda1235204ee12122636ef9683a007846a5a6e93065ac4cb89a2",
+    "invalid-subgroup-pair.json": "c624cd1b460dca7848fbecc8912d29c410599ff2b02c5615499400b6513bfe8f",
+    "mixed-reordered.json": "536e824f906ce9582f96fec9f07bbbf34c74b99e007dcdbd33ffd90c97a62eb9",
+    "mixed.json": "5a4289eab3fb7145a67aed898f5f0ba59438dfa46443201b08ea702ffd174c37",
+    "nacl-cold.json": "14f1e0d1af70ab06117b531a250f6c37d08404636d015deee3bda55ed9254b16",
+    "nacl-dilute.json": "6e1df42409b23a3b0da700e0c9bc7ebd61336be5043d971f5df1b41cc1dd2ba8",
+    "nacl.json": "04e3185d480585004a03778daaf3c1978a702b725561a8f8d5a7d6408743171a",
+    "negative-input.json": "8f57ffe5af43db70a70e6df0d2a035e0316fc0bc2f14b232be3c340c09416277",
+    "neutral.json": "9181d9594b12d1367f110c3c0c294cf063d6296fa56f9276b8554c92942d3bb1",
+    "shared-ion.json": "dc23bfab3a31adb22fa40761c7fbfd237f02ae92ba5f50981e6b73a399636d87",
+    "sulfate.json": "b9a8a66f4d1d148b3d14ded2cb8b7cf1cf81a6b5648529e655e0394ad9eec709",
+    "water-limit.json": "4d133512ff8bd33050eab568c285003fa1577d8f75a4faa49049e93ed13fdaaf"
+  },
+  "compiler": "GNU Fortran (GCC) 16.2.1 20260810",
+  "flags": "-c -O2 -fcheck=bounds -ffree-line-length-none -fwrapv",
+  "generator_sha256": "d719b1225722d4a42ed1d7d7a312060602d32dd4a87aded17aeff2d7c2630f56",
+  "parameter_manifest_sha256": "f2dfd5c9b01fc535f849ec2957397d1a578e1667ab84e957511207c62a73d3c6",
+  "reader_sha256": "fbf591b5b1ee7d4a05958e0cc57bacdccaa7a44caf549731f1fc26dfd0f2361f",
+  "revision": "24041a1b0db090de1285008814a5285b4b9b746b",
+  "source_manifest_sha256": "db0c490c78b264df1381b5d3144426f2494c2208236c1db2590bb0b3d474d9b7",
+  "working_precision": "selected_real_kind(15)"
+}

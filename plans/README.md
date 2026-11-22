@@ -44,7 +44,7 @@ capture for resolved chemistry. [PR #1687](https://github.com/uncscode/particula
 - **Thermodynamics and observations.** Homogeneous binary BAT activity is
   available in kinetic condensation on CPU and CUDA. The citric-acid study
   compares water activity with measurements and a separate AIOMFAC-web
-  calculation. Kinetic phase separation and a native AIOMFAC activity model
+  calculation. Kinetic phase separation and a [native AIOMFAC activity model](aiomfac-activity-package.md)
   remain follow-ons. Viscosity is deferred. [BAT qualification](../docs/studies/validation/material-properties/binary-bat.md)
   · [Citric-acid comparison](../docs/studies/literature/particle-water-uptake/citric-acid/index.md)
 - **GPU workloads.** Stage 4 measured direct-BAT CPU and tabulated-BAT CUDA
