@@ -163,15 +163,24 @@ def critical_k(k, ss, kelvin):
 
 
 def _match_fraction(film, growth, diameter, rh, active):
+    water_per_dry_volume = (growth**3 - 1) * film.water_density / film.solid
+    minimum = water_per_dry_volume / film.bounds[1]
+    maximum = min(1.0, water_per_dry_volume / film.bounds[0])
+    if minimum > maximum or minimum <= 0:
+        return None
+
     def residual(fraction):
-        ratio = (growth**3 - 1) * film.water_density / (film.solid * fraction)
+        ratio = np.clip(water_per_dry_volume / fraction, *film.bounds)
         return film.saturation(ratio, diameter, fraction, active) - np.log(rh)
 
-    grid = np.linspace(0.12, 1.0, 65)
+    grid = np.linspace(minimum, maximum, 65)
     error = residual(grid)
-    brackets = np.flatnonzero(error[:-1] * error[1:] <= 0)
-    if len(brackets) != 1:
+    exact = grid[error == 0]
+    brackets = np.flatnonzero(error[:-1] * error[1:] < 0)
+    if len(exact) + len(brackets) != 1:
         return None
+    if len(exact):
+        return exact[0]
     i = brackets[0]
     return brentq(residual, grid[i], grid[i + 1])
 
