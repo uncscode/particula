@@ -1,0 +1,86 @@
+row,dataset,case,target,temperature_K,measured,tolerance,in_fit,family
+0,gas,O2_2.6,SO2_ppm,1098,501.0,15.03,True,-1
+1,gas,O2_2.6,SO2_ppm,1123,500.0,15.0,True,-1
+2,gas,O2_2.6,SO2_ppm,1148,501.0,15.03,True,-1
+3,gas,O2_2.6,SO2_ppm,1173,504.0,15.12,True,-1
+4,gas,O2_2.6,SO2_ppm,1198,510.0,15.299999999999999,True,-1
+5,gas,O2_2.6,SO2_ppm,1223,527.0,15.809999999999999,True,-1
+6,gas,O2_2.6,SO2_ppm,1248,578.0,17.34,True,-1
+7,gas,O2_2.6,SO2_ppm,1273,633.0,18.99,True,-1
+8,gas,O2_2.6,SO2_ppm,1298,706.0,21.18,True,-1
+9,gas,O2_2.6,SO2_ppm,1323,778.0,23.34,True,-1
+10,gas,O2_2.6,SO2_ppm,1348,831.0,24.93,True,-1
+11,gas,O2_2.6,SO2_ppm,1373,854.0,25.619999999999997,True,-1
+12,gas,O2_4.7,SO2_ppm,1123,540.0,16.2,False,-1
+13,gas,O2_4.7,SO2_ppm,1148,551.0,16.53,False,-1
+14,gas,O2_4.7,SO2_ppm,1173,568.0,17.04,False,-1
+15,gas,O2_4.7,SO2_ppm,1198,580.0,17.4,False,-1
+16,gas,O2_4.7,SO2_ppm,1223,605.0,18.15,False,-1
+17,gas,O2_4.7,SO2_ppm,1248,623.0,18.689999999999998,False,-1
+18,gas,O2_4.7,SO2_ppm,1273,641.0,19.23,False,-1
+19,gas,O2_4.7,SO2_ppm,1298,694.0,20.82,False,-1
+20,gas,O2_4.7,SO2_ppm,1323,765.0,22.95,False,-1
+21,gas,O2_4.7,SO2_ppm,1348,833.0,24.99,False,-1
+22,gas,O2_4.7,SO2_ppm,1373,851.0,25.529999999999998,False,-1
+23,gas,O2_4.6,SO2_ppm,1073,541.0,16.23,True,-1
+24,gas,O2_4.6,SO2_ppm,1098,541.0,16.23,True,-1
+25,gas,O2_4.6,SO2_ppm,1123,545.0,16.349999999999998,True,-1
+26,gas,O2_4.6,SO2_ppm,1148,550.0,16.5,True,-1
+27,gas,O2_4.6,SO2_ppm,1173,548.0,16.439999999999998,True,-1
+28,gas,O2_4.6,SO2_ppm,1198,561.0,16.83,True,-1
+29,gas,O2_4.6,SO2_ppm,1223,572.0,17.16,True,-1
+30,gas,O2_4.6,SO2_ppm,1248,595.0,17.849999999999998,True,-1
+31,gas,O2_4.6,SO2_ppm,1273,651.0,19.529999999999998,True,-1
+32,gas,O2_4.6,SO2_ppm,1298,718.0,21.54,True,-1
+33,gas,O2_4.6,SO2_ppm,1323,800.0,24.0,True,-1
+34,gas,O2_4.6,SO2_ppm,1348,831.0,24.93,True,-1
+35,gas,O2_4.6,SO2_ppm,1373,877.0,26.31,True,-1
+36,aerosol,Reference,count,,14.7,1.9,True,0
+37,aerosol,Reference,number_gmd,,203.0,30.45,True,1
+38,aerosol,Reference,lpi_mass,,234.0,46.800000000000004,True,2
+39,aerosol,Reference,smps_mass,,278.0,55.6,True,3
+40,aerosol,Reference,lpi_mass_gmd,,393.0,58.949999999999996,True,4
+41,aerosol,Reference,smps_mass_gmd,,309.0,46.35,True,5
+42,aerosol,No SO2,count,,3.0,0.48,True,0
+43,aerosol,No SO2,number_gmd,,155.0,23.25,True,1
+44,aerosol,No SO2,lpi_mass,,209.0,41.800000000000004,True,2
+45,aerosol,No SO2,smps_mass,,142.0,28.400000000000002,True,3
+46,aerosol,No SO2,lpi_mass_gmd,,456.0,68.39999999999999,True,4
+47,aerosol,No SO2,smps_mass_gmd,,427.0,64.05,True,5
+48,aerosol,High SO2,count,,29.2,4.8,True,0
+49,aerosol,High SO2,number_gmd,,145.0,21.75,True,1
+50,aerosol,High SO2,lpi_mass,,196.0,39.2,True,2
+51,aerosol,High SO2,smps_mass,,283.0,56.6,True,3
+52,aerosol,High SO2,lpi_mass_gmd,,305.0,45.75,True,4
+53,aerosol,High SO2,smps_mass_gmd,,243.0,36.449999999999996,True,5
+54,aerosol,High SO2,sulfate_pct,,35.0,5.0,True,6
+55,aerosol,Low O2,count,,2.8,0.63,True,0
+56,aerosol,Low O2,number_gmd,,290.0,43.5,True,1
+57,aerosol,Low O2,lpi_mass,,176.0,35.2,True,2
+58,aerosol,Low O2,smps_mass,,132.0,26.400000000000002,True,3
+59,aerosol,Low O2,lpi_mass_gmd,,321.0,48.15,True,4
+60,aerosol,Low O2,smps_mass_gmd,,412.0,61.8,True,5
+61,aerosol,High O2,count,,32.1,1.7,False,0
+62,aerosol,High O2,number_gmd,,140.0,21.0,False,1
+63,aerosol,High O2,lpi_mass,,221.0,44.2,False,2
+64,aerosol,High O2,smps_mass,,184.0,36.800000000000004,False,3
+65,aerosol,High O2,lpi_mass_gmd,,341.0,51.15,False,4
+66,aerosol,High O2,smps_mass_gmd,,216.0,32.4,False,5
+67,aerosol,High KCl,count,,18.3,4.1,False,0
+68,aerosol,High KCl,number_gmd,,249.0,37.35,False,1
+69,aerosol,High KCl,lpi_mass,,275.0,55.0,False,2
+70,aerosol,High KCl,smps_mass,,501.0,100.2,False,3
+71,aerosol,High KCl,lpi_mass_gmd,,319.0,47.85,False,4
+72,aerosol,High KCl,smps_mass_gmd,,363.0,54.449999999999996,False,5
+73,Fig14,KCl 104 ppm,count,,38.4,7.68,True,0
+74,Fig14,KCl 104 ppm,smps_mass,,239.0,47.800000000000004,True,3
+75,Fig14,KCl 156 ppm,count,,35.0,7.0,False,0
+76,Fig14,KCl 156 ppm,smps_mass,,294.0,58.800000000000004,False,3
+77,Fig14,KCl 208 ppm,count,,23.8,4.760000000000001,True,0
+78,Fig14,KCl 208 ppm,smps_mass,,374.0,74.8,True,3
+79,Fig14,KCl 260 ppm,count,,19.0,3.8000000000000003,False,0
+80,Fig14,KCl 260 ppm,smps_mass,,394.0,78.80000000000001,False,3
+81,Fig14,KCl 312 ppm,count,,17.1,3.4200000000000004,True,0
+82,Fig14,KCl 312 ppm,smps_mass,,399.0,79.80000000000001,True,3
+83,Fig14,KCl 364 ppm,count,,11.8,2.3600000000000003,False,0
+84,Fig14,KCl 364 ppm,smps_mass,,401.0,80.2,False,3

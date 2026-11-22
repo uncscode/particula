@@ -1,0 +1,79 @@
+vector,index,label,source_url,sourced_form,tested_low,tested_high
+x,0,log gas rate at 1100 K,,,,
+x,1,gas activation energy adjustment (kJ/mol),,,,
+x,2,log wet sulfation rate,,,,
+x,3,log wall transport rate,,,,
+x,4,KCl curvature coefficient,,,,
+x,5,sulfate curvature coefficient,,,,
+x,6,wet oxygen order,,,,
+x,7,geometric standard deviation,,,,
+x,8,chloride/sulfate mode diameter ratio,,,,
+x,9,Bisulfite oxidation by oxygen,https://doi.org/10.1016/j.fuel.2024.130974,Multiply the R17/R17b pair by exp(a) at fixed equilibrium constant. The steady-state KHSO3 pool and its oxidation flux both respond.,-2,2
+x,10,KCl hydrolysis and reverse chlorination,https://doi.org/10.1016/j.fuel.2024.130974,"Multiply both directions of R10 by exp(a), holding Kp fixed. The 1.7e8 m3 mol−1 s−1 chlorination rate enters the oxidative-drain term k17b O2/k10 in the steady-state hydrolysis balance.",-2,2
+x,11,KOH + SO₂ association falloff,https://doi.org/10.1016/j.fuel.2024.130974,Use k0*[M] = exp(a)*2.6e30*T^(−7.6)*[M] in m3 mol−1 s−1; k11=(k0[M])/(1+k0[M]/1e8). Recalculate the reverse dissociation by detailed balance.,-2,2
+x,12,Bisulfite intermediate stability,https://doi.org/10.1016/j.fuel.2024.130974,Decrease Hf(KHSO3) by a*5 kJ mol−1. Multiply R11 association Kp by exp(+5000a/RT) and R17b oxidation Kp by its reciprocal. Recalculate R11 reverse and R17b forward fluxes.,-2,2
+x,13,HCl-dependent suppression of hydrolysis,https://doi.org/10.1016/j.fuel.2024.130974,Add 7.5a ppm of persistent background HCl to R10 hydrolysis mass action. This spans 0 to 15 ppm over the search interval.,0,2
+x,14,Reversible SO₂/SO₃ oxidation kinetics,https://doi.org/10.1021/jp0557215,Multiply both by exp[1000a(1/1273−1/T)]. The Arrhenius slope shifts by 1000a K while preserving the 1273 K rate; in the 1100 K pivot parameters add 1000a(1/1273−1/1100) to log frequency and 8.31446261815324a kJ/mol to apparent Ea.,-2,2
+x,15,KCl + SO₃ chlorosulfate association,https://doi.org/10.1016/j.fuel.2024.130974,"Geometrically interpolate h0 to k13[KCl] with weight a/2. k13=(k0[M])/(1+k0[M]/kinf), k0=1.9e29 T^(−7.8) m6 mol−2 s−1 and kinf=1e8 m3 mol−1 s−1.",0,2
+x,16,KOH + SO₃ bisulfate association,https://doi.org/10.1016/j.fuel.2024.130974,"Add (a/2) k12 [KOH] to SO3 removal, with KOH from wet pseudo-steady state. Use low-pressure k0=2.6e30 T^(−7.6) m6 mol−2 s−1, kinf=1e8 m3 mol−1 s−1, and Lindemann interpolation.",0,2
+x,17,Finite terminal bisulfate capture,https://doi.org/10.1016/j.fuel.2024.130974,Use h/(1+a*h/(k19[KCl]+k18[KOH])). Table 2 k19=3e7 and k18=1e8 m3 mol−1 s−1. This adds a concentration-dependent terminal waiting time.,0,2
+x,18,Monomeric KCl availability,https://janaf.nist.gov/tables/Cl-091.html,"Use c_reactive=c_total f_m^(a/2), with f_m=2/(1+sqrt(1+8 Kp p_total/1 bar)) from 2 KCl ⇌ (KCl)2. JANAF gives log10 Kp = log10 Kf(dimer)−2log10 Kf(monomer); interpolate the tabulation against 1/T.",0,2
+x,19,Sulfation of airborne solid KCl by SO₂,https://doi.org/10.1021/ef400405z,"Sengeløv initial shrinking-core rate times 53.2 µm/r, evaluated with the current effective radius of airborne chloride, times accessible fraction a.",0.0,1.0
+x,20,Sulfation of deposited KCl by SO₂,https://doi.org/10.1021/ef400405z,Apply the Sengeløv SO₂/O₂ rate to an exposed equivalent 53.2 µm chloride deposit grain; a varies accessible fraction.,0.0,1.0
+x,21,Chloride coating of sulfate surfaces,https://doi.org/10.1080/02786820050195340,Suppressed foreign-area fraction decays as a/S on supersaturated KCl. Pure chloride surfaces retain their original rates.,0.0,1.0
+x,22,Interfacial salt uptake,https://doi.org/10.1029/2004JD005458,"Set common mass accommodation alpha=10^(−a), adding surface resistance to the original transition-regime uptake of each salt. The large-Knudsen limit falls in proportion to alpha.",0.0,1.0
+x,23,Curvature-limited KCl growth,https://doi.org/10.1080/02786820050195340,Interpolate planar and curved positive-only growth fluxes. Monomer saturation multiplies by exp(2σv/rkT); dimer saturation carries its square at fixed association equilibrium.,0.0,1.0
+x,24,Curvature-limited K₂SO₄ growth,https://backend.orbit.dtu.dk/ws/files/4716854/JZ-Thesis%2009-07-07%20-%20final.pdf,Interpolate planar and Kelvin-corrected positive-only sulfate flux. Use 2σv/rkT with the study bulk sulfate volume (2660 kg/m³) and Appendix D surface energy.,0.0,1.0
+x,25,Dimer participation in KCl cluster formation,https://doi.org/10.1080/02786820050195340,"Only the dimer contribution to the critical cluster impingement flux loses fraction a. The collision term becomes p_m+√2(1−a)p_d, with the same equilibrium speciation, saddle and critical mass.",0.0,1.0
+x,26,Wall-catalyzed SO₂ oxidation,https://doi.org/10.1016/j.ces.2007.05.016,"Activate above 873 K. Bound the reversible relaxation by 4·3.66·D/d² for 25 mm diameter, with D=1.2×10⁻⁵(T/298.15)^1.75 m²/s. Fit the dimensionless effective utilization a.",0.0,1.0
+x,27,Secondary condensed-phase sulfation,https://doi.org/10.1021/ef400405z,Reduce the impingement ceiling by diffusive resistance and by the chloride volume fraction as a proxy for exposed surface. Fit effective SO₃ capture probability a between zero and one.,0.0,1.0
+x,28,Heat removal in sulfate cluster formation,https://doi.org/10.1103/PhysRevLett.101.125703,"Interpolate the original sulfate birth and the Feder factor b²/(b²+q²) at local vapor fraction, temperature, and supersaturation; nitrogen thermalizes clusters. Derive latent heat from Appendix D saturation pressure.",0.0,1.0
+x,29,SO3 thermal dissociation,https://doi.org/10.1021/jp0557215,2^a multiplies k1b=5.7e11 exp(-40000/T)[N2] s^-1 and its detailed-balance reverse.,-1,1
+x,30,Atomic oxygen abstraction by SO3,https://doi.org/10.1021/jp0557215,3^a multiplies 7.8e5 exp(-3065/T) m3 mol^-1 s^-1 for SO3+O ⇌ SO2+O2 with the same equilibrium.,-1,1
+x,31,Competing SO3 + O abstraction barrier,https://doi.org/10.1021/jp067499p,Geometric interpolation from the 2006 flame-inferred R2 to Hindiyarti k=.028 T^2.57 exp[-122300/(RT)] m3 mol^-1 s^-1; reverse from equilibrium.,0,1
+x,32,Falloff of oxygen atom association,https://doi.org/10.1021/jp0557215,"Geometric interpolation to the Yilmaz RRKM N2 Troe association times Kc,diss; k_inf=3.7e5 exp(-850/T), k0=2.9e15 T^-3.58 exp(-2620/T), Fcent=.57 exp(-T/371)+.43 exp(-T/7442), SI mol/m3.",0,1
+x,33,Gas-phase recombination of oxygen atoms,https://raw.githubusercontent.com/Cantera/cantera/main/data/gri30.yaml,2^a scales k3=1.2e5/T m6 mol^-2 s^-1; [M]_eff=[total]+14.4[H2O]; reverse from Kc for 2O ⇌ O2.,-1,1
+x,34,OH pair formation from water and O,https://raw.githubusercontent.com/Cantera/cantera/main/data/gri30.yaml,"2^a multiplies 2OH ⇌ O+H2O, k=.0357 T^2.4 exp[2110 cal mol^-1/(RT)] in SI after conversion of cal to J; reverse by Kc.",-1,1
+x,35,Measured-range trace water in dry feed,https://doi.org/10.1021/jp0557215,"Set water to 100+60a-10a^2 ppm (30–150 ppm, 100 ppm at zero); displace N2 and conserve elemental H throughout.",-1,1
+x,36,SO3 abstraction by OH,https://doi.org/10.1021/jp067499p,3^a multiplies .048 T^2.46 exp[-114100/(RT)] m3 mol^-1 s^-1; reverse from thermochemistry.,-1,1
+x,37,HO2 recycling via atomic oxygen,https://raw.githubusercontent.com/Cantera/cantera/main/data/gri30.yaml,"2^a multiplies k=2e7 m3 mol^-1 s^-1, with its thermodynamic reverse.",-1,1
+x,38,Mixed OH and HO2 radical termination,https://raw.githubusercontent.com/Cantera/cantera/main/data/gri30.yaml,"2^a scales the sum of both duplicate GRI terms, 1.45e7 exp[500 cal/(RT)] + 5e9 exp[-17330 cal/(RT)] m3 mol^-1 s^-1, reverse by Kc.",-1,1
+x,39,Quartz-assisted oxygen atom recombination,https://doi.org/10.1021/jp0557215,First order 20a(T/1273)^1.75 s^-1 with return of 1/2 O2. The temperature dependence represents diffusive delivery to a reactive wall.,0,1
+x,40,Prior effective reversible SO2 and SO3 exchange,https://backend.orbit.dtu.dk/ws/files/4716854/JZ-Thesis%2009-07-07%20-%20final.pdf,a times the previously calibrated reversible SO2 oxidation law in parallel with explicit pathways; freeze the original training-only gas fit at log pivot=-5.1253641490 and delta Ea=114.45626480 kJ/mol (Ea total 177.45626480).,0,1
+x,41,Delayed bisulfite oxidation,https://doi.org/10.1016/j.fuel.2024.130974,"Use the same diversion, with R17b KHSO₃ + O₂ → KHSO₄ + O set by R17 and thermochemical reversal.",0,1
+x,42,Chlorosulfate intermediate on the SO₃ branch,https://doi.org/10.1016/j.fuel.2024.130974,R13 adduct formation draws one KCl and one SO₃. Its R20 hydrolysis frequency uses 5% water and the Table 2 estimated rate.,0,1
+x,43,Explicit KOH and chlorine exchange,https://doi.org/10.1016/j.fuel.2024.130974,Relax the actual KCl + H₂O ⇌ KOH + HCl pair toward the common chlorine balance using R10 kinetics and the 1-bar Table 1 equilibrium ratio.,0,1
+x,44,KOH competition for sulfur dioxide,https://doi.org/10.1016/j.fuel.2024.130974,R11 Lindemann KOH + SO₂ (+M) association uses measured/inferred bath molarity and Chanpirak low/high-pressure limits.,0,1
+x,45,KOH capture of sulfur trioxide,https://doi.org/10.1016/j.fuel.2024.130974,R12 Lindemann KOH + SO₃ (+M) → KHSO₄ competes with R11 for KOH and with the KCl capture pathway for SO₃.,0,1
+x,46,Bisulfite redissociation and SO₂ return,https://doi.org/10.1016/j.fuel.2024.130974,R11b breakup calculated from R11 falloff and the equilibrium constant. KHSO₃ can break up or transform via R17b.,0,1
+x,47,Chlorosulfate redissociation and SO₃ return,https://doi.org/10.1016/j.fuel.2024.130974,Reverse R13 calculated from its pressure-dependent association and equilibrium constant. Breakup competes with R20 and R21.,0,1
+x,48,Bisulfate redissociation and SO₃ return,https://doi.org/10.1016/j.fuel.2024.130974,"Reverse R12 via forward falloff and Table 1 thermochemistry. R12b, terminal capture and reduction share one KHSO₄ inventory.",0,1
+x,49,Bisulfate reservoir before chloride capture,https://doi.org/10.1016/j.fuel.2024.130974,The same KHSO₄ routing uses estimated R19 KHSO₄ + KCl capture at 3×10⁷ m³/mol/s.,0,1
+x,50,KOH competes with KCl for bisulfate,https://doi.org/10.1016/j.fuel.2024.130974,R18 consumes explicit KOH at the Chanpirak estimated rate and returns K₂SO₄ + H₂O. Competes with R19 for bisulfate.,0,1
+x,51,Hydroxide attack on chlorosulfate,https://doi.org/10.1016/j.fuel.2024.130974,"R21 competes with R20 hydrolysis for KClSO₃ and consumes actual KOH, forming sulfate + HCl.",0,1
+x,52,HCl recombination on bisulfate,https://doi.org/10.1016/j.fuel.2024.130974,R20b KHSO₄ + HCl ⇌ KClSO₃ + H₂O uses the forward hydrolysis coefficient divided by the thermochemical equilibrium ratio.,0,1
+x,53,Terminal R19 reversal by endogenous HCl,https://doi.org/10.1016/j.fuel.2024.130974,R19b gas K₂SO₄ + HCl → KHSO₄ + KCl uses thermodynamic reversal of the published estimated R19.,0,1
+x,54,Terminal R18 reversal by water,https://doi.org/10.1016/j.fuel.2024.130974,R18b uses the original 5% wet bath and forward R18 divided by Kp. Gas-phase sulfate alone reacts.,0,1
+x,55,Atomic oxygen reduction of bisulfate,https://doi.org/10.1016/j.fuel.2024.130974,R17 KHSO₄ + O → KHSO₃ + O₂ uses Table 2 rate and an imposed O mole fraction from 0 to 10⁻⁹.,0,1
+x,56,OH oxidation of bisulfite,https://doi.org/10.1016/j.fuel.2024.130974,"Rescale reverse R16 KHSO₃ + OH → KHSO₄ + H by 0–1 ppb imposed OH, using R16 and Kp.",0,1
+x,57,Atomic hydrogen reduction of bisulfate,https://doi.org/10.1016/j.fuel.2024.130974,R16 KHSO₄ + H → KHSO₃ + OH with Table 2 barrier and 0–1 ppb imposed H.,0,1
+x,58,R17b oxidation-rate uncertainty,https://doi.org/10.1016/j.fuel.2024.130974,"Adjust the rate by exp(6000b/RT), an apparent activation energy perturbation of up to 6 kJ/mol.",-1,1
+x,59,R20 hydrolysis-rate uncertainty,https://doi.org/10.1016/j.fuel.2024.130974,Vary the R20-like water hazard by exp(6000b/RT).,-1,1
+x,60,R19 chloride-termination uncertainty,https://doi.org/10.1016/j.fuel.2024.130974,Adjust R19 on actual KCl and KHSO₄ by exp(6000b/RT).,-1,1
+x,61,Bisulfite association falloff,https://doi.org/10.1016/j.fuel.2024.130974,Apply 10^b to R11 low-pressure limit only and retain its published high-pressure ceiling.,-1,1
+x,62,Bisulfate association falloff,https://doi.org/10.1016/j.fuel.2024.130974,"Apply 10^b to the R12 low-pressure limit, preserving the high-pressure ceiling and Kp.",-1,1
+x,63,Chlorosulfate falloff and refeeding,https://doi.org/10.1016/j.fuel.2024.130974,Scale only the underlying R13 low-pressure association limit by 10^b when computing breakup from Kp.,-1,1
+x,64,Bisulfite formation enthalpy coupling,https://doi.org/10.1016/j.fuel.2024.130974,Perturb KHSO₃ formation enthalpy by −3b kcal/mol. Forward R11 affinity and opposing R17b oxidation affinity respond in opposite directions.,-1,1
+x,65,Bisulfate formation enthalpy coupling,https://doi.org/10.1016/j.fuel.2024.130974,"Perturb KHSO₄ formation enthalpy by −3b kcal/mol consistently in explicit R12b, R17b, R16b, R18b, R19b and R20b.",-1,1
+x,66,Chlorosulfate formation enthalpy coupling,https://doi.org/10.1016/j.fuel.2024.130974,Perturb KClSO₃ formation enthalpy by −3b kcal/mol in explicit R13b breakup and R20b HCl recombination.,-1,1
+x,67,Monomer selection for bisulfate capture,https://doi.org/10.1080/02786820050195340,Interpolate between analytical KCl and the JANAF equilibrium monomer fraction for R19 attack on KHSO₄.,0,1
+x,68,Shared dry-to-wet SO₃ supply,https://doi.org/10.1016/j.ces.2007.05.016,Replace that fraction with the fitted dry radical-supply law before competition for SO₃ by KCl and KOH. Use the wet bath in the wet calculation and preserve the supplier validity limits.,0,1
+u,0,binary association factor,,,,
+u,1,third-body association factor,,,,
+u,2,ion association factor,,,,
+u,3,"binary binding (E/kB, K)",,,,
+u,4,"third-body binding (E/kB, K)",,,,
+u,5,"ion binding (E/kB, K)",,,,
+u,6,attachment scale,,,,
+u,7,ion supply scale,,,,
+u,8,reserved inactive,,,,

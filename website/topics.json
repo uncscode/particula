@@ -5346,6 +5346,42 @@
           }
         ]
       }
+    },
+    {
+      "source": "docs/studies/literature/straw-combustion/index.md",
+      "title": "Particula fits the measured rise in particle number with sulfur dioxide in a straw-combustion analogue",
+      "topic": "emissions",
+      "also": [
+        "nucleation",
+        "gas"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "straw-combustion",
+        "runs": [
+          "straw-combustion"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/nucleation.md",
+            "label": "Particle formation and nucleation"
+          }
+        ]
+      },
+      "tocFigure": "straw-combustion/toc.png"
+    },
+    {
+      "source": "docs/studies/literature/straw-combustion/straw_combustion.py",
+      "title": "Replay the measured sulfur response in a cooling flue gas",
+      "topic": "emissions",
+      "also": [
+        "nucleation",
+        "gas"
+      ],
+      "role": "Studies",
+      "start_here": false
     }
   ],
   "supporting": [

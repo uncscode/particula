@@ -4,6 +4,9 @@ Follow comparisons with published measurements, reference calculations and datas
 
 <div class="study-figures">
 
+[![After a cooling tube, measured and fitted particle counts rise from 3.0 and 5.2 million per cm³ at zero added sulfur dioxide to 29.2 and 27.8 million per cm³ at 500 ppm.](../../images/straw-combustion/toc.png)\
+Particula fits the measured rise in particle number with sulfur dioxide in a straw-combustion analogue](straw-combustion/index.md)
+
 [![In polluted air the observed and simulated cloud counts rise by 72 and 73 per cm³ from backgrounds of 1,562 and 456.](../../images/pi-chamber-lidar/graphical-abstract.svg)\
 Particula reproduces the polluted Π Chamber’s droplet gain but underestimates the background count](pi-chamber-lidar/index.md)
 
@@ -68,6 +71,7 @@ At the inferred Π Chamber humidity, modeled sulfate haze falls below the optica
 - [Evaporation and reactive uptake](evaporation-and-uptake/index.md)
 - [Fitting mean drop mass with a constant collision rate leaves a sixfold shortfall in counts at twice the starting radius](shear-drop-spectrum/index.md)
 - [Particle water uptake and activation](particle-water-uptake/index.md)
+- [Particula fits the measured rise in particle number with sulfur dioxide in a straw-combustion analogue](straw-combustion/index.md)
 - [Particula predicts water-drop fall speeds within 4.2% at nine diameters from 0.20 to 1.00 mm](drizzle-settling/index.md)
 - [Particula reproduces the polluted Π Chamber’s droplet gain but underestimates the background count](pi-chamber-lidar/index.md)
 - [Particula sizes a 100.7 nm PSL standard at about 102 nm near atmospheric pressure](dry-psl-mobility/index.md)
