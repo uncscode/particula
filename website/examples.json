@@ -1860,5 +1860,30 @@
     ],
     "plot_inputs": [],
     "full_canvas": false
+  },
+  "antarctic-ccn-uncertainty": {
+    "title": "Antarctic CCN uncertainty across supersaturation settings",
+    "source": "docs/studies/literature/antarctic-ccn/uncertainty.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 300,
+    "inputs": [
+      "scripts/antarctic_ccn/analysis.py",
+      "scripts/antarctic_ccn/model.py",
+      "scripts/antarctic_ccn/plots.py",
+      "docs/data/antarctic-ccn/inputs.npz",
+      "docs/data/antarctic-ccn/activities.csv",
+      "docs/data/antarctic-ccn/water-activity.csv",
+      "docs/data/antarctic-ccn/calibration-ranges.csv",
+      "docs/data/antarctic-ccn/attribution-ranges.csv",
+      "scripts/antarctic_ccn/recovery.py",
+      "docs/data/antarctic-ccn/synthetic-decisions.csv.gz"
+    ],
+    "data_expression": "report",
+    "render_functions": [],
+    "plot_inputs": [
+      "scripts/antarctic_ccn/plots.py"
+    ],
+    "full_canvas": true
   }
 }

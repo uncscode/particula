@@ -18,6 +18,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Add an external population without changing existing particles](examples/particle-processes/sources-and-dilution/adding_particles_during_simulation.py)
 - [Aerosol size distributions](tutorials/building-an-aerosol/particles/aerosol_distributions.py)
 - [After glyoxal dilution, two models predict rising organic mass per sulfate as measurements fall](literature/evaporation-and-uptake/glyoxal_chamber.py)
+- [Antarctic CCN uncertainty across supersaturation settings](literature/antarctic-ccn/uncertainty.py)
 - [Audit a respiratory-droplet illustration before using its predictions](examples/coupled-populations/emissions/cough_droplets_partitioning.py)
 - [Brownian coagulation in a PDF population](tutorials/coagulation-populations/coagulation_2_pdf_pattern.py)
 - [Brownian coagulation in a PMF population](tutorials/coagulation-populations/coagulation_1_pmf_pattern.py)

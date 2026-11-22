@@ -5579,6 +5579,41 @@
           }
         ]
       }
+    },
+    {
+      "source": "docs/studies/literature/antarctic-ccn/uncertainty.py",
+      "title": "Antarctic CCN uncertainty across supersaturation settings",
+      "topic": "activity-kappa",
+      "also": [
+        "activity-nonideal"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/antarctic-ccn/index.md",
+      "title": "How an organic film can improve one Antarctic CCN count and worsen the activation spectrum",
+      "topic": "activity-kappa",
+      "also": [
+        "activity-nonideal"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "antarctic-ccn",
+        "runs": [
+          "antarctic-ccn-uncertainty"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/ccn-retrieval.md",
+            "label": "How to use this"
+          }
+        ]
+      },
+      "tocFigure": "antarctic-ccn/graphical-abstract.png",
+      "tocSource": "scripts/antarctic_ccn/toc.py"
     }
   ],
   "supporting": [
