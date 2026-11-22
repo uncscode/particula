@@ -39,8 +39,8 @@ with the installed runtime dependencies. Slow, performance and benchmark tests
 have separate execution policies. Tests that require CUDA can skip on CPU
 builders. Actual CUDA execution requires a CUDA-capable runner.
 
-Keep package test helpers and their data in the installed package. Study scripts
-can import a shared case from `particula.execution.tests`. A source CI regression
+Keep package test helpers and their data in the installed package. The coupled restart tests
+use a fixed case that ships with the package. A source CI regression
 also checks package tests for imports from checkout-only directories, including
 imports inside CUDA-only branches.
 
