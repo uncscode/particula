@@ -3566,6 +3566,8 @@ invalid.
 - `particula.execution._condensation_ode_kernels`
 - `particula.execution._condensation_reservoirs`
 - `particula.execution._condensation_ros3_kernels`
+- `particula.execution._discovery_measurements`
+- `particula.execution._discovery_trajectory`
 - `particula.execution._gpu_condensation_block_ros3`
 - `particula.execution._gpu_condensation_ros3`
 - `particula.execution._gpu_gas_forcing`
@@ -3600,6 +3602,7 @@ invalid.
 - `particula.execution.gpu_restart`
 - `particula.execution.gpu_session`
 - `particula.execution.graph_capture`
+- `particula.execution.inverse_chemistry`
 - `particula.execution.inverse_condensation`
 - `particula.execution.inverse_optics`
 - `particula.execution.ode`

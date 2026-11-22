@@ -5694,8 +5694,11 @@ Return a detached, normalized representation for interchange.
 - `particula.dynamics.chemistry.adapter`
 - `particula.dynamics.chemistry.binding`
 - `particula.dynamics.chemistry.device`
+- `particula.dynamics.chemistry.discovery`
+- `particula.dynamics.chemistry.inference`
 - `particula.dynamics.chemistry.mechanism`
 - `particula.dynamics.chemistry.ncar`
+- `particula.dynamics.chemistry.observations`
 - `particula.dynamics.chemistry.process`
 - `particula.dynamics.chemistry.resolved`
 - `particula.dynamics.chemistry.resolved_adapter`
@@ -6483,6 +6486,536 @@ Publish only after every chemistry box reached the interval boundary.
 
 ---
 
+# particula.dynamics.chemistry.discovery
+
+*module*
+
+Bounded stoichiometric searches for hidden kinetic intermediates.
+
+Rows encode net molecular coefficients of irreversible elementary reactions.
+The overall-stoichiometry mode follows de Carvalho Servia et al.
+(doi:10.1039/D5SC01473E): each selected step contributes once to the net
+reaction. Competing branches can instead be searched without a net target.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/discovery.py#L1-L1)
+
+## particula.dynamics.chemistry.discovery.Network
+
+*attribute* · *module attribute*
+
+```python
+Network = tuple[Step, ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/discovery.py#L17-L17)
+
+## particula.dynamics.chemistry.discovery.Step
+
+*attribute* · *module attribute*
+
+```python
+Step = tuple[int, ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/discovery.py#L16-L16)
+
+## particula.dynamics.chemistry.discovery.SearchResult
+
+*class* · *dataclass*
+
+```python
+class SearchResult
+```
+
+Unique networks and whether a work or result limit stopped search.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/discovery.py#L20-L26)
+
+### particula.dynamics.chemistry.discovery.SearchResult.examined
+
+*attribute* · *instance attribute*
+
+```python
+examined: int
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/discovery.py#L25-L25)
+
+### particula.dynamics.chemistry.discovery.SearchResult.limit
+
+*attribute* · *instance attribute*
+
+```python
+limit: str | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/discovery.py#L26-L26)
+
+### particula.dynamics.chemistry.discovery.SearchResult.networks
+
+*attribute* · *instance attribute*
+
+```python
+networks: tuple[Network, ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/discovery.py#L24-L24)
+
+### particula.dynamics.chemistry.discovery.SearchResult.__init__
+
+*method*
+
+```python
+def __init__(networks: tuple[Network, ...], examined: int, limit: str | None) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/discovery.py#L0-L0)
+
+## particula.dynamics.chemistry.discovery._canonical
+
+*function*
+
+```python
+def _canonical(network: Network, hidden: tuple[int, ...]) -> Network
+```
+
+Canonicalize labels of participating equivalent intermediates.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/discovery.py#L176-L185)
+
+## particula.dynamics.chemistry.discovery._exchange_closure
+
+*function*
+
+```python
+def _exchange_closure(available, links)
+```
+
+Follow reversible links including chains sharing a species.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/discovery.py#L166-L173)
+
+## particula.dynamics.chemistry.discovery._reachable
+
+*function*
+
+```python
+def _reachable(network, initial, required, links)
+```
+
+Check that the initial substrates can supply all selected steps.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/discovery.py#L143-L163)
+
+## particula.dynamics.chemistry.discovery._search_constraints
+
+*function*
+
+```python
+def _search_constraints(initial, required, hidden, exchange_pairs, max_intermediates)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/discovery.py#L93-L115)
+
+## particula.dynamics.chemistry.discovery._validate_search
+
+*function*
+
+```python
+def _validate_search(steps, initial, products, interchangeable, net, bounds)
+```
+
+Normalize integer coefficients and validate the search domains.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/discovery.py#L118-L140)
+
+## particula.dynamics.chemistry.discovery.balanced_steps
+
+*function*
+
+```python
+def balanced_steps(phases: Sequence[str], composition: Sequence[Sequence[int]]) -> tuple[Step, ...]
+```
+
+Enumerate unimolecular and bimolecular steps within each phase.
+
+Composition rows contain nonnegative atom counts (or conserved pool
+units) per species. Columns share an explicitly declared basis. Each
+reaction has one or two molecules on each side and conserves this basis.
+Gas-particle exchange is handled separately by the condensation process.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/discovery.py#L188-L230)
+
+## particula.dynamics.chemistry.discovery.compile_network
+
+*function*
+
+```python
+def compile_network(network: Network, species: dict[str, dict], rates: Sequence[float]) -> ReactionMechanism
+```
+
+Build a native mechanism from elementary steps and rate coefficients.
+
+The insertion order of the phase-qualified species catalog is the matrix
+column order. Each rate is in inverse seconds for a unimolecular step or
+cubic metres per mole per second for a bimolecular step. Gas and particle
+rates use their respective phase volumes. Binding the returned mechanism
+to an aerosol state performs the native mass and elemental balance checks.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/discovery.py#L233-L277)
+
+## particula.dynamics.chemistry.discovery.enumerate_networks
+
+*function*
+
+```python
+def enumerate_networks(steps: Iterable[Step], initial: Sequence[bool], products: Sequence[int], *, max_steps: int, max_trials: int, max_candidates: int, net: Step | None = None, max_intermediates: int | None = None, interchangeable: Sequence[int] = (), exchange_pairs: Sequence[tuple[int, int]] = ()) -> SearchResult
+```
+
+Search combinations of allowed, prebalanced elementary steps.
+
+Columns share a caller-defined species order. Initial flags indicate
+substrates available at the start. Every required product must be made
+and every selected reaction must be reachable. Supply interchangeable
+indices only for hidden species with identical physical constraints.
+max_intermediates bounds used columns other than initial species and
+specified products. Reversible exchange pairs link phases once either
+phase has a source. They add no fitted reaction or net coefficient.
+Limits count examined combinations and unique returned networks.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/discovery.py#L29-L90)
+
+---
+
+# particula.dynamics.chemistry.inference
+
+*module*
+
+Fit mechanism candidates to experiments with shared or local parameters.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L1-L1)
+
+## particula.dynamics.chemistry.inference.Loss
+
+*attribute* · *module attribute*
+
+```python
+Loss = Callable[[Vector, bool], tuple[float, Vector | None]]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L13-L13)
+
+## particula.dynamics.chemistry.inference.Vector
+
+*attribute* · *module attribute*
+
+```python
+Vector = NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L12-L12)
+
+## particula.dynamics.chemistry.inference.CandidateFit
+
+*class* · *dataclass*
+
+```python
+class CandidateFit
+```
+
+Calibration and held-out experiments for one candidate.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L165-L172)
+
+### particula.dynamics.chemistry.inference.CandidateFit.bounds
+
+*attribute* · *instance attribute*
+
+```python
+bounds: Sequence[tuple[float, float]]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L170-L170)
+
+### particula.dynamics.chemistry.inference.CandidateFit.experiments
+
+*attribute* · *instance attribute*
+
+```python
+experiments: Sequence[ExperimentLoss]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L169-L169)
+
+### particula.dynamics.chemistry.inference.CandidateFit.held_out
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+held_out: Sequence[ExperimentLoss] = ()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L172-L172)
+
+### particula.dynamics.chemistry.inference.CandidateFit.starts
+
+*attribute* · *instance attribute*
+
+```python
+starts: Sequence[Vector]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L171-L171)
+
+### particula.dynamics.chemistry.inference.CandidateFit.__init__
+
+*method*
+
+```python
+def __init__(experiments: Sequence[ExperimentLoss], bounds: Sequence[tuple[float, float]], starts: Sequence[Vector], held_out: Sequence[ExperimentLoss] = ()) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L0-L0)
+
+## particula.dynamics.chemistry.inference.ExperimentLoss
+
+*class* · *dataclass*
+
+```python
+class ExperimentLoss
+```
+
+Experiment objective and its mapping into the global parameter vector.
+
+Reusing an index across experiments shares the corresponding physical
+parameter. Using a distinct index makes it experiment-specific. The
+objective receives local physical values and a gradient request.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L16-L26)
+
+### particula.dynamics.chemistry.inference.ExperimentLoss.evaluate
+
+*attribute* · *instance attribute*
+
+```python
+evaluate: Loss
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L26-L26)
+
+### particula.dynamics.chemistry.inference.ExperimentLoss.parameter_indices
+
+*attribute* · *instance attribute*
+
+```python
+parameter_indices: tuple[int, ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L25-L25)
+
+### particula.dynamics.chemistry.inference.ExperimentLoss.__init__
+
+*method*
+
+```python
+def __init__(parameter_indices: tuple[int, ...], evaluate: Loss) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L0-L0)
+
+## particula.dynamics.chemistry.inference.FitResult
+
+*class* · *dataclass*
+
+```python
+class FitResult
+```
+
+Physical parameters, loss and diagnostics for each start.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L29-L36)
+
+### particula.dynamics.chemistry.inference.FitResult.converged
+
+*attribute* · *instance attribute*
+
+```python
+converged: tuple[bool, ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L35-L35)
+
+### particula.dynamics.chemistry.inference.FitResult.evaluations
+
+*attribute* · *instance attribute*
+
+```python
+evaluations: tuple[int, ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L36-L36)
+
+### particula.dynamics.chemistry.inference.FitResult.loss
+
+*attribute* · *instance attribute*
+
+```python
+loss: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L34-L34)
+
+### particula.dynamics.chemistry.inference.FitResult.parameters
+
+*attribute* · *instance attribute*
+
+```python
+parameters: Vector
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L33-L33)
+
+### particula.dynamics.chemistry.inference.FitResult.__init__
+
+*method*
+
+```python
+def __init__(parameters: Vector, loss: float, converged: tuple[bool, ...], evaluations: tuple[int, ...]) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L0-L0)
+
+## particula.dynamics.chemistry.inference.RankedNetwork
+
+*class* · *dataclass*
+
+```python
+class RankedNetwork
+```
+
+Mechanism and fit, with score gap measured from the best candidate.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L175-L183)
+
+### particula.dynamics.chemistry.inference.RankedNetwork.competitive
+
+*attribute* · *instance attribute*
+
+```python
+competitive: bool
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L183-L183)
+
+### particula.dynamics.chemistry.inference.RankedNetwork.delta
+
+*attribute* · *instance attribute*
+
+```python
+delta: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L182-L182)
+
+### particula.dynamics.chemistry.inference.RankedNetwork.fit
+
+*attribute* · *instance attribute*
+
+```python
+fit: FitResult
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L180-L180)
+
+### particula.dynamics.chemistry.inference.RankedNetwork.network
+
+*attribute* · *instance attribute*
+
+```python
+network: Network
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L179-L179)
+
+### particula.dynamics.chemistry.inference.RankedNetwork.score
+
+*attribute* · *instance attribute*
+
+```python
+score: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L181-L181)
+
+### particula.dynamics.chemistry.inference.RankedNetwork.__init__
+
+*method*
+
+```python
+def __init__(network: Network, fit: FitResult, score: float, delta: float, competitive: bool) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L0-L0)
+
+## particula.dynamics.chemistry.inference._minimize
+
+*function*
+
+```python
+def _minimize(objective, initial, gradient, max_iterations, max_evaluations)
+```
+
+Enforce the same objective-call ceiling for AD and finite differences.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L64-L91)
+
+## particula.dynamics.chemistry.inference._parameter_domain
+
+*function*
+
+```python
+def _parameter_domain(bounds, starts)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L39-L61)
+
+## particula.dynamics.chemistry.inference.fit_experiments
+
+*function*
+
+```python
+def fit_experiments(experiments: Sequence[ExperimentLoss], bounds: Sequence[tuple[float, float]], starts: Sequence[Vector], *, gradient: bool = True, max_iterations: int = 100, max_evaluations: int = 1000) -> FitResult
+```
+
+Fit finite box-bounded parameters in normalized linear coordinates.
+
+Zero-valued rates are feasible when the supplied lower bound is zero.
+Set the bounds equal to fix a parameter for a rate profile or channel
+deletion control. Finite-difference fits use the same bounds and starts.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L94-L162)
+
+## particula.dynamics.chemistry.inference.fit_networks
+
+*function*
+
+```python
+def fit_networks(search: SearchResult, prepare: Callable[[Network], CandidateFit], *, criterion: str, tolerance: float, gradient=True, max_iterations=100, max_evaluations=1000) -> tuple[RankedNetwork, ...]
+```
+
+Rank every enumerated candidate using matched fitting budgets.
+
+For 'aic', each fit objective must be a negative log likelihood for the
+same observations and noise model. Count all free fitted parameters.
+For 'held_out', score untouched experiments at training estimates.
+The tolerance is in the selected score's units. All candidates within
+it remain competitive, including simpler parents. Search completeness
+and its stopping reason remain available on the supplied SearchResult.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/inference.py#L186-L253)
+
+---
+
 # particula.dynamics.chemistry.mechanism
 
 *module*
@@ -7006,6 +7539,120 @@ def main()
 Convert a supported NCAR file to inspectable native JSON or YAML.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/ncar.py#L173-L182)
+
+---
+
+# particula.dynamics.chemistry.observations
+
+*module*
+
+Time-resolved observation likelihoods for kinetic mechanism discovery.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/observations.py#L1-L1)
+
+## particula.dynamics.chemistry.observations.ObservationSeries
+
+*class* · *dataclass*
+
+```python
+class ObservationSeries
+```
+
+Finite observations and whitening factors at irregular sample times.
+
+Covariances have squared or cross-product measurement units. Their
+diagonals describe variances. Off-diagonal entries represent correlated
+channels at the same time. A missing observation is represented by NaN.
+Each observed block must be positive definite: omit one channel for an
+exact derived total. Distinct time points are treated as independent.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/observations.py#L10-L73)
+
+### particula.dynamics.chemistry.observations.ObservationSeries.factors
+
+*attribute* · *instance attribute*
+
+```python
+factors: tuple[NDArray[np.float64], ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/observations.py#L24-L24)
+
+### particula.dynamics.chemistry.observations.ObservationSeries.indices
+
+*attribute* · *instance attribute*
+
+```python
+indices: tuple[NDArray[np.intp], ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/observations.py#L23-L23)
+
+### particula.dynamics.chemistry.observations.ObservationSeries.times
+
+*attribute* · *instance attribute*
+
+```python
+times: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/observations.py#L21-L21)
+
+### particula.dynamics.chemistry.observations.ObservationSeries.values
+
+*attribute* · *instance attribute*
+
+```python
+values: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/observations.py#L22-L22)
+
+### particula.dynamics.chemistry.observations.ObservationSeries.__init__
+
+*method*
+
+```python
+def __init__(times: NDArray[np.float64], values: NDArray[np.float64], indices: tuple[NDArray[np.intp], ...], factors: tuple[NDArray[np.float64], ...]) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/observations.py#L0-L0)
+
+### particula.dynamics.chemistry.observations.ObservationSeries.create
+
+*method* · *classmethod*
+
+```python
+def create(times: ArrayLike, values: ArrayLike, covariance: ArrayLike)
+```
+
+Validate observations and shared or per-time covariance.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/observations.py#L26-L54)
+
+### particula.dynamics.chemistry.observations.ObservationSeries.loss
+
+*method*
+
+```python
+def loss(predictions: ArrayLike) -> tuple[float, NDArray[np.float64]]
+```
+
+Evaluate the Gaussian loss and its prediction gradient.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/observations.py#L56-L73)
+
+## particula.dynamics.chemistry.observations._factor
+
+*function*
+
+```python
+def _factor(covariance)
+```
+
+Check the observed covariance before using its lower triangle.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/observations.py#L76-L87)
 
 ---
 
@@ -57209,6 +57856,8 @@ invalid.
 - `particula.execution._condensation_ode_kernels`
 - `particula.execution._condensation_reservoirs`
 - `particula.execution._condensation_ros3_kernels`
+- `particula.execution._discovery_measurements`
+- `particula.execution._discovery_trajectory`
 - `particula.execution._gpu_condensation_block_ros3`
 - `particula.execution._gpu_condensation_ros3`
 - `particula.execution._gpu_gas_forcing`
@@ -57243,6 +57892,7 @@ invalid.
 - `particula.execution.gpu_restart`
 - `particula.execution.gpu_session`
 - `particula.execution.graph_capture`
+- `particula.execution.inverse_chemistry`
 - `particula.execution.inverse_condensation`
 - `particula.execution.inverse_optics`
 - `particula.execution.ode`
@@ -57925,6 +58575,178 @@ def stage_state(state: FloatVector, increment: FloatVector, result: FloatVector)
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L215-L220)
+
+---
+
+# particula.execution._discovery_measurements
+
+*module*
+
+Differentiable log-diameter response for the SiMBA inverse workflow.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_discovery_measurements.py#L1-L1)
+
+## particula.execution._discovery_measurements._below
+
+*function*
+
+```python
+def _below(edge: wp.float64, diameter: wp.float64, width: wp.float64)
+```
+
+Probability of a reported diameter below a finite detector edge.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_discovery_measurements.py#L11-L15)
+
+## particula.execution._discovery_measurements.observe_number_spectrum
+
+*function*
+
+```python
+def observe_number_spectrum(diameter: FloatMatrix, number: FloatMatrix, edges: FloatVector, log_width: wp.float64, output: FloatMatrix)
+```
+
+Integrate counts per m³ by diameter, including underflow and overflow.
+
+Diameter and strictly ascending edges are in metres. Each cohort has a
+Gaussian response in natural-log diameter with positive log_width. The
+output columns are number concentrations per bin, including both tails.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_discovery_measurements.py#L18-L42)
+
+---
+
+# particula.execution._discovery_trajectory
+
+*module*
+
+Warp kernels for deterministic gas chemistry and seeded chamber growth.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_discovery_trajectory.py#L1-L1)
+
+## particula.execution._discovery_trajectory.PI
+
+*attribute* · *module attribute*
+
+```python
+PI = wp.constant(wp.float64(3.141592653589793))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_discovery_trajectory.py#L17-L17)
+
+## particula.execution._discovery_trajectory.THIRD
+
+*attribute* · *module attribute*
+
+```python
+THIRD = wp.constant(wp.float64(1 / 3))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_discovery_trajectory.py#L18-L18)
+
+## particula.execution._discovery_trajectory._chemistry
+
+*function*
+
+```python
+def _chemistry(b: int, s: int, kind: int, volume: wp.float64, state: FloatMatrix, rates: FloatVector, phase: IntVector, first: IntVector, second: IntVector, change: wp.array2d(dtype=int))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_discovery_trajectory.py#L108-L128)
+
+## particula.execution._discovery_trajectory.advance
+
+*function*
+
+```python
+def advance(state: FloatMatrix, slope: FloatMatrix, dt: wp.float64, result: FloatMatrix, invalid: IntVector)
+```
+
+Advance one explicit stage and flag failed domain checks.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_discovery_trajectory.py#L176-L189)
+
+## particula.execution._discovery_trajectory.cohort_observables
+
+*function*
+
+```python
+def cohort_observables(bulk: FloatMatrix, diam: FloatMatrix, count: FloatMatrix)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_discovery_trajectory.py#L192-L198)
+
+## particula.execution._discovery_trajectory.derivative
+
+*function*
+
+```python
+def derivative(state: FloatMatrix, bulk: FloatMatrix, flux: FloatMatrix, gas: IntVector, particle: IntVector, rates: FloatVector, phase: IntVector, first: IntVector, second: IntVector, change: wp.array2d(dtype=int), seed: FloatVector, result: FloatMatrix)
+```
+
+Compute molar tendencies and accumulate deposited inventories.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_discovery_trajectory.py#L131-L173)
+
+## particula.execution._discovery_trajectory.exchange
+
+*function*
+
+```python
+def exchange(state: FloatMatrix, bulk: FloatMatrix, gas: IntVector, particle: IntVector, diffusion: FloatVector, mean_path: FloatVector, saturation: FloatVector, flux: FloatMatrix)
+```
+
+Evaluates reversible ideal-solution transfer at unit accommodation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_discovery_trajectory.py#L84-L105)
+
+## particula.execution._discovery_trajectory.geometry
+
+*function*
+
+```python
+def geometry(inventory: FloatMatrix, bulk: FloatMatrix)
+```
+
+Use the saved volume reduction when differentiating the cube root.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_discovery_trajectory.py#L72-L81)
+
+## particula.execution._discovery_trajectory.initialize
+
+*function*
+
+```python
+def initialize(dose: FloatVector, seed: FloatVector, quantile: FloatVector, fractions: FloatVector, molar_volume: FloatVector, state: FloatMatrix)
+```
+
+Initialize gas and equal-number lognormal seed cohorts in mol/m³ air.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_discovery_trajectory.py#L21-L52)
+
+## particula.execution._discovery_trajectory.inventory
+
+*function*
+
+```python
+def inventory(state: FloatMatrix, molar_volume: FloatVector, bulk: FloatMatrix)
+```
+
+Return suspended volume fraction, number, diameter and total moles.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_discovery_trajectory.py#L55-L69)
+
+## particula.execution._discovery_trajectory.observe
+
+*function*
+
+```python
+def observe(state: FloatMatrix, spectra: FloatMatrix, masses: FloatVector, organic: IntVector, gases: IntVector, output: FloatVector)
+```
+
+Observe gas and organic mass in kg/m³ and number per instrument bin.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_discovery_trajectory.py#L201-L223)
 
 ---
 
@@ -79862,6 +80684,369 @@ inspect payloads, or synchronize.
 request-bound capture resources.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/graph_capture.py#L468-L534)
+
+---
+
+# particula.execution.inverse_chemistry
+
+*module*
+
+Differentiate a fixed SiMBA network through deterministic chamber growth.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L1-L1)
+
+## particula.execution.inverse_chemistry.SeededChamber
+
+*class* · *dataclass*
+
+```python
+class SeededChamber
+```
+
+Fixed chemistry, seed composition, instrument and chamber conditions.
+
+Densities (kg/m³) and initial seed volume fractions are keyed by particle
+species. Gas and particle species require declared molar masses. A flat
+interface, ideal activities and unit accommodation define vapor exchange.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L27-L44)
+
+### particula.execution.inverse_chemistry.SeededChamber.cohorts
+
+*attribute* · *instance attribute*
+
+```python
+cohorts: int
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L44-L44)
+
+### particula.execution.inverse_chemistry.SeededChamber.density
+
+*attribute* · *instance attribute*
+
+```python
+density: dict[str, float]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L37-L37)
+
+### particula.execution.inverse_chemistry.SeededChamber.edges_m
+
+*attribute* · *instance attribute*
+
+```python
+edges_m: tuple[float, ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L42-L42)
+
+### particula.execution.inverse_chemistry.SeededChamber.exchange
+
+*attribute* · *instance attribute*
+
+```python
+exchange: tuple[VaporExchange, ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L39-L39)
+
+### particula.execution.inverse_chemistry.SeededChamber.log_response_width
+
+*attribute* · *instance attribute*
+
+```python
+log_response_width: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L43-L43)
+
+### particula.execution.inverse_chemistry.SeededChamber.measured_gases
+
+*attribute* · *instance attribute*
+
+```python
+measured_gases: tuple[str, ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L41-L41)
+
+### particula.execution.inverse_chemistry.SeededChamber.mechanism
+
+*attribute* · *instance attribute*
+
+```python
+mechanism: ReactionMechanism
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L36-L36)
+
+### particula.execution.inverse_chemistry.SeededChamber.organic
+
+*attribute* · *instance attribute*
+
+```python
+organic: tuple[str, ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L40-L40)
+
+### particula.execution.inverse_chemistry.SeededChamber.seed_fractions
+
+*attribute* · *instance attribute*
+
+```python
+seed_fractions: dict[str, float]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L38-L38)
+
+### particula.execution.inverse_chemistry.SeededChamber.__init__
+
+*method*
+
+```python
+def __init__(mechanism: ReactionMechanism, density: dict[str, float], seed_fractions: dict[str, float], exchange: tuple[VaporExchange, ...], organic: tuple[str, ...], measured_gases: tuple[str, ...], edges_m: tuple[float, ...], log_response_width: float, cohorts: int) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L0-L0)
+
+## particula.execution.inverse_chemistry.Trajectory
+
+*class* · *dataclass*
+
+```python
+class Trajectory
+```
+
+Predictions, final inventories, loss and optional derivatives.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L47-L56)
+
+### particula.execution.inverse_chemistry.Trajectory.final_state
+
+*attribute* · *instance attribute*
+
+```python
+final_state: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L52-L52)
+
+### particula.execution.inverse_chemistry.Trajectory.gradients
+
+*attribute* · *instance attribute*
+
+```python
+gradients: dict[str, np.ndarray]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L55-L55)
+
+### particula.execution.inverse_chemistry.Trajectory.loss
+
+*attribute* · *instance attribute*
+
+```python
+loss: float | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L54-L54)
+
+### particula.execution.inverse_chemistry.Trajectory.predictions
+
+*attribute* · *instance attribute*
+
+```python
+predictions: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L51-L51)
+
+### particula.execution.inverse_chemistry.Trajectory.species
+
+*attribute* · *instance attribute*
+
+```python
+species: tuple[str, ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L53-L53)
+
+### particula.execution.inverse_chemistry.Trajectory.transfer_bytes
+
+*attribute* · *instance attribute*
+
+```python
+transfer_bytes: dict[str, int]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L56-L56)
+
+### particula.execution.inverse_chemistry.Trajectory.__init__
+
+*method*
+
+```python
+def __init__(predictions: np.ndarray, final_state: np.ndarray, species: tuple[str, ...], loss: float | None, gradients: dict[str, np.ndarray], transfer_bytes: dict[str, int]) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L0-L0)
+
+## particula.execution.inverse_chemistry.VaporExchange
+
+*class* · *dataclass*
+
+```python
+class VaporExchange
+```
+
+Paired phases of one compound and its constant transport properties.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L17-L24)
+
+### particula.execution.inverse_chemistry.VaporExchange.diffusivity_m2_s
+
+*attribute* · *instance attribute*
+
+```python
+diffusivity_m2_s: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L23-L23)
+
+### particula.execution.inverse_chemistry.VaporExchange.gas
+
+*attribute* · *instance attribute*
+
+```python
+gas: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L21-L21)
+
+### particula.execution.inverse_chemistry.VaporExchange.mean_free_path_m
+
+*attribute* · *instance attribute*
+
+```python
+mean_free_path_m: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L24-L24)
+
+### particula.execution.inverse_chemistry.VaporExchange.particle
+
+*attribute* · *instance attribute*
+
+```python
+particle: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L22-L22)
+
+### particula.execution.inverse_chemistry.VaporExchange.__init__
+
+*method*
+
+```python
+def __init__(gas: str, particle: str, diffusivity_m2_s: float, mean_free_path_m: float) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L0-L0)
+
+## particula.execution.inverse_chemistry._compile
+
+*function*
+
+```python
+def _compile(chamber)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L72-L119)
+
+## particula.execution.inverse_chemistry._finish
+
+*function*
+
+```python
+def _finish(bad, outputs, observations, tape, floats, params, gas_ids, state, names, download, traffic)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L382-L412)
+
+## particula.execution.inverse_chemistry._integrate
+
+*function*
+
+```python
+def _integrate(state, duration, max_step, slope, advance)
+```
+
+Take fixed midpoint steps ending exactly at an observation time.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L185-L192)
+
+## particula.execution.inverse_chemistry._measurement_grid
+
+*function*
+
+```python
+def _measurement_grid(chamber, times, max_step, observations, gradient, seed)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L153-L182)
+
+## particula.execution.inverse_chemistry._transfers
+
+*function*
+
+```python
+def _transfers(device)
+```
+
+Count explicit input and output tensor bytes for a CUDA replay.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L195-L214)
+
+## particula.execution.inverse_chemistry._validate_exchange
+
+*function*
+
+```python
+def _validate_exchange(chamber, gases, particles, masses, composition)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L122-L150)
+
+## particula.execution.inverse_chemistry._vector
+
+*function*
+
+```python
+def _vector(values, length, label)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L59-L69)
+
+## particula.execution.inverse_chemistry.simulate_chamber
+
+*function*
+
+```python
+def simulate_chamber(chamber: SeededChamber, times, *, dose, rates, saturation, seed, max_step, device, observations: ObservationSeries | None = None, gradient=False) -> Trajectory
+```
+
+Integrate a fixed candidate with explicit midpoint and optional Warp AD.
+
+Dose is mol/m³ air in sorted gas-species order. Rates follow native reaction
+order, saturation (mol/m³) follows exchange order. Seed controls are total
+number/m³, median diameter (m), geometric standard deviation, and first-
+order deposition at 100 nm (1/s). Times and max_step are in seconds.
+Predictions consist of measured gases, suspended organic kg/m³, and the
+number spectrum including both tails. A NaN observation masks a channel.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/inverse_chemistry.py#L217-L379)
 
 ---
 
