@@ -1,0 +1,43 @@
+{
+  "stabilization_max_nrmse_change": 9.71445146547012e-16,
+  "stabilization_max_peak_change_ug_m3": 2.8421709430404007e-13,
+  "stabilization_max_gross_ug_m3": 283.1207271150519,
+  "mass_null": 0.15875530814361075,
+  "joint_null": 0.18042451957052177,
+  "pair_tests": [
+    {
+      "partner": 0,
+      "steps": 120,
+      "max_abs_ug_m3": 3.552713678800501e-15
+    },
+    {
+      "partner": 0,
+      "steps": 240,
+      "max_abs_ug_m3": 3.552713678800501e-15
+    },
+    {
+      "partner": 0,
+      "steps": 480,
+      "max_abs_ug_m3": 1.4210854715202004e-14
+    },
+    {
+      "partner": 1,
+      "steps": 120,
+      "max_abs_ug_m3": 0.01329950177683159
+    },
+    {
+      "partner": 1,
+      "steps": 240,
+      "max_abs_ug_m3": 0.006653663183559644
+    },
+    {
+      "partner": 1,
+      "steps": 480,
+      "max_abs_ug_m3": 0.003327810721145852
+    }
+  ],
+  "versions": {
+    "warp": "1.11.1",
+    "gpu": "NVIDIA GeForce RTX 5060"
+  }
+}

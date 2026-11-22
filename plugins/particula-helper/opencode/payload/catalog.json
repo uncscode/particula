@@ -4,6 +4,10 @@
     "name": "particula-build"
   },
   {
+    "description": "Analyze aerosol chamber experiments by linking fast bulk SOA yield searches with particle-resolved chemistry and microphysics. Use for joint fits to mass, counts, size spectra, composition or water uptake and for comparing deposition, dilution, mixing and coagulation.",
+    "name": "particula-chamber-analysis"
+  },
+  {
     "description": "Diagnose Particula exceptions, incorrect results, version migrations or CPU/GPU mismatches; use for traceback analysis, API drift, conservation failures, or numerical instability.",
     "name": "particula-debug"
   },
@@ -26,6 +30,10 @@
   {
     "description": "Plan Particula repository features, maintenance, or research when a development plan or issue scope is requested; define code boundaries, scientific acceptance criteria, dependencies, and evidence. Not for designing an aerosol simulation study.",
     "name": "particula-plan"
+  },
+  {
+    "description": "Discover precursor-compatible aerosol reaction networks by screening discrete pathways, fitting rates with automatic differentiation and testing candidates in CUDA chamber replays. Use for primary chemistry, product aging, cross-reactions, and evidence for competing mechanisms.",
+    "name": "particula-reaction-discovery"
   },
   {
     "description": "Investigate and prepare a developer-facing GitHub issue for a researcher's suspected Particula bug, unexpected result, or perceived scientific error. Use for reporting concerns, not implementing fixes or submitting code PRs.",

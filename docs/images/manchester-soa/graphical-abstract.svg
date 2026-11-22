@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Measured and fitted α-pinene and o-cresol aerosol yield in the Manchester chamber</title>
+  <desc id="desc">At approximately 299 micrograms per cubic metre of total precursor consumed, the measured particle-wall-corrected organic aerosol yield was 27.4 percent in Voliotis et al. Figure 5. Averaged across the two eligible Manchester runs, Particula gave 15.1 percent with the organic-mass fit and 27.5 percent with the mass-and-particle-number fit. The bars use a common zero and scale.</desc>
+  <rect width="300" height="300" fill="#FBF2E3"/>
+  <g transform="translate(3 -6) scale(.78)" stroke-linejoin="round" stroke-linecap="round">
+<path d="M21 39 L45 26 L124 26 L100 39 Z" fill="#EFD1A5" stroke="#243E43" stroke-width="2"/>
+<path d="M100 39 L124 26 L124 88 L100 102 Z" fill="#CAD9D2" stroke="#243E43" stroke-width="2"/>
+<path d="M21 39 L100 39 L100 102 L21 102 Z" fill="#FBF2E3" stroke="#243E43" stroke-width="2"/>
+<path d="M27 44 L32 93 L91 96 L95 44" fill="#CAD9D2" fill-opacity=".51" stroke="#617679" stroke-width="1"/>
+<path d="M38 29 L52 22 L104 22 L91 29 Z" fill="#FBF2E3" stroke="#243E43" stroke-width="1.6"/>
+<path d="M46 45 l-3 8 M62 45 l-3 8 M78 45 l-3 8" stroke="#A44D21" stroke-width="1.6"/>
+<path d="M32 103 v5 M90 103 v5 M119 92 v4" stroke="#243E43" stroke-width="2"/>
+<circle cx="39" cy="71" r="2.5" fill="#135963"/>
+<circle cx="50" cy="58" r="1.6" fill="#135963"/>
+<circle cx="59" cy="79" r="3.2" fill="#135963"/>
+<circle cx="70" cy="64" r="2.1" fill="#135963"/>
+<circle cx="82" cy="84" r="2.7" fill="#135963"/>
+<circle cx="86" cy="57" r="1.5" fill="#135963"/>
+<circle cx="46" cy="87" r="1.4" fill="#135963"/>
+<circle cx="72" cy="90" r="1.25" fill="#135963"/>
+<circle cx="52" cy="68" r="1" fill="#135963"/>
+<circle cx="81" cy="73" r="1.1" fill="#135963"/>
+  </g>
+  <g font-family="Liberation Sans, Arial, sans-serif" fill="#243E43">
+    <text x="113" y="34" font-size="18" font-weight="bold">Manchester</text>
+    <text x="113" y="54" font-size="18" font-weight="bold">chamber</text>
+    <text x="113" y="74" font-size="14.5">α-pinene + o-cresol</text>
+    <path d="M20 87 H280" stroke="#617679" stroke-width=".8"/>
+    <text x="20" y="111" font-size="20" font-weight="bold">Wall-corrected SOA yield</text>
+    <text x="20" y="130" font-size="14">At ≈299 µg m⁻³ of precursor consumed</text>
+    <text x="20" y="157" font-size="16" font-weight="bold">Manchester measurement</text>
+    <rect x="20" y="164" width="197.504" height="11" fill="#243E43"/>
+    <text x="224.504" y="176" font-size="17" font-weight="bold" fill="#243E43">27.4%</text>
+    <text x="20" y="210" font-size="16" font-weight="bold">Particula · mass fit</text>
+    <rect x="20" y="217" width="108.559" height="11" fill="#135963"/>
+    <text x="135.559" y="229" font-size="17" font-weight="bold" fill="#135963">15.1%</text>
+    <text x="20" y="263" font-size="16" font-weight="bold">Particula · mass + number fit</text>
+    <rect x="20" y="270" width="198.190" height="11" fill="#135963"/>
+    <text x="225.190" y="282" font-size="17" font-weight="bold" fill="#135963">27.5%</text>
+  </g>
+</svg>

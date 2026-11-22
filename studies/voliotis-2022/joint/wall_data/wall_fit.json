@@ -1,0 +1,34 @@
+{
+  "source_pdf": "https://amt.copernicus.org/articles/15/539/2022/amt-15-539-2022.pdf",
+  "source_pdf_sha256": "d66067b17792ec2b8488228be3cab931a6be73cc45ede0408a9b865a8ceab8b2",
+  "fits": {
+    "all_readable_log": {
+      "count": 18,
+      "eddy_s-1": 13.739149429354534,
+      "rms_log_rate_ratio": 0.24574373565249236,
+      "rmse_s-1": 3.8668570189732225e-05,
+      "max_absolute_relative_error": 0.912832333948498
+    },
+    "all_readable_absolute": {
+      "count": 18,
+      "eddy_s-1": 8.542917479175388,
+      "rms_log_rate_ratio": 0.34011238555495943,
+      "rmse_s-1": 2.7845379313476667e-05,
+      "max_absolute_relative_error": 0.5408180660095834
+    },
+    "isolated_log": {
+      "count": 14,
+      "eddy_s-1": 16.551404797047777,
+      "rms_log_rate_ratio": 0.17129692859941192,
+      "rmse_s-1": 1.5071590411707648e-05,
+      "max_absolute_relative_error": 0.36834441271862606
+    },
+    "isolated_absolute": {
+      "count": 14,
+      "eddy_s-1": 13.947282760910994,
+      "rms_log_rate_ratio": 0.1911477513336941,
+      "rmse_s-1": 1.2899256163249625e-05,
+      "max_absolute_relative_error": 0.41878215715829104
+    }
+  }
+}

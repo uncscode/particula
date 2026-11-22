@@ -1,0 +1,6 @@
+run,doi,file,source_url,sha256
+2,10.25326/3549-H353,20190329_UMAN_DMPS.edf,https://eurochamp.ipsl.upmc.fr/datacenter-rest/data/a2af3dd7-308e-4b9a-8e8f-5921488c7943/20190329_UMAN_DMPS.edf,fe887ba1bb11afaae2bfb5ffc3df6915134acde2fb7fd06dc1e35c18f3e9267a
+2,10.25326/3549-H353,20190329_UMAN_GAS.edf,https://eurochamp.ipsl.upmc.fr/datacenter-rest/data/a2af3dd7-308e-4b9a-8e8f-5921488c7943/20190329_UMAN_GAS.edf,ac2dc2b34f3bf2407ee6554fef01c0b49f7a4c9f383ef65b99eb050efe15019e
+2,10.25326/3549-H353,20190329_UMAN_RHT.edf,https://eurochamp.ipsl.upmc.fr/datacenter-rest/data/a2af3dd7-308e-4b9a-8e8f-5921488c7943/20190329_UMAN_RHT.edf,7a0763c16cc9c765dc150e6d47505712c7fa375933959b1abf38f235bfcfb527
+2,10.25326/3549-H353,20190329_UMAN_WCPC.edf,https://eurochamp.ipsl.upmc.fr/datacenter-rest/data/a2af3dd7-308e-4b9a-8e8f-5921488c7943/20190329_UMAN_WCPC.edf,e03c6843be174f0555fa8eaea332920af3f6183ded77c56153095c80acf4242d
+2,10.25326/GXV6-3646,20190329_UMAN_AMS.edf,https://eurochamp.ipsl.upmc.fr/datacenter-rest/data/0613b771-0190-4493-86a5-6c6576172642/20190329_UMAN_AMS.edf,c89685e56e0fb26176296f60ea4e243639e087037e04becfe534654ebc5a814e

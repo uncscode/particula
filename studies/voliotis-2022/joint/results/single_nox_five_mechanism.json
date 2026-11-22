@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "basis": "mol/m^3-air",
+  "species": {
+    "gas:A": {},
+    "gas:I": {},
+    "gas:LV": {},
+    "gas:O2": {},
+    "gas:SV": {},
+    "gas:effective_rate": {},
+    "gas:other": {},
+    "gas:unproductive_A": {},
+    "gas:wall": {}
+  },
+  "reactions": [
+    {
+      "id": "precursor_oxidation",
+      "reactants": {
+        "gas:A": 1,
+        "gas:O2": 1
+      },
+      "products": {
+        "gas:I": 1
+      },
+      "orders": {
+        "gas:A": 1,
+        "gas:O2": 0,
+        "gas:effective_rate": 1
+      },
+      "rate": {
+        "type": "constant",
+        "units": "m^3/mol/s",
+        "k": 1.0
+      }
+    },
+    {
+      "id": "unresolved_products",
+      "reactants": {
+        "gas:unproductive_A": 1
+      },
+      "products": {
+        "gas:other": 1
+      },
+      "orders": {
+        "gas:effective_rate": 1,
+        "gas:unproductive_A": 1
+      },
+      "rate": {
+        "type": "constant",
+        "units": "m^3/mol/s",
+        "k": 1.0
+      }
+    },
+    {
+      "id": "semivolatile_products",
+      "reactants": {
+        "gas:I": 1
+      },
+      "products": {
+        "gas:SV": 1
+      },
+      "orders": {
+        "gas:I": 1
+      },
+      "rate": {
+        "type": "constant",
+        "units": "1/s",
+        "k": 0.000759344173250562
+      }
+    },
+    {
+      "id": "wall_SV",
+      "reactants": {
+        "gas:SV": 1
+      },
+      "products": {
+        "gas:wall": 1
+      },
+      "orders": {
+        "gas:SV": 1
+      },
+      "rate": {
+        "type": "constant",
+        "units": "1/s",
+        "k": 0.0013664887124407508
+      }
+    },
+    {
+      "id": "wall_LV",
+      "reactants": {
+        "gas:LV": 1
+      },
+      "products": {
+        "gas:wall": 1
+      },
+      "orders": {
+        "gas:LV": 1
+      },
+      "rate": {
+        "type": "constant",
+        "units": "1/s",
+        "k": 0.0013664887124407508
+      }
+    }
+  ]
+}

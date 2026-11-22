@@ -1,0 +1,3 @@
+interface:
+  display_name: "Particula Reaction Discovery"
+  short_description: "Fit and test reaction networks with CUDA and AD"

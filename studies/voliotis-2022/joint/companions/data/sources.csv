@@ -1,0 +1,9 @@
+run,doi,file,url,sha256
+6,10.25326/59rg-y252,20190713_UMAN_CCN.edf,https://eurochamp.ipsl.upmc.fr/datacenter-rest/data/73390782-bd8b-47f5-854b-36bf6335c45e/20190713_UMAN_CCN.edf,e2f306ee4b62e2595c74f339f717d8653c9bca7725512fde09c51b1691d36cc4
+6,10.25326/59rg-y252,20190713_UMAN_HTDMA_100nm.edf,https://eurochamp.ipsl.upmc.fr/datacenter-rest/data/73390782-bd8b-47f5-854b-36bf6335c45e/20190713_UMAN_HTDMA_100nm.edf,f994bd3c81cc22349dfb3b80213779f396c124eb1b3de12500cbcc10a9ba5281
+6,10.25326/59rg-y252,20190713_UMAN_HTDMA_150nm.edf,https://eurochamp.ipsl.upmc.fr/datacenter-rest/data/73390782-bd8b-47f5-854b-36bf6335c45e/20190713_UMAN_HTDMA_150nm.edf,5fe3364c95ba38e55fa081908fc60bfe4938b76c898362c130369e6598efeb0e
+6,10.25326/59rg-y252,20190713_UMAN_HTDMA_75nm.edf,https://eurochamp.ipsl.upmc.fr/datacenter-rest/data/73390782-bd8b-47f5-854b-36bf6335c45e/20190713_UMAN_HTDMA_75nm.edf,07b75a681c1c22334e805a749d626d87ea3562f9f1554afd28c025b289a2886f
+15,10.25326/e0ep-qr41,20190424_UMAN_CCN.edf,https://eurochamp.ipsl.upmc.fr/datacenter-rest/data/f58bb5b1-4570-401b-a3c6-8a39eb1080db/20190424_UMAN_CCN.edf,3a498a1c9b8702a4fae915fdcfd299c7039997f44680573159890240beefb284
+15,10.25326/e0ep-qr41,20190424_UMAN_HTDMA_100nm.edf,https://eurochamp.ipsl.upmc.fr/datacenter-rest/data/f58bb5b1-4570-401b-a3c6-8a39eb1080db/20190424_UMAN_HTDMA_100nm.edf,970c626ddd2fd9b9724c48972d9e43489e8e90705055e55ef0b6a0459b3d4345
+15,10.25326/e0ep-qr41,20190424_UMAN_HTDMA_150nm.edf,https://eurochamp.ipsl.upmc.fr/datacenter-rest/data/f58bb5b1-4570-401b-a3c6-8a39eb1080db/20190424_UMAN_HTDMA_150nm.edf,fafa6fd057cf2d8f378cbd9a6d0c9bd33deb51d997f55fe7e913df72f4fcc1e4
+15,10.25326/e0ep-qr41,20190424_UMAN_HTDMA_75nm.edf,https://eurochamp.ipsl.upmc.fr/datacenter-rest/data/f58bb5b1-4570-401b-a3c6-8a39eb1080db/20190424_UMAN_HTDMA_75nm.edf,bb9fff4f1045f0d9e83b8b0af220e932fcb12fc1a43c674c5c2e0fdad68cdc21

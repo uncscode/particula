@@ -1,0 +1,8 @@
+{
+  "reservoir_cases": 256,
+  "reservoir_max_abs_ug_m3": 1.9099388737231493e-11,
+  "isoprene_free_run_count": 8,
+  "isoprene_free_max_change": 0.0,
+  "reference_nominal_peak24": 94.20482304170186,
+  "diverted_nominal_peak24": 76.78204923983584
+}

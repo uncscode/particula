@@ -1,0 +1,48 @@
+# Mixture yield and water uptake with frozen chamber chemistry
+
+The original suspended-mass fit can reproduce parts of the chamber record while assigning different amounts of aerosol to the walls or to individual precursors. Here we tested two previously calibrated mechanisms against an additional yield comparison and fitted water uptake using two public experiment records.
+
+## Manchester mixture yields
+
+We replayed the 70-channel mass fit and the reaction-family-restricted mass-and-number fit on CUDA for 15 runs. Chemistry, wall eddy diffusivity, injection multipliers, precursor histories and the 50% fragment retention were frozen. Particle-wall-corrected model SOA is suspended organic mass plus its cumulative deposition. The calculation excludes sulfate, vapour lost to walls and any post-deposition aging. The paper corrected measurements using independently measured size-dependent particle decay. Numerically equal wall corrections are therefore not assumed. The replays used 3.75 and 1.875 s steps with forward reaction order. The primary results use 1.875 s. The maximum organic inventory residual was below 2 × 10⁻¹⁰ µg m⁻³.
+
+We read four filled, all-precursor measurement symbols for each mixture from the native 2067 × 2613 raster on PDF page 15, using the legend labels in graphical panels c–f. Read approximate horizontal and vertical coordinates in a 720-pixel-wide view with aspect ratio preserved. The two horizontal calibration ticks are 10 and 100 µg m⁻³ on a log axis. The vertical ticks are 0 and 0.4 yield. We selected visible symbols across the growth range, omitting dense overlapping symbols. The stored coordinates make that selection explicit. A one-pixel reading shift corresponds to about 1.6–2.0% in organic mass and 0.0017 in yield, increasing the relative uncertainty at low yields. The reported paper uncertainties also include mass, VOC and wall-correction uncertainties. [Figure 5, equations 2–4 and Tables 3–4](https://acp.copernicus.org/articles/22/14147/2022/#section3) · [Read points and axis coordinates](data/figure5.csv)
+
+At each point we inferred total consumed VOC as plotted wall-corrected SOA mass divided by plotted yield. Each compatible five-hour simulation was sampled when it first reached that consumption. Species-specific consumption came from its archived smoothed fractional VOC history and its frozen fitted injection dose. The figure alone does not give the consumption vector or run identifier for each dot. We compare every eligible run from that mixture and average replicates at a point before averaging points. No extrapolation. Of 28 possible run/point comparisons, the mass fit covers 27 and the joint fit covers 25. These sparse, representative curves cover all four mixtures. Model agreement here is conditional on reusing the same campaign for calibration.
+
+| Mixture | Mass fit mean absolute yield error (percentage points) | Mass fit mean mixture minus isolated-parent yield (percentage points) |
+|---|---:|---:|
+| α-pinene + o-cresol | 6.98 | +3.34 |
+| α-pinene + isoprene | 4.98 | −1.42 |
+| o-cresol + isoprene | 0.56 | −2.84 |
+| All three | 5.55 | +0.64 |
+
+The α-pinene/o-cresol model gives an enhancement relative to its own additive control, but at about 299 µg m⁻³ total VOC consumed the digitized yield is 27.4% and its replicate-mean yield is only 15.1%. The o-cresol/isoprene mass fit comes closest to the four yield measurements while predicting suppression relative to its own isolated parents. For the joint calibration the modeled interaction for this pair changes sign (+0.67 percentage points over three covered points). The original paper found no unambiguous experimental suppression for this pair. The model therefore illustrates how a mixture yield can look right even if the single-parent baseline differs. For the ternary mixture the mass fit lies about 5.55 percentage points high on average, despite a small modeled interaction. [Pointwise comparisons, domain gaps and both calibrations](yield_points.csv)
+
+Two additive references are provided. In six additional CUDA batches, each isolated-parent control used the very same time-varying parent consumption, injection multiplier and initial seed and count as its mixture. We removed both partners and fed the entire remaining source to the single-parent branch. The wall-corrected masses of the precursors present sum to the model additive reference. A pure-parent chamber run reproduces itself under this control. The paper-based reference instead interpolates along Manchester’s published single-VOC two-product fits. We digitized the blue and red dashed curves in panel f, converted each point to single-parent consumption using mass/yield, then interpolated the component mass at each simulated component’s consumption and applied Eq. 4. Isoprene contributes zero mass in this published reference. Entries outside either published curve are blank. The paper-based reference is conditional on the simulated component split, while the Figure 5 comparison itself matches total consumption. The alternate isoprene-excluded denominator is also recorded for each available simulation. [Reference curves](data/single_curves.csv) · [Frozen minute histories](replay.csv.gz)
+
+## Does a water-uptake fit transfer between two precursor systems?
+
+Eight preliminary v1 EDFs provide hygroscopicity (κ) from HTDMA at 75, 100 and 150 nm and from cloud condensation nucleus (CCN) activation for α-pinene run 6 and o-cresol/isoprene run 15. The records share the corresponding AMS lights-on time origin. We retained the first five hours of observations and used the last pre-light measurement for each run and instrument as the effective sulfate-seed reference. The 150 nm series begin after growth has started, so their diagnostic predictions use the 100 nm seed anchor. Only 100 nm HTDMA (35 post-light observations) and CCN (58 observations) contributed to parameter fits. Each run contributes equal weight to its calibration objective. The transfer test conditions on the target run’s pre-light seed measurement and the already-calibrated bulk trajectory. It withholds that run’s post-light water data. CCN supersaturation and sampled activation diameter vary during each run. The 75 and 150 nm observations are supplied as transfer diagnostics across sizes. [Run 6 measurements](https://doi.org/10.25326/59RG-Y252) · [Run 15 measurements](https://doi.org/10.25326/E0EP-QR41) · [Wang et al., measurement methods](https://acp.copernicus.org/articles/22/4149/2022/) · [Source filenames, authors’ download URLs and hashes](data/sources.csv)
+
+For each water probe we predicted effective κ as (κseed × Vseed + κorg × E × Vorg)/(Vseed + E × Vorg). Dry volumes use the replayed suspended seed and organic mass divided by their respective densities, 1.77 and 1.40 g cm⁻³. First we fixed E = 1 and fitted κorg between 0 and 0.30. Then we allowed E to vary from 0.25 to 4. This multiplier represents how strongly organic material contributes to the instrument-selected particles compared with the modeled bulk composition. Size dependence, nonideal water mixing and errors in predicted seed or organic mass can all affect it. It is an empirical diagnostic. The bounded nonnegative κorg is an assumption in this comparison. Wang et al. reported that apparent organic κ inferred under volume additivity can also be negative. We fitted the observed dimensionless κ separately for HTDMA and CCN. Derived growth factor, activation diameter and κ from the same scan would otherwise count the same measurement twice.
+
+| Water probe | Bulk mixing, both runs fitted | Added volume multiplier, both runs fitted | Bulk mixing, transferred | Added multiplier, transferred |
+|---|---:|---:|---:|---:|
+| 100 nm HTDMA | 0.0277 | 0.0248 | 0.0362 | 0.0518 |
+| CCN activation | 0.0995 | 0.0446 | 0.0995 | 0.0759 |
+
+Values are RMSE in κ over the individual observations for the frozen mass calibration. Transfer uses run 6 parameters on run 15 and vice versa. For context, setting organic κ to zero and E = 1 gives 0.0330 for 100 nm HTDMA and 0.0995 for CCN. The pooled two-parameter fits give (κorg, E) = (0.122, 1.67) for 100 nm HTDMA and (0.093, 4.00) for CCN. The latter reaches the upper bound. The independently calibrated joint mass-and-number mechanism also gives a lower CCN transfer RMSE with the multiplier (0.1140 to 0.0724), but worse 100 nm transfer (0.0322 to 0.0449). These two runs support a discrepancy in the activation calculation and leave its physical cause unresolved. An intrinsic organic κ, a new reaction or a phase-dependent rate cannot be inferred from the fitted multiplier. [Fitted parameters](water_parameters.csv) · [Scores by training run, test run and diameter](water_scores.csv) · [Predictions and instrument conditions](water_predictions.csv.gz)
+
+## Reproduction
+
+Use the environment described in the [chain methods](../chains/METHODS.md). From the repository root run:
+
+```bash
+export PYTHONPATH="$PWD"
+python studies/voliotis-2022/joint/chains/companion_replay.py
+python studies/voliotis-2022/joint/companions/compare.py
+MPLBACKEND=Agg python studies/voliotis-2022/joint/companions/plot.py
+```
+
+The comparison checks the source SHA-256 hashes on read. To regenerate the published single-precursor curve coordinates from the [paper PDF](https://acp.copernicus.org/articles/22/14147/2022/acp-22-14147-2022.pdf), use `pdfimages -f 15 -l 15 -png paper.pdf figure` and pass `figure-000.png` to `read_reference_curves.py`. The publicly archived EDFs are credited to Gordon McFiggans and the Manchester team under the campaign’s [CC BY 4.0 licence](https://creativecommons.org/licenses/by/4.0/). The Figure 5 coordinates are derived from Voliotis et al. (2022), also CC BY 4.0.

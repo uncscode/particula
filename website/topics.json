@@ -2927,6 +2927,30 @@
       "start_here": false
     },
     {
+      "source": "docs/studies/literature/evaporation-and-uptake/manchester-soa/index.md",
+      "title": "How well does Particula reproduce organic aerosol formation in the Manchester chamber?",
+      "topic": "chambers",
+      "also": [
+        "condensation",
+        "losses-deposition",
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "manchester-soa",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/wall-loss.md",
+            "label": "Size-dependent particle deposition"
+          }
+        ]
+      },
+      "tocFigure": "manchester-soa/graphical-abstract.svg"
+    },
+    {
       "source": "docs/studies/literature/pi-chamber/seed-chemistry.md",
       "title": "At the inferred Π Chamber humidity, modeled sulfate haze falls below the optical detection limit",
       "topic": "chambers",

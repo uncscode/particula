@@ -1,0 +1,12 @@
+{
+  "stage": "train",
+  "seconds": 89.05192785384133,
+  "python": "3.12.12",
+  "numpy": "2.3.4",
+  "scipy": "1.16.2",
+  "particula": "0.3.3",
+  "source": "/tmp/particula-soa-formation-study/particula/__init__.py",
+  "warp": "1.11.1",
+  "gpu": "NVIDIA GeForce RTX 5060",
+  "head": "78c2937a4fbeeefffba41c8d20efe2cf6f1b8186"
+}

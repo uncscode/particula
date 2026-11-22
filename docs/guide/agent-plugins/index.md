@@ -3,14 +3,16 @@
 <a id="ai-assistants"></a>
 <a id="agentic-plugins"></a>
 
-Particula Helper provides eight researcher workflows: environment setup,
-guidance, simulation design, execution, analysis, TOC figure design, debugging and issue reporting,
+Particula Helper provides ten researcher workflows covering environment setup,
+guidance, simulation design, chamber fitting, reaction discovery, execution, analysis, TOC figure design, debugging and issue reporting,
 plus six repository development skills for planning, implementation, testing,
 documentation, example authoring and review. It packages instructions and Python examples; your
 assistant supplies the tools to read files and execute Python. No hosted
 simulation service or MCP server is included.
 
 Use `particula-studies-literature` for simulation analysis and literature reports. In plugin versions through 0.3.4, the analysis skill is named `particula-analyze`.
+
+Use `particula-chamber-analysis` to link bulk SOA yield fits to particle-resolved chamber microphysics. Use `particula-reaction-discovery` to propose reaction chains, fit their rates with automatic differentiation and compare their predictions on CUDA. Both are available from Particula Helper 0.3.8.
 
 Use `particula-toc` to design a 3 × 3 inch graphical abstract around one relationship from the study.
 
