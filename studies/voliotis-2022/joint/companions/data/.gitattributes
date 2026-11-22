@@ -1,0 +1,2 @@
+# Keep original instrument-file bytes for the published SHA-256 checks.
+*.edf -text -diff
