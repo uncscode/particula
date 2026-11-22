@@ -1,0 +1,341 @@
+[
+  {
+    "case": "hypoth",
+    "iteration": 1,
+    "reactions": "AA>B AA>C",
+    "stoichiometry": "molecular",
+    "rates": [
+      0.12212019415479647,
+      2.9805656431964354e-17
+    ],
+    "rmse": [
+      0.5765320359105967,
+      1.2016206215142384,
+      0.4530281415661695
+    ],
+    "aic": 933.3884077861668,
+    "published_aic": 1139.86,
+    "optimizer_status": [
+      2,
+      3
+    ]
+  },
+  {
+    "case": "hypoth",
+    "iteration": 1,
+    "reactions": "AA>B AA>C",
+    "stoichiometry": "unit signed change",
+    "rates": [
+      0.09239250629216443,
+      0.019084264392877325
+    ],
+    "rmse": [
+      0.7171655873735571,
+      0.9177775592694645,
+      0.8600546167529174
+    ],
+    "aic": 1110.3422402543483,
+    "published_aic": 1139.86,
+    "optimizer_status": [
+      2,
+      2
+    ]
+  },
+  {
+    "case": "hypoth",
+    "iteration": 2,
+    "reactions": "AA>D AA>B D>C",
+    "stoichiometry": "molecular",
+    "rates": [
+      1.2227096704160327e-16,
+      0.12211797900610354,
+      1.8057288101170732
+    ],
+    "rmse": [
+      0.5765187606289498,
+      1.201626990854875,
+      0.4530281415661683
+    ],
+    "aic": 935.3830900613893,
+    "published_aic": 106.28,
+    "optimizer_status": [
+      2,
+      3
+    ]
+  },
+  {
+    "case": "hypoth",
+    "iteration": 2,
+    "reactions": "AA>D AA>B D>C",
+    "stoichiometry": "unit signed change",
+    "rates": [
+      0.05768512621241148,
+      0.11704004194060995,
+      0.0345327085367575
+    ],
+    "rmse": [
+      0.4154269353569725,
+      0.268943163153379,
+      0.15227531811451311
+    ],
+    "aic": 60.91403030030397,
+    "published_aic": 106.28,
+    "optimizer_status": [
+      2,
+      2
+    ]
+  },
+  {
+    "case": "hypoth",
+    "iteration": 3,
+    "reactions": "AA>B A>D D>E AE>C",
+    "stoichiometry": "molecular",
+    "rates": [
+      0.12211839647222163,
+      8.196497389327268e-15,
+      0.01967762450478272,
+      0.046558137876024475
+    ],
+    "rmse": [
+      0.5765212624857333,
+      1.2016257904732242,
+      0.45302814156616955
+    ],
+    "aic": 937.3840922472319,
+    "published_aic": -317.99,
+    "optimizer_status": [
+      3,
+      2
+    ]
+  },
+  {
+    "case": "hypoth",
+    "iteration": 3,
+    "reactions": "AA>B A>D D>E AE>C",
+    "stoichiometry": "unit signed change",
+    "rates": [
+      0.09958370340348417,
+      0.19865445650881838,
+      0.40767433107856166,
+      0.07915258714758473
+    ],
+    "rmse": [
+      0.15369010930963561,
+      0.15322809657784783,
+      0.1509237400271564
+    ],
+    "aic": -406.8428873949806,
+    "published_aic": -317.99,
+    "optimizer_status": [
+      2,
+      2
+    ]
+  },
+  {
+    "case": "hypoth",
+    "iteration": 4,
+    "reactions": "AA>B AA>D D>EE E>F EF>C",
+    "stoichiometry": "molecular",
+    "rates": [
+      0.12212109220946174,
+      1.7436319335605978e-17,
+      9.99999642278506,
+      9.999999065019436,
+      9.999999736479255
+    ],
+    "rmse": [
+      0.5765374179820594,
+      1.20161803946139,
+      0.45302814156617
+    ],
+    "aic": 939.390563705195,
+    "published_aic": 390.92,
+    "optimizer_status": [
+      3,
+      3
+    ]
+  },
+  {
+    "case": "hypoth",
+    "iteration": 4,
+    "reactions": "AA>B AA>D D>EE E>F EF>C",
+    "stoichiometry": "unit signed change",
+    "rates": [
+      0.1170291835102196,
+      0.057660967247423464,
+      0.2744843749170665,
+      9.999999999532564,
+      4.894470126003459
+    ],
+    "rmse": [
+      0.4154160255089599,
+      0.2689603289892274,
+      0.16066565324044121
+    ],
+    "aic": 81.01589873375366,
+    "published_aic": 390.92,
+    "optimizer_status": [
+      2,
+      2
+    ]
+  },
+  {
+    "case": "aldol_condensation",
+    "iteration": 1,
+    "reactions": "AB>CD",
+    "stoichiometry": "molecular",
+    "rates": [
+      0.06970886723750798
+    ],
+    "rmse": [
+      1.3131299434277461,
+      0.6619199441577284,
+      1.1684209444249418,
+      1.180840035043141
+    ],
+    "aic": 1759.230897749629,
+    "published_aic": null,
+    "optimizer_status": [
+      2,
+      2
+    ]
+  },
+  {
+    "case": "aldol_condensation",
+    "iteration": 2,
+    "reactions": "A>E BE>CD",
+    "stoichiometry": "molecular",
+    "rates": [
+      0.6936038094129365,
+      0.12162415661975293
+    ],
+    "rmse": [
+      0.1980467161390098,
+      0.7903130900935355,
+      0.5952969088614471,
+      0.6140115568186096
+    ],
+    "aic": 848.4217543290902,
+    "published_aic": 866.58,
+    "optimizer_status": [
+      2,
+      2
+    ]
+  },
+  {
+    "case": "aldol_condensation",
+    "iteration": 3,
+    "reactions": "A>E BE>F F>CD",
+    "stoichiometry": "molecular",
+    "rates": [
+      0.7727142534458712,
+      0.28247810231969867,
+      0.6769951607543554
+    ],
+    "rmse": [
+      0.13201528510853883,
+      0.15094300815369038,
+      0.14733780151121428,
+      0.16537173466491392
+    ],
+    "aic": -580.3569413013682,
+    "published_aic": -351.17,
+    "optimizer_status": [
+      2,
+      2
+    ]
+  },
+  {
+    "case": "aldol_condensation",
+    "iteration": 4,
+    "reactions": "A>E EB>FG F>C G>D",
+    "stoichiometry": "molecular",
+    "rates": [
+      0.7727152310873437,
+      0.2824662244830711,
+      0.679621814401066,
+      0.6744432699056457
+    ],
+    "rmse": [
+      0.1320152532197304,
+      0.15094182941438977,
+      0.14727548877691,
+      0.1653174732266439
+    ],
+    "aic": -578.5847121942451,
+    "published_aic": -349.21,
+    "optimizer_status": [
+      2,
+      2
+    ]
+  },
+  {
+    "case": "fruc_HMF2",
+    "iteration": 1,
+    "reactions": "A>BD D>BE E>BC",
+    "stoichiometry": "molecular",
+    "rates": [
+      0.02883785675611941,
+      9.999999999943862,
+      9.999999999979705
+    ],
+    "rmse": [
+      0.1967633972672152,
+      0.19958705683749878,
+      0.19967398865063085
+    ],
+    "aic": -171.45352902714225,
+    "published_aic": -166.18,
+    "optimizer_status": [
+      4,
+      4
+    ]
+  },
+  {
+    "case": "fruc_HMF2",
+    "iteration": 2,
+    "reactions": "A>D D>BE E>BF F>BC",
+    "stoichiometry": "molecular",
+    "rates": [
+      0.028919277563406086,
+      9.999999999566226,
+      9.999999999723386,
+      9.999999999887297
+    ],
+    "rmse": [
+      0.19665710085434143,
+      0.2018549622273906,
+      0.20033630454883733
+    ],
+    "aic": -165.23251664725436,
+    "published_aic": -169.4,
+    "optimizer_status": [
+      4,
+      3
+    ]
+  },
+  {
+    "case": "fruc_HMF2",
+    "iteration": 3,
+    "reactions": "A>BD D>EF EF>D D>BG G>BC",
+    "stoichiometry": "molecular",
+    "rates": [
+      0.028933190759312454,
+      0.023359081805225963,
+      1.880618880484926e-05,
+      9.999999954133072,
+      9.999999999800503
+    ],
+    "rmse": [
+      0.1966483210517226,
+      0.19910725997710732,
+      0.20005808589198237
+    ],
+    "aic": -167.77455440583455,
+    "published_aic": -161.52,
+    "optimizer_status": [
+      2,
+      3
+    ]
+  }
+]
