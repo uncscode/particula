@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 748 464" width="748" height="464" role="img" aria-labelledby="title desc">
+<title id="title">Manchester precursors and one fitted α-pinene particle-aging pathway</title>
+<desc id="desc">Skeletal structures of α-pinene, o-cresol and isoprene, and a separate proposed pinic acid assignment from the Manchester composition study. The structures show connectivity without assigning stereochemistry. A selected model pathway couples two α-pinene-derived particle intermediates into dimer material. Retained oxidation and then cleavage put half of the transferred organic mass into a particle residue and half into gas. All downstream pools have unassigned molecular structures.</desc>
+<metadata>Structures drawn from PubChem two-dimensional records for CID 6654, 335, 6557 and 10131. Pinic acid was a tentative assignment in Shao et al. (2022), Figure 6a, https://doi.org/10.5194/acp-22-9799-2022 . Model channels aa_particle, AA_oxidize and AA_oxsplit from studies/voliotis-2022/joint/results/chains/resolution_checked_mechanism.json. S_AA,p and D_AA refer to the same dimer mass inventory.</metadata>
+<defs>
+  <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L7 3.5 L0 7 Z" fill="#366268"/></marker>
+</defs>
+<rect width="748" height="464" rx="12" fill="#FFFCF6"/>
+<g font-family="Liberation Sans, Arial, sans-serif" fill="#243e43">
+  <rect x="510" y="14" width="223" height="161" rx="8" fill="#F2E7D4"/>
+  <text x="23" y="37" font-size="20" font-weight="bold">Measured precursors</text>
+  <text x="524" y="38" font-size="16" font-weight="bold">Manchester filter analysis</text>
+  <text x="524" y="62" font-size="14">Tentative pinic acid assignment</text>
+  <text x="524" y="160" font-size="13">C₉H₁₄O₄ · Shao et al., Fig. 6a</text>
+  <g transform="translate(23 47)"><path xmlns="http://www.w3.org/2000/svg" class="bond-0 atom-0 atom-1" d="M 93.6,42.9 L 73.9,26.4" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-1 atom-0 atom-2" d="M 93.6,42.9 L 69.4,43.1" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-2 atom-0 atom-6" d="M 93.6,42.9 L 102.2,57.9" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-3 atom-0 atom-7" d="M 93.6,42.9 L 108.6,34.3" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-4 atom-1 atom-3" d="M 73.9,26.4 L 61.1,9.3" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-5 atom-1 atom-4" d="M 73.9,26.4 L 38.7,31.7" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-6 atom-2 atom-3" d="M 69.4,43.1 L 61.1,9.3" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-7 atom-2 atom-5" d="M 69.4,43.1 L 48.2,58.1" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-8 atom-4 atom-8" d="M 38.7,31.7 L 33.9,48.4" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-9 atom-5 atom-8" d="M 48.2,58.1 L 33.9,48.4" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-9 atom-5 atom-8" d="M 48.2,53.8 L 37.9,46.9" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-10 atom-5 atom-9" d="M 48.2,58.1 L 48.8,75.3" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" d="M 61.7,10.2 L 61.1,9.3 L 61.5,11.0" style="fill:none;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;" />
+<path xmlns="http://www.w3.org/2000/svg" d="M 40.4,31.5 L 38.7,31.7 L 38.4,32.6" style="fill:none;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;" />
+<path xmlns="http://www.w3.org/2000/svg" d="M 34.1,47.5 L 33.9,48.4 L 34.6,48.9" style="fill:none;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;" />
+</g>
+<g transform="translate(184 47)"><path xmlns="http://www.w3.org/2000/svg" class="bond-0 atom-0 atom-2" d="M 79.5,19.0 L 79.5,26.6" style="fill:none;fill-rule:evenodd;stroke:#843A1C;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-0 atom-0 atom-2" d="M 79.5,26.6 L 79.5,34.3" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-1 atom-1 atom-2" d="M 61.7,44.6 L 79.5,34.3" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-2 atom-1 atom-3" d="M 61.7,44.6 L 61.7,65.1" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-2 atom-1 atom-3" d="M 64.8,46.3 L 64.8,63.3" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-3 atom-1 atom-4" d="M 61.7,44.6 L 44.0,34.3" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-4 atom-2 atom-5" d="M 79.5,34.3 L 97.3,44.6" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-4 atom-2 atom-5" d="M 79.5,37.8 L 94.2,46.3" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-5 atom-3 atom-6" d="M 61.7,65.1 L 79.5,75.3" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-6 atom-5 atom-7" d="M 97.3,44.6 L 97.3,65.1" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-7 atom-6 atom-7" d="M 79.5,75.3 L 97.3,65.1" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-7 atom-6 atom-7" d="M 79.5,71.8 L 94.2,63.3" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" d="M 61.7,64.1 L 61.7,65.1 L 62.6,65.6" style="fill:none;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;" />
+<path xmlns="http://www.w3.org/2000/svg" d="M 96.4,44.0 L 97.3,44.6 L 97.3,45.6" style="fill:none;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;" />
+<path xmlns="http://www.w3.org/2000/svg" d="M 78.6,74.8 L 79.5,75.3 L 80.4,74.8" style="fill:none;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;" />
+<path xmlns="http://www.w3.org/2000/svg" d="M 97.3,64.1 L 97.3,65.1 L 96.4,65.6" style="fill:none;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;" />
+<path xmlns="http://www.w3.org/2000/svg" class="atom-0" d="M 75.5 13.8 Q 75.5 11.7, 76.5 10.5 Q 77.6 9.3, 79.5 9.3 Q 81.4 9.3, 82.5 10.5 Q 83.5 11.7, 83.5 13.8 Q 83.5 15.9, 82.5 17.1 Q 81.4 18.3, 79.5 18.3 Q 77.6 18.3, 76.5 17.1 Q 75.5 15.9, 75.5 13.8 M 79.5 17.3 Q 80.8 17.3, 81.6 16.4 Q 82.3 15.5, 82.3 13.8 Q 82.3 12.1, 81.6 11.2 Q 80.8 10.3, 79.5 10.3 Q 78.2 10.3, 77.5 11.2 Q 76.7 12.1, 76.7 13.8 Q 76.7 15.5, 77.5 16.4 Q 78.2 17.3, 79.5 17.3 " fill="#843A1C" />
+<path xmlns="http://www.w3.org/2000/svg" class="atom-0" d="M 84.9 9.4 L 86.1 9.4 L 86.1 13.2 L 90.5 13.2 L 90.5 9.4 L 91.7 9.4 L 91.7 18.2 L 90.5 18.2 L 90.5 14.1 L 86.1 14.1 L 86.1 18.2 L 84.9 18.2 L 84.9 9.4 " fill="#843A1C" />
+</g>
+<g transform="translate(344 47)"><path xmlns="http://www.w3.org/2000/svg" class="bond-0 atom-0 atom-1" d="M 61.4,36.4 L 40.7,24.4" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-1 atom-0 atom-2" d="M 61.4,36.4 L 82.2,24.4" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-2 atom-0 atom-3" d="M 59.6,35.3 L 59.6,60.4" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-2 atom-0 atom-3" d="M 63.2,35.3 L 63.2,60.4" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-3 atom-2 atom-4" d="M 82.2,24.4 L 103.0,36.4" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-3 atom-2 atom-4" d="M 82.2,28.5 L 101.2,39.5" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" d="M 60.4,35.8 L 61.4,36.4 L 62.5,35.8" style="fill:none;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;" />
+<path xmlns="http://www.w3.org/2000/svg" d="M 81.2,25.0 L 82.2,24.4 L 83.3,25.0" style="fill:none;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;" />
+</g>
+<g transform="translate(541 68)"><path xmlns="http://www.w3.org/2000/svg" class="bond-0 atom-0 atom-11" d="M 100.1,60.9 L 101.4,55.9" style="fill:none;fill-rule:evenodd;stroke:#843A1C;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-0 atom-0 atom-11" d="M 101.4,55.9 L 102.8,50.9" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-1 atom-1 atom-11" d="M 113.2,49.2 L 107.8,50.6" style="fill:none;fill-rule:evenodd;stroke:#843A1C;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-1 atom-1 atom-11" d="M 107.8,50.6 L 102.5,52.1" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-1 atom-1 atom-11" d="M 112.7,47.2 L 107.3,48.6" style="fill:none;fill-rule:evenodd;stroke:#843A1C;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-1 atom-1 atom-11" d="M 107.3,48.6 L 101.9,50.1" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-2 atom-2 atom-12" d="M 49.4,14.5 L 52.7,17.8" style="fill:none;fill-rule:evenodd;stroke:#843A1C;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-2 atom-2 atom-12" d="M 52.7,17.8 L 56.0,21.1" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-3 atom-3 atom-12" d="M 52.3,30.8 L 53.7,25.5" style="fill:none;fill-rule:evenodd;stroke:#843A1C;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-3 atom-3 atom-12" d="M 53.7,25.5 L 55.2,20.3" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-3 atom-3 atom-12" d="M 54.3,31.3 L 55.7,26.1" style="fill:none;fill-rule:evenodd;stroke:#843A1C;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-3 atom-3 atom-12" d="M 55.7,26.1 L 57.2,20.8" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-4 atom-4 atom-5" d="M 93.0,27.3 L 79.1,27.3" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-5 atom-4 atom-6" d="M 93.0,27.3 L 93.0,41.2" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-6 atom-4 atom-8" d="M 93.0,27.3 L 106.8,27.3" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-7 atom-4 atom-9" d="M 93.0,27.3 L 93.0,13.5" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-8 atom-5 atom-7" d="M 79.1,27.3 L 79.1,41.2" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-9 atom-5 atom-10" d="M 79.1,27.3 L 69.4,17.5" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-10 atom-6 atom-7" d="M 93.0,41.2 L 79.1,41.2" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-11 atom-6 atom-11" d="M 93.0,41.2 L 102.8,50.9" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" class="bond-12 atom-10 atom-12" d="M 69.4,17.5 L 56.0,21.1" style="fill:none;fill-rule:evenodd;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+<path xmlns="http://www.w3.org/2000/svg" d="M 79.1,40.5 L 79.1,41.2 L 79.8,41.2" style="fill:none;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;" />
+<path xmlns="http://www.w3.org/2000/svg" d="M 69.9,18.0 L 69.4,17.5 L 68.7,17.7" style="fill:none;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;" />
+<path xmlns="http://www.w3.org/2000/svg" d="M 102.7,51.2 L 102.8,50.9 L 102.3,50.4" style="fill:none;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;" />
+<path xmlns="http://www.w3.org/2000/svg" d="M 55.8,20.9 L 56.0,21.1 L 56.7,20.9" style="fill:none;stroke:#233D42;stroke-width:2.2px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1;" />
+<path xmlns="http://www.w3.org/2000/svg" class="atom-0" d="M 96.5 64.3 Q 96.5 62.9, 97.2 62.1 Q 97.9 61.3, 99.2 61.3 Q 100.5 61.3, 101.2 62.1 Q 101.9 62.9, 101.9 64.3 Q 101.9 65.7, 101.2 66.6 Q 100.5 67.4, 99.2 67.4 Q 97.9 67.4, 97.2 66.6 Q 96.5 65.7, 96.5 64.3 M 99.2 66.7 Q 100.1 66.7, 100.6 66.1 Q 101.0 65.5, 101.0 64.3 Q 101.0 63.2, 100.6 62.6 Q 100.1 62.0, 99.2 62.0 Q 98.3 62.0, 97.8 62.6 Q 97.3 63.2, 97.3 64.3 Q 97.3 65.5, 97.8 66.1 Q 98.3 66.7, 99.2 66.7 " fill="#843A1C" />
+<path xmlns="http://www.w3.org/2000/svg" class="atom-0" d="M 102.8 61.4 L 103.6 61.4 L 103.6 63.9 L 106.6 63.9 L 106.6 61.4 L 107.4 61.4 L 107.4 67.3 L 106.6 67.3 L 106.6 64.6 L 103.6 64.6 L 103.6 67.3 L 102.8 67.3 L 102.8 61.4 " fill="#843A1C" />
+<path xmlns="http://www.w3.org/2000/svg" class="atom-1" d="M 113.4 47.4 Q 113.4 46.0, 114.1 45.2 Q 114.8 44.4, 116.1 44.4 Q 117.4 44.4, 118.1 45.2 Q 118.8 46.0, 118.8 47.4 Q 118.8 48.8, 118.1 49.6 Q 117.4 50.4, 116.1 50.4 Q 114.8 50.4, 114.1 49.6 Q 113.4 48.8, 113.4 47.4 M 116.1 49.8 Q 117.0 49.8, 117.5 49.2 Q 118.0 48.5, 118.0 47.4 Q 118.0 46.2, 117.5 45.6 Q 117.0 45.0, 116.1 45.0 Q 115.2 45.0, 114.7 45.6 Q 114.3 46.2, 114.3 47.4 Q 114.3 48.6, 114.7 49.2 Q 115.2 49.8, 116.1 49.8 " fill="#843A1C" />
+<path xmlns="http://www.w3.org/2000/svg" class="atom-2" d="M 37.7 8.4 L 38.5 8.4 L 38.5 10.9 L 41.5 10.9 L 41.5 8.4 L 42.3 8.4 L 42.3 14.3 L 41.5 14.3 L 41.5 11.6 L 38.5 11.6 L 38.5 14.3 L 37.7 14.3 L 37.7 8.4 " fill="#843A1C" />
+<path xmlns="http://www.w3.org/2000/svg" class="atom-2" d="M 43.5 11.3 Q 43.5 9.9, 44.2 9.1 Q 44.9 8.4, 46.2 8.4 Q 47.5 8.4, 48.2 9.1 Q 48.9 9.9, 48.9 11.3 Q 48.9 12.8, 48.2 13.6 Q 47.5 14.4, 46.2 14.4 Q 44.9 14.4, 44.2 13.6 Q 43.5 12.8, 43.5 11.3 M 46.2 13.7 Q 47.1 13.7, 47.6 13.1 Q 48.1 12.5, 48.1 11.3 Q 48.1 10.2, 47.6 9.6 Q 47.1 9.0, 46.2 9.0 Q 45.3 9.0, 44.8 9.6 Q 44.3 10.2, 44.3 11.3 Q 44.3 12.5, 44.8 13.1 Q 45.3 13.7, 46.2 13.7 " fill="#843A1C" />
+<path xmlns="http://www.w3.org/2000/svg" class="atom-3" d="M 49.7 34.5 Q 49.7 33.1, 50.4 32.3 Q 51.1 31.5, 52.4 31.5 Q 53.7 31.5, 54.4 32.3 Q 55.1 33.1, 55.1 34.5 Q 55.1 35.9, 54.4 36.7 Q 53.7 37.5, 52.4 37.5 Q 51.1 37.5, 50.4 36.7 Q 49.7 35.9, 49.7 34.5 M 52.4 36.9 Q 53.3 36.9, 53.8 36.3 Q 54.3 35.7, 54.3 34.5 Q 54.3 33.3, 53.8 32.8 Q 53.3 32.2, 52.4 32.2 Q 51.5 32.2, 51.0 32.8 Q 50.6 33.3, 50.6 34.5 Q 50.6 35.7, 51.0 36.3 Q 51.5 36.9, 52.4 36.9 " fill="#843A1C" />
+</g>
+  <g font-size="16" font-weight="bold" text-anchor="middle">
+    <text x="94" y="151">α-pinene</text><text x="255" y="151">o-cresol</text><text x="415" y="151">Isoprene</text>
+  </g>
+  <path d="M21 189 H727" stroke="#8EA3A0"/>
+  <text x="23" y="219" font-size="20" font-weight="bold">An α-pinene pathway from the fitted mechanism</text>
+  <text x="23" y="243" font-size="14">Each model pool groups organic material with an unresolved molecular structure.</text>
+  <g fill="#E4EFEB" stroke="#74918C" stroke-width="1.3">
+    <rect x="21" y="260" width="188" height="62" rx="6"/>
+    <rect x="282" y="260" width="153" height="62" rx="6"/>
+    <rect x="512" y="260" width="211" height="62" rx="6"/>
+  </g>
+  <g text-anchor="middle" font-size="18" font-weight="bold" fill="#135963">
+    <text x="115" y="285">2 P<tspan dy="4" font-size="12">A</tspan></text>
+    <text x="358" y="285">D<tspan dy="4" font-size="12">AA</tspan></text>
+    <text x="618" y="285">W<tspan dy="4" font-size="12">AA</tspan></text>
+  </g>
+  <g text-anchor="middle" font-size="14">
+    <text x="115" y="308">Particle intermediates</text>
+    <text x="358" y="308">Particle dimer</text>
+    <text x="618" y="308">Oxidized particle product</text>
+  </g>
+  <g font-size="12" text-anchor="middle" font-weight="bold" fill="#365E63">
+    <text x="245" y="282">Coupling</text><text x="473" y="282">Oxidation</text>
+  </g>
+  <g fill="none" stroke="#366268" stroke-width="2" marker-end="url(#arrow)">
+    <path d="M212 294 H278"/><path d="M438 294 H508"/>
+    <path d="M618 323 V358 H334 V382"/><path d="M618 358 V382"/>
+  </g>
+  <text x="462" y="349" font-size="14" fill="#365E63" font-weight="bold">Cleavage</text>
+  <g stroke-width="1.3">
+    <rect x="208" y="386" width="251" height="57" rx="6" fill="#E4EFEB" stroke="#74918C"/>
+    <rect x="512" y="386" width="211" height="57" rx="6" fill="#FFFCF6" stroke="#74918C" stroke-dasharray="5 3"/>
+  </g>
+  <g text-anchor="middle">
+    <text x="334" y="409" font-weight="bold" font-size="17">½ L<tspan dy="4" font-size="12">AA</tspan></text>
+    <text x="618" y="409" font-weight="bold" font-size="17">½ U<tspan dy="4" font-size="12">AA</tspan></text>
+    <text x="334" y="430" font-size="14">Retained particle residue</text>
+    <text x="618" y="430" font-size="14">Released gas product</text>
+  </g>
+  <text x="23" y="400" font-size="14">The default split assigns</text>
+  <text x="23" y="420" font-size="14">half the transferred mass</text>
+  <text x="23" y="440" font-size="14">to each product.</text>
+</g>
+</svg>
