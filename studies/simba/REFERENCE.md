@@ -99,3 +99,19 @@ all participate in the differentiated trajectory. The wall coefficient is
 defined for an inverse-diameter synthetic deposition law at 100 nm.
 
 [CPU and CUDA qualification](trajectory_qualification.json)
+
+The [bounded enumeration record](enumeration.json) checks whether the native
+generator can propose each of the eleven tabulated finalists. Starting from
+element or conserved-pool vectors, it generates unimolecular and bimolecular
+steps, imposes the paper's terminal-product and net-balance restrictions,
+and searches up to each reported complexity. All eleven occurred within the
+stated budgets. The largest search examined 1,385,979 combinations. The
+hidden species budgets are supplied hypotheses. The independent refits above
+compare the published finalists, while enumeration also admits additional
+networks whose fit was outside this finalist comparison.
+
+```bash
+PYTHONPATH=. python studies/simba/enumeration.py /tmp/enumeration.json
+PYTHONPATH=. python studies/simba/native_parity.py /tmp/native_parity.json
+PYTHONPATH=. python studies/simba/heldout_recovery.py cuda:0 /tmp/recovery.json
+```

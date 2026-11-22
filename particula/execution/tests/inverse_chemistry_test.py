@@ -90,3 +90,22 @@ def test_coupled_gradients(device):
                 atol=1e-9,
                 err_msg=f"{group}[{j}]",
             )
+
+
+def test_elemental_balance_and_duplicate_exchange():
+    """An equal molar mass alone cannot justify transmutation or phase mapping."""
+    from dataclasses import replace
+
+    from particula.dynamics.chemistry import ReactionMechanism
+    from particula.execution.inverse_chemistry import _compile
+
+    model = coupled_case()
+    with pytest.raises(ValueError, match="Duplicate vapor exchange"):
+        _compile(replace(model, exchange=model.exchange * 2))
+    data = model.mechanism.to_dict()
+    data["species"]["gas:A"]["elements"] = {"Y": 1}
+    with pytest.raises(ValueError, match="elemental imbalance"):
+        _compile(replace(model, mechanism=ReactionMechanism(data)))
+    data["species"]["gas:V"]["elements"] = {"Y": 1}
+    with pytest.raises(ValueError, match="different elemental"):
+        _compile(replace(model, mechanism=ReactionMechanism(data)))

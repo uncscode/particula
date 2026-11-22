@@ -8,6 +8,7 @@ import warp as wp
 from scipy.special import ndtri
 
 from particula.dynamics.chemistry import ReactionMechanism
+from particula.dynamics.chemistry.binding import _compile_network
 from particula.dynamics.chemistry.observations import ObservationSeries
 from particula.execution import _discovery_trajectory as kernels
 from particula.execution._discovery_measurements import observe_number_spectrum
@@ -52,6 +53,7 @@ class Trajectory:
     species: tuple[str, ...]
     loss: float | None
     gradients: dict[str, np.ndarray]
+    transfer_bytes: dict[str, int]
 
 
 def _vector(values, length, label):
@@ -96,7 +98,11 @@ def _compile(chamber):
     vol = [
         masses[n] / chamber.density[n] if n in particles else 0.0 for n in names
     ]
-    phase, first, second, change = [], [], [], []
+    composition = dict(mechanism.species)
+    change, _, _ = _compile_network(
+        mechanism, composition, [masses[n] for n in names]
+    )
+    phase, first, second = [], [], []
     for reaction in mechanism.reactions:
         lhs = [
             names.index(n) for n, order in reaction.orders for _ in range(order)
@@ -108,8 +114,16 @@ def _compile(chamber):
         phase.append(int(names[lhs[0]] in particles))
         first.append(lhs[0])
         second.append(lhs[1] if len(lhs) == 2 else -1)
-        net = reaction.signed_coefficients()
-        change.append([net.get(n, 0) for n in names])
+
+    _validate_exchange(chamber, gases, particles, masses, composition)
+    return names, masses, vol, fractions, (phase, first, second, change)
+
+
+def _validate_exchange(chamber, gases, particles, masses, composition):
+    if len({(p.gas, p.particle) for p in chamber.exchange}) != len(
+        chamber.exchange
+    ):
+        raise ValueError("Duplicate vapor exchange pair")
     for pair in chamber.exchange:
         if (
             pair.gas not in gases
@@ -121,12 +135,19 @@ def _compile(chamber):
             raise ValueError(
                 "Exchange requires matching gas and particle molar masses"
             )
+        if (
+            composition[pair.gas]
+            and composition[pair.particle]
+            and composition[pair.gas] != composition[pair.particle]
+        ):
+            raise ValueError(
+                "Exchange species have different elemental compositions"
+            )
         if not all(
             np.isfinite(v) and v > 0
             for v in (pair.diffusivity_m2_s, pair.mean_free_path_m)
         ):
             raise ValueError("Invalid vapor transport properties")
-    return names, masses, vol, fractions, (phase, first, second, change)
 
 
 def _measurement_grid(chamber, times, max_step, observations, gradient, seed):
@@ -171,6 +192,28 @@ def _integrate(state, duration, max_step, slope, advance):
     return state
 
 
+def _transfers(device):
+    """Count explicit input and output tensor bytes for a CUDA replay."""
+    traffic = {"host_to_device": 0, "device_to_host": 0}
+    cuda = wp.get_device(device).is_cuda
+
+    def upload(x, dtype, trainable=False):
+        array = wp.array(x, dtype=dtype, device=device, requires_grad=trainable)
+        if cuda:
+            traffic["host_to_device"] += array.size * (
+                8 if dtype == wp.float64 else 4
+            )
+        return array
+
+    def download(array):
+        host = array.numpy()
+        if cuda:
+            traffic["device_to_host"] += host.nbytes
+        return host
+
+    return upload, download, traffic
+
+
 def simulate_chamber(
     chamber: SeededChamber,
     times,
@@ -208,18 +251,14 @@ def simulate_chamber(
         chamber, times, max_step, observations, gradient, seed
     )
     opts = dict(dtype=wp.float64, device=device)
-    params = {
-        k: wp.array(v, requires_grad=gradient, **opts)
-        for k, v in inputs.items()
-    }
+    upload, download, traffic = _transfers(device)
+    params = {k: upload(v, wp.float64, gradient) for k, v in inputs.items()}
 
     def floats(x):
-        return wp.array(x, **opts)
+        return upload(x, wp.float64)
 
     def ints(x):
-        return wp.array(
-            np.asarray(x, dtype=np.int32), dtype=wp.int32, device=device
-        )
+        return upload(np.asarray(x, dtype=np.int32), wp.int32)
 
     def empty(shape):
         return wp.empty(shape, requires_grad=gradient, **opts)
@@ -292,7 +331,7 @@ def simulate_chamber(
 
     tape = wp.Tape() if gradient else None
     outputs = []
-    with tape if gradient else nullcontext():
+    with tape if tape is not None else nullcontext():
         state = empty(shape)
         run(
             kernels.initialize,
@@ -326,16 +365,36 @@ def simulate_chamber(
             )
             outputs.append(out)
     return _finish(
-        bad, outputs, observations, tape, floats, params, gas_ids, state, names
+        bad,
+        outputs,
+        observations,
+        tape,
+        floats,
+        params,
+        gas_ids,
+        state,
+        names,
+        download,
+        traffic,
     )
 
 
 def _finish(
-    bad, outputs, observations, tape, floats, params, gas_ids, state, names
+    bad,
+    outputs,
+    observations,
+    tape,
+    floats,
+    params,
+    gas_ids,
+    state,
+    names,
+    download,
+    traffic,
 ):
-    if bad.numpy()[0]:
+    if download(bad)[0]:
         raise ValueError("Invalid trajectory stage; reduce max_step")
-    predictions = np.stack([o.numpy() for o in outputs])
+    predictions = np.stack([download(o) for o in outputs])
     if not np.isfinite(predictions).all():
         raise ValueError("Nonfinite observation")
     loss, adj = (
@@ -348,6 +407,6 @@ def _finish(
         tape.backward(
             grads={o: floats(a) for o, a in zip(outputs, adj, strict=True)}
         )
-        grads = {k: p.grad.numpy() for k, p in params.items()}
+        grads = {k: download(p.grad) for k, p in params.items()}
         grads["dose"] = grads["dose"][gas_ids]
-    return Trajectory(predictions, state.numpy(), names, loss, grads)
+    return Trajectory(predictions, download(state), names, loss, grads, traffic)

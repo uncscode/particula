@@ -35,7 +35,9 @@ def enumerate_networks(
     max_trials: int,
     max_candidates: int,
     net: Step | None = None,
+    max_intermediates: int | None = None,
     interchangeable: Sequence[int] = (),
+    exchange_pairs: Sequence[tuple[int, int]] = (),
 ) -> SearchResult:
     """Search combinations of allowed, prebalanced elementary steps.
 
@@ -43,6 +45,9 @@ def enumerate_networks(
     substrates available at the start. Every required product must be made
     and every selected reaction must be reachable. Supply interchangeable
     indices only for hidden species with identical physical constraints.
+    max_intermediates bounds used columns other than initial species and
+    specified products. Reversible exchange pairs link phases once either
+    phase has a source. They add no fitted reaction or net coefficient.
     Limits count examined combinations and unique returned networks.
     """
     rows, required, hidden, target = _validate_search(
@@ -52,6 +57,9 @@ def enumerate_networks(
         interchangeable,
         net,
         (max_steps, max_trials, max_candidates),
+    )
+    links, hidden_columns, hidden_limit = _search_constraints(
+        initial, required, hidden, exchange_pairs, max_intermediates
     )
     found: dict[Network, Network] = {}
     examined = 0
@@ -65,9 +73,12 @@ def enumerate_networks(
                 and tuple(map(sum, zip(*network, strict=True))) != target
             ):
                 continue
-            if any(not any(row[i] > 0 for row in network) for i in required):
+            if (
+                sum(any(row[i] for row in network) for i in hidden_columns)
+                > hidden_limit
+            ):
                 continue
-            if not _reachable(network, initial):
+            if not _reachable(network, initial, required, links):
                 continue
             key = _canonical(network, hidden)
             if key not in found:
@@ -77,6 +88,31 @@ def enumerate_networks(
                     )
                 found[key] = network
     return SearchResult(tuple(found.values()), examined, None)
+
+
+def _search_constraints(
+    initial, required, hidden, exchange_pairs, max_intermediates
+):
+    links = tuple((index(a), index(b)) for a, b in exchange_pairs)
+    if any(
+        min(a, b) < 0 or max(a, b) >= len(initial) or a == b for a, b in links
+    ):
+        raise ValueError("Invalid exchange species indices")
+    if any(a in hidden or b in hidden for a, b in links):
+        raise ValueError("Exchange-linked species require fixed labels")
+    hidden_columns = tuple(
+        i
+        for i, present in enumerate(initial)
+        if not present and i not in required
+    )
+    hidden_limit = (
+        len(hidden_columns)
+        if max_intermediates is None
+        else index(max_intermediates)
+    )
+    if hidden_limit < 0:
+        raise ValueError("Intermediate limit must be nonnegative")
+    return links, hidden_columns, hidden_limit
 
 
 def _validate_search(steps, initial, products, interchangeable, net, bounds):
@@ -104,11 +140,16 @@ def _validate_search(steps, initial, products, interchangeable, net, bounds):
     return rows, required, hidden, target
 
 
-def _reachable(network: Network, initial: Sequence[bool]) -> bool:
+def _reachable(network, initial, required, links):
     """Check that the initial substrates can supply all selected steps."""
     available = {i for i, present in enumerate(initial) if present}
+    made = {i for row in network for i, v in enumerate(row) if v > 0}
+    _exchange_closure(made, links)
+    if not made.issuperset(required):
+        return False
     remaining = list(network)
     while remaining:
+        _exchange_closure(available, links)
         reachable = [
             row
             for row in remaining
@@ -120,6 +161,16 @@ def _reachable(network: Network, initial: Sequence[bool]) -> bool:
             available.update(i for i, v in enumerate(row) if v > 0)
             remaining.remove(row)
     return not remaining
+
+
+def _exchange_closure(available, links):
+    """Follow reversible links including chains sharing a species."""
+    size = -1
+    while size != len(available):
+        size = len(available)
+        for a, b in links:
+            if a in available or b in available:
+                available.update((a, b))
 
 
 def _canonical(network: Network, hidden: tuple[int, ...]) -> Network:

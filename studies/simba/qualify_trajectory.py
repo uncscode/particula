@@ -62,8 +62,42 @@ def qualify(device, vapor):
                 discrepancies, 2e-4, err_msg=f"{group}[{j}]"
             )
             grad_errors[f"{group}[{j}]"] = discrepancies
+    # Perturb all continuous controls together and isolate each detector family.
+    high, low = {}, {}
+    for group, values in controls.items():
+        direction = np.where(values > 0, values, 0.0) * np.linspace(
+            0.3, -0.2, len(values)
+        )
+        high[group] = values + 1e-4 * direction
+        low[group] = values - 1e-4 * direction
+    slopes = (reference(times, **high)[0] - reference(times, **low)[0]) / 2e-4
+    masked_errors = {}
+    for label, channels in (
+        ("vapor", [0, 1]),
+        ("aerosol_mass", [2]),
+        ("size", [3, 4, 5]),
+    ):
+        target = np.full_like(ref, np.nan)
+        target[:, channels] = 0.9 * ref[:, channels]
+        series = ObservationSeries.create(times, target, np.diag(scales**2))
+        result = simulate_chamber(
+            model,
+            times,
+            **controls,
+            device=device,
+            max_step=0.025,
+            observations=series,
+            gradient=True,
+        )
+        measured = sum(
+            result.gradients[g] @ ((high[g] - low[g]) / 2e-4) for g in controls
+        )
+        expected = np.sum(series.loss(ref)[1] * slopes)
+        np.testing.assert_allclose(measured, expected, rtol=0.002, atol=1e-5)
+        masked_errors[label] = float(abs(measured - expected))
     return {
         "initial_vapor_mol_m3": vapor,
+        "isolated_channel_mixed_derivative_errors": masked_errors,
         "steps_s": [0.1, 0.05, 0.025],
         "channel_peak_normalized_errors": np.asarray(errors).tolist(),
         "gradient_absolute_errors_per_parameter_scale": grad_errors,

@@ -32,3 +32,43 @@ def test_shared_local_and_fixed(gradient):
     )
     np.testing.assert_allclose(profile.parameters, [0.0, 0.4, 0.9], atol=1e-7)
     assert profile.loss > result.loss
+
+
+def test_rank_held_out_ties():
+    """Both candidate paths predict the same conserved observable."""
+    from particula.dynamics.chemistry.discovery import SearchResult
+    from particula.dynamics.chemistry.inference import (
+        CandidateFit,
+        fit_networks,
+    )
+
+    direct = ((-1, 0, 1),)
+    chain = ((-1, 1, 0), (0, -1, 1))
+    search = SearchResult((chain, direct), 2, None)
+
+    def prepare(net):
+        size = len(net)
+        measured = experiment((0,), [0.5])
+        return CandidateFit(
+            [measured], [(0, 1)] * size, [np.zeros(size)], [measured]
+        )
+
+    ranks = fit_networks(search, prepare, criterion="held_out", tolerance=1e-8)
+    assert {r.network for r in ranks if r.competitive} == {chain, direct}
+    aic = fit_networks(search, prepare, criterion="aic", tolerance=0.01)
+    assert [r.network for r in aic if r.competitive] == [direct]
+
+
+@pytest.mark.parametrize("gradient", [False, True])
+def test_evaluation_budget(gradient):
+    """Account for FD probes and retain the best evaluated feasible point."""
+    fit = fit_experiments(
+        [experiment((0,), [0.5])],
+        [(0.0, 1.0)],
+        [np.array([0.1])],
+        gradient=gradient,
+        max_evaluations=1,
+    )
+    assert fit.evaluations == (1,)
+    assert fit.converged == (False,)
+    np.testing.assert_allclose(fit.parameters, [0.1])

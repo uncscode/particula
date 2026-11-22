@@ -83,3 +83,32 @@ def test_discovered_bimolecular_reaction_executes():
     np.testing.assert_allclose(
         state.gas.concentration[:, 0] / 0.01, [0.5, 2 / 3], rtol=2e-6
     )
+
+
+def test_condensation_makes_particle_intermediate_reachable():
+    """Vapor produced by A supplies particle aging via a reversible pair."""
+    options = dict(
+        max_steps=2, max_trials=10, max_candidates=5, exchange_pairs=[(1, 2)]
+    )
+    search = enumerate_networks(
+        [(-1, 1, 0, 0), (0, 0, -1, 1)], [1, 0, 0, 0], [3], **options
+    )
+    assert len(search.networks) == 1 and len(search.networks[0]) == 2
+    assert not enumerate_networks(
+        [(0, 0, -1, 1)], [1, 0, 0, 0], [3], **options
+    ).networks
+
+
+def test_intermediate_budget_keeps_direct_parent():
+    """A zero hidden-species budget retains a nested direct control."""
+    result = enumerate_networks(
+        [(-1, 0, 1), (-1, 1, 0), (0, -1, 1)],
+        [1, 0, 0],
+        [2],
+        net=(-1, 0, 1),
+        max_steps=2,
+        max_trials=10,
+        max_candidates=4,
+        max_intermediates=0,
+    )
+    assert result.networks == (((-1, 0, 1),),)

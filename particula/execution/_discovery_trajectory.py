@@ -28,7 +28,7 @@ def initialize(
     state: FloatMatrix,
 ):
     """Initialize gas and equal-number lognormal seed cohorts in mol/m³ air."""
-    b, j = wp.tid()
+    b, j = wp.tid()  # type: ignore[misc]
     ns = dose.shape[0]
     value = wp.float64(0)
     if b == 0 and j < ns:
@@ -55,14 +55,14 @@ def initialize(
 @wp.kernel
 def inventory(state: FloatMatrix, molar_volume: FloatVector, bulk: FloatMatrix):
     """Return suspended volume fraction, number, diameter and total moles."""
-    j = wp.tid()
+    j = wp.tid()  # Scalar launch over occupied cohorts.
     ns = molar_volume.shape[0]
     vol = wp.float64(0)
     moles = wp.float64(0)
     for s in range(ns):
-        vol += state[j + 1, s] * molar_volume[s]
-        moles += state[j + 1, s]
-    number = state[j + 1, 2 * ns]
+        vol += state[j + 1, s] * molar_volume[s]  # type: ignore[operator]
+        moles += state[j + 1, s]  # type: ignore[operator]
+    number = state[j + 1, 2 * ns]  # type: ignore[operator]
     bulk[j, 0] = vol
     bulk[j, 1] = number
     bulk[j, 2] = wp.float64(0)
@@ -93,7 +93,7 @@ def exchange(
     flux: FloatMatrix,
 ):
     """Evaluates reversible ideal-solution transfer at unit accommodation."""
-    j, p = wp.tid()
+    j, p = wp.tid()  # type: ignore[misc]
     radius = wp.float64(0.5) * bulk[j, 2]
     correction = vapor_transition_correction_wp(
         mean_path[p] / radius, wp.float64(1)
@@ -116,7 +116,7 @@ def _chemistry(
     phase: IntVector,
     first: IntVector,
     second: IntVector,
-    change: wp.array2d(dtype=int),
+    change: wp.array2d(dtype=int),  # type: ignore[valid-type]
 ):
     value = wp.float64(0)
     for r in range(rates.shape[0]):
@@ -139,12 +139,12 @@ def derivative(
     phase: IntVector,
     first: IntVector,
     second: IntVector,
-    change: wp.array2d(dtype=int),
+    change: wp.array2d(dtype=int),  # type: ignore[valid-type]
     seed: FloatVector,
     result: FloatMatrix,
 ):
     """Compute molar tendencies and accumulate deposited inventories."""
-    b, s = wp.tid()
+    b, s = wp.tid()  # type: ignore[misc]
     ns = change.shape[1]
     volume = wp.float64(1)
     kind = int(0)
@@ -182,7 +182,7 @@ def advance(
     invalid: IntVector,
 ):
     """Advance one explicit stage and flag failed domain checks."""
-    b, s = wp.tid()
+    b, s = wp.tid()  # type: ignore[misc]
     value = state[b, s] + dt * slope[b, s]
     result[b, s] = value
     if not wp.isfinite(value) or value < wp.float64(0):

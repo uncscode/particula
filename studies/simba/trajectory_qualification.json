@@ -2,6 +2,11 @@
   "cpu": [
     {
       "initial_vapor_mol_m3": 0.0,
+      "isolated_channel_mixed_derivative_errors": {
+        "vapor": 1.1766311079602909e-05,
+        "aerosol_mass": 1.685207226553853e-05,
+        "size": 2.2601338757477496e-06
+      },
       "steps_s": [
         0.1,
         0.05,
@@ -152,6 +157,11 @@
     },
     {
       "initial_vapor_mol_m3": 1e-07,
+      "isolated_channel_mixed_derivative_errors": {
+        "vapor": 4.702858317773284e-07,
+        "aerosol_mass": 5.137275465180724e-06,
+        "size": 2.1469402721185915e-06
+      },
       "steps_s": [
         0.1,
         0.05,
@@ -304,6 +314,11 @@
   "cuda:0": [
     {
       "initial_vapor_mol_m3": 0.0,
+      "isolated_channel_mixed_derivative_errors": {
+        "vapor": 1.1766311079505765e-05,
+        "aerosol_mass": 1.6852072265760576e-05,
+        "size": 2.2601338767469503e-06
+      },
       "steps_s": [
         0.1,
         0.05,
@@ -454,6 +469,11 @@
     },
     {
       "initial_vapor_mol_m3": 1e-07,
+      "isolated_channel_mixed_derivative_errors": {
+        "vapor": 4.702858317634506e-07,
+        "aerosol_mass": 5.137275465291746e-06,
+        "size": 2.1469402733120813e-06
+      },
       "steps_s": [
         0.1,
         0.05,
