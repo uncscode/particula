@@ -126,3 +126,63 @@ error during preparation reports the required bytes. A failed interval
 signals device code 110, and an invalid initial geometry or rate signals
 111. Concentrations and masses publish together only after all boxes finish.
 [Qualification, costs and limitations](../../studies/validation/condensation/resolved-chemistry.md)
+
+## Differentiate a candidate mechanism through a seeded chamber
+
+For a fixed network, `SeededChamber` combines constant first- or second-order
+gas and particle reactions, reversible gas exchange, deterministic wall loss,
+and a finite-width size response. Use this concrete inverse model to ask how a
+change in precursor dose, a reaction rate, or product volatility affects a
+measured channel at a particular time. Supply a native mechanism with declared
+molar masses, particle densities in kg/m³, seed **volume** fractions, and the
+particle species that contribute to suspended organic mass. Each
+`VaporExchange` pairs the same compound in gas and particle phases, with
+diffusivity in m²/s and mean free path in m. Exchange assumes ideal mole
+fraction activity, a flat interface, and unit mass accommodation.
+
+For a configured `chamber`, the following call uses observations at the
+instrument sample times in seconds. In this example the mechanism has two
+gases, two first-order reactions, and one exchanging compound. Replace the
+control values with those for the experiment being fitted.
+
+```python
+from particula.dynamics.chemistry.observations import ObservationSeries
+from particula.execution.inverse_chemistry import simulate_chamber
+
+series = ObservationSeries.create(sample_times, measured_values, covariance)
+fit = simulate_chamber(
+    chamber, sample_times,
+    dose=[1e-7, 1e-9],       # mol/m³ of air, sorted gas-species order
+    rates=[0.5, 0.2],        # native reaction order; both s⁻¹ here
+    saturation=[2e-8],       # mol/m³, in VaporExchange order
+    seed=[1e10, 1e-7, 1.4, 0.04],
+    max_step=0.05, device="cuda:0", observations=series, gradient=True,
+)
+dose_gradient = fit.gradients["dose"]
+```
+
+The seed controls are initial total number concentration (m⁻³), median
+diameter (m), geometric standard deviation, and deposition rate at 100 nm
+(s⁻¹). Equal-number cohorts sample the initial lognormal size distribution.
+The synthetic deposition law scales inversely with particle diameter. Deposition
+removes cohort weight and records lost material in the wall inventory.
+
+Rows of `fit.predictions` follow observation times. Columns give each selected
+vapor in kg/m³ in `measured_gases` order, suspended organic mass in kg/m³,
+then number per bin in m⁻³ including underflow and overflow. A Gaussian
+response in natural-log diameter spreads each cohort across bin edges specified
+in metres. Supply measurement covariance in these channel units, either shared
+across times or separately per time. Use NaN for an unavailable channel and
+omit an exactly dependent total. At each time the observed covariance block
+must be positive definite. The likelihood treats different times as independent.
+
+`fit.loss` is the Gaussian negative log likelihood. The four entries in
+`fit.gradients` give its derivatives by dose, rate, saturation concentration,
+and seed control in their input order. To fit vapor alone or a subset of size
+channels, mask the other columns. Choose `device="cpu"` for Warp CPU.
+The fixed-step midpoint solve lands on each sample time. Refine `max_step`
+when a stage leaves the physical domain and check both predictions and
+derivatives under refinement. The [coupled qualification and reproduction
+commands](../../studies/validation/chemistry/simba-discovery/index.md)
+describe the independent CPU reference, CUDA and Warp CPU checks, and
+the synthetic validity range.

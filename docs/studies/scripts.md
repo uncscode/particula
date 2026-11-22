@@ -22,6 +22,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Brownian coagulation in a PDF population](tutorials/coagulation-populations/coagulation_2_pdf_pattern.py)
 - [Brownian coagulation in a PMF population](tutorials/coagulation-populations/coagulation_1_pmf_pattern.py)
 - [Build on the CPU, evolve on CUDA, analyze on the CPU](tutorials/working-with-gpu/gpu_prepared_quick_start.py)
+- [Can a delayed product reveal a hidden intermediate?](examples/custom-processes/discover_hidden_intermediate.py)
 - [Can a recorded ascent reproduce droplet growth and close two gas budgets?](examples/thermodynamics/parcel-experiments/parcel_replay.py)
 - [Can bulk optics resolve aerosol mixing state?](validation/material-properties/optical-mixing-state/infer_mixing_state.py)
 - [Can partitioning explain two measured isomer time histories?](literature/pinic-isomers/isomer_history.py)

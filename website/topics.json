@@ -4671,6 +4671,27 @@
       "start_here": true
     },
     {
+      "source": "docs/studies/examples/custom-processes/discover_hidden_intermediate.py",
+      "title": "Can a delayed product reveal a hidden intermediate?",
+      "topic": "custom",
+      "also": [],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "simba-hidden-intermediate",
+        "runs": [
+          "simba-hidden-intermediate"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/gas-chemistry.md",
+            "label": "How to use this"
+          }
+        ]
+      }
+    },
+    {
       "source": "docs/studies/examples/custom-processes/native_gas_chemistry.py",
       "title": "Track a gas reaction through a chamber pulse",
       "topic": "custom",
@@ -5406,6 +5427,31 @@
       ],
       "role": "Studies",
       "start_here": false
+    },
+    {
+      "source": "docs/studies/validation/chemistry/simba-discovery/index.md",
+      "title": "Can vapor and aerosol measurements distinguish a reaction mechanism?",
+      "topic": "verification-scientific",
+      "also": [
+        "condensation-reservoirs"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "simba-discovery-validation",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/resolved-chemistry.md",
+            "label": "How to use this"
+          },
+          {
+            "target": "docs/guide/processes/gas-chemistry.md",
+            "label": "How to use this"
+          }
+        ]
+      }
     }
   ],
   "supporting": [
@@ -5668,9 +5714,14 @@
     {
       "source": "docs/studies/examples/thermodynamics/parcel-experiments/index.md",
       "reason": "Collection of prescribed parcel replay and cluster experiments."
+    },
+    {
+      "source": "docs/studies/validation/chemistry/index.md",
+      "reason": "Browsing directory for mechanism discovery validation."
     }
   ],
   "study_group_exceptions": {
-    "docs/studies/literature": "Six primary choices cover distinct measurement or process families. The seventh is a cross-listed validation against wall loss theory."
+    "docs/studies/literature": "Six primary choices cover distinct measurement or process families. The seventh is a cross-listed validation against wall loss theory.",
+    "docs/studies/validation": "Mechanism discovery qualifies inference across chemistry, partitioning and instrument response. Its own navigation entry distinguishes these tests from forward condensation, coagulation, material property and workflow qualifications."
   }
 }

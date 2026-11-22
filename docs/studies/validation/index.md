@@ -11,5 +11,6 @@ Inspect what was compared, which reference was used, and the range of workloads 
 - [Coagulation](coagulation/index.md)
 - [Condensation and chemistry](condensation/index.md)
 - [Material properties and reference checks](material-properties/index.md)
+- [Mechanism discovery](chemistry/index.md)
 - [Workflow and release qualification](workflows-and-releases/index.md)
 <!-- STUDY_LIST_END -->
