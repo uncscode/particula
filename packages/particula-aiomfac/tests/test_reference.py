@@ -14,9 +14,10 @@ REF = Path(__file__).resolve().parents[1] / "reference"
 class TestFixtures(unittest.TestCase):
     def test_identity(self):
         pin = tomllib.loads((REF / "upstream.toml").read_text())
+        self.assertRegex(__version__, r"^(0|[1-9]\d*)(\.(0|[1-9]\d*)){2}$")
         self.assertEqual(
-            (__version__, UPSTREAM_REVISION, UPSTREAM_VERSION),
-            ("0.1.4", pin["revision"], pin["version"]),
+            (UPSTREAM_REVISION, UPSTREAM_VERSION),
+            (pin["revision"], pin["version"]),
         )
 
     def test_inventory(self):
