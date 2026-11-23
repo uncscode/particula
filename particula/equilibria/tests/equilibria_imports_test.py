@@ -24,6 +24,7 @@ EXPECTED_ALL = {
     "EquilibriaStrategy",
     "LiquidVaporPartitioningStrategy",
     "EquilibriumResult",
+    "MixtureEquilibriumResult",
     "PhaseConcentrations",
     "LiquidVaporPartitioningBuilder",
     "EquilibriaFactory",

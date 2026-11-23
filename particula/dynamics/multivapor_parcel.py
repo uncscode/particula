@@ -378,7 +378,10 @@ class ParcelTendencies:
                         ) from error
                     activity[uncertain] = exact[uncertain]
                     rates = surface_rates(activity)[0]
-            flux[active] = rates
+            # A dry material lane can take up vapor at its deliquescence
+            # boundary. It has no mass available for evaporation.
+            dry = masses[active][:, self.targets] == 0
+            flux[active] = np.where(dry, np.maximum(rates, 0.0), rates)
         dq = -(state.number @ flux) / state.dry_air_mass
         dtemp = (volume * dp - dq @ self.latent) / CP
         if not np.isfinite(dtemp) or not np.all(np.isfinite(flux)):

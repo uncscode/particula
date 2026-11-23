@@ -7,7 +7,7 @@ if (sulfate || carbonate) {
     double initial_cations = 0.;
     for (int i = 0; i < C; ++i)
         initial_cations += initial[N + i];
-    if (carbonate && sulfur > 0. && ca >= 0) {
+    if (!gibbs_carbonate && carbonate && sulfur > 0. && ca >= 0) {
         const double calcium = initial[ca];
         double remaining = calcium < sulfur
                                ? sulfur - calcium
@@ -28,9 +28,10 @@ if (sulfate || carbonate) {
         -4.54916799587 - (dh * (1. / ts - 1. / t0) - (cp - slope * t0) * log(ts / t0) -
                           .5 * slope * (ts - t0)) /
                              8.314472;
-    if (carbon > 2.220446049250313e-16 * solvent) {
-        const int n = sulfur > 0. ? 6 : 5;
-        const double water_available = fmin(3.5 * initial_cations, .98 * initial[water]);
+    if ((carbonate && gibbs_carbonate) || carbon > 2.220446049250313e-16 * solvent) {
+        const bool water_only = carbon == 0.;
+        const int n = (water_only ? 2 : 5) + (sulfur > 0. ? 1 : 0);
+        const double water_available = gibbs_carbonate ? initial[water] : fmin(3.5 * initial_cations, .98 * initial[water]);
         const double proton_max = initial[h] + initial[hc] + 2. * initial[co2] +
                                   water_available + (sulfate ? initial[hs] : 0.);
         const double bound[5] = {fmin(proton_max, carbon), carbon,
@@ -46,7 +47,7 @@ if (sulfate || carbonate) {
         double spectator = 0.;
         for (int j = N; j < S; ++j)
             if (j != h && j != oh && j != hc && j != co &&
-                (n == 5 || (j != so && j != hs)))
+                (sulfur == 0. || (j != so && j != hs)))
                 spectator += initial[j] * charge[j - N];
         const double norm =
             fmax(1.e-300, fmax(fabs(spectator), fmax(fmax(carbon, sulfur),
@@ -69,6 +70,11 @@ if (sulfate || carbonate) {
             else
                 hi = ph;
         }
+        if (water_only) {
+            seed[0] = seed[4]; // proton, hydroxide, and optional bisulfate ratio
+            seed[1] = seed[3];
+            seed[2] = seed[5];
+        }
         for (int j = 0; j < n; ++j)
             if (!(seed[j] > 0.) || !isfinite(seed[j])) {
                 fail(5);
@@ -79,16 +85,22 @@ if (sulfate || carbonate) {
             double v[6];
             for (int j = 0; j < n; ++j)
                 v[j] = exp(fmin(50., fmax(-700., z[j])));
-            amounts[hc] = v[0];
-            amounts[co] = v[1];
-            amounts[co2] = v[2];
-            amounts[oh] = v[3];
-            amounts[h] = v[4];
-            amounts[water] =
-                initial[water] + (v[2] - initial[co2]) - (v[3] - initial[oh]);
-            if (n == 6) {
-                amounts[hs] = sulfur * v[5] / (1. + v[5]);
-                amounts[so] = sulfur / (1. + v[5]);
+            if (water_only) {
+                amounts[h] = v[0];
+                amounts[oh] = v[1];
+            } else {
+                amounts[hc] = v[0];
+                amounts[co] = v[1];
+                amounts[co2] = v[2];
+                amounts[oh] = v[3];
+                amounts[h] = v[4];
+            }
+            amounts[water] = initial[water] + (amounts[co2] - initial[co2])
+                                            - (amounts[oh] - initial[oh]);
+            if (sulfur > 0.) {
+                const double ratio = v[n - 1];
+                amounts[hs] = sulfur * ratio / (1. + ratio);
+                amounts[so] = sulfur / (1. + ratio);
             }
             if (!(amounts[water] > 0.)) {
                 for (int j = 0; j < n; ++j)
@@ -96,17 +108,25 @@ if (sulfate || carbonate) {
                 return;
             }
             terms();
-            double lnaw = lng[water] + log(x[water]), lns = log(solvent),
-                   lh = log(v[4]) - lns + lng[h];
-            f[0] = lh + log(v[0]) + lng[hc] - log(v[2]) - lng[co2] - lnaw - k1;
-            f[1] = lh + log(v[1]) + lng[co] - log(v[0]) - lng[hc] - k2;
-            f[2] = lh + log(v[3]) - lns + lng[oh] - lnaw - kw;
-            if (n == 6)
-                f[3] = lh + lng[so] - lng[hs] - log(v[5]) - ks;
-            f[n - 2] = log((v[0] + v[1] + v[2]) / carbon);
-            f[n - 1] = 0.;
-            for (int j = N; j < S; ++j)
-                f[n - 1] += amounts[j] * charge[j - N] / norm;
+            const double lnaw = lng[water] + log(x[water]), lns = log(solvent);
+            const double lh = log(amounts[h]) - lns + lng[h];
+            int k = 0;
+            if (!water_only) {
+                f[k++] = lh + log(v[0]) + lng[hc] - log(v[2]) - co2_molal_log - lnaw - k1;
+                f[k++] = lh + log(v[1]) + lng[co] - log(v[0]) - lng[hc] - k2;
+            }
+            f[k++] = lh + log(amounts[oh]) - lns + lng[oh] - lnaw - kw;
+            if (sulfur > 0.)
+                f[k++] = lh + lng[so] - lng[hs] - log(v[n - 1]) - ks;
+            if (!water_only)
+                f[k++] = log((v[0] + v[1] + v[2]) / carbon);
+            double net = 0., weight = 0.;
+            for (int j = N; j < S; ++j) {
+                const double equivalents = amounts[j] * charge[j - N];
+                net += equivalents;
+                weight += fabs(equivalents);
+            }
+            f[k] = net / (gibbs_carbonate ? fmax(weight, 1.e-300) : norm);
         };
         // Powell's scaled dogleg in a unit metric. The small dense Jacobian
         // is refreshed per accepted step and factored with partial pivoting.
@@ -236,23 +256,25 @@ if (sulfate || carbonate) {
             }
             equations(z, f);
             errors[0] = 0.;
-            for (int i = 0; i < n - 2; ++i)
+            for (int i = 0; i < n - (water_only ? 1 : 2); ++i)
                 errors[0] = fmax(errors[0], fabs(f[i]));
             bool finite_residual = true;
             for (int i = 0; i < n; ++i)
                 finite_residual = finite_residual && isfinite(f[i]);
             ok = finite_residual && errors[0] <= 1.e-8 && fabs(f[n - 1]) <= 1.e-10 &&
-                 fabs(f[n - 2]) <= 1.e-10;
-            for (int j = 0; j < 5; ++j)
-                ok = ok && amounts[index[j]] <= bound[j] * (1. + 1.e-10);
-            if (n == 6)
+                 (water_only || fabs(f[n - 2]) <= 1.e-10);
+            if (!gibbs_carbonate)
+                for (int j = 0; j < 5; ++j)
+                    ok = ok && amounts[index[j]] <= bound[j] * (1. + 1.e-10);
+            if (!gibbs_carbonate && n == 6)
                 ok = ok && amounts[hs] <= fmin(proton_max, sulfur) * (1. + 1.e-10);
         }
         if (!ok) {
             fail(5);
             return;
         }
-        errors[2] = fabs(amounts[hc] + amounts[co] + amounts[co2] - carbon) / carbon;
+        if (!water_only)
+            errors[2] = fabs(amounts[hc] + amounts[co] + amounts[co2] - carbon) / carbon;
     } else if (fmin(sulfur, initial[h] + initial[hs]) > 2.220446049250313e-19 * solvent) {
         const double hydrogen = initial[h] + initial[hs], bound = fmin(hydrogen, sulfur);
         auto sulfate_equation = [&](double b) __attribute__((noinline)) {

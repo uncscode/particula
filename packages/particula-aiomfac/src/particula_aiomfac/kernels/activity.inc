@@ -28,7 +28,8 @@ for (int k = 0; k < S; ++k) {
 }
 double solvent = 0., strength = 0., scale = 0., mole_sum = 0.;
 for (int j = 0; j < N; ++j)
-    solvent += amounts[j] * mw[j];
+    if (!(gibbs_carbonate && carbonate && j == co2))
+        solvent += amounts[j] * mw[j];
 if (!(solvent > 0.) || ((sulfate || carbonate) && !(amounts[water] > 0.))) {
     fail(3);
     return;
@@ -68,7 +69,16 @@ for (int j = 0; j < N; ++j) {
     for (int g = 0; g < G; ++g)
         ref[j] += counts[j * G + g] * group[g];
 }
+double co2_molal_log = 0.;
 auto terms = [&]() __attribute__((noinline)) {
+    // Gibbs extension treats dissolved CO2 as a molal solute. Obtain the
+    // base solvent/ion activity from the composition with CO2 removed.
+    const bool extension = gibbs_carbonate && carbonate;
+    double co2_moles = 0.;
+    if (extension) {
+        co2_moles = amounts[co2];
+        amounts[co2] = 0.;
+    }
     solvent = 0.;
     mole_sum = 0.;
     double solvent_moles = 0., ion_sum = 0., area_sum = 0., volume_sum = 0.;
@@ -195,6 +205,26 @@ auto terms = [&]() __attribute__((noinline)) {
         sr[co2] = lr[co2] = mr[co2] = 0.;
         for (int j = 0; j < I; ++j)
             mr[co2] += 2. * mol[j] * lambda_co2[j];
+        co2_molal_log = mr[co2];
+        if (extension) {
+            // d*(ln(d/M)-1) + 2*d*sum(lambda_i*n_i)/M.
+            // Derive all solute AND solvent corrections from this potential.
+            const double co2_molal = co2_moles / solvent;
+            const double full_mole_sum = mole_sum + co2_moles;
+            const double normalize = log(full_mole_sum / mole_sum);
+            for (int j = 0; j < N; ++j) {
+                sr[j] += normalize;
+                mr[j] -= mw[j] * co2_molal * (1. + co2_molal_log);
+            }
+            for (int i = 0; i < I; ++i)
+                mr[N + i] += 2. * co2_molal * lambda_co2[i];
+            sr[co2] = log(full_mole_sum / solvent);
+            mr[co2] = co2_molal_log;
+            amounts[co2] = co2_moles;
+            for (int j = 0; j < S; ++j)
+                x[j] = amounts[j] / full_mole_sum;
+            mole_sum = full_mole_sum;
+        }
     }
     for (int j = 0; j < S; ++j)
         lng[j] = sr[j] + mr[j] + lr[j] - (j < N ? 0. : scale);

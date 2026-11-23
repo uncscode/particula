@@ -42,6 +42,124 @@ bisulfate or closed carbonate equilibrium require a speciation solver.
 The backend source distribution includes the executable closed-water example
 and instructions for installing the paired development wheels.
 
+### Stable liquids and gas–particle equilibrium
+
+Select `phase_mode="stable"` in the AIOMFAC activity factory parameters to
+resolve internal liquid separation during condensation or a parcel calculation.
+The default for simulations is `"single_liquid"`. Stable mode uses direct
+activity evaluations at the current particle composition and temperature.
+Internal equilibration is instantaneous. The particle retains one total mass
+per material. At every gas exchange step, coexisting liquids give the same
+neutral chemical potential. The transport model applies its own curvature term.
+
+With a configured provider `activity`, the following calls distinguish a
+fixed condensed inventory from a gas–liquid equilibrium with a finite reservoir.
+Here the mixture and native layout are both water, 2-propanol, ammonium sulfate.
+The first two calls accept masses in any common unit. The bulk solver accepts
+analytical concentrations and pure-vapor saturation concentrations in µg/m³.
+
+```python
+liquids = activity.phase_equilibrium([0.40, 0.42, 0.18], 303.15)
+water_activity = activity.activities_at_temperature(
+    [0.40, 0.42, 0.18], 303.15, ["water"]
+)
+from particula.equilibria import EquilibriaFactory
+strategy = EquilibriaFactory().get_strategy(
+    "liquid_vapor", {"activity_model": activity}
+)
+result = strategy.solve(
+    inventories=[0.0, 7.0, 3.0], temperature=303.15,
+    saturation_concentrations={"water": 3.03e7}, relative_humidity=0.77,
+)
+```
+
+A specified relative humidity is a ratio. The reported water exchange is
+positive for net uptake from that reservoir into the combined gas and liquid
+system. Omit `relative_humidity` to close the supplied total water inventory.
+List each exchanging neutral in `saturation_concentrations`, including water.
+Unlisted components remain condensed. The result provides phase amounts,
+per-phase chemistry, gas inventories, water exchange, and convergence diagnostics.
+When `result.liquids` is `None`, inspect `result.solid_liquid` for retained
+crystals or dry ions. Without condensed material all mass lies in the gas.
+
+Standalone equilibrium defaults to stable liquids. Its `execution="cuda"`
+option uses device liquid calculations within a host-controlled bulk reservoir
+solve. Native resident condensation and parcel evaluation keep the particle
+phase search on the device. The search admits at most two liquids and requires
+a dissolved mixture. Inspect reported solver failures at unsupported states.
+[Derivation and equilibrium assumptions](../../theory/thermodynamics/equilibria-theory.md)
+· [Humidity sweep](../../studies/examples/thermodynamics/equilibria/aiomfac_humidity_sweep.py)
+· [Closed evaporating droplet](../../studies/examples/thermodynamics/equilibria/aiomfac_evaporating_droplet.py)
+
+### Select the carbonate reference
+
+For stable carbonate calculations, pass `"carbonate_model": "gibbs_consistent"`
+in the activity factory parameters. This extension uses a molal reference for
+dissolved CO₂ and includes the corresponding ion and solvent chemical
+potentials. For an explicitly mapped CO₂ lane, use its Henry-law pressure
+at unit molal activity when converting activities to partial pressures.
+Supply gas equilibrium constants on that same reference. Historical
+single-liquid calculations use the default `"pinned"` carbonate model.
+Both phase stability and the carbonate extension require direct evaluation.
+[Carbonate derivation](../../theory/thermodynamics/equilibria-theory.md)
+
+### Follow salt mass into dissolved ions and back into crystals
+
+`SpeciesInventory` holds **physical mass concentrations** in µg/m³ of air.
+The solid, liquid-neutral, liquid-ion, gas, surface-ion, and dry-residual-ion
+fields are disjoint. To supply solid NaCl, put its mass in `solids`. Dissolved
+Na⁺ and Cl⁻ use AIOMFAC IDs 202 and 242 in `liquid_ions`. To supply an
+already dissolved sample, put its mass directly into those ion fields.
+
+```python
+from particula.particles import ActivityFactory
+from particula_aiomfac import MixtureSpec, SpeciesInventory
+
+groups = {"water": {16: 1}, "NaCl": {202: 1, 242: 1}}
+salt_model = ActivityFactory().get_strategy("aiomfac", {
+    "mixture": MixtureSpec(groups),
+    "material_mapping": dict(enumerate(groups)),
+    "phase_mode": "stable",
+    "solids": {"NaCl": "halite"},
+})
+state = salt_model.equilibrate_species(
+    species_inventory=SpeciesInventory(
+        liquid_neutrals={"water": 1000.0}, solids={"NaCl": 1.0},
+    ),
+    temperature=298.15,
+)
+print(state.inventory.solids, state.inventory.liquid_ions)
+```
+
+At 298.15 K the 1 µg/m³ of halite fully dissolves in this example, yielding
+0.393375 µg/m³ of sodium and 0.606625 µg/m³ of chloride. With 1 µg/m³
+of water at the same salt loading, about 0.639611 µg/m³ stays crystalline.
+At complete dry-out an ion without sufficient counterion or a specified mineral
+remains in `residual_ions`. Use `inventory.total_mass` for the conserved mass.
+The analytical feed and the per-phase species diagnostics are alternative
+descriptions of that material.
+
+For a finite gas inventory, add `gas_reactions` to the call. The supplied
+`HCL_298` and `NH3_298` reactions in `particula_aiomfac.reservoirs` apply at
+298.15 K. Declare their aqueous constituents in the mixture. A
+`GasReaction` provides the stoichiometry, natural log of the equilibrium
+constant, temperature, reference pressure, and signed gas charge. Charged
+transfer also requires an `IonSurface` with measured or explicitly assumed
+binding constants, site capacity in mol/m³ air, and capacitance in F/m³ air.
+The returned interfacial and gas populations close the charge balance.
+The equilibrium amount of a gas ion depends on that electrochemical input.
+
+To apply a closed solve to native arrays, pass
+`species_layout=SpeciesLayout(...)` and `species_options={...}` to
+`Equilibria(strategy, ...)`. Map each physical material exactly once, including
+solid and dissolved ions as separate materials. Select one internally mixed
+population per box. Two reserved slots allow the runnable to represent a
+fractional mean charge with adjacent integer charge states. The resulting
+per-box reports are on `aerosol.equilibria_result`. Native kinetic condensation
+and parcel transport exchange the configured neutral vapors. The species
+runnable applies ion, crystal and charged-gas transformations as an
+instantaneous equilibrium step.
+
 ## Key Benefits
 
 - **Consistent dynamics workflow**: Use the same strategy-based API as condensation, coagulation, and wall loss
@@ -426,7 +544,7 @@ Yes. Subclass `ActivityStrategy` from `particula.particles.activity_strategies` 
 
 ### How does activity connect to equilibria?
 
-Activity determines the effective concentration that drives phase equilibrium. The `LiquidVaporPartitioningStrategy` uses BAT model activity internally to compute gas-particle partitioning.
+Activity determines the effective concentration that drives phase equilibrium. `LiquidVaporPartitioningStrategy` uses BAT by default. Supply a configured AIOMFAC provider as `activity_model` for mixture-specific equilibrium.
 
 ## See Also
 

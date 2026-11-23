@@ -184,7 +184,12 @@ def fluxes(
         heat += latent * f
         sink += latent * b
     for j in range(lanes.shape[0]):
-        flux[c, j] = free[c, j] - slopes[c, j] * heat / sink
+        rate = free[c, j] - slopes[c, j] * heat / sink
+        if masses[0, c, lanes[j]] == ZERO:
+            # A dry crystal has a finite deliquescence activity but cannot
+            # evaporate material absent from the condensed inventory.
+            rate = wp.max(ZERO, rate)
+        flux[c, j] = rate
 
 
 @wp.kernel(enable_backward=False)

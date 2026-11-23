@@ -164,3 +164,63 @@ guard the predicted flux direction. ROS3 uses the table in stage fluxes and
 direct same-device chemistry for the physical Jacobian. This applies to CPU
 and CUDA closed boxes and resident CUDA multi-vapor parcels. Ionic outputs
 and speciation diagnostics use direct evaluation. Checkpoints bind the table digest.
+
+### Solid–liquid equilibrium
+
+Use a Particula AIOMFAC activity provider and anhydrous salt dissolution
+constants to partition condensed material among the stable liquids and
+crystals. In this example one cubic metre contains 1 µg of water and 1 µg
+of total NaCl. At 298.15 K about 0.640 µg of halite crystallizes. Dilution
+with an additional 9 µg of water dissolves all of the salt.
+
+```python
+from particula.particles.activity_factories import ActivityFactory
+from particula_aiomfac import MixtureSpec, solve_solid_liquid
+
+mixture = MixtureSpec({"water": {16: 1}, "NaCl": {202: 1, 242: 1}})
+activity = ActivityFactory().get_strategy("aiomfac", {
+    "mixture": mixture, "material_mapping": {0: "water", 1: "NaCl"},
+    "phase_mode": "stable",
+})
+for water in (1.0, 10.0, 0.0):
+    result = solve_solid_liquid(activity, [water, 1.0], 298.15, {"NaCl": "halite"})
+    print(result.solid_masses, result.ion_masses, result.residual_ion_masses)
+```
+
+The two rows of `neutral_masses` and `ion_masses` refer to alpha and beta.
+Sum these physical masses with `solid_masses` and `residual_ion_masses` for
+the condensed inventory in µg/m³. The separate `dissolved_masses` vector
+expresses those same liquids in analytical components. For feeds specified
+as independent ions use `solve_ionic_solid_liquid`, supplying neutral names
+and AIOMFAC ion IDs in mol/m³. Each liquid is electroneutral. On complete
+dry-out, available ions form the specified crystals and unmatched ions retain
+their identities. Wet reactive restarts accept physical dissolved species,
+including bicarbonate, carbonate, aqueous CO₂, hydroxide, bisulfate and
+sulfate when the corresponding chemistry is enabled. The crystal transfer
+conserves total carbon, sulfur, solvent equivalents, spectator ions and charge,
+so bicarbonate can supply a carbonate crystal. Source salts can supply
+different crystals through shared ions. The bulk equilibrium calculation assumes immediate crystallization and
+redissolution. Nucleation delays and metastable efflorescence require kinetics.
+
+For each present crystal `log_saturation` is log₁₀(IAP/Ksp) and equals zero
+at equilibrium. Absent crystals may be undersaturated. The quantity is
+undefined for a completely dry sample. The supplied pure halite and sylvite
+constants are log₁₀(Ksp) = 1.57 and 0.90 at 298.15 K on the unit-molality
+scale. A caller can specify `SolidSalt(log10_ksp, temperature_min_k,
+temperature_max_k)` for a declared anhydrous cation–anion formula, with a
+constant value over its stated temperature interval. Hydrates and mixtures
+triggering the upstream prescribed CaSO₄ removal have no explicit solid
+model here. [USGS PHREEQC Pitzer database](https://github.com/phreeqc-dev/phreeqc3/blob/master/database/pitzer.dat)
+
+At 298.15 K the saturated NaCl calculation gives a flat-surface RH of 75.53%.
+The measured value is 75.29 ± 0.12%, a model difference of +0.24 percentage
+points. The crystal saturation residual in this calculation is below 10⁻⁹
+in log₁₀(IAP/Ksp). [Greenspan (1977), Table 2](https://pmc.ncbi.nlm.nih.gov/articles/PMC5295834/)
+
+The CUDA two-liquid search can be costly in dilute reactive carbonate
+solutions. At 298.15 K, one stress case with water and CaCO₃ in a 1 to
+0.00002 mass ratio and a synthetic crystal log₁₀Ksp of −4 reached an
+unresolved device stability/solid status. The CPU solve gave one unsaturated
+liquid with water activity 0.999990797. Native kinetic trials propagate
+the numerical failure, allowing adaptive rejection or termination if
+the controller exhausts its retries.

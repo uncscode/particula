@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 115.77765694819391,
+  "package_source_sha256": "b31d0fad7ea1c62b026a003c852ff2eb2407e6d9836256eca0fa77b069d368db",
+  "scientific_source_sha256": "a3168e173157df99620bee0156bc684bbf2e23f68a79dfee429b7061abdfd365",
+  "input_sha256": {
+    "packages/particula-aiomfac/src/particula_aiomfac/model.py": "5228ec542038bcc401db62b8f03501bfe7d09f07ca9c81dc47cfd41ee1ac28a1",
+    "packages/particula-aiomfac/src/particula_aiomfac/_terms.py": "631e25c763a5e3cea0ca7b47f59c57977f39e2509b36396fe2e00e653070d7f7",
+    "packages/particula-aiomfac/src/particula_aiomfac/_equilibrium.py": "9a442626a5119d05ebf2da1492d505698f482271d4e72d33a69c8276e6f947c7",
+    "packages/particula-aiomfac/src/particula_aiomfac/adapter.py": "faa36eceb1b68a52563389404cfcd8b740bdef8c8e1aa05a5486df681e7457d6",
+    "packages/particula-aiomfac/src/particula_aiomfac/phases.py": "feffd17f34d97c72f42a74123baeb7a6e1cc711f4b2a3b946ccf5dc5d4f50b20",
+    "packages/particula-aiomfac/src/particula_aiomfac/reciprocal.py": "0b77c6107daac50490dcc86613919be68bf3515721299a4d28dbc1a3d8c3467d",
+    "packages/particula-aiomfac/src/particula_aiomfac/partitioning.py": "c0c81f34b3fa05809ac95ef9414e57b4e95d4cf7461b8eaf37d21c050c061da0",
+    "packages/particula-aiomfac/src/particula_aiomfac/data/parameters.npz": "14d464c03eb549578d26158bdfe9f7f209f79110e6e4b9a95a0ae4c18c0813ce",
+    "packages/particula-aiomfac/src/particula_aiomfac/data/manifest.json": "6baaf6ef914c089ca6a53c27a94830534d602ea24d04132d6120cef289464070"
+  },
+  "example": "aiomfac-evaporating-droplet",
+  "fingerprint": "4dd5c63ab972f13ea683cd4b4c5e28a270f2ce611b7063b5dc69a4fcbdb0c634",
+  "source": "docs/studies/examples/thermodynamics/equilibria/aiomfac_evaporating_droplet.py",
+  "revision": "4403136e17df574a63ba4d2096281f16dc19f6ad",
+  "package_dirty": true,
+  "executed_at": "2026-11-23T03:40:51.937887+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.5",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Closed equilibrium water mass fraction: 0.43000\nFinal kinetic water mass fraction: 0.43000\nMaximum relative water-budget error: 4.23e-16\n"
+      },
+      {
+        "image": "figure-4-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "773a944a12704c6c1cca3c2c538a3ad11b4f8fc00d86bb18038de463ba6300d9",
+    "data.json": "d4320ef7408245c7d6d4a7d808b3e5067214f77361805f24b95ab98fe841dcb4",
+    "figure-4-1.png": "3d79e883e2ced25998adc9415d5ecacea6509f030ec39e432879aa61668fe555"
+  },
+  "simulation_fingerprint": "baf5a43033ab64c5786e5cc138b8933fca506097253617587034b86daa36b7a8"
+}

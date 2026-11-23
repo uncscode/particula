@@ -1966,5 +1966,59 @@
       "scripts/antarctic_ccn/plots.py"
     ],
     "full_canvas": true
+  },
+  "aiomfac-humidity-sweep": {
+    "title": "When does drying split an alcohol–salt droplet into two liquids?",
+    "source": "docs/studies/examples/thermodynamics/equilibria/aiomfac_humidity_sweep.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 900,
+    "inputs": [],
+    "invoke": "report = run_example()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\noverview = plot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true,
+    "science_inputs": [
+      "packages/particula-aiomfac/src/particula_aiomfac/model.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/_terms.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/_equilibrium.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/adapter.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/phases.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/reciprocal.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/partitioning.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/data/parameters.npz",
+      "packages/particula-aiomfac/src/particula_aiomfac/data/manifest.json"
+    ]
+  },
+  "aiomfac-evaporating-droplet": {
+    "title": "How long does an evaporating droplet take to reach two-liquid equilibrium?",
+    "source": "docs/studies/examples/thermodynamics/equilibria/aiomfac_evaporating_droplet.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 900,
+    "inputs": [],
+    "invoke": "report = run_example()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\noverview = plot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true,
+    "science_inputs": [
+      "packages/particula-aiomfac/src/particula_aiomfac/model.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/_terms.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/_equilibrium.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/adapter.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/phases.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/reciprocal.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/partitioning.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/data/parameters.npz",
+      "packages/particula-aiomfac/src/particula_aiomfac/data/manifest.json"
+    ]
   }
 }

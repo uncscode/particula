@@ -25,7 +25,10 @@ from particula.abc_factory import StrategyFactoryABC
 from particula.equilibria.equilibria_builders import (
     LiquidVaporPartitioningBuilder,
 )
-from particula.equilibria.equilibria_strategies import EquilibriaStrategy
+from particula.equilibria.equilibria_strategies import (
+    EquilibriaStrategy,
+    LiquidVaporPartitioningStrategy,
+)
 
 BuilderType = LiquidVaporPartitioningBuilder
 
@@ -37,8 +40,8 @@ class EquilibriaFactory(StrategyFactoryABC[BuilderType, EquilibriaStrategy]):
     :class:`StrategyFactoryABC` workflow.
 
     Supported strategy types:
-        - "liquid_vapor": ``LiquidVaporPartitioningStrategy`` for organic
-          aerosol liquid-vapor partitioning equilibrium.
+        - "liquid_vapor": ``LiquidVaporPartitioningStrategy`` for BAT or a
+          configured mixture activity model.
 
     Examples:
         >>> factory = EquilibriaFactory()
@@ -73,14 +76,15 @@ class EquilibriaFactory(StrategyFactoryABC[BuilderType, EquilibriaStrategy]):
         self,
         strategy_type: str,
         parameters: Optional[Dict[str, Any]] = None,
-    ) -> EquilibriaStrategy:
+    ) -> LiquidVaporPartitioningStrategy:
         """Create an equilibria strategy using its corresponding builder.
 
         Args:
             strategy_type: Name of the strategy to build. Case-insensitive.
                 Supported: "liquid_vapor".
             parameters: Optional parameter mapping for the builder.
-                For "liquid_vapor": {"water_activity": float}.
+                Optional keys are water_activity and activity_model. With a
+                mixture model, omitting water_activity closes the water budget.
 
         Returns:
             Built equilibria strategy instance.

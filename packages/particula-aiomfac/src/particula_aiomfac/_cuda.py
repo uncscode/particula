@@ -6,13 +6,14 @@ from threading import Lock
 import numpy as np
 import warp as wp
 
+from . import UPSTREAM_REVISION, UPSTREAM_VERSION
 from ._equilibrium import CARBONATE_EVALUATIONS_PER_DIMENSION
 from .model import ActivityResult, ConvergenceError
 
 # The same runtime layout is used by every mixture on a device. Parameter
 # slices are uploaded once. Generated aliases refer only to offsets, never
 # to a host pointer or to a particular composition.
-DIMS = "N I C G M D sulfate carbonate water co2 h hs so hc co oh ca evaluations_per_dimension".split()
+DIMS = "N I C G M D sulfate carbonate water co2 h hs so hc co oh ca evaluations_per_dimension gibbs_carbonate".split()
 TABLES = (
     "conversion mw charge counts q area vol interaction main_index group_mw "
     "main_counts bgroup cgroup b_pair_b c_pair_b decay_b b_pair_c c_pair_c "
@@ -25,7 +26,7 @@ OUTPUT = (
 ).split()
 
 
-def _snippet():
+def _snippet(*, phases=False, solids=False):
     header = [
         f"const int {name}=layout.data[{j}];" for j, name in enumerate(DIMS)
     ]
@@ -46,13 +47,33 @@ def _snippet():
             header.append(f"double *{prefix}{name}={array}.data+{offset};")
             pos += 1
     resources = files(__package__).joinpath("kernels")
-    return "\n".join(
-        header
-        + [
+    direct = "\n".join(
+        [
             resources.joinpath(k + ".inc").read_text()
             for k in ("activity", "equilibrium", "output")
         ]
     )
+
+    if phases:
+        header += [
+            "auto chemistry = [&](const double *mass) __attribute__((noinline)) {",
+            direct,
+            "};",
+        ]
+        phase_body = resources.joinpath("phases.inc").read_text()
+        if solids:
+            header += [
+                "auto liquid = [&](const double *mass)"
+                " __attribute__((noinline)) {",
+                phase_body,
+                "};",
+                resources.joinpath("solids.inc").read_text(),
+            ]
+        else:
+            header.append(phase_body)
+    else:
+        header.append(direct)
+    return "\n".join(header)
 
 
 @wp.func_native(_snippet())
@@ -114,6 +135,7 @@ class CudaModel:
         if not self.device.is_cuda:
             raise ValueError("CUDA execution requires an NVIDIA CUDA device")
         self.prepared = p
+        self._standalone_phases = None
         n, i, c, g, m, d = (
             len(p.neutrals),
             len(p.ions),
@@ -165,7 +187,15 @@ class CudaModel:
             n + p.ions.index(j) if j in p.ions else -1
             for j in (205, 248, 261, 250, 262, 247, 221)
         )
-        layout.append(CARBONATE_EVALUATIONS_PER_DIMENSION)
+        layout.extend(
+            [
+                CARBONATE_EVALUATIONS_PER_DIMENSION,
+                int(
+                    getattr(p, "carbonate_model", "pinned")
+                    == "gibbs_consistent"
+                ),
+            ]
+        )
         flat = [np.asarray(a, dtype=np.float64).ravel() for a in arrays]
         layout.extend(np.cumsum([0] + [a.size for a in flat[:-1]]))
         sizes = [s, s, s, i, s, s, s, s, g * g, g, g, g, n, m, m, m]
@@ -286,6 +316,12 @@ class CudaModel:
                 stream=stream,
             )
 
+    def phase_equilibrium(self, masses, temperature_K, water_index):
+        """Solve phase stability and coexistence on this CUDA device."""
+        from ._cuda_phases import phase_equilibrium
+
+        return phase_equilibrium(self, masses, temperature_K, water_index)
+
     def evaluate(self, masses, temperature_K, *, diagnostics=False):
         p = self.prepared
         mass = np.asarray(masses, dtype=np.float64)
@@ -363,4 +399,10 @@ class CudaModel:
             terms,
             get("moles"),
             flags.reshape(shape),
+            (UPSTREAM_VERSION, UPSTREAM_REVISION)
+            + (
+                ("gibbs_consistent",)
+                if p.carbonate_model == "gibbs_consistent"
+                else ()
+            ),
         )

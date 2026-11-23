@@ -1,0 +1,102 @@
+{
+  "temperature_k": 298.15,
+  "co2_pressure_atm": 1.0,
+  "solvent_basis": "kg added water",
+  "pure_water_carbon_anchor_mol_kg": 0.03439537113806398,
+  "solubility": [
+    {
+      "nacl_mol_kg": 0.0,
+      "observed_mol_kg": 0.03439537113806398,
+      "predicted_mol_kg": 0.03439537113806541,
+      "relative_difference_pct": 4.1522341120980855e-12,
+      "dilute_co2_analytical_mol_kg": 0.03439537113806398
+    },
+    {
+      "nacl_mol_kg": 0.2,
+      "observed_mol_kg": 0.03279442344321346,
+      "predicted_mol_kg": 0.033159502073493226,
+      "relative_difference_pct": 1.1132338731672853,
+      "dilute_co2_analytical_mol_kg": 0.03311286890136986
+    },
+    {
+      "nacl_mol_kg": 0.5,
+      "observed_mol_kg": 0.03053514593940289,
+      "predicted_mol_kg": 0.0313424166172788,
+      "relative_difference_pct": 2.6437426547033516,
+      "dilute_co2_analytical_mol_kg": 0.03127821958394515
+    },
+    {
+      "nacl_mol_kg": 1.0,
+      "observed_mol_kg": 0.027258377389285323,
+      "predicted_mol_kg": 0.028521471194744092,
+      "relative_difference_pct": 4.633782075213566,
+      "dilute_co2_analytical_mol_kg": 0.028443566327993906
+    },
+    {
+      "nacl_mol_kg": 2.0,
+      "observed_mol_kg": 0.02223309890651403,
+      "predicted_mol_kg": 0.02360921319641497,
+      "relative_difference_pct": 6.189484856282257,
+      "dilute_co2_analytical_mol_kg": 0.023521666976858424
+    },
+    {
+      "nacl_mol_kg": 3.0,
+      "observed_mol_kg": 0.018522516912529742,
+      "predicted_mol_kg": 0.019538843436133643,
+      "relative_difference_pct": 5.486978515951013,
+      "dilute_co2_analytical_mol_kg": 0.019451457352087028
+    }
+  ],
+  "ionization": [
+    {
+      "nacl_mol_kg": 0.1,
+      "observed_pk1": 6.1191,
+      "matched_cell": true,
+      "predicted_pk1": 6.128978566311277,
+      "pinned_pk1": 6.129063398218787,
+      "difference_pk1": 0.009878566311276593,
+      "sensitivity_pk1": 6.039561475379429e-05
+    },
+    {
+      "nacl_mol_kg": 0.2,
+      "observed_pk1": 6.0593,
+      "matched_cell": false,
+      "predicted_pk1": 6.072737059434486,
+      "pinned_pk1": 6.072825514755463,
+      "difference_pk1": 0.013437059434485477,
+      "sensitivity_pk1": 7.343695247818971e-05
+    },
+    {
+      "nacl_mol_kg": 0.5,
+      "observed_pk1": 5.9838000000000005,
+      "matched_cell": false,
+      "predicted_pk1": 5.993041630424332,
+      "pinned_pk1": 5.99312372089534,
+      "difference_pk1": 0.009241630424331682,
+      "sensitivity_pk1": 8.911692672253224e-05
+    },
+    {
+      "nacl_mol_kg": 0.7,
+      "observed_pk1": 5.964799999999999,
+      "matched_cell": false,
+      "predicted_pk1": 5.964155379382728,
+      "pinned_pk1": 5.9642296482859525,
+      "difference_pk1": -0.0006446206172716629,
+      "sensitivity_pk1": 9.763589076783319e-05
+    },
+    {
+      "nacl_mol_kg": 1.0,
+      "observed_pk1": 5.9472000000000005,
+      "matched_cell": false,
+      "predicted_pk1": 5.9352995820066745,
+      "pinned_pk1": 5.9353599325535935,
+      "difference_pk1": -0.011900417993325973,
+      "sensitivity_pk1": 0.00010797649710880819
+    }
+  ],
+  "held_out_solubility_relative_rmse_pct": 4.4298365031204225,
+  "max_log_pressure_residual": 1.8540724511238395e-13,
+  "max_relative_carbon_residual": 2.220446049250313e-16,
+  "max_normalized_charge_residual": 3.7894467767619124e-16,
+  "max_log_mass_action_residual": 3.552713678800501e-15
+}

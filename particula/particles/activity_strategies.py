@@ -73,6 +73,69 @@ class ActivityStrategy(ABC):
             raise ValueError("particle activity must be finite and nonnegative")
         return full[:, targets]
 
+    def activities_at_temperature(
+        self, masses, temperature, species, *, material_names=None
+    ):
+        """Return named neutral activities on the last material axis.
+
+        Pass native material names for strategies without an intrinsic mixture.
+        Temperature is in K and all masses use a common unit.
+        """
+        values = np.asarray(masses, dtype=float)
+        if values.ndim == 0:
+            raise ValueError("expected a material axis")
+        if material_names is None:
+            resolver = getattr(self, "material_lanes", None)
+            if resolver is None:
+                raise ValueError(
+                    "material_names are required for this activity strategy"
+                )
+            targets = resolver(species)
+        else:
+            names = tuple(material_names)
+            if len(names) != values.shape[-1] or len(set(names)) != len(names):
+                raise ValueError(
+                    "material_names must uniquely label the material axis"
+                )
+            validate = getattr(self, "validate_material_names", None)
+            if validate is not None:
+                validate(names)
+            targets = tuple(names.index(name) for name in species)
+            resolver = getattr(self, "material_lanes", None)
+            if resolver is not None and targets != resolver(species):
+                raise ValueError(
+                    "material_names disagree with the configured mixture"
+                )
+        shape = values.shape[:-1]
+        rows = values.reshape(-1, values.shape[-1])
+        tk = np.broadcast_to(
+            np.asarray(temperature, dtype=float), shape
+        ).reshape(-1)
+        if np.any(~np.isfinite(tk) | (tk <= 0)):
+            raise ValueError("temperature must be finite and positive in K")
+        result = self.neutral_activities(
+            rows, tk, list(targets), np.ones(len(rows), dtype=bool)
+        )
+        return result.reshape(shape + (len(targets),))
+
+    def partial_pressures_at_temperature(
+        self,
+        masses,
+        temperature,
+        species,
+        pure_vapor_pressures,
+        *,
+        material_names=None,
+    ):
+        """Return flat-surface partial pressures in Pa, in target order."""
+        activities = self.activities_at_temperature(
+            masses, temperature, species, material_names=material_names
+        )
+        pressure = np.broadcast_to(pure_vapor_pressures, activities.shape)
+        if not np.isfinite(pressure).all() or np.any(pressure < 0):
+            raise ValueError("invalid pure vapor pressure")
+        return activities * pressure
+
     @abstractmethod
     def activity(
         self, mass_concentration: Union[float, NDArray[np.float64]]
