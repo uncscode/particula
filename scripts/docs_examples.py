@@ -58,6 +58,11 @@ def executable_signature(source):
     ]
 
 
+def scientific_inputs(config):
+    """Include installed science code when hashing study dependencies."""
+    return [*config.get("inputs", []), *config.get("science_inputs", [])]
+
+
 def fingerprint(config, root=ROOT):
     """Hash executable semantics, settings, and declared input bytes."""
     payload = {
@@ -68,7 +73,7 @@ def fingerprint(config, root=ROOT):
         "input_destinations": config.get("input_destinations", {}),
         "inputs": {
             name: hashlib.sha256((root / name).read_bytes()).hexdigest()
-            for name in config.get("inputs", [])
+            for name in scientific_inputs(config)
         },
     }
     if config.get("full_canvas"):
@@ -376,7 +381,23 @@ def historical_study_inputs(example_id, config, root, science_root, original):
         recorded_package_hash=original["package_source_sha256"],
     )
     if original["revision"] != pin["revision"]:
-        raise ValueError("Saved data does not match the pinned historical run")
+        # A simulation run before committing records its parent revision.
+        # Accept the immediately following commit only with the observed bytes.
+        if not original.get("package_dirty") or original[
+            "package_source_sha256"
+        ] != pin.get("package_source_sha256"):
+            raise ValueError(
+                "Saved data does not match the pinned historical run"
+            )
+        parents = subprocess.check_output(  # noqa: S603 -- pinned Git checkout
+            [GIT, "show", "-s", "--format=%P", "HEAD"],
+            cwd=science_root,
+            text=True,
+        ).split()
+        if parents != [original["revision"]]:
+            raise ValueError(
+                "Saved data does not match the pinned historical run"
+            )
 
     # A fresh archived-library run executes the study in the author checkout.
     # Its observed data may include new timings. Keep its execution digest
@@ -575,7 +596,7 @@ def refresh(
             "scientific_source_sha256": initial_science_hash,
             "input_sha256": {
                 name: hashlib.sha256((root / name).read_bytes()).hexdigest()
-                for name in config.get("inputs", [])
+                for name in scientific_inputs(config)
             },
             "example": example_id,
             "fingerprint": initial_fingerprint,
@@ -661,7 +682,7 @@ def simulation_fingerprint(config, root=ROOT):
         "input_destinations": config.get("input_destinations", {}),
         "inputs": {
             name: hashlib.sha256((root / name).read_bytes()).hexdigest()
-            for name in config.get("inputs", [])
+            for name in scientific_inputs(config)
             if name not in config.get("plot_inputs", [])
         },
     }
@@ -743,7 +764,7 @@ def selected_changed(configs, base, root=ROOT):
     )
     selected = []
     for key, config in configs.items():
-        dependencies = set(config.get("inputs", []))
+        dependencies = set(scientific_inputs(config))
         if config.get("full_canvas"):
             dependencies.update(STYLE_INPUTS)
         if all_changed or changed.intersection(dependencies):

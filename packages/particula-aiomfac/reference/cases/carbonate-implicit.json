@@ -1,0 +1,18 @@
+{
+  "components": [
+    "water",
+    "KOH",
+    "KHCO3",
+    "K2CO3"
+  ],
+  "fractions": [
+    0.98199999,
+    0.018,
+    1e-08,
+    0
+  ],
+  "temperature_K": 298,
+  "basis": "mole",
+  "source": "Same analytical mixture as input_0003 with zero input CO2 omitted",
+  "expected_status": "ok"
+}

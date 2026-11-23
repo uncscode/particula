@@ -14,12 +14,18 @@ import os
 import re
 import shutil
 import subprocess
+import time
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION_PATH = "particula/__init__.py"
+BACKEND = "particula-aiomfac"
+VERSION_PATHS = {
+    "particula": VERSION_PATH,
+    BACKEND: "packages/particula-aiomfac/src/particula_aiomfac/__init__.py",
+}
 REPOSITORY = "uncscode/particula"
 
 
@@ -68,18 +74,43 @@ def read_version(source: str) -> str:
     return version
 
 
+def increased_since(before: str, project: str, version: str) -> bool:
+    """Handle a new backend path only when Git can read the previous commit."""
+    path = VERSION_PATHS[project]
+    if project == BACKEND and not command(
+        "git", "ls-tree", before + "^{commit}", "--", path
+    ):
+        return True
+    previous = read_version(command("git", "show", f"{before}:{path}"))
+    previous_parts, current_parts = (
+        version_parts(previous),
+        version_parts(version),
+    )
+    if current_parts < previous_parts:
+        raise ValueError(f"{project} version must not decrease")
+    return current_parts > previous_parts
+
+
 def plan(
-    event_name: str, event: dict, repository: str, ref: str, sha: str
+    event_name: str,
+    event: dict,
+    repository: str,
+    ref: str,
+    sha: str,
+    project: str = "particula",
 ) -> dict:
     """Gate publication on an upstream version increase or matching release."""
-    version = read_version((ROOT / VERSION_PATH).read_text())
+    path = VERSION_PATHS[project]
+    version = read_version(command("git", "show", f"{sha}:{path}"))
     result = {
         "version": version,
-        "tag": f"v{version}",
+        "tag": release_tag(project, version),
         "build": "false",
         "publish": "false",
     }
-    if event_name in {"pull_request", "merge_group"}:
+    if event_name in {"pull_request", "merge_group", "workflow_dispatch"} or (
+        event_name == "push" and repository != REPOSITORY
+    ):
         result["build"] = "true"
     elif (
         repository == REPOSITORY
@@ -91,16 +122,13 @@ def plan(
             raise ValueError(
                 "A version release requires a known previous main commit"
             )
-        previous = read_version(
-            command("git", "show", f"{before}:{VERSION_PATH}")
-        )
-        if version_parts(version) < version_parts(previous):
-            raise ValueError("Particula version must not decrease")
-        if version_parts(version) > version_parts(previous):
+        if increased_since(before, project, version):
             result.update(build="true", publish="true")
     elif repository == REPOSITORY and event_name == "release":
         release = event["release"]
-        if release["tag_name"].startswith("particula-helper-v"):
+        if project == BACKEND or release["tag_name"].startswith(
+            ("particula-helper-v", "particula-aiomfac-v")
+        ):
             return result
         if (
             release["tag_name"] != result["tag"]
@@ -140,12 +168,20 @@ def fetch_json(url: str, *, github: bool = False) -> dict | None:
         raise
 
 
-def distributions(directory: Path, version: str) -> list[Path]:
+def release_tag(project: str, version: str) -> str:
+    """Keep the library and backend tag histories independent."""
+    return f"v{version}" if project == "particula" else f"{project}-v{version}"
+
+
+def distributions(
+    directory: Path, version: str, project: str = "particula"
+) -> list[Path]:
     """Require exactly the versioned universal wheel and source archive."""
     version_parts(version)
+    stem = project.replace("-", "_")
     expected = [
-        directory / f"particula-{version}-py3-none-any.whl",
-        directory / f"particula-{version}.tar.gz",
+        directory / f"{stem}-{version}-py3-none-any.whl",
+        directory / f"{stem}-{version}.tar.gz",
     ]
     actual = set(directory.glob("*.whl")) | set(directory.glob("*.tar.gz"))
     if actual != set(expected) or any(
@@ -162,14 +198,20 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def check_pypi(directory: Path, version: str) -> None:
+def check_pypi(
+    directory: Path, version: str, project: str = "particula"
+) -> bool:
     """Allow upload retries only when any existing PyPI files are identical."""
-    files = distributions(directory, version)
-    release = fetch_json(f"https://pypi.org/pypi/particula/{version}/json")
+    files = distributions(directory, version, project)
+    release = fetch_json(f"https://pypi.org/pypi/{project}/{version}/json")
     existing = (
         {item["filename"]: item for item in release["urls"]} if release else {}
     )
+    if existing.keys() - {p.name for p in files}:
+        raise ValueError("Unexpected public distributions for this version")
     for path in files:
+        if existing.get(path.name, {}).get("yanked"):
+            raise ValueError(f"Refusing to release yanked file {path.name}")
         if path.name in existing and existing[path.name]["digests"][
             "sha256"
         ] != digest(path):
@@ -177,10 +219,22 @@ def check_pypi(directory: Path, version: str) -> None:
                 f"PyPI already has different bytes for {path.name}"
             )
 
+    complete = all(path.name in existing for path in files)
+    if complete and (summary := os.environ.get("GITHUB_STEP_SUMMARY")):
+        with Path(summary).open("a") as stream:
+            stream.write(
+                f"Verified public PyPI files for {project} {version}\n\n"
+            )
+            for path in files:
+                sha256 = existing[path.name]["digests"]["sha256"]
+                stream.write(f"- `{path.name}` SHA-256 `{sha256}`\n")
+            stream.write("\n")
+    return complete
 
-def ensure_tag(version: str, sha: str) -> str:
+
+def ensure_tag(version: str, sha: str, project: str = "particula") -> str:
     """Create an annotated tag or verify an existing tag without moving it."""
-    tag = f"v{version}"
+    tag = release_tag(project, version)
     # Fetching first makes annotated and lightweight existing tags comparable.
     command("git", "fetch", "origin", "--tags")
     tags = command("git", "tag", "--list", tag)
@@ -199,7 +253,7 @@ def ensure_tag(version: str, sha: str) -> str:
             tag,
             sha,
             "-m",
-            f"Particula {version}",
+            f"{'Particula' if project == 'particula' else project} {version}",
         )
         command("git", "push", "origin", f"refs/tags/{tag}:refs/tags/{tag}")
     return tag
@@ -224,12 +278,15 @@ def upload_missing_assets(tag: str, assets: list[Path], release: dict) -> None:
         command("gh", "release", "upload", tag, *missing, "--repo", REPOSITORY)
 
 
-def previous_library_tag(version: str) -> str | None:
+def previous_library_tag(
+    version: str, project: str = "particula"
+) -> str | None:
     """Select the previous stable library tag, excluding plugin releases."""
     candidates = []
-    for tag in command("git", "tag", "--list", "v*").splitlines():
+    prefix = release_tag(project, "")
+    for tag in command("git", "tag", "--list", f"{prefix}*").splitlines():
         try:
-            parts = version_parts(tag[1:])
+            parts = version_parts(tag[len(prefix) :])
         except ValueError:
             continue
         if parts < version_parts(version):
@@ -237,7 +294,9 @@ def previous_library_tag(version: str) -> str | None:
     return max(candidates)[1] if candidates else None
 
 
-def publish_github(directory: Path, version: str, sha: str) -> None:
+def publish_github(
+    directory: Path, version: str, sha: str, project: str = "particula"
+) -> None:
     """Create an annotated exact-commit tag and release without overwrites."""
     version_parts(version)
     if os.environ.get("GITHUB_REPOSITORY") != REPOSITORY:
@@ -246,21 +305,21 @@ def publish_github(directory: Path, version: str, sha: str) -> None:
         raise ValueError("Expected a full source commit SHA")
     if command("git", "rev-parse", "HEAD") != sha:
         raise ValueError("Checkout must match the tested source commit")
-    if read_version((ROOT / VERSION_PATH).read_text()) != version:
+    if read_version((ROOT / VERSION_PATHS[project]).read_text()) != version:
         raise ValueError("Checkout version differs from release version")
-    files = distributions(directory, version)
+    files = distributions(directory, version, project)
     sums = directory / "PYTHON-SHA256SUMS"
     sums.write_text("".join(f"{digest(path)}  {path.name}\n" for path in files))
     assets = sorted(path for path in directory.iterdir() if path.is_file())
     if any(path.is_symlink() for path in assets):
         raise ValueError("Release assets must not be symlinks")
-    tag = ensure_tag(version, sha)
+    tag = ensure_tag(version, sha, project)
     release = fetch_json(
         f"https://api.github.com/repos/{REPOSITORY}/releases/tags/{tag}",
         github=True,
     )
     if release is None:
-        previous = previous_library_tag(version)
+        previous = previous_library_tag(version, project)
         notes = ["--notes-start-tag", previous] if previous else []
         command(
             "gh",
@@ -272,9 +331,10 @@ def publish_github(directory: Path, version: str, sha: str) -> None:
             REPOSITORY,
             "--verify-tag",
             "--title",
-            f"Particula {version}",
+            f"{'Particula' if project == 'particula' else project} {version}",
             "--generate-notes",
             *notes,
+            *(["--latest=false"] if project == BACKEND else []),
         )
         return
     upload_missing_assets(tag, assets, release)
@@ -289,6 +349,8 @@ def main() -> None:
     )
     parser.add_argument("--version")
     parser.add_argument("--sha")
+    parser.add_argument("--project", choices=VERSION_PATHS, default="particula")
+    parser.add_argument("--require-visible", action="store_true")
     args = parser.parse_args()
     if args.operation == "plan":
         result = plan(
@@ -297,15 +359,25 @@ def main() -> None:
             os.environ["GITHUB_REPOSITORY"],
             os.environ["GITHUB_REF"],
             os.environ["GITHUB_SHA"],
+            args.project,
         )
+        result.update(project=args.project, sha=os.environ["GITHUB_SHA"])
         with Path(os.environ["GITHUB_OUTPUT"]).open("a") as output:
             output.write(
                 "".join(f"{key}={value}\n" for key, value in result.items())
             )
     elif args.operation == "github":
-        publish_github(args.directory, args.version, args.sha)
+        publish_github(args.directory, args.version, args.sha, args.project)
     else:
-        check_pypi(args.directory, args.version)
+        for attempt in range(12):
+            complete = check_pypi(args.directory, args.version, args.project)
+            if complete or not args.require_visible:
+                break
+            if attempt == 11:
+                raise SystemExit(
+                    "Timed out waiting for both verified public files"
+                )
+            time.sleep(10)
 
 
 if __name__ == "__main__":

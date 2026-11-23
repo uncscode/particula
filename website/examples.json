@@ -1861,6 +1861,87 @@
     "plot_inputs": [],
     "full_canvas": false
   },
+  "aiomfac-closed-box": {
+    "title": "Water and organic exchange in a closed box",
+    "source": "docs/studies/examples/thermodynamics/activity/aiomfac_closed_box.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 2700,
+    "inputs": [],
+    "invoke": "report = run_example()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\noverview = plot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true,
+    "historical_run": {
+      "revision": "49afcbd19ff7032ff545a3d96e57ddca6baef7c2",
+      "package_source_sha256": "c288cfd8eea2dfd7ab9f60ea95359d22a128d2a744b59b0c4f33fedf6503fd79",
+      "data_sha256": "5f1fecc49b642368bee4c548205dd7ee97e770f9fe4c0294723e13801b030540"
+    },
+    "science_inputs": [
+      "packages/particula-aiomfac/src/particula_aiomfac/__init__.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/_condensation.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/_cuda.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/_equilibrium.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/_terms.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/adapter.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/data/manifest.json",
+      "packages/particula-aiomfac/src/particula_aiomfac/data/parameters.npz",
+      "packages/particula-aiomfac/src/particula_aiomfac/kernels/activity.inc",
+      "packages/particula-aiomfac/src/particula_aiomfac/kernels/equilibrium.inc",
+      "packages/particula-aiomfac/src/particula_aiomfac/kernels/output.inc",
+      "packages/particula-aiomfac/src/particula_aiomfac/model.py",
+      "particula/particles/prepared_activity.py",
+      "particula/dynamics/condensation/condensation_strategies.py",
+      "particula/execution/_adaptive_condensation_physics.py",
+      "particula/execution/gpu_resident_condensation.py",
+      "particula/gpu/kernels/condensation.py"
+    ]
+  },
+  "aiomfac-multivapor-parcel": {
+    "title": "Water and organic uptake in a rising parcel",
+    "source": "docs/studies/examples/thermodynamics/parcel-experiments/aiomfac_multivapor_parcel.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 2700,
+    "inputs": [],
+    "invoke": "report = run_example()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\noverview = plot_results(report)\nactivation = plot_activation(report)",
+    "render_functions": [
+      "plot_results",
+      "plot_activation"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true,
+    "historical_run": {
+      "revision": "49afcbd19ff7032ff545a3d96e57ddca6baef7c2",
+      "package_source_sha256": "c288cfd8eea2dfd7ab9f60ea95359d22a128d2a744b59b0c4f33fedf6503fd79",
+      "data_sha256": "8ebef42ed8435a0c9a79eee779b06064539764ba110967bb6c7a1257589b215f"
+    },
+    "science_inputs": [
+      "packages/particula-aiomfac/src/particula_aiomfac/__init__.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/_condensation.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/_cuda.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/_equilibrium.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/_terms.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/adapter.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/data/manifest.json",
+      "packages/particula-aiomfac/src/particula_aiomfac/data/parameters.npz",
+      "packages/particula-aiomfac/src/particula_aiomfac/kernels/activity.inc",
+      "packages/particula-aiomfac/src/particula_aiomfac/kernels/equilibrium.inc",
+      "packages/particula-aiomfac/src/particula_aiomfac/kernels/output.inc",
+      "packages/particula-aiomfac/src/particula_aiomfac/model.py",
+      "particula/particles/prepared_activity.py",
+      "particula/dynamics/multivapor_parcel.py",
+      "particula/dynamics/parcel.py",
+      "particula/execution/multivapor_parcel.py",
+      "particula/execution/_multivapor_parcel_kernels.py"
+    ]
+  },
   "antarctic-ccn-uncertainty": {
     "title": "Antarctic CCN uncertainty across supersaturation settings",
     "source": "docs/studies/literature/antarctic-ccn/uncertainty.py",

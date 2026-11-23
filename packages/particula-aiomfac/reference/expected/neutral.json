@@ -1,0 +1,50 @@
+{
+  "equilibrium": {},
+  "errors": [],
+  "ionic_strength_mol_per_kg": 0.0,
+  "ions": {},
+  "mixed_solvent_reference": false,
+  "molality_conversion": 0.0,
+  "neutrals": {
+    "butanediol": {
+      "activity": 0.15301308072629896,
+      "defined": true,
+      "ln_gamma": 0.2632612944486805,
+      "lr": 0.0,
+      "mass_fraction": 0.4,
+      "mr": 0.0,
+      "sr": 0.2632612944486805,
+      "x": 0.11759683457610445
+    },
+    "water": {
+      "activity": 0.9082968784473754,
+      "defined": true,
+      "ln_gamma": 0.028922228582496955,
+      "lr": 0.0,
+      "mass_fraction": 0.6,
+      "mr": 0.0,
+      "sr": 0.028922228582496955,
+      "x": 0.8824031654238956
+    }
+  },
+  "relative_charge_residual": 0.0,
+  "salts": {},
+  "species": {
+    "butanediol": {
+      "activity": 0.15301308072629896,
+      "gamma": 1.3011666621627844,
+      "mass_fraction": 0.4,
+      "molality": 4.438526409232135,
+      "x": 0.11759683457610445
+    },
+    "water": {
+      "activity": 0.9082968784473754,
+      "gamma": 1.0293445377783077,
+      "mass_fraction": 0.6,
+      "molality": 33.30506103707519,
+      "x": 0.8824031654238956
+    }
+  },
+  "status": "ok",
+  "warning": 16
+}

@@ -49,7 +49,7 @@ launches.
 # pyright: reportGeneralTypeIssues=false
 # pyright: reportOperatorIssue=false
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from numbers import Real
 from typing import Any, no_type_check
 
@@ -146,7 +146,8 @@ class CondensationActivitySurfaceConfig:
     particle-wide value for every condensing species.
 
     Attributes:
-        activity_mode: Select ideal (0), kappa (1) or binary BAT (2).
+        activity_mode: Ideal (0), kappa (1), BAT (2), or prepared (3).
+        provider: A retained, shape-matched device binding for mode 3.
         surface_tension_mode: Integer selector: ``0`` for static or ``1`` for
             composition-weighted surface tension.
         water_species_index: Water material index. BAT requires zero.
@@ -167,6 +168,7 @@ class CondensationActivitySurfaceConfig:
     kappas: Any
     molar_mass_reference: Any
     bat_table: Any = None
+    provider: Any = None
 
 
 @dataclass(frozen=True)
@@ -305,6 +307,10 @@ class _PreparedCondensationCall:
     parallel_reductions: Any = None
     ion_material_indices: tuple[int, int] | None = None
     kelvin_density: float = 0.0
+    provider: Any = None
+    flux_guard: Any = None
+    staged_arrays: tuple = ()
+    committed_transfer: Any = None
 
 
 def _read_float64_array(array: Any) -> np.ndarray:
@@ -415,7 +421,7 @@ def _validate_binary_activity_table(
         raise ValueError("BAT table requires pure water and organic endpoints")
 
 
-def validate_condensation_activity_surface_config(
+def validate_condensation_activity_surface_config(  # noqa: C901
     activity_surface: CondensationActivitySurfaceConfig | Any,
     n_species: int,
     device: Any,
@@ -453,7 +459,7 @@ def validate_condensation_activity_surface_config(
             f"in {caller_name}."
         )
     _validate_int32_selector(
-        "activity_mode", activity_surface.activity_mode, (0, 1, 2)
+        "activity_mode", activity_surface.activity_mode, (0, 1, 2, 3)
     )
     _validate_int32_selector(
         "surface_tension_mode", activity_surface.surface_tension_mode, (0, 1)
@@ -504,6 +510,12 @@ def validate_condensation_activity_surface_config(
     if not np.all(np.isfinite(references)) or np.any(references <= 0.0):
         raise ValueError(
             "activity_surface.molar_mass_reference must be finite and positive."
+        )
+    if (activity_surface.activity_mode == 3) != (
+        activity_surface.provider is not None
+    ):
+        raise ValueError(
+            "prepared activity mode requires a bound device provider"
         )
     if activity_surface.activity_mode == 2:
         _validate_binary_activity_table(
@@ -662,7 +674,11 @@ def _condensation_mass_transfer_impl(  # noqa: C901
         )
         activity_factor = wp.float64(1.0)
         if activity_enabled == wp.int32(1) and water_species_index == 0:
-            if activity_mode == ACTIVITY_MODE_IDEAL:
+            if activity_mode == wp.int32(3):
+                activity_factor = activity_parameters[
+                    box_idx * masses.shape[1] + particle_idx
+                ]
+            elif activity_mode == ACTIVITY_MODE_IDEAL:
                 activity_factor = water_activity_ideal_wp(
                     masses,
                     molar_mass_reference,
@@ -790,7 +806,12 @@ def _condensation_mass_transfer_impl(  # noqa: C901
             gas_constant,
         )
         activity_factor = wp.float64(1.0)
-        if (
+        if activity_enabled == wp.int32(1) and activity_mode == wp.int32(3):
+            activity_factor = activity_parameters[
+                (box_idx * masses.shape[1] + particle_idx) * n_species
+                + species_idx
+            ]
+        elif (
             activity_enabled == wp.int32(1)
             and activity_mode == ACTIVITY_MODE_BAT
         ):
@@ -2959,7 +2980,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
             device=device,
         )
 
-    return _PreparedCondensationCall(
+    call = _PreparedCondensationCall(
         particles,
         gas,
         thermodynamics,
@@ -3015,8 +3036,123 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         ),
     )
 
+    if activity_surface is None or activity_surface.provider is None:
+        return call
+    from particula.gpu.kernels.activity_guard import BoxFluxGuard
 
-def _enqueue_prepared_condensation_call(
+    provider = activity_surface.provider
+    if (
+        provider.values.shape != expected_shape
+        or provider.values.device != device
+    ):
+        raise ValueError(
+            "prepared activity workspace must match particle shape and device"
+        )
+    # Keep accepted inventories untouched until all four limited updates and the
+    # final composition pass. Flatten only during preparation for graph capture.
+    staged = {}
+    copies = []
+    for name in (
+        "particle_masses",
+        "particle_concentration",
+        "particle_charge",
+        "gas_concentration",
+        "gas_vapor_pressure",
+        "energy_transfer",
+        "total_mass_transfer",
+    ):
+        live = getattr(call, name)
+        if live is not None:
+            temporary = wp.empty_like(live)
+            staged[name] = temporary
+            copies.append((live.flatten(), temporary.flatten()))
+    return replace(
+        call,
+        **staged,
+        provider=provider,
+        flux_guard=BoxFluxGuard(provider)
+        if getattr(provider, "hybrid", False)
+        else None,
+        staged_arrays=tuple(copies),
+        committed_transfer=call.total_mass_transfer,
+        kappas=provider.values.flatten(),
+        failure=wp.zeros(1, dtype=int, device=device),
+    )
+
+
+@wp.kernel(enable_backward=False)
+@no_type_check
+def _commit_provider_step(
+    staged: wp.array(dtype=Any),
+    live: wp.array(dtype=Any),
+    failure: wp.array(dtype=int),
+):
+    i = wp.tid()
+    if failure[0] == 0:
+        live[i] = staged[i]
+
+
+def _enqueue_prepared_condensation_call(p):
+    """Commit a provider step once every refreshed composition passes."""
+    if p.provider is None:
+        return _advance_fixed_substeps(p)
+    for live, temporary in p.staged_arrays:
+        wp.copy(temporary, live)
+    _advance_fixed_substeps(p)
+    p.provider.evaluate(
+        p.particle_masses,
+        p.particle_concentration,
+        p.refresh_temperature,
+        p.failure,
+        4,
+    )
+    for live, temporary in p.staged_arrays:
+        wp.launch(
+            _commit_provider_step,
+            live.size,
+            inputs=[temporary, live, p.failure],
+            device=p.device,
+        )
+    return p.particles, p.committed_transfer
+
+
+def _mapped_proposal(p, activities, dest):
+    wp.launch(
+        _mapped_condensation_mass_transfer_kernel,
+        dim=p.particle_concentration.shape,
+        inputs=[
+            p.particle_masses,
+            p.particle_concentration,
+            p.particle_density,
+            p.gas_concentration,
+            p.gas_vapor_pressure,
+            p.gas_molar_mass,
+            p.surface_tension,
+            activities,
+            p.molar_mass_reference,
+            p.effective_surface_tension,
+            p.activity_enabled,
+            p.activity_mode,
+            p.surface_tension_mode,
+            p.water_species_index,
+            p.mass_accommodation,
+            p.diffusion_coefficient_vapor,
+            p.latent_heat_values,
+            p.latent_heat_enabled,
+            p.dynamic_viscosity,
+            p.mean_free_path,
+            wp.float64(constants.GAS_CONSTANT),
+            wp.float64(constants.BOLTZMANN_CONSTANT),
+            p.refresh_temperature,
+            p.substep_time_step,
+            dest,
+        ]
+        + [p.particle_to_gas, wp.float64(p.kelvin_density)],
+        device=p.device,
+    )
+
+
+def _advance_fixed_substeps(  # noqa: C901
     prepared: _PreparedCondensationCall,
 ) -> tuple[Any, Any]:
     """Enqueue the bound four-substep device sequence without setup work.
@@ -3066,7 +3202,15 @@ def _enqueue_prepared_condensation_call(
             device=p.device,
         )
         return p.particles, p.total_mass_transfer
-    for _ in range(4):
+    for substep in range(4):
+        if p.provider is not None:
+            p.provider.evaluate(
+                p.particle_masses,
+                p.particle_concentration,
+                p.refresh_temperature,
+                p.failure,
+                substep,
+            )
         if int(p.surface_tension_mode) == int(
             SURFACE_TENSION_MODE_COMPOSITION_WEIGHTED
         ):
@@ -3108,39 +3252,16 @@ def _enqueue_prepared_condensation_call(
             ],
             device=p.device,
         )
-        wp.launch(
-            _mapped_condensation_mass_transfer_kernel,
-            dim=(n_boxes, n_particles),
-            inputs=[
+        if p.flux_guard is not None:
+            p.flux_guard.refine(
+                lambda activities, dest: _mapped_proposal(p, activities, dest),
                 p.particle_masses,
                 p.particle_concentration,
-                p.particle_density,
-                p.gas_concentration,
-                p.gas_vapor_pressure,
-                p.gas_molar_mass,
-                p.surface_tension,
-                p.kappas,
-                p.molar_mass_reference,
-                p.effective_surface_tension,
-                p.activity_enabled,
-                p.activity_mode,
-                p.surface_tension_mode,
-                p.water_species_index,
-                p.mass_accommodation,
-                p.diffusion_coefficient_vapor,
-                p.latent_heat_values,
-                p.latent_heat_enabled,
-                p.dynamic_viscosity,
-                p.mean_free_path,
-                wp.float64(constants.GAS_CONSTANT),
-                wp.float64(constants.BOLTZMANN_CONSTANT),
                 p.refresh_temperature,
-                p.substep_time_step,
-                p.work_mass_transfer,
-            ]
-            + [p.particle_to_gas, wp.float64(p.kelvin_density)],
-            device=p.device,
-        )
+                p.failure,
+                substep,
+            )
+        _mapped_proposal(p, p.kappas, p.work_mass_transfer)
         wp.launch(
             native_kernels.gate_transfer,
             dim=(n_boxes, n_particles),
@@ -3337,24 +3458,26 @@ def condensation_step_gpu(
         ValueError: If preflight rejects the containers, inputs, sidecars, or
             output ownership, or if a post-launch runtime validation fails.
     """
-    return _enqueue_prepared_condensation_call(
-        _prepare_condensation_step_gpu(
-            particles,
-            gas,
-            temperature,
-            pressure,
-            time_step,
-            surface_tension,
-            mass_accommodation,
-            diffusion_coefficient_vapor,
-            mass_transfer,
-            environment=environment,
-            thermodynamics=thermodynamics,
-            activity_surface=activity_surface,
-            scratch_buffers=scratch_buffers,
-            latent_heat=latent_heat,
-            energy_transfer=energy_transfer,
-            thermal_work=thermal_work,
-            species_binding=species_binding,
-        )
+    call = _prepare_condensation_step_gpu(
+        particles,
+        gas,
+        temperature,
+        pressure,
+        time_step,
+        surface_tension,
+        mass_accommodation,
+        diffusion_coefficient_vapor,
+        mass_transfer,
+        environment=environment,
+        thermodynamics=thermodynamics,
+        activity_surface=activity_surface,
+        scratch_buffers=scratch_buffers,
+        latent_heat=latent_heat,
+        energy_transfer=energy_transfer,
+        thermal_work=thermal_work,
+        species_binding=species_binding,
     )
+    result = _enqueue_prepared_condensation_call(call)
+    if call.provider is not None and int(call.failure.numpy()[0]):
+        raise ValueError(call.provider.failure_message())
+    return result

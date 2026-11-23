@@ -40,6 +40,7 @@ class ODEProblem:
     admissible: Callable[[Array], bool]
     jacobian: Jacobian | None = None
     time_derivative: Rate | None = None
+    validate_candidate: Rate | None = None
 
 
 @dataclass
@@ -295,8 +296,14 @@ class AdaptiveSolver:
             return self.time
         h = min(self.next_step, self.max_step, bound - self.time)
         floor = min(self.min_step, bound - self.time)
+        last_domain_error = None
         for _ in range(self.max_trials):
             if h < floor or self.time + h == self.time:
+                if last_domain_error is not None:
+                    raise RuntimeError(
+                        f"{self.method} step below min_step: "
+                        f"{last_domain_error}"
+                    ) from last_domain_error
                 raise RuntimeError("accuracy requires a step below min_step")
             domain_failure = False
             try:
@@ -307,11 +314,20 @@ class AdaptiveSolver:
                         "ros3": self._ros3,
                     }[self.method]
                     candidate, error = trial(self.time, self._state, h)
+                    if (
+                        self.method != "rk23"
+                        and self.problem.validate_candidate is not None
+                    ):
+                        self.problem.validate_candidate(
+                            self.time + h, _readonly(candidate)
+                        )
+                    last_domain_error = None
                     scale = self.atol + self.rtol * np.maximum(
                         np.abs(self._state), np.abs(candidate)
                     )
                     norm = float(np.max(np.abs(error) / scale))
-            except (TrialDomainError, FloatingPointError):
+            except (TrialDomainError, FloatingPointError) as error:
+                last_domain_error = error
                 domain_failure = True
                 norm = np.inf
             if norm <= 1:
@@ -337,6 +353,11 @@ class AdaptiveSolver:
                 if not np.isfinite(norm)
                 else max(0.1, min(0.5, 0.9 * norm**exponent))
             )
+        if last_domain_error is not None:
+            raise RuntimeError(
+                f"{self.method} maximum trial count exceeded: "
+                f"{last_domain_error}"
+            ) from last_domain_error
         raise RuntimeError(
             "maximum trial count exceeded without accepting a step"
         )

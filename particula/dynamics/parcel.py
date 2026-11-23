@@ -18,6 +18,11 @@ from scipy.integrate import solve_ivp
 from scipy.optimize import brentq
 
 from particula.aerosol import Aerosol
+from particula.dynamics.multivapor_parcel import (
+    MultiVaporParcelInitialState,
+    MultiVaporParcelTrajectory,
+    cpu_multivapor_reference,
+)
 from particula.gas.environment_data import EnvironmentData
 from particula.gas.gas_data import GasData
 from particula.gas.properties.thermal_conductivity import (
@@ -328,8 +333,48 @@ def _cpu_reference(initial, wet, time, updraft, phase_exchange):
     )
 
 
+def _parcel_output_times(steps, timestep, updraft):
+    """Validate common parcel forcing and construct the output time grid."""
+    if (
+        isinstance(steps, (bool, np.bool_))
+        or not isinstance(steps, (int, np.integer))
+        or steps < 1
+    ):
+        raise ValueError("steps must be a positive integer")
+    if not np.isfinite(timestep) or timestep <= 0 or not np.isfinite(updraft):
+        raise ValueError(
+            "require a positive finite timestep and finite updraft"
+        )
+    return np.arange(steps + 1, dtype=np.float64) * timestep
+
+
+def _run_multivapor(
+    initial, time, updraft, device, adaptive, phase_exchange, gradient
+):
+    """Dispatch the explicit wet-state parcel after validating its controls."""
+    if gradient:
+        raise ValueError("multi-vapor parcel sensitivities are unsupported")
+    if device == "cpu":
+        if adaptive is not None:
+            raise ValueError("multi-vapor CPU uses the SciPy Radau reference")
+        return cpu_multivapor_reference(initial, time, updraft, phase_exchange)
+    if device == "cuda" or device.startswith("cuda:"):
+        if not isinstance(adaptive, (ParcelRK23, ParcelROS3)):
+            raise ValueError(
+                "multi-vapor CUDA requires ParcelRK23 or ParcelROS3"
+            )
+        from particula.execution.multivapor_parcel import (
+            run_multivapor_cuda,
+        )
+
+        return run_multivapor_cuda(
+            initial, time, updraft, phase_exchange, device, adaptive
+        )
+    raise ValueError("multi-vapor parcel requires CPU or an NVIDIA CUDA device")
+
+
 def run_parcel(
-    initial: ParcelInitialState,
+    initial: ParcelInitialState | MultiVaporParcelInitialState,
     *,
     updraft: float,
     timestep: float,
@@ -338,11 +383,12 @@ def run_parcel(
     gradient: bool = False,
     phase_exchange: bool = True,
     adaptive: ParcelRK23 | ParcelROS3 | None = None,
-) -> ParcelTrajectory:
+) -> ParcelTrajectory | MultiVaporParcelTrajectory:
     """Advance a single parcel under constant signed vertical velocity.
 
     Args:
-        initial: Subsaturated state including any equilibrium aerosol water.
+        initial: A subsaturated κ parcel or explicit multi-vapor wet classes.
+            Multi-vapor input specifies each initial material and gas inventory.
         updraft: Vertical velocity in m/s, positive upward.
         timestep: Output spacing (s). Also the fixed Warp step by default.
         steps: Positive number of intervals.
@@ -361,15 +407,10 @@ def run_parcel(
     Raises:
         ValueError: Invalid state, backend, integration interval or trajectory.
     """
-    if (
-        isinstance(steps, (bool, np.bool_))
-        or not isinstance(steps, (int, np.integer))
-        or steps < 1
-    ):
-        raise ValueError("steps must be a positive integer")
-    if not np.isfinite(timestep) or timestep <= 0 or not np.isfinite(updraft):
-        raise ValueError(
-            "require a positive finite timestep and finite updraft"
+    time = _parcel_output_times(steps, timestep, updraft)
+    if isinstance(initial, MultiVaporParcelInitialState):
+        return _run_multivapor(
+            initial, time, updraft, device, adaptive, phase_exchange, gradient
         )
     initial = replace(
         initial,
@@ -379,7 +420,6 @@ def run_parcel(
     initial.dry_radius.setflags(write=False)
     initial.number.setflags(write=False)
     wet = _initial_radii(initial)
-    time = np.arange(steps + 1, dtype=np.float64) * timestep
     if adaptive is not None and not isinstance(
         adaptive, (ParcelRK23, ParcelROS3)
     ):

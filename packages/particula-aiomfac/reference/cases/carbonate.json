@@ -1,0 +1,20 @@
+{
+  "components": [
+    "water",
+    "CO2(aq)",
+    "KOH",
+    "KHCO3",
+    "K2CO3"
+  ],
+  "fractions": [
+    0.98199999,
+    0,
+    0.018,
+    1e-08,
+    0
+  ],
+  "temperature_K": 298,
+  "basis": "mole",
+  "source": "Inputfiles/input_0003.txt row 1",
+  "expected_status": "ok"
+}

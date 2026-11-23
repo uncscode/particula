@@ -1,0 +1,18 @@
+{
+  "components": [
+    "water",
+    "vanillic_acid",
+    "butanediol",
+    "NaCl"
+  ],
+  "fractions": [
+    0.977,
+    0.001,
+    0.002,
+    0.02
+  ],
+  "temperature_K": 298,
+  "basis": "mass",
+  "source": "Examples_Input/input_0008.txt row 1",
+  "expected_status": "ok"
+}

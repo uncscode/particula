@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 12.1185657591559,
+  "package_source_sha256": "c288cfd8eea2dfd7ab9f60ea95359d22a128d2a744b59b0c4f33fedf6503fd79",
+  "scientific_source_sha256": "5d595c420c4548b381e35ce18fa80df7da13ef8925e39e98da62bf3fe8249a92",
+  "input_sha256": {
+    "packages/particula-aiomfac/src/particula_aiomfac/__init__.py": "1aa9546b6900fe3a5764b797aeec067bf4e27b73382b9c825bf9563c35057a5c",
+    "packages/particula-aiomfac/src/particula_aiomfac/_condensation.py": "17483eba29f10379920226d0f99398b83e0d521934caf039fb6245394314ad0b",
+    "packages/particula-aiomfac/src/particula_aiomfac/_cuda.py": "dc38805c02aecc15e4374c75c2305104165b241716d500cf758afc0e7b39298e",
+    "packages/particula-aiomfac/src/particula_aiomfac/_equilibrium.py": "c3d2bb0cd394fe348059b0b256b7b93924cfbb25583e29330956f21f029eb483",
+    "packages/particula-aiomfac/src/particula_aiomfac/_terms.py": "631e25c763a5e3cea0ca7b47f59c57977f39e2509b36396fe2e00e653070d7f7",
+    "packages/particula-aiomfac/src/particula_aiomfac/adapter.py": "b8ceb3e6fded91daf2122b5dad82c8a8000febdb0787e73dcfb8fb42b8e9d4c2",
+    "packages/particula-aiomfac/src/particula_aiomfac/data/manifest.json": "6baaf6ef914c089ca6a53c27a94830534d602ea24d04132d6120cef289464070",
+    "packages/particula-aiomfac/src/particula_aiomfac/data/parameters.npz": "14d464c03eb549578d26158bdfe9f7f209f79110e6e4b9a95a0ae4c18c0813ce",
+    "packages/particula-aiomfac/src/particula_aiomfac/kernels/activity.inc": "21dae5955186d7df8269bad7bf53869ff3f304568185bb30420a3051fec1e147",
+    "packages/particula-aiomfac/src/particula_aiomfac/kernels/equilibrium.inc": "09b733b344b6c5f8ae918c9c414dab07bbfcf7fbee1f4f5b39aa39e51b2ee4cc",
+    "packages/particula-aiomfac/src/particula_aiomfac/kernels/output.inc": "cd3ae436bb99b41538f7f75e576b3f3216f6fe7170682f9b568b1e78e105f193",
+    "packages/particula-aiomfac/src/particula_aiomfac/model.py": "38889ecd87bb3e398d957897f6692b9645a96f25565c6e43e585475ea0a54107",
+    "particula/particles/prepared_activity.py": "04b1be37d8a9de2bb5dbef8c1d491306a6124dae70589dc1af7c8e287cb100b4",
+    "particula/dynamics/condensation/condensation_strategies.py": "bb022556a10d43c63ac0c2eb68aad43151a71c5dec00d9ce41db03642c143cdd",
+    "particula/execution/_adaptive_condensation_physics.py": "25c0c6a32a5031dfd9647c65dfee79c673d9b91980bb9b4336192d968ff9d2bb",
+    "particula/execution/gpu_resident_condensation.py": "b6bb7e461d589888c043f3cebfdbc7b42db292c083a35834ed569577a7446d8e",
+    "particula/gpu/kernels/condensation.py": "b3d29efa7a21da1a8b8c2886d1dfbf8a8e78dcb05b8815c0be95291c84b9bcd0"
+  },
+  "example": "aiomfac-closed-box",
+  "fingerprint": "e0f18a6163ec30c2fe6953c595d4fa570f32482c5a7f93decdfffe00a540208c",
+  "source": "docs/studies/examples/thermodynamics/activity/aiomfac_closed_box.py",
+  "revision": "a3ff1e82e7da3ef0a21fe7c1431cf1ea86d5d769",
+  "package_dirty": true,
+  "executed_at": "2026-11-23T00:47:38.044555+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.4",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "image": "figure-5-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "201708a356411991902a4f96c8a0f3975579aa5432602310726c0c1b6a274bd1",
+    "data.json": "5f1fecc49b642368bee4c548205dd7ee97e770f9fe4c0294723e13801b030540",
+    "executed_source.py": "201708a356411991902a4f96c8a0f3975579aa5432602310726c0c1b6a274bd1",
+    "figure-5-1.png": "ab8c823e3a1f9d384a1684d27a702f54620141ceeddbf34c0d7df76413ea9cc8"
+  },
+  "simulation_fingerprint": "fc60fe714679b099d3cebcda57804b5c25c4e215ec31b09fc216c9c857177b99",
+  "historical_run": {
+    "revision": "49afcbd19ff7032ff545a3d96e57ddca6baef7c2",
+    "package_source_sha256": "c288cfd8eea2dfd7ab9f60ea95359d22a128d2a744b59b0c4f33fedf6503fd79",
+    "data_sha256": "5f1fecc49b642368bee4c548205dd7ee97e770f9fe4c0294723e13801b030540"
+  },
+  "render_versions": {
+    "particula": "0.3.5",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {
+    "packages/particula-aiomfac/src/particula_aiomfac/__init__.py": "1aa9546b6900fe3a5764b797aeec067bf4e27b73382b9c825bf9563c35057a5c",
+    "packages/particula-aiomfac/src/particula_aiomfac/_condensation.py": "17483eba29f10379920226d0f99398b83e0d521934caf039fb6245394314ad0b",
+    "packages/particula-aiomfac/src/particula_aiomfac/_cuda.py": "dc38805c02aecc15e4374c75c2305104165b241716d500cf758afc0e7b39298e",
+    "packages/particula-aiomfac/src/particula_aiomfac/_equilibrium.py": "c3d2bb0cd394fe348059b0b256b7b93924cfbb25583e29330956f21f029eb483",
+    "packages/particula-aiomfac/src/particula_aiomfac/_terms.py": "631e25c763a5e3cea0ca7b47f59c57977f39e2509b36396fe2e00e653070d7f7",
+    "packages/particula-aiomfac/src/particula_aiomfac/adapter.py": "b8ceb3e6fded91daf2122b5dad82c8a8000febdb0787e73dcfb8fb42b8e9d4c2",
+    "packages/particula-aiomfac/src/particula_aiomfac/data/manifest.json": "6baaf6ef914c089ca6a53c27a94830534d602ea24d04132d6120cef289464070",
+    "packages/particula-aiomfac/src/particula_aiomfac/data/parameters.npz": "14d464c03eb549578d26158bdfe9f7f209f79110e6e4b9a95a0ae4c18c0813ce",
+    "packages/particula-aiomfac/src/particula_aiomfac/kernels/activity.inc": "21dae5955186d7df8269bad7bf53869ff3f304568185bb30420a3051fec1e147",
+    "packages/particula-aiomfac/src/particula_aiomfac/kernels/equilibrium.inc": "09b733b344b6c5f8ae918c9c414dab07bbfcf7fbee1f4f5b39aa39e51b2ee4cc",
+    "packages/particula-aiomfac/src/particula_aiomfac/kernels/output.inc": "cd3ae436bb99b41538f7f75e576b3f3216f6fe7170682f9b568b1e78e105f193",
+    "packages/particula-aiomfac/src/particula_aiomfac/model.py": "38889ecd87bb3e398d957897f6692b9645a96f25565c6e43e585475ea0a54107",
+    "particula/particles/prepared_activity.py": "04b1be37d8a9de2bb5dbef8c1d491306a6124dae70589dc1af7c8e287cb100b4",
+    "particula/dynamics/condensation/condensation_strategies.py": "bb022556a10d43c63ac0c2eb68aad43151a71c5dec00d9ce41db03642c143cdd",
+    "particula/execution/_adaptive_condensation_physics.py": "25c0c6a32a5031dfd9647c65dfee79c673d9b91980bb9b4336192d968ff9d2bb",
+    "particula/execution/gpu_resident_condensation.py": "b6bb7e461d589888c043f3cebfdbc7b42db292c083a35834ed569577a7446d8e",
+    "particula/gpu/kernels/condensation.py": "40eac1a914e7a27bea762a2fcafc715852b12afe286efcf225d10ded95f18630"
+  },
+  "rendered_at": "2026-11-23T01:27:25.533633+00:00",
+  "render_revision": "cf116ee1316b141651a3fb4704014a845c03b9ef",
+  "render_elapsed_seconds": 3.5746916099451482
+}

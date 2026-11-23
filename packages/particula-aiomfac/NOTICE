@@ -1,0 +1,47 @@
+AIOMFAC-web 3.15, Andi Zuend and contributors. See reference/upstream.toml for the exact source.
+The reference executables are built locally. The distribution contains no upstream Fortran source or binary.
+The packaged NumPy equations and initialized parameter arrays are derived from AIOMFAC-web 3.15 (2026 Particula port). See tools/export_parameters.py for table regeneration and reference/parameters.toml for the active branches.
+Runtime CPU equilibrium uses scipy.optimize; CUDA uses the packaged activity and equilibrium kernels. MINPACK, zerobracket_inwards, ModStringFunctions and the upstream I/O utilities are inputs to the contributor's reference build. Both distributions contain the runtime parameter arrays and sparse tables. The source archive also contains reference fixtures and regeneration scripts. Those scripts fetch and verify the pinned Fortran files separately.
+File-specific provenance (paths relative to upstream). Retain the original notices in any redistribution of these sources.
+
+Auxiliary/Pure_component_smiles_table.csv: upstream repository GPLv3 license; no separate license identified in header
+Examples_Input/input_0008.txt: upstream repository GPLv3 license; no separate license identified in header
+FortranCode/AIOMFAC_inout.f90: upstream copyright holders; GPL-3.0-or-later per file header
+FortranCode/Main_IO_driver.f90: upstream copyright holders; GPL-3.0-or-later per file header
+FortranCode/Makefile: upstream repository GPLv3 license; no separate license identified in header
+FortranCode/ModAIOMFACvar.f90: upstream copyright holders; GPL-3.0-or-later per file header
+FortranCode/ModCalcActCoeff.f90: upstream copyright holders; GPL-3.0-or-later per file header
+FortranCode/ModCompScaleConversion.f90: upstream copyright holders; GPL-3.0-or-later per file header
+FortranCode/ModComponentNames.f90: upstream copyright holders; GPL-3.0-or-later per file header
+FortranCode/ModFiniteDiffSens.f90: upstream copyright holders; GPL-3.0-or-later per file header
+FortranCode/ModMRpart.f90: upstream copyright holders; GPL-3.0-or-later per file header
+FortranCode/ModNumericalTransformations.f90: upstream copyright holders; GPL-3.0-or-later per file header
+FortranCode/ModOScommands.f90: upstream repository GPLv3 license; no separate license identified in header
+FortranCode/ModPureCompProp.f90: upstream copyright holders; GPL-3.0-or-later per file header
+FortranCode/ModPureViscosPar.f90: upstream repository GPLv3 license; no separate license identified in header
+FortranCode/ModSRparam.f90: upstream repository GPLv3 license; no separate license identified in header
+FortranCode/ModSRunifac.f90: upstream copyright holders; GPL-3.0-or-later per file header
+FortranCode/ModStringFunctions.f90: David Frank, modifications by Andi Zuend; no standalone license in header
+FortranCode/ModSubgroupProp.f90: upstream copyright holders; GPL-3.0-or-later per file header
+FortranCode/ModSystemProp.f90: upstream copyright holders; GPL-3.0-or-later per file header
+FortranCode/ModViscEyring.f90: upstream repository GPLv3 license; no separate license identified in header
+FortranCode/ModZSRvisc.f90: upstream repository GPLv3 license; no separate license identified in header
+FortranCode/Mod_InputOutput.f90: upstream copyright holders; GPL-3.0-or-later per file header
+FortranCode/Mod_MINPACK.f90: University of Chicago (1999) MINPACK conditions/disclaimer in file, upstream modifications
+FortranCode/Mod_NumPrec.f90: upstream repository GPLv3 license; no separate license identified in header
+FortranCode/Mod_kind_param.f90: upstream repository GPLv3 license; no separate license identified in header
+FortranCode/SubModDefSystem.f90: upstream copyright holders; GPL-3.0-or-later per file header
+FortranCode/SubModDissociationEquil.f90: upstream copyright holders; GPL-3.0-or-later per file header
+FortranCode/aiomfac_inout__genmod.f90: compiler-generated interface in upstream distribution
+FortranCode/brent.f90: Richard Brent algorithms, John Burkardt Fortran implementation; GNU LGPL per source
+FortranCode/brentzero__genmod.f90: compiler-generated interface in upstream distribution
+FortranCode/glomin__genmod.f90: compiler-generated interface in upstream distribution
+FortranCode/local_min__genmod.f90: compiler-generated interface in upstream distribution
+FortranCode/local_min_rc__genmod.f90: compiler-generated interface in upstream distribution
+FortranCode/maketemplate.txt: upstream repository GPLv3 license; no separate license identified in header
+FortranCode/timestampbrent__genmod.f90: compiler-generated interface in upstream distribution
+FortranCode/zero_rc__genmod.f90: compiler-generated interface in upstream distribution
+FortranCode/zerobracket_inwards.f90: Andi Zuend (2011), adapted from Numerical Recipes per header; review underlying terms before reuse/distribution
+FortranCode/zerobracket_inwards__genmod.f90: compiler-generated interface in upstream distribution
+Inputfiles/input_0003.txt: upstream repository GPLv3 license; no separate license identified in header
+LICENSE: upstream copyright holders; GPL-3.0-or-later per file header

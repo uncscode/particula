@@ -1,0 +1,372 @@
+{
+  "mixed-water": {
+    "name": "mixed-water",
+    "components": [
+      [
+        "water",
+        {
+          "16": 1
+        }
+      ],
+      [
+        "vanillic_acid",
+        {
+          "9": 3,
+          "10": 2,
+          "17": 1,
+          "24": 1,
+          "137": 1
+        }
+      ],
+      [
+        "butanediol",
+        {
+          "142": 2,
+          "150": 2,
+          "153": 2
+        }
+      ],
+      [
+        "NaCl",
+        {
+          "202": 1,
+          "242": 1
+        }
+      ]
+    ],
+    "dry_weights": [
+      0,
+      1,
+      2,
+      20
+    ],
+    "targets": [
+      "water"
+    ],
+    "variable_dry": [],
+    "bounds": [
+      [
+        0.0,
+        6.0
+      ],
+      [
+        286.0,
+        302.0
+      ]
+    ],
+    "log_tolerances": [
+      4e-05
+    ],
+    "max_level": 10
+  },
+  "mixed-two-vapor": {
+    "name": "mixed-two-vapor",
+    "components": [
+      [
+        "water",
+        {
+          "16": 1
+        }
+      ],
+      [
+        "vanillic_acid",
+        {
+          "9": 3,
+          "10": 2,
+          "17": 1,
+          "24": 1,
+          "137": 1
+        }
+      ],
+      [
+        "butanediol",
+        {
+          "142": 2,
+          "150": 2,
+          "153": 2
+        }
+      ],
+      [
+        "NaCl",
+        {
+          "202": 1,
+          "242": 1
+        }
+      ]
+    ],
+    "dry_weights": [
+      0,
+      1,
+      2,
+      20
+    ],
+    "targets": [
+      "water",
+      "butanediol"
+    ],
+    "variable_dry": [
+      "butanediol"
+    ],
+    "bounds": [
+      [
+        0.0,
+        6.0
+      ],
+      [
+        286.0,
+        302.0
+      ],
+      [
+        0.04,
+        0.14
+      ]
+    ],
+    "log_tolerances": [
+      4e-05,
+      0.0005
+    ],
+    "max_level": 10
+  },
+  "mixed-variable-acid": {
+    "name": "mixed-variable-acid",
+    "components": [
+      [
+        "water",
+        {
+          "16": 1
+        }
+      ],
+      [
+        "vanillic_acid",
+        {
+          "9": 3,
+          "10": 2,
+          "17": 1,
+          "24": 1,
+          "137": 1
+        }
+      ],
+      [
+        "butanediol",
+        {
+          "142": 2,
+          "150": 2,
+          "153": 2
+        }
+      ],
+      [
+        "NaCl",
+        {
+          "202": 1,
+          "242": 1
+        }
+      ]
+    ],
+    "dry_weights": [
+      0,
+      1,
+      2,
+      20
+    ],
+    "targets": [
+      "water",
+      "butanediol"
+    ],
+    "variable_dry": [
+      "butanediol",
+      "vanillic_acid"
+    ],
+    "bounds": [
+      [
+        0.0,
+        6.0
+      ],
+      [
+        286.0,
+        302.0
+      ],
+      [
+        0.04,
+        0.14
+      ],
+      [
+        0.025,
+        0.075
+      ]
+    ],
+    "log_tolerances": [
+      4e-05,
+      0.0005
+    ],
+    "max_level": 10
+  },
+  "sulfate": {
+    "name": "sulfate",
+    "components": [
+      [
+        "water",
+        {
+          "16": 1
+        }
+      ],
+      [
+        "NH4HSO4",
+        {
+          "204": 1,
+          "248": 1
+        }
+      ]
+    ],
+    "dry_weights": [
+      0,
+      1
+    ],
+    "targets": [
+      "water"
+    ],
+    "variable_dry": [],
+    "bounds": [
+      [
+        1.5,
+        2.5
+      ],
+      [
+        295.0,
+        301.0
+      ]
+    ],
+    "log_tolerances": [
+      4e-05
+    ],
+    "max_level": 10
+  },
+  "carbonate": {
+    "name": "carbonate",
+    "components": [
+      [
+        "water",
+        {
+          "16": 1
+        }
+      ],
+      [
+        "KHCO3",
+        {
+          "203": 1,
+          "250": 1
+        }
+      ]
+    ],
+    "dry_weights": [
+      0,
+      1
+    ],
+    "targets": [
+      "water"
+    ],
+    "variable_dry": [],
+    "bounds": [
+      [
+        3.0,
+        4.0
+      ],
+      [
+        295.0,
+        301.0
+      ]
+    ],
+    "log_tolerances": [
+      4e-05
+    ],
+    "max_level": 10
+  },
+  "neutral": {
+    "name": "neutral",
+    "components": [
+      [
+        "water",
+        {
+          "16": 1
+        }
+      ],
+      [
+        "butanediol",
+        {
+          "142": 2,
+          "150": 2,
+          "153": 2
+        }
+      ]
+    ],
+    "dry_weights": [
+      0,
+      1
+    ],
+    "targets": [
+      "water"
+    ],
+    "variable_dry": [],
+    "bounds": [
+      [
+        0.0,
+        6.0
+      ],
+      [
+        286.0,
+        302.0
+      ]
+    ],
+    "log_tolerances": [
+      4e-05
+    ],
+    "max_level": 10
+  },
+  "shared-ion": {
+    "name": "shared-ion",
+    "components": [
+      [
+        "water",
+        {
+          "16": 1
+        }
+      ],
+      [
+        "NaCl",
+        {
+          "202": 1,
+          "242": 1
+        }
+      ],
+      [
+        "KCl",
+        {
+          "203": 1,
+          "242": 1
+        }
+      ]
+    ],
+    "dry_weights": [
+      0,
+      3,
+      2
+    ],
+    "targets": [
+      "water"
+    ],
+    "variable_dry": [],
+    "bounds": [
+      [
+        0.0,
+        6.0
+      ],
+      [
+        286.0,
+        302.0
+      ]
+    ],
+    "log_tolerances": [
+      4e-05
+    ],
+    "max_level": 10
+  }
+}

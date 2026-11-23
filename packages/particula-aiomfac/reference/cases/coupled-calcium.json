@@ -1,0 +1,18 @@
+{
+  "components": [
+    "water",
+    "NH4HSO4",
+    "KHCO3",
+    "CaCl2"
+  ],
+  "fractions": [
+    0.969,
+    0.02,
+    0.01,
+    0.001
+  ],
+  "temperature_K": 298.15,
+  "basis": "mass",
+  "source": "Closed coupled system with substoichiometric calcium",
+  "expected_status": "ok"
+}

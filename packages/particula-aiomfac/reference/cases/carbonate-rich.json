@@ -1,0 +1,20 @@
+{
+  "components": [
+    "water",
+    "CO2(aq)",
+    "KOH",
+    "KHCO3",
+    "K2CO3"
+  ],
+  "fractions": [
+    0.9819,
+    0,
+    0.018,
+    0.0001,
+    0
+  ],
+  "temperature_K": 298,
+  "basis": "mole",
+  "source": "Perturbation of input_0003 for shared-process history",
+  "expected_status": "ok"
+}

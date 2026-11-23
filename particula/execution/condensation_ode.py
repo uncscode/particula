@@ -6,7 +6,7 @@ Full species maps, resolved counts/volume and PDF quadrature remain native.
 This path integrates isothermal rates, not inventory-limited finite-step maps.
 """
 
-from copy import deepcopy
+from copy import copy, deepcopy
 
 import numpy as np
 
@@ -61,6 +61,20 @@ class CondensationODE:
         _cpu_batch.validate(aerosol)
         self._base = _cpu_batch.detached(aerosol)
         self._strategy = deepcopy(strategy)
+
+        self._linear_strategy = self._strategy
+        activity = self._strategy.activity_strategy
+        if (
+            method == "ros3"
+            and getattr(activity, "evaluation", None) == "hybrid"
+        ):
+            direct = getattr(activity, "direct_for_linearization", None)
+            if not callable(direct):
+                raise ValueError(
+                    "hybrid ROS3 requires a direct linearization provider"
+                )
+            self._linear_strategy = copy(self._strategy)
+            self._linear_strategy.activity_strategy = direct()
         self._forcing = forcing
         self._viscosity = (
             None
@@ -125,7 +139,20 @@ class CondensationODE:
             + [gas_tol[index] for index in self._gas_indices]
         )
         self.problem = ODEProblem(
-            self._rate, self._admissible, self._jacobian, self._partial_time
+            self._rate,
+            self._admissible,
+            self._jacobian,
+            self._partial_time,
+            validate_candidate=(
+                self._rate
+                if getattr(
+                    self._strategy.activity_strategy,
+                    "prepared_provider_version",
+                    None,
+                )
+                == 1
+                else None
+            ),
         )
         self.solver = AdaptiveSolver(
             self.problem,
@@ -206,6 +233,9 @@ class CondensationODE:
         return bool(np.all(masses.sum(axis=2)[active] > 0))
 
     def _rate(self, time, values):
+        return self._strategy_rate(time, values, self._strategy)
+
+    def _strategy_rate(self, time, values, strategy):
         if not self._admissible(values):
             raise TrialDomainError("condensation trial has invalid inventory")
         state = self._unpack(time, values)
@@ -213,17 +243,25 @@ class CondensationODE:
         gas_rate = np.zeros_like(state.gas.concentration)
         for box, pairs in enumerate(self._maps):
             view = _cpu_batch.box_view(state, box)
-            rate = self._strategy.mass_transfer_rate(
-                view.particles,
-                view.gas,
-                float(view.environment.temperature[0]),
-                float(view.environment.pressure[0]),
-                None
-                if self._viscosity is None
-                else float(self._viscosity[box]),
-            )
+            try:
+                rate = strategy.mass_transfer_rate(
+                    view.particles,
+                    view.gas,
+                    float(view.environment.temperature[0]),
+                    float(view.environment.pressure[0]),
+                    None
+                    if self._viscosity is None
+                    else float(self._viscosity[box]),
+                )
+            except getattr(
+                strategy.activity_strategy, "trial_failure_types", ()
+            ) as error:
+                raise TrialDomainError(
+                    f"condensation activity at box {box}, "
+                    f"rate at t={time:g}: {error}"
+                ) from error
             mass_rate[box] = rate
-            if self._strategy.update_gases:
+            if strategy.update_gases:
                 for source, target in pairs:
                     gas_rate[box, source] = -np.dot(
                         self._weights[box], rate[:, target]
@@ -248,7 +286,11 @@ class CondensationODE:
 
         # Keep physical perturbations local after large wet-to-dry changes.
         differences = coordinate_steps(self, values)
-        base = self._rate(time, values)
+
+        def rate(state):
+            return self._strategy_rate(time, state, self._linear_strategy)
+
+        base = rate(values)
         jacobian = np.empty((values.size, values.size))
         for index in range(values.size):
             delta = differences[index]
@@ -256,11 +298,9 @@ class CondensationODE:
             plus[index] += delta
             minus[index] -= delta
             if self._admissible(minus):
-                jacobian[:, index] = (
-                    self._rate(time, plus) - self._rate(time, minus)
-                ) / (2 * delta)
+                jacobian[:, index] = (rate(plus) - rate(minus)) / (2 * delta)
             else:
-                jacobian[:, index] = (self._rate(time, plus) - base) / delta
+                jacobian[:, index] = (rate(plus) - base) / delta
         return jacobian
 
     def _partial_time(self, time, values):
@@ -272,7 +312,8 @@ class CondensationODE:
         if delta <= 0:
             return np.zeros_like(values)
         return (
-            self._rate(time + delta, values) - self._rate(time, values)
+            self._strategy_rate(time + delta, values, self._linear_strategy)
+            - self._strategy_rate(time, values, self._linear_strategy)
         ) / delta
 
     @property

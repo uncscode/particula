@@ -401,7 +401,12 @@ def test_publication_requires_validated_upstream_version_bump(
 
 
 @pytest.mark.parametrize(
-    "tag, expected", [("particula-helper-v0.3.4", False), ("v0.3.1", True)]
+    "tag, expected",
+    [
+        ("particula-helper-v0.3.4", False),
+        ("particula-aiomfac-v0.1.4", False),
+        ("v0.3.1", True),
+    ],
 )
 def test_plugin_release_does_not_publish_python_or_reattach_assets(
     tag, expected

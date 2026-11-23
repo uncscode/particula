@@ -1,0 +1,50 @@
+{
+  "equilibrium": {},
+  "errors": [],
+  "ionic_strength_mol_per_kg": 0.0,
+  "ions": {},
+  "mixed_solvent_reference": false,
+  "molality_conversion": 0.0,
+  "neutrals": {
+    "butanediol": {
+      "activity": 0.9769283932395089,
+      "defined": true,
+      "ln_gamma": -0.0012464844894675142,
+      "lr": 0.0,
+      "mass_fraction": 0.96,
+      "mr": 0.0,
+      "sr": -0.0012464844894675142,
+      "x": 0.978146878582777
+    },
+    "vanillic_acid": {
+      "activity": 0.006954999831605877,
+      "defined": true,
+      "ln_gamma": -1.1448829667985847,
+      "lr": 0.0,
+      "mass_fraction": 0.04,
+      "mr": 0.0,
+      "sr": -1.1448829667985847,
+      "x": 0.021853121417222943
+    }
+  },
+  "relative_charge_residual": 0.0,
+  "salts": {},
+  "species": {
+    "butanediol": {
+      "activity": 0.9769283932395089,
+      "gamma": 0.9987542920496423,
+      "mass_fraction": 0.96,
+      "molality": 10.652463382157123,
+      "x": 0.978146878582777
+    },
+    "vanillic_acid": {
+      "activity": 0.006954999831605877,
+      "gamma": 0.31826116273369,
+      "mass_fraction": 0.04,
+      "molality": 0.23799040898651785,
+      "x": 0.021853121417222943
+    }
+  },
+  "status": "ok",
+  "warning": 16
+}

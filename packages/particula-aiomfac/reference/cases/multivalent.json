@@ -1,0 +1,14 @@
+{
+  "components": [
+    "water",
+    "CaCl2"
+  ],
+  "fractions": [
+    0.98,
+    0.02
+  ],
+  "temperature_K": 298,
+  "basis": "mass",
+  "source": "Particula fixed-dissociation qualification",
+  "expected_status": "ok"
+}

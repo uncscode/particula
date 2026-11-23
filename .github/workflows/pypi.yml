@@ -22,7 +22,7 @@ jobs:
   testing:
     if: >-
       github.event_name != 'workflow_dispatch' &&
-      (github.event_name != 'release' || !startsWith(github.event.release.tag_name, 'particula-helper-v'))
+      (github.event_name != 'release' || (!startsWith(github.event.release.tag_name, 'particula-helper-v') && !startsWith(github.event.release.tag_name, 'particula-aiomfac-v')))
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -55,13 +55,14 @@ jobs:
 
   release-plan:
     if: >-
-      github.event_name != 'workflow_dispatch' &&
-      (github.event_name != 'release' || !startsWith(github.event.release.tag_name, 'particula-helper-v'))
+      (github.event_name != 'release' || (!startsWith(github.event.release.tag_name, 'particula-helper-v') && !startsWith(github.event.release.tag_name, 'particula-aiomfac-v')))
     runs-on: ubuntu-latest
     outputs:
+      backend-version: ${{ steps.backend.outputs.version }}
+      backend-publish: ${{ steps.backend.outputs.publish }}
       version: ${{ steps.plan.outputs.version }}
       tag: ${{ steps.plan.outputs.tag }}
-      build: ${{ steps.plan.outputs.build }}
+      build: ${{ (steps.plan.outputs.build == 'true' || steps.backend.outputs.build == 'true') && 'true' || 'false' }}
       publish: ${{ steps.plan.outputs.publish }}
     steps:
       - uses: actions/checkout@v7
@@ -74,6 +75,10 @@ jobs:
       - name: Identify an upstream library version increase
         id: plan
         run: python scripts/release.py plan
+
+      - name: Identify the backend version independently
+        id: backend
+        run: python scripts/release.py plan --project particula-aiomfac
 
   pyping:
     needs: release-plan
@@ -92,34 +97,54 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install build 'flit_core>=3.12,<4'
-      - name: Build package
-        run: python -m build
-      - name: Verify exact release documentation bundles
-        run: >-
-          python scripts/check_doc_bundle.py
-          --wheel dist/particula-*.whl --sdist dist/particula-*.tar.gz
-          --report .artifacts/docs-bundle.json
-      - name: Save documentation bundle evidence
-        uses: actions/upload-artifact@v7
-        with:
-          name: docs-bundle
-          path: .artifacts/docs-bundle.json
-          include-hidden-files: true
-          if-no-files-found: error
-      - name: Record checksums for the verified Python distributions
-        if: needs.release-plan.outputs.publish == 'true'
-        working-directory: dist
+      - name: Build candidate archives and audit their contents
         run: |
-          sha256sum *.whl *.tar.gz > PYTHON-SHA256SUMS
-          cp ../.artifacts/docs-bundle.json .
-      - name: Save exact release assets for publication and retries
-        if: needs.release-plan.outputs.publish == 'true'
+          python -m build --outdir candidates/base
+          python -m build --outdir candidates/backend packages/particula-aiomfac
+          python scripts/check_doc_bundle.py --wheel candidates/base/*.whl --sdist candidates/base/*.tar.gz --report candidates/docs-bundle.json
+          python packages/particula-aiomfac/tools/qualify_packages.py --from-dist candidates --audit-only --manifest candidates/release.json
+          (cd candidates && sha256sum base/* backend/* *.json > SHA256SUMS)
+          {
+            echo 'For joint releases, publish the backend, verify its public hashes, then publish Particula and check the public extra.'
+            echo 'This run authorizes base publication: ${{ needs.release-plan.outputs.publish }}. Backend publication: ${{ needs.release-plan.outputs.backend-publish }}.'
+            echo '~~~json'
+            cat candidates/release.json
+            echo '~~~'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Retain the exact candidate files for qualification and publication
         uses: actions/upload-artifact@v7
         with:
           name: python-release-${{ github.sha }}
-          path: dist/*
+          path: candidates/
           if-no-files-found: error
           retention-days: 30
+
+  qualify-candidates:
+    needs: [release-plan, pyping]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.12', '3.13', '3.14']
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-release-${{ github.sha }}
+          path: candidates
+      - name: Verify original archives and run isolated CPU installs
+        run: |
+          (cd candidates && sha256sum --strict --check SHA256SUMS)
+          python packages/particula-aiomfac/tools/qualify_packages.py --from-dist candidates ${{ matrix.python == '3.12' && '--sdists' || '' }}
+
+      - name: Test a backend-only release against public Particula
+        if: matrix.python == '3.12' && needs.release-plan.outputs.backend-publish == 'true' && needs.release-plan.outputs.publish != 'true'
+        run: python packages/particula-aiomfac/tools/public_probe.py --backend-wheel candidates/backend/*.whl --backend-version "${{ needs.release-plan.outputs.backend-version }}"
 
   slow-examples:
     needs: release-plan
@@ -139,7 +164,7 @@ jobs:
           python -m pytest examples_tests -Werror -m "slow and not performance" --durations=10
 
   validate:
-    if: github.event_name != 'release' || !startsWith(github.event.release.tag_name, 'particula-helper-v')
+    if: github.event_name != 'release' || (!startsWith(github.event.release.tag_name, 'particula-helper-v') && !startsWith(github.event.release.tag_name, 'particula-aiomfac-v'))
     runs-on: ubuntu-latest
     timeout-minutes: 20
     outputs:
@@ -273,9 +298,100 @@ jobs:
               --notes-file plugin-dist/GITHUB-RELEASE.md
           fi
 
+  backend-stage:
+    needs: [release-plan, qualify-candidates, testing, slow-examples, validate]
+    if: >-
+      !cancelled() && github.repository == 'uncscode/particula' &&
+      needs.release-plan.outputs.backend-publish == 'true' &&
+      needs.qualify-candidates.result == 'success' && needs.testing.result == 'success' &&
+      (needs.release-plan.outputs.publish != 'true' ||
+       (needs.slow-examples.result == 'success' && needs.validate.result == 'success'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: aiomfac-stage-${{ needs.release-plan.outputs.backend-version }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-release-${{ github.sha }}
+          path: candidates
+      - name: Verify candidate bytes and check for prior uploads
+        env:
+          VERSION: ${{ needs.release-plan.outputs.backend-version }}
+        run: |
+          (cd candidates && sha256sum --strict --check SHA256SUMS)
+          python scripts/release.py pypi-check --project particula-aiomfac --directory candidates/backend --version "$VERSION"
+      - name: Check the other half of a joint release
+        if: needs.release-plan.outputs.publish == 'true'
+        run: python scripts/release.py pypi-check --directory candidates/base --version "${{ needs.release-plan.outputs.version }}"
+      - name: Archive verified backend files on the matching GitHub tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.release-plan.outputs.backend-version }}
+        run: |
+          cp candidates/release.json candidates/backend/
+          python scripts/release.py github --project particula-aiomfac --directory candidates/backend --version "$VERSION" --sha "$GITHUB_SHA"
+
+  backend-upload:
+    if: ${{ !cancelled() && needs.backend-stage.result == 'success' }}
+    needs: [release-plan, backend-stage]
+    runs-on: ubuntu-latest
+    environment: pypi-aiomfac
+    permissions:
+      id-token: write
+    concurrency:
+      group: aiomfac-upload-${{ needs.release-plan.outputs.backend-version }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-release-${{ github.sha }}
+          path: candidates
+      - name: Publish backend with PyPI Trusted Publishing
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086
+        with:
+          packages-dir: candidates/backend/
+          attestations: true
+          skip-existing: true
+
+  backend-visible:
+    if: ${{ !cancelled() && needs.backend-upload.result == 'success' }}
+    needs: [release-plan, backend-upload]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-release-${{ github.sha }}
+          path: candidates
+      - name: Verify both public backend hashes
+        run: python scripts/release.py pypi-check --require-visible --project particula-aiomfac --directory candidates/backend --version "${{ needs.release-plan.outputs.backend-version }}"
+      - name: Test public backend-only release
+        if: needs.release-plan.outputs.publish != 'true'
+        run: python packages/particula-aiomfac/tools/public_probe.py --backend-version "${{ needs.release-plan.outputs.backend-version }}"
+
   publish:
-    needs: [release-plan, testing, slow-examples, pyping, validate]
-    if: github.repository == 'uncscode/particula' && needs.release-plan.outputs.publish == 'true'
+    needs: [release-plan, testing, slow-examples, pyping, qualify-candidates, validate, backend-visible]
+    if: >-
+      !cancelled() && github.repository == 'uncscode/particula' &&
+      needs.release-plan.outputs.publish == 'true' &&
+      needs.testing.result == 'success' && needs.slow-examples.result == 'success' &&
+      needs.pyping.result == 'success' && needs.qualify-candidates.result == 'success' &&
+      needs.validate.result == 'success' &&
+      (needs.release-plan.outputs.backend-publish != 'true' || needs.backend-visible.result == 'success')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -292,7 +408,14 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: python-release-${{ github.sha }}
-          path: release-assets
+          path: candidates
+      - name: Check availability of the backend required by the candidate extra
+        run: |
+          (cd candidates && sha256sum --strict --check SHA256SUMS)
+          python packages/particula-aiomfac/tools/public_probe.py --base-wheel candidates/base/*.whl
+          mkdir release-assets
+          cp candidates/base/* candidates/*.json release-assets/
+          (cd release-assets && sha256sum *.whl *.tar.gz > PYTHON-SHA256SUMS)
       - name: Download the tested plugin packages
         uses: actions/download-artifact@v4
         with:
@@ -325,3 +448,29 @@ jobs:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
           skip-existing: true
+
+  verify-public-install:
+    if: ${{ !cancelled() && needs.publish.result == 'success' }}
+    needs: [release-plan, publish]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-release-${{ github.sha }}
+          path: candidates
+      - name: Verify base hashes and install the public extra
+        env:
+          BASE: ${{ needs.release-plan.outputs.version }}
+          BACKEND: ${{ needs.release-plan.outputs.backend-version }}
+          JOINT: ${{ needs.release-plan.outputs.backend-publish }}
+        run: |
+          python scripts/release.py pypi-check --require-visible --directory candidates/base --version "$BASE"
+          args=(--base-version "$BASE")
+          if [[ "$JOINT" == true ]]; then args+=(--backend-version "$BACKEND"); fi
+          python packages/particula-aiomfac/tools/public_probe.py "${args[@]}"

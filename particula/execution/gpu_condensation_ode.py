@@ -85,6 +85,7 @@ class GPUCondensationODE:
             )
         self._base = _cpu_batch.detached(aerosol)
         self._strategy = deepcopy(strategy)
+
         self._forcing = forcing
         self._plan = plan_adaptive_condensation(self._strategy, self._base)
         pairs = tuple(
@@ -239,6 +240,24 @@ class GPUCondensationODE:
                 forward[target], reverse[source] = source, target
         self._forward = self._array(forward, wp.int32)
         self._reverse = self._array(reverse, wp.int32)
+        self._provider = None
+        self._flux_guard = None
+        if config["activity_mode"] == 3:
+            self._provider = self._strategy.activity_strategy.bind_device(
+                self._shape, np.flatnonzero(forward >= 0), self.device
+            )
+            self._bat_table = self._provider.values.flatten()
+            if getattr(self._provider, "hybrid", False):
+                from particula.gpu.kernels.activity_guard import BoxFluxGuard
+
+                if self.method == "ros3" and not callable(
+                    getattr(self._provider, "evaluate_direct", None)
+                ):
+                    raise ValueError(
+                        "hybrid ROS3 requires direct device linearization"
+                    )
+                self._flux_guard = BoxFluxGuard(self._provider)
+            self._provider_stage = 0
 
     def _check_ready(self):
         if self._faulted:
@@ -257,8 +276,14 @@ class GPUCondensationODE:
         self.control_readbacks += 1
         if self._invalid.numpy()[0]:
             raise TrialDomainError(
-                "GPU trial leaves the physical inventory domain"
+                self._activity_failure()
+                or "GPU trial leaves the physical inventory domain"
             )
+
+    def _activity_failure(self):
+        if self._provider is not None:
+            return self._provider.failure_message()
+        return ""
 
     def _environment(self, time):
         if self._forcing is None:
@@ -305,13 +330,42 @@ class GPUCondensationODE:
         )
         self._status()
 
-    def _rate(self, time, state, result):
+    def _material_rates(self, activities, dest):
+        self._launch(
+            material_rates,
+            self._shape,
+            [
+                self._masses,
+                self._counts,
+                self._density,
+                self._gas,
+                self._vapor,
+                self._molar,
+                self._tension,
+                self._surface_density,
+                self._surface_reference,
+                self._phases,
+                self._references,
+                self._activity_density,
+                self._kappas,
+                activities,
+                wp.int32(self._plan.values["activity_mode"]),
+                wp.int32(self._plan.values["water"]),
+                self._accommodation,
+                self._diffusion,
+                self._mean_free_path,
+                self._temperature,
+                self._forward,
+                dest,
+            ],
+        )
+
+    def _rate(self, time, state, result, *, linearize=False):
         self._unpack_trial(state)
         if self._forcing is not None:
             temperature, pressure = self._environment(time)
             self._temperature.assign(np.array(temperature, copy=True))
             self._pressure.assign(np.array(pressure, copy=True))
-        config = self._plan.values
         self._launch(
             _refresh_vapor_pressure_kernel,
             self._gas_shape,
@@ -332,35 +386,33 @@ class GPUCondensationODE:
                 self._mean_free_path,
             ],
         )
-        self.statistics.rate_calls += 1
-        self._launch(
-            material_rates,
-            self._shape,
-            [
+        if self._provider is not None:
+            evaluate = (
+                self._provider.evaluate_direct
+                if linearize and self._flux_guard is not None
+                else self._provider.evaluate
+            )
+            evaluate(
                 self._masses,
                 self._counts,
-                self._density,
-                self._gas,
-                self._vapor,
-                self._molar,
-                self._tension,
-                self._surface_density,
-                self._surface_reference,
-                self._phases,
-                self._references,
-                self._activity_density,
-                self._kappas,
-                self._bat_table,
-                wp.int32(config["activity_mode"]),
-                wp.int32(config["water"]),
-                self._accommodation,
-                self._diffusion,
-                self._mean_free_path,
                 self._temperature,
-                self._forward,
-                self._mass_rate,
-            ],
-        )
+                self._invalid,
+                stage=self._provider_stage,
+            )
+            self._provider_stage += 1
+            self._status()
+        self.statistics.rate_calls += 1
+        if self._flux_guard is not None and not linearize:
+            self._flux_guard.refine(
+                self._material_rates,
+                self._masses,
+                self._counts,
+                self._temperature,
+                self._invalid,
+                self._provider_stage - 1,
+            )
+            self._status()
+        self._material_rates(self._bat_table, self._mass_rate)
         self._launch(
             algebra.pack_rate,
             self._mass_size,
@@ -419,7 +471,13 @@ class GPUCondensationODE:
             ],
         )
 
+    def _begin_activity_trial(self):
+        if self._provider is not None:
+            self._provider.detail.zero_()
+            self._provider_stage = 0
+
     def _trial(self, h):
+        self._begin_activity_trial()
         if self._ros3 is not None:
             return self._ros3.trial(self, h)
         k1, k2, k3, k4 = self._rates
@@ -472,7 +530,10 @@ class GPUCondensationODE:
         floor = min(self.min_step, bound - self.time)
         for _ in range(self.max_trials):
             if h < floor or self.time + h == self.time:
-                raise RuntimeError("accuracy requires a step below min_step")
+                raise RuntimeError(
+                    self._activity_failure()
+                    or "accuracy requires a step below min_step"
+                )
             domain_failure = False
             try:
                 norm = self._trial(h)
@@ -504,7 +565,8 @@ class GPUCondensationODE:
                 else max(0.1, min(0.5, 0.9 * norm ** (-1 / 3)))
             )
         raise RuntimeError(
-            "maximum trial count exceeded without accepting a step"
+            self._activity_failure()
+            or "maximum trial count exceeded without accepting a step"
         )
 
     def snapshot(self):

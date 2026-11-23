@@ -62,7 +62,13 @@ def plan_adaptive_condensation(strategy, aerosol):  # noqa: C901
     water = 0
     mode = 0
     bat_table = np.zeros(0)
-    if type(activity) in (ActivityIdealMolar, ActivityKappaParameter):
+    from particula.particles.prepared_activity import provider_identity
+
+    identity = provider_identity(activity)
+    if identity is not None:
+        activity.validate_material_layout(width, targets)
+        mode = 3
+    elif type(activity) in (ActivityIdealMolar, ActivityKappaParameter):
         references = _vector(
             activity.molar_mass, width, "activity molar mass", positive=True
         )

@@ -178,9 +178,13 @@ class GPUResidentCondensation(GPUCondensationODE):
                 self._norm,
             ],
         )
-        self._unpack_trial(self._candidate)
+        if self._provider is None:
+            self._unpack_trial(self._candidate)
+        else:
+            self._rate(self.time, self._candidate, self._rates[1])
 
     def _iteration(self):
+        self._begin_activity_trial()
         self._launch(
             control.begin_trial,
             1,
@@ -235,13 +239,18 @@ class GPUResidentCondensation(GPUCondensationODE):
         self.statistics.domain_rejected = int(counters[2])
         trials = int(counters[0] + counters[1])
         self.statistics.rate_calls = trials * (
-            4 if self.method == "rk23" else 2 + 4 * self._ros3.width
+            4
+            if self.method == "rk23"
+            else 2 + int(self._provider is not None) + 4 * self._ros3.width
         )
         self.statistics.jacobian_calls = 0 if self.method == "rk23" else trials
         self.statistics.factorizations = self.statistics.jacobian_calls
         self.statistics.linear_solves = 3 * self.statistics.jacobian_calls
         if counters[3]:
             self._faulted = True
+            failure = self._activity_failure()
+            if failure:
+                raise RuntimeError(failure)
             raise RuntimeError(
                 "resident adaptive step below min_step"
                 if counters[3] == 1

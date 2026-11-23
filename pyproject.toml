@@ -37,6 +37,7 @@ repository = "https://github.com/uncscode/particula"
 particula-docs = "particula_docs:main"
 
 [project.optional-dependencies]
+aiomfac = ["particula-aiomfac>=0.1.4,<0.2"]
 plot = ["matplotlib>=3.8"]
 dev = [
     "pytest", "pytest-cov", "jupyterlab", "nbclient", "nbconvert",
@@ -163,6 +164,7 @@ include = [
     "website/examples.json", "scripts/", "examples_tests/", "conda/", "conftest.py",
 ]
 exclude = [
+    "packages/particula-aiomfac/**",
     ".trash/**", "**/__pycache__/**", "**/*.pyc",
     "**/*.bak", "**/*.pyo", "**/*.tmp", "**/*.log",
     "**/.ipynb_checkpoints/**", "**/.pytest_cache/**",

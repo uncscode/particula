@@ -1,0 +1,18 @@
+{
+  "components": [
+    "water",
+    "butanediol",
+    "vanillic_acid",
+    "NaCl"
+  ],
+  "fractions": [
+    0.977,
+    0.002,
+    0.001,
+    0.02
+  ],
+  "temperature_K": 298,
+  "basis": "mass",
+  "source": "Particula reference suite",
+  "expected_status": "ok"
+}

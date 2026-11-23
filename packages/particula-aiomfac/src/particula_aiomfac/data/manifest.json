@@ -1,0 +1,275 @@
+{
+  "revision": "24041a1b0db090de1285008814a5285b4b9b746b",
+  "dataset": 1,
+  "use_latest_param": false,
+  "source_manifest": "reference/upstream.toml",
+  "tables": {
+    "NKTAB": {
+      "shape": [
+        265
+      ],
+      "dtype": "<i4",
+      "units": "1",
+      "index_offset": [
+        1
+      ],
+      "sha256": "89de1dde3f41e7bb8b1ba8e0173ae7bda1a53c402702b35e61a09395d19242c0"
+    },
+    "SR_RR": {
+      "shape": [
+        265
+      ],
+      "dtype": "<f8",
+      "units": "1",
+      "index_offset": [
+        1
+      ],
+      "sha256": "584c342414fcf4823c2e18819ba7d3cc8d560d428846fe3c1afe8144ec2e24f8"
+    },
+    "SR_QQ": {
+      "shape": [
+        265
+      ],
+      "dtype": "<f8",
+      "units": "1",
+      "index_offset": [
+        1
+      ],
+      "sha256": "7e812553317a2961cf5a95e91d760a019bbfc7c95babfa3251561bb7ad26f48f"
+    },
+    "GroupMW": {
+      "shape": [
+        200
+      ],
+      "dtype": "<f8",
+      "units": "g/mol",
+      "index_offset": [
+        1
+      ],
+      "sha256": "61ff8c531348ff865c5b2fd52bd38fb264088066247dba076d615600ae73ec4e"
+    },
+    "SMWC": {
+      "shape": [
+        40
+      ],
+      "dtype": "<f8",
+      "units": "g/mol",
+      "index_offset": [
+        201
+      ],
+      "sha256": "b195656cc459ebda370dedb7efb9bc1fc8f39cea8004e176a4b493c367c5bdbd"
+    },
+    "SMWA": {
+      "shape": [
+        40
+      ],
+      "dtype": "<f8",
+      "units": "g/mol",
+      "index_offset": [
+        241
+      ],
+      "sha256": "aeeed6a6a5d4d4a14de6ba43b94a3da60e803f83cb94de4b67c7b89b4d0dea1a"
+    },
+    "lambdaIN": {
+      "shape": [
+        65
+      ],
+      "dtype": "<f8",
+      "units": "kg/mol",
+      "index_offset": [
+        201
+      ],
+      "sha256": "64650061878a1d8132785968a89f9e4622cf077fe2dca6bac2df9364b417efc1"
+    },
+    "Ioncharge": {
+      "shape": [
+        65
+      ],
+      "dtype": "<i4",
+      "units": "elementary charge",
+      "index_offset": [
+        201
+      ],
+      "sha256": "24db947e196ee2d212595849ff7bdc10c7b4e22becd9974745b1cf6a7926fe9d"
+    },
+    "ARR": {
+      "shape": [
+        76,
+        76
+      ],
+      "dtype": "<f8",
+      "units": "K",
+      "index_offset": [
+        1,
+        1
+      ],
+      "sha256": "99550e3ed0e2b04c5a592ae45b5d6da7c44bfb8c41e8fa94457e23a235c490cc"
+    },
+    "bTABnc": {
+      "shape": [
+        76,
+        23
+      ],
+      "dtype": "<f8",
+      "units": "kg/mol",
+      "index_offset": [
+        1,
+        201
+      ],
+      "sha256": "07c10d1d98786341c665a017a4cdd0be23e638460d24951eb2bff23dbb8dba86"
+    },
+    "cTABnc": {
+      "shape": [
+        76,
+        23
+      ],
+      "dtype": "<f8",
+      "units": "kg/mol",
+      "index_offset": [
+        1,
+        201
+      ],
+      "sha256": "3102c0485416fccb1bc98d702764fd1cda1a75b6b5b9ec25238d14b12079d680"
+    },
+    "bTABna": {
+      "shape": [
+        76,
+        25
+      ],
+      "dtype": "<f8",
+      "units": "kg/mol",
+      "index_offset": [
+        1,
+        241
+      ],
+      "sha256": "9a982ce882d56d26536392531c236f1cb18c939a73ce4c89c90508626f990322"
+    },
+    "cTABna": {
+      "shape": [
+        76,
+        25
+      ],
+      "dtype": "<f8",
+      "units": "kg/mol",
+      "index_offset": [
+        1,
+        241
+      ],
+      "sha256": "c501194629df9b6c85605c8a75f7ba56b9e908f8df9dcf66e3430304e00a6ab5"
+    },
+    "bTABAC": {
+      "shape": [
+        40,
+        40
+      ],
+      "dtype": "<f8",
+      "units": "kg/mol",
+      "index_offset": [
+        201,
+        241
+      ],
+      "sha256": "f6edfed0ea64bc68f152adf69643d45f97910a01d2adaf9c96a20c5622326478"
+    },
+    "cTABAC": {
+      "shape": [
+        40,
+        40
+      ],
+      "dtype": "<f8",
+      "units": "kg/mol",
+      "index_offset": [
+        201,
+        241
+      ],
+      "sha256": "5231452eda01879885f7632ffda78ffe6a371af89c43a9de08d1160806f5fe55"
+    },
+    "Cn1TABAC": {
+      "shape": [
+        40,
+        40
+      ],
+      "dtype": "<f8",
+      "units": "(kg/mol)^2",
+      "index_offset": [
+        201,
+        241
+      ],
+      "sha256": "59ec91dcb7dc65b5f928091cb0e25c26729a0a4453ebe7d8244fc1ceae7d9712"
+    },
+    "Cn2TABAC": {
+      "shape": [
+        40,
+        40
+      ],
+      "dtype": "<f8",
+      "units": "(kg/mol)^2",
+      "index_offset": [
+        201,
+        241
+      ],
+      "sha256": "469351ee040fc951b7795225889a6b9cc2f5cd9820755a958b93e3f4a1b06a1e"
+    },
+    "omegaTAB": {
+      "shape": [
+        40,
+        40
+      ],
+      "dtype": "<f8",
+      "units": "(kg/mol)^0.5",
+      "index_offset": [
+        201,
+        241
+      ],
+      "sha256": "babe691664d1a7442404393bec5cc16cd0afb1bec5b9c4586c9b90b75557725b"
+    },
+    "omega2TAB": {
+      "shape": [
+        40,
+        40
+      ],
+      "dtype": "<f8",
+      "units": "(kg/mol)^0.5",
+      "index_offset": [
+        201,
+        241
+      ],
+      "sha256": "924c511d184d3363171f3a97bfa09f6539550b1e0ad432a72473d42e89367018"
+    },
+    "RccTAB": {
+      "shape": [
+        23,
+        23
+      ],
+      "dtype": "<f8",
+      "units": "kg/mol",
+      "index_offset": [
+        201,
+        201
+      ],
+      "sha256": "b9541448294251b9cc7e4d5280664f975e8cf2c86eef134905d553950e8f8175"
+    },
+    "qcca1TAB": {
+      "shape": [
+        23,
+        23,
+        40
+      ],
+      "dtype": "<f8",
+      "units": "(kg/mol)^2",
+      "index_offset": [
+        201,
+        201,
+        241
+      ],
+      "sha256": "8d6d7539b7354d78c6b4f109d22bd2336b2c186d50d8badf78b695293787ac64"
+    }
+  },
+  "estimated_pairs": {
+    "201/250": "203/250",
+    "204/246": "204/245",
+    "204/247": "203/247",
+    "221/246": "221/245",
+    "221/247": "221/244",
+    "223/247": "223/244"
+  }
+}

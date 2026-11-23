@@ -494,6 +494,9 @@ def _condensation_expected_requirements(
         False: CONDENSATION_NO_LATENT_HEAT_CAPABILITY,
     }
     activity_capabilities = {
+        CondensationActivityMode.PREPARED: Capability(
+            "condensation_prepared_activity"
+        ),
         CondensationActivityMode.IDEAL: CONDENSATION_IDEAL_ACTIVITY_CAPABILITY,
         CondensationActivityMode.BAT: CONDENSATION_BAT_ACTIVITY_CAPABILITY,
         CondensationActivityMode.KAPPA: CONDENSATION_KAPPA_ACTIVITY_CAPABILITY,
@@ -537,9 +540,9 @@ def test_condensation_catalogue_maps_all_cpu_configurations() -> None:
         if declaration.device == CPU_CONDENSATION_PROFILE_DEVICE
     }
 
-    assert len(configurations) == 48
-    assert len(cpu_declarations) == 48
-    assert len(CONDENSATION_CAPABILITY_MATRIX.declarations) == 60
+    assert len(configurations) == 60
+    assert len(cpu_declarations) == 60
+    assert len(CONDENSATION_CAPABILITY_MATRIX.declarations) == 76
     assert all(
         len(entry.requirements.values) == 4
         for entry in CONDENSATION_CAPABILITY_MATRIX.declarations
@@ -568,6 +571,7 @@ def test_condensation_catalogue_maps_exact_warp_profile_rows() -> None:
             CondensationActivityMode.IDEAL,
             CondensationActivityMode.KAPPA,
             CondensationActivityMode.BAT,
+            CondensationActivityMode.PREPARED,
         )
         for surface in (
             CondensationSurfaceMode.STATIC,
@@ -580,9 +584,9 @@ def test_condensation_catalogue_maps_exact_warp_profile_rows() -> None:
         if declaration.device == WARP_CONDENSATION_PROFILE_DEVICE
     }
 
-    assert len(configurations) == 12
-    assert len(warp_declarations) == 12
-    assert len(CONDENSATION_CAPABILITY_MATRIX.declarations) == 60
+    assert len(configurations) == 16
+    assert len(warp_declarations) == 16
+    assert len(CONDENSATION_CAPABILITY_MATRIX.declarations) == 76
     assert all(
         len(entry.requirements.values) == 4 for entry in warp_declarations
     )

@@ -294,6 +294,25 @@ def test_simulation_fingerprint_excludes_only_rendering(example):
     assert examples.simulation_fingerprint(config, root) != before
 
 
+def test_installed_science_dependency_invalidates_saved_result(example):
+    """The runtime package can be audited without copying it into a study ZIP."""
+    root, config = example
+    config["science_inputs"] = ["optional-backend.py"]
+    backend = root / "optional-backend.py"
+    backend.write_text("value = 0")
+    before = (
+        examples.fingerprint(config, root),
+        examples.simulation_fingerprint(config, root),
+    )
+    backend.write_text("value = 1")
+    after = (
+        examples.fingerprint(config, root),
+        examples.simulation_fingerprint(config, root),
+    )
+    assert all(a != b for a, b in zip(before, after, strict=True))
+    assert "optional-backend.py" not in config["inputs"]
+
+
 def test_replot_requires_data_and_valid_scientific_provenance(example):
     """Missing data fails before executing any renderer or simulation."""
     root, config = example
@@ -614,6 +633,23 @@ def test_historical_replot_checks_original_inputs_and_pinned_data(tmp_path):
             "demo", config, tmp_path, results, science_root=science
         )
 
+    assert load_archive(current)[2] == {"observation": 3}
+    # A run on dirty sources can be archived at their exact next commit.
+    git(
+        "-c",
+        "user.name=Test",
+        "-c",
+        "user.email=test@example.org",
+        "commit",
+        "--allow-empty",
+        "-qm",
+        "Archive exact executed inputs",
+    )
+    pin["revision"] = git("rev-parse", "HEAD")
+    with pytest.raises(ValueError, match="pinned historical run"):
+        load_archive(current)
+    manifest["package_dirty"] = True
+    (directory / "manifest.json").write_text(json.dumps(manifest))
     assert load_archive(current)[2] == {"observation": 3}
     with pytest.raises(ValueError, match="no pinned"):
         load_archive(config)

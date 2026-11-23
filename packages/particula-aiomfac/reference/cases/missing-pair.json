@@ -1,0 +1,14 @@
+{
+  "components": [
+    "water",
+    "calcium_methanesulfonate"
+  ],
+  "fractions": [
+    0.99,
+    0.01
+  ],
+  "temperature_K": 298,
+  "basis": "mass",
+  "source": "Particula fixed-dissociation qualification",
+  "expected_status": "upstream_error_9"
+}

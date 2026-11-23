@@ -1,0 +1,14 @@
+{
+  "components": [
+    "butanediol",
+    "vanillic_acid"
+  ],
+  "fractions": [
+    0.96,
+    0.04
+  ],
+  "temperature_K": 298,
+  "basis": "mass",
+  "source": "Particula fixed-dissociation qualification",
+  "expected_status": "ok"
+}

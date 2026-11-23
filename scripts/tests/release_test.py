@@ -69,7 +69,7 @@ def test_upstream_version_increase(
 
     def git(*args):
         calls.append(args)
-        return f'__version__ = "{previous}"\n'
+        return f'__version__ = "{current if args[-1].startswith(SHA) else previous}"\n'
 
     monkeypatch.setattr(release, "command", git)
     result = release.plan(
@@ -81,25 +81,31 @@ def test_upstream_version_increase(
         "build": publish,
         "publish": publish,
     }
-    assert calls == [("git", "show", f"{'a' * 40}:{release.VERSION_PATH}")]
+    assert calls == [
+        ("git", "show", f"{SHA}:{release.VERSION_PATH}"),
+        ("git", "show", f"{'a' * 40}:{release.VERSION_PATH}"),
+    ]
 
 
 @pytest.mark.parametrize(
     "event,repo,ref,build",
     [
-        ("push", "someone/particula", "refs/heads/main", "false"),
+        ("push", "someone/particula", "refs/heads/main", "true"),
         ("push", release.REPOSITORY, "refs/heads/feature", "false"),
         ("pull_request", release.REPOSITORY, "refs/pull/1/merge", "true"),
         ("merge_group", release.REPOSITORY, "refs/heads/queue", "true"),
-        ("workflow_dispatch", release.REPOSITORY, "refs/heads/main", "false"),
+        ("workflow_dispatch", release.REPOSITORY, "refs/heads/main", "true"),
         ("release", "someone/particula", "refs/tags/v0.3.2", "false"),
     ],
 )
 def test_nonpublication_events(source, monkeypatch, event, repo, ref, build):
     """PRs build, but forks, branches and unrelated events never publish."""
-    monkeypatch.setattr(
-        release, "command", lambda *args: pytest.fail("Unexpected Git access")
-    )
+
+    def git(*args):
+        assert args == ("git", "show", f"{SHA}:{release.VERSION_PATH}")
+        return '__version__ = "0.3.2"'
+
+    monkeypatch.setattr(release, "command", git)
     result = release.plan(event, {}, repo, ref, SHA)
     assert result["build"] == build
     assert result["publish"] == "false"
@@ -107,6 +113,13 @@ def test_nonpublication_events(source, monkeypatch, event, repo, ref, build):
 
 def test_unknown_before_and_downgrades_fail(source, monkeypatch):
     """A missing comparison or downgrade cannot silently ship."""
+
+    def git(*args):
+        if args[-1].startswith(SHA):
+            return '__version__ = "0.3.2"'
+        return '__version__ = "0.4.0"'
+
+    monkeypatch.setattr(release, "command", git)
     for before in ("", "0" * 40, "not-a-sha"):
         with pytest.raises(ValueError, match="previous main"):
             release.plan(
@@ -116,9 +129,6 @@ def test_unknown_before_and_downgrades_fail(source, monkeypatch):
                 "refs/heads/main",
                 SHA,
             )
-    monkeypatch.setattr(
-        release, "command", lambda *args: '__version__ = "0.4.0"'
-    )
     with pytest.raises(ValueError, match="must not decrease"):
         release.plan(
             "push",
@@ -143,7 +153,11 @@ def test_manual_release_must_match_source(
     source, monkeypatch, tag, sha, prerelease, expected
 ):
     """Keep manual library publication, excluding plugins and mismatched tags."""
-    monkeypatch.setattr(release, "command", lambda *args: sha)
+    monkeypatch.setattr(
+        release,
+        "command",
+        lambda *args: '__version__ = "0.3.2"' if args[1] == "show" else sha,
+    )
     event = {
         "release": {"tag_name": tag, "prerelease": prerelease, "draft": False}
     }
@@ -372,14 +386,21 @@ def test_workflow_requires_same_run_tests_and_verified_artifacts():
         "release-plan",
         "testing",
         "slow-examples",
+        "qualify-candidates",
+        "backend-visible",
         "pyping",
         "validate",
     }
     assert set(jobs["publish"]["needs"]) == prerequisites
     assert all(not jobs[job].get("continue-on-error") for job in prerequisites)
+    condition = jobs["publish"]["if"]
+    assert "github.repository == 'uncscode/particula'" in condition
+    assert "needs.release-plan.outputs.publish == 'true'" in condition
+    for job in prerequisites - {"release-plan", "backend-visible"}:
+        assert f"needs.{job}.result == 'success'" in condition
     assert (
-        jobs["publish"]["if"]
-        == "github.repository == 'uncscode/particula' && needs.release-plan.outputs.publish == 'true'"
+        "(needs.release-plan.outputs.backend-publish != 'true' || needs.backend-visible.result == 'success')"
+        in condition
     )
     assert jobs["publish"]["permissions"] == {"contents": "write"}
     publish = jobs["publish"]["steps"]
@@ -441,3 +462,103 @@ def test_downloaded_assets_are_verified_before_publication(tmp_path, asset):
     (tmp_path / asset).write_bytes(b"changed")
     result = subprocess.run(command, cwd=tmp_path, check=False)  # noqa: S603
     assert result.returncode != 0
+
+
+def test_joint_and_independent_versions(repository, source):
+    """A missing backend path in a valid previous commit bootstraps its release."""
+    _, base_sha, _, git = repository
+    backend = source / release.VERSION_PATHS[release.BACKEND]
+    backend.parent.mkdir(parents=True)
+    backend.write_text('__version__ = "0.1.4"')
+
+    def decisions(before):
+        git("add", ".")
+        git("commit", "--allow-empty", "-m", "Release candidate")
+        after = git("rev-parse", "HEAD")
+        return tuple(
+            release.plan(
+                "push",
+                {"before": before},
+                release.REPOSITORY,
+                "refs/heads/main",
+                after,
+                project,
+            )["publish"]
+            for project in release.VERSION_PATHS
+        )
+
+    assert decisions(base_sha) == ("false", "true")
+    (source / release.VERSION_PATH).write_text('__version__ = "0.3.5"')
+    assert decisions(base_sha) == ("true", "true")
+    joint = git("rev-parse", "HEAD")
+    assert decisions(joint) == ("false", "false")
+    (source / release.VERSION_PATH).write_text('__version__ = "0.3.6"')
+    assert decisions(joint) == ("true", "false")
+    backend.write_text('__version__ = "0.1.3"')
+    with pytest.raises(ValueError, match="must not decrease"):
+        decisions(joint)
+    with pytest.raises(subprocess.CalledProcessError):
+        release.plan(
+            "push",
+            {"before": "e" * 40},
+            release.REPOSITORY,
+            "refs/heads/main",
+            git("rev-parse", "HEAD"),
+            release.BACKEND,
+        )
+
+
+def test_backend_tag_and_interrupted_upload(tmp_path, monkeypatch):
+    """Backend retry accepts a partial matching upload and rejects conflicting bytes."""
+    version = "0.1.4"
+    tag = release.release_tag(release.BACKEND, version)
+    assert tag == "particula-aiomfac-v0.1.4"
+    files = [
+        "particula_aiomfac-0.1.4.tar.gz",
+        "particula_aiomfac-0.1.4-py3-none-any.whl",
+    ]
+    for name in files:
+        (tmp_path / name).write_bytes(name.encode())
+    records = []
+
+    def registry(url):
+        assert url == "https://pypi.org/pypi/particula-aiomfac/0.1.4/json"
+        return {"urls": records}
+
+    monkeypatch.setattr(release, "fetch_json", registry)
+    for name in files:
+        assert not release.check_pypi(tmp_path, version, release.BACKEND)
+        records.append(
+            {
+                "filename": name,
+                "digests": {"sha256": release.digest(tmp_path / name)},
+            }
+        )
+    assert release.check_pypi(tmp_path, version, release.BACKEND)
+    records[0]["digests"]["sha256"] = "wrong"
+    with pytest.raises(ValueError, match="different bytes"):
+        release.check_pypi(tmp_path, version, release.BACKEND)
+
+
+def test_backend_upload_permissions():
+    """Only the hosted backend publisher receives OIDC, and uses the original artifact."""
+    jobs = yaml.safe_load(
+        (release.ROOT / ".github/workflows/pypi.yml").read_text()
+    )["jobs"]
+    assert [
+        k
+        for k, v in jobs.items()
+        if v.get("permissions", {}).get("id-token") == "write"
+    ] == ["backend-upload"]
+    upload = jobs["backend-upload"]
+    assert upload["environment"] == "pypi-aiomfac"
+    assert upload["runs-on"] == "ubuntu-latest"
+    download, publish = upload["steps"]
+    assert "download-artifact" in download["uses"]
+    assert download["with"]["name"] == "python-release-${{ github.sha }}"
+    assert publish["with"] == {
+        "packages-dir": "candidates/backend/",
+        "attestations": True,
+        "skip-existing": True,
+    }
+    assert "backend-stage" in upload["needs"]

@@ -80,8 +80,12 @@ class BlockROS3Stages(ROS3Stages):
                         self.span,
                     ],
                 )
-                owner._rate(owner.time, self.plus, owner._rates[2])
-                owner._rate(owner.time, self.minus, owner._rates[3])
+                owner._rate(
+                    owner.time, self.plus, owner._rates[2], linearize=True
+                )
+                owner._rate(
+                    owner.time, self.minus, owner._rates[3], linearize=True
+                )
                 owner._launch(
                     block.extract,
                     self.particular.shape,
@@ -108,12 +112,21 @@ class BlockROS3Stages(ROS3Stages):
                 delta = min(delta, owner._forcing.end - owner.time)
             if delta > 0:
                 owner.statistics.time_derivative_calls += 1
-                owner._rate(owner.time + delta, owner._state, owner._rates[3])
+                base = owner._rates[0]
+                if owner._flux_guard is not None:
+                    base = owner._rates[2]
+                    owner._rate(owner.time, owner._state, base, linearize=True)
+                owner._rate(
+                    owner.time + delta,
+                    owner._state,
+                    owner._rates[3],
+                    linearize=True,
+                )
                 owner._launch(
                     algebra.partial_time,
                     owner._size,
                     [
-                        owner._rates[0],
+                        base,
                         owner._rates[3],
                         wp.float64(delta),
                         self.partial,

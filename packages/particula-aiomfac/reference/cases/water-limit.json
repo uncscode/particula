@@ -1,0 +1,14 @@
+{
+  "components": [
+    "water",
+    "butanediol"
+  ],
+  "fractions": [
+    1,
+    0
+  ],
+  "temperature_K": 298.15,
+  "basis": "mass",
+  "source": "Particula reference suite",
+  "expected_status": "ok"
+}

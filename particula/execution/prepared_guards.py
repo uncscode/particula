@@ -82,6 +82,9 @@ def refresh_saturation(
     if failure[0] != 0:
         return
     box, species = wp.tid()
+    if vapor_pressure[box, species] == wp.float64(0.0):
+        saturation[box, species] = wp.float64(0.0)
+        return
     saturation[box, species] = (
         concentration[box, species]
         * _GAS_CONSTANT

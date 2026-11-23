@@ -407,6 +407,14 @@ class PreparedSimulation:
             90: "GPU process produced invalid field values",
             91: "GPU particle-field event contract violated",
         }
+        if failure == 1 and "condensation" in self._bindings:
+            provider = getattr(
+                self._bindings["condensation"].prepared, "provider", None
+            )
+            if provider is not None:
+                message = provider.failure_message()
+                if message:
+                    raise ValueError(message)
         if failure == 9:
             self._bindings["coagulation"].check_admission()
         if failure in messages:

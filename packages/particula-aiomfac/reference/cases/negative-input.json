@@ -1,0 +1,14 @@
+{
+  "components": [
+    "water",
+    "NaCl"
+  ],
+  "fractions": [
+    1.01,
+    -0.01
+  ],
+  "temperature_K": 298.15,
+  "basis": "mass",
+  "source": "Particula reference suite",
+  "expected_status": "invalid_input"
+}

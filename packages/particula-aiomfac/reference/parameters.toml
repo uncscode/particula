@@ -1,0 +1,27 @@
+# Source paths are relative to the hash-verified FortranCode directory.
+[groups]
+source = "ModSubgroupProp.f90"
+tables = ["NKTAB", "Ioncharge", "GroupMW", "SMWC", "SMWA"]
+mapping = "SubModDefSystem.f90: SetSystem, including implicit electrolyte components"
+
+[short_range]
+parameters = "ModSRparam.f90: SRdata"
+use_latest_param = false
+equations = "ModSRunifac.f90: SRgref"
+dataset = 1
+temperature = "Psi = exp(-A/T) for this dataset; three-coefficient branch only for designated fitting datasets"
+
+[middle_long_range]
+source = "ModMRpart.f90: MRdata, LR/MR and molality conversion"
+ionic_reference = "Infinite dilution in pure water, molality per kg electrolyte-free solvent"
+neutral_reference = "Pure liquid, mole-fraction scale; carbonate CO2(aq) has a dedicated upstream convention"
+conversion = "ModCompScaleConversion.f90; xinputtype true denotes independent-component mole fractions"
+assembly = "ModCalcActCoeff.f90: AIOMFAC_calc, Gammas"
+
+[equilibria]
+source = "SubModDissociationEquil.f90: sulfate root and coupled carbonate equilibria"
+carbonate_gas_equilibration = false
+carbonate_solver = "Mod_MINPACK.f90: hybrd1, HighPrecSolving=true, upstream seeded retries"
+sulfate_solver = "brent.f90 and zerobracket_inwards.f90"
+canonical_initialization = "fresh process per input state"
+co2_ion_parameters = "ModMRpart.f90: lambdaIN, ion subgroup ID minus 201, kg/mol"

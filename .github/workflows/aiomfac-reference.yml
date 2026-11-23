@@ -1,0 +1,67 @@
+name: AIOMFAC reference and package
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'packages/particula-aiomfac/**'
+      - 'pyproject.toml'
+      - '_particula_build.py'
+      - 'particula/particles/activity_*.py'
+      - 'particula/dynamics/condensation/condensation_strategies.py'
+      - 'particula/dynamics/*parcel.py'
+      - 'particula/execution/*condensation*.py'
+      - 'particula/execution/*parcel*.py'
+      - 'particula/particles/prepared_activity.py'
+      - 'particula/gpu/kernels/activity_guard.py'
+      - 'particula/gpu/kernels/condensation.py'
+      - 'docs/studies/examples/thermodynamics/**/aiomfac_*.py'
+      - '.github/workflows/aiomfac-reference.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'packages/particula-aiomfac/**'
+      - 'pyproject.toml'
+      - '_particula_build.py'
+      - 'particula/particles/activity_*.py'
+      - 'particula/dynamics/condensation/condensation_strategies.py'
+      - 'particula/dynamics/*parcel.py'
+      - 'particula/execution/*condensation*.py'
+      - 'particula/execution/*parcel*.py'
+      - 'particula/particles/prepared_activity.py'
+      - 'particula/gpu/kernels/activity_guard.py'
+      - 'particula/gpu/kernels/condensation.py'
+      - 'docs/studies/examples/thermodynamics/**/aiomfac_*.py'
+      - '.github/workflows/aiomfac-reference.yml'
+permissions:
+  contents: read
+jobs:
+  packages:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install build pytest . ./packages/particula-aiomfac
+      - run: python -m pytest -q packages/particula-aiomfac/tests particula/dynamics/tests/multivapor_parcel_test.py
+      - run: python packages/particula-aiomfac/tools/qualify_packages.py
+  reproduce:
+    runs-on: ubuntu-24.04
+    env:
+      FC: gfortran-13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update && sudo apt-get install -y gfortran-13
+      - name: Generate and check numerical references
+        run: |
+          ref=packages/particula-aiomfac/tools/reference.py
+          python "$ref" fetch
+          python -m pip install numpy
+          python packages/particula-aiomfac/tools/export_parameters.py
+          python "$ref" build
+          python "$ref" verify
+          python "$ref" fetch --offline
+          python "$ref" verify

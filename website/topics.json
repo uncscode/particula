@@ -1462,6 +1462,33 @@
       "start_here": false
     },
     {
+      "source": "docs/studies/validation/condensation/aiomfac-sparse/index.md",
+      "title": "When sparse AIOMFAC activity tables pay off",
+      "topic": "verification-performance",
+      "also": [
+        "activity-nonideal",
+        "condensation-reservoirs",
+        "gpu"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "aiomfac-sparse-tables",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/studies/examples/thermodynamics/activity/aiomfac_closed_box.py",
+            "label": "Closed-box equations and reference"
+          },
+          {
+            "target": "docs/studies/examples/thermodynamics/parcel-experiments/aiomfac_multivapor_parcel.py",
+            "label": "Parcel and activation reference"
+          }
+        ]
+      }
+    },
+    {
       "source": "docs/studies/validation/condensation/stiffness.md",
       "title": "Condensation error across a measured timestep grid",
       "topic": "verification-scientific",
@@ -5581,6 +5608,73 @@
       }
     },
     {
+      "source": "docs/studies/examples/thermodynamics/activity/aiomfac_closed_box.py",
+      "title": "Water and organic exchange in a closed box",
+      "topic": "condensation-reservoirs",
+      "also": [
+        "activity-nonideal",
+        "condensation-adaptive",
+        "gpu"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "aiomfac-closed-box",
+        "runs": [
+          "aiomfac-closed-box"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/studies/examples/thermodynamics/parcel-experiments/aiomfac_multivapor_parcel.py",
+            "label": "Compare the same dissolved mixture in another flow"
+          },
+          {
+            "target": "docs/guide/processes/condensation.md",
+            "label": "Native species mappings and mass budgets"
+          },
+          {
+            "target": "docs/theory/dynamics/condensation-equations.md",
+            "label": "Vapor transfer and droplet curvature"
+          }
+        ]
+      }
+    },
+    {
+      "source": "docs/studies/examples/thermodynamics/parcel-experiments/aiomfac_multivapor_parcel.py",
+      "title": "Water and organic uptake in a rising parcel",
+      "topic": "parcels",
+      "also": [
+        "activity-nonideal",
+        "condensation-energy",
+        "condensation-adaptive",
+        "gpu"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "aiomfac-multivapor-parcel",
+        "runs": [
+          "aiomfac-multivapor-parcel"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/studies/examples/thermodynamics/activity/aiomfac_closed_box.py",
+            "label": "Compare the same dissolved mixture in another flow"
+          },
+          {
+            "target": "docs/guide/processes/condensation.md",
+            "label": "Native species mappings and mass budgets"
+          },
+          {
+            "target": "docs/theory/dynamics/condensation-equations.md",
+            "label": "Vapor transfer and droplet curvature"
+          }
+        ]
+      }
+    },
+    {
       "source": "docs/studies/literature/antarctic-ccn/uncertainty.py",
       "title": "Antarctic CCN uncertainty across supersaturation settings",
       "topic": "activity-kappa",
@@ -5887,6 +5981,7 @@
     }
   ],
   "study_group_exceptions": {
+    "docs/studies/validation/condensation": "The sparse-activity benchmark compares chemistry construction, lookup and fallback costs across both parcel and box workflows. Its reference and timing matrix are shared across integrators.",
     "docs/studies/literature": "Six primary choices cover distinct measurement or process families. The seventh is a cross-listed validation against wall loss theory.",
     "docs/studies/validation": "Eight study collections distinguish mechanism inference and optical validation from the existing physical-process and workflow qualifications."
   }

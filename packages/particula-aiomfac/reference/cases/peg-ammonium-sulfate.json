@@ -1,0 +1,16 @@
+{
+  "components": [
+    "water",
+    "PEG_oligomer",
+    "ammonium_sulfate"
+  ],
+  "fractions": [
+    0.9,
+    0.08,
+    0.02
+  ],
+  "temperature_K": 298,
+  "basis": "mass",
+  "source": "Particula fixed-dissociation qualification",
+  "expected_status": "ok"
+}

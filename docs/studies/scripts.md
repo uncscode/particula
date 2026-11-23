@@ -131,6 +131,8 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Track removal in a rectangular chamber](examples/particle-processes/wall-loss/rectangular_wall_loss_strategy.py)
 - [Turn measurements into particle state](tutorials/building-an-aerosol/particles/particle_data.py)
 - [Water activity of Mt. Hua ion mixtures](literature/particle-water-uptake/mt-hua/mixture_activity.py)
+- [Water and organic exchange in a closed box](examples/thermodynamics/activity/aiomfac_closed_box.py)
+- [Water and organic uptake in a rising parcel](examples/thermodynamics/parcel-experiments/aiomfac_multivapor_parcel.py)
 - [Water uptake and evaporation after a humidity pulse](benchmarks/bat-humidity-pulse/bat_humidity_pulse.py)
 - [Water uptake from a maintained vapor reservoir](tutorials/condensation/condensation_2_massbin.py)
 - [What crosses a shared parcel face?](examples/thermodynamics/parcel-experiments/parcel_cluster.py)

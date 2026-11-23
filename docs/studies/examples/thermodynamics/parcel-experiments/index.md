@@ -12,6 +12,7 @@ For the model assumptions, start with [parcel theory](../../../../theory/thermod
 
 <!-- STUDY_LIST_START -->
 - [Can a recorded ascent reproduce droplet growth and close two gas budgets?](parcel_replay.py)
+- [Water and organic uptake in a rising parcel](aiomfac_multivapor_parcel.py)
 - [What crosses a shared parcel face?](parcel_cluster.py)
 - [Where does a particle group travel in wind and updraft?](cluster_lofting.py)
 <!-- STUDY_LIST_END -->

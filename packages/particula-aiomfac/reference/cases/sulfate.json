@@ -1,0 +1,14 @@
+{
+  "components": [
+    "water",
+    "NH4HSO4"
+  ],
+  "fractions": [
+    0.88,
+    0.12
+  ],
+  "temperature_K": 298.15,
+  "basis": "mass",
+  "source": "Particula reference suite",
+  "expected_status": "ok"
+}
