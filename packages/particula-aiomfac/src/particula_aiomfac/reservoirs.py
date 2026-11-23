@@ -604,7 +604,10 @@ def equilibrate_species(
         reactions
         and surface is None
         and len(neutral_gases) == len(reactions)
-        and not (p.carbonate or p.sulfate)
+        and not p.carbonate
+        # A bisulfate recipe with no ionic inventory has only neutral vapors
+        # and solvents. A positive-liquid balance can miss complete evaporation.
+        and not (p.sulfate and np.any(conserved[n:]))
     ):
         partition = _neutral_partition(
             provider,
