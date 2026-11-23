@@ -25,7 +25,7 @@ existing liquid-vapor partitioning helpers.
 partitioning = partitioning_module
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L30-L30)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L36-L36)
 
 ## particula.equilibria.equilibria_strategies.EquilibriaStrategy
 
@@ -55,7 +55,7 @@ solid-liquid, or other phase equilibria problems.
 'CustomEquilibria'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L69-L113)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L94-L117)
 
 ### particula.equilibria.equilibria_strategies.EquilibriaStrategy.get_name
 
@@ -67,32 +67,19 @@ def get_name() -> str
 
 Return a stable strategy identifier.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L111-L113)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L115-L117)
 
 ### particula.equilibria.equilibria_strategies.EquilibriaStrategy.solve
 
 *method* · *abstract*
 
 ```python
-def solve(c_star_j_dry: NDArray[np.float64], concentration_organic_matter: NDArray[np.float64], molar_mass: NDArray[np.float64], oxygen2carbon: NDArray[np.float64], density: NDArray[np.float64], partition_coefficient_guess: Optional[NDArray[np.float64]] = None) -> EquilibriumResult
+def solve(*args, **kwargs) -> Any
 ```
 
-Solve for equilibrium state.
+Solve for equilibrium with the inputs of the configured model.
 
-**Parameters**
-
-- `c_star_j_dry` (`NDArray[np.float64]`) — Dry saturation concentrations [µg/m³].
-- `concentration_organic_matter` (`NDArray[np.float64]`) — Organic mass concentrations [µg/m³].
-- `molar_mass` (`NDArray[np.float64]`) — Species molar masses [g/mol].
-- `oxygen2carbon` (`NDArray[np.float64]`) — Oxygen-to-carbon ratios [-].
-- `density` (`NDArray[np.float64]`) — Species densities [kg/m³].
-- `partition_coefficient_guess` (`Optional[NDArray[np.float64]]`) (default: `None`) — Optional initial guesses for partition coefficients [-].
-
-**Returns**
-
-- (`EquilibriumResult`) — Structured equilibrium result.
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L86-L109)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L111-L113)
 
 ## particula.equilibria.equilibria_strategies.EquilibriumResult
 
@@ -112,7 +99,7 @@ Result of an equilibria calculation.
 - `water_content` (`tuple[float, float]`) — Water content for (alpha, beta) phases [µg/m³].
 - `error` (`float`) — Optimization convergence error.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L49-L66)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L55-L72)
 
 ### particula.equilibria.equilibria_strategies.EquilibriumResult.alpha_phase
 
@@ -122,7 +109,7 @@ Result of an equilibria calculation.
 alpha_phase: PhaseConcentrations
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L62-L62)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L68-L68)
 
 ### particula.equilibria.equilibria_strategies.EquilibriumResult.beta_phase
 
@@ -132,7 +119,7 @@ alpha_phase: PhaseConcentrations
 beta_phase: Optional[PhaseConcentrations]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L63-L63)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L69-L69)
 
 ### particula.equilibria.equilibria_strategies.EquilibriumResult.error
 
@@ -142,7 +129,7 @@ beta_phase: Optional[PhaseConcentrations]
 error: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L66-L66)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L72-L72)
 
 ### particula.equilibria.equilibria_strategies.EquilibriumResult.partition_coefficients
 
@@ -152,7 +139,7 @@ error: float
 partition_coefficients: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L64-L64)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L70-L70)
 
 ### particula.equilibria.equilibria_strategies.EquilibriumResult.water_content
 
@@ -162,7 +149,7 @@ partition_coefficients: NDArray[np.float64]
 water_content: tuple[float, float]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L65-L65)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L71-L71)
 
 ### particula.equilibria.equilibria_strategies.EquilibriumResult.__init__
 
@@ -191,7 +178,7 @@ condensed phases while exposing structured results.
 
 **Parameters**
 
-- `water_activity` (`float`) (default: `0.5`) — Target water activity (0-1 range). Defaults to 0.5.
+- `water_activity` (`float | None`) (default: `None`) — Target water activity (0-1 range). Defaults to 0.5.
 
 **Examples**
 
@@ -209,7 +196,27 @@ condensed phases while exposing structured results.
 True
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L116-L261)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L126-L394)
+
+### particula.equilibria.equilibria_strategies.LiquidVaporPartitioningStrategy.activity_model
+
+*attribute* · *instance attribute*
+
+```python
+activity_model = activity_model
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L165-L165)
+
+### particula.equilibria.equilibria_strategies.LiquidVaporPartitioningStrategy.mixture_water_activity
+
+*attribute* · *instance attribute*
+
+```python
+mixture_water_activity = water_activity
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L153-L153)
 
 ### particula.equilibria.equilibria_strategies.LiquidVaporPartitioningStrategy.water_activity
 
@@ -219,19 +226,19 @@ True
 water_activity = float(water_activity)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L145-L145)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L160-L160)
 
 ### particula.equilibria.equilibria_strategies.LiquidVaporPartitioningStrategy.__init__
 
 *method*
 
 ```python
-def __init__(water_activity: float = 0.5) -> None
+def __init__(water_activity: float | None = None, *, activity_model=None) -> None
 ```
 
 Initialize the strategy with the requested water activity.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L139-L145)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L149-L165)
 
 ### particula.equilibria.equilibria_strategies.LiquidVaporPartitioningStrategy._convert_to_result
 
@@ -241,7 +248,7 @@ Initialize the strategy with the requested water activity.
 def _convert_to_result(alpha: PhaseOutput, beta: Optional[PhaseOutput], system: SystemOutput, error_value: float) -> EquilibriumResult
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L189-L230)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L277-L318)
 
 ### particula.equilibria.equilibria_strategies.LiquidVaporPartitioningStrategy._extract_error
 
@@ -251,7 +258,7 @@ def _convert_to_result(alpha: PhaseOutput, beta: Optional[PhaseOutput], system: 
 def _extract_error(system: SystemOutput, fit_result: OptimizeResult) -> float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L252-L261)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L385-L394)
 
 ### particula.equilibria.equilibria_strategies.LiquidVaporPartitioningStrategy._is_valid_phase_output
 
@@ -261,7 +268,17 @@ def _extract_error(system: SystemOutput, fit_result: OptimizeResult) -> float
 def _is_valid_phase_output(phase: Sequence[object]) -> bool
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L248-L250)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L381-L383)
+
+### particula.equilibria.equilibria_strategies.LiquidVaporPartitioningStrategy._mixture_result
+
+*method*
+
+```python
+def _mixture_result(bulk, inventories) -> MixtureEquilibriumResult
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L336-L379)
 
 ### particula.equilibria.equilibria_strategies.LiquidVaporPartitioningStrategy._to_phase
 
@@ -271,19 +288,19 @@ def _is_valid_phase_output(phase: Sequence[object]) -> bool
 def _to_phase(phase: PhaseOutput) -> PhaseConcentrations
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L232-L246)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L320-L334)
 
 ### particula.equilibria.equilibria_strategies.LiquidVaporPartitioningStrategy.solve
 
 *method*
 
 ```python
-def solve(c_star_j_dry: NDArray[np.float64], concentration_organic_matter: NDArray[np.float64], molar_mass: NDArray[np.float64], oxygen2carbon: NDArray[np.float64], density: NDArray[np.float64], partition_coefficient_guess: Optional[NDArray[np.float64]] = None) -> EquilibriumResult
+def solve(c_star_j_dry: NDArray[np.float64] | None = None, concentration_organic_matter: NDArray[np.float64] | None = None, molar_mass: NDArray[np.float64] | None = None, oxygen2carbon: NDArray[np.float64] | None = None, density: NDArray[np.float64] | None = None, partition_coefficient_guess: Optional[NDArray[np.float64]] = None, **mixture_inputs) -> EquilibriumResult | SpeciesEquilibrium
 ```
 
 Solve for equilibrium state using liquid-vapor partitioning.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L147-L187)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L197-L275)
 
 ### particula.equilibria.equilibria_strategies.LiquidVaporPartitioningStrategy.get_name
 
@@ -297,7 +314,166 @@ Inherited from: `particula.equilibria.equilibria_strategies.EquilibriaStrategy`
 
 Return a stable strategy identifier.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L111-L113)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L115-L117)
+
+## particula.equilibria.equilibria_strategies.MixtureEquilibriumResult
+
+*class* · *dataclass*
+
+```python
+class MixtureEquilibriumResult(EquilibriumResult)
+```
+
+Bases: `particula.equilibria.equilibria_strategies.EquilibriumResult`
+
+Whole-mixture bulk equilibrium with material lanes in declaration order.
+
+Concentrations and water exchange use µg/m³. Relative humidity is a ratio.
+The liquids record holds the phase-resolved AIOMFAC chemistry, or None
+when the condensed state is dry or the entire inventory is gaseous.
+Inspect solid_liquid for crystal and residual ion masses.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L75-L91)
+
+### particula.equilibria.equilibria_strategies.MixtureEquilibriumResult.gas_concentrations
+
+*attribute* · *instance attribute*
+
+```python
+gas_concentrations: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L86-L86)
+
+### particula.equilibria.equilibria_strategies.MixtureEquilibriumResult.liquids
+
+*attribute* · *instance attribute*
+
+```python
+liquids: object | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L85-L85)
+
+### particula.equilibria.equilibria_strategies.MixtureEquilibriumResult.phase_component_names
+
+*attribute* · *instance attribute*
+
+```python
+phase_component_names: tuple[str, ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L91-L91)
+
+### particula.equilibria.equilibria_strategies.MixtureEquilibriumResult.relative_humidity
+
+*attribute* · *instance attribute*
+
+```python
+relative_humidity: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L87-L87)
+
+### particula.equilibria.equilibria_strategies.MixtureEquilibriumResult.solid_liquid
+
+*attribute* · *instance attribute*
+
+```python
+solid_liquid: object | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L90-L90)
+
+### particula.equilibria.equilibria_strategies.MixtureEquilibriumResult.vapor_residual
+
+*attribute* · *instance attribute*
+
+```python
+vapor_residual: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L89-L89)
+
+### particula.equilibria.equilibria_strategies.MixtureEquilibriumResult.water_exchanged
+
+*attribute* · *instance attribute*
+
+```python
+water_exchanged: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L88-L88)
+
+### particula.equilibria.equilibria_strategies.MixtureEquilibriumResult.alpha_phase
+
+*attribute* · *instance attribute*
+
+```python
+alpha_phase: PhaseConcentrations
+```
+
+Inherited from: `particula.equilibria.equilibria_strategies.EquilibriumResult`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L68-L68)
+
+### particula.equilibria.equilibria_strategies.MixtureEquilibriumResult.beta_phase
+
+*attribute* · *instance attribute*
+
+```python
+beta_phase: Optional[PhaseConcentrations]
+```
+
+Inherited from: `particula.equilibria.equilibria_strategies.EquilibriumResult`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L69-L69)
+
+### particula.equilibria.equilibria_strategies.MixtureEquilibriumResult.error
+
+*attribute* · *instance attribute*
+
+```python
+error: float
+```
+
+Inherited from: `particula.equilibria.equilibria_strategies.EquilibriumResult`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L72-L72)
+
+### particula.equilibria.equilibria_strategies.MixtureEquilibriumResult.partition_coefficients
+
+*attribute* · *instance attribute*
+
+```python
+partition_coefficients: NDArray[np.float64]
+```
+
+Inherited from: `particula.equilibria.equilibria_strategies.EquilibriumResult`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L70-L70)
+
+### particula.equilibria.equilibria_strategies.MixtureEquilibriumResult.water_content
+
+*attribute* · *instance attribute*
+
+```python
+water_content: tuple[float, float]
+```
+
+Inherited from: `particula.equilibria.equilibria_strategies.EquilibriumResult`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L71-L71)
+
+### particula.equilibria.equilibria_strategies.MixtureEquilibriumResult.__init__
+
+*method*
+
+```python
+def __init__(alpha_phase: PhaseConcentrations, beta_phase: Optional[PhaseConcentrations], partition_coefficients: NDArray[np.float64], water_content: tuple[float, float], error: float, liquids: object | None, gas_concentrations: NDArray[np.float64], relative_humidity: float, water_exchanged: float, vapor_residual: float, solid_liquid: object | None, phase_component_names: tuple[str, ...]) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L0-L0)
 
 ## particula.equilibria.equilibria_strategies.PhaseConcentrations
 
@@ -315,7 +491,7 @@ Concentrations in a single phase.
 - `water_concentration` (`float`) — Total aqueous concentration in the phase [µg/m³].
 - `total_concentration` (`float`) — Total concentration (organic + water) [µg/m³].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L33-L46)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L39-L52)
 
 ### particula.equilibria.equilibria_strategies.PhaseConcentrations.species_concentrations
 
@@ -325,7 +501,7 @@ Concentrations in a single phase.
 species_concentrations: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L44-L44)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L50-L50)
 
 ### particula.equilibria.equilibria_strategies.PhaseConcentrations.total_concentration
 
@@ -335,7 +511,7 @@ species_concentrations: NDArray[np.float64]
 total_concentration: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L46-L46)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L52-L52)
 
 ### particula.equilibria.equilibria_strategies.PhaseConcentrations.water_concentration
 
@@ -345,7 +521,7 @@ total_concentration: float
 water_concentration: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L45-L45)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L51-L51)
 
 ### particula.equilibria.equilibria_strategies.PhaseConcentrations.__init__
 
@@ -356,3 +532,15 @@ def __init__(species_concentrations: NDArray[np.float64], water_concentration: f
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L0-L0)
+
+## particula.equilibria.equilibria_strategies._validate_closed_species_reservoir
+
+*function*
+
+```python
+def _validate_closed_species_reservoir(strategy: EquilibriaStrategy) -> None
+```
+
+Physical species inventories close the gas and condensed water budget.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L120-L123)

@@ -40,7 +40,27 @@ deterministic parameter handling for factory usage.
 0.65
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L17-L100)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L17-L114)
+
+### particula.equilibria.equilibria_builders.LiquidVaporPartitioningBuilder._activity_model
+
+*attribute* · *instance attribute*
+
+```python
+_activity_model = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L38-L38)
+
+### particula.equilibria.equilibria_builders.LiquidVaporPartitioningBuilder._explicit_water
+
+*attribute* · *instance attribute*
+
+```python
+_explicit_water = False
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L39-L39)
 
 ### particula.equilibria.equilibria_builders.LiquidVaporPartitioningBuilder._water_activity
 
@@ -50,7 +70,7 @@ deterministic parameter handling for factory usage.
 _water_activity: float | None = 0.5
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L38-L38)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L40-L40)
 
 ### particula.equilibria.equilibria_builders.LiquidVaporPartitioningBuilder.required_parameters
 
@@ -74,7 +94,7 @@ def __init__() -> None
 
 Initialize builder with default water activity.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L35-L38)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L35-L40)
 
 ### particula.equilibria.equilibria_builders.LiquidVaporPartitioningBuilder.build
 
@@ -86,7 +106,7 @@ def build() -> LiquidVaporPartitioningStrategy
 
 Build the configured :class:`LiquidVaporPartitioningStrategy`.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L93-L100)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L104-L114)
 
 ### particula.equilibria.equilibria_builders.LiquidVaporPartitioningBuilder.pre_build_check
 
@@ -98,7 +118,19 @@ def pre_build_check() -> None
 
 Ensure builder is ready to build a strategy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L87-L91)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L98-L102)
+
+### particula.equilibria.equilibria_builders.LiquidVaporPartitioningBuilder.set_activity_model
+
+*method*
+
+```python
+def set_activity_model(model) -> Self
+```
+
+Use a mixture activity provider for gas/liquid partitioning.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L61-L64)
 
 ### particula.equilibria.equilibria_builders.LiquidVaporPartitioningBuilder.set_parameters
 
@@ -110,7 +142,8 @@ def set_parameters(parameters: dict[str, Any]) -> Self
 
 Set parameters from a dictionary with strict key validation.
 
-Only ``{"water_activity"}`` is accepted. Unknown keys, including
+Accept a BAT water activity or a configured activity model.
+Unknown keys, including
 unit-suffixed variants, raise ``ValueError`` to keep behavior
 deterministic for factories.
 
@@ -126,7 +159,7 @@ deterministic for factories.
 
 - `ValueError` — If an unknown key is provided or value is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L58-L85)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L66-L96)
 
 ### particula.equilibria.equilibria_builders.LiquidVaporPartitioningBuilder.set_water_activity
 
@@ -150,7 +183,7 @@ Set the target water activity.
 
 - `ValueError` — If ``value`` is outside the inclusive [0, 1] range.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L40-L56)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L42-L59)
 
 ### particula.equilibria.equilibria_builders.LiquidVaporPartitioningBuilder.check_keys
 

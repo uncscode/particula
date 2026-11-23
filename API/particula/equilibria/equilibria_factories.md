@@ -35,7 +35,7 @@ across particula factories.
 BuilderType = LiquidVaporPartitioningBuilder
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_factories.py#L30-L30)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_factories.py#L33-L33)
 
 ## particula.equilibria.equilibria_factories.EquilibriaFactory
 
@@ -54,8 +54,8 @@ Builds equilibria strategies using registered builders and the
 
 > **Supported strategy types**
 >
-> - "liquid_vapor": ``LiquidVaporPartitioningStrategy`` for organic
->   aerosol liquid-vapor partitioning equilibrium.
+> - "liquid_vapor": ``LiquidVaporPartitioningStrategy`` for BAT or a
+>   configured mixture activity model.
 
 **Examples**
 
@@ -74,7 +74,7 @@ Builds equilibria strategies using registered builders and the
 0.75
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_factories.py#L33-L106)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_factories.py#L36-L110)
 
 ### particula.equilibria.equilibria_factories.EquilibriaFactory.get_builders
 
@@ -99,14 +99,14 @@ Return available equilibria builders keyed by strategy name.
 True
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_factories.py#L56-L70)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_factories.py#L59-L73)
 
 ### particula.equilibria.equilibria_factories.EquilibriaFactory.get_strategy
 
 *method*
 
 ```python
-def get_strategy(strategy_type: str, parameters: Optional[Dict[str, Any]] = None) -> EquilibriaStrategy
+def get_strategy(strategy_type: str, parameters: Optional[Dict[str, Any]] = None) -> LiquidVaporPartitioningStrategy
 ```
 
 Create an equilibria strategy using its corresponding builder.
@@ -114,15 +114,15 @@ Create an equilibria strategy using its corresponding builder.
 **Parameters**
 
 - `strategy_type` (`str`) — Name of the strategy to build. Case-insensitive. Supported: "liquid_vapor".
-- `parameters` (`Optional[Dict[str, Any]]`) (default: `None`) — Optional parameter mapping for the builder. For "liquid_vapor": {"water_activity": float}.
+- `parameters` (`Optional[Dict[str, Any]]`) (default: `None`) — Optional parameter mapping for the builder. Optional keys are water_activity and activity_model. With a mixture model, omitting water_activity closes the water budget.
 
 **Returns**
 
-- (`EquilibriaStrategy`) — Built equilibria strategy instance.
+- (`LiquidVaporPartitioningStrategy`) — Built equilibria strategy instance.
 
 **Raises**
 
 - `ValueError` — If ``strategy_type`` is unknown or parameters are
 invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_factories.py#L72-L106)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_factories.py#L75-L110)

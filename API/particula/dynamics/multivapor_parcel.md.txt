@@ -347,7 +347,7 @@ class ParcelTendencies
 
 Evaluate the coupled instantaneous mass, pressure and heat budgets.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/multivapor_parcel.py#L241-L388)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/multivapor_parcel.py#L241-L391)
 
 ### particula.dynamics.multivapor_parcel.ParcelTendencies.diffusivity
 
@@ -471,7 +471,7 @@ def rates(pressure, temperature, vapor, masses)
 
 Return dp (Pa/s), dT (K/s), dq (kg/kg/s), and J (kg/particle/s).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/multivapor_parcel.py#L267-L388)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/multivapor_parcel.py#L267-L391)
 
 ## particula.dynamics.multivapor_parcel.ParcelVapor
 
@@ -657,7 +657,7 @@ the embedded error estimate sensitive to both trace and bulk species.
 Failed physical Radau trials retry from the accepted state at a smaller
 step. Provider errors on the initial state are reported immediately.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/multivapor_parcel.py#L391-L473)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/multivapor_parcel.py#L394-L476)
 
 ## particula.dynamics.multivapor_parcel.multivapor_trajectory
 

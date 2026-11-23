@@ -52,7 +52,27 @@ Execute an equilibria strategy within the runnable interface.
 
 - `strategy` (`EquilibriaStrategy`) — Concrete ``EquilibriaStrategy`` used to solve equilibrium.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L48-L230)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L51-L272)
+
+### particula.equilibria.Equilibria.species_layout
+
+*attribute* · *instance attribute*
+
+```python
+species_layout = species_layout
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L77-L77)
+
+### particula.equilibria.Equilibria.species_options
+
+*attribute* · *instance attribute*
+
+```python
+species_options = dict(species_options or {})
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L78-L78)
 
 ### particula.equilibria.Equilibria.strategy
 
@@ -62,14 +82,14 @@ Execute an equilibria strategy within the runnable interface.
 strategy = strategy
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L61-L61)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L76-L76)
 
 ### particula.equilibria.Equilibria.__init__
 
 *method*
 
 ```python
-def __init__(strategy: EquilibriaStrategy) -> None
+def __init__(strategy: EquilibriaStrategy, *, species_layout=None, species_options=None) -> None
 ```
 
 Initialize with the provided equilibria strategy.
@@ -77,8 +97,10 @@ Initialize with the provided equilibria strategy.
 **Parameters**
 
 - `strategy` (`EquilibriaStrategy`) — Concrete ``EquilibriaStrategy`` used during execution.
+- `species_layout` (default: `None`) — Optional mapping of physical species to native particle lanes for one equilibrating population per box.
+- `species_options` (default: `None`) — Gas reactions, solids, surface parameters and execution settings for the closed physical species solver.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L55-L61)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L58-L78)
 
 ### particula.equilibria.Equilibria._apply_attribute_result
 
@@ -88,7 +110,7 @@ Initialize with the provided equilibria strategy.
 def _apply_attribute_result(aerosol: Aerosol, result: Any) -> Aerosol
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L215-L222)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L257-L264)
 
 ### particula.equilibria.Equilibria._apply_equilibrium_result
 
@@ -103,7 +125,7 @@ Apply strategy results to the aerosol or attach for downstream use.
 Accepts either an updated ``Aerosol`` instance, a mapping/struct with
 recognizable concentration fields, or raises when ``None`` is returned.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L161-L195)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L198-L237)
 
 ### particula.equilibria.Equilibria._apply_mapping_result
 
@@ -113,7 +135,7 @@ recognizable concentration fields, or raises when ``None`` is returned.
 def _apply_mapping_result(aerosol: Aerosol, result: Mapping[str, Any]) -> Aerosol
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L204-L213)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L246-L255)
 
 ### particula.equilibria.Equilibria._attach_equilibrium_result_dataclass
 
@@ -123,7 +145,7 @@ def _apply_mapping_result(aerosol: Aerosol, result: Mapping[str, Any]) -> Aeroso
 def _attach_equilibrium_result_dataclass(aerosol: Aerosol, result: EquilibriumResult) -> Aerosol
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L197-L202)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L239-L244)
 
 ### particula.equilibria.Equilibria._attach_phase_concentrations
 
@@ -133,7 +155,7 @@ def _attach_equilibrium_result_dataclass(aerosol: Aerosol, result: EquilibriumRe
 def _attach_phase_concentrations(aerosol: Aerosol, result: PhaseConcentrations) -> Aerosol
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L224-L230)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L266-L272)
 
 ### particula.equilibria.Equilibria._extract_partitioning_inputs
 
@@ -150,7 +172,7 @@ absent, falls back to attributes of the aerosol itself. Raises with a
 clear message when a required field is unavailable to keep failures
 explicit during testing.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L118-L159)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L148-L196)
 
 ### particula.equilibria.Equilibria.execute
 
@@ -180,7 +202,7 @@ Run equilibria over the provided time step.
 - `AttributeError` — When required partitioning inputs are missing.
 - `TypeError` — If the strategy returns ``None``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L67-L116)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L84-L146)
 
 ### particula.equilibria.Equilibria.rate
 
@@ -192,7 +214,7 @@ def rate(aerosol: Aerosol) -> Any
 
 Return the strategy identifier for non-rate processes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L63-L65)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L80-L82)
 
 ### particula.equilibria.Equilibria.__or__
 
@@ -427,8 +449,8 @@ Builds equilibria strategies using registered builders and the
 
 > **Supported strategy types**
 >
-> - "liquid_vapor": ``LiquidVaporPartitioningStrategy`` for organic
->   aerosol liquid-vapor partitioning equilibrium.
+> - "liquid_vapor": ``LiquidVaporPartitioningStrategy`` for BAT or a
+>   configured mixture activity model.
 
 **Examples**
 
@@ -447,7 +469,7 @@ Builds equilibria strategies using registered builders and the
 0.75
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_factories.py#L33-L106)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_factories.py#L36-L110)
 
 ### particula.equilibria.EquilibriaFactory.get_builders
 
@@ -472,14 +494,14 @@ Return available equilibria builders keyed by strategy name.
 True
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_factories.py#L56-L70)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_factories.py#L59-L73)
 
 ### particula.equilibria.EquilibriaFactory.get_strategy
 
 *method*
 
 ```python
-def get_strategy(strategy_type: str, parameters: Optional[Dict[str, Any]] = None) -> EquilibriaStrategy
+def get_strategy(strategy_type: str, parameters: Optional[Dict[str, Any]] = None) -> LiquidVaporPartitioningStrategy
 ```
 
 Create an equilibria strategy using its corresponding builder.
@@ -487,18 +509,18 @@ Create an equilibria strategy using its corresponding builder.
 **Parameters**
 
 - `strategy_type` (`str`) — Name of the strategy to build. Case-insensitive. Supported: "liquid_vapor".
-- `parameters` (`Optional[Dict[str, Any]]`) (default: `None`) — Optional parameter mapping for the builder. For "liquid_vapor": {"water_activity": float}.
+- `parameters` (`Optional[Dict[str, Any]]`) (default: `None`) — Optional parameter mapping for the builder. Optional keys are water_activity and activity_model. With a mixture model, omitting water_activity closes the water budget.
 
 **Returns**
 
-- (`EquilibriaStrategy`) — Built equilibria strategy instance.
+- (`LiquidVaporPartitioningStrategy`) — Built equilibria strategy instance.
 
 **Raises**
 
 - `ValueError` — If ``strategy_type`` is unknown or parameters are
 invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_factories.py#L72-L106)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_factories.py#L75-L110)
 
 ## particula.equilibria.EquilibriaStrategy
 
@@ -530,7 +552,7 @@ solid-liquid, or other phase equilibria problems.
 'CustomEquilibria'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L69-L113)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L94-L117)
 
 ### particula.equilibria.EquilibriaStrategy.get_name
 
@@ -542,32 +564,19 @@ def get_name() -> str
 
 Return a stable strategy identifier.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L111-L113)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L115-L117)
 
 ### particula.equilibria.EquilibriaStrategy.solve
 
 *method* · *abstract*
 
 ```python
-def solve(c_star_j_dry: NDArray[np.float64], concentration_organic_matter: NDArray[np.float64], molar_mass: NDArray[np.float64], oxygen2carbon: NDArray[np.float64], density: NDArray[np.float64], partition_coefficient_guess: Optional[NDArray[np.float64]] = None) -> EquilibriumResult
+def solve(*args, **kwargs) -> Any
 ```
 
-Solve for equilibrium state.
+Solve for equilibrium with the inputs of the configured model.
 
-**Parameters**
-
-- `c_star_j_dry` (`NDArray[np.float64]`) — Dry saturation concentrations [µg/m³].
-- `concentration_organic_matter` (`NDArray[np.float64]`) — Organic mass concentrations [µg/m³].
-- `molar_mass` (`NDArray[np.float64]`) — Species molar masses [g/mol].
-- `oxygen2carbon` (`NDArray[np.float64]`) — Oxygen-to-carbon ratios [-].
-- `density` (`NDArray[np.float64]`) — Species densities [kg/m³].
-- `partition_coefficient_guess` (`Optional[NDArray[np.float64]]`) (default: `None`) — Optional initial guesses for partition coefficients [-].
-
-**Returns**
-
-- (`EquilibriumResult`) — Structured equilibrium result.
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L86-L109)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L111-L113)
 
 ## particula.equilibria.EquilibriumResult
 
@@ -589,7 +598,7 @@ Result of an equilibria calculation.
 - `water_content` (`tuple[float, float]`) — Water content for (alpha, beta) phases [µg/m³].
 - `error` (`float`) — Optimization convergence error.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L49-L66)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L55-L72)
 
 ### particula.equilibria.EquilibriumResult.alpha_phase
 
@@ -599,7 +608,7 @@ Result of an equilibria calculation.
 alpha_phase: PhaseConcentrations
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L62-L62)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L68-L68)
 
 ### particula.equilibria.EquilibriumResult.beta_phase
 
@@ -609,7 +618,7 @@ alpha_phase: PhaseConcentrations
 beta_phase: Optional[PhaseConcentrations]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L63-L63)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L69-L69)
 
 ### particula.equilibria.EquilibriumResult.error
 
@@ -619,7 +628,7 @@ beta_phase: Optional[PhaseConcentrations]
 error: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L66-L66)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L72-L72)
 
 ### particula.equilibria.EquilibriumResult.partition_coefficients
 
@@ -629,7 +638,7 @@ error: float
 partition_coefficients: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L64-L64)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L70-L70)
 
 ### particula.equilibria.EquilibriumResult.water_content
 
@@ -639,7 +648,7 @@ partition_coefficients: NDArray[np.float64]
 water_content: tuple[float, float]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L65-L65)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L71-L71)
 
 ### particula.equilibria.EquilibriumResult.__init__
 
@@ -684,7 +693,27 @@ deterministic parameter handling for factory usage.
 0.65
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L17-L100)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L17-L114)
+
+### particula.equilibria.LiquidVaporPartitioningBuilder._activity_model
+
+*attribute* · *instance attribute*
+
+```python
+_activity_model = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L38-L38)
+
+### particula.equilibria.LiquidVaporPartitioningBuilder._explicit_water
+
+*attribute* · *instance attribute*
+
+```python
+_explicit_water = False
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L39-L39)
 
 ### particula.equilibria.LiquidVaporPartitioningBuilder._water_activity
 
@@ -694,7 +723,7 @@ deterministic parameter handling for factory usage.
 _water_activity: float | None = 0.5
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L38-L38)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L40-L40)
 
 ### particula.equilibria.LiquidVaporPartitioningBuilder.required_parameters
 
@@ -718,7 +747,7 @@ def __init__() -> None
 
 Initialize builder with default water activity.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L35-L38)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L35-L40)
 
 ### particula.equilibria.LiquidVaporPartitioningBuilder.build
 
@@ -730,7 +759,7 @@ def build() -> LiquidVaporPartitioningStrategy
 
 Build the configured :class:`LiquidVaporPartitioningStrategy`.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L93-L100)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L104-L114)
 
 ### particula.equilibria.LiquidVaporPartitioningBuilder.pre_build_check
 
@@ -742,7 +771,19 @@ def pre_build_check() -> None
 
 Ensure builder is ready to build a strategy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L87-L91)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L98-L102)
+
+### particula.equilibria.LiquidVaporPartitioningBuilder.set_activity_model
+
+*method*
+
+```python
+def set_activity_model(model) -> Self
+```
+
+Use a mixture activity provider for gas/liquid partitioning.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L61-L64)
 
 ### particula.equilibria.LiquidVaporPartitioningBuilder.set_parameters
 
@@ -754,7 +795,8 @@ def set_parameters(parameters: dict[str, Any]) -> Self
 
 Set parameters from a dictionary with strict key validation.
 
-Only ``{"water_activity"}`` is accepted. Unknown keys, including
+Accept a BAT water activity or a configured activity model.
+Unknown keys, including
 unit-suffixed variants, raise ``ValueError`` to keep behavior
 deterministic for factories.
 
@@ -770,7 +812,7 @@ deterministic for factories.
 
 - `ValueError` — If an unknown key is provided or value is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L58-L85)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L66-L96)
 
 ### particula.equilibria.LiquidVaporPartitioningBuilder.set_water_activity
 
@@ -794,7 +836,7 @@ Set the target water activity.
 
 - `ValueError` — If ``value`` is outside the inclusive [0, 1] range.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L40-L56)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_builders.py#L42-L59)
 
 ### particula.equilibria.LiquidVaporPartitioningBuilder.check_keys
 
@@ -848,7 +890,7 @@ condensed phases while exposing structured results.
 
 **Parameters**
 
-- `water_activity` (`float`) (default: `0.5`) — Target water activity (0-1 range). Defaults to 0.5.
+- `water_activity` (`float | None`) (default: `None`) — Target water activity (0-1 range). Defaults to 0.5.
 
 **Examples**
 
@@ -866,7 +908,27 @@ condensed phases while exposing structured results.
 True
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L116-L261)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L126-L394)
+
+### particula.equilibria.LiquidVaporPartitioningStrategy.activity_model
+
+*attribute* · *instance attribute*
+
+```python
+activity_model = activity_model
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L165-L165)
+
+### particula.equilibria.LiquidVaporPartitioningStrategy.mixture_water_activity
+
+*attribute* · *instance attribute*
+
+```python
+mixture_water_activity = water_activity
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L153-L153)
 
 ### particula.equilibria.LiquidVaporPartitioningStrategy.water_activity
 
@@ -876,19 +938,19 @@ True
 water_activity = float(water_activity)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L145-L145)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L160-L160)
 
 ### particula.equilibria.LiquidVaporPartitioningStrategy.__init__
 
 *method*
 
 ```python
-def __init__(water_activity: float = 0.5) -> None
+def __init__(water_activity: float | None = None, *, activity_model=None) -> None
 ```
 
 Initialize the strategy with the requested water activity.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L139-L145)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L149-L165)
 
 ### particula.equilibria.LiquidVaporPartitioningStrategy._convert_to_result
 
@@ -898,7 +960,7 @@ Initialize the strategy with the requested water activity.
 def _convert_to_result(alpha: PhaseOutput, beta: Optional[PhaseOutput], system: SystemOutput, error_value: float) -> EquilibriumResult
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L189-L230)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L277-L318)
 
 ### particula.equilibria.LiquidVaporPartitioningStrategy._extract_error
 
@@ -908,7 +970,7 @@ def _convert_to_result(alpha: PhaseOutput, beta: Optional[PhaseOutput], system: 
 def _extract_error(system: SystemOutput, fit_result: OptimizeResult) -> float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L252-L261)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L385-L394)
 
 ### particula.equilibria.LiquidVaporPartitioningStrategy._is_valid_phase_output
 
@@ -918,7 +980,17 @@ def _extract_error(system: SystemOutput, fit_result: OptimizeResult) -> float
 def _is_valid_phase_output(phase: Sequence[object]) -> bool
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L248-L250)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L381-L383)
+
+### particula.equilibria.LiquidVaporPartitioningStrategy._mixture_result
+
+*method*
+
+```python
+def _mixture_result(bulk, inventories) -> MixtureEquilibriumResult
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L336-L379)
 
 ### particula.equilibria.LiquidVaporPartitioningStrategy._to_phase
 
@@ -928,19 +1000,19 @@ def _is_valid_phase_output(phase: Sequence[object]) -> bool
 def _to_phase(phase: PhaseOutput) -> PhaseConcentrations
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L232-L246)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L320-L334)
 
 ### particula.equilibria.LiquidVaporPartitioningStrategy.solve
 
 *method*
 
 ```python
-def solve(c_star_j_dry: NDArray[np.float64], concentration_organic_matter: NDArray[np.float64], molar_mass: NDArray[np.float64], oxygen2carbon: NDArray[np.float64], density: NDArray[np.float64], partition_coefficient_guess: Optional[NDArray[np.float64]] = None) -> EquilibriumResult
+def solve(c_star_j_dry: NDArray[np.float64] | None = None, concentration_organic_matter: NDArray[np.float64] | None = None, molar_mass: NDArray[np.float64] | None = None, oxygen2carbon: NDArray[np.float64] | None = None, density: NDArray[np.float64] | None = None, partition_coefficient_guess: Optional[NDArray[np.float64]] = None, **mixture_inputs) -> EquilibriumResult | SpeciesEquilibrium
 ```
 
 Solve for equilibrium state using liquid-vapor partitioning.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L147-L187)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L197-L275)
 
 ### particula.equilibria.LiquidVaporPartitioningStrategy.get_name
 
@@ -954,7 +1026,168 @@ Inherited from: `particula.equilibria.equilibria_strategies.EquilibriaStrategy`
 
 Return a stable strategy identifier.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L111-L113)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L115-L117)
+
+## particula.equilibria.MixtureEquilibriumResult
+
+*class* · *dataclass*
+
+```python
+class MixtureEquilibriumResult(EquilibriumResult)
+```
+
+Bases: `particula.equilibria.equilibria_strategies.EquilibriumResult`
+
+Re-exported from: `particula.equilibria.equilibria_strategies`
+
+Whole-mixture bulk equilibrium with material lanes in declaration order.
+
+Concentrations and water exchange use µg/m³. Relative humidity is a ratio.
+The liquids record holds the phase-resolved AIOMFAC chemistry, or None
+when the condensed state is dry or the entire inventory is gaseous.
+Inspect solid_liquid for crystal and residual ion masses.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L75-L91)
+
+### particula.equilibria.MixtureEquilibriumResult.gas_concentrations
+
+*attribute* · *instance attribute*
+
+```python
+gas_concentrations: NDArray[np.float64]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L86-L86)
+
+### particula.equilibria.MixtureEquilibriumResult.liquids
+
+*attribute* · *instance attribute*
+
+```python
+liquids: object | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L85-L85)
+
+### particula.equilibria.MixtureEquilibriumResult.phase_component_names
+
+*attribute* · *instance attribute*
+
+```python
+phase_component_names: tuple[str, ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L91-L91)
+
+### particula.equilibria.MixtureEquilibriumResult.relative_humidity
+
+*attribute* · *instance attribute*
+
+```python
+relative_humidity: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L87-L87)
+
+### particula.equilibria.MixtureEquilibriumResult.solid_liquid
+
+*attribute* · *instance attribute*
+
+```python
+solid_liquid: object | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L90-L90)
+
+### particula.equilibria.MixtureEquilibriumResult.vapor_residual
+
+*attribute* · *instance attribute*
+
+```python
+vapor_residual: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L89-L89)
+
+### particula.equilibria.MixtureEquilibriumResult.water_exchanged
+
+*attribute* · *instance attribute*
+
+```python
+water_exchanged: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L88-L88)
+
+### particula.equilibria.MixtureEquilibriumResult.alpha_phase
+
+*attribute* · *instance attribute*
+
+```python
+alpha_phase: PhaseConcentrations
+```
+
+Inherited from: `particula.equilibria.equilibria_strategies.EquilibriumResult`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L68-L68)
+
+### particula.equilibria.MixtureEquilibriumResult.beta_phase
+
+*attribute* · *instance attribute*
+
+```python
+beta_phase: Optional[PhaseConcentrations]
+```
+
+Inherited from: `particula.equilibria.equilibria_strategies.EquilibriumResult`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L69-L69)
+
+### particula.equilibria.MixtureEquilibriumResult.error
+
+*attribute* · *instance attribute*
+
+```python
+error: float
+```
+
+Inherited from: `particula.equilibria.equilibria_strategies.EquilibriumResult`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L72-L72)
+
+### particula.equilibria.MixtureEquilibriumResult.partition_coefficients
+
+*attribute* · *instance attribute*
+
+```python
+partition_coefficients: NDArray[np.float64]
+```
+
+Inherited from: `particula.equilibria.equilibria_strategies.EquilibriumResult`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L70-L70)
+
+### particula.equilibria.MixtureEquilibriumResult.water_content
+
+*attribute* · *instance attribute*
+
+```python
+water_content: tuple[float, float]
+```
+
+Inherited from: `particula.equilibria.equilibria_strategies.EquilibriumResult`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L71-L71)
+
+### particula.equilibria.MixtureEquilibriumResult.__init__
+
+*method*
+
+```python
+def __init__(alpha_phase: PhaseConcentrations, beta_phase: Optional[PhaseConcentrations], partition_coefficients: NDArray[np.float64], water_content: tuple[float, float], error: float, liquids: object | None, gas_concentrations: NDArray[np.float64], relative_humidity: float, water_exchanged: float, vapor_residual: float, solid_liquid: object | None, phase_component_names: tuple[str, ...]) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L0-L0)
 
 ## particula.equilibria.PhaseConcentrations
 
@@ -974,7 +1207,7 @@ Concentrations in a single phase.
 - `water_concentration` (`float`) — Total aqueous concentration in the phase [µg/m³].
 - `total_concentration` (`float`) — Total concentration (organic + water) [µg/m³].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L33-L46)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L39-L52)
 
 ### particula.equilibria.PhaseConcentrations.species_concentrations
 
@@ -984,7 +1217,7 @@ Concentrations in a single phase.
 species_concentrations: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L44-L44)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L50-L50)
 
 ### particula.equilibria.PhaseConcentrations.total_concentration
 
@@ -994,7 +1227,7 @@ species_concentrations: NDArray[np.float64]
 total_concentration: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L46-L46)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L52-L52)
 
 ### particula.equilibria.PhaseConcentrations.water_concentration
 
@@ -1004,7 +1237,7 @@ total_concentration: float
 water_concentration: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L45-L45)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria_strategies.py#L51-L51)
 
 ### particula.equilibria.PhaseConcentrations.__init__
 
@@ -1029,7 +1262,7 @@ Legacy property helper for liquid-vapor partitioning.
 Emits a :class:`DeprecationWarning` and delegates to the partitioning
 implementation. Prefer the strategy interfaces for new code.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/__init__.py#L64-L78)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/__init__.py#L65-L79)
 
 ## particula.equilibria.liquid_vapor_obj_function
 
@@ -1044,7 +1277,7 @@ Legacy objective function for liquid-vapor partitioning.
 Emits a :class:`DeprecationWarning` and delegates to the partitioning
 implementation. Prefer the strategy interfaces for new code.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/__init__.py#L81-L93)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/__init__.py#L82-L94)
 
 ## particula.equilibria.liquid_vapor_partitioning
 
@@ -1060,7 +1293,7 @@ Emits a :class:`DeprecationWarning` and delegates to the partitioning
 implementation. Prefer :class:`LiquidVaporPartitioningStrategy` or
 :class:`Equilibria` for new code.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/__init__.py#L48-L61)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/__init__.py#L49-L62)
 
 **Modules**
 

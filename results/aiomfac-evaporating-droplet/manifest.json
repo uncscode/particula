@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 115.92482892703265,
+  "package_source_sha256": "b31d0fad7ea1c62b026a003c852ff2eb2407e6d9836256eca0fa77b069d368db",
+  "scientific_source_sha256": "a3168e173157df99620bee0156bc684bbf2e23f68a79dfee429b7061abdfd365",
+  "input_sha256": {
+    "packages/particula-aiomfac/src/particula_aiomfac/model.py": "5228ec542038bcc401db62b8f03501bfe7d09f07ca9c81dc47cfd41ee1ac28a1",
+    "packages/particula-aiomfac/src/particula_aiomfac/_terms.py": "631e25c763a5e3cea0ca7b47f59c57977f39e2509b36396fe2e00e653070d7f7",
+    "packages/particula-aiomfac/src/particula_aiomfac/_equilibrium.py": "9a442626a5119d05ebf2da1492d505698f482271d4e72d33a69c8276e6f947c7",
+    "packages/particula-aiomfac/src/particula_aiomfac/adapter.py": "faa36eceb1b68a52563389404cfcd8b740bdef8c8e1aa05a5486df681e7457d6",
+    "packages/particula-aiomfac/src/particula_aiomfac/phases.py": "feffd17f34d97c72f42a74123baeb7a6e1cc711f4b2a3b946ccf5dc5d4f50b20",
+    "packages/particula-aiomfac/src/particula_aiomfac/reciprocal.py": "0b77c6107daac50490dcc86613919be68bf3515721299a4d28dbc1a3d8c3467d",
+    "packages/particula-aiomfac/src/particula_aiomfac/partitioning.py": "c0c81f34b3fa05809ac95ef9414e57b4e95d4cf7461b8eaf37d21c050c061da0",
+    "packages/particula-aiomfac/src/particula_aiomfac/data/parameters.npz": "14d464c03eb549578d26158bdfe9f7f209f79110e6e4b9a95a0ae4c18c0813ce",
+    "packages/particula-aiomfac/src/particula_aiomfac/data/manifest.json": "6baaf6ef914c089ca6a53c27a94830534d602ea24d04132d6120cef289464070"
+  },
+  "example": "aiomfac-evaporating-droplet",
+  "fingerprint": "5f43554de56c9ffb9d65e63f651aacdff77f1585a223018f2881a3c970e42859",
+  "source": "docs/studies/examples/thermodynamics/equilibria/aiomfac_evaporating_droplet.py",
+  "revision": "6037e46c7b8fc5428750ac7e28df9aa66bda18e5",
+  "package_dirty": false,
+  "executed_at": "2026-11-23T04:14:05.776179+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.5",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "image": "figure-5-1.png"
+      },
+      {
+        "image": "figure-5-2.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "a6be56e4751c3ba4126e0ff0ad2840e844e4df8da83fd10727b9074806501666",
+    "data.json": "3408d76f8f7f9a6802cf19cc90f055b560d142fe709315cd7b38f97760bc4344",
+    "executed_source.py": "bef119c7c5e19e1e4c02e5775d30275108d10bae4102cf42fd885873f6541048",
+    "figure-5-1.png": "a63c7706eef0d35794d72fb5884982bc817b5a45c51ed1ccb476a54329ff7b24",
+    "figure-5-2.png": "49cf397e7d38d20797ce616a9b0fb5a40d99f17c88c5c5e30387282adbc38785"
+  },
+  "simulation_fingerprint": "76ae4cae8fb700ec8f11ce4fe3cb4e8277e429affef981f0a693e691ad41472c",
+  "render_versions": {
+    "particula": "0.3.5",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {
+    "packages/particula-aiomfac/src/particula_aiomfac/model.py": "5228ec542038bcc401db62b8f03501bfe7d09f07ca9c81dc47cfd41ee1ac28a1",
+    "packages/particula-aiomfac/src/particula_aiomfac/_terms.py": "631e25c763a5e3cea0ca7b47f59c57977f39e2509b36396fe2e00e653070d7f7",
+    "packages/particula-aiomfac/src/particula_aiomfac/_equilibrium.py": "9a442626a5119d05ebf2da1492d505698f482271d4e72d33a69c8276e6f947c7",
+    "packages/particula-aiomfac/src/particula_aiomfac/adapter.py": "faa36eceb1b68a52563389404cfcd8b740bdef8c8e1aa05a5486df681e7457d6",
+    "packages/particula-aiomfac/src/particula_aiomfac/phases.py": "feffd17f34d97c72f42a74123baeb7a6e1cc711f4b2a3b946ccf5dc5d4f50b20",
+    "packages/particula-aiomfac/src/particula_aiomfac/reciprocal.py": "0b77c6107daac50490dcc86613919be68bf3515721299a4d28dbc1a3d8c3467d",
+    "packages/particula-aiomfac/src/particula_aiomfac/partitioning.py": "c0c81f34b3fa05809ac95ef9414e57b4e95d4cf7461b8eaf37d21c050c061da0",
+    "packages/particula-aiomfac/src/particula_aiomfac/data/parameters.npz": "14d464c03eb549578d26158bdfe9f7f209f79110e6e4b9a95a0ae4c18c0813ce",
+    "packages/particula-aiomfac/src/particula_aiomfac/data/manifest.json": "6baaf6ef914c089ca6a53c27a94830534d602ea24d04132d6120cef289464070"
+  },
+  "rendered_at": "2026-11-23T12:51:10.588892+00:00",
+  "render_revision": "d4cdadc4b648de6cb49eb0f97530f6489d89f797",
+  "render_elapsed_seconds": 5.350971792126074
+}

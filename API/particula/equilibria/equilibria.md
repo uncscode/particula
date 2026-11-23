@@ -52,7 +52,27 @@ Execute an equilibria strategy within the runnable interface.
 
 - `strategy` (`EquilibriaStrategy`) — Concrete ``EquilibriaStrategy`` used to solve equilibrium.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L48-L230)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L51-L272)
+
+### particula.equilibria.equilibria.Equilibria.species_layout
+
+*attribute* · *instance attribute*
+
+```python
+species_layout = species_layout
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L77-L77)
+
+### particula.equilibria.equilibria.Equilibria.species_options
+
+*attribute* · *instance attribute*
+
+```python
+species_options = dict(species_options or {})
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L78-L78)
 
 ### particula.equilibria.equilibria.Equilibria.strategy
 
@@ -62,14 +82,14 @@ Execute an equilibria strategy within the runnable interface.
 strategy = strategy
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L61-L61)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L76-L76)
 
 ### particula.equilibria.equilibria.Equilibria.__init__
 
 *method*
 
 ```python
-def __init__(strategy: EquilibriaStrategy) -> None
+def __init__(strategy: EquilibriaStrategy, *, species_layout=None, species_options=None) -> None
 ```
 
 Initialize with the provided equilibria strategy.
@@ -77,8 +97,10 @@ Initialize with the provided equilibria strategy.
 **Parameters**
 
 - `strategy` (`EquilibriaStrategy`) — Concrete ``EquilibriaStrategy`` used during execution.
+- `species_layout` (default: `None`) — Optional mapping of physical species to native particle lanes for one equilibrating population per box.
+- `species_options` (default: `None`) — Gas reactions, solids, surface parameters and execution settings for the closed physical species solver.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L55-L61)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L58-L78)
 
 ### particula.equilibria.equilibria.Equilibria._apply_attribute_result
 
@@ -88,7 +110,7 @@ Initialize with the provided equilibria strategy.
 def _apply_attribute_result(aerosol: Aerosol, result: Any) -> Aerosol
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L215-L222)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L257-L264)
 
 ### particula.equilibria.equilibria.Equilibria._apply_equilibrium_result
 
@@ -103,7 +125,7 @@ Apply strategy results to the aerosol or attach for downstream use.
 Accepts either an updated ``Aerosol`` instance, a mapping/struct with
 recognizable concentration fields, or raises when ``None`` is returned.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L161-L195)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L198-L237)
 
 ### particula.equilibria.equilibria.Equilibria._apply_mapping_result
 
@@ -113,7 +135,7 @@ recognizable concentration fields, or raises when ``None`` is returned.
 def _apply_mapping_result(aerosol: Aerosol, result: Mapping[str, Any]) -> Aerosol
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L204-L213)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L246-L255)
 
 ### particula.equilibria.equilibria.Equilibria._attach_equilibrium_result_dataclass
 
@@ -123,7 +145,7 @@ def _apply_mapping_result(aerosol: Aerosol, result: Mapping[str, Any]) -> Aeroso
 def _attach_equilibrium_result_dataclass(aerosol: Aerosol, result: EquilibriumResult) -> Aerosol
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L197-L202)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L239-L244)
 
 ### particula.equilibria.equilibria.Equilibria._attach_phase_concentrations
 
@@ -133,7 +155,7 @@ def _attach_equilibrium_result_dataclass(aerosol: Aerosol, result: EquilibriumRe
 def _attach_phase_concentrations(aerosol: Aerosol, result: PhaseConcentrations) -> Aerosol
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L224-L230)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L266-L272)
 
 ### particula.equilibria.equilibria.Equilibria._extract_partitioning_inputs
 
@@ -150,7 +172,7 @@ absent, falls back to attributes of the aerosol itself. Raises with a
 clear message when a required field is unavailable to keep failures
 explicit during testing.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L118-L159)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L148-L196)
 
 ### particula.equilibria.equilibria.Equilibria.execute
 
@@ -180,7 +202,7 @@ Run equilibria over the provided time step.
 - `AttributeError` — When required partitioning inputs are missing.
 - `TypeError` — If the strategy returns ``None``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L67-L116)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L84-L146)
 
 ### particula.equilibria.equilibria.Equilibria.rate
 
@@ -192,7 +214,7 @@ def rate(aerosol: Aerosol) -> Any
 
 Return the strategy identifier for non-rate processes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L63-L65)
+[View source](https://github.com/uncscode/particula/blob/main/particula/equilibria/equilibria.py#L80-L82)
 
 ### particula.equilibria.equilibria.Equilibria.__or__
 
