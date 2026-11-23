@@ -195,7 +195,22 @@ def test_native_runnable_transfers_actual_lanes_and_rolls_back_on_capacity():
         surface_ions={242: 4},
         slots=(0,),
     )
+    prescribed = EquilibriaFactory().get_strategy(
+        "liquid_vapor", {"activity_model": provider(), "water_activity": 0.8}
+    )
     original = particles.masses.copy()
+    with pytest.raises(ValueError, match="closed gas reservoir"):
+        prescribed.solve(
+            species_inventory=SpeciesInventory(), temperature=298.15
+        )
+    with pytest.raises(ValueError, match="closed gas reservoir"):
+        Equilibria(
+            prescribed, species_layout=layout, species_options=charged_options()
+        ).execute(aerosol, 1.0)
+    np.testing.assert_array_equal(particles.masses, original)
+    np.testing.assert_array_equal(aerosol.gas.concentration, [[0.0]])
+    np.testing.assert_array_equal(particles.concentration, [[count, 0.0]])
+    np.testing.assert_array_equal(particles.charge, [[0.0, 0.0]])
     with pytest.raises(ValueError, match="second slot"):
         Equilibria(
             strategy, species_layout=layout, species_options=charged_options()
@@ -389,3 +404,70 @@ def test_physical_pure_water_vapor_limit(initial_water, expected_gas):
     assert out.inventory.liquid_neutrals["water"] == pytest.approx(
         initial_water - expected_gas
     )
+
+
+@pytest.mark.parametrize(
+    "total, expected_gas", [(3.0, 3.0), (10.0, 10.0), (15.0, 10.0)]
+)
+def test_alcohol_vapor_without_exchanging_water(total, expected_gas):
+    """A closed alcohol vapor can remain dry or condense at its saturation."""
+    groups = {"alcohol": {141: 2, 151: 1, 153: 1}, "water": {16: 1}}
+    model = ActivityFactory().get_strategy(
+        "aiomfac",
+        {
+            "mixture": MixtureSpec(groups),
+            "material_mapping": dict(enumerate(groups)),
+        },
+    )
+    mw = model.prepared.neutral_mw[model.prepared.neutrals.index("alcohol")]
+    reaction = GasReaction(
+        {"alcohol": 1}, np.log(101325 * mw * 1e9 / (R * 298.15 * 10)), 298.15
+    )
+    out = model.equilibrate_species(
+        species_inventory=SpeciesInventory(gases={"IPA": total}),
+        temperature=298.15,
+        gas_reactions={"IPA": reaction},
+    )
+    assert out.inventory.gases == pytest.approx({"IPA": expected_gas})
+    assert out.inventory.liquid_neutrals == pytest.approx(
+        {"water": 0.0, "alcohol": total - expected_gas}
+    )
+    assert (out.condensed.liquids is None) == (total <= 10.0)
+    assert out.inventory.total_mass == pytest.approx(total)
+
+
+@pytest.mark.parametrize("total, condensed", [(7.0, 0.0), (15.0, 5.0)])
+def test_two_closed_alcohol_vapors_at_the_dew_point(total, condensed):
+    """Identical modeled solvents give an ideal binary dew point of 10 µg/m³."""
+    groups = {
+        "A": {141: 2, 151: 1, 153: 1},
+        "water": {16: 1},
+        "B": {141: 2, 151: 1, 153: 1},
+    }
+    model = ActivityFactory().get_strategy(
+        "aiomfac",
+        {
+            "mixture": MixtureSpec(groups),
+            "material_mapping": dict(enumerate(groups)),
+        },
+    )
+    mw = model.prepared.neutral_mw[model.prepared.neutrals.index("A")]
+    log_k = np.log(101325 * mw * 1e9 / (R * 298.15 * 10))
+    fractions = {"B": 0.7, "A": 0.3}
+    out = model.equilibrate_species(
+        species_inventory=SpeciesInventory(
+            liquid_neutrals={key: total * x for key, x in fractions.items()}
+        ),
+        temperature=298.15,
+        gas_reactions={
+            key: GasReaction({key: 1}, log_k, 298.15) for key in fractions
+        },
+    )
+    for key, x in fractions.items():
+        assert out.inventory.gases[key] == pytest.approx(
+            (total - condensed) * x
+        )
+        assert out.inventory.liquid_neutrals[key] == pytest.approx(
+            condensed * x
+        )
+    assert (out.condensed.liquids is None) == (condensed == 0)

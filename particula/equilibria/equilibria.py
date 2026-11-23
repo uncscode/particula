@@ -35,7 +35,10 @@ import inspect
 from typing import TYPE_CHECKING, Any, Mapping
 
 from particula.aerosol import Aerosol
-from particula.equilibria.equilibria_strategies import EquilibriaStrategy
+from particula.equilibria.equilibria_strategies import (
+    EquilibriaStrategy,
+    _validate_closed_species_reservoir,
+)
 from particula.runnable import RunnableABC
 
 if TYPE_CHECKING:
@@ -114,6 +117,7 @@ class Equilibria(RunnableABC):
             raise ValueError("sub_steps must be positive")
 
         if self.species_layout is not None:
+            _validate_closed_species_reservoir(self.strategy)
             model = getattr(self.strategy, "activity_model", None)
             apply_species = getattr(model, "apply_species_equilibrium", None)
             if not callable(apply_species):

@@ -117,6 +117,12 @@ class EquilibriaStrategy(ABC):
         return self.__class__.__name__
 
 
+def _validate_closed_species_reservoir(strategy: EquilibriaStrategy) -> None:
+    """Physical species inventories close the gas and condensed water budget."""
+    if getattr(strategy, "mixture_water_activity", None) is not None:
+        raise ValueError("species inventories use a closed gas reservoir")
+
+
 class LiquidVaporPartitioningStrategy(EquilibriaStrategy):
     """Liquid-vapor partitioning equilibrium strategy.
 
@@ -216,10 +222,7 @@ class LiquidVaporPartitioningStrategy(EquilibriaStrategy):
                     "and volatility data"
                 )
             if "species_inventory" in mixture_inputs:
-                if self.mixture_water_activity is not None:
-                    raise ValueError(
-                        "species inventories use a closed gas reservoir"
-                    )
+                _validate_closed_species_reservoir(self)
                 return self.activity_model.equilibrate_species(**mixture_inputs)
             mixture_inputs.setdefault(
                 "relative_humidity", self.mixture_water_activity
