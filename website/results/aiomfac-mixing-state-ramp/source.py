@@ -320,8 +320,11 @@ def plot_history(report):
 # radius-dependent Kelvin correction. The result is the ambient RH for a
 # completely equilibrated particle of that dry composition and mass.
 # The left panel follows each whole droplet from its initial wet diameter at
-# 90% RH to its wet diameter at first detection of two liquids. The short
-# vertical segments reach back to the preceding one-liquid observation.
+# 90% RH to its wet diameter at first detection of two liquids. The dashed
+# 1:1 line shows where the two diameters would be equal. At a given initial
+# diameter, the vertical distance from the line down to a point is the
+# diameter lost during drying. The short gray segment above each point
+# reaches back to the preceding one-liquid observation.
 # Diameters are volume-equivalent spheres, calculated from the same additive
 # material volumes as the kinetic model, $D=(6\sum_i m_i/(π\rho_i))^{1/3}$.
 # Color gives the initial salt fraction of the retained dry mass.
@@ -354,7 +357,7 @@ def plot_cloud_points(report):
     at_split = diameter_um[end, columns]
     salt_percent = 100 * dry[:, 1:].sum(axis=1) / dry.sum(axis=1)
 
-    fig, (size, humidity) = plotting.subplots(1, 2, size="wide")
+    fig, (size, humidity) = plotting.subplots(1, 2, size="square")
     size.vlines(
         initial,
         at_split,
@@ -373,10 +376,25 @@ def plot_cloud_points(report):
         linewidths=0.25,
     )
     fig.colorbar(points, ax=size, label="Salt (% of retained mass)")
+    xmin, xmax = size.get_xlim()
+    ymin, ymax = size.get_ylim()
+    limits = (min(xmin, ymin), max(xmax, ymax))
+    size.plot(
+        limits,
+        limits,
+        "--",
+        color="0.35",
+        lw=1.3,
+        zorder=1,
+        label="1:1 (equal diameters)",
+    )
     size.set(
+        xlim=limits,
+        ylim=limits,
         xlabel="Initial wet diameter (µm)",
         ylabel="Wet diameter at first split (µm)",
     )
+    plotting.legend(size, placement="inside", loc="upper left")
 
     humidity.vlines(
         salt_percent[columns],
@@ -397,7 +415,7 @@ def plot_cloud_points(report):
         label="Equilibrium onset",
     )
     humidity.set(xlabel="Salt (% of retained mass)", ylabel="Ambient RH (%)")
-    plotting.legend(humidity, placement="inside", loc="upper right")
+    plotting.legend(humidity, placement="inside", loc="lower left")
     plotting.fit(fig)
     return fig
 
@@ -489,8 +507,11 @@ if __name__ == "__main__":
 #
 # Initial wet diameters ranged from 3.80 to 4.98 µm. At the first two-liquid
 # observation they spanned 3.46 to 4.48 µm, with a median of 3.99 µm.
-# The median droplet retained 90.7% of its initial diameter. The median
-# diameter change across an onset sampling interval was 0.020 µm.
+# All 1,000 points lie below the 1:1 line because every droplet had shrunk
+# by the first detection of a second liquid. The median diameter loss was
+# 9.3% of the initial wet diameter. Across the shorter interval from the
+# last one-liquid sample to the first two-liquid sample, the median
+# diameter change was 0.020 µm.
 #
 # The independent equilibrium cloud points span **85.13% to 86.21% RH**
 # across the same 1,000 dry inventories, with curvature included. Water
