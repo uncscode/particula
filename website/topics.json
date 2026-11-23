@@ -5708,6 +5708,60 @@
       },
       "tocFigure": "antarctic-ccn/graphical-abstract.png",
       "tocSource": "scripts/antarctic_ccn/toc.py"
+    },
+    {
+      "source": "docs/studies/examples/thermodynamics/equilibria/aiomfac_humidity_sweep.py",
+      "title": "When does drying split an alcohol–salt droplet into two liquids?",
+      "topic": "partitioning",
+      "also": [
+        "activity-nonideal"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "aiomfac-humidity-sweep",
+        "runs": [
+          "aiomfac-humidity-sweep"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/thermodynamics/equilibria-theory.md",
+            "label": "Phase stability and reservoir constraints"
+          },
+          {
+            "target": "docs/studies/examples/thermodynamics/equilibria/aiomfac_evaporating_droplet.py",
+            "label": "Follow the same mixture during evaporation"
+          }
+        ]
+      }
+    },
+    {
+      "source": "docs/studies/examples/thermodynamics/equilibria/aiomfac_evaporating_droplet.py",
+      "title": "How long does an evaporating droplet take to reach two-liquid equilibrium?",
+      "topic": "condensation-reservoirs",
+      "also": [
+        "activity-nonideal"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "aiomfac-evaporating-droplet",
+        "runs": [
+          "aiomfac-evaporating-droplet"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/thermodynamics/equilibria-theory.md",
+            "label": "Phase stability and reservoir constraints"
+          },
+          {
+            "target": "docs/studies/examples/thermodynamics/equilibria/aiomfac_humidity_sweep.py",
+            "label": "Find the phase boundary at prescribed humidity"
+          }
+        ]
+      }
     }
   ],
   "supporting": [

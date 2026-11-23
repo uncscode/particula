@@ -36,7 +36,7 @@ jobs:
           cache-dependency-path: website/package-lock.json
       - name: Install documentation dependencies
         run: |
-          python -m pip install -e '.[extra]' -r website/requirements.txt pytest
+          python -m pip install -e '.[extra]' -e ./packages/particula-aiomfac -r website/requirements.txt pytest
           npm --prefix website ci
       - name: Test publishing infrastructure
         run: |

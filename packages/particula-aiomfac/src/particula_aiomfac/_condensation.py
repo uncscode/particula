@@ -134,9 +134,21 @@ class DeviceActivities:
 
     def __init__(self, provider, shape, targets, device):
         rows = shape[0] * shape[1]
-        self.model = CudaModel(
-            provider.prepared, device, capacity=max(1, min(4096, rows))
-        )
+        capacity = max(1, min(4096, rows))
+        if provider.phase_mode == "stable":
+            p = provider.prepared
+            d = max(p.ncomponents, len(p.neutrals) + len(p.ions))
+            capacity = min(
+                capacity, max(1, (32 * 1024**2) // (8 * (d * d + 21 * d + 2)))
+            )
+        self.model = CudaModel(provider.prepared, device, capacity=capacity)
+        self.phase_solver = None
+        if provider.phase_mode == "stable":
+            from ._cuda_phases import DevicePhases
+
+            self.phase_solver = DevicePhases(
+                self.model, provider=provider, targets=targets
+            )
         self.device = self.model.device
         self.values = wp.zeros(shape, dtype=wp.float64, device=device)
         self.detail = wp.zeros(5, dtype=int, device=device)
@@ -257,9 +269,14 @@ class DeviceActivities:
                 self.table.lookup_into(
                     mass, temp, active, out, err, reason, direct, stream
                 )
-            self.model.evaluate_into(
-                mass, temp, out, flags, work, stream=stream, active=direct
-            )
+            if self.phase_solver is None:
+                self.model.evaluate_into(
+                    mass, temp, out, flags, work, stream=stream, active=direct
+                )
+            else:
+                self.phase_solver.evaluate_into(
+                    mass, temp, out, flags, work, direct, stream
+                )
             if refine:
                 wp.launch(
                     _refined,

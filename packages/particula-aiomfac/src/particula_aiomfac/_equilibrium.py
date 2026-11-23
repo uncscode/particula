@@ -61,6 +61,19 @@ def log_constants(t):
 
 def trial_logs(p, neutral, ion, t):
     """Return molal ion log coefficients, log water activity and solvent kg."""
+    if p.carbonate and p.carbonate_model == "gibbs_consistent":
+        from .carbonate import activity_terms
+
+        sr, mr, lr, _, conversion, _, mass = activity_terms(
+            p, neutral[None, :], ion[None, :], np.array([t])
+        )
+        gamma = (sr + mr + lr)[0]
+        xw = neutral[p.water] / (neutral.sum() + ion.sum())
+        return (
+            gamma[len(neutral) :] - conversion[0],
+            np.log(xw) + gamma[p.water],
+            mass[0],
+        )
     solvent = neutral @ p.neutral_mw
     m = ion / solvent
     x = np.r_[neutral, ion] / (neutral.sum() + ion.sum())
@@ -97,7 +110,8 @@ def solve(p, neutral, ion, t):
     solid = 0.0
     # The closed carbonate routine removes stoichiometric CaSO4 before solving.
     # Its trace floor is defined per kg of the initial electrolyte-free solvent.
-    if p.carbonate and sulfur and 221 in p.ions:
+    extension = p.carbonate and p.carbonate_model == "gibbs_consistent"
+    if p.carbonate and not extension and sulfur and 221 in p.ions:
         calcium = idx(221)
         remaining = (
             sulfur - i0[calcium]
@@ -119,7 +133,7 @@ def solve(p, neutral, ion, t):
         4
     )  # largest mass action residual, charge, carbon and sulfur
     calls = retries = 0
-    if carbon > np.finfo(float).eps * initial_solvent:
+    if carbon > (0.0 if extension else np.finfo(float).eps * initial_solvent):
         # Electroneutrality and carbon conservation close the 5/6 variable system.
         # Scale the conservation rows by inventory for trace carbon.
         coupled = sulfur > 0
@@ -185,7 +199,12 @@ def solve(p, neutral, ion, t):
                 [
                     *eq,
                     np.log((b + c + d) / carbon),
-                    (ion @ p.charge) / charge_scale,
+                    (ion @ p.charge)
+                    / (
+                        max(ion @ abs(p.charge), 1e-300)
+                        if extension
+                        else charge_scale
+                    ),
                 ]
             )
 
@@ -235,9 +254,13 @@ def solve(p, neutral, ion, t):
             checks[0] = np.max(abs(f[:-2]))
             if checks[0] <= 1e-8 and max(abs(f[-2:])) <= 1e-10:
                 final = [ion[hc], ion[co], neutral[p.co2], ion[oh], ion[h]]
-                if np.all(final <= limits * (1 + 1e-10)) and (
-                    not coupled
-                    or ion[hs] <= min(proton_max, sulfur) * (1 + 1e-10)
+                if (
+                    extension
+                    or np.all(final <= limits * (1 + 1e-10))
+                    and (
+                        not coupled
+                        or ion[hs] <= min(proton_max, sulfur) * (1 + 1e-10)
+                    )
                 ):
                     break
         else:
@@ -245,6 +268,57 @@ def solve(p, neutral, ion, t):
                 f"no carbonate root within inventory bounds; residual {f}"
             )
         checks[2] = abs((ion[hc] + ion[co] + neutral[p.co2]) - carbon) / carbon
+    elif extension:
+        # At the carbon-free face water still self-ionizes and, where present,
+        # bisulfate re-equilibrates. Retain the exact O and H budgets.
+        passive = i0.copy()
+        passive[[oh, h]] = 0.0
+        if sulfur:
+            passive[[hs, so]] = 0.0
+        spectator = passive @ p.charge
+
+        def zero_carbon(v):
+            nonlocal calls
+            calls += 1
+            proton, hydroxide = np.exp(np.clip(v[:2], -700, 50))
+            ion[h], ion[oh] = proton, hydroxide
+            neutral[p.water] = n0[p.water] + i0[oh] - hydroxide
+            if sulfur:
+                ratio = np.exp(np.clip(v[2], -700, 50))
+                ion[hs], ion[so] = (
+                    sulfur * ratio / (1 + ratio),
+                    sulfur / (1 + ratio),
+                )
+            if neutral[p.water] <= 0:
+                return np.full(len(v), 1e3 + abs(neutral[p.water]))
+            g, water, solv = trial_logs(p, neutral, ion, t)
+            lh = v[0] - np.log(solv) + g[h]
+            eqs = [lh + v[1] - np.log(solv) + g[oh] - water - constants[2]]
+            if sulfur:
+                eqs.append(lh + g[so] - g[hs] - v[2] - constants[3])
+            eqs.append((ion @ p.charge) / max(ion @ abs(p.charge), 1e-300))
+            return np.asarray(eqs)
+
+        def guess(logh):
+            concentration = np.exp(logh)
+            sulfate_ratio = concentration / np.exp(constants[3])
+            net = (
+                spectator
+                + initial_solvent
+                * (concentration - np.exp(constants[2]) / concentration)
+                - sulfur * (2 + sulfate_ratio) / (1 + sulfate_ratio)
+            )
+            return net
+
+        logh = brentq(guess, -100, 50)
+        start = [
+            logh + np.log(initial_solvent),
+            constants[2] - logh + np.log(initial_solvent),
+        ]
+        if sulfur:
+            start.append(logh - constants[3])
+        answer = root(zero_carbon, start, tol=1e-11)
+        checks[0] = max(abs(zero_carbon(answer.x)[:-1]))
     elif (
         coupled
         and min(i0[h] + i0[hs], sulfur)

@@ -12,5 +12,7 @@ Begin with phase properties and activities, then use those properties to calcula
 <!-- STUDY_LIST_START -->
 - [Follow water–organic mixing from composition to water activity](activity_part1.py)
 - [How does water uptake change organic aerosol partitioning?](equilibria_part1.py)
+- [How long does an evaporating droplet take to reach two-liquid equilibrium?](aiomfac_evaporating_droplet.py)
 - [Separate water uptake from organic partitioning](equilibria_example.py)
+- [When does drying split an alcohol–salt droplet into two liquids?](aiomfac_humidity_sweep.py)
 <!-- STUDY_LIST_END -->

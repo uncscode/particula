@@ -121,6 +121,7 @@ class PreparedModel:
 
     sulfate: bool = False
     carbonate: bool = False
+    carbonate_model: str = "pinned"
     water: int = -1
     co2: int = -1
     co2_lambda: np.ndarray | None = None
@@ -131,6 +132,12 @@ class PreparedModel:
         return self._evaluate_rows(
             masses, temperature_K, diagnostics, collect_failures=False
         )
+
+    def phase_equilibrium(self, masses, temperature, water_index):
+        """Resolve coexisting liquids for one inventory in declaration order."""
+        from .phases import phase_equilibrium
+
+        return phase_equilibrium(self, masses, temperature, water_index)
 
     def _evaluate_rows(
         self, masses, temperature_K, diagnostics, *, collect_failures
@@ -263,19 +270,26 @@ class PreparedModel:
             species_moles[rows] = x
             x /= x.sum(axis=1, keepdims=True)
             mol[rows] = ion_moles / solvent_mass
-            sr = np.empty_like(x)
-            for temperature in np.unique(tk):
-                selected = tk == temperature
-                sr[selected] = short_range(self, x[selected], temperature)
-            mr, lr, strength, scale = electrolyte_terms(
-                self,
-                neutral_moles / neutral_moles.sum(axis=1, keepdims=True),
-                mol[rows],
-                tk,
-            )
-            if self.carbonate:
-                sr[:, self.co2] = lr[:, self.co2] = 0.0
-                mr[:, self.co2] = 2 * (mol[rows] @ self.co2_lambda)
+            if self.carbonate and self.carbonate_model == "gibbs_consistent":
+                from .carbonate import activity_terms
+
+                sr, mr, lr, strength, scale, mol[rows], _ = activity_terms(
+                    self, neutral_moles, ion_moles, tk
+                )
+            else:
+                sr = np.empty_like(x)
+                for temperature in np.unique(tk):
+                    selected = tk == temperature
+                    sr[selected] = short_range(self, x[selected], temperature)
+                mr, lr, strength, scale = electrolyte_terms(
+                    self,
+                    neutral_moles / neutral_moles.sum(axis=1, keepdims=True),
+                    mol[rows],
+                    tk,
+                )
+                if self.carbonate:
+                    sr[:, self.co2] = lr[:, self.co2] = 0.0
+                    mr[:, self.co2] = 2 * (mol[rows] @ self.co2_lambda)
             coeff = sr + mr + lr
             bad_coeff = ~np.isfinite(coeff).all(axis=1) | ~np.isfinite(scale)
             if collect_failures:
@@ -343,6 +357,12 @@ class PreparedModel:
             terms,
             restore(species_moles),
             restore(status),
+            (UPSTREAM_VERSION, UPSTREAM_REVISION)
+            + (
+                ("gibbs_consistent",)
+                if self.carbonate_model == "gibbs_consistent"
+                else ()
+            ),
         )
 
 
@@ -364,16 +384,28 @@ class AIOMFACModel:
 
     @staticmethod
     def prepare(
-        mixture: MixtureSpec, *, execution="cpu", device=None
+        mixture: MixtureSpec,
+        *,
+        execution="cpu",
+        device=None,
+        carbonate_model="pinned",
     ) -> "PreparedModel | CudaModel":
         """Bind analytical and internal species to one requested device."""
         if execution not in ("cpu", "cuda"):
             raise ValueError(f"unsupported AIOMFAC execution {execution!r}")
+        if carbonate_model not in ("pinned", "gibbs_consistent"):
+            raise ValueError(
+                "carbonate_model must be pinned or gibbs_consistent"
+            )
         comp = dict(mixture.components)
         original = len(comp)
         ids = set().union(*comp.values())
         sulfate = 248 in ids or 261 in ids and bool(ids & {205, 250})
         carbonate = 250 in ids or 262 in ids and bool(ids & {205, 248})
+
+        if carbonate_model == "gibbs_consistent" and ids & {173, 250, 262}:
+            carbonate = True
+            sulfate = bool(ids & {248, 261})
 
         def include(name, groups):
             if groups not in comp.values():
@@ -389,7 +421,9 @@ class AIOMFACModel:
             include("implicit H2CO3", {205: 2, 262: 1})
             include("implicit HHCO3", {205: 1, 250: 1})
             include("implicit HOH", {205: 1, 247: 1})
-        prepared = _prepare_fixed(comp)
+        prepared = replace(
+            _prepare_fixed(comp), carbonate_model=carbonate_model
+        )
         if sulfate or carbonate:
             waters = [
                 j for j, k in enumerate(prepared.neutrals) if comp[k] == {16: 1}
@@ -408,6 +442,16 @@ class AIOMFACModel:
                     "aqueous equilibrium accepts one dissolved CO2 component"
                 )
             co2 = co2_indices[0] if co2_indices else -1
+            if carbonate and carbonate_model == "gibbs_consistent":
+                # Preserve stoichiometric kg as well as C, H and O. The pinned
+                # CO₂ subgroup mass is rounded independently of the ion table.
+                tables = _tables()
+                co3 = tables["SMWA"][262 - 241] * 0.001
+                proton = tables["SMWC"][205 - 201] * 0.001
+                mw = prepared.neutral_mw.copy()
+                mw[co2] = co3 + 2 * proton - mw[waters[0]]
+                mw.setflags(write=False)
+                prepared = replace(prepared, neutral_mw=mw)
             lambdas = _tables()["lambdaIN"][np.asarray(prepared.ions) - 201]
             lambdas.setflags(write=False)
             prepared = replace(

@@ -41,6 +41,7 @@ from particula.equilibria.equilibria_strategies import (
     EquilibriaStrategy,
     EquilibriumResult,
     LiquidVaporPartitioningStrategy,
+    MixtureEquilibriumResult,
     PhaseConcentrations,
 )
 
@@ -98,6 +99,7 @@ __all__ = [
     "EquilibriaStrategy",
     "LiquidVaporPartitioningStrategy",
     "EquilibriumResult",
+    "MixtureEquilibriumResult",
     "PhaseConcentrations",
     # Builder pattern
     "LiquidVaporPartitioningBuilder",

@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional, Sequence
+from typing import TYPE_CHECKING, Any, Optional, Sequence, overload
 
 import numpy as np
 from numpy.typing import NDArray
@@ -26,6 +26,12 @@ from particula.equilibria.partitioning import (
     PhaseOutput,
     SystemOutput,
 )
+
+if TYPE_CHECKING:
+    from particula_aiomfac.reservoirs import (
+        SpeciesEquilibrium,
+        SpeciesInventory,
+    )
 
 partitioning = partitioning_module
 
@@ -66,6 +72,25 @@ class EquilibriumResult:
     error: float
 
 
+@dataclass
+class MixtureEquilibriumResult(EquilibriumResult):
+    """Whole-mixture bulk equilibrium with material lanes in declaration order.
+
+    Concentrations and water exchange use µg/m³. Relative humidity is a ratio.
+    The liquids record holds the phase-resolved AIOMFAC chemistry, or None
+    when the condensed state is dry or the entire inventory is gaseous.
+    Inspect solid_liquid for crystal and residual ion masses.
+    """
+
+    liquids: object | None
+    gas_concentrations: NDArray[np.float64]
+    relative_humidity: float
+    water_exchanged: float
+    vapor_residual: float
+    solid_liquid: object | None
+    phase_component_names: tuple[str, ...]
+
+
 class EquilibriaStrategy(ABC):
     """Abstract base class for equilibria strategies.
 
@@ -84,29 +109,8 @@ class EquilibriaStrategy(ABC):
     """
 
     @abstractmethod
-    def solve(
-        self,
-        c_star_j_dry: NDArray[np.float64],
-        concentration_organic_matter: NDArray[np.float64],
-        molar_mass: NDArray[np.float64],
-        oxygen2carbon: NDArray[np.float64],
-        density: NDArray[np.float64],
-        partition_coefficient_guess: Optional[NDArray[np.float64]] = None,
-    ) -> EquilibriumResult:
-        """Solve for equilibrium state.
-
-        Args:
-            c_star_j_dry: Dry saturation concentrations [µg/m³].
-            concentration_organic_matter: Organic mass concentrations [µg/m³].
-            molar_mass: Species molar masses [g/mol].
-            oxygen2carbon: Oxygen-to-carbon ratios [-].
-            density: Species densities [kg/m³].
-            partition_coefficient_guess: Optional initial guesses for
-                partition coefficients [-].
-
-        Returns:
-            Structured equilibrium result.
-        """
+    def solve(self, *args, **kwargs) -> Any:
+        """Solve for equilibrium with the inputs of the configured model."""
 
     def get_name(self) -> str:
         """Return a stable strategy identifier."""
@@ -136,14 +140,44 @@ class LiquidVaporPartitioningStrategy(EquilibriaStrategy):
         True
     """
 
-    def __init__(self, water_activity: float = 0.5) -> None:
+    def __init__(
+        self, water_activity: float | None = None, *, activity_model=None
+    ) -> None:
         """Initialize the strategy with the requested water activity."""
+        self.mixture_water_activity = water_activity
+        if water_activity is None:
+            water_activity = 0.5
         if not 0 <= water_activity <= 1:
             raise ValueError(
                 f"water_activity must be in [0, 1], got {water_activity}"
             )
         self.water_activity = float(water_activity)
+        if activity_model is not None and not callable(
+            getattr(activity_model, "solve_partitioning", None)
+        ):
+            raise TypeError("activity model must provide solve_partitioning")
+        self.activity_model = activity_model
 
+    @overload
+    def solve(
+        self,
+        *,
+        species_inventory: SpeciesInventory,
+        temperature: float,
+        **options,
+    ) -> SpeciesEquilibrium: ...
+
+    @overload
+    def solve(
+        self,
+        *,
+        inventories,
+        temperature: float,
+        saturation_concentrations,
+        **options,
+    ) -> MixtureEquilibriumResult: ...
+
+    @overload
     def solve(
         self,
         c_star_j_dry: NDArray[np.float64],
@@ -152,8 +186,59 @@ class LiquidVaporPartitioningStrategy(EquilibriaStrategy):
         oxygen2carbon: NDArray[np.float64],
         density: NDArray[np.float64],
         partition_coefficient_guess: Optional[NDArray[np.float64]] = None,
-    ) -> EquilibriumResult:
+    ) -> EquilibriumResult: ...
+
+    def solve(
+        self,
+        c_star_j_dry: NDArray[np.float64] | None = None,
+        concentration_organic_matter: NDArray[np.float64] | None = None,
+        molar_mass: NDArray[np.float64] | None = None,
+        oxygen2carbon: NDArray[np.float64] | None = None,
+        density: NDArray[np.float64] | None = None,
+        partition_coefficient_guess: Optional[NDArray[np.float64]] = None,
+        **mixture_inputs,
+    ) -> EquilibriumResult | SpeciesEquilibrium:
         """Solve for equilibrium state using liquid-vapor partitioning."""
+        legacy = (
+            c_star_j_dry,
+            concentration_organic_matter,
+            molar_mass,
+            oxygen2carbon,
+            density,
+        )
+        if self.activity_model is not None:
+            if (
+                any(value is not None for value in legacy)
+                or partition_coefficient_guess is not None
+            ):
+                raise TypeError(
+                    "configured activity model takes analytical inventories "
+                    "and volatility data"
+                )
+            if "species_inventory" in mixture_inputs:
+                if self.mixture_water_activity is not None:
+                    raise ValueError(
+                        "species inventories use a closed gas reservoir"
+                    )
+                return self.activity_model.equilibrate_species(**mixture_inputs)
+            mixture_inputs.setdefault(
+                "relative_humidity", self.mixture_water_activity
+            )
+            bulk = self.activity_model.solve_partitioning(**mixture_inputs)
+            return self._mixture_result(bulk, mixture_inputs["inventories"])
+        if (
+            mixture_inputs
+            or c_star_j_dry is None
+            or concentration_organic_matter is None
+            or molar_mass is None
+            or oxygen2carbon is None
+            or density is None
+        ):
+            raise TypeError(
+                "BAT partitioning requires volatility, concentration, "
+                "molar mass, O:C and density"
+            )
+
         if c_star_j_dry.size == 0:
             raise ValueError("input arrays must be non-empty")
 
@@ -243,6 +328,51 @@ class LiquidVaporPartitioningStrategy(EquilibriaStrategy):
             species_concentrations=species_concentrations,
             water_concentration=water_concentration,
             total_concentration=total_concentration,
+        )
+
+    def _mixture_result(self, bulk, inventories) -> MixtureEquilibriumResult:
+        water = self.activity_model.water_index
+        zero = np.zeros_like(bulk.gas_concentrations)
+        names = tuple(self.activity_model.mixture.components)
+        if bulk.solid_liquid is not None:
+            names = bulk.solid_liquid.component_names
+        alpha = (
+            bulk.liquids.alpha_masses
+            if bulk.liquids is not None
+            else np.zeros(len(names))
+        )
+        beta = bulk.liquids.beta_masses if bulk.liquids is not None else None
+        total = np.array(inventories, dtype=float, copy=True)
+        condensed = total - bulk.gas_concentrations
+        condensed[water] = alpha[water] + (
+            beta[water] if beta is not None else 0.0
+        )
+        total[water] = bulk.gas_concentrations[water] + condensed[water]
+
+        def phase(mass):
+            return PhaseConcentrations(
+                mass.copy(), float(mass[water]), float(mass.sum())
+            )
+
+        return MixtureEquilibriumResult(
+            phase(alpha),
+            phase(beta) if beta is not None else None,
+            np.divide(condensed, total, out=zero.copy(), where=total > 0),
+            (
+                float(alpha[water]),
+                float(beta[water]) if beta is not None else 0.0,
+            ),
+            max(
+                bulk.vapor_residual,
+                bulk.liquids.chemical_potential_error if bulk.liquids else 0.0,
+            ),
+            bulk.liquids,
+            bulk.gas_concentrations,
+            bulk.relative_humidity,
+            bulk.water_exchanged,
+            bulk.vapor_residual,
+            bulk.solid_liquid,
+            names,
         )
 
     @staticmethod

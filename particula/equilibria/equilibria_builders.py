@@ -35,6 +35,8 @@ class LiquidVaporPartitioningBuilder(BuilderABC):
     def __init__(self) -> None:
         """Initialize builder with default water activity."""
         super().__init__(required_parameters=[])
+        self._activity_model = None
+        self._explicit_water = False
         self._water_activity: float | None = 0.5
 
     def set_water_activity(self, value: float) -> Self:
@@ -52,13 +54,20 @@ class LiquidVaporPartitioningBuilder(BuilderABC):
         water_activity = float(value)
         if not 0 <= water_activity <= 1:
             raise ValueError(f"water_activity must be in [0, 1], got {value}")
+        self._explicit_water = True
         self._water_activity = water_activity
+        return self
+
+    def set_activity_model(self, model) -> Self:
+        """Use a mixture activity provider for gas/liquid partitioning."""
+        self._activity_model = model
         return self
 
     def set_parameters(self, parameters: dict[str, Any]) -> Self:
         """Set parameters from a dictionary with strict key validation.
 
-        Only ``{"water_activity"}`` is accepted. Unknown keys, including
+        Accept a BAT water activity or a configured activity model.
+        Unknown keys, including
         unit-suffixed variants, raise ``ValueError`` to keep behavior
         deterministic for factories.
 
@@ -71,14 +80,16 @@ class LiquidVaporPartitioningBuilder(BuilderABC):
         Raises:
             ValueError: If an unknown key is provided or value is invalid.
         """
-        allowed_keys = {"water_activity"}
+        allowed_keys = {"water_activity", "activity_model"}
         invalid_keys = set(parameters) - allowed_keys
         if invalid_keys:
             raise ValueError(
                 f"Invalid parameter(s): {sorted(invalid_keys)}. "
-                "Allowed keys: water_activity."
+                "Allowed keys: water_activity, activity_model."
             )
 
+        if "activity_model" in parameters:
+            self.set_activity_model(parameters["activity_model"])
         if "water_activity" in parameters:
             self.set_water_activity(parameters["water_activity"])
 
@@ -97,4 +108,7 @@ class LiquidVaporPartitioningBuilder(BuilderABC):
             raise ValueError("water_activity must be set before build")
         return LiquidVaporPartitioningStrategy(
             water_activity=self._water_activity
+            if self._explicit_water
+            else None,
+            activity_model=self._activity_model,
         )

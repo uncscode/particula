@@ -52,13 +52,27 @@ class Equilibria(RunnableABC):
         strategy: Concrete ``EquilibriaStrategy`` used to solve equilibrium.
     """
 
-    def __init__(self, strategy: EquilibriaStrategy) -> None:
+    def __init__(
+        self,
+        strategy: EquilibriaStrategy,
+        *,
+        species_layout=None,
+        species_options=None,
+    ) -> None:
         """Initialize with the provided equilibria strategy.
 
         Args:
             strategy: Concrete ``EquilibriaStrategy`` used during execution.
+            species_layout: Optional mapping of physical species to native
+                particle lanes for one equilibrating population per box.
+            species_options: Gas reactions, solids, surface parameters and
+                execution settings for the closed physical species solver.
         """
+        if species_options and species_layout is None:
+            raise ValueError("species_options require a native species layout")
         self.strategy = strategy
+        self.species_layout = species_layout
+        self.species_options = dict(species_options or {})
 
     def rate(self, aerosol: Aerosol) -> Any:  # noqa: ARG002
         """Return the strategy identifier for non-rate processes."""
@@ -99,6 +113,18 @@ class Equilibria(RunnableABC):
         if sub_steps <= 0:
             raise ValueError("sub_steps must be positive")
 
+        if self.species_layout is not None:
+            model = getattr(self.strategy, "activity_model", None)
+            apply_species = getattr(model, "apply_species_equilibrium", None)
+            if not callable(apply_species):
+                raise TypeError(
+                    "native species layout requires a species equilibrium model"
+                )
+            reports = apply_species(
+                aerosol, self.species_layout, **self.species_options
+            )
+            aerosol.equilibria_result = reports  # type: ignore[attr-defined]
+            return aerosol
         partitioning_inputs = self._extract_partitioning_inputs(aerosol)
         dt = time_step / sub_steps
         solve_params = inspect.signature(self.strategy.solve).parameters
@@ -123,6 +149,13 @@ class Equilibria(RunnableABC):
         clear message when a required field is unavailable to keep failures
         explicit during testing.
         """
+        if getattr(self.strategy, "activity_model", None) is not None:
+            candidate = getattr(aerosol, "partitioning_inputs", None)
+            if not isinstance(candidate, Mapping):
+                raise AttributeError(
+                    "configured mixture requires a partitioning_inputs mapping"
+                )
+            return dict(candidate)
         required_keys = [
             "c_star_j_dry",
             "concentration_organic_matter",
@@ -180,6 +213,11 @@ class Equilibria(RunnableABC):
 
         if isinstance(result, EquilibriumResult):
             return self._attach_equilibrium_result_dataclass(aerosol, result)
+
+        if getattr(self.strategy, "activity_model", None) is not None:
+            # Species-resolved equilibrium owns disjoint solid/ion/gas amounts.
+            aerosol.equilibria_result = result  # type: ignore[attr-defined]
+            return aerosol
 
         if isinstance(result, Mapping):
             return self._apply_mapping_result(aerosol, result)
