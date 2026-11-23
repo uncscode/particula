@@ -90,7 +90,7 @@ Retain opaque backend result values by identity without inspection.
 - `value` (`object`) — Opaque backend-owned result value.
 - `diagnostics` (`object | None`) (default: `None`) — Optional opaque backend-owned diagnostic value.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L858-L868)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L863-L873)
 
 ### particula.execution.BackendResult.diagnostics
 
@@ -100,7 +100,7 @@ Retain opaque backend result values by identity without inspection.
 diagnostics: object | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L868-L868)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L873-L873)
 
 ### particula.execution.BackendResult.value
 
@@ -110,7 +110,7 @@ diagnostics: object | None = None
 value: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L867-L867)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L872-L872)
 
 ### particula.execution.BackendResult.__init__
 
@@ -144,7 +144,7 @@ aerosol and process-physics validation.
 
 - `runnable` (`_CPURunnable | RunnableABC`) — Runnable invoked once for every valid execution state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1025-L1106)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1030-L1111)
 
 ### particula.execution.CPUExecutionAdapter._runnable
 
@@ -154,7 +154,7 @@ aerosol and process-physics validation.
 _runnable = runnable
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1047-L1047)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1052-L1052)
 
 ### particula.execution.CPUExecutionAdapter.__init__
 
@@ -170,7 +170,7 @@ Retain the runnable by identity without inspecting it.
 
 - `runnable` (`_CPURunnable | RunnableABC`) — CPU runnable invoked once by :meth:`execute` for each valid state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1040-L1047)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1045-L1052)
 
 ### particula.execution.CPUExecutionAdapter.execute
 
@@ -203,7 +203,7 @@ non-boolean real scalar.
 - `ValueError` — If controls are invalid or the runnable returns a
 different aerosol object.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1049-L1106)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1054-L1111)
 
 ## particula.execution.CPUExecutionContext
 
@@ -378,7 +378,7 @@ boundary. The carrier neither copies nor validates the aerosol or controls.
 - `time_step` (`object`) — Caller-supplied total execution duration.
 - `sub_steps` (`object`) — Caller-supplied number of runnable substeps.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1000-L1022)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1005-L1027)
 
 ### particula.execution.CPUExecutionState.aerosol
 
@@ -388,7 +388,7 @@ boundary. The carrier neither copies nor validates the aerosol or controls.
 aerosol: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1014-L1014)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1019-L1019)
 
 ### particula.execution.CPUExecutionState.context
 
@@ -398,7 +398,7 @@ aerosol: object
 context: object = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1017-L1017)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1022-L1022)
 
 ### particula.execution.CPUExecutionState.sub_steps
 
@@ -408,7 +408,7 @@ context: object = None
 sub_steps: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1016-L1016)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1021-L1021)
 
 ### particula.execution.CPUExecutionState.time_step
 
@@ -418,7 +418,7 @@ sub_steps: object
 time_step: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1015-L1015)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1020-L1020)
 
 ### particula.execution.CPUExecutionState.backend_payload
 
@@ -430,7 +430,7 @@ backend_payload: object
 
 Return the caller-owned aerosol as the opaque CPU payload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1020-L1022)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1025-L1027)
 
 ### particula.execution.CPUExecutionState.__init__
 
@@ -823,9 +823,10 @@ support. It does not inspect or detect concrete activity implementations.
 - `IDEAL` — Ideal activity-coefficient semantics.
 - `BAT` — Homogeneous binary BAT activities for water and organic.
 - `KAPPA` — Kappa activity-coefficient semantics.
+- `PREPARED` — Direct material activities from a bound device provider.
 - `NONREPRESENTABLE` — Semantics not representable by a profile.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L389-L405)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L389-L407)
 
 ### particula.execution.CondensationActivityMode.BAT
 
@@ -835,7 +836,7 @@ support. It does not inspect or detect concrete activity implementations.
 BAT = 'bat'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L404-L404)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L405-L405)
 
 ### particula.execution.CondensationActivityMode.IDEAL
 
@@ -845,7 +846,7 @@ BAT = 'bat'
 IDEAL = 'ideal'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L402-L402)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L403-L403)
 
 ### particula.execution.CondensationActivityMode.KAPPA
 
@@ -855,7 +856,7 @@ IDEAL = 'ideal'
 KAPPA = 'kappa'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L403-L403)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L404-L404)
 
 ### particula.execution.CondensationActivityMode.NONREPRESENTABLE
 
@@ -865,7 +866,17 @@ KAPPA = 'kappa'
 NONREPRESENTABLE = 'nonrepresentable'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L405-L405)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L407-L407)
+
+### particula.execution.CondensationActivityMode.PREPARED
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+PREPARED = 'prepared'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L406-L406)
 
 ## particula.execution.CondensationConfiguration
 
@@ -892,7 +903,7 @@ It also does not select an adapter or determine runtime availability.
 
 - `TypeError` — If a field is not its exact declared metadata type.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L425-L468)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L427-L470)
 
 ### particula.execution.CondensationConfiguration.activity_mode
 
@@ -902,7 +913,7 @@ It also does not select an adapter or determine runtime availability.
 activity_mode: CondensationActivityMode
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L445-L445)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L447-L447)
 
 ### particula.execution.CondensationConfiguration.execution_mode
 
@@ -912,7 +923,7 @@ activity_mode: CondensationActivityMode
 execution_mode: CondensationExecutionMode
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L443-L443)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L445-L445)
 
 ### particula.execution.CondensationConfiguration.latent_heat
 
@@ -922,7 +933,7 @@ execution_mode: CondensationExecutionMode
 latent_heat: bool
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L444-L444)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L446-L446)
 
 ### particula.execution.CondensationConfiguration.surface_mode
 
@@ -932,7 +943,7 @@ latent_heat: bool
 surface_mode: CondensationSurfaceMode
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L446-L446)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L448-L448)
 
 ### particula.execution.CondensationConfiguration.__init__
 
@@ -954,7 +965,7 @@ def __post_init__() -> None
 
 Validate the exact semantic configuration field types.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L448-L468)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L450-L470)
 
 ## particula.execution.CondensationExecutionMode
 
@@ -1019,7 +1030,7 @@ support. It does not inspect or detect concrete surface implementations.
 - `COMPOSITION_WEIGHTED` — Composition-weighted surface-tension semantics.
 - `NONREPRESENTABLE` — Semantics not representable by a profile.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L408-L422)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L410-L424)
 
 ### particula.execution.CondensationSurfaceMode.COMPOSITION_WEIGHTED
 
@@ -1029,7 +1040,7 @@ support. It does not inspect or detect concrete surface implementations.
 COMPOSITION_WEIGHTED = 'composition_weighted'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L421-L421)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L423-L423)
 
 ### particula.execution.CondensationSurfaceMode.NONREPRESENTABLE
 
@@ -1039,7 +1050,7 @@ COMPOSITION_WEIGHTED = 'composition_weighted'
 NONREPRESENTABLE = 'nonrepresentable'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L422-L422)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L424-L424)
 
 ### particula.execution.CondensationSurfaceMode.STATIC
 
@@ -1049,7 +1060,7 @@ NONREPRESENTABLE = 'nonrepresentable'
 STATIC = 'static'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L420-L420)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L422-L422)
 
 ## particula.execution.Device
 
@@ -1140,7 +1151,7 @@ attribute without invoking or probing it. Selection returns the registered
 adapter by identity and does not establish an execution, state, or result
 contract.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L766-L778)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L771-L783)
 
 ### particula.execution.ExecutionAdapter.execute
 
@@ -1152,7 +1163,7 @@ execute: Callable[..., object]
 
 Return the callable execution seam without fixing its signature.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L777-L778)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L782-L783)
 
 ## particula.execution.ExecutionCapabilityError
 
@@ -1407,7 +1418,7 @@ registration state. Registration and selection are context-local only:
 neither invokes an adapter, probes availability, loads a backend, nor
 transfers data.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1181-L1249)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1186-L1254)
 
 ### particula.execution.ExecutionContext._matrix
 
@@ -1417,7 +1428,7 @@ transfers data.
 _matrix = matrix
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1201-L1201)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1206-L1206)
 
 ### particula.execution.ExecutionContext._registry
 
@@ -1427,7 +1438,7 @@ _matrix = matrix
 _registry = _AdapterRegistry()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1202-L1202)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1207-L1207)
 
 ### particula.execution.ExecutionContext.__init__
 
@@ -1447,7 +1458,7 @@ Store a matrix and create an empty private adapter registry.
 
 - `TypeError` — If ``matrix`` is not a CapabilityMatrix.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1190-L1202)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1195-L1207)
 
 ### particula.execution.ExecutionContext.register_adapter
 
@@ -1475,7 +1486,7 @@ context and is selected later by its exact process/backend pair.
 order.
 - `ValueError` — If the process/backend pair is already registered.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1204-L1226)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1209-L1231)
 
 ### particula.execution.ExecutionContext.resolve
 
@@ -1504,7 +1515,7 @@ method does not catch adapter errors because it never executes adapters.
 - `ValueError` — If CPU device spelling is invalid or support is absent.
 - `LookupError` — If supported request has no exact registered adapter.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1228-L1249)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L1233-L1254)
 
 ## particula.execution.ExecutionRequest
 
@@ -1531,7 +1542,7 @@ state, nor establishes execution state or result contracts.
 - `TypeError` — If a field is not its declared metadata type.
 - `ValueError` — If the backend does not match the device backend.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L706-L750)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L711-L755)
 
 ### particula.execution.ExecutionRequest.backend
 
@@ -1541,7 +1552,7 @@ state, nor establishes execution state or result contracts.
 backend: Backend
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L724-L724)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L729-L729)
 
 ### particula.execution.ExecutionRequest.device
 
@@ -1551,7 +1562,7 @@ backend: Backend
 device: Device
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L725-L725)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L730-L730)
 
 ### particula.execution.ExecutionRequest.process
 
@@ -1561,7 +1572,7 @@ device: Device
 process: Process
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L726-L726)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L731-L731)
 
 ### particula.execution.ExecutionRequest.requirements
 
@@ -1571,7 +1582,7 @@ process: Process
 requirements: CapabilityRequirements
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L727-L727)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L732-L732)
 
 ### particula.execution.ExecutionRequest.__init__
 
@@ -1598,7 +1609,7 @@ Validate request metadata without resolving or executing it.
 - `TypeError` — If a field is not its declared metadata type.
 - `ValueError` — If backend and device backend differ.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L729-L750)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L734-L755)
 
 ## particula.execution.ExecutionResult
 
@@ -1620,7 +1631,7 @@ boundary, including that ``state`` is the original caller-owned object.
 - `mutation` (`MutationDeclaration`) — Explicit permission for in-place state mutation.
 - `backend_result` (`BackendResult | None`) (default: `None`) — Optional opaque backend result retained by identity.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L871-L888)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L876-L893)
 
 ### particula.execution.ExecutionResult.backend_result
 
@@ -1630,7 +1641,7 @@ boundary, including that ``state`` is the original caller-owned object.
 backend_result: BackendResult | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L888-L888)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L893-L893)
 
 ### particula.execution.ExecutionResult.metadata
 
@@ -1640,7 +1651,7 @@ backend_result: BackendResult | None = None
 metadata: tuple[tuple[str, str], ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L886-L886)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L891-L891)
 
 ### particula.execution.ExecutionResult.mutation
 
@@ -1650,7 +1661,7 @@ metadata: tuple[tuple[str, str], ...]
 mutation: MutationDeclaration
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L887-L887)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L892-L892)
 
 ### particula.execution.ExecutionResult.state
 
@@ -1660,7 +1671,7 @@ mutation: MutationDeclaration
 state: ExecutionState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L885-L885)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L890-L890)
 
 ### particula.execution.ExecutionResult.__init__
 
@@ -1687,7 +1698,7 @@ Describe retained caller-owned state with an opaque backend payload.
 The payload is not inspected by this module. Boundary validation requires
 the same state object supplied by the caller and retains it by identity.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L753-L763)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L758-L768)
 
 ### particula.execution.ExecutionState.backend_payload
 
@@ -1699,7 +1710,7 @@ backend_payload: object
 
 Return opaque backend-owned payload state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L762-L763)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L767-L768)
 
 ## particula.execution.FallbackBoundary
 
@@ -2071,7 +2082,7 @@ Declare exactly one explicit state-mutation permission.
 - `TypeError` — If scopes is not an exact frozenset of MutationScope values.
 - `ValueError` — If scopes is empty or combines mutation scopes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L793-L809)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L798-L814)
 
 ### particula.execution.MutationDeclaration.scopes
 
@@ -2081,7 +2092,7 @@ Declare exactly one explicit state-mutation permission.
 scopes: frozenset[MutationScope]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L805-L805)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L810-L810)
 
 ### particula.execution.MutationDeclaration.__init__
 
@@ -2103,7 +2114,7 @@ def __post_init__() -> None
 
 Validate the closed, immutable mutation declaration.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L807-L809)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L812-L814)
 
 ## particula.execution.MutationScope
 
@@ -2121,7 +2132,7 @@ Declare the one allowed mutation scope for an execution result.
 not infer or
 verify that a declared mutation occurred.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L781-L790)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L786-L795)
 
 ### particula.execution.MutationScope.NONE
 
@@ -2131,7 +2142,7 @@ verify that a declared mutation occurred.
 NONE = 'none'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L789-L789)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L794-L794)
 
 ### particula.execution.MutationScope.STATE
 
@@ -2141,7 +2152,7 @@ NONE = 'none'
 STATE = 'state'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L790-L790)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L795-L795)
 
 ## particula.execution.Process
 
@@ -3472,7 +3483,7 @@ an adapter, import an optional backend, or determine runtime availability.
 
 - (`bool`) — True when the exact configuration is declared by the backend profile.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L631-L653)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L636-L658)
 
 ## particula.execution.get_condensation_requirements
 
@@ -3499,7 +3510,7 @@ inspect runtime, device, or optional-backend state.
 
 - `TypeError` — If ``configuration`` is not a CondensationConfiguration.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L530-L564)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L535-L569)
 
 ## particula.execution.require_condensation_profile
 
@@ -3525,7 +3536,7 @@ import an optional backend, or determine runtime availability.
 - `TypeError` — If either argument is not its declared metadata type.
 - `ValueError` — If the configuration is not declared by the profile.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L656-L680)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L661-L685)
 
 ## particula.execution.validate_execution_result
 
@@ -3553,7 +3564,7 @@ Validate and return an immutable state ownership result without executing
 invalid.
 - `ValueError` — If state was replaced or metadata is otherwise invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L934-L970)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/__init__.py#L939-L975)
 
 **Modules**
 
@@ -3571,6 +3582,7 @@ invalid.
 - `particula.execution._gpu_condensation_block_ros3`
 - `particula.execution._gpu_condensation_ros3`
 - `particula.execution._gpu_gas_forcing`
+- `particula.execution._multivapor_parcel_kernels`
 - `particula.execution._ros3_coefficients`
 - `particula.execution.adapters`
 - `particula.execution.analysis_io`
@@ -3605,6 +3617,7 @@ invalid.
 - `particula.execution.inverse_chemistry`
 - `particula.execution.inverse_condensation`
 - `particula.execution.inverse_optics`
+- `particula.execution.multivapor_parcel`
 - `particula.execution.ode`
 - `particula.execution.optical_recording`
 - `particula.execution.particle_field_kernels`

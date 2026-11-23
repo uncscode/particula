@@ -30,7 +30,7 @@ EnvironmentForcing tables impose knot boundaries; opaque discontinuous
 callbacks require explicit run boundaries. Full evaporation of an
 active slot is a domain boundary; unsupported crossings fail at min_step.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L26-L291)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L26-L332)
 
 ### particula.execution.condensation_ode.CondensationODE._base
 
@@ -50,7 +50,7 @@ _base = _cpu_batch.detached(aerosol)
 _forcing = forcing
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L64-L64)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L78-L78)
 
 ### particula.execution.condensation_ode.CondensationODE._gas_indices
 
@@ -60,7 +60,7 @@ _forcing = forcing
 _gas_indices = tuple(gas_indices)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L104-L104)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L118-L118)
 
 ### particula.execution.condensation_ode.CondensationODE._initial_physical
 
@@ -70,7 +70,7 @@ _gas_indices = tuple(gas_indices)
 _initial_physical = values.copy()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L117-L117)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L131-L131)
 
 ### particula.execution.condensation_ode.CondensationODE._initial_scaled
 
@@ -80,7 +80,17 @@ _initial_physical = values.copy()
 _initial_scaled = values / self._scale
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L118-L118)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L132-L132)
+
+### particula.execution.condensation_ode.CondensationODE._linear_strategy
+
+*attribute* · *instance attribute*
+
+```python
+_linear_strategy = self._strategy
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L65-L65)
 
 ### particula.execution.condensation_ode.CondensationODE._maps
 
@@ -90,7 +100,7 @@ _initial_scaled = values / self._scale
 _maps = []
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L77-L77)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L91-L91)
 
 ### particula.execution.condensation_ode.CondensationODE._mass_count
 
@@ -100,7 +110,7 @@ _maps = []
 _mass_count = len(self._mass_indices)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L105-L105)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L119-L119)
 
 ### particula.execution.condensation_ode.CondensationODE._mass_indices
 
@@ -110,7 +120,7 @@ _mass_count = len(self._mass_indices)
 _mass_indices = tuple(mass_indices)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L103-L103)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L117-L117)
 
 ### particula.execution.condensation_ode.CondensationODE._scale
 
@@ -120,7 +130,7 @@ _mass_indices = tuple(mass_indices)
 _scale = np.array(mass_scale + gas_scale)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L116-L116)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L130-L130)
 
 ### particula.execution.condensation_ode.CondensationODE._shape
 
@@ -130,7 +140,7 @@ _scale = np.array(mass_scale + gas_scale)
 _shape = aerosol.particles.masses.shape
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L74-L74)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L88-L88)
 
 ### particula.execution.condensation_ode.CondensationODE._strategy
 
@@ -150,7 +160,7 @@ _strategy = deepcopy(strategy)
 _viscosity = None if dynamic_viscosity is None else self._tolerances(dynamic_viscosity, (aerosol.particles.n_boxes), 'dynamic_viscosity').copy()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L65-L73)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L79-L87)
 
 ### particula.execution.condensation_ode.CondensationODE._weights
 
@@ -160,17 +170,17 @@ _viscosity = None if dynamic_viscosity is None else self._tolerances(dynamic_vis
 _weights = []
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L78-L78)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L92-L92)
 
 ### particula.execution.condensation_ode.CondensationODE.problem
 
 *attribute* · *instance attribute*
 
 ```python
-problem = ODEProblem(self._rate, self._admissible, self._jacobian, self._partial_time)
+problem = ODEProblem(self._rate, self._admissible, self._jacobian, self._partial_time, validate_candidate=self._rate if getattr(self._strategy.activity_strategy, 'prepared_provider_version', None) == 1 else None)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L127-L129)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L141-L156)
 
 ### particula.execution.condensation_ode.CondensationODE.solver
 
@@ -180,7 +190,7 @@ problem = ODEProblem(self._rate, self._admissible, self._jacobian, self._partial
 solver = AdaptiveSolver(self.problem, self._initial_scaled, time=time, method=method, atol=tolerance / self._scale, rtol=rtol, **controls)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L130-L138)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L157-L165)
 
 ### particula.execution.condensation_ode.CondensationODE.time
 
@@ -192,7 +202,7 @@ time
 
 Return accepted absolute time [s].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L279-L281)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L320-L322)
 
 ### particula.execution.condensation_ode.CondensationODE.__init__
 
@@ -204,7 +214,7 @@ def __init__(aerosol, strategy, *, particle_atol=1e-24, gas_atol=1e-12, rtol=1e-
 
 Validate physics and construct scaled continuous coordinates.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L39-L140)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L39-L167)
 
 ### particula.execution.condensation_ode.CondensationODE._admissible
 
@@ -214,7 +224,7 @@ Validate physics and construct scaled continuous coordinates.
 def _admissible(values)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L195-L206)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L222-L233)
 
 ### particula.execution.condensation_ode.CondensationODE._jacobian
 
@@ -224,7 +234,7 @@ def _admissible(values)
 def _jacobian(time, values)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L239-L264)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L277-L304)
 
 ### particula.execution.condensation_ode.CondensationODE._pack
 
@@ -234,7 +244,7 @@ def _jacobian(time, values)
 def _pack(state)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L155-L159)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L182-L186)
 
 ### particula.execution.condensation_ode.CondensationODE._partial_time
 
@@ -244,7 +254,7 @@ def _pack(state)
 def _partial_time(time, values)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L266-L276)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L306-L317)
 
 ### particula.execution.condensation_ode.CondensationODE._rate
 
@@ -254,7 +264,17 @@ def _partial_time(time, values)
 def _rate(time, values)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L208-L237)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L235-L236)
+
+### particula.execution.condensation_ode.CondensationODE._strategy_rate
+
+*method*
+
+```python
+def _strategy_rate(time, values, strategy)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L238-L275)
 
 ### particula.execution.condensation_ode.CondensationODE._tolerances
 
@@ -264,7 +284,7 @@ def _rate(time, values)
 def _tolerances(value, shape, name)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L142-L153)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L169-L180)
 
 ### particula.execution.condensation_ode.CondensationODE._unpack
 
@@ -274,7 +294,7 @@ def _tolerances(value, shape, name)
 def _unpack(time, values)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L161-L193)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L188-L220)
 
 ### particula.execution.condensation_ode.CondensationODE.snapshot
 
@@ -286,7 +306,7 @@ def snapshot()
 
 Return detached accepted native state, including forcing.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L289-L291)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L330-L332)
 
 ### particula.execution.condensation_ode.CondensationODE.step
 
@@ -298,4 +318,4 @@ def step(bound)
 
 Accept one physical step no later than bound [s].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L283-L287)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/condensation_ode.py#L324-L328)

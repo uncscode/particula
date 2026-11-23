@@ -19,6 +19,7 @@ Import all the particle classes and functions, so they can be accessed from
 - `particula.particles.particle_data`
 - `particula.particles.particle_data_builder`
 - `particula.particles.particle_data_initialization`
+- `particula.particles.prepared_activity`
 - `particula.particles.properties`
 - `particula.particles.slot_management`
 - `particula.particles.surface_builders`

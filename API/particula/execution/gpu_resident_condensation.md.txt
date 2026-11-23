@@ -29,7 +29,7 @@ callbacks are rejected; callers may update environment at segment bounds.
 Tolerances and physical units match GPUCondensationODE. CUDA conditional
 graph support (Toolkit and driver >=12.4) is required.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_resident_condensation.py#L14-L335)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_resident_condensation.py#L14-L344)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._accepted
 
@@ -141,7 +141,7 @@ _atol = self._array(absolute)
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L154-L154)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L155-L155)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._base
 
@@ -165,7 +165,7 @@ _candidate = self._array(np.zeros(self._size))
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L156-L156)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L157-L157)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._faulted
 
@@ -177,7 +177,7 @@ _faulted = False
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L108-L108)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L109-L109)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._forcing
 
@@ -189,7 +189,7 @@ _forcing = forcing
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L88-L88)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L89-L89)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._gas_shape
 
@@ -201,7 +201,7 @@ _gas_shape = aerosol.gas.concentration.shape
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L112-L112)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L113-L113)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._host_initial_physical
 
@@ -213,7 +213,7 @@ _host_initial_physical = physical.copy()
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L148-L148)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L149-L149)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._host_initial_scaled
 
@@ -225,7 +225,7 @@ _host_initial_scaled = physical / self._host_scale
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L149-L149)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L150-L150)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._host_scale
 
@@ -237,7 +237,7 @@ _host_scale = np.concatenate((np.broadcast_to(np.maximum(aerosol.particles.masse
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L115-L126)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L116-L127)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._initial_physical
 
@@ -249,7 +249,7 @@ _initial_physical = self._array(self._host_initial_physical)
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L150-L150)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L151-L151)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._initial_scaled
 
@@ -261,7 +261,7 @@ _initial_scaled = self._array(self._host_initial_scaled)
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L151-L151)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L152-L152)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._invalid
 
@@ -273,7 +273,7 @@ _invalid = self._array(np.zeros(1, dtype=np.int32), wp.int32)
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L159-L159)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L160-L160)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._mass_size
 
@@ -285,7 +285,7 @@ _mass_size = aerosol.particles.masses.size
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L113-L113)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L114-L114)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._norm
 
@@ -297,7 +297,7 @@ _norm = self._array(np.zeros(1))
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L160-L160)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L161-L161)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._plan
 
@@ -309,7 +309,7 @@ _plan = plan_adaptive_condensation(self._strategy, self._base)
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L89-L89)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L90-L90)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._rates
 
@@ -321,7 +321,7 @@ _rates = tuple((self._array(np.zeros(self._size)) for _ in range(4)))
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L158-L158)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L159-L159)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._rtol
 
@@ -333,7 +333,7 @@ _rtol = self._array(np.full(self._size, relative))
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L155-L155)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L156-L156)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._scale
 
@@ -345,7 +345,7 @@ _scale = self._array(self._host_scale)
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L153-L153)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L154-L154)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._shape
 
@@ -357,7 +357,7 @@ _shape = aerosol.particles.masses.shape
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L111-L111)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L112-L112)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._size
 
@@ -369,7 +369,7 @@ _size = self._mass_size + aerosol.gas.concentration.size
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L114-L114)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L115-L115)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._stage
 
@@ -381,7 +381,7 @@ _stage = self._array(np.zeros(self._size))
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L157-L157)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L158-L158)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._state
 
@@ -393,7 +393,7 @@ _state = self._array(self._host_initial_scaled)
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L152-L152)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L153-L153)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._strategy
 
@@ -417,7 +417,7 @@ _time = AdaptiveSolver._scalar(time, 'time', positive=False)
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L95-L95)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L96-L96)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation.device
 
@@ -429,7 +429,7 @@ device = wp.get_device(device)
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L109-L109)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L110-L110)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation.device_storage_bytes
 
@@ -441,7 +441,7 @@ device_storage_bytes = 0
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L147-L147)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L148-L148)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation.last_error
 
@@ -453,7 +453,7 @@ last_error = None
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L106-L106)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L107-L107)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation.max_step
 
@@ -465,7 +465,7 @@ max_step = AdaptiveSolver._scalar(max_step, 'max_step')
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L97-L97)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L98-L98)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation.max_trials
 
@@ -477,7 +477,7 @@ max_trials = max_trials
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L103-L103)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L104-L104)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation.method
 
@@ -489,7 +489,7 @@ method = method
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L104-L104)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L105-L105)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation.min_step
 
@@ -501,7 +501,7 @@ min_step = AdaptiveSolver._scalar(min_step, 'min_step')
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L96-L96)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L97-L97)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation.next_step
 
@@ -513,7 +513,7 @@ next_step = AdaptiveSolver._scalar(first_step, 'first_step')
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L98-L98)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L99-L99)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation.statistics
 
@@ -525,7 +525,7 @@ statistics = StepStatistics()
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L176-L176)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L177-L177)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation.time
 
@@ -539,7 +539,7 @@ Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
 Return the accepted shared physical time [s].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L454-L456)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L512-L514)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation.__init__
 
@@ -563,7 +563,7 @@ def _device_trial()
 
 Build a trial without acceptance, host scalar reads or uploads.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_resident_condensation.py#L104-L181)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_resident_condensation.py#L104-L184)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._export_to_session
 
@@ -575,7 +575,7 @@ def _export_to_session(session)
 
 Commit accepted physical masses/gas to the same event buffers.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_resident_condensation.py#L318-L322)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_resident_condensation.py#L327-L331)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._iteration
 
@@ -585,7 +585,7 @@ Commit accepted physical masses/gas to the same event buffers.
 def _iteration()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_resident_condensation.py#L183-L207)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_resident_condensation.py#L186-L211)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._reset_coordinates
 
@@ -597,7 +597,7 @@ def _reset_coordinates(time, first_step)
 
 Reset scaled coordinates and control using device state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_resident_condensation.py#L287-L316)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_resident_condensation.py#L296-L325)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._reset_from_session
 
@@ -609,7 +609,7 @@ def _reset_from_session(session, time, first_step)
 
 Import event buffers on device at a complete split boundary.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_resident_condensation.py#L256-L268)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_resident_condensation.py#L265-L277)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._status
 
@@ -631,7 +631,7 @@ def advance(bound)
 
 Reach an explicit observation/forcing bound [s] entirely on CUDA.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_resident_condensation.py#L209-L250)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_resident_condensation.py#L213-L259)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation.restart_controller
 
@@ -648,7 +648,7 @@ Physical state and accepted time are retained; per-interval statistics
 reset. This matches a split flow's fresh-controller policy without
 downloading or re-uploading physical state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_resident_condensation.py#L270-L285)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_resident_condensation.py#L279-L294)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation.snapshot
 
@@ -660,7 +660,7 @@ def snapshot()
 
 Explicitly download accepted native state and current environment.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_resident_condensation.py#L324-L335)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_resident_condensation.py#L333-L344)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation.step
 
@@ -672,7 +672,19 @@ def step(bound)
 
 Advance to the bound, including all internal accepted steps.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_resident_condensation.py#L252-L254)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_resident_condensation.py#L261-L263)
+
+### particula.execution.gpu_resident_condensation.GPUResidentCondensation._activity_failure
+
+*method*
+
+```python
+def _activity_failure()
+```
+
+Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L283-L286)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._allocate_physics
 
@@ -684,7 +696,7 @@ def _allocate_physics()
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L199-L241)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L200-L260)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._array
 
@@ -696,7 +708,19 @@ def _array(values, dtype=wp.float64)
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L192-L197)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L193-L198)
+
+### particula.execution.gpu_resident_condensation.GPUResidentCondensation._begin_activity_trial
+
+*method*
+
+```python
+def _begin_activity_trial()
+```
+
+Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L474-L477)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._check_ready
 
@@ -708,7 +732,7 @@ def _check_ready()
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L243-L251)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L262-L270)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._combine
 
@@ -720,7 +744,7 @@ def _combine(h, coefficients, output)
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L409-L420)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L461-L472)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._environment
 
@@ -732,7 +756,7 @@ def _environment(time)
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L263-L275)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L288-L300)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._launch
 
@@ -744,19 +768,31 @@ def _launch(kernel, dim, inputs)
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L253-L254)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L272-L273)
+
+### particula.execution.gpu_resident_condensation.GPUResidentCondensation._material_rates
+
+*method*
+
+```python
+def _material_rates(activities, dest)
+```
+
+Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L333-L361)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._rate
 
 *method*
 
 ```python
-def _rate(time, state, result)
+def _rate(time, state, result, *, linearize=False)
 ```
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L308-L407)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L363-L459)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._step
 
@@ -770,7 +806,7 @@ Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
 Advance within one smooth forcing interval.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L465-L508)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L523-L570)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._tolerance
 
@@ -782,7 +818,7 @@ def _tolerance(value, shape, name)
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L179-L190)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L180-L191)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._trial
 
@@ -794,7 +830,7 @@ def _trial(h)
 
 Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L422-L451)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L479-L509)
 
 ### particula.execution.gpu_resident_condensation.GPUResidentCondensation._unpack_trial
 
@@ -808,4 +844,4 @@ Inherited from: `particula.execution.gpu_condensation_ode.GPUCondensationODE`
 
 Validate and unpack device coordinates without a physical rate.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L277-L306)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_condensation_ode.py#L302-L331)

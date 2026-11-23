@@ -31,4 +31,4 @@ def plan_adaptive_condensation(strategy, aerosol)
 
 Validate and freeze constant/Buck, ideal/kappa and phased surfaces.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_adaptive_condensation_plan.py#L41-L157)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_adaptive_condensation_plan.py#L41-L163)

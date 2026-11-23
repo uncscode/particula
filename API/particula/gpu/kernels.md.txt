@@ -56,6 +56,7 @@ Lazily resolve a supported public direct-kernel entry point.
 - `particula.gpu.kernels._condensation_parallel`
 - `particula.gpu.kernels._population_validation`
 - `particula.gpu.kernels._wall_loss_native`
+- `particula.gpu.kernels.activity_guard`
 - `particula.gpu.kernels.coagulation`
 - `particula.gpu.kernels.cohort`
 - `particula.gpu.kernels.communication`

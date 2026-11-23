@@ -25,7 +25,7 @@ Homogeneous binary BAT activities in [water, organic] material order.
 Configure organic properties as for ActivityNonIdealBinary. Both species
 activities enter the kinetic condensation surface-pressure calculation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L335-L363)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L355-L383)
 
 ### particula.particles.activity_strategies.ActivityBAT.density
 
@@ -37,7 +37,7 @@ density = density
 
 Inherited from: `particula.particles.activity_strategies.ActivityNonIdealBinary`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L271-L271)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L291-L291)
 
 ### particula.particles.activity_strategies.ActivityBAT.functional_group
 
@@ -49,7 +49,7 @@ functional_group = functional_group
 
 Inherited from: `particula.particles.activity_strategies.ActivityNonIdealBinary`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L272-L272)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L292-L292)
 
 ### particula.particles.activity_strategies.ActivityBAT.molar_mass_g
 
@@ -61,7 +61,7 @@ molar_mass_g = self.molar_mass_kg * 1000.0
 
 Inherited from: `particula.particles.activity_strategies.ActivityNonIdealBinary`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L269-L269)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L289-L289)
 
 ### particula.particles.activity_strategies.ActivityBAT.molar_mass_kg
 
@@ -73,7 +73,7 @@ molar_mass_kg = float(molar_mass)
 
 Inherited from: `particula.particles.activity_strategies.ActivityNonIdealBinary`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L268-L268)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L288-L288)
 
 ### particula.particles.activity_strategies.ActivityBAT.oxygen2carbon
 
@@ -85,7 +85,19 @@ oxygen2carbon = oxygen2carbon
 
 Inherited from: `particula.particles.activity_strategies.ActivityNonIdealBinary`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L270-L270)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L290-L290)
+
+### particula.particles.activity_strategies.ActivityBAT.provider_interface_version
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+provider_interface_version = 1
+```
+
+Inherited from: `particula.particles.activity_strategies.ActivityStrategy`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L56-L56)
 
 ### particula.particles.activity_strategies.ActivityBAT.activity
 
@@ -100,7 +112,7 @@ Return [water, organic] activities on the final material axis.
 Masses share a common mass basis. Empty rows represent unused slots
 and contribute zero surface pressure to both lanes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L342-L359)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L362-L379)
 
 ### particula.particles.activity_strategies.ActivityBAT.get_name
 
@@ -112,7 +124,7 @@ def get_name() -> str
 
 Return the two-species strategy identifier.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L361-L363)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L381-L383)
 
 ### particula.particles.activity_strategies.ActivityBAT.__init__
 
@@ -126,7 +138,7 @@ Inherited from: `particula.particles.activity_strategies.ActivityNonIdealBinary`
 
 Initialize the binary non-ideal activity strategy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L260-L272)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L280-L292)
 
 ### particula.particles.activity_strategies.ActivityBAT._activity_pair
 
@@ -140,7 +152,25 @@ Inherited from: `particula.particles.activity_strategies.ActivityNonIdealBinary`
 
 Evaluate water and organic activities at the same composition.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L292-L328)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L312-L348)
+
+### particula.particles.activity_strategies.ActivityBAT.neutral_activities
+
+*method*
+
+```python
+def neutral_activities(masses, temperature, targets, active) -> NDArray[np.float64]
+```
+
+Inherited from: `particula.particles.activity_strategies.ActivityStrategy`
+
+Return dimensionless activity in requested material order.
+
+Version 1 receives full particle-by-material masses (kg), the current
+temperature in K and a boolean particle occupancy mask. Existing
+strategies retain their full-composition unit-pressure evaluation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L58-L74)
 
 ### particula.particles.activity_strategies.ActivityBAT.partial_pressure
 
@@ -163,7 +193,7 @@ Calculate the vapor pressure of species in the particle phase.
 
 - (`Union[float, NDArray[np.float64]]`) — Vapor pressure of the particle in Pa.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L73-L90)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L93-L110)
 
 ## particula.particles.activity_strategies.ActivityIdealMass
 
@@ -193,7 +223,19 @@ References:
 - "Raoult's Law,"
     [Wikipedia](https://en.wikipedia.org/wiki/Raoult%27s_law).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L141-L172)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L161-L192)
+
+### particula.particles.activity_strategies.ActivityIdealMass.provider_interface_version
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+provider_interface_version = 1
+```
+
+Inherited from: `particula.particles.activity_strategies.ActivityStrategy`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L56-L56)
 
 ### particula.particles.activity_strategies.ActivityIdealMass.activity
 
@@ -213,7 +255,7 @@ Calculate the activity of a species based on mass concentration.
 
 - (`Union[float, NDArray[np.float64]]`) — Activity of the species, unitless.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L161-L172)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L181-L192)
 
 ### particula.particles.activity_strategies.ActivityIdealMass.get_name
 
@@ -227,7 +269,25 @@ Inherited from: `particula.particles.activity_strategies.ActivityStrategy`
 
 Return the type of the activity strategy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L69-L71)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L89-L91)
+
+### particula.particles.activity_strategies.ActivityIdealMass.neutral_activities
+
+*method*
+
+```python
+def neutral_activities(masses, temperature, targets, active) -> NDArray[np.float64]
+```
+
+Inherited from: `particula.particles.activity_strategies.ActivityStrategy`
+
+Return dimensionless activity in requested material order.
+
+Version 1 receives full particle-by-material masses (kg), the current
+temperature in K and a boolean particle occupancy mask. Existing
+strategies retain their full-composition unit-pressure evaluation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L58-L74)
 
 ### particula.particles.activity_strategies.ActivityIdealMass.partial_pressure
 
@@ -250,7 +310,7 @@ Calculate the vapor pressure of species in the particle phase.
 
 - (`Union[float, NDArray[np.float64]]`) — Vapor pressure of the particle in Pa.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L73-L90)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L93-L110)
 
 ## particula.particles.activity_strategies.ActivityIdealMolar
 
@@ -288,7 +348,7 @@ a = strategy.activity(np.array([1.2, 2.5, 3.0]))
 > - "Raoult's Law,"
 > [Wikipedia](https://en.wikipedia.org/wiki/Raoult%27s_law).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L93-L138)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L113-L158)
 
 ### particula.particles.activity_strategies.ActivityIdealMolar.molar_mass
 
@@ -298,7 +358,19 @@ a = strategy.activity(np.array([1.2, 2.5, 3.0]))
 molar_mass = molar_mass
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L123-L123)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L143-L143)
+
+### particula.particles.activity_strategies.ActivityIdealMolar.provider_interface_version
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+provider_interface_version = 1
+```
+
+Inherited from: `particula.particles.activity_strategies.ActivityStrategy`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L56-L56)
 
 ### particula.particles.activity_strategies.ActivityIdealMolar.__init__
 
@@ -314,7 +386,7 @@ Initialize the ActivityIdealMolar strategy.
 
 - `molar_mass` (`Union[float, NDArray[np.float64]]`) (default: `0.0`) — Molar mass in kg/mol.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L117-L123)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L137-L143)
 
 ### particula.particles.activity_strategies.ActivityIdealMolar.activity
 
@@ -334,7 +406,7 @@ Calculate the activity of a species based on mass concentration.
 
 - (`Union[float, NDArray[np.float64]]`) — Activity of the species, unitless.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L125-L138)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L145-L158)
 
 ### particula.particles.activity_strategies.ActivityIdealMolar.get_name
 
@@ -348,7 +420,25 @@ Inherited from: `particula.particles.activity_strategies.ActivityStrategy`
 
 Return the type of the activity strategy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L69-L71)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L89-L91)
+
+### particula.particles.activity_strategies.ActivityIdealMolar.neutral_activities
+
+*method*
+
+```python
+def neutral_activities(masses, temperature, targets, active) -> NDArray[np.float64]
+```
+
+Inherited from: `particula.particles.activity_strategies.ActivityStrategy`
+
+Return dimensionless activity in requested material order.
+
+Version 1 receives full particle-by-material masses (kg), the current
+temperature in K and a boolean particle occupancy mask. Existing
+strategies retain their full-composition unit-pressure evaluation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L58-L74)
 
 ### particula.particles.activity_strategies.ActivityIdealMolar.partial_pressure
 
@@ -371,7 +461,7 @@ Calculate the vapor pressure of species in the particle phase.
 
 - (`Union[float, NDArray[np.float64]]`) — Vapor pressure of the particle in Pa.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L73-L90)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L93-L110)
 
 ## particula.particles.activity_strategies.ActivityIdealVolume
 
@@ -404,7 +494,7 @@ References:
 - "Raoult's Law,"
     [Wikipedia](https://en.wikipedia.org/wiki/Raoult%27s_law).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L175-L218)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L195-L238)
 
 ### particula.particles.activity_strategies.ActivityIdealVolume.density
 
@@ -414,7 +504,19 @@ References:
 density = density
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L203-L203)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L223-L223)
+
+### particula.particles.activity_strategies.ActivityIdealVolume.provider_interface_version
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+provider_interface_version = 1
+```
+
+Inherited from: `particula.particles.activity_strategies.ActivityStrategy`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L56-L56)
 
 ### particula.particles.activity_strategies.ActivityIdealVolume.__init__
 
@@ -430,7 +532,7 @@ Initialize the ActivityIdealVolume strategy.
 
 - `density` (`Union[float, NDArray[np.float64]]`) (default: `0.0`) — Density of the species in kg/m^3.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L197-L203)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L217-L223)
 
 ### particula.particles.activity_strategies.ActivityIdealVolume.activity
 
@@ -450,7 +552,7 @@ Calculate the activity of a species based on mass concentration.
 
 - (`Union[float, NDArray[np.float64]]`) — Activity of the species, unitless.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L205-L218)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L225-L238)
 
 ### particula.particles.activity_strategies.ActivityIdealVolume.get_name
 
@@ -464,7 +566,25 @@ Inherited from: `particula.particles.activity_strategies.ActivityStrategy`
 
 Return the type of the activity strategy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L69-L71)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L89-L91)
+
+### particula.particles.activity_strategies.ActivityIdealVolume.neutral_activities
+
+*method*
+
+```python
+def neutral_activities(masses, temperature, targets, active) -> NDArray[np.float64]
+```
+
+Inherited from: `particula.particles.activity_strategies.ActivityStrategy`
+
+Return dimensionless activity in requested material order.
+
+Version 1 receives full particle-by-material masses (kg), the current
+temperature in K and a boolean particle occupancy mask. Existing
+strategies retain their full-composition unit-pressure evaluation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L58-L74)
 
 ### particula.particles.activity_strategies.ActivityIdealVolume.partial_pressure
 
@@ -487,7 +607,7 @@ Calculate the vapor pressure of species in the particle phase.
 
 - (`Union[float, NDArray[np.float64]]`) — Vapor pressure of the particle in Pa.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L73-L90)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L93-L110)
 
 ## particula.particles.activity_strategies.ActivityKappaParameter
 
@@ -533,7 +653,7 @@ a = strategy.activity(np.array([1.0, 2.0]))
 >   nucleus activity. Atmospheric Chemistry and Physics, 7(8),
 >   1961-1971. [DOI](https://doi.org/10.5194/acp-7-1961-2007).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L366-L453)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L386-L473)
 
 ### particula.particles.activity_strategies.ActivityKappaParameter.density
 
@@ -543,7 +663,7 @@ a = strategy.activity(np.array([1.0, 2.0]))
 density = density if density is not None else np.array([0.0], dtype=np.float64)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L418-L422)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L438-L442)
 
 ### particula.particles.activity_strategies.ActivityKappaParameter.kappa
 
@@ -553,7 +673,7 @@ density = density if density is not None else np.array([0.0], dtype=np.float64)
 kappa = kappa if kappa is not None else np.array([0.0], dtype=np.float64)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L415-L417)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L435-L437)
 
 ### particula.particles.activity_strategies.ActivityKappaParameter.molar_mass
 
@@ -563,7 +683,7 @@ kappa = kappa if kappa is not None else np.array([0.0], dtype=np.float64)
 molar_mass = molar_mass if molar_mass is not None else np.array([0.0], dtype=np.float64)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L423-L427)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L443-L447)
 
 ### particula.particles.activity_strategies.ActivityKappaParameter.water_index
 
@@ -573,7 +693,19 @@ molar_mass = molar_mass if molar_mass is not None else np.array([0.0], dtype=np.
 water_index = water_index
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L428-L428)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L448-L448)
+
+### particula.particles.activity_strategies.ActivityKappaParameter.provider_interface_version
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+provider_interface_version = 1
+```
+
+Inherited from: `particula.particles.activity_strategies.ActivityStrategy`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L56-L56)
 
 ### particula.particles.activity_strategies.ActivityKappaParameter.__init__
 
@@ -592,7 +724,7 @@ Initialize the ActivityKappaParameter strategy.
 - `molar_mass` (`Optional[NDArray[np.float64]]`) (default: `None`) — Molar masses in kg/mol (array or scalar).
 - `water_index` (`int`) (default: `0`) — Index of the water species.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L400-L428)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L420-L448)
 
 ### particula.particles.activity_strategies.ActivityKappaParameter.activity
 
@@ -619,7 +751,7 @@ Calculate the activity of a species based on mass concentration.
 >   nucleus activity. Atmospheric Chemistry and Physics, 7(8),
 >   1961-1971. [DOI](https://doi.org/10.5194/acp-7-1961-2007).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L430-L453)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L450-L473)
 
 ### particula.particles.activity_strategies.ActivityKappaParameter.get_name
 
@@ -633,7 +765,25 @@ Inherited from: `particula.particles.activity_strategies.ActivityStrategy`
 
 Return the type of the activity strategy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L69-L71)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L89-L91)
+
+### particula.particles.activity_strategies.ActivityKappaParameter.neutral_activities
+
+*method*
+
+```python
+def neutral_activities(masses, temperature, targets, active) -> NDArray[np.float64]
+```
+
+Inherited from: `particula.particles.activity_strategies.ActivityStrategy`
+
+Return dimensionless activity in requested material order.
+
+Version 1 receives full particle-by-material masses (kg), the current
+temperature in K and a boolean particle occupancy mask. Existing
+strategies retain their full-composition unit-pressure evaluation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L58-L74)
 
 ### particula.particles.activity_strategies.ActivityKappaParameter.partial_pressure
 
@@ -656,7 +806,7 @@ Calculate the vapor pressure of species in the particle phase.
 
 - (`Union[float, NDArray[np.float64]]`) — Vapor pressure of the particle in Pa.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L73-L90)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L93-L110)
 
 ## particula.particles.activity_strategies.ActivityNonIdealBinary
 
@@ -708,7 +858,7 @@ ordered as [water, organic].
 > efficient reduced-complexity model. Atmospheric Chemistry and
 > Physics, 19(19), 13383-13410. https://doi.org/10.5194/acp-19-13383-2019
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L222-L332)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L242-L352)
 
 ### particula.particles.activity_strategies.ActivityNonIdealBinary.density
 
@@ -718,7 +868,7 @@ ordered as [water, organic].
 density = density
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L271-L271)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L291-L291)
 
 ### particula.particles.activity_strategies.ActivityNonIdealBinary.functional_group
 
@@ -728,7 +878,7 @@ density = density
 functional_group = functional_group
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L272-L272)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L292-L292)
 
 ### particula.particles.activity_strategies.ActivityNonIdealBinary.molar_mass_g
 
@@ -738,7 +888,7 @@ functional_group = functional_group
 molar_mass_g = self.molar_mass_kg * 1000.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L269-L269)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L289-L289)
 
 ### particula.particles.activity_strategies.ActivityNonIdealBinary.molar_mass_kg
 
@@ -748,7 +898,7 @@ molar_mass_g = self.molar_mass_kg * 1000.0
 molar_mass_kg = float(molar_mass)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L268-L268)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L288-L288)
 
 ### particula.particles.activity_strategies.ActivityNonIdealBinary.oxygen2carbon
 
@@ -758,7 +908,19 @@ molar_mass_kg = float(molar_mass)
 oxygen2carbon = oxygen2carbon
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L270-L270)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L290-L290)
+
+### particula.particles.activity_strategies.ActivityNonIdealBinary.provider_interface_version
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+provider_interface_version = 1
+```
+
+Inherited from: `particula.particles.activity_strategies.ActivityStrategy`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L56-L56)
 
 ### particula.particles.activity_strategies.ActivityNonIdealBinary.__init__
 
@@ -770,7 +932,7 @@ def __init__(molar_mass: float, oxygen2carbon: float, density: float, functional
 
 Initialize the binary non-ideal activity strategy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L260-L272)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L280-L292)
 
 ### particula.particles.activity_strategies.ActivityNonIdealBinary._activity_pair
 
@@ -782,7 +944,7 @@ def _activity_pair(mass_concentration)
 
 Evaluate water and organic activities at the same composition.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L292-L328)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L312-L348)
 
 ### particula.particles.activity_strategies.ActivityNonIdealBinary.activity
 
@@ -807,7 +969,7 @@ Calculate organic activity using the BAT model.
 - `ValueError` — If the input is scalar or last dimension is not 2.
 - `ValueError` — If any total moles are non-positive.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L274-L290)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L294-L310)
 
 ### particula.particles.activity_strategies.ActivityNonIdealBinary.get_name
 
@@ -819,7 +981,25 @@ def get_name() -> str
 
 Return the strategy identifier.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L330-L332)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L350-L352)
+
+### particula.particles.activity_strategies.ActivityNonIdealBinary.neutral_activities
+
+*method*
+
+```python
+def neutral_activities(masses, temperature, targets, active) -> NDArray[np.float64]
+```
+
+Inherited from: `particula.particles.activity_strategies.ActivityStrategy`
+
+Return dimensionless activity in requested material order.
+
+Version 1 receives full particle-by-material masses (kg), the current
+temperature in K and a boolean particle occupancy mask. Existing
+strategies retain their full-composition unit-pressure evaluation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L58-L74)
 
 ### particula.particles.activity_strategies.ActivityNonIdealBinary.partial_pressure
 
@@ -842,7 +1022,7 @@ Calculate the vapor pressure of species in the particle phase.
 
 - (`Union[float, NDArray[np.float64]]`) — Vapor pressure of the particle in Pa.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L73-L90)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L93-L110)
 
 ## particula.particles.activity_strategies.ActivityStrategy
 
@@ -882,7 +1062,17 @@ References:
 - "Vapor Pressure,"
     [Wikipedia](https://en.wikipedia.org/wiki/Vapor_pressure).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L27-L90)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L27-L110)
+
+### particula.particles.activity_strategies.ActivityStrategy.provider_interface_version
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+provider_interface_version = 1
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L56-L56)
 
 ### particula.particles.activity_strategies.ActivityStrategy.activity
 
@@ -902,7 +1092,7 @@ Calculate the activity of a species based on its mass concentration.
 
 - (`Union[float, NDArray[np.float64]]`) — Activity of the species, unitless.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L56-L67)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L76-L87)
 
 ### particula.particles.activity_strategies.ActivityStrategy.get_name
 
@@ -914,7 +1104,23 @@ def get_name() -> str
 
 Return the type of the activity strategy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L69-L71)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L89-L91)
+
+### particula.particles.activity_strategies.ActivityStrategy.neutral_activities
+
+*method*
+
+```python
+def neutral_activities(masses, temperature, targets, active) -> NDArray[np.float64]
+```
+
+Return dimensionless activity in requested material order.
+
+Version 1 receives full particle-by-material masses (kg), the current
+temperature in K and a boolean particle occupancy mask. Existing
+strategies retain their full-composition unit-pressure evaluation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L58-L74)
 
 ### particula.particles.activity_strategies.ActivityStrategy.partial_pressure
 
@@ -935,4 +1141,4 @@ Calculate the vapor pressure of species in the particle phase.
 
 - (`Union[float, NDArray[np.float64]]`) — Vapor pressure of the particle in Pa.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L73-L90)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/activity_strategies.py#L93-L110)

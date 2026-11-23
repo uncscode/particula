@@ -1,0 +1,14 @@
+{
+  "graph_launches": 2,
+  "kernel_executions": 454,
+  "lookup_kernels": 24,
+  "cuda_copies": 0,
+  "allocation_calls": 0,
+  "runtime_calls": {
+    "cuCtxSynchronize": 2,
+    "cuProfilerStart": 1,
+    "cuProfilerStop": 1,
+    "cudaGraphLaunch_v10000": 2,
+    "cudaStreamIsCapturing_v10000": 1
+  }
+}

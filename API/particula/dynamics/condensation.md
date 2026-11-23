@@ -99,7 +99,7 @@ rate_array = iso_cond.rate(particle, gas_species, 298.15, 101325)
 > - Seinfeld & Pandis, "Atmospheric Chemistry and Physics," 3rd Ed.,
 >   Wiley, 2016.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L852-L1053)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L945-L1146)
 
 ### particula.dynamics.condensation.CondensationIsothermal.accommodation_coefficient
 
@@ -111,7 +111,7 @@ accommodation_coefficient = accommodation_coefficient
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L230-L230)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L311-L311)
 
 ### particula.dynamics.condensation.CondensationIsothermal.activity_strategy
 
@@ -123,7 +123,7 @@ activity_strategy = activity_strategy
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L233-L233)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L314-L314)
 
 ### particula.dynamics.condensation.CondensationIsothermal.diffusion_coefficient
 
@@ -135,7 +135,7 @@ diffusion_coefficient = diffusion_coefficient
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L229-L229)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L310-L310)
 
 ### particula.dynamics.condensation.CondensationIsothermal.molar_mass
 
@@ -147,7 +147,7 @@ molar_mass = molar_mass
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L228-L228)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L309-L309)
 
 ### particula.dynamics.condensation.CondensationIsothermal.skip_partitioning_indices
 
@@ -159,7 +159,7 @@ skip_partitioning_indices = skip_partitioning_indices
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L232-L232)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L313-L313)
 
 ### particula.dynamics.condensation.CondensationIsothermal.species_map
 
@@ -171,7 +171,7 @@ species_map = species_map
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L236-L236)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L317-L317)
 
 ### particula.dynamics.condensation.CondensationIsothermal.surface_strategy
 
@@ -183,7 +183,7 @@ surface_strategy = surface_strategy
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L234-L234)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L315-L315)
 
 ### particula.dynamics.condensation.CondensationIsothermal.update_gases
 
@@ -195,7 +195,7 @@ update_gases = update_gases
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L231-L231)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L312-L312)
 
 ### particula.dynamics.condensation.CondensationIsothermal.vapor_pressure_strategy
 
@@ -207,7 +207,7 @@ vapor_pressure_strategy = vapor_pressure_strategy
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L235-L235)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L316-L316)
 
 ### particula.dynamics.condensation.CondensationIsothermal.__init__
 
@@ -231,7 +231,7 @@ Initialize the CondensationIsothermal strategy.
 - `vapor_pressure_strategy` (`VaporPressureStrategy | Sequence[VaporPressureStrategy] | None`) (default: `None`) — Vapor pressure strategy used for GasData inputs. Native parameters use the complete gas ordering.
 - `species_map` (`CondensationSpeciesMap | None`) (default: `None`) — Explicit gas-name provenance and gas-to-particle pairs required for tagged native data. Unmapped lanes do not transfer.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L894-L935)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L987-L1028)
 
 ### particula.dynamics.condensation.CondensationIsothermal.mass_transfer_rate
 
@@ -269,7 +269,7 @@ missing.
 - `ValueError` — If state, species mapping or physical inputs are
 invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L937-L974)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1030-L1067)
 
 ### particula.dynamics.condensation.CondensationIsothermal.rate
 
@@ -304,7 +304,7 @@ missing.
 - `ValueError` — If state, species mapping or physical inputs are
 invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L976-L1008)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1069-L1101)
 
 ### particula.dynamics.condensation.CondensationIsothermal.step
 
@@ -341,7 +341,7 @@ missing.
 - `ValueError` — If state, storage, configuration or a proposal is
 invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1012-L1053)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1105-L1146)
 
 ### particula.dynamics.condensation.CondensationIsothermal._native_latent_heat_values
 
@@ -355,7 +355,7 @@ Inherited from: `particula.dynamics.condensation.condensation_strategies.Condens
 
 Validate optional latent heat in the complete gas ordering.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L458-L472)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L539-L553)
 
 ### particula.dynamics.condensation.CondensationIsothermal._native_mass_transfer_rate
 
@@ -373,7 +373,7 @@ Transport and vapor parameters follow the full gas ordering. Activity
 and surface strategies see the full particle composition. Pair-specific
 scalar transport calls avoid accidental particle/species broadcasting.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L353-L390)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L434-L471)
 
 ### particula.dynamics.condensation.CondensationIsothermal._native_parameters
 
@@ -387,7 +387,7 @@ Inherited from: `particula.dynamics.condensation.condensation_strategies.Condens
 
 Admit current state and full-gas transport parameters.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L238-L279)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L319-L368)
 
 ### particula.dynamics.condensation.CondensationIsothermal._native_pressure_terms
 
@@ -401,7 +401,7 @@ Inherited from: `particula.dynamics.condensation.condensation_strategies.Condens
 
 Evaluate full composition and mapped pressure lanes in Pa.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L281-L351)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L370-L432)
 
 ### particula.dynamics.condensation.CondensationIsothermal._native_rate_from_parameters
 
@@ -420,7 +420,7 @@ have already been admitted on the complete grid and are passed to the
 inventory finalizer separately. This helper never interprets their
 concentration as density or performs public process admission.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L392-L456)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L473-L537)
 
 ### particula.dynamics.condensation.CondensationIsothermal._native_single_step
 
@@ -439,7 +439,7 @@ finite-stage inventory limiter still bounds the particle proposal.
 Latent energy is extensive J, including resolved volume or PDF
 quadrature, and follows actual representable particle mass changes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L474-L537)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L555-L630)
 
 ### particula.dynamics.condensation.CondensationIsothermal._resolve_strategies
 
@@ -453,7 +453,7 @@ Inherited from: `particula.dynamics.condensation.condensation_strategies.Condens
 
 Require explicit process-owned activity, surface and vapor laws.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L539-L561)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L632-L654)
 
 ### particula.dynamics.condensation.CondensationIsothermal.calculate_pressure_delta
 
@@ -490,7 +490,7 @@ delta_p = cond.calculate_pressure_delta(
 )
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L697-L743)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L790-L836)
 
 ### particula.dynamics.condensation.CondensationIsothermal.first_order_mass_transport
 
@@ -536,7 +536,7 @@ k = cond.first_order_mass_transport(
 )
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L642-L695)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L735-L788)
 
 ### particula.dynamics.condensation.CondensationIsothermal.knudsen_number
 
@@ -577,7 +577,7 @@ kn = cond.knudsen_number(
 )
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L599-L640)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L692-L733)
 
 ### particula.dynamics.condensation.CondensationIsothermal.mean_free_path
 
@@ -614,7 +614,7 @@ lam = cond.mean_free_path(temperature=298.15, pressure=101325)
 print(f"{lam:.2e} m")
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L563-L597)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L656-L690)
 
 ## particula.dynamics.condensation.CondensationIsothermalBuilder
 
@@ -1083,7 +1083,7 @@ theta_mode controls how the first-pass fraction (theta) is selected:
 > CondensationIsothermalStaggeredBuilder: Fluent builder for this
 >     strategy.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1056-L1525)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1149-L1618)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.VALID_THETA_MODES
 
@@ -1093,7 +1093,7 @@ theta_mode controls how the first-pass fraction (theta) is selected:
 VALID_THETA_MODES = ('half', 'random', 'batch')
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1106-L1106)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1199-L1199)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.num_batches
 
@@ -1103,7 +1103,7 @@ VALID_THETA_MODES = ('half', 'random', 'batch')
 num_batches = num_batches
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1182-L1182)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1275-L1275)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.random_state
 
@@ -1113,7 +1113,7 @@ num_batches = num_batches
 random_state = random_state
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1184-L1184)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1277-L1277)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.shuffle_each_step
 
@@ -1123,7 +1123,7 @@ random_state = random_state
 shuffle_each_step = shuffle_each_step
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1183-L1183)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1276-L1276)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.theta_mode
 
@@ -1133,7 +1133,7 @@ shuffle_each_step = shuffle_each_step
 theta_mode = theta_mode
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1181-L1181)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1274-L1274)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.accommodation_coefficient
 
@@ -1145,7 +1145,7 @@ accommodation_coefficient = accommodation_coefficient
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L230-L230)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L311-L311)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.activity_strategy
 
@@ -1157,7 +1157,7 @@ activity_strategy = activity_strategy
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L233-L233)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L314-L314)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.diffusion_coefficient
 
@@ -1169,7 +1169,7 @@ diffusion_coefficient = diffusion_coefficient
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L229-L229)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L310-L310)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.molar_mass
 
@@ -1181,7 +1181,7 @@ molar_mass = molar_mass
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L228-L228)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L309-L309)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.skip_partitioning_indices
 
@@ -1193,7 +1193,7 @@ skip_partitioning_indices = skip_partitioning_indices
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L232-L232)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L313-L313)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.species_map
 
@@ -1205,7 +1205,7 @@ species_map = species_map
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L236-L236)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L317-L317)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.surface_strategy
 
@@ -1217,7 +1217,7 @@ surface_strategy = surface_strategy
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L234-L234)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L315-L315)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.update_gases
 
@@ -1229,7 +1229,7 @@ update_gases = update_gases
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L231-L231)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L312-L312)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.vapor_pressure_strategy
 
@@ -1241,7 +1241,7 @@ vapor_pressure_strategy = vapor_pressure_strategy
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L235-L235)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L316-L316)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.__init__
 
@@ -1279,7 +1279,7 @@ empty Gauss-Seidel sweeps.
 - `ValueError` — If ``theta_mode`` is unsupported or ``num_batches`` is
 less than 1.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1109-L1184)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1202-L1277)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered._get_theta_values
 
@@ -1308,7 +1308,7 @@ configured RNG determines theta draws when ``theta_mode`` is
 
 - `ValueError` — When ``theta_mode`` is unsupported.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1186-L1226)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1279-L1319)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered._make_batches
 
@@ -1336,7 +1336,7 @@ Partition particle indices into Gauss-Seidel batches.
 > configured seed, ``Generator``, or ``RandomState`` when
 > ``shuffle_each_step`` is True; order is preserved otherwise.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1260-L1294)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1353-L1387)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered._native_staggered_step
 
@@ -1355,7 +1355,7 @@ Local theta durations are applied per node, including mixed durations
 in a vectorized batch. PDF weights come from the entire original grid.
 A disabled gas update retains fixed reservoir pressure between batches.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1322-L1406)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1415-L1499)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered._validate_native_staggered_controls
 
@@ -1367,7 +1367,7 @@ def _validate_native_staggered_controls() -> None
 
 Revalidate mutable controls before drawing randomness or writing.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1296-L1320)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1389-L1413)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered._validate_num_batches
 
@@ -1398,7 +1398,7 @@ Ensure batch count respects available particles.
 > The caller skips this helper when ``n_particles`` is zero, so no
 > logging occurs for the empty case.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1228-L1258)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1321-L1351)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.mass_transfer_rate
 
@@ -1436,7 +1436,7 @@ missing.
 - `ValueError` — If state, species mapping or physical inputs are
 invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1409-L1445)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1502-L1538)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.rate
 
@@ -1471,7 +1471,7 @@ missing.
 - `ValueError` — If state, species mapping or physical inputs are
 invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1447-L1479)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1540-L1572)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.step
 
@@ -1509,7 +1509,7 @@ missing.
 - `ValueError` — If state, storage, configuration or a proposal is
 invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1483-L1525)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1576-L1618)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered._native_latent_heat_values
 
@@ -1523,7 +1523,7 @@ Inherited from: `particula.dynamics.condensation.condensation_strategies.Condens
 
 Validate optional latent heat in the complete gas ordering.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L458-L472)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L539-L553)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered._native_mass_transfer_rate
 
@@ -1541,7 +1541,7 @@ Transport and vapor parameters follow the full gas ordering. Activity
 and surface strategies see the full particle composition. Pair-specific
 scalar transport calls avoid accidental particle/species broadcasting.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L353-L390)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L434-L471)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered._native_parameters
 
@@ -1555,7 +1555,7 @@ Inherited from: `particula.dynamics.condensation.condensation_strategies.Condens
 
 Admit current state and full-gas transport parameters.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L238-L279)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L319-L368)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered._native_pressure_terms
 
@@ -1569,7 +1569,7 @@ Inherited from: `particula.dynamics.condensation.condensation_strategies.Condens
 
 Evaluate full composition and mapped pressure lanes in Pa.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L281-L351)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L370-L432)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered._native_rate_from_parameters
 
@@ -1588,7 +1588,7 @@ have already been admitted on the complete grid and are passed to the
 inventory finalizer separately. This helper never interprets their
 concentration as density or performs public process admission.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L392-L456)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L473-L537)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered._native_single_step
 
@@ -1607,7 +1607,7 @@ finite-stage inventory limiter still bounds the particle proposal.
 Latent energy is extensive J, including resolved volume or PDF
 quadrature, and follows actual representable particle mass changes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L474-L537)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L555-L630)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered._resolve_strategies
 
@@ -1621,7 +1621,7 @@ Inherited from: `particula.dynamics.condensation.condensation_strategies.Condens
 
 Require explicit process-owned activity, surface and vapor laws.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L539-L561)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L632-L654)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.calculate_pressure_delta
 
@@ -1658,7 +1658,7 @@ delta_p = cond.calculate_pressure_delta(
 )
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L697-L743)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L790-L836)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.first_order_mass_transport
 
@@ -1704,7 +1704,7 @@ k = cond.first_order_mass_transport(
 )
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L642-L695)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L735-L788)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.knudsen_number
 
@@ -1745,7 +1745,7 @@ kn = cond.knudsen_number(
 )
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L599-L640)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L692-L733)
 
 ### particula.dynamics.condensation.CondensationIsothermalStaggered.mean_free_path
 
@@ -1782,7 +1782,7 @@ lam = cond.mean_free_path(temperature=298.15, pressure=101325)
 print(f"{lam:.2e} m")
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L563-L597)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L656-L690)
 
 ## particula.dynamics.condensation.CondensationIsothermalStaggeredBuilder
 
@@ -2348,7 +2348,7 @@ log warnings and fall back to the isothermal path.
 - `latent_heat_input` — Raw latent heat value provided at initialization.
 - `last_latent_heat_energy` — Total latent heat energy released in the most recent step [J]. Positive values indicate condensation and negative values indicate evaporation. Overwritten each call.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1528-L1757)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1621-L1850)
 
 ### particula.dynamics.condensation.CondensationLatentHeat._latent_heat_strategy
 
@@ -2358,7 +2358,7 @@ log warnings and fall back to the isothermal path.
 _latent_heat_strategy = self._resolve_latent_heat_strategy(latent_heat_strategy=latent_heat_strategy, latent_heat=latent_heat)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1595-L1598)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1688-L1691)
 
 ### particula.dynamics.condensation.CondensationLatentHeat.last_latent_heat_energy
 
@@ -2368,7 +2368,7 @@ _latent_heat_strategy = self._resolve_latent_heat_strategy(latent_heat_strategy=
 last_latent_heat_energy = 0.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1599-L1599)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1692-L1692)
 
 ### particula.dynamics.condensation.CondensationLatentHeat.latent_heat_input
 
@@ -2378,7 +2378,7 @@ last_latent_heat_energy = 0.0
 latent_heat_input = latent_heat
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1594-L1594)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1687-L1687)
 
 ### particula.dynamics.condensation.CondensationLatentHeat.latent_heat_strategy_input
 
@@ -2388,7 +2388,7 @@ latent_heat_input = latent_heat
 latent_heat_strategy_input = latent_heat_strategy
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1593-L1593)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1686-L1686)
 
 ### particula.dynamics.condensation.CondensationLatentHeat.accommodation_coefficient
 
@@ -2400,7 +2400,7 @@ accommodation_coefficient = accommodation_coefficient
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L230-L230)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L311-L311)
 
 ### particula.dynamics.condensation.CondensationLatentHeat.activity_strategy
 
@@ -2412,7 +2412,7 @@ activity_strategy = activity_strategy
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L233-L233)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L314-L314)
 
 ### particula.dynamics.condensation.CondensationLatentHeat.diffusion_coefficient
 
@@ -2424,7 +2424,7 @@ diffusion_coefficient = diffusion_coefficient
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L229-L229)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L310-L310)
 
 ### particula.dynamics.condensation.CondensationLatentHeat.molar_mass
 
@@ -2436,7 +2436,7 @@ molar_mass = molar_mass
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L228-L228)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L309-L309)
 
 ### particula.dynamics.condensation.CondensationLatentHeat.skip_partitioning_indices
 
@@ -2448,7 +2448,7 @@ skip_partitioning_indices = skip_partitioning_indices
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L232-L232)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L313-L313)
 
 ### particula.dynamics.condensation.CondensationLatentHeat.species_map
 
@@ -2460,7 +2460,7 @@ species_map = species_map
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L236-L236)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L317-L317)
 
 ### particula.dynamics.condensation.CondensationLatentHeat.surface_strategy
 
@@ -2472,7 +2472,7 @@ surface_strategy = surface_strategy
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L234-L234)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L315-L315)
 
 ### particula.dynamics.condensation.CondensationLatentHeat.update_gases
 
@@ -2484,7 +2484,7 @@ update_gases = update_gases
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L231-L231)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L312-L312)
 
 ### particula.dynamics.condensation.CondensationLatentHeat.vapor_pressure_strategy
 
@@ -2496,7 +2496,7 @@ vapor_pressure_strategy = vapor_pressure_strategy
 
 Inherited from: `particula.dynamics.condensation.condensation_strategies.CondensationStrategy`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L235-L235)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L316-L316)
 
 ### particula.dynamics.condensation.CondensationLatentHeat.__init__
 
@@ -2522,7 +2522,7 @@ Initialize the CondensationLatentHeat strategy.
 - `latent_heat_strategy` (`LatentHeatStrategy | None`) (default: `None`) — Optional latent heat strategy to use.
 - `latent_heat` (`float | NDArray[np.float64]`) (default: `0.0`) — Scalar latent heat fallback [J/kg].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1547-L1599)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1640-L1692)
 
 ### particula.dynamics.condensation.CondensationLatentHeat._resolve_latent_heat_strategy
 
@@ -2547,7 +2547,7 @@ values log a warning and fall back to isothermal behavior.
 
 - (`LatentHeatStrategy | None`) — Resolved latent heat strategy, or None for isothermal fallback.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1601-L1638)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1694-L1731)
 
 ### particula.dynamics.condensation.CondensationLatentHeat.mass_transfer_rate
 
@@ -2585,7 +2585,7 @@ missing.
 - `ValueError` — If state, species mapping or physical inputs are
 invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1640-L1676)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1733-L1769)
 
 ### particula.dynamics.condensation.CondensationLatentHeat.rate
 
@@ -2620,7 +2620,7 @@ missing.
 - `ValueError` — If state, species mapping or physical inputs are
 invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1678-L1710)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1771-L1803)
 
 ### particula.dynamics.condensation.CondensationLatentHeat.step
 
@@ -2659,7 +2659,7 @@ missing.
 - `ValueError` — If state, storage, configuration or a proposal is
 invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1714-L1757)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L1807-L1850)
 
 ### particula.dynamics.condensation.CondensationLatentHeat._native_latent_heat_values
 
@@ -2673,7 +2673,7 @@ Inherited from: `particula.dynamics.condensation.condensation_strategies.Condens
 
 Validate optional latent heat in the complete gas ordering.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L458-L472)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L539-L553)
 
 ### particula.dynamics.condensation.CondensationLatentHeat._native_mass_transfer_rate
 
@@ -2691,7 +2691,7 @@ Transport and vapor parameters follow the full gas ordering. Activity
 and surface strategies see the full particle composition. Pair-specific
 scalar transport calls avoid accidental particle/species broadcasting.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L353-L390)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L434-L471)
 
 ### particula.dynamics.condensation.CondensationLatentHeat._native_parameters
 
@@ -2705,7 +2705,7 @@ Inherited from: `particula.dynamics.condensation.condensation_strategies.Condens
 
 Admit current state and full-gas transport parameters.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L238-L279)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L319-L368)
 
 ### particula.dynamics.condensation.CondensationLatentHeat._native_pressure_terms
 
@@ -2719,7 +2719,7 @@ Inherited from: `particula.dynamics.condensation.condensation_strategies.Condens
 
 Evaluate full composition and mapped pressure lanes in Pa.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L281-L351)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L370-L432)
 
 ### particula.dynamics.condensation.CondensationLatentHeat._native_rate_from_parameters
 
@@ -2738,7 +2738,7 @@ have already been admitted on the complete grid and are passed to the
 inventory finalizer separately. This helper never interprets their
 concentration as density or performs public process admission.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L392-L456)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L473-L537)
 
 ### particula.dynamics.condensation.CondensationLatentHeat._native_single_step
 
@@ -2757,7 +2757,7 @@ finite-stage inventory limiter still bounds the particle proposal.
 Latent energy is extensive J, including resolved volume or PDF
 quadrature, and follows actual representable particle mass changes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L474-L537)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L555-L630)
 
 ### particula.dynamics.condensation.CondensationLatentHeat._resolve_strategies
 
@@ -2771,7 +2771,7 @@ Inherited from: `particula.dynamics.condensation.condensation_strategies.Condens
 
 Require explicit process-owned activity, surface and vapor laws.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L539-L561)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L632-L654)
 
 ### particula.dynamics.condensation.CondensationLatentHeat.calculate_pressure_delta
 
@@ -2808,7 +2808,7 @@ delta_p = cond.calculate_pressure_delta(
 )
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L697-L743)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L790-L836)
 
 ### particula.dynamics.condensation.CondensationLatentHeat.first_order_mass_transport
 
@@ -2854,7 +2854,7 @@ k = cond.first_order_mass_transport(
 )
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L642-L695)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L735-L788)
 
 ### particula.dynamics.condensation.CondensationLatentHeat.knudsen_number
 
@@ -2895,7 +2895,7 @@ kn = cond.knudsen_number(
 )
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L599-L640)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L692-L733)
 
 ### particula.dynamics.condensation.CondensationLatentHeat.mean_free_path
 
@@ -2932,7 +2932,7 @@ lam = cond.mean_free_path(temperature=298.15, pressure=101325)
 print(f"{lam:.2e} m")
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L563-L597)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L656-L690)
 
 ## particula.dynamics.condensation.CondensationLatentHeatBuilder
 
@@ -3510,7 +3510,7 @@ References:
 - Seinfeld, J. H. & Pandis, S. N. (2016). Atmospheric Chemistry and
   Physics: From Air Pollution to Climate Change (3rd ed.). Wiley.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L148-L848)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L229-L941)
 
 ### particula.dynamics.condensation.CondensationStrategy.accommodation_coefficient
 
@@ -3520,7 +3520,7 @@ References:
 accommodation_coefficient = accommodation_coefficient
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L230-L230)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L311-L311)
 
 ### particula.dynamics.condensation.CondensationStrategy.activity_strategy
 
@@ -3530,7 +3530,7 @@ accommodation_coefficient = accommodation_coefficient
 activity_strategy = activity_strategy
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L233-L233)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L314-L314)
 
 ### particula.dynamics.condensation.CondensationStrategy.diffusion_coefficient
 
@@ -3540,7 +3540,7 @@ activity_strategy = activity_strategy
 diffusion_coefficient = diffusion_coefficient
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L229-L229)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L310-L310)
 
 ### particula.dynamics.condensation.CondensationStrategy.molar_mass
 
@@ -3550,7 +3550,7 @@ diffusion_coefficient = diffusion_coefficient
 molar_mass = molar_mass
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L228-L228)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L309-L309)
 
 ### particula.dynamics.condensation.CondensationStrategy.skip_partitioning_indices
 
@@ -3560,7 +3560,7 @@ molar_mass = molar_mass
 skip_partitioning_indices = skip_partitioning_indices
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L232-L232)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L313-L313)
 
 ### particula.dynamics.condensation.CondensationStrategy.species_map
 
@@ -3570,7 +3570,7 @@ skip_partitioning_indices = skip_partitioning_indices
 species_map = species_map
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L236-L236)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L317-L317)
 
 ### particula.dynamics.condensation.CondensationStrategy.surface_strategy
 
@@ -3580,7 +3580,7 @@ species_map = species_map
 surface_strategy = surface_strategy
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L234-L234)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L315-L315)
 
 ### particula.dynamics.condensation.CondensationStrategy.update_gases
 
@@ -3590,7 +3590,7 @@ surface_strategy = surface_strategy
 update_gases = update_gases
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L231-L231)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L312-L312)
 
 ### particula.dynamics.condensation.CondensationStrategy.vapor_pressure_strategy
 
@@ -3600,7 +3600,7 @@ update_gases = update_gases
 vapor_pressure_strategy = vapor_pressure_strategy
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L235-L235)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L316-L316)
 
 ### particula.dynamics.condensation.CondensationStrategy.__init__
 
@@ -3624,7 +3624,7 @@ Initialize the CondensationStrategy instance.
 - `vapor_pressure_strategy` (`VaporPressureStrategy | Sequence[VaporPressureStrategy] | None`) (default: `None`) — Vapor pressure strategy or per-species strategies in complete gas order for native inputs.
 - `species_map` (`CondensationSpeciesMap | None`) (default: `None`) — Explicit gas-name provenance and gas-to-particle pairs required for tagged native data. Unmapped lanes do not transfer.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L185-L236)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L266-L317)
 
 ### particula.dynamics.condensation.CondensationStrategy._native_latent_heat_values
 
@@ -3636,7 +3636,7 @@ def _native_latent_heat_values(gas: GasData, temperature: float) -> NDArray[np.f
 
 Validate optional latent heat in the complete gas ordering.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L458-L472)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L539-L553)
 
 ### particula.dynamics.condensation.CondensationStrategy._native_mass_transfer_rate
 
@@ -3652,7 +3652,7 @@ Transport and vapor parameters follow the full gas ordering. Activity
 and surface strategies see the full particle composition. Pair-specific
 scalar transport calls avoid accidental particle/species broadcasting.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L353-L390)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L434-L471)
 
 ### particula.dynamics.condensation.CondensationStrategy._native_parameters
 
@@ -3664,7 +3664,7 @@ def _native_parameters(particle: ParticleData, gas: GasData, temperature: float,
 
 Admit current state and full-gas transport parameters.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L238-L279)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L319-L368)
 
 ### particula.dynamics.condensation.CondensationStrategy._native_pressure_terms
 
@@ -3676,7 +3676,7 @@ def _native_pressure_terms(particle: ParticleData, gas: GasData, temperature: fl
 
 Evaluate full composition and mapped pressure lanes in Pa.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L281-L351)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L370-L432)
 
 ### particula.dynamics.condensation.CondensationStrategy._native_rate_from_parameters
 
@@ -3693,7 +3693,7 @@ have already been admitted on the complete grid and are passed to the
 inventory finalizer separately. This helper never interprets their
 concentration as density or performs public process admission.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L392-L456)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L473-L537)
 
 ### particula.dynamics.condensation.CondensationStrategy._native_single_step
 
@@ -3710,7 +3710,7 @@ finite-stage inventory limiter still bounds the particle proposal.
 Latent energy is extensive J, including resolved volume or PDF
 quadrature, and follows actual representable particle mass changes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L474-L537)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L555-L630)
 
 ### particula.dynamics.condensation.CondensationStrategy._resolve_strategies
 
@@ -3722,7 +3722,7 @@ def _resolve_strategies() -> tuple[ActivityStrategy, SurfaceStrategy, VaporPress
 
 Require explicit process-owned activity, surface and vapor laws.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L539-L561)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L632-L654)
 
 ### particula.dynamics.condensation.CondensationStrategy.calculate_pressure_delta
 
@@ -3757,7 +3757,7 @@ delta_p = cond.calculate_pressure_delta(
 )
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L697-L743)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L790-L836)
 
 ### particula.dynamics.condensation.CondensationStrategy.first_order_mass_transport
 
@@ -3801,7 +3801,7 @@ k = cond.first_order_mass_transport(
 )
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L642-L695)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L735-L788)
 
 ### particula.dynamics.condensation.CondensationStrategy.knudsen_number
 
@@ -3840,7 +3840,7 @@ kn = cond.knudsen_number(
 )
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L599-L640)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L692-L733)
 
 ### particula.dynamics.condensation.CondensationStrategy.mass_transfer_rate
 
@@ -3878,7 +3878,7 @@ missing.
 - `ValueError` — If state, species mapping or physical inputs are
 invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L745-L780)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L838-L873)
 
 ### particula.dynamics.condensation.CondensationStrategy.mean_free_path
 
@@ -3913,7 +3913,7 @@ lam = cond.mean_free_path(temperature=298.15, pressure=101325)
 print(f"{lam:.2e} m")
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L563-L597)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L656-L690)
 
 ### particula.dynamics.condensation.CondensationStrategy.rate
 
@@ -3948,7 +3948,7 @@ missing.
 - `ValueError` — If state, species mapping or physical inputs are
 invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L782-L811)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L875-L904)
 
 ### particula.dynamics.condensation.CondensationStrategy.step
 
@@ -3985,7 +3985,7 @@ missing.
 - `ValueError` — If state, storage, configuration or a proposal is
 invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L814-L848)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/condensation_strategies.py#L907-L941)
 
 **Modules**
 

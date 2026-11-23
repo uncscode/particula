@@ -26,7 +26,7 @@ def advance_clock(clock: wp.array(dtype=wp.float64), time_step: wp.float64, fail
 
 Advance absolute time only after a successful complete process cycle.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_guards.py#L93-L102)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_guards.py#L96-L105)
 
 ## particula.execution.prepared_guards.equal_active_counts
 
@@ -62,4 +62,4 @@ def refresh_saturation(concentration: wp.array2d(dtype=wp.float64), molar_mass: 
 
 Refresh full-gas ratios only while the sequence remains valid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_guards.py#L71-L90)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_guards.py#L71-L93)

@@ -41,7 +41,7 @@ def _freeze(value)
 
 Represent configuration as data, without retaining live objects.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L92-L132)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L92-L138)
 
 ## particula.execution.cpu_configuration.condensation_identity
 
@@ -53,7 +53,7 @@ def condensation_identity(strategy)
 
 Retain all declared CPU transport, mapping and thermodynamic inputs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L135-L137)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L141-L143)
 
 ## particula.execution.cpu_configuration.cpu_process_identity
 
@@ -65,4 +65,4 @@ def cpu_process_identity(process)
 
 Retain native configuration without imposing GPU capability limits.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L140-L155)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/cpu_configuration.py#L146-L161)

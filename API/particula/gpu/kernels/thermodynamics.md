@@ -59,7 +59,17 @@ because the evaluator uses canonical water/ice equations.
 - `parameters` (`Any`) — Per-species ``wp.float64`` parameters with shape ``(n_species, 4)``. Slot zero is constant-mode pressure in Pa; all four slots are reserved and unused for Buck mode.
 - `molar_mass_reference` (`Any`) — Ordered ``wp.float64`` compatibility fingerprint with shape ``(n_species,)``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/thermodynamics.py#L60-L82)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/thermodynamics.py#L60-L83)
+
+### particula.gpu.kernels.thermodynamics.ThermodynamicsConfig.allow_zero_pressure
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+allow_zero_pressure: bool = False
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/thermodynamics.py#L83-L83)
 
 ### particula.gpu.kernels.thermodynamics.ThermodynamicsConfig.modes
 
@@ -96,7 +106,7 @@ parameters: Any
 *method*
 
 ```python
-def __init__(modes: Any, parameters: Any, molar_mass_reference: Any) -> None
+def __init__(modes: Any, parameters: Any, molar_mass_reference: Any, allow_zero_pressure: bool = False) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/thermodynamics.py#L0-L0)
@@ -135,7 +145,7 @@ equations.
 - `ValueError` — If an input violates the device-array contract or the
 configuration is invalid. ``gas.vapor_pressure`` is unchanged.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/thermodynamics.py#L383-L442)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/thermodynamics.py#L386-L445)
 
 ## particula.gpu.kernels.thermodynamics.validate_thermodynamics_config
 
@@ -169,4 +179,4 @@ parameters, calculate vapor pressure, or refresh ``gas.vapor_pressure``.
 - `ValueError` — If the configuration schema, device locality, values, or
 ordered molar-mass fingerprint is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/thermodynamics.py#L140-L245)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/thermodynamics.py#L141-L248)

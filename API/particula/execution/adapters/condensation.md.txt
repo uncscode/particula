@@ -33,7 +33,7 @@ promised after a writer-capable failure.
 CPUCondensationAdapter = CPUCondensationExecutionAdapter
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L1043-L1043)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L1046-L1046)
 
 ## particula.execution.adapters.condensation.WarpCondensationAdapter
 
@@ -43,7 +43,7 @@ CPUCondensationAdapter = CPUCondensationExecutionAdapter
 WarpCondensationAdapter = WarpCondensationExecutionAdapter
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L1044-L1044)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L1047-L1047)
 
 ## particula.execution.adapters.condensation.CPUCondensationExecutionAdapter
 
@@ -399,7 +399,7 @@ This concrete-only adapter is imported from
 ``particula.execution.adapters.condensation``. It forwards the exact
 native kernel tuple without reconstructing it.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L864-L971)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L864-L974)
 
 ### particula.execution.adapters.condensation.WarpCondensationExecutionAdapter.execute
 
@@ -435,7 +435,7 @@ Direct errors propagate unchanged.
 - `ImportError` — If the optional Warp kernel cannot be imported after
 successful preflight.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L940-L971)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L940-L974)
 
 ### particula.execution.adapters.condensation.WarpCondensationExecutionAdapter.prepare
 
@@ -1134,7 +1134,7 @@ Validate semantic-profile sidecars before native kernel resolution.
 - `ValueError` — If a required sidecar is missing or incompatible with the
 selected latent-heat, activity, or surface-tension semantics.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L974-L1039)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/adapters/condensation.py#L977-L1042)
 
 ## particula.execution.adapters.condensation._validate_time_step
 

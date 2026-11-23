@@ -23,7 +23,7 @@ and physical volume. Its binned number densities are counts divided by volume.
 CP = 1005.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L35-L35)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L40-L40)
 
 ## particula.dynamics.parcel.FloatArray
 
@@ -33,7 +33,7 @@ CP = 1005.0
 FloatArray = NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L40-L40)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L45-L45)
 
 ## particula.dynamics.parcel.LATENT
 
@@ -43,7 +43,7 @@ FloatArray = NDArray[np.float64]
 LATENT = 2500000.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L36-L36)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L41-L41)
 
 ## particula.dynamics.parcel.RD
 
@@ -53,7 +53,7 @@ LATENT = 2500000.0
 RD = GAS_CONSTANT / MOLECULAR_WEIGHT_AIR
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L33-L33)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L38-L38)
 
 ## particula.dynamics.parcel.RHO_W
 
@@ -63,7 +63,7 @@ RD = GAS_CONSTANT / MOLECULAR_WEIGHT_AIR
 RHO_W = 1000.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L37-L37)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L42-L42)
 
 ## particula.dynamics.parcel.RV
 
@@ -73,7 +73,7 @@ RHO_W = 1000.0
 RV = GAS_CONSTANT / 0.01801528
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L34-L34)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L39-L39)
 
 ## particula.dynamics.parcel.SIGMA
 
@@ -83,7 +83,7 @@ RV = GAS_CONSTANT / 0.01801528
 SIGMA = 0.072
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L38-L38)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L43-L43)
 
 ## particula.dynamics.parcel.WATER_FACTOR
 
@@ -93,7 +93,7 @@ SIGMA = 0.072
 WATER_FACTOR = 4 * np.pi / 3 * RHO_W
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L39-L39)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L44-L44)
 
 ## particula.dynamics.parcel.ParcelInitialState
 
@@ -116,7 +116,7 @@ Initial physical state before equilibration at subsaturated humidity.
 - `dry_air_mass` (`float`) — Fixed dry air inventory (kg).
 - `height` (`float`) — Initial altitude (m).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L43-L65)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L48-L70)
 
 ### particula.dynamics.parcel.ParcelInitialState.dry_air_mass
 
@@ -126,7 +126,7 @@ Initial physical state before equilibration at subsaturated humidity.
 dry_air_mass: float = 1.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L64-L64)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L69-L69)
 
 ### particula.dynamics.parcel.ParcelInitialState.dry_radius
 
@@ -136,7 +136,7 @@ dry_air_mass: float = 1.0
 dry_radius: FloatArray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L58-L58)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L63-L63)
 
 ### particula.dynamics.parcel.ParcelInitialState.height
 
@@ -146,7 +146,7 @@ dry_radius: FloatArray
 height: float = 0.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L65-L65)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L70-L70)
 
 ### particula.dynamics.parcel.ParcelInitialState.kappa
 
@@ -156,7 +156,7 @@ height: float = 0.0
 kappa: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L60-L60)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L65-L65)
 
 ### particula.dynamics.parcel.ParcelInitialState.number
 
@@ -166,7 +166,7 @@ kappa: float
 number: FloatArray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L59-L59)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L64-L64)
 
 ### particula.dynamics.parcel.ParcelInitialState.pressure
 
@@ -176,7 +176,7 @@ number: FloatArray
 pressure: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L61-L61)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L66-L66)
 
 ### particula.dynamics.parcel.ParcelInitialState.temperature
 
@@ -186,7 +186,7 @@ pressure: float
 temperature: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L62-L62)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L67-L67)
 
 ### particula.dynamics.parcel.ParcelInitialState.vapor
 
@@ -196,7 +196,7 @@ temperature: float
 vapor: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L63-L63)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L68-L68)
 
 ### particula.dynamics.parcel.ParcelInitialState.__init__
 
@@ -227,7 +227,7 @@ min_step is the smallest permitted retry in seconds. max_trials bounds
 all evaluated trials, including unused speculative Warp trials. A linearized
 droplet relaxation limit also protects sensitivities near equilibrium.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L90-L100)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L95-L105)
 
 ### particula.dynamics.parcel.ParcelRK23.max_trials
 
@@ -239,7 +239,7 @@ max_trials: int = 100000
 
 Inherited from: `particula.dynamics.parcel._ParcelAdaptiveControls`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L74-L74)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L79-L79)
 
 ### particula.dynamics.parcel.ParcelRK23.min_step
 
@@ -251,7 +251,7 @@ min_step: float = 1e-09
 
 Inherited from: `particula.dynamics.parcel._ParcelAdaptiveControls`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L73-L73)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L78-L78)
 
 ### particula.dynamics.parcel.ParcelRK23.rtol
 
@@ -263,7 +263,7 @@ rtol: float = 1e-05
 
 Inherited from: `particula.dynamics.parcel._ParcelAdaptiveControls`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L72-L72)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L77-L77)
 
 ### particula.dynamics.parcel.ParcelRK23.__init__
 
@@ -287,7 +287,7 @@ Inherited from: `particula.dynamics.parcel._ParcelAdaptiveControls`
 
 Reject invalid controller settings before device allocation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L76-L87)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L81-L92)
 
 ## particula.dynamics.parcel.ParcelROS3
 
@@ -304,7 +304,7 @@ Adaptive third-order Rosenbrock solver with a second-order estimator.
 Uses the coupled parcel Jacobian and explicit time derivative at each
 trial. rtol, min_step (s) and max_trials use the ParcelRK23 scales.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L103-L109)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L108-L114)
 
 ### particula.dynamics.parcel.ParcelROS3.max_trials
 
@@ -316,7 +316,7 @@ max_trials: int = 100000
 
 Inherited from: `particula.dynamics.parcel._ParcelAdaptiveControls`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L74-L74)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L79-L79)
 
 ### particula.dynamics.parcel.ParcelROS3.min_step
 
@@ -328,7 +328,7 @@ min_step: float = 1e-09
 
 Inherited from: `particula.dynamics.parcel._ParcelAdaptiveControls`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L73-L73)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L78-L78)
 
 ### particula.dynamics.parcel.ParcelROS3.rtol
 
@@ -340,7 +340,7 @@ rtol: float = 1e-05
 
 Inherited from: `particula.dynamics.parcel._ParcelAdaptiveControls`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L72-L72)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L77-L77)
 
 ### particula.dynamics.parcel.ParcelROS3.__init__
 
@@ -364,7 +364,7 @@ Inherited from: `particula.dynamics.parcel._ParcelAdaptiveControls`
 
 Reject invalid controller settings before device allocation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L76-L87)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L81-L92)
 
 ## particula.dynamics.parcel.ParcelStepStatistics
 
@@ -379,7 +379,7 @@ Controller counts and smallest/largest accepted timestep (s).
 evaluated_trials includes speculative candidates discarded after the
 controller changes step size. rejected_steps counts controller rejections.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L112-L124)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L117-L129)
 
 ### particula.dynamics.parcel.ParcelStepStatistics.accepted_steps
 
@@ -389,7 +389,7 @@ controller changes step size. rejected_steps counts controller rejections.
 accepted_steps: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L120-L120)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L125-L125)
 
 ### particula.dynamics.parcel.ParcelStepStatistics.evaluated_trials
 
@@ -399,7 +399,7 @@ accepted_steps: int
 evaluated_trials: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L124-L124)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L129-L129)
 
 ### particula.dynamics.parcel.ParcelStepStatistics.maximum_step
 
@@ -409,7 +409,7 @@ evaluated_trials: int
 maximum_step: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L123-L123)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L128-L128)
 
 ### particula.dynamics.parcel.ParcelStepStatistics.minimum_step
 
@@ -419,7 +419,7 @@ maximum_step: float
 minimum_step: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L122-L122)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L127-L127)
 
 ### particula.dynamics.parcel.ParcelStepStatistics.rejected_steps
 
@@ -429,7 +429,7 @@ minimum_step: float
 rejected_steps: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L121-L121)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L126-L126)
 
 ### particula.dynamics.parcel.ParcelStepStatistics.__init__
 
@@ -458,7 +458,7 @@ and class. updraft_gradient is the terminal liquid mixing ratio derivative
 per m/s at fixed elapsed time, or None when unrequested. statistics
 contains work counts and step extrema for adaptive Warp execution.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L127-L189)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L132-L194)
 
 ### particula.dynamics.parcel.ParcelTrajectory.height
 
@@ -468,7 +468,7 @@ contains work counts and step extrema for adaptive Warp execution.
 height: FloatArray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L140-L140)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L145-L145)
 
 ### particula.dynamics.parcel.ParcelTrajectory.initial
 
@@ -478,7 +478,7 @@ height: FloatArray
 initial: ParcelInitialState
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L149-L149)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L154-L154)
 
 ### particula.dynamics.parcel.ParcelTrajectory.liquid
 
@@ -488,7 +488,7 @@ initial: ParcelInitialState
 liquid: FloatArray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L145-L145)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L150-L150)
 
 ### particula.dynamics.parcel.ParcelTrajectory.pressure
 
@@ -498,7 +498,7 @@ liquid: FloatArray
 pressure: FloatArray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L141-L141)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L146-L146)
 
 ### particula.dynamics.parcel.ParcelTrajectory.statistics
 
@@ -508,7 +508,7 @@ pressure: FloatArray
 statistics: ParcelStepStatistics | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L150-L150)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L155-L155)
 
 ### particula.dynamics.parcel.ParcelTrajectory.supersaturation
 
@@ -518,7 +518,7 @@ statistics: ParcelStepStatistics | None = None
 supersaturation: FloatArray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L146-L146)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L151-L151)
 
 ### particula.dynamics.parcel.ParcelTrajectory.temperature
 
@@ -528,7 +528,7 @@ supersaturation: FloatArray
 temperature: FloatArray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L142-L142)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L147-L147)
 
 ### particula.dynamics.parcel.ParcelTrajectory.time
 
@@ -538,7 +538,7 @@ temperature: FloatArray
 time: FloatArray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L139-L139)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L144-L144)
 
 ### particula.dynamics.parcel.ParcelTrajectory.updraft_gradient
 
@@ -548,7 +548,7 @@ time: FloatArray
 updraft_gradient: float | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L148-L148)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L153-L153)
 
 ### particula.dynamics.parcel.ParcelTrajectory.vapor
 
@@ -558,7 +558,7 @@ updraft_gradient: float | None
 vapor: FloatArray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L144-L144)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L149-L149)
 
 ### particula.dynamics.parcel.ParcelTrajectory.volume
 
@@ -568,7 +568,7 @@ vapor: FloatArray
 volume: FloatArray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L143-L143)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L148-L148)
 
 ### particula.dynamics.parcel.ParcelTrajectory.wet_radius
 
@@ -578,7 +578,7 @@ volume: FloatArray
 wet_radius: FloatArray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L147-L147)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L152-L152)
 
 ### particula.dynamics.parcel.ParcelTrajectory.__init__
 
@@ -606,7 +606,7 @@ to mass. Gas holds water vapor in kg/m³. The native discrete volume
 is 1 m³. Multiply its density inventories by the physical parcel
 volume at this sample to recover extensive quantities.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L152-L189)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L157-L194)
 
 ## particula.dynamics.parcel._ParcelAdaptiveControls
 
@@ -618,7 +618,7 @@ class _ParcelAdaptiveControls
 
 Shared local error tolerance and adaptive trial limits.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L68-L87)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L73-L92)
 
 ### particula.dynamics.parcel._ParcelAdaptiveControls.max_trials
 
@@ -628,7 +628,7 @@ Shared local error tolerance and adaptive trial limits.
 max_trials: int = 100000
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L74-L74)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L79-L79)
 
 ### particula.dynamics.parcel._ParcelAdaptiveControls.min_step
 
@@ -638,7 +638,7 @@ max_trials: int = 100000
 min_step: float = 1e-09
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L73-L73)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L78-L78)
 
 ### particula.dynamics.parcel._ParcelAdaptiveControls.rtol
 
@@ -648,7 +648,7 @@ min_step: float = 1e-09
 rtol: float = 1e-05
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L72-L72)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L77-L77)
 
 ### particula.dynamics.parcel._ParcelAdaptiveControls.__init__
 
@@ -670,7 +670,7 @@ def __post_init__()
 
 Reject invalid controller settings before device allocation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L76-L87)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L81-L92)
 
 ## particula.dynamics.parcel._cpu_reference
 
@@ -682,7 +682,7 @@ def _cpu_reference(initial, wet, time, updraft, phase_exchange)
 
 Integrate pressure, temperature, vapor and squared radii.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L262-L328)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L267-L333)
 
 ## particula.dynamics.parcel._equilibrium
 
@@ -692,7 +692,7 @@ Integrate pressure, temperature, vapor and squared radii.
 def _equilibrium(radius, dry_radius, temperature, kappa)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L197-L202)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L202-L207)
 
 ## particula.dynamics.parcel._initial_radii
 
@@ -702,7 +702,31 @@ def _equilibrium(radius, dry_radius, temperature, kappa)
 def _initial_radii(initial)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L205-L259)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L210-L264)
+
+## particula.dynamics.parcel._parcel_output_times
+
+*function*
+
+```python
+def _parcel_output_times(steps, timestep, updraft)
+```
+
+Validate common parcel forcing and construct the output time grid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L336-L348)
+
+## particula.dynamics.parcel._run_multivapor
+
+*function*
+
+```python
+def _run_multivapor(initial, time, updraft, device, adaptive, phase_exchange, gradient)
+```
+
+Dispatch the explicit wet-state parcel after validating its controls.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L351-L373)
 
 ## particula.dynamics.parcel._saturation_pressure
 
@@ -714,21 +738,21 @@ def _saturation_pressure(temperature)
 
 Liquid-water saturation pressure (Pa), constant-L Clausius-Clapeyron.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L192-L194)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L197-L199)
 
 ## particula.dynamics.parcel.run_parcel
 
 *function*
 
 ```python
-def run_parcel(initial: ParcelInitialState, *, updraft: float, timestep: float, steps: int, device: str = 'cpu', gradient: bool = False, phase_exchange: bool = True, adaptive: ParcelRK23 | ParcelROS3 | None = None) -> ParcelTrajectory
+def run_parcel(initial: ParcelInitialState | MultiVaporParcelInitialState, *, updraft: float, timestep: float, steps: int, device: str = 'cpu', gradient: bool = False, phase_exchange: bool = True, adaptive: ParcelRK23 | ParcelROS3 | None = None) -> ParcelTrajectory | MultiVaporParcelTrajectory
 ```
 
 Advance a single parcel under constant signed vertical velocity.
 
 **Parameters**
 
-- `initial` (`ParcelInitialState`) — Subsaturated state including any equilibrium aerosol water.
+- `initial` (`ParcelInitialState | MultiVaporParcelInitialState`) — A subsaturated κ parcel or explicit multi-vapor wet classes. Multi-vapor input specifies each initial material and gas inventory.
 - `updraft` (`float`) — Vertical velocity in m/s, positive upward.
 - `timestep` (`float`) — Output spacing (s). Also the fixed Warp step by default.
 - `steps` (`int`) — Positive number of intervals.
@@ -739,10 +763,10 @@ Advance a single parcel under constant signed vertical velocity.
 
 **Returns**
 
-- (`ParcelTrajectory`) — State histories and the requested Warp derivative.
+- (`ParcelTrajectory | MultiVaporParcelTrajectory`) — State histories and the requested Warp derivative.
 
 **Raises**
 
 - `ValueError` — Invalid state, backend, integration interval or trajectory.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L331-L448)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L376-L488)

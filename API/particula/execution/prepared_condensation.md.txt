@@ -20,7 +20,7 @@ def _activity_plan(activity, particles, gas, pairs, vapor)
 
 Translate material activities to the direct solver configuration.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L125-L211)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L125-L220)
 
 ## particula.execution.prepared_condensation._surface_plan
 
@@ -68,7 +68,7 @@ def compile_condensation(plan: _ProcessPlan, context: BuiltinPreparationContext)
 
 Allocate retained thermodynamics, species maps and transport sidecars.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L303-L421)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L321-L451)
 
 ## particula.execution.prepared_condensation.plan_condensation
 
@@ -80,4 +80,4 @@ def plan_condensation(process, aerosol, *, allow_zero_vapor=False) -> _ProcessPl
 
 Freeze representable physical parameters before any upload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L214-L300)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_condensation.py#L223-L318)

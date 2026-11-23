@@ -20,7 +20,7 @@ class ROS3Stages
 
 Allocate linear-storage scratch on the owner's requested device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_ros3.py#L15-L188)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_ros3.py#L15-L200)
 
 ### particula.execution._gpu_condensation_ros3.ROS3Stages.increments
 
@@ -52,7 +52,7 @@ def linearize(owner)
 
 Differentiate local particle/gas columns at the accepted state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_ros3.py#L30-L89)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_ros3.py#L30-L98)
 
 ### particula.execution._gpu_condensation_ros3.ROS3Stages.solve
 
@@ -64,7 +64,7 @@ def solve(owner, h, result)
 
 Eliminate gas coupling and back-substitute particle increments.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_ros3.py#L91-L135)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_ros3.py#L100-L144)
 
 ### particula.execution._gpu_condensation_ros3.ROS3Stages.trial
 
@@ -76,4 +76,4 @@ def trial(owner, h)
 
 Check the full candidate and return the embedded maximum error.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_ros3.py#L137-L188)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_ros3.py#L146-L200)

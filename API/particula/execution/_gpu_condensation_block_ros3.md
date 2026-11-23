@@ -18,7 +18,7 @@ Bases: `particula.execution._gpu_condensation_ros3.ROS3Stages`
 
 Store O(particles * exchanging_materials**2) device scratch.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_block_ros3.py#L13-L225)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_block_ros3.py#L13-L238)
 
 ### particula.execution._gpu_condensation_block_ros3.BlockROS3Stages._factorized
 
@@ -170,7 +170,7 @@ def linearize(owner)
 
 Color independent particles, retaining every cross-material row.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_block_ros3.py#L57-L121)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_block_ros3.py#L57-L134)
 
 ### particula.execution._gpu_condensation_block_ros3.BlockROS3Stages.solve
 
@@ -182,7 +182,7 @@ def solve(owner, h, result)
 
 Factor once per trial and solve each stage on device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_block_ros3.py#L123-L225)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_block_ros3.py#L136-L238)
 
 ### particula.execution._gpu_condensation_block_ros3.BlockROS3Stages.trial
 
@@ -196,4 +196,4 @@ Inherited from: `particula.execution._gpu_condensation_ros3.ROS3Stages`
 
 Check the full candidate and return the embedded maximum error.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_ros3.py#L137-L188)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_ros3.py#L146-L200)
