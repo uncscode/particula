@@ -1,7 +1,7 @@
 AIOMFAC-web 3.15, Andi Zuend and contributors. See reference/upstream.toml for the exact source.
 The reference executables are built locally. The distribution contains no upstream Fortran source or binary.
 The packaged NumPy equations and initialized parameter arrays are derived from AIOMFAC-web 3.15 (2026 Particula port). See tools/export_parameters.py for table regeneration and reference/parameters.toml for the active branches.
-Runtime CPU equilibrium uses scipy.optimize; CUDA uses the packaged activity and equilibrium kernels. MINPACK, zerobracket_inwards, ModStringFunctions and the upstream I/O utilities are inputs to the contributor's reference build. The wheel and source archive contain the parameter data, fixtures and regeneration scripts; the reference scripts fetch and check the pinned Fortran files separately.
+Runtime CPU equilibrium uses scipy.optimize; CUDA uses the packaged activity and equilibrium kernels. MINPACK, zerobracket_inwards, ModStringFunctions and the upstream I/O utilities are inputs to the contributor's reference build. Both distributions contain the runtime parameter arrays and sparse tables. The source archive also contains reference fixtures and regeneration scripts. Those scripts fetch and verify the pinned Fortran files separately.
 File-specific provenance (paths relative to upstream). Retain the original notices in any redistribution of these sources.
 
 Auxiliary/Pure_component_smiles_table.csv: upstream repository GPLv3 license; no separate license identified in header
