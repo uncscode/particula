@@ -1,4 +1,4 @@
-"""Regressions for the external recipe mismatch behind feedstock PR #54."""
+"""Regressions for the external recipe mismatches in feedstock PRs #54 and #60."""
 
 from __future__ import annotations
 
@@ -31,7 +31,11 @@ def test_failed_pr54_recipe_is_rejected_with_missing_inputs(checker, tmp_path):
     """The actual old recipe cannot pass against our corrected local mirror."""
     assert not checker.check_contract(MIRROR, FAILED_RECIPE, tmp_path)
     report = json.loads((tmp_path / "contract.json").read_text())
-    assert set(report["differences"]) == {"test.source_files", "test.commands"}
+    assert set(report["differences"]) == {
+        "requirements.run",
+        "test.source_files",
+        "test.commands",
+    }
     assert report["contracts"]["external"]["source_files"] == ["particula"]
     assert "pyproject.toml" in report["contracts"]["mirror"]["source_files"]
     assert (
@@ -44,13 +48,50 @@ def test_corrected_external_handoff_passes_despite_release_metadata(
 ):
     """Source/version/maintainer differences do not hide or fabricate drift."""
     recipe = FAILED_RECIPE.read_text()
-    start = recipe.index("test:\n")
+    start = recipe.index("requirements:\n")
     end = recipe.index("about:\n")
     mirror = MIRROR.read_text()
-    contract = mirror[mirror.index("test:\n") : mirror.index("about:\n")]
+    contract = mirror[
+        mirror.index("requirements:\n") : mirror.index("about:\n")
+    ]
     external = tmp_path / "external.yaml"
+    # Runtime requirement order does not affect parity.
+    contract = contract.replace(
+        "    - warp-lang\n    - pyyaml", "    - pyyaml\n    - warp-lang"
+    )
     external.write_text(recipe[:start] + contract + recipe[end:])
     assert checker.check_contract(MIRROR, external, tmp_path / "evidence")
+
+
+@pytest.mark.parametrize("allow_drift", [False, True])
+def test_missing_pyyaml_with_matching_tests(checker, tmp_path, allow_drift):
+    """The dependency omission in PR #60 is detectable on its own."""
+    external = tmp_path / "external.yaml"
+    external.write_text(MIRROR.read_text().replace("    - pyyaml\n", ""))
+    assert (
+        checker.check_contract(
+            MIRROR, external, tmp_path, allow_drift=allow_drift
+        )
+        is allow_drift
+    )
+    report = json.loads((tmp_path / "contract.json").read_text())
+    assert report["passed"] is False
+    assert report["differences"] == ["requirements.run"]
+    assert "pyyaml" in report["contracts"]["mirror"]["run"]
+    assert "pyyaml" not in report["contracts"]["external"]["run"]
+
+
+@pytest.mark.parametrize("runtime", ["pyyaml # [linux]", "{{ dependency }}"])
+def test_unsupported_runtime_fails_even_in_advisory_mode(
+    checker, tmp_path, runtime
+):
+    """Conditional or templated dependencies require explicit review."""
+    external = tmp_path / "external.yaml"
+    external.write_text(MIRROR.read_text().replace("- pyyaml", f"- {runtime}"))
+    assert not checker.check_contract(
+        MIRROR, external, tmp_path, allow_drift=True
+    )
+    assert json.loads((tmp_path / "contract.json").read_text())["errors"]
 
 
 @pytest.mark.parametrize(
@@ -95,13 +136,13 @@ def test_enclosing_template_cannot_certify_absent_tests(checker, directive):
     )
     ending = directive.split()[0]
     recipe = "{% " + directive + " %}\n" + block + "{% end" + ending + " %}\n"
-    with pytest.raises(ValueError, match="Templated test contracts"):
+    with pytest.raises(ValueError, match="Templated recipe contracts"):
         checker.test_contract(recipe)
 
 
 def test_commented_out_contract_is_rejected(checker):
     """A Jinja comment cannot publish a contract that will not execute."""
-    with pytest.raises(ValueError, match="Templated test contracts"):
+    with pytest.raises(ValueError, match="Templated recipe contracts"):
         checker.test_contract("{#\n" + MIRROR.read_text() + "\n#}")
 
 
@@ -167,6 +208,7 @@ def test_cli_failure_and_evidence(tmp_path, use_failed_recipe):
     assert not report["passed"]
     if use_failed_recipe:
         assert set(report["differences"]) == {
+            "requirements.run",
             "test.source_files",
             "test.commands",
         }
@@ -241,11 +283,12 @@ def test_cli_policy_keeps_parity_distinct_from_advisory_success(
     assert report["check_passed"] is accepted
     assert report["mode"] == ("advisory" if allow_drift else "strict")
     assert bool(report["errors"]) is (not matching and not drift)
-    if drift:
-        assert set(report["differences"]) == {
-            "test.source_files",
-            "test.commands",
-        }
+    expected_differences = set()
+    if case in {"old_recipe", "legacy"}:
+        expected_differences.update(("test.source_files", "test.commands"))
+    if case == "old_recipe":
+        expected_differences.add("requirements.run")
+    assert set(report["differences"]) == expected_differences
     assert ("::warning::" in result.stdout) is (drift and allow_drift)
     if external.exists():
         assert (

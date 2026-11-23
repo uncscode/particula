@@ -79,22 +79,26 @@ before merging the feedstock PR.
 ## External feedstock drift gate
 
 The independent `feedstock-contract` job fetches
-`conda-forge/particula-feedstock` and compares its literal `test.requires`,
-`test.source_files`, and ordered `test.commands` against our locally tested
-recipe. Automatic PR runs compare against external `main` in **advisory drift
+`conda-forge/particula-feedstock` and compares its literal `requirements.run`,
+`test.requires`, `test.source_files`, and ordered `test.commands` against our
+locally tested recipe. Automatic PR runs compare against external `main` in **advisory drift
 mode**; manual dispatch selects a candidate PR ref and enforces **strict
 parity**. It reads recipe data only and executes no code,
 Jinja, build scripts, or test commands from that checkout. It saves both recipe
 files, their SHA-256 hashes, the external commit, and a JSON comparison report.
-Unsupported test templates/selectors/schema and missing data fail explicitly
-in both modes. Validation is bounded to the test contract, not the entire
-recipe. Advisory mode accepts only differences between two readable,
-supported test contracts and emits a visible warning. The JSON report keeps
+Missing data and unsupported templates, selectors, or schemas in the checked
+mappings fail in both modes. Advisory mode emits a warning for differences
+between two supported contracts. The JSON report keeps
 `passed=false` for drift; `mode` identifies the policy and `check_passed`
 records whether that policy passed. A green advisory job is not parity evidence.
 Input/requirement list ordering is ignored; command ordering is significant.
-The shared `python {{ python_min }}` requirement is compared literally; this
-check does not certify external variant values or dependency solves.
+Python minimum-version expressions and dependency constraints are compared
+literally. The external build verifies the dependency solve.
+
+In [feedstock PR #60](https://github.com/conda-forge/particula-feedstock/pull/60),
+`pip check` stopped the 0.3.5 build because the external runtime requirements
+omitted PyYAML. A missing runtime requirement now appears in the comparison
+report even when the test inputs and commands match.
 
 **Source PR readiness** requires the real **conda-build** and source tests.
 The automatic **feedstock-contract** check may pass with reported drift because
