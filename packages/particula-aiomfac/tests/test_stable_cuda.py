@@ -696,3 +696,41 @@ def test_small_new_liquid_near_binodal_cuda():
     gpu = p.phase_equilibrium(feed, 298.15, execution="cuda")
     np.testing.assert_allclose(gpu.beta_masses, ref.beta_masses, rtol=2e-7)
     np.testing.assert_array_less(gpu.beta_masses.sum() / feed.sum(), 0.001)
+
+
+@pytest.mark.parametrize(
+    "feed",
+    [
+        [
+            0.6620006564835846,
+            0.2720568201925576,
+            0.03489894965646451,
+            0.031043573667393257,
+        ],
+        [
+            0.6962452632978388,
+            0.2286434854507551,
+            0.05568961458106756,
+            0.019421636670338565,
+        ],
+    ],
+)
+def test_two_salt_incipient_liquid_amount_cuda(feed):
+    """Resolve small minority phases at two kinetic humidity-ramp stages."""
+    mixture = MixtureSpec(
+        {
+            "water": {16: 1},
+            "IPA": {141: 2, 151: 1, 153: 1},
+            "NaCl": {202: 1, 242: 1},
+            "KCl": {203: 1, 242: 1},
+        }
+    )
+    provider = _provider(mixture)
+    mass = np.array(feed)
+    cpu = provider.phase_equilibrium(mass, 298.15)
+    gpu = provider.phase_equilibrium(mass, 298.15, execution="cuda")
+    np.testing.assert_allclose(
+        gpu.beta_masses, cpu.beta_masses, rtol=0, atol=2.0e-8
+    )
+    np.testing.assert_array_less(gpu.beta_masses.sum(), 0.01)
+    np.testing.assert_array_less(gpu.chemical_potential_error, 1.0e-8)
