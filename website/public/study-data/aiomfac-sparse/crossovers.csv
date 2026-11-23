@@ -1,0 +1,13 @@
+recipe,mode,first_tested_gpu_faster,paired_sizes
+carbonate,direct,1,9
+carbonate,hybrid,2048,9
+mixed-two-vapor,direct,512,9
+mixed-two-vapor,hybrid,128,9
+mixed-water,direct,2048,9
+mixed-water,hybrid,2048,9
+neutral,direct,2048,9
+neutral,hybrid,2048,9
+shared-ion,direct,1,9
+shared-ion,hybrid,512,9
+sulfate,direct,8,9
+sulfate,hybrid,512,9

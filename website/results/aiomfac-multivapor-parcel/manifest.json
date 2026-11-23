@@ -1,34 +1,34 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 93.68691527610645,
-  "package_source_sha256": "87ced8f24a4b7b3c0ce04794a32ffb3718eb24b0f635c15d3ef468efe5b2a2a9",
-  "scientific_source_sha256": "a4cba6487ecded6ee8d6a048c01cfe0d01d1ff966857bad3e6b521f9bb77354e",
+  "elapsed_seconds": 102.10978998895735,
+  "package_source_sha256": "c288cfd8eea2dfd7ab9f60ea95359d22a128d2a744b59b0c4f33fedf6503fd79",
+  "scientific_source_sha256": "5d595c420c4548b381e35ce18fa80df7da13ef8925e39e98da62bf3fe8249a92",
   "input_sha256": {
-    "packages/particula-aiomfac/src/particula_aiomfac/__init__.py": "84af75eb4fd65637d9bd54c1f104a7c1ae6d067ef5aae8323910ce1ebc384410",
-    "packages/particula-aiomfac/src/particula_aiomfac/_condensation.py": "1ddc515799db2f32bb62a63e47bb4faa93ee7d7bb5466972cc3bf016656d9aac",
+    "packages/particula-aiomfac/src/particula_aiomfac/__init__.py": "1aa9546b6900fe3a5764b797aeec067bf4e27b73382b9c825bf9563c35057a5c",
+    "packages/particula-aiomfac/src/particula_aiomfac/_condensation.py": "17483eba29f10379920226d0f99398b83e0d521934caf039fb6245394314ad0b",
     "packages/particula-aiomfac/src/particula_aiomfac/_cuda.py": "dc38805c02aecc15e4374c75c2305104165b241716d500cf758afc0e7b39298e",
     "packages/particula-aiomfac/src/particula_aiomfac/_equilibrium.py": "c3d2bb0cd394fe348059b0b256b7b93924cfbb25583e29330956f21f029eb483",
     "packages/particula-aiomfac/src/particula_aiomfac/_terms.py": "631e25c763a5e3cea0ca7b47f59c57977f39e2509b36396fe2e00e653070d7f7",
-    "packages/particula-aiomfac/src/particula_aiomfac/adapter.py": "086692f1e2762fe61b9281c6e085be8d5d4c974da92767d953ec9dabe445f5af",
+    "packages/particula-aiomfac/src/particula_aiomfac/adapter.py": "b8ceb3e6fded91daf2122b5dad82c8a8000febdb0787e73dcfb8fb42b8e9d4c2",
     "packages/particula-aiomfac/src/particula_aiomfac/data/manifest.json": "6baaf6ef914c089ca6a53c27a94830534d602ea24d04132d6120cef289464070",
     "packages/particula-aiomfac/src/particula_aiomfac/data/parameters.npz": "14d464c03eb549578d26158bdfe9f7f209f79110e6e4b9a95a0ae4c18c0813ce",
     "packages/particula-aiomfac/src/particula_aiomfac/kernels/activity.inc": "21dae5955186d7df8269bad7bf53869ff3f304568185bb30420a3051fec1e147",
     "packages/particula-aiomfac/src/particula_aiomfac/kernels/equilibrium.inc": "09b733b344b6c5f8ae918c9c414dab07bbfcf7fbee1f4f5b39aa39e51b2ee4cc",
     "packages/particula-aiomfac/src/particula_aiomfac/kernels/output.inc": "cd3ae436bb99b41538f7f75e576b3f3216f6fe7170682f9b568b1e78e105f193",
-    "packages/particula-aiomfac/src/particula_aiomfac/model.py": "a08b223857cf3e1f477955699bc47f00a5662e506570e2b5107cee675deb6f8e",
+    "packages/particula-aiomfac/src/particula_aiomfac/model.py": "38889ecd87bb3e398d957897f6692b9645a96f25565c6e43e585475ea0a54107",
     "particula/particles/prepared_activity.py": "04b1be37d8a9de2bb5dbef8c1d491306a6124dae70589dc1af7c8e287cb100b4",
-    "particula/dynamics/multivapor_parcel.py": "e4cf528676d68609789420ca4a448a4c41f751dc2b640d8b85509b5d5157c505",
+    "particula/dynamics/multivapor_parcel.py": "9651df32cdbfbffc6e40da642373e548e4d7a5a359f3df8e5b9b5b9a46391804",
     "particula/dynamics/parcel.py": "1142191c559a7a7d8291a2870407ada886507e6c4f704a482d45f4e6f2d8cfe9",
-    "particula/execution/multivapor_parcel.py": "4dcaaf0e0cc4ccded347ea2b986d8299b7dff29efda42d912fda04793f1200b3",
-    "particula/execution/_multivapor_parcel_kernels.py": "670392b384c7a70fb6999b78e89dae4f00b289fe504cfe64fc629386c6959c2f"
+    "particula/execution/multivapor_parcel.py": "6d002339c34f2eed298b85ba2301d32a7c3878e0384b4954c412bdf7ae38886e",
+    "particula/execution/_multivapor_parcel_kernels.py": "bcdd214ec312f2fdb68a87df766a3dd3445ff4b7dd9a2a1b31560be5245895a8"
   },
   "example": "aiomfac-multivapor-parcel",
-  "fingerprint": "b245e89b6630ba2611c641f0bf19a40b372d42ba02304d09db24862997b00595",
+  "fingerprint": "5f5bddf788b49911f2c1e4ddd286b89f468c4c6d7525c1c4200be3a32324f97f",
   "source": "docs/studies/examples/thermodynamics/parcel-experiments/aiomfac_multivapor_parcel.py",
-  "revision": "1e97cb5f3ef4a0644de71cff7b41384500336e35",
+  "revision": "a3ff1e82e7da3ef0a21fe7c1431cf1ea86d5d769",
   "package_dirty": true,
-  "executed_at": "2026-11-22T22:57:44.815492+00:00",
+  "executed_at": "2026-11-23T00:49:21.405072+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
@@ -48,10 +48,10 @@
     [],
     [
       {
-        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.execution._multivapor_parcel_kernels 76d557b load on device 'cuda:0' took 0.96 ms  (cached)\nModule particula_aiomfac._condensation c529ea0 load on device 'cuda:0' took 0.29 ms  (cached)\nModule particula_aiomfac._cuda b513fe0 load on device 'cuda:0' took 2.10 ms  (cached)\n"
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.execution._multivapor_parcel_kernels 9048f9c load on device 'cuda:0' took 1.05 ms  (cached)\nModule particula_aiomfac._condensation 9c44814 load on device 'cuda:0' took 0.31 ms  (cached)\nModule particula_aiomfac._cuda b513fe0 load on device 'cuda:0' took 2.08 ms  (cached)\n"
       },
       {
-        "text": "two_vapors maximum species budget errors [1.4062769549308556e-15, 7.504886321635955e-16] maximum first-law residual (K) 2.0398509104069262e-08\nwater_only maximum species budget errors [1.0547077161981418e-15, 0.0] maximum first-law residual (K) 2.0405620415608894e-08\nRK23 refined comparison with Radau {'errors': {'radius': 2.8270033021193797e-06, 'vapor': [2.196721324589256e-09, 6.8804798453436e-07], 'condensed': [2.1967209630634663e-09, 6.880479850034154e-07], 'temperature_K': 1.0784287951537408e-07, 'supersaturation': 8.76213457345898e-09}, 'rtol': 2e-06, 'steps': 409, 'rejections': 22, 'activity_evaluations': 1724, 'warmed_replay_s': 0.8079640709329396, 'setup_s': 0.003154665930196643, 'segment_observation_readbacks': 300, 'parcel_workspace_bytes': 852, 'process_device_pool_peak_bytes': 16272, 'device': 'NVIDIA GeForce RTX 5060', 'warp': '1.11.1', 'restart_compared': True, 'max_relative_inventory_error': [1.7578461936635694e-16, 1.8762215804089888e-16], 'max_first_law_error_K': 2.0394162025816343e-08}\nROS3 refined comparison with Radau {'errors': {'radius': 2.2637898311472782e-07, 'vapor': [5.021887077752026e-10, 1.9424933538344047e-07], 'condensed': [5.021898311487857e-10, 1.942493358994014e-07], 'temperature_K': 2.4654923436173704e-08, 'supersaturation': 2.0047710158621612e-09}, 'rtol': 2e-06, 'steps': 687, 'rejections': 3, 'activity_evaluations': 6210, 'warmed_replay_s': 2.9293792524840683, 'setup_s': 0.005988967837765813, 'segment_observation_readbacks': 300, 'parcel_workspace_bytes': 1268, 'process_device_pool_peak_bytes': 17104, 'device': 'NVIDIA GeForce RTX 5060', 'warp': '1.11.1', 'restart_compared': True, 'max_relative_inventory_error': [1.7578461936635694e-16, 1.8762215804089888e-16], 'max_first_law_error_K': 2.0405928280453622e-08}\n1,500 m ascent; initial RH (%) 81.99999999999999 saturation height (m) 399.96845942625293 peak ambient S (%) 0.42970955343490935 at (m) 422.0\nClass 1 {'height_m': 463.4746092643574, 'critical_radius_um': 7.655770966586911, 'critical_supersaturation_pct': 0.009220309018714323, 'ambient_supersaturation_pct': 0.2920968722278107}\nClass 2 {'height_m': 707.2356154272551, 'critical_radius_um': 13.725963425190066, 'critical_supersaturation_pct': 0.005162073588116742, 'ambient_supersaturation_pct': 0.1679268308922648}\nActivated number fraction 1.0 endpoint LWC (g/m\u00b3) 2.543263607795848 wet radii (\u00b5m) [20.444476874587792, 20.737957818765825] temperature (K) 289.58407560565047\n1,500 m ROS3 maximum radius error 8.481429580875499e-08 activation shifts (m) [0.000562544123454245, 0.002133811942258035]\n1,500 m RK23 maximum radius error 2.7201962462530815e-06 activation shifts (m) [0.0005645819707069677, 0.0021328476756252712]\n"
+        "text": "two_vapors maximum species budget errors [2.6367692904953543e-15, 1.876221580408989e-15] maximum first-law residual (K) 2.0397857181109202e-08\nwater_only maximum species budget errors [1.2304923355644988e-15, 0.0] maximum first-law residual (K) 2.0405532152878436e-08\nRK23 refined comparison with Radau {'errors': {'radius': 2.8270041723121864e-06, 'vapor': [2.196777224098214e-09, 6.880378744909211e-07], 'condensed': [2.1967747686068124e-09, 6.880378760153512e-07], 'temperature_K': 1.0784475534819649e-07, 'supersaturation': 8.762304437581747e-09}, 'rtol': 2e-06, 'steps': 409, 'rejections': 22, 'activity_evaluations': 1724, 'warmed_replay_s': 0.8215550142340362, 'setup_s': 0.0035284420009702444, 'segment_observation_readbacks': 300, 'parcel_workspace_bytes': 852, 'process_device_pool_peak_bytes': 16384, 'device': 'NVIDIA GeForce RTX 5060', 'warp': '1.11.1', 'restart_compared': True, 'max_relative_inventory_error': [1.7578461936635694e-16, 1.8762215804089888e-16], 'max_first_law_error_K': 2.0394162025816343e-08}\nROS3 refined comparison with Radau {'errors': {'radius': 2.263792748813387e-07, 'vapor': [5.021871257136283e-10, 1.9425360630870866e-07], 'condensed': [5.021895194057498e-10, 1.9425360749307354e-07], 'temperature_K': 2.4655605557200033e-08, 'supersaturation': 2.0048089854896034e-09}, 'rtol': 2e-06, 'steps': 687, 'rejections': 3, 'activity_evaluations': 6210, 'warmed_replay_s': 2.9356983865145594, 'setup_s': 0.006154712056741118, 'segment_observation_readbacks': 300, 'parcel_workspace_bytes': 1268, 'process_device_pool_peak_bytes': 17216, 'device': 'NVIDIA GeForce RTX 5060', 'warp': '1.11.1', 'restart_compared': True, 'max_relative_inventory_error': [1.7578461936635694e-16, 1.8762215804089888e-16], 'max_first_law_error_K': 2.0405928280453622e-08}\n1,500 m ascent; initial RH (%) 81.99999999999999 saturation height (m) 399.9684594261746 peak ambient S (%) 0.4297095534550932 at (m) 422.0\nClass 1 {'height_m': 463.4746091847825, 'critical_radius_um': 7.655770962930668, 'critical_supersaturation_pct': 0.009220309018788687, 'ambient_supersaturation_pct': 0.2920968723740772}\nClass 2 {'height_m': 707.2356154271622, 'critical_radius_um': 13.725963425190042, 'critical_supersaturation_pct': 0.005162073588116756, 'ambient_supersaturation_pct': 0.16792683089225663}\nActivated number fraction 1.0 endpoint LWC (g/m\u00b3) 2.5432636077960247 wet radii (\u00b5m) [20.444476874588226, 20.737957818766372] temperature (K) 289.58407560565024\n1,500 m ROS3 maximum radius error 8.481695590312199e-08 activation shifts (m) [0.000562623698385778, 0.0021338120351401813]\n1,500 m RK23 maximum radius error 2.720188728710937e-06 activation shifts (m) [0.0005646615456385007, 0.0021328477685074176]\n"
       },
       {
         "image": "figure-5-1.png"
@@ -62,10 +62,10 @@
     ]
   ],
   "files": {
-    "source.py": "923a30f77668bf69a011119757241db08668c95fb5bf7b9fc8c2d1e3728f46c7",
-    "data.json": "1c5563dddecc0a11743f2f2795e56b867140c4f8560c317a7e8ea8edaab4d33a",
+    "source.py": "db597a8b3414c10ba2f2742c8b41a66e408252e0b52187515ef9056128bd9dc0",
+    "data.json": "8ebef42ed8435a0c9a79eee779b06064539764ba110967bb6c7a1257589b215f",
     "figure-5-1.png": "1982ba3d6ebbba12f334a8a8c39e9f3b8b7a43feac374c8aa42acbd67e7f6963",
     "figure-5-2.png": "37e18d56514717ecb4016472fd0e5469c44c55a30aa6f5bea3e3efce764a97e0"
   },
-  "simulation_fingerprint": "667bcfdef1fce59afa2ef034318c1ac7a4b99c1f36fd35cee16a17520e14d20e"
+  "simulation_fingerprint": "e33bd79acf32f8238c5c6ffa2ea309259c3ef9defdc193bc697493fd3b2878a1"
 }

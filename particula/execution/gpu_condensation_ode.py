@@ -85,6 +85,7 @@ class GPUCondensationODE:
             )
         self._base = _cpu_batch.detached(aerosol)
         self._strategy = deepcopy(strategy)
+
         self._forcing = forcing
         self._plan = plan_adaptive_condensation(self._strategy, self._base)
         pairs = tuple(
@@ -240,11 +241,22 @@ class GPUCondensationODE:
         self._forward = self._array(forward, wp.int32)
         self._reverse = self._array(reverse, wp.int32)
         self._provider = None
+        self._flux_guard = None
         if config["activity_mode"] == 3:
             self._provider = self._strategy.activity_strategy.bind_device(
                 self._shape, np.flatnonzero(forward >= 0), self.device
             )
             self._bat_table = self._provider.values.flatten()
+            if getattr(self._provider, "hybrid", False):
+                from particula.gpu.kernels.activity_guard import BoxFluxGuard
+
+                if self.method == "ros3" and not callable(
+                    getattr(self._provider, "evaluate_direct", None)
+                ):
+                    raise ValueError(
+                        "hybrid ROS3 requires direct device linearization"
+                    )
+                self._flux_guard = BoxFluxGuard(self._provider)
             self._provider_stage = 0
 
     def _check_ready(self):
@@ -318,13 +330,42 @@ class GPUCondensationODE:
         )
         self._status()
 
-    def _rate(self, time, state, result):
+    def _material_rates(self, activities, dest):
+        self._launch(
+            material_rates,
+            self._shape,
+            [
+                self._masses,
+                self._counts,
+                self._density,
+                self._gas,
+                self._vapor,
+                self._molar,
+                self._tension,
+                self._surface_density,
+                self._surface_reference,
+                self._phases,
+                self._references,
+                self._activity_density,
+                self._kappas,
+                activities,
+                wp.int32(self._plan.values["activity_mode"]),
+                wp.int32(self._plan.values["water"]),
+                self._accommodation,
+                self._diffusion,
+                self._mean_free_path,
+                self._temperature,
+                self._forward,
+                dest,
+            ],
+        )
+
+    def _rate(self, time, state, result, *, linearize=False):
         self._unpack_trial(state)
         if self._forcing is not None:
             temperature, pressure = self._environment(time)
             self._temperature.assign(np.array(temperature, copy=True))
             self._pressure.assign(np.array(pressure, copy=True))
-        config = self._plan.values
         self._launch(
             _refresh_vapor_pressure_kernel,
             self._gas_shape,
@@ -346,7 +387,12 @@ class GPUCondensationODE:
             ],
         )
         if self._provider is not None:
-            self._provider.evaluate(
+            evaluate = (
+                self._provider.evaluate_direct
+                if linearize and self._flux_guard is not None
+                else self._provider.evaluate
+            )
+            evaluate(
                 self._masses,
                 self._counts,
                 self._temperature,
@@ -356,34 +402,17 @@ class GPUCondensationODE:
             self._provider_stage += 1
             self._status()
         self.statistics.rate_calls += 1
-        self._launch(
-            material_rates,
-            self._shape,
-            [
+        if self._flux_guard is not None and not linearize:
+            self._flux_guard.refine(
+                self._material_rates,
                 self._masses,
                 self._counts,
-                self._density,
-                self._gas,
-                self._vapor,
-                self._molar,
-                self._tension,
-                self._surface_density,
-                self._surface_reference,
-                self._phases,
-                self._references,
-                self._activity_density,
-                self._kappas,
-                self._bat_table,
-                wp.int32(config["activity_mode"]),
-                wp.int32(config["water"]),
-                self._accommodation,
-                self._diffusion,
-                self._mean_free_path,
                 self._temperature,
-                self._forward,
-                self._mass_rate,
-            ],
-        )
+                self._invalid,
+                self._provider_stage - 1,
+            )
+            self._status()
+        self._material_rates(self._bat_table, self._mass_rate)
         self._launch(
             algebra.pack_rate,
             self._mass_size,

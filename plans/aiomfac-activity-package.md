@@ -1,6 +1,6 @@
 # AIOMFAC activity package for Particula
 
-The reference, direct activities on CPU and CUDA, closed CPU and CUDA speciation, and two-vapor condensation on CPU and CUDA are implemented locally. [Closed-box and rising-parcel qualification](aiomfac-condensation-integration.md). [Milestones 4 and 5 qualification](aiomfac-speciation-and-cuda.md). [Milestones 2 and 3 implementation and evidence](aiomfac-cpu-activity.md). Build a standalone activity calculator in the Particula repository and expose it through `pip install "particula[aiomfac]"`. Deliver direct float64 CPU and NVIDIA CUDA calculations, integrate them into kinetic condensation including resident execution and restart, and then qualify optional sparse tables. Viscosity is deferred.
+The reference, direct activities on CPU and CUDA, closed CPU and CUDA speciation, and two-vapor condensation on CPU and CUDA are implemented locally. [Closed-box and rising-parcel qualification](aiomfac-condensation-integration.md). [Milestones 4 and 5 qualification](aiomfac-speciation-and-cuda.md). [Milestones 2 and 3 implementation and evidence](aiomfac-cpu-activity.md). Build a standalone activity calculator in the Particula repository and expose it through `pip install "particula[aiomfac]"`. Deliver direct float64 CPU and NVIDIA CUDA calculations, integrate them into kinetic condensation including resident execution and restart, and qualify optional sparse tables. [Milestone 7 table generation, empirical domains and measured break-even](aiomfac-sparse-activity-tables.md). Viscosity is deferred.
 
 ## Milestone 1 qualification — 2026-11-22
 
@@ -96,7 +96,7 @@ Build tables offline from the direct model using a nested dyadic sparse grid and
 
 Fall back to direct calculation on the same device at absent-component boundaries, outside the validated domain, on dry-ratio mismatch, in difficult or unqualified speciation regions, and where the estimated error could reverse the flux direction. Count table hits, direct fallbacks, and failures. An optional approximation must remain useful after fallback overhead is included.
 
-Qualify hybrid fixed-step and RK23 first. Keep ROS3 on direct evaluation and reject a hybrid ROS3 configuration until interpolated derivatives and boundary behavior are separately qualified. Independent interpolation of activities does not ensure Gibbs–Duhem consistency. Check slopes, thermodynamic consistency where the coordinates permit, fluxes, and trajectories. Restrict these tables to the qualified condensation use.
+Hybrid fixed-step, RK23 and ROS3 use guarded activities. ROS3 samples direct same-device chemistry for its physical Jacobian, including both sides of a table boundary and time-dependent box forcing. Independent interpolation of activities does not ensure Gibbs–Duhem consistency. Check slopes, thermodynamic consistency where the coordinates permit, fluxes, and trajectories. Restrict these tables to the qualified condensation use.
 
 ## Validation and performance
 
@@ -125,9 +125,9 @@ Benchmark direct and hybrid CPU and CUDA across batch size, material count, acti
 | [4. CPU speciation](aiomfac-speciation-and-cuda.md#milestone-4--cpu-equilibrium) | Closed-system cases converge reproducibly with checked residuals and explicit failures. | 3–5 |
 | [5. Direct CUDA](aiomfac-speciation-and-cuda.md#milestone-5--direct-cuda-activities) | Real-device parity across supported chemistry, including bounded device speciation. | 3–5 |
 | [6. Condensation integration](aiomfac-condensation-integration.md) | Two neutral vapors exchange in a finite box and a thermodynamically coupled rising parcel. Resident RK23 and ROS3 pass replay and restart on NVIDIA. | 8–12 |
-| 7. Sparse tables | Fixed-dry and bounded variable-composition domains pass independent fixed-step/RK23 and fallback tests. | 3–5 |
+| [7. Sparse tables and scaling](aiomfac-sparse-activity-tables.md) | [CPU/CUDA build, lookup and trajectory study](../docs/studies/validation/condensation/aiomfac-sparse/index.md). Fixed-dry and bounded variable-composition domains pass fixed-step, RK23 and ROS3 trajectory and fallback tests. | 4–6 |
 | 8. Release qualification | Isolated packages, installation matrix, performance report, user guide, and reproducible examples. | 2–3 |
-| **Total** | **Complete activity scope, including optional table qualification** | **26–41** |
+| **Total** | **Complete activity scope, including optional table qualification** | **27–42** |
 
 These are planning estimates for an experienced scientific-software developer with GPU access and scientific review. Allow 20–30% contingency, especially for difficult speciation and resident integration. The direct CPU calculator is independently usable after milestone 4. Label supported chemistry, solver modes, and devices at each stage.
 

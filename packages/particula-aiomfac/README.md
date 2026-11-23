@@ -1,6 +1,6 @@
 # particula-aiomfac
 
-Version 0.1.3 evaluates liquid-phase activities with bundled AIOMFAC-web 3.15
+Version 0.1.4 evaluates liquid-phase activities with bundled AIOMFAC-web 3.15
 parameters. NumPy and SciPy provide CPU evaluation. The optional Warp backend
 evaluates the same chemistry in float64 on NVIDIA CUDA devices. It runs independently of Particula.
 Each component is a neutral molecule described by explicit subgroup counts or a
@@ -107,3 +107,48 @@ The [Fortran reference guide](reference/README.md) describes the pinned
 source, table generation, and numerical qualification. The backend wheel includes
 the generated tables and GPL notices. The source archive includes the tools,
 examples, reference corpus and tests.
+
+## Precompute and use neutral activity tables
+
+Install the backend, or select it through Particula's `aiomfac` extra. The
+standalone `cuda` extra adds Warp. Generate a portable artifact using either
+native calculator in an environment with the matching device.
+
+```sh
+particula-aiomfac-table build mixed-water --device cpu --output mixed-cpu.npz
+particula-aiomfac-table build mixed-water --device cuda:0 --output mixed-gpu.npz
+```
+
+```python
+from particula_aiomfac.sparse import ActivityTable, build_table
+
+table = ActivityTable.load("mixed-water")  # or ActivityTable.load("mixed-gpu.npz")
+model = table.prepare(device="cpu")
+activities, log_error, reason = model.evaluate([[0.977, 0.001, 0.002, 0.020]], 298)
+```
+
+Each row contains mass amounts in the recipe's analytical order. Temperature
+is in kelvin. Output columns follow `table.recipe.targets`. An occupied row
+uses lookup (0) or same-device direct evaluation for absent components (1),
+incompatible dry ratios (2), out-of-domain coordinates (3), or unqualified
+cells (4). Vacant rows have reason −1. Direct failures raise an indexed error.
+The empirical error expresses absolute uncertainty in natural log activity.
+Fortran fixtures provide independent historical comparisons.
+
+The installed recipes are `mixed-water`, `mixed-two-vapor`,
+`mixed-variable-acid`, `neutral`, `shared-ion`, `sulfate` and `carbonate`.
+Inspect one with `from particula_aiomfac.sparse import load_recipe`. To adapt
+it, serialize `dataclasses.asdict(load_recipe("mixed-water"))` to JSON, edit
+the mixture, targets, coordinates and tolerances, then pass the JSON filename
+to the builder. The first two coordinates are natural log water/dry mass and
+temperature. Subsequent coordinates are each named component's fraction of
+the remaining dry mass. Run independent accuracy checks for each new domain.
+
+For Particula condensation, add `"evaluation": "hybrid"` and
+`"table": "mixed-two-vapor"` (or an artifact path) to the existing
+`ActivityFactory().get_strategy("aiomfac", parameters)` configuration. Supply
+the full analytical mixture and material mapping. Fixed stepping, RK23 and ROS3
+guard the predicted flux direction. ROS3 uses the table in stage fluxes and
+direct same-device chemistry for the physical Jacobian. This applies to CPU
+and CUDA closed boxes and resident CUDA multi-vapor parcels. Ionic outputs
+and speciation diagnostics use direct evaluation. Checkpoints bind the table digest.

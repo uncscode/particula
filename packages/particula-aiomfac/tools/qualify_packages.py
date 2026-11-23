@@ -2,6 +2,7 @@
 
 import argparse
 import email
+import os
 import subprocess
 import sys
 import tarfile
@@ -31,6 +32,8 @@ def check_archives(dist, backend):
             "LICENSE",
             "NOTICE",
             "tools/reference.py",
+            "tools/sparse_study.py",
+            "tools/sparse_trajectories.py",
             "tools/export_parameters.py",
             "examples/closed_water.py",
             "src/particula_aiomfac/data/parameters.npz",
@@ -62,6 +65,17 @@ def check_archives(dist, backend):
             "particula_aiomfac/kernels/" + name + ".inc" in wheel_files
             for name in ("activity", "equilibrium", "output")
         )
+        for recipe in (
+            "mixed-water",
+            "mixed-two-vapor",
+            "mixed-variable-acid",
+            "sulfate",
+            "carbonate",
+            "shared-ion",
+            "neutral",
+        ):
+            item = f"particula_aiomfac/data/sparse/{recipe}.npz"
+            assert item in wheel_files and "src/" + item in source_files
         for notice in ("LICENSE", "NOTICE"):
             assert any(
                 p.endswith(".dist-info/licenses/" + notice) for p in wheel_files
@@ -217,6 +231,7 @@ for name,wanted in zip(("particula","particula_aiomfac"),sys.argv[1:],strict=Tru
                         else []
                     ),
                 ],
+                env=dict(os.environ, PATH=str(python.parent), PYTHONPATH=""),
                 cwd=work,
                 check=True,
             )

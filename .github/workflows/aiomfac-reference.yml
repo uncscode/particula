@@ -12,6 +12,8 @@ on:
       - 'particula/execution/*condensation*.py'
       - 'particula/execution/*parcel*.py'
       - 'particula/particles/prepared_activity.py'
+      - 'particula/gpu/kernels/activity_guard.py'
+      - 'particula/gpu/kernels/condensation.py'
       - 'docs/studies/examples/thermodynamics/**/aiomfac_*.py'
       - '.github/workflows/aiomfac-reference.yml'
   push:
@@ -26,6 +28,8 @@ on:
       - 'particula/execution/*condensation*.py'
       - 'particula/execution/*parcel*.py'
       - 'particula/particles/prepared_activity.py'
+      - 'particula/gpu/kernels/activity_guard.py'
+      - 'particula/gpu/kernels/condensation.py'
       - 'docs/studies/examples/thermodynamics/**/aiomfac_*.py'
       - '.github/workflows/aiomfac-reference.yml'
 permissions:

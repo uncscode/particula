@@ -19,3 +19,6 @@ cuda = ["warp-lang>=1.11"]
 [tool.flit.sdist]
 include = ["reference/", "tools/", "tests/", "examples/"]
 exclude = ["**/__pycache__/", "**/*.pyc", ".pytest_cache/"]
+
+[project.scripts]
+particula-aiomfac-table = "particula_aiomfac.sparse:main"

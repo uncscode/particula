@@ -1462,6 +1462,33 @@
       "start_here": false
     },
     {
+      "source": "docs/studies/validation/condensation/aiomfac-sparse/index.md",
+      "title": "When sparse AIOMFAC activity tables pay off",
+      "topic": "verification-performance",
+      "also": [
+        "activity-nonideal",
+        "condensation-reservoirs",
+        "gpu"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "aiomfac-sparse-tables",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/studies/examples/thermodynamics/activity/aiomfac_closed_box.py",
+            "label": "Closed-box equations and reference"
+          },
+          {
+            "target": "docs/studies/examples/thermodynamics/parcel-experiments/aiomfac_multivapor_parcel.py",
+            "label": "Parcel and activation reference"
+          }
+        ]
+      }
+    },
+    {
       "source": "docs/studies/validation/condensation/stiffness.md",
       "title": "Condensation error across a measured timestep grid",
       "topic": "verification-scientific",
@@ -5919,6 +5946,7 @@
     }
   ],
   "study_group_exceptions": {
+    "docs/studies/validation/condensation": "The sparse-activity benchmark compares chemistry construction, lookup and fallback costs across both parcel and box workflows. Its reference and timing matrix are shared across integrators.",
     "docs/studies/literature": "Six primary choices cover distinct measurement or process families. The seventh is a cross-listed validation against wall loss theory.",
     "docs/studies/validation": "Eight study collections distinguish mechanism inference and optical validation from the existing physical-process and workflow qualifications."
   }

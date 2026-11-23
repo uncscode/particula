@@ -210,6 +210,34 @@ class _TrialDomainError(ValueError):
     """A numerical trial left the physical domain before acceptance."""
 
 
+def _uncertain_fluxes(
+    rates, driving, slope, sink, offset, errors, latent, enabled
+):
+    """Bound the shared surface temperature before each species flux."""
+    eps = np.expm1(errors)
+    dheat = (abs(driving) * eps) @ latent
+    dsink = (abs(slope) * eps) @ latent
+    safe = sink > dsink
+    doffset = (dheat + abs(offset) * dsink) / np.where(safe, sink - dsink, 1.0)
+    bound = (
+        eps * (abs(driving) + abs(slope * offset[:, None]))
+        + abs(slope) * (1 + eps) * doffset[:, None]
+    )
+    return np.any(errors > 0, axis=1) & (
+        ~safe | np.any((abs(rates) <= bound) & enabled, axis=1)
+    )
+
+
+def _activity_intervals(provider, masses, temperature, targets):
+    """Return activities and optional error estimates for occupied classes."""
+    args = (masses, temperature, targets, np.ones(len(masses), dtype=bool))
+    if getattr(provider, "evaluation", None) == "hybrid" and hasattr(
+        provider, "neutral_with_error"
+    ):
+        return provider.neutral_with_error(*args)
+    return provider.neutral_activities(*args), None
+
+
 class ParcelTendencies:
     """Evaluate the coupled instantaneous mass, pressure and heat budgets."""
 
@@ -259,11 +287,11 @@ class ParcelTendencies:
             if np.any(radius <= 0):
                 raise _TrialDomainError("occupied parcel class has zero volume")
             try:
-                activity = state.activity_strategy.neutral_activities(
+                activity, errors = _activity_intervals(
+                    state.activity_strategy,
                     masses[active],
                     temperature,
                     self.targets,
-                    np.ones(active.sum(), dtype=bool),
                 )
             except getattr(
                 state.activity_strategy, "trial_failure_types", ()
@@ -286,7 +314,6 @@ class ParcelTendencies:
             psat = self.p0 * np.exp(
                 self.latent / self.gas_r * (1 / self.t0 - 1 / temperature)
             )
-            equilibrium = activity * psat * np.exp(curvature)
             mobility = (
                 4
                 * np.pi
@@ -297,25 +324,61 @@ class ParcelTendencies:
                 / pressure
                 / (self.gas_r * temperature)
             ) * self.enabled
-            isothermal = mobility * (
-                vapor * self.gas_r * temperature / volume - equilibrium
-            )
-            # Linearize surface equilibrium vapor density about the trial
-            # temperature with activity and radius fixed. All vapors share one
-            # conductive heat sink, including simultaneous evaporation.
-            slope = (
-                mobility
-                * equilibrium
-                * (self.latent / (self.gas_r * temperature) - 1 - curvature)
-                / temperature
-            )
             conduction = (
                 4 * np.pi * radius[:, 0] * get_thermal_conductivity(temperature)
             )
-            surface_offset = (isothermal @ self.latent) / (
-                conduction + slope @ self.latent
-            )
-            flux[active] = isothermal - slope * surface_offset[:, None]
+
+            def surface_rates(activity):
+                equilibrium = activity * psat * np.exp(curvature)
+                isothermal = mobility * (
+                    vapor * self.gas_r * temperature / volume - equilibrium
+                )
+                # Linearize surface equilibrium vapor density about the trial
+                # temperature. All vapors share one conductive heat sink.
+                slope = (
+                    mobility
+                    * equilibrium
+                    * (self.latent / (self.gas_r * temperature) - 1 - curvature)
+                    / temperature
+                )
+                sink = conduction + slope @ self.latent
+                surface_offset = (isothermal @ self.latent) / sink
+                return (
+                    isothermal - slope * surface_offset[:, None],
+                    slope,
+                    sink,
+                    surface_offset,
+                    mobility * equilibrium,
+                )
+
+            rates, slope, sink, offset, driving = surface_rates(activity)
+            if errors is not None:
+                uncertain = _uncertain_fluxes(
+                    rates,
+                    driving,
+                    slope,
+                    sink,
+                    offset,
+                    errors,
+                    self.latent,
+                    self.enabled,
+                )
+                if uncertain.any():
+                    try:
+                        exact = state.activity_strategy.refine_neutrals(
+                            masses[active], temperature, self.targets, uncertain
+                        )
+                    except getattr(
+                        state.activity_strategy, "trial_failure_types", ()
+                    ) as error:
+                        slot = int(np.flatnonzero(active)[error.batch_index[0]])
+                        raise _TrialDomainError(
+                            f"parcel activity at box 0, slot {slot}: "
+                            f"{error.reason}"
+                        ) from error
+                    activity[uncertain] = exact[uncertain]
+                    rates = surface_rates(activity)[0]
+            flux[active] = rates
         dq = -(state.number @ flux) / state.dry_air_mass
         dtemp = (volume * dp - dq @ self.latent) / CP
         if not np.isfinite(dtemp) or not np.all(np.isfinite(flux)):

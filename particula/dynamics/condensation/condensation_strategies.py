@@ -152,6 +152,60 @@ def _native_neutral_activities(activity, particle, temperature, targets):
     return fractions
 
 
+def _native_gas_pressures(vapor, gas, temperature):
+    """Validate and return pure and ambient pressures in gas order (Pa)."""
+    if isinstance(vapor, Sequence) and len(vapor) != len(gas.name):
+        raise ValueError("vapor pressure strategies must follow full gas order")
+    pure = np.asarray(
+        _pure_vapor_pressure_from_strategy(vapor, float(temperature))
+        if isinstance(vapor, Sequence)
+        else vapor.pure_vapor_pressure(
+            np.full(len(gas.name), float(temperature))
+        )
+    )
+    if pure.ndim != 0 and pure.shape != (len(gas.name),):
+        raise ValueError("vapor pressure must be scalar or full-gas ordered")
+    pure = np.broadcast_to(pure, (len(gas.name),))
+    if not np.all(np.isfinite(pure)) or np.any(pure < 0):
+        raise ValueError("pure vapor pressure must be finite and nonnegative")
+    partial_gas = _partial_pressure_from_strategy(
+        vapor, gas.concentration[0], gas.molar_mass, temperature
+    )
+    if partial_gas.shape != (len(gas.name),):
+        raise ValueError("partial pressure must follow full gas order")
+    if not np.all(np.isfinite(partial_gas)):
+        raise ValueError("partial gas pressure must be finite")
+    return pure, partial_gas
+
+
+def _refine_pressure_terms(
+    activity,
+    particle,
+    temperature,
+    targets,
+    partial_gas,
+    errors,
+    scales,
+    delta,
+    equilibrium,
+):
+    """Re-evaluate a row if its activity interval can reverse a mapped flux."""
+    ambiguous = np.any(
+        (errors > 0)
+        & (
+            abs(delta[:, targets]) <= equilibrium[:, targets] * np.expm1(errors)
+        ),
+        axis=1,
+    )
+    if ambiguous.any():
+        exact = activity.refine_neutrals(
+            particle.masses[0], temperature, targets, ambiguous
+        )
+        ix = np.ix_(ambiguous, targets)
+        equilibrium[ix] = exact[ambiguous] * scales[ambiguous]
+        delta[ix] = partial_gas - equilibrium[ix]
+
+
 def _native_kelvin_lane(
     kelvin: NDArray[np.float64],
     particle: ParticleData,
@@ -287,7 +341,7 @@ class CondensationStrategy(ABC):
         validate_layout = getattr(
             self.activity_strategy, "validate_material_layout", None
         )
-        if validate_layout is not None:
+        if validate_layout is not None and self.species_map is not None:
             validate_layout(
                 particle.n_species,
                 tuple(target for _, target in self.species_map.gas_to_particle),
@@ -324,42 +378,28 @@ class CondensationStrategy(ABC):
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         """Evaluate full composition and mapped pressure lanes in Pa."""
         activity, surface, vapor = self._resolve_strategies()
-        if isinstance(vapor, Sequence) and len(vapor) != len(gas.name):
-            raise ValueError(
-                "vapor pressure strategies must follow full gas order"
+        pure, partial_gas = _native_gas_pressures(vapor, gas, temperature)
+        errors = None
+        if getattr(activity, "evaluation", None) == "hybrid" and hasattr(
+            activity, "neutral_with_error"
+        ):
+            fractions, errors = activity.neutral_with_error(
+                particle.masses[0],
+                temperature,
+                targets,
+                particle.concentration[0] > 0,
             )
-        pure = np.asarray(
-            _pure_vapor_pressure_from_strategy(vapor, float(temperature))
-            if isinstance(vapor, Sequence)
-            else vapor.pure_vapor_pressure(
-                np.full(len(gas.name), float(temperature))
+        else:
+            fractions = _native_neutral_activities(
+                activity, particle, temperature, targets
             )
-        )
-        if pure.ndim != 0 and pure.shape != (len(gas.name),):
-            raise ValueError(
-                "vapor pressure must be scalar or full-gas ordered"
-            )
-        pure = np.broadcast_to(pure, (len(gas.name),))
-        if not np.all(np.isfinite(pure)) or np.any(pure < 0):
-            raise ValueError(
-                "pure vapor pressure must be finite and nonnegative"
-            )
-        partial_gas = _partial_pressure_from_strategy(
-            vapor, gas.concentration[0], gas.molar_mass, temperature
-        )
-        if partial_gas.shape != (len(gas.name),):
-            raise ValueError("partial pressure must follow full gas order")
-        if not np.all(np.isfinite(partial_gas)):
-            raise ValueError("partial gas pressure must be finite")
-        fractions = _native_neutral_activities(
-            activity, particle, temperature, targets
-        )
         delta = np.zeros_like(particle.masses[0])
         equilibrium = np.zeros_like(delta)
         if particle.n_particles == 0:
             # Gas and activity configuration were validated above. There are
             # no material radii on which to evaluate the Kelvin correction.
             return delta, equilibrium
+        scales = np.empty_like(fractions) if errors is not None else None
         for lane, (source, target) in enumerate(
             zip(sources, targets, strict=True)
         ):
@@ -373,8 +413,22 @@ class CondensationStrategy(ABC):
                 dtype=np.float64,
             )
             kelvin = _native_kelvin_lane(kelvin, particle, int(target))
+            if scales is not None:
+                scales[:, lane] = pure[source] * kelvin
             equilibrium[:, target] = pure[source] * fractions[:, lane] * kelvin
             delta[:, target] = partial_gas[source] - equilibrium[:, target]
+        if errors is not None and scales is not None:
+            _refine_pressure_terms(
+                activity,
+                particle,
+                temperature,
+                targets,
+                partial_gas[np.asarray(sources)],
+                errors,
+                scales,
+                delta,
+                equilibrium,
+            )
         return delta, equilibrium
 
     def _native_mass_transfer_rate(
@@ -541,15 +595,16 @@ class CondensationStrategy(ABC):
             sources,
             targets,
         )
+        activity = self.activity_strategy
         if (
-            getattr(self.activity_strategy, "prepared_provider_version", None)
-            == 1
+            activity is not None
+            and getattr(activity, "prepared_provider_version", None) == 1
         ):
             # Validate the candidate before either inventory becomes visible.
             active = particle.concentration[0] > 0
             if particle.distribution_type == "particle_resolved":
                 active &= np.any(new_masses > 0, axis=1)
-            self.activity_strategy.neutral_activities(
+            activity.neutral_activities(
                 new_masses, temperature, targets, active
             )
         heat = self._native_latent_heat_values(gas, temperature)

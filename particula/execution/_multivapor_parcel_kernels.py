@@ -427,3 +427,80 @@ def decide(
     if counters[2] >= limit and counters[3] == 0 and clock[0] < clock[2]:
         counters[3] = 3
     condition[0] = int(counters[3] == 0 and clock[0] < clock[2])
+
+
+@wp.kernel(enable_backward=False)
+def flux_guard(
+    pressure: Vector,
+    temperature: Vector,
+    vapor: Vector,
+    volume: Vector,
+    masses: Cube,
+    density: Vector,
+    lanes: Ints,
+    props: Matrix,
+    free: Matrix,
+    slopes: Matrix,
+    flux: Matrix,
+    errors: Cube,
+    uncertain: wp.array2d(dtype=int),
+):
+    """Bound heat and mass flux errors about the trial surface solution."""
+    c = wp.tid()
+    size = wp.float64(0.0)
+    for j in range(density.shape[0]):
+        size += masses[0, c, j] / density[j]
+    r = wp.pow(wp.float64(3.0) * size / PI4, ONE / wp.float64(3.0))
+    t = temperature[0]
+    sink = (
+        PI4 * r * wp.float64(0.001) * (wp.float64(4.39) + wp.float64(0.071) * t)
+    )
+    heat = wp.float64(0.0)
+    dsink = wp.float64(0.0)
+    dheat = wp.float64(0.0)
+    uncertain[0, c] = 0
+    active = int(0)
+    for j in range(lanes.shape[0]):
+        eps = wp.exp(errors[0, c, lanes[j]]) - ONE
+        if eps > ZERO:
+            active = 1
+        mobility = (
+            PI4
+            * r
+            * props[j, 4]
+            * wp.pow(t / wp.float64(273.15), wp.float64(1.94))
+            * wp.float64(101325.0)
+            / (pressure[0] * props[j, 0] * t)
+        )
+        driving = mobility * vapor[j] * props[j, 0] * t / volume[0] - free[c, j]
+        heat += free[c, j] * props[j, 1]
+        sink += slopes[c, j] * props[j, 1]
+        dsink += wp.abs(slopes[c, j]) * eps * props[j, 1]
+        dheat += wp.abs(driving) * eps * props[j, 1]
+    if active == 0:
+        return
+    if not (sink > dsink):
+        uncertain[0, c] = 1
+        return
+    offset = heat / sink
+    doffset = (dheat + wp.abs(offset) * dsink) / (sink - dsink)
+    for j in range(lanes.shape[0]):
+        if props[j, 4] > ZERO:
+            eps = wp.exp(errors[0, c, lanes[j]]) - ONE
+            mobility = (
+                PI4
+                * r
+                * props[j, 4]
+                * wp.pow(t / wp.float64(273.15), wp.float64(1.94))
+                * wp.float64(101325.0)
+                / (pressure[0] * props[j, 0] * t)
+            )
+            driving = (
+                mobility * vapor[j] * props[j, 0] * t / volume[0] - free[c, j]
+            )
+            bound = (
+                eps * (wp.abs(driving) + wp.abs(slopes[c, j] * offset))
+                + wp.abs(slopes[c, j]) * (ONE + eps) * doffset
+            )
+            if wp.abs(flux[c, j]) <= bound:
+                uncertain[0, c] = 1

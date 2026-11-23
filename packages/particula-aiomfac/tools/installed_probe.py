@@ -1,8 +1,12 @@
 """Exercise installed wheel entry points from outside the checkout."""
 
 import json
+import os
 import runpy
+import shutil
+import subprocess
 import sys
+import tempfile
 from importlib.resources import files
 from pathlib import Path
 
@@ -79,10 +83,44 @@ def calculate(case_id, execution):
     )
 
 
+def installed_sparse(cuda):
+    """Build with the installed entry point outside the tree, with no compiler on PATH."""
+    from particula_aiomfac.sparse import ActivityTable
+
+    devices = ("cpu", "cuda:0") if cuda else ("cpu",)
+    with tempfile.TemporaryDirectory() as tmp:
+        cli = Path(sys.executable).with_name("particula-aiomfac-table")
+        for build_device in devices:
+            artifact = Path(tmp) / "mixed.npz"
+            subprocess.run(
+                [
+                    cli,
+                    "build",
+                    "mixed-water",
+                    "--device",
+                    build_device,
+                    "--output",
+                    artifact,
+                ],
+                cwd=tmp,
+                env=dict(os.environ, PATH=str(cli.parent), PYTHONPATH=""),
+                check=True,
+            )
+            for run_device in devices:
+                model = ActivityTable.load(artifact).prepare(device=run_device)
+                masses = np.tile([0.977, 0.001, 0.002, 0.020], (2, 1))
+                masses[1, 1] *= 2
+                a, _, reason = model.evaluate(masses, 298.0)
+                assert abs(a[0, 0] - 0.9878567852129456) < 1e-4
+                np.testing.assert_array_equal(reason, [0, 2])
+
+
 if __name__ == "__main__":
+    assert shutil.which("gfortran") is None
     if sys.argv[1] == "base":
         base_activities()
     else:
+        installed_sparse("cuda" in sys.argv[2:])
         for device in ("cpu", "cuda") if "cuda" in sys.argv[2:] else ("cpu",):
             for case in ("mixed", "sulfate", "coupled-carbonate-sulfate"):
                 calculate(case, device)
@@ -107,3 +145,31 @@ if __name__ == "__main__":
                 )
             )
             parcel["simulate"](device="cuda:0" if cuda else "cpu")
+            from dataclasses import replace
+
+            from particula_aiomfac.adapter import AIOMFACActivity
+
+            initial = parcel["initial_parcel"]()
+            hybrid = AIOMFACActivity(
+                initial.activity_strategy.mixture,
+                dict(enumerate(initial.material_names)),
+                evaluation="hybrid",
+                table="mixed-two-vapor",
+            )
+            initial = replace(initial, activity_strategy=hybrid)
+            reference = parcel["run_parcel"](
+                initial, timestep=1.0, updraft=1.0, steps=150
+            )
+            b = box["make_box"](table="mixed-two-vapor")
+            box["compare"](
+                box["native"](b, 8), box["radau"](box["make_box"]()), b.targets
+            )
+            if cuda:
+                for method in ("rk23", "ros3"):
+                    box["qualify_restart"](method, table="mixed-two-vapor")
+                    solver = parcel[
+                        "ParcelRK23" if method == "rk23" else "ParcelROS3"
+                    ]
+                    parcel["cuda_comparison"](
+                        reference, solver(rtol=2e-6), "cuda:0", restart=True
+                    )

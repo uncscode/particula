@@ -128,6 +128,14 @@ class PreparedModel:
 
     def evaluate(self, masses, temperature_K, *, diagnostics=False):
         """Calculate activities for scalar or batched masses in common mass units."""
+        return self._evaluate_rows(
+            masses, temperature_K, diagnostics, collect_failures=False
+        )
+
+    def _evaluate_rows(
+        self, masses, temperature_K, diagnostics, *, collect_failures
+    ):
+        """Optionally retain per-node numerical failures for offline refinement."""
         mass = np.asarray(masses, dtype=np.float64)
         if mass.ndim == 0 or mass.shape[-1] != self.ncomponents:
             raise ValueError(
@@ -215,6 +223,26 @@ class PreparedModel:
                         RuntimeError,
                         FloatingPointError,
                     ) as error:
+                        if collect_failures:
+                            # Discard partially speciated trial amounts. A benign
+                            # pure-water placeholder keeps other rows vectorized.
+                            # The builder excludes this row using its status.
+                            status[start + j] = -5
+                            neutral_moles[j] = 0.0
+                            neutral_moles[j, self.water] = (
+                                1.0 / self.neutral_mw[self.water]
+                            )
+                            ion_moles[j] = 0.0
+                            if diagnostics:
+                                terms["evaluations"][start + j] = 0
+                                terms["retries"][start + j] = 0
+                                terms["equilibrium_residuals"][start + j] = (
+                                    np.nan
+                                )
+                                terms["precipitated_caso4_mol_per_kg_input"][
+                                    start + j
+                                ] = np.nan
+                            continue
                         index = tuple(
                             map(int, np.unravel_index(start + j, shape))
                         )
@@ -249,10 +277,13 @@ class PreparedModel:
                 sr[:, self.co2] = lr[:, self.co2] = 0.0
                 mr[:, self.co2] = 2 * (mol[rows] @ self.co2_lambda)
             coeff = sr + mr + lr
-            reject(
-                ~np.isfinite(coeff).all(axis=1) | ~np.isfinite(scale),
-                "unrepresentable activity calculation",
-            )
+            bad_coeff = ~np.isfinite(coeff).all(axis=1) | ~np.isfinite(scale)
+            if collect_failures:
+                status[
+                    start + np.flatnonzero(bad_coeff & (status[rows] >= 0))
+                ] = -1
+            else:
+                reject(bad_coeff, "unrepresentable activity calculation")
             xout[rows] = x[:, :n]
             nm[rows], im[rows] = solvent > tiny, mol[rows] > tiny
             lng[rows] = np.where(nm[rows], coeff[:, :n], np.nan)

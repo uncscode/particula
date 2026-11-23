@@ -56,6 +56,21 @@ This feature is built around user-facing APIs exposed via
   transport_k`, `get_mass_transfer`, `get_radius_transfer_rate` for reference
   and lower-level workflows.
 
+### Sparse AIOMFAC activities
+
+With `particula[aiomfac]` installed, an AIOMFAC provider accepts
+`evaluation="hybrid"` and `table="mixed-two-vapor"` in its factory parameters.
+Select a recipe whose analytical components and order match the configured
+mixture. The material mapping still includes dissolved nonvolatile components.
+Each direct or interpolated result uses the current wet composition and
+temperature. The box and parcel request an exact evaluation when the
+activity error interval makes a vapor flux direction uncertain. The default
+remains direct AIOMFAC. With `method="ros3"` on a native CPU or CUDA box, or
+`ParcelROS3` on a resident CUDA parcel, each stage uses guarded activities.
+Every finite-difference sample for the Jacobian uses direct AIOMFAC on the
+simulation device. This keeps derivatives consistent when a perturbation crosses
+a table face or flux-sign threshold. See the [domain limits, timing sweeps and activation ascent](../../studies/validation/condensation/aiomfac-sparse/index.md).
+
 ## Water phase and numerical accuracy
 
 `WaterBuckStrategy` uses the ice-pressure coefficients below 273.15 K and

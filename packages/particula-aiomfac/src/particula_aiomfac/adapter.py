@@ -1,9 +1,11 @@
 """Particula activity provider for native CPU and prepared CUDA condensation."""
 
+from copy import copy
 from functools import lru_cache
 from hashlib import sha256
 from importlib.resources import files
 from operator import index
+from pathlib import Path
 from types import MappingProxyType
 
 import numpy as np
@@ -15,7 +17,6 @@ from . import (
     MixtureSpec,
     __version__,
 )
-
 from ._equilibrium import ActivityDomainError
 
 
@@ -38,16 +39,45 @@ class AIOMFACActivity(ActivityStrategy):
             "native_isothermal",
             "prepared_cuda",
             "resident_condensation",
+            "hybrid_neutral_activities",
+            "hybrid_ros3",
         }
     )
 
     def __init__(
-        self, mixture, material_mapping, inert_indices=(), execution="cpu"
+        self,
+        mixture,
+        material_mapping,
+        inert_indices=(),
+        execution="cpu",
+        evaluation="direct",
+        table=None,
     ):
         if execution != "cpu":
             raise ValueError("native condensation requires CPU execution")
         self.mixture = mixture
         self.prepared = AIOMFACModel.prepare(mixture, execution=execution)
+        if evaluation not in ("direct", "hybrid") or (
+            evaluation == "hybrid"
+        ) != (table is not None):
+            raise ValueError(
+                "hybrid evaluation requires a table and direct evaluation takes none"
+            )
+        self.table = None
+        self.evaluation = evaluation
+        if table is not None:
+            from .sparse import ActivityTable
+
+            path = Path(table)
+            self.table_source = (
+                str(path.resolve()) if path.is_file() else str(table)
+            )
+            self.table = ActivityTable.load(self.table_source)
+            if tuple(self.table.recipe.mixture.components.items()) != tuple(
+                mixture.components.items()
+            ):
+                raise ValueError("sparse table analytical mixture mismatch")
+        self.counts = np.zeros(7, dtype=np.int64)
         names = tuple(mixture.components)
         inert = tuple(inert_indices)
         lanes = (*material_mapping, *inert)
@@ -89,6 +119,10 @@ class AIOMFACActivity(ActivityStrategy):
             components,
             self.material_order,
             self.width,
+        ) + (
+            ()
+            if self.table is None
+            else ((self.table_source, self.table.digest),)
         )
 
     def __deepcopy__(self, memo):
@@ -97,19 +131,34 @@ class AIOMFACActivity(ActivityStrategy):
 
     @classmethod
     def from_identity(cls, identity):
-        _, _, _, _, _, _, components, order, width = identity
+        """Restore a provider after checking its layout, revision and artifact."""
+        _, _, _, _, _, _, components, order, width, *artifact = identity
         mixture = MixtureSpec(
             {name: dict(groups) for name, groups in components}
         )
         mapping = dict(zip(order, mixture.components, strict=True))
         provider = cls(
-            mixture, mapping, tuple(i for i in range(width) if i not in mapping)
+            mixture,
+            mapping,
+            tuple(i for i in range(width) if i not in mapping),
+            **(
+                dict(evaluation="hybrid", table=artifact[0][0])
+                if artifact
+                else {}
+            ),
         )
         if provider.prepared_identity() != identity:
             raise ValueError(
                 "incompatible AIOMFAC parameter or provider identity"
             )
         return provider
+
+    def direct_for_linearization(self):
+        """Share the prepared CPU chemistry for physical rate derivatives."""
+        direct = copy(self)
+        direct.table = None
+        direct.evaluation = "direct"
+        return direct
 
     def bind_device(self, shape, targets, device):
         """Bind one layout; each owner has independent stream-compatible buffers."""
@@ -134,16 +183,52 @@ class AIOMFACActivity(ActivityStrategy):
                 )
 
     def neutral_activities(self, masses, temperature, targets, active):
+        """Return dimensionless neutral activities in native material order."""
+        return self.neutral_with_error(masses, temperature, targets, active)[0]
+
+    def neutral_with_error(
+        self, masses, temperature, targets, active, *, exact=False
+    ):
+        """Return neutral activities and empirical absolute log error by lane."""
         self.validate_material_layout(masses.shape[-1], targets)
         selected = [self.neutral_lanes[k] for k in targets]
         result = np.zeros((len(masses), len(targets)))
-        if np.any(active):
-            dissolved = masses[np.ix_(active, self.material_order)]
+        error = np.zeros_like(result)
+        rows = np.flatnonzero(active)
+        if not len(rows):
+            return result, error
+        dissolved = masses[np.ix_(rows, self.material_order)]
+        tk = np.broadcast_to(temperature, (len(masses),))[rows]
+        names = [self.prepared.neutrals[i] for i in selected]
+        if (
+            self.table is not None
+            and names
+            and not exact
+            and set(names) <= set(self.table.recipe.targets)
+        ):
+            values, estimates, reasons = self.table.lookup(dissolved, tk)
+            lanes = [self.table.recipe.targets.index(k) for k in names]
+            result[rows] = values[:, lanes]
+            error[rows] = estimates[:, lanes]
+            self.counts[:5] += np.bincount(reasons, minlength=5)
+            misses = reasons != 0
+            dissolved, tk, rows = dissolved[misses], tk[misses], rows[misses]
+        if len(rows):
             try:
-                tk = np.broadcast_to(temperature, (len(masses),))[active]
-                evaluation = self.prepared.evaluate(dissolved, tk)
-            except ActivityDomainError as error:
-                slot = int(np.flatnonzero(active)[error.batch_index[0]])
-                raise type(error)(error.reason, batch_index=(slot,)) from error
-            result[active] = evaluation.neutral_activities[:, selected]
-        return result
+                values = self.prepared.evaluate(
+                    dissolved, tk
+                ).neutral_activities
+            except ActivityDomainError as exc:
+                self.counts[6] += 1
+                slot = int(rows[exc.batch_index[0]])
+                raise type(exc)(exc.reason, batch_index=(slot,)) from exc
+            result[rows] = values[:, selected]
+        return result, error
+
+    def refine_neutrals(self, masses, temperature, targets, mask):
+        """Recompute all requested neutrals of flux-ambiguous occupied rows."""
+        self.counts[0] -= np.count_nonzero(mask)
+        self.counts[5] += np.count_nonzero(mask)
+        return self.neutral_with_error(
+            masses, temperature, targets, mask, exact=True
+        )[0]

@@ -278,6 +278,8 @@ def cuda_comparison(
         max_relative_inventory_error=budgets["max_relative_inventory_error"],
         max_first_law_error_K=budgets["max_first_law_error_K"],
     )
+    if getattr(owner.binding, "hybrid", False):
+        metrics["lookup_counts"] = owner.binding.counts.numpy().tolist()
     return (metrics, hist) if return_trajectory else metrics
 
 

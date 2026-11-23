@@ -308,6 +308,7 @@ class _PreparedCondensationCall:
     ion_material_indices: tuple[int, int] | None = None
     kelvin_density: float = 0.0
     provider: Any = None
+    flux_guard: Any = None
     staged_arrays: tuple = ()
     committed_transfer: Any = None
 
@@ -3037,6 +3038,8 @@ def _prepare_condensation_step_gpu(  # noqa: C901
 
     if activity_surface is None or activity_surface.provider is None:
         return call
+    from particula.gpu.kernels.activity_guard import BoxFluxGuard
+
     provider = activity_surface.provider
     if (
         provider.values.shape != expected_shape
@@ -3067,6 +3070,9 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         call,
         **staged,
         provider=provider,
+        flux_guard=BoxFluxGuard(provider)
+        if getattr(provider, "hybrid", False)
+        else None,
         staged_arrays=tuple(copies),
         committed_transfer=call.total_mass_transfer,
         kappas=provider.values.flatten(),
@@ -3107,6 +3113,42 @@ def _enqueue_prepared_condensation_call(p):
             device=p.device,
         )
     return p.particles, p.committed_transfer
+
+
+def _mapped_proposal(p, activities, dest):
+    wp.launch(
+        _mapped_condensation_mass_transfer_kernel,
+        dim=p.particle_concentration.shape,
+        inputs=[
+            p.particle_masses,
+            p.particle_concentration,
+            p.particle_density,
+            p.gas_concentration,
+            p.gas_vapor_pressure,
+            p.gas_molar_mass,
+            p.surface_tension,
+            activities,
+            p.molar_mass_reference,
+            p.effective_surface_tension,
+            p.activity_enabled,
+            p.activity_mode,
+            p.surface_tension_mode,
+            p.water_species_index,
+            p.mass_accommodation,
+            p.diffusion_coefficient_vapor,
+            p.latent_heat_values,
+            p.latent_heat_enabled,
+            p.dynamic_viscosity,
+            p.mean_free_path,
+            wp.float64(constants.GAS_CONSTANT),
+            wp.float64(constants.BOLTZMANN_CONSTANT),
+            p.refresh_temperature,
+            p.substep_time_step,
+            dest,
+        ]
+        + [p.particle_to_gas, wp.float64(p.kelvin_density)],
+        device=p.device,
+    )
 
 
 def _advance_fixed_substeps(  # noqa: C901
@@ -3209,39 +3251,16 @@ def _advance_fixed_substeps(  # noqa: C901
             ],
             device=p.device,
         )
-        wp.launch(
-            _mapped_condensation_mass_transfer_kernel,
-            dim=(n_boxes, n_particles),
-            inputs=[
+        if p.flux_guard is not None:
+            p.flux_guard.refine(
+                lambda activities, dest: _mapped_proposal(p, activities, dest),
                 p.particle_masses,
                 p.particle_concentration,
-                p.particle_density,
-                p.gas_concentration,
-                p.gas_vapor_pressure,
-                p.gas_molar_mass,
-                p.surface_tension,
-                p.kappas,
-                p.molar_mass_reference,
-                p.effective_surface_tension,
-                p.activity_enabled,
-                p.activity_mode,
-                p.surface_tension_mode,
-                p.water_species_index,
-                p.mass_accommodation,
-                p.diffusion_coefficient_vapor,
-                p.latent_heat_values,
-                p.latent_heat_enabled,
-                p.dynamic_viscosity,
-                p.mean_free_path,
-                wp.float64(constants.GAS_CONSTANT),
-                wp.float64(constants.BOLTZMANN_CONSTANT),
                 p.refresh_temperature,
-                p.substep_time_step,
-                p.work_mass_transfer,
-            ]
-            + [p.particle_to_gas, wp.float64(p.kelvin_density)],
-            device=p.device,
-        )
+                p.failure,
+                substep,
+            )
+        _mapped_proposal(p, p.kappas, p.work_mass_transfer)
         wp.launch(
             native_kernels.gate_transfer,
             dim=(n_boxes, n_particles),

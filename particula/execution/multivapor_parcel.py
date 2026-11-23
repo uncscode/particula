@@ -144,6 +144,12 @@ class ResidentMultiVaporParcel:
         self.binding = initial.activity_strategy.bind_device(
             (1, nclass, nmat), self.lanes, self.device
         )
+        if (
+            self.ros
+            and getattr(self.binding, "hybrid", False)
+            and not callable(getattr(self.binding, "evaluate_direct", None))
+        ):
+            raise ValueError("hybrid ROS3 requires direct device linearization")
         self._arrays = []
 
         def upload(x, dtype=wp.float64):
@@ -194,6 +200,11 @@ class ResidentMultiVaporParcel:
             self.pivots = zeros(self.n, wp.int32)
             self.delta = zeros(1)
             self.f0, self.fr = zeros(self.n), zeros(self.n)
+            self.jac_base = (
+                zeros(self.n)
+                if getattr(self.binding, "hybrid", False)
+                else self.f0
+            )
         # Compile the trial on scratch before capturing the acceptance loop.
         self._trial()
         self.counters.zero_()
@@ -232,23 +243,7 @@ class ResidentMultiVaporParcel:
             stage,
         )
 
-    def _rate(self, state, out, stage):
-        self._unpack(state, stage)
-        self.binding.evaluate(
-            self.masses, self._counts, self.temp, self.invalid, stage=stage
-        )
-        self._launch(
-            k.hydro,
-            1,
-            self.pressure,
-            self.temp,
-            self.vapor,
-            self._props,
-            RD,
-            self.rhs.loading * STANDARD_GRAVITY * self.updraft,
-            self.vol,
-            self.dp,
-        )
+    def _fluxes(self):
         self._launch(
             k.fluxes,
             self.nclass,
@@ -267,6 +262,58 @@ class ResidentMultiVaporParcel:
             self.slopes,
             self.flux,
         )
+
+    def _rate(self, state, out, stage, *, linearize=False):
+        self._unpack(state, stage)
+        hybrid = getattr(self.binding, "hybrid", False)
+        evaluate = (
+            self.binding.evaluate_direct
+            if linearize and hybrid
+            else self.binding.evaluate
+        )
+        evaluate(
+            self.masses, self._counts, self.temp, self.invalid, stage=stage
+        )
+        self._launch(
+            k.hydro,
+            1,
+            self.pressure,
+            self.temp,
+            self.vapor,
+            self._props,
+            RD,
+            self.rhs.loading * STANDARD_GRAVITY * self.updraft,
+            self.vol,
+            self.dp,
+        )
+        self._fluxes()
+        if hybrid and not linearize:
+            self._launch(
+                k.flux_guard,
+                self.nclass,
+                self.pressure,
+                self.temp,
+                self.vapor,
+                self.vol,
+                self.masses,
+                self._density,
+                self._lanes,
+                self._props,
+                self.free,
+                self.slopes,
+                self.flux,
+                self.binding.errors,
+                self.binding.uncertain,
+            )
+            self.binding.evaluate(
+                self.masses,
+                self._counts,
+                self.temp,
+                self.invalid,
+                stage=stage,
+                refine=True,
+            )
+            self._fluxes()
         self._launch(
             k.accumulate,
             1,
@@ -297,6 +344,8 @@ class ResidentMultiVaporParcel:
         a, b, c, d = self.stages
         if self.ros:
             self._rate(self.y, self.f0, 1)
+            if self.jac_base is not self.f0:
+                self._rate(self.y, self.jac_base, 1, linearize=True)
             self._launch(k.mark_base, 1, self.invalid, self.counters)
             for j in range(self.n):
                 self._launch(
@@ -313,11 +362,11 @@ class ResidentMultiVaporParcel:
                     self._counts,
                     self.initial.dry_air_mass,
                 )
-                self._rate(self.trial, self.fr, 2 + j)
+                self._rate(self.trial, self.fr, 2 + j, linearize=True)
                 self._launch(
                     k.linearize,
                     self.n,
-                    self.f0,
+                    self.jac_base,
                     self.fr,
                     self.delta,
                     self.clock,

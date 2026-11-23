@@ -75,7 +75,7 @@ class Box:
     equilibrium: np.ndarray
 
 
-def make_box(direction=1, permuted=False):
+def make_box(direction=1, permuted=False, *, table=None):
     """Prepare native state with gas and material maps in explicit orders."""
     from particula_aiomfac import MixtureSpec
 
@@ -137,6 +137,11 @@ def make_box(direction=1, permuted=False):
     provider = ActivityFactory().get_strategy(
         "aiomfac",
         {
+            **(
+                {"evaluation": "hybrid", "table": table}
+                if table is not None
+                else {}
+            ),
             "mixture": MixtureSpec(GROUPS),
             "material_mapping": {
                 i: k for i, k in enumerate(materials) if k in GROUPS
@@ -337,6 +342,9 @@ def gpu_run(box, solver, steps_per_sample=8):
                 rejected=0,
                 activity_evaluations=5 * owner.completed_steps,
             )
+            provider = owner._bindings["condensation"].prepared.provider
+            if getattr(provider, "hybrid", False):
+                stats["lookup_counts"] = provider.counts.numpy().tolist()
     else:
         driver, method = solver.split("-")
         cls = {"host": GPUCondensationODE, "resident": GPUResidentCondensation}[
@@ -370,6 +378,8 @@ def gpu_run(box, solver, steps_per_sample=8):
             interval_times.append(perf_counter() - start)
             result.append(sample(box, owner.snapshot()))
         stats = asdict(owner.statistics)
+        if getattr(owner._provider, "hybrid", False):
+            stats["lookup_counts"] = owner._provider.counts.numpy().tolist()
         stats["activity_evaluations"] = stats["rate_calls"]
         stats["control_readbacks"] = owner.control_readbacks
         stats["initial_rate_downloads"] = 1
@@ -390,7 +400,7 @@ def gpu_run(box, solver, steps_per_sample=8):
     return result, stats
 
 
-def qualify_restart(method, device="cuda:0"):
+def qualify_restart(method, device="cuda:0", *, table=None):
     """Force reversed gas offsets between intervals and resume an archived cycle."""
     from particula.dynamics import Dilution, DilutionStrategy
     from particula.execution.gpu_coupled import (
@@ -403,7 +413,7 @@ def qualify_restart(method, device="cuda:0"):
         save_coupled_checkpoint,
     )
 
-    box = make_box()
+    box = make_box(table=table)
     interval = 1e-6
     # Zero removal preserves the finite box budget across the event grid.
     events = (Dilution(DilutionStrategy(0.0)),)

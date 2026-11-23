@@ -1,7 +1,12 @@
 """Profile four warmed resident graphs on one NVIDIA device."""
 
+import argparse
 import ctypes
+import json
 import runpy
+import sqlite3
+from dataclasses import replace
+from pathlib import Path
 
 import warp as wp
 from particula.dynamics.parcel import ParcelRK23, ParcelROS3
@@ -13,7 +18,7 @@ from particula.execution.gpu_resident_condensation import (
 from particula.execution.multivapor_parcel import ResidentMultiVaporParcel
 
 
-def profile_graphs():
+def profile_graphs(hybrid=False, method=None):
     """Capture only replay, excluding preparation and explicit observations."""
     boxmod = runpy.run_path(
         "docs/studies/examples/thermodynamics/activity/aiomfac_closed_box.py"
@@ -21,11 +26,26 @@ def profile_graphs():
     parcelmod = runpy.run_path(
         "docs/studies/examples/thermodynamics/parcel-experiments/aiomfac_multivapor_parcel.py"
     )
-    box = boxmod["make_box"]()
+    box = boxmod["make_box"](table="mixed-two-vapor" if hybrid else None)
     parcel = parcelmod["initial_parcel"]()
+    schemes = {"rk23": ParcelRK23, "ros3": ParcelROS3}
+    methods = (method,) if method else (("rk23",) if hybrid else tuple(schemes))
+    if hybrid:
+        from particula_aiomfac.adapter import AIOMFACActivity
+
+        parcel = replace(
+            parcel,
+            activity_strategy=AIOMFACActivity(
+                parcel.activity_strategy.mixture,
+                dict(enumerate(parcel.material_names)),
+                evaluation="hybrid",
+                table="mixed-two-vapor",
+            ),
+        )
     owners = []
     graphs = []
-    for method, cls in [("rk23", ParcelRK23), ("ros3", ParcelROS3)]:
+    for method in methods:
+        cls = schemes[method]
         b = GPUResidentCondensation(
             box.aerosol,
             box.process,
@@ -59,7 +79,7 @@ def profile_graphs():
     wp.synchronize_device("cuda:0")
     if driver.cuProfilerStop() != 0:
         raise RuntimeError("CUDA profiler could not stop")
-    for i in (0, 2):
+    for i in range(0, len(owners), 2):
         if not (
             owners[i]._counters.numpy()[3] == 0
             and owners[i]._control.numpy()[1] == 0.0001
@@ -72,5 +92,55 @@ def profile_graphs():
             raise RuntimeError("parcel stopped before the observation")
 
 
+def summarize_trace(path):
+    """Summarize a CUDA-profiler-range Nsight SQLite export after replay."""
+    with sqlite3.connect(path) as db:
+        tables = {
+            row[0]
+            for row in db.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            )
+        }
+        runtime = dict(
+            db.execute(
+                "SELECT s.value,count(*) FROM CUPTI_ACTIVITY_KIND_RUNTIME r "
+                "JOIN StringIds s ON r.nameId=s.id GROUP BY s.value"
+            )
+        )
+        kernels = dict(
+            db.execute(
+                "SELECT s.value,count(*) FROM CUPTI_ACTIVITY_KIND_KERNEL k "
+                "JOIN StringIds s ON k.shortName=s.id GROUP BY s.value"
+            )
+        )
+        copies = 0
+        if "CUPTI_ACTIVITY_KIND_MEMCPY" in tables:
+            copies = db.execute(
+                "SELECT COUNT(*) FROM CUPTI_ACTIVITY_KIND_MEMCPY"
+            ).fetchone()[0]
+    return dict(
+        graph_launches=sum(v for k, v in runtime.items() if "GraphLaunch" in k),
+        kernel_executions=sum(kernels.values()),
+        lookup_kernels=sum(
+            v for k, v in kernels.items() if k.startswith("_lookup_")
+        ),
+        cuda_copies=copies,
+        allocation_calls=sum(
+            v for k, v in runtime.items() if "Alloc" in k or "Malloc" in k
+        ),
+        runtime_calls=runtime,
+    )
+
+
 if __name__ == "__main__":
-    profile_graphs()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--hybrid", action="store_true")
+    parser.add_argument("--method", choices=("rk23", "ros3"))
+    parser.add_argument(
+        "--summary", type=Path, help="summarize an exported Nsight trace"
+    )
+    args = parser.parse_args()
+    if args.summary:
+        print(json.dumps(summarize_trace(args.summary), indent=2))
+    else:
+        profile_graphs(args.hybrid, args.method)

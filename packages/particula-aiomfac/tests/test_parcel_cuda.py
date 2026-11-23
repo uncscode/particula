@@ -65,9 +65,42 @@ def make_state(case_name):
     )
 
 
-@pytest.mark.parametrize("control", [ParcelRK23(), ParcelROS3()])
-def test_backend_failure_preserves_accepted_coordinates(control):
+@pytest.mark.parametrize(
+    ("control", "hybrid"),
+    [(ParcelRK23(), False), (ParcelROS3(), False), (ParcelROS3(), True)],
+)
+def test_backend_failure_preserves_accepted_coordinates(
+    control, hybrid, tmp_path
+):
     s = make_state("coupled-trace-bound")
+    if hybrid:
+        from particula_aiomfac.sparse import TableRecipe, build_table
+
+        provider = s.activity_strategy
+        recipe = TableRecipe(
+            name="coupled",
+            components=tuple(provider.mixture.components.items()),
+            dry_weights=(0, 1, 1),
+            targets=("water",),
+            variable_dry=(),
+            bounds=((3.0, 3.1), (295.0, 296.0)),
+            log_tolerances=(4e-5,),
+            max_level=1,
+        )
+        table = tmp_path / "coupled.npz"
+        build_table(recipe).save(table)
+        s = replace(
+            s,
+            activity_strategy=ActivityFactory().get_strategy(
+                "aiomfac",
+                dict(
+                    mixture=provider.mixture,
+                    material_mapping=dict(enumerate(s.material_names)),
+                    evaluation="hybrid",
+                    table=table,
+                ),
+            ),
+        )
     owner = ResidentMultiVaporParcel(
         s, device="cuda:0", adaptive=control, timestep=1e-3, updraft=1.0
     )
@@ -78,6 +111,8 @@ def test_backend_failure_preserves_accepted_coordinates(control):
         owner.advance(0.001)
     np.testing.assert_array_equal(owner.y.numpy(), capture.coordinates)
     assert owner.clock.numpy()[0] == 0
+    if hybrid:
+        assert owner.binding.counts.numpy()[6] > 0
 
 
 @pytest.mark.parametrize("control", [ParcelRK23(), ParcelROS3()])
