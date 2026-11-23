@@ -298,25 +298,41 @@ def simulate_two_vapors():
 # share grows from zero. Dashed horizontal references come from the closed
 # equilibrium solve, which takes no time steps.
 # %%
+@plt.style.context("particula.default")
 def plot_results(data):
     """Show vapor uptake of evaporated water and liquid phase appearance."""
-    fig, (left, right) = plt.subplots(
-        1, 2, figsize=(8.8, 3.7), constrained_layout=True
-    )
+    from particula import plotting
+
+    fig, (left, right) = plotting.subplots(1, 2, size="wide")
     t = data["time_s"]
-    left.plot(t, data["water"], "o-", color="#17678a", label="Particle water")
     left.plot(
-        t, data["beta_share"], "s-", color="#a24426", label="Organic-rich phase"
+        t,
+        data["water"],
+        "o-",
+        color=plotting.COLORS["teal"],
+        label="Particle water",
+    )
+    left.plot(
+        t,
+        data["beta_share"],
+        "s-",
+        color=plotting.COLORS["rust"],
+        label="Organic-rich phase",
     )
     left.axhline(
         data["equilibrium_water"],
         ls="--",
-        color="#17678a",
+        color=plotting.COLORS["teal"],
         label="Bulk water endpoint",
     )
     left.set_ylabel("Fraction of total particle mass")
-    left.legend(frameon=False)
-    right.plot(t, 100 * np.array(data["humidity"]), "o-", color="#487b43")
+    plotting.legend(left, placement="inside")
+    right.plot(
+        t,
+        100 * np.array(data["humidity"]),
+        "o-",
+        color=plotting.COLORS["indigo"],
+    )
     right.axhline(100 * data["equilibrium_rh"], color="0.35", ls="--")
     right.set_ylabel("Vapor relative humidity (%)")
     for ax in (left, right):
@@ -324,10 +340,12 @@ def plot_results(data):
         ax.set_xlim(0, 3.2)
         ax.set_xlabel("Time (s)")
     multi = data["two_vapors"]
-    transfer, (part, air) = plt.subplots(
-        1, 2, figsize=(8.8, 3.7), constrained_layout=True
+    transfer, (part, air) = plotting.subplots(1, 2, size="wide")
+    colors = (
+        plotting.COLORS["teal"],
+        plotting.COLORS["rust"],
+        plotting.COLORS["indigo"],
     )
-    colors = ("#17678a", "#a24426", "#715688")
     labels = ("Water", "2-propanol", "Ammonium sulfate")
     for i, (label, color) in enumerate(zip(labels, colors, strict=True)):
         part.plot(
@@ -358,13 +376,15 @@ def plot_results(data):
             lw=0,
         )
     part.set_ylabel("Mass per droplet (pg)")
-    part.legend(frameon=False)
+    plotting.legend(part, placement="inside")
     air.axhline(0, color="0.55", lw=0.7)
     air.set_ylabel("Change in vapor mass (mg/m³)")
     for axis in (part, air):
         axis.set_xscale("symlog", linthresh=0.02)
         axis.set_xlim(0, 3.2)
         axis.set_xlabel("Time (s)")
+    plotting.fit(transfer)
+    plotting.fit(fig)
     return fig, transfer
 
 

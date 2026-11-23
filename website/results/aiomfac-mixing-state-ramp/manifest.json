@@ -31,7 +31,7 @@
     "particula/particles/prepared_activity.py": "04b1be37d8a9de2bb5dbef8c1d491306a6124dae70589dc1af7c8e287cb100b4"
   },
   "example": "aiomfac-mixing-state-ramp",
-  "fingerprint": "1010f9fc12c3fd427ad14032b7eca73cca56f32b72db78aa2bb7072ee1341257",
+  "fingerprint": "5ca5f7cc716d2f845ed58d4babb5b24a63c9f20e398dd7e8e72bfcb91d722edf",
   "source": "docs/studies/examples/thermodynamics/equilibria/aiomfac_mixing_state_ramp.py",
   "revision": "83dd7eca054ce1d74ec8bc3239412bbbf2750704",
   "package_dirty": false,
@@ -67,12 +67,12 @@
     ]
   ],
   "files": {
-    "source.py": "d41785df513cfa6cb48bad8b713297aa2e9509f51c4217dd95d376008b7047d9",
+    "source.py": "b792e80449f747dffaad23e69ebe20ef0a6d0d4e105d442c63d4999031a394fc",
     "data.json": "86bc8cb61766711b558f5b3b7b460df29dbbff404f8076a2472da62dfcc0ec1f",
     "executed_source.py": "b534329ac93eb4222acd6800bcc8856a824ece55be0a1db1775182f4f20c5948",
-    "figure-6-1.png": "75e69a501c6f02ff918783096673170e1d32162334d63e36f70309a8f559f5c7",
-    "figure-6-2.png": "5485090717d79d654c2c77766389392ef5d111ba1abf009266b1b961fd47095d",
-    "figure-6-3.png": "52cd11a5c1c2dd3651e981e9285d2907c7fd7d82c869c7daa224cf3686c1429d"
+    "figure-6-1.png": "239050a635781cef91a7f4652b762b697ddefd4a46df96651426ffd28cecf58d",
+    "figure-6-2.png": "0e63403edce1582ae212914131e8e4d7993e66aa17be49e0eb709bf1cedadd6b",
+    "figure-6-3.png": "35e7241a8d1a6a226284a1c4b56dd53138cc4c01fa7b4d8889d3b9ac421549c0"
   },
   "simulation_fingerprint": "261eb4ebe8f092012ff6bf5bcd6ac80379b9620b89704b9db631deb5cfaa59f1",
   "render_versions": {
@@ -112,7 +112,7 @@
     "particula/gpu/kernels/condensation.py": "b3d29efa7a21da1a8b8c2886d1dfbf8a8e78dcb05b8815c0be95291c84b9bcd0",
     "particula/particles/prepared_activity.py": "04b1be37d8a9de2bb5dbef8c1d491306a6124dae70589dc1af7c8e287cb100b4"
   },
-  "rendered_at": "2026-11-23T04:30:14.932531+00:00",
-  "render_revision": "83dd7eca054ce1d74ec8bc3239412bbbf2750704",
-  "render_elapsed_seconds": 2.1337733468972147
+  "rendered_at": "2026-11-23T12:53:04.915345+00:00",
+  "render_revision": "d4cdadc4b648de6cb49eb0f97530f6489d89f797",
+  "render_elapsed_seconds": 4.681962793925777
 }
