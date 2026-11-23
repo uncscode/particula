@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 4.786003052955493,
+  "package_source_sha256": "4806288781cb500d3d363d336267f1652cd8efabde58fe55d40d465cd6006c13",
+  "scientific_source_sha256": "82c7fd93e383f4eb3c038d6a6bd755aef738b6fec75e616f92b728dee77ed4d3",
+  "input_sha256": {
+    "scripts/antarctic_ccn/analysis.py": "72e3ca4552b6e940b52e3f7236a732fa1e6d0ffedb38c92dfe0b846ccb6b7b74",
+    "scripts/antarctic_ccn/model.py": "37f9e9698d750754433c2c6af8bbb34ab0fe211f3577d93f4e403a536142901f",
+    "scripts/antarctic_ccn/plots.py": "6a052b501934b6d1ddbc0a22084b13e6a5864a1546e291dd855a21b1d2d4fe61",
+    "docs/data/antarctic-ccn/inputs.npz": "b780eab89377eb2482e65df56f79c92a2ac6d19e55d680a6184b58a9838111bb",
+    "docs/data/antarctic-ccn/activities.csv": "42533196582d9fa5ca807601601a09cd334e2f9a0be3a6e1694a10496dd537c1",
+    "docs/data/antarctic-ccn/water-activity.csv": "004fedd60893a64a31a8d44aabfc74247abdad0bb73eb4a00b64bd9a684fe379",
+    "docs/data/antarctic-ccn/calibration-ranges.csv": "15d31cae284006b51d7a41f2ea61ae8fa381ae3f6a303cd12f0257e3f0bb4e3c",
+    "docs/data/antarctic-ccn/attribution-ranges.csv": "df88fef04d3aeb961255c3cb5fa3e54e2d998b24901bb2df7fbc5d0aa23c2d66",
+    "scripts/antarctic_ccn/recovery.py": "65cea0045a6530eceaa07abadb150d76d2ee64af545cf50d803071ae6a9d88f8",
+    "docs/data/antarctic-ccn/synthetic-decisions.csv.gz": "6b4876d8c23cc5e9b36561a826f62fb072e64edc3e49ca404a5ab0f16f804be2"
+  },
+  "example": "antarctic-ccn-uncertainty",
+  "fingerprint": "447fa91e4c97993abccfb8c1259a36bb9edcc3618562fb8ea304453dbd04d4ce",
+  "source": "docs/studies/literature/antarctic-ccn/uncertainty.py",
+  "revision": "b91c0d187c4fe7f7161c576336b496dcd8d64f60",
+  "package_dirty": false,
+  "executed_at": "2026-11-22T23:36:39.226552+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.4",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "image": "figure-2-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-3-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-4-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-4-1.png": "195c6e803190b36b8257762a7033c506581b79758d86e0991f7ac75a5e00cad8",
+    "figure-3-1.png": "845ed836e767c646f59d64f1ae77894220b9ae945634500dc28058010e8f13b3",
+    "figure-2-1.png": "2051f4077e4461f6026f8cee1c8005d90f3252ae6f6f242a9995e97d8ea98978",
+    "executed_source.py": "427a3e99980b4b836b38e5eeb9c4fc38e3593d4e120c62cea76097cbd72dc098",
+    "data.json": "b281b82d772ba5d50c3acd08608d572847055e6f13d57301f20eab74ede9ffcc",
+    "source.py": "427a3e99980b4b836b38e5eeb9c4fc38e3593d4e120c62cea76097cbd72dc098"
+  },
+  "simulation_fingerprint": "a54d7b89d6dd7d7703b72d08270f4491a61ddcb7a411f0b1ed50e3544c84c5f7",
+  "render_versions": {
+    "particula": "0.3.4",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {
+    "scripts/antarctic_ccn/analysis.py": "72e3ca4552b6e940b52e3f7236a732fa1e6d0ffedb38c92dfe0b846ccb6b7b74",
+    "scripts/antarctic_ccn/model.py": "37f9e9698d750754433c2c6af8bbb34ab0fe211f3577d93f4e403a536142901f",
+    "scripts/antarctic_ccn/plots.py": "6a052b501934b6d1ddbc0a22084b13e6a5864a1546e291dd855a21b1d2d4fe61",
+    "docs/data/antarctic-ccn/inputs.npz": "b780eab89377eb2482e65df56f79c92a2ac6d19e55d680a6184b58a9838111bb",
+    "docs/data/antarctic-ccn/activities.csv": "42533196582d9fa5ca807601601a09cd334e2f9a0be3a6e1694a10496dd537c1",
+    "docs/data/antarctic-ccn/water-activity.csv": "004fedd60893a64a31a8d44aabfc74247abdad0bb73eb4a00b64bd9a684fe379",
+    "docs/data/antarctic-ccn/calibration-ranges.csv": "15d31cae284006b51d7a41f2ea61ae8fa381ae3f6a303cd12f0257e3f0bb4e3c",
+    "docs/data/antarctic-ccn/attribution-ranges.csv": "df88fef04d3aeb961255c3cb5fa3e54e2d998b24901bb2df7fbc5d0aa23c2d66",
+    "scripts/antarctic_ccn/recovery.py": "65cea0045a6530eceaa07abadb150d76d2ee64af545cf50d803071ae6a9d88f8",
+    "docs/data/antarctic-ccn/synthetic-decisions.csv.gz": "6b4876d8c23cc5e9b36561a826f62fb072e64edc3e49ca404a5ab0f16f804be2"
+  },
+  "rendered_at": "2026-11-22T23:36:42.457531+00:00",
+  "render_revision": "b91c0d187c4fe7f7161c576336b496dcd8d64f60",
+  "render_elapsed_seconds": 2.114445311948657
+}

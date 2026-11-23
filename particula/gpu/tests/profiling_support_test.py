@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import os
 import subprocess
 import sys
 from dataclasses import replace
@@ -371,6 +372,8 @@ def test_raw_provenance_is_contained_streamed_and_reverified(
     raw_root = support.ensure_profiling_raw_root(root)
     report = raw_root / "trace.json"
     report.write_bytes(b"hello")
+    # Make the next read eligible for an access-time update under relatime.
+    os.utime(report, ns=(0, report.stat().st_mtime_ns))
     provenance = support.build_raw_report_provenance(root, "trace.json")
     assert provenance.byte_size == 5
     assert provenance.sha256 == hashlib.sha256(b"hello").hexdigest()
@@ -378,6 +381,28 @@ def test_raw_provenance_is_contained_streamed_and_reverified(
     report.write_bytes(b"changed")
     with pytest.raises(ValueError):
         support.verify_raw_report_provenance(root, provenance)
+
+
+def test_raw_provenance_rejects_same_size_rewrite_during_hash(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A rewrite after the first read invalidates the sampled digest."""
+    root = tmp_path / ".artifacts"
+    root.mkdir()
+    report = support.ensure_profiling_raw_root(root) / "trace.json"
+    report.write_bytes(b"hello")
+    os.utime(report, ns=(0, 0))
+    read = os.read
+
+    def read_and_rewrite(fd: int, count: int) -> bytes:
+        chunk = read(fd, count)
+        if chunk:
+            report.write_bytes(b"world")
+        return chunk
+
+    monkeypatch.setattr(os, "read", read_and_rewrite)
+    with pytest.raises(ValueError, match="changed while it was hashed"):
+        support.build_raw_report_provenance(root, report.name)
 
 
 @pytest.mark.parametrize(

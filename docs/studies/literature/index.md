@@ -4,6 +4,9 @@ Follow comparisons with published measurements, reference calculations and datas
 
 <div class="study-figures">
 
+[![At 0.4% full coating reduces mean CCN bias. Both adjacent rises move farther from the measurements at nominal calibration.](../../images/antarctic-ccn/graphical-abstract.png)\
+How an organic film can improve one Antarctic CCN count and worsen the activation spectrum](antarctic-ccn/index.md)
+
 [![The fitted Manchester network grew from 38 to 40 channels as α-pinene vapor returned to labile particle material and o-cresol dimer-family vapor returned to retained material. Refitting accounted for about 90% of the reduction in worst joint error and the added channels for 10%. Joint error fell in 12 of 15 experiments.](../../images/manchester-soa/campaign-performance-toc.svg)\
 Twelve of 15 Manchester runs improved, yet the average joint error rose](evaporation-and-uptake/manchester-campaign-performance/index.md)
 
@@ -83,6 +86,7 @@ At the inferred Π Chamber humidity, modeled sulfate haze falls below the optica
 - [At low ion production, CLOUD’s 70% humidity measurement exceeds the ceiling set by the reported wall loss](cloud-ion-humidity/index.md)
 - [Evaporation and reactive uptake](evaporation-and-uptake/index.md)
 - [Fitting mean drop mass with a constant collision rate leaves a sixfold shortfall in counts at twice the starting radius](shear-drop-spectrum/index.md)
+- [How an organic film can improve one Antarctic CCN count and worsen the activation spectrum](antarctic-ccn/index.md)
 - [Particle water uptake and activation](particle-water-uptake/index.md)
 - [Particula fits the measured rise in particle number with sulfur dioxide in a straw-combustion analogue](straw-combustion/index.md)
 - [Particula predicts water-drop fall speeds within 4.2% at nine diameters from 0.20 to 1.00 mm](drizzle-settling/index.md)

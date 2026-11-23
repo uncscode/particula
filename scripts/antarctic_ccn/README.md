@@ -1,0 +1,35 @@
+# Reproduce the King Sejong CCN comparison
+
+Run from the repository root with the Particula scientific and docs dependencies. The published example rebuilds the nominal thermodynamics, integrates the measured size distributions and refits coating on each training resample. Figure 3 also uses calibration envelopes and labelled synthetic decisions from the earlier process-discovery analysis.
+
+```bash
+export OPENBLAS_NUM_THREADS=1
+python -m scripts.antarctic_ccn.analysis
+python -m scripts.render_literature_tocs antarctic-ccn
+python scripts/docs_examples.py refresh antarctic-ccn-uncertainty
+python scripts/docs_examples.py replot antarctic-ccn-uncertainty
+python -m scripts.antarctic_ccn.calibration /tmp/antarctic-calibration
+```
+
+The last command independently rebuilds 729 measurement scenarios. It spans three levels each of shared counter gain (±5%), counter offset (±0.025 percentage points), dry diameter (±5%), number (±10%), measured growth factor (±2%) and conditioning RH (89.6%, 90%, 90.4%). It preserves integrated bin number under a sizing-only shift, and re-infers dry composition after adjusting growth or RH. The grid is a sensitivity analysis without probability weights. The source-to-figure paths below are relative to the repo root.
+
+| Figure or quantity | Inputs, model and calculation | Saved plot data |
+|---|---|---|
+| Measured spectrum and hourly variability | `docs/data/antarctic-ccn/inputs.npz` → `model.py` → `analysis.py` → `plots.py` | [Mean and hourly intervals](../../website/public/study-data/antarctic-ccn/plot-spreads.csv) |
+| Graphical abstract and changes in absolute bias | Subtract measured counts within each paired date resample. Form rising increments on the same hourly vectors. Compare absolute mean biases to salts within the replicate. | [Paired contrasts](../../website/public/study-data/antarctic-ccn/paired-bias.csv) |
+| Signed size effects and calibration limits | Apply the film only to a selected dry-size band. Resample paired differences at nominal calibration. The dotted lines span cases accepted for the common-film model. | [Size intervals](../../website/public/study-data/antarctic-ccn/size-spreads.csv) · [Calibration envelopes](../../docs/data/antarctic-ccn/calibration-ranges.csv) |
+| Fitted effect, maximum and shortfall | `analysis.py` rebuilds the nominal date intervals. `calibration.py` rebuilds the ranges with four-channel RMSE within 1 CCN/cm³ of the global grid minimum. | [Retained ranges](../../docs/data/antarctic-ccn/attribution-ranges.csv) · [Grid scores](../../website/public/study-data/antarctic-ccn/calibration-cases.csv.gz) |
+| Detection by imposed cause | `recovery.py` scores 28,672 previously simulated independent campaigns from the original search with a 12% minimum salt fraction, 1,024 per generating configuration per noise model. Each has five simulated hourly counts at the actual timestamps. The archived decisions use fits to four channels with three training-date folds. Each row records its generating truth, full-calendar chemical effect in CCN/cm³, decision and decision with the finite law omitted. The registered example recomputes binomial Wilson intervals from these decisions. | [Campaign decisions](../../docs/data/antarctic-ccn/synthetic-decisions.csv.gz) |
+| Numerical particle uncertainty | The revised field comparison paired sampled sizes and growth classes across physics on a GeForce RTX 5060. A three-hour pilot used 1,024 draws per hour. Each seed covers 373 observation hours with 8,192 draws per hour. The table records the 78-hour test mean. Standard error is the sample standard deviation across eight seed contrasts divided by √8. | [Particle and CPU contrasts by seed](../../website/public/study-data/antarctic-ccn/particle-refinement.csv) |
+
+## Author observations and material assumptions
+
+Wei Xu, Young Jun Yoon and Darius Ceburnis archived *aerosol measurement KSJ station* under CC BY 4.0. The supplied [matched observations](../../docs/data/antarctic-ccn/inputs.npz) are an adapted, compressed subset with the 373 common clean-sector hours, five measured CCN settings, logarithmic dry-size densities and growth distributions at five dry sizes. To rebuild this input, download the three author CSVs. Save “KSJ SMPS clean 20260319.csv” as `smps`, “KSJ HTDMA clean 20260319.csv” as `htdma`, and “KSJ CCN clean 20260731.csv” as `ccn` in a directory. Run `python -m scripts.antarctic_ccn.prepare RAW_DIRECTORY OUTPUT_DIRECTORY`. The preparer checks the original MD5 digests and matches timestamps. [Xu et al.](https://doi.org/10.1029/2026GL125204) · [Author archive](https://doi.org/10.5281/zenodo.22008294) · [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+
+The separate-salt calculation uses binary NaCl and ammonium sulfate water activities from AIOMFAC-web, tabulated versus water-to-dry-salt mass ratio. The finite-film calculation uses the sulfate activity table and Davies et al.’s suberic-acid analogue. The organic dry volume comes from growth inversion. At fixed growth the water-to-salt mass ratio is inversely proportional to dry salt volume fraction. The measured activity table bounds that ratio, and the physical upper limit on the salt volume fraction is one. The film model conserves that volume while calculating fractional surface coverage at each wet diameter. Unmatched growth classes keep their salt-reference response. The modeled film changes are confined to 35–165 nm. Particula supplies the Kelvin radius. Dry size integration uses measured log-bin widths and interpolation between HTDMA anchors. [AIOMFAC](https://doi.org/10.5194/acp-8-4559-2008) · [Finite-film laboratory comparison](https://doi.org/10.5194/acp-19-2933-2019)
+
+## Reading the uncertainty
+
+Every fourth sorted date is retrospective test data (26 dates, 78 hours). The other 78 dates contain 295 hours. The primary fit has one bounded coated fraction common to all eligible particles. The alternative estimates four dry-size-specific fractions. The 0.4% channel stays hidden from fitting. Seed 12520430 generates 1,000 independent training/test pairs of date resamples. Whole dates keep their observed number of hours and cross-channel covariance. All-hour summaries combine the independently sampled date strata. Each mean weights hours equally. The plotted 95% intervals are pointwise percentiles of the mean or paired contrast. The 10th–90th percentiles describe individual hours at the original fitted parameters. Each absolute-bias change uses the absolute value of a signed mean bias. Hourly mean absolute error is a separate score.
+
+The secondary marine comparison uses a prespecified Kleinheins monolayer formulation, 20 input rows in the SOAP archive (19 with source-confirmed organic loadings), and 83 vector-extracted North Atlantic Figure 3b observations. The study text reports the transfer checks. The public example runs the Antarctic analysis. [Kleinheins code and parameters](https://doi.org/10.5281/zenodo.13588318) · [SOAP archive](https://doi.org/10.1594/PANGAEA.919801) · [Quinn et al.](https://doi.org/10.1038/ngeo2092)

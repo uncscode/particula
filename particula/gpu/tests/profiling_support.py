@@ -764,7 +764,14 @@ def _hash_report_descriptor(directory: Path, filename: str) -> tuple[int, str]:
             if total > MAX_RAW_REPORT_BYTES:
                 raise ValueError("raw report has an invalid byte size.")
             digest.update(chunk)
-        if os.fstat(report_fd) != initial or total != size:
+        # Reading this descriptor can itself advance the access time.
+        final = os.fstat(report_fd)
+        if (
+            total != size
+            or final.st_size != size
+            or final.st_mtime_ns != initial.st_mtime_ns
+            or final.st_ctime_ns != initial.st_ctime_ns
+        ):
             raise ValueError("raw report changed while it was hashed.")
         return size, digest.hexdigest()
     finally:
