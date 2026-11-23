@@ -2,6 +2,8 @@
 
 import argparse
 import email
+import hashlib
+import json
 import os
 import subprocess
 import sys
@@ -27,6 +29,18 @@ def check_archives(dist, backend):
         source_files = {
             p.split("/", 1)[1] for p in archive.getnames() if "/" in p
         }
+    project = "particula-aiomfac" if backend else "particula"
+    assert metadata["Name"] == project
+    stem = project.replace("-", "_") + "-" + metadata["Version"]
+    assert (
+        wheel.name == stem + "-py3-none-any.whl"
+        and sdist.name == stem + ".tar.gz"
+    )
+    with tarfile.open(sdist) as archive:
+        pkg = email.message_from_bytes(
+            archive.extractfile(stem + "/PKG-INFO").read()
+        )
+        assert (pkg["Name"], pkg["Version"]) == (project, metadata["Version"])
     if backend:
         required = {
             "LICENSE",
@@ -92,7 +106,6 @@ def check_archives(dist, backend):
             for r in metadata.get_all("Requires-Dist", [])
         )
         # Compare payload digests too, including files renamed under bundled docs.
-        import hashlib
 
         protected = {
             hashlib.sha256(p.read_bytes()).digest()
@@ -132,6 +145,44 @@ def check_archives(dist, backend):
     return wheel
 
 
+def write_manifest(base, backend, destination):
+    """Record scientific identity and digests from the actual wheel payload."""
+    identity = {
+        "commit": subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
+        ).strip(),
+        "distributions": {},
+    }
+    for wheel in (base, backend):
+        with zipfile.ZipFile(wheel) as z:
+            meta = email.message_from_bytes(
+                z.read(
+                    next(
+                        n
+                        for n in z.namelist()
+                        if n.endswith(".dist-info/METADATA")
+                    )
+                )
+            )
+            if wheel == backend:
+                data = "particula_aiomfac/data/"
+                identity["upstream_revision"] = json.loads(
+                    z.read(data + "manifest.json")
+                )["revision"]
+                identity["parameters_sha256"] = hashlib.sha256(
+                    z.read(data + "parameters.npz")
+                ).hexdigest()
+        artifacts = [wheel, *wheel.parent.glob("*.tar.gz")]
+        identity["distributions"][meta["Name"]] = {
+            "version": meta["Version"],
+            "sha256": {
+                file.name: hashlib.sha256(file.read_bytes()).hexdigest()
+                for file in artifacts
+            },
+        }
+    destination.write_text(json.dumps(identity, indent=2) + "\n")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -149,13 +200,38 @@ def main():
         action="store_true",
         help="exercise standalone and combined wheels on an NVIDIA GPU",
     )
+    parser.add_argument(
+        "--from-dist",
+        type=Path,
+        help="qualify existing base/ and backend/ archive pairs without rebuilding",
+    )
+    parser.add_argument(
+        "--sdists",
+        action="store_true",
+        help="also install each source archive in isolation",
+    )
+    parser.add_argument(
+        "--manifest", type=Path, help="write the audited release manifest"
+    )
+    parser.add_argument(
+        "--audit-only",
+        action="store_true",
+        help="stop after inspecting both archive pairs",
+    )
     args = parser.parse_args()
-    cache = ROOT / ".artifacts/aiomfac-packages"
-    cache.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(dir=cache) as work:
+    if args.from_dist and args.dist_dir:
+        parser.error("--from-dist and --dist-dir are mutually exclusive")
+    with tempfile.TemporaryDirectory() as work:
         work = Path(work)
         wheels = []
         for name, project in (("base", ROOT), ("backend", PACKAGE)):
+            if args.from_dist:
+                wheels.append(
+                    check_archives(
+                        args.from_dist.resolve() / name, name == "backend"
+                    )
+                )
+                continue
             dist = (args.dist_dir.resolve() if args.dist_dir else work) / name
             cmd = [sys.executable, "-m", "build", "--outdir", str(dist)]
             if args.no_isolation:
@@ -163,6 +239,10 @@ def main():
             subprocess.run([*cmd, str(project)], cwd=work, check=True)
             wheels.append(check_archives(dist, name == "backend"))
         base, backend = wheels
+        if args.manifest:
+            write_manifest(base, backend, args.manifest)
+        if args.audit_only:
+            return
         [archive] = backend.parent.glob("*.tar.gz")
         with tarfile.open(archive) as sdist:
             sdist.extractall(work / "source", filter="data")
@@ -174,6 +254,14 @@ def main():
             ("base", str(base)),
             ("backend", str(backend)),
             ("combined", str(base) + "[aiomfac]"),
+            *(
+                [
+                    ("base-source", str(next(base.parent.glob("*.tar.gz")))),
+                    ("backend-source", str(archive)),
+                ]
+                if args.sdists
+                else []
+            ),
             *([("backend-cuda", str(backend) + "[cuda]")] if args.cuda else []),
         ]:
             env = work / ("env-" + label)
@@ -185,8 +273,11 @@ def main():
                     "-m",
                     "pip",
                     "install",
-                    "--constraint",
-                    constraint,
+                    *(
+                        ["--constraint", constraint]
+                        if label == "combined"
+                        else []
+                    ),
                     "--find-links",
                     backend.parent,
                     requirement,
@@ -214,7 +305,7 @@ for name,wanted in zip(("particula","particula_aiomfac"),sys.argv[1:],strict=Tru
                     "-c",
                     probe,
                     "no" if label.startswith("backend") else "yes",
-                    "no" if label == "base" else "yes",
+                    "no" if label.startswith("base") else "yes",
                 ],
                 cwd=work,
                 check=True,
@@ -224,7 +315,7 @@ for name,wanted in zip(("particula","particula_aiomfac"),sys.argv[1:],strict=Tru
                     python,
                     "-I",
                     unpacked / "tools/installed_probe.py",
-                    label,
+                    label.removesuffix("-source"),
                     *(
                         ["cuda"]
                         if args.cuda and label in {"combined", "backend-cuda"}

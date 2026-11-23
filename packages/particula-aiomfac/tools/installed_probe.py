@@ -164,6 +164,26 @@ if __name__ == "__main__":
             box["compare"](
                 box["native"](b, 8), box["radau"](box["make_box"]()), b.targets
             )
+            from particula.execution.condensation_ode import CondensationODE
+
+            b = box["make_box"](table="mixed-two-vapor", permuted=True)
+            ode = CondensationODE(
+                b.aerosol,
+                b.process,
+                method="ros3",
+                rtol=1e-8,
+                particle_atol=1e-30,
+                gas_atol=1e-16,
+                first_step=1e-5,
+            )
+            rows = [box["sample"](b, ode.snapshot())]
+            for stop in box["TIMES"][1:]:
+                while ode.time < stop:
+                    ode.step(stop)
+                rows.append(box["sample"](b, ode.snapshot()))
+            box["compare"](
+                rows, box["radau"](box["make_box"](permuted=True)), b.targets
+            )
             if cuda:
                 for method in ("rk23", "ros3"):
                     box["qualify_restart"](method, table="mixed-two-vapor")

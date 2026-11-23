@@ -3,6 +3,16 @@
 Version 0.1.4 evaluates liquid-phase activities with bundled AIOMFAC-web 3.15
 parameters. NumPy and SciPy provide CPU evaluation. The optional Warp backend
 evaluates the same chemistry in float64 on NVIDIA CUDA devices. It runs independently of Particula.
+The PyPI installation commands for the standalone backend and the Particula integration are
+
+```sh
+python -m pip install particula-aiomfac
+python -m pip install "particula[aiomfac]"
+```
+
+The combined install includes the backend. The first combined release targets Particula 0.3.5.
+[CPU and CUDA accuracy, timing and supported table domains](https://github.com/uncscode/particula/blob/main/docs/studies/validation/condensation/aiomfac-sparse/index.md).
+
 Each component is a neutral molecule described by explicit subgroup counts or a
 salt described by its ion IDs and analytical formula-unit stoichiometry.
 
@@ -20,6 +30,8 @@ result = prepared.evaluate([0.977, 0.001, 0.002, 0.020], 298.0, diagnostics=True
 water = result.neutral_activities[result.neutral_ids.index("water")]
 mean_nacl = result.mean_electrolyte_coefficients[result.electrolyte_ids.index((202, 242))]
 ```
+
+At 298 K the reference water activity is 0.9878567852129456 and the mean NaCl molal coefficient is 0.7037048661941817.
 
 Use any common mass unit in mixture declaration order on the last axis.
 Temperature in kelvin broadcasts over the leading axes. All outputs retain those
@@ -82,7 +94,7 @@ even when the same Particula version is available on a package index.
 
 ```sh
 python packages/particula-aiomfac/tools/qualify_packages.py --dist-dir .artifacts/aiomfac-cpu-dist
-python -m pip install ".artifacts/aiomfac-cpu-dist/base/particula-0.3.4-py3-none-any.whl[aiomfac]" --find-links .artifacts/aiomfac-cpu-dist/backend
+python -m pip install ".artifacts/aiomfac-cpu-dist/base/particula-0.3.5-py3-none-any.whl[aiomfac]" --find-links .artifacts/aiomfac-cpu-dist/backend
 python packages/particula-aiomfac/examples/closed_water.py
 ```
 
