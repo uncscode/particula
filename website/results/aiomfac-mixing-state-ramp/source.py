@@ -119,15 +119,16 @@ def first_splits(phase_count):
 # the other endpoint of the onset interval. Distinct symbols identify
 # censored particles.
 # %%
+@plt.style.context("particula.default")
 def plot_mixing(report):
     """Compare individual solute masses with onset across the mixing states."""
+    from particula import plotting
+
     dry = np.asarray(report["dry_mass_kg"])
     fractions = dry / dry.sum(axis=1, keepdims=True)
     rh = 100 * np.asarray(report["rh"])
     first, initial, detected, unseen = first_splits(report["phase_count"])
-    fig, (left, right) = plt.subplots(
-        1, 2, figsize=(10, 4.2), layout="constrained"
-    )
+    fig, (left, right) = plotting.subplots(1, 2, size="wide")
     picograms = dry * 1e15
     positive = picograms[picograms > 0]
     bins = np.geomspace(positive.min() * 0.98, positive.max() * 1.02, 24)
@@ -135,7 +136,11 @@ def plot_mixing(report):
     for j, (label, color, line) in enumerate(
         zip(
             names,
-            ("#9a462b", "#3c7e54", "#216782"),
+            (
+                plotting.COLORS["rust"],
+                plotting.COLORS["indigo"],
+                plotting.COLORS["teal"],
+            ),
             ("-", "--", ":"),
             strict=True,
         )
@@ -154,7 +159,7 @@ def plot_mixing(report):
         xlabel="Retained mass per droplet (pg)",
         ylabel="Droplets per log-spaced bin",
     )
-    left.legend(frameon=False, fontsize=9)
+    plotting.legend(left, placement="inside")
     salt = 100 * (fractions[:, 1] + fractions[:, 2])
     potassium_share = (
         100 * fractions[:, 2] / (fractions[:, 1] + fractions[:, 2])
@@ -168,13 +173,15 @@ def plot_mixing(report):
             (levels[:-1] + levels[1:]) / 2,
             levels[-1] + rh_step / 2,
         ]
+        ramp = plotting.colormap("magnitude")
+        shades = colors.ListedColormap(ramp(np.linspace(0.32, 1, len(levels))))
         points = right.scatter(
             salt[detected],
             potassium_share[detected],
             c=onsets,
             s=13,
-            cmap="viridis",
-            norm=colors.BoundaryNorm(edges, ncolors=256),
+            cmap=shades,
+            norm=colors.BoundaryNorm(edges, ncolors=shades.N),
             linewidths=0,
             alpha=0.85,
         )
@@ -205,16 +212,17 @@ def plot_mixing(report):
             potassium_share[initial],
             s=20,
             marker="x",
-            color="#be3f20",
+            color=plotting.COLORS["rust"],
             linewidths=1,
             label="Split at first sample",
         )
     if unseen.any() or initial.any():
-        right.legend(frameon=True, fontsize=8)
+        plotting.legend(right, placement="inside")
     right.set(
         xlabel="Total salt (% of retained mass)",
         ylabel="KCl (% of retained salt mass)",
     )
+    plotting.fit(fig)
     return fig
 
 
@@ -229,18 +237,20 @@ def plot_mixing(report):
 # droplets and its 10th–90th percentile range. These percentiles describe
 # the simulated population.
 # %%
+@plt.style.context("particula.default")
 def plot_history(report):
     """Show per-ID liquid counts and water histories across the humidity ramp."""
+    from particula import plotting
+
     dry = np.asarray(report["dry_mass_kg"])
     water = np.asarray(report["water_kg"])
     time = np.asarray(report["time_s"])
     rh = 100 * np.asarray(report["rh"])
     split = np.asarray(report["phase_count"]) == 2
     rank = np.argsort(dry[:, 1:].sum(axis=1) / dry.sum(axis=1), kind="stable")
-    fig, (left, right) = plt.subplots(
-        1, 2, figsize=(10, 4.1), layout="constrained"
-    )
-    palette = ("#e3edf0", "#98492f")
+    fig, (left, right) = plotting.subplots(1, 2, size="wide")
+    palette = (plotting.colormap("magnitude")(0.12), plotting.COLORS["rust"])
+    left.grid(False)
     left.imshow(
         split[:, rank].T,
         cmap=colors.ListedColormap(palette),
@@ -258,14 +268,15 @@ def plot_history(report):
         xlabel="Sampled ambient RH (%)",
         ylabel="Droplet rank by dry salt fraction",
     )
-    left.legend(
+    plotting.legend(
+        left,
+        placement="inside",
         handles=[
             Patch(color=c, label=n)
             for c, n in zip(palette, ("One liquid", "Two liquids"), strict=True)
         ],
         loc="lower left",
         ncols=2,
-        fontsize=8,
     )
     water_fraction = water / (water + dry.sum(axis=1))
     lower, middle, upper = 100 * np.quantile(
@@ -275,28 +286,32 @@ def plot_history(report):
         time,
         lower,
         upper,
-        color="#216782",
+        color=plotting.COLORS["teal"],
         alpha=0.18,
         label="Water, 10th–90th percentiles",
     )
     right.plot(
-        time, middle, color="#216782", label="Median water mass fraction"
+        time,
+        middle,
+        color=plotting.COLORS["teal"],
+        label="Median water mass fraction",
     )
     right.plot(
         time,
         100 * split.mean(axis=1),
         "o--",
         ms=3,
-        color="#98492f",
+        color=plotting.COLORS["rust"],
         label="Droplets with two liquids",
     )
     right.set(xlabel="Elapsed time (s)", ylabel="Percent", ylim=(-2, 102))
-    right.legend(frameon=False, fontsize=8)
+    plotting.legend(right, placement="inside")
+    plotting.fit(fig)
     return fig
 
 
 # %% [markdown]
-# ## Compare each onset with its equilibrium cloud point
+# ## At what droplet size and humidity does a second liquid appear?
 #
 # For each particle, the independent CPU calculation fixes its dry
 # composition and solves for the water amount at which a distinct second
@@ -304,13 +319,20 @@ def plot_history(report):
 # salt chemical potentials across the two liquids and applies the same
 # radius-dependent Kelvin correction. The result is the ambient RH for a
 # completely equilibrated particle of that dry composition and mass.
-# Compare it with the gas RH on the kinetic path. Each vertical line segment
-# spans the last one-liquid and first two-liquid samples for one particle.
-# The difference from its cloud point includes finite-rate water exchange
-# and the sampling interval.
+# The left panel follows each whole droplet from its initial wet diameter at
+# 90% RH to its wet diameter at first detection of two liquids. The short
+# vertical segments reach back to the preceding one-liquid observation.
+# Diameters are volume-equivalent spheres, calculated from the same additive
+# material volumes as the kinetic model, $D=(6\sum_i m_i/(π\rho_i))^{1/3}$.
+# Color gives the initial salt fraction of the retained dry mass.
+# On the right, compare the equilibrium RH for each dry composition with
+# the two ambient humidities bracketing its kinetic onset.
 # %%
+@plt.style.context("particula.default")
 def plot_cloud_points(report):
-    """Compare Kelvin-corrected cloud points and sampled kinetic brackets by ID."""
+    """Relate the first split to initial size, dry composition and humidity."""
+    from particula import plotting
+
     control = report["equilibrium_control"]["particle_cloud_points"]
     ids = np.asarray(report["particle_id"])
     if not np.array_equal(control["particle_id"], ids):
@@ -318,33 +340,65 @@ def plot_cloud_points(report):
             "Cloud-point IDs differ from the trajectory column order"
         )
     cloud_rh = 100 * np.asarray(control["equilibrium_rh"])
-    order = np.argsort(cloud_rh, kind="stable")
-    ranks = np.empty_like(order)
-    ranks[order] = np.arange(1, len(order) + 1)
     first, _, detected, _ = first_splits(report["phase_count"])
+    columns = np.flatnonzero(detected)
+    end = first[columns]
     rh = 100 * np.asarray(report["rh"])
-    fig, ax = plt.subplots(figsize=(8, 3.6), layout="constrained")
-    ax.vlines(
-        ranks[detected],
-        rh[first[detected]],
-        rh[first[detected] - 1],
-        color="#985230",
-        alpha=0.65,
-        linewidth=1,
-        label="Sample interval of first split during drying",
+
+    dry = np.asarray(report["dry_mass_kg"])
+    density = np.asarray(report["material_density_kg_m3"])
+    water = np.asarray(report["water_kg"])
+    volume = (dry / density[1:]).sum(axis=1) + water / density[0]
+    diameter_um = 1e6 * np.cbrt(6 * volume / np.pi)
+    initial = diameter_um[0, columns]
+    at_split = diameter_um[end, columns]
+    salt_percent = 100 * dry[:, 1:].sum(axis=1) / dry.sum(axis=1)
+
+    fig, (size, humidity) = plotting.subplots(1, 2, size="wide")
+    size.vlines(
+        initial,
+        at_split,
+        diameter_um[end - 1, columns],
+        color="0.45",
+        lw=0.8,
+        alpha=0.45,
     )
-    ax.plot(
-        ranks[order],
-        cloud_rh[order],
-        color="#145776",
-        linewidth=2.5,
-        label="Equilibrium cloud point",
+    points = size.scatter(
+        initial,
+        at_split,
+        c=salt_percent[columns],
+        cmap=plotting.colormap("magnitude"),
+        s=12,
+        edgecolors=plotting.COLORS["teal"],
+        linewidths=0.25,
     )
-    ax.set(
-        xlabel="Droplet rank by equilibrium cloud-point RH",
-        ylabel="Ambient RH (%)",
+    fig.colorbar(points, ax=size, label="Salt (% of retained mass)")
+    size.set(
+        xlabel="Initial wet diameter (µm)",
+        ylabel="Wet diameter at first split (µm)",
     )
-    ax.legend(frameon=False, fontsize=9)
+
+    humidity.vlines(
+        salt_percent[columns],
+        rh[end],
+        rh[end - 1],
+        color=plotting.COLORS["rust"],
+        alpha=0.35,
+        linewidth=0.8,
+        label="Kinetic onset interval",
+    )
+    humidity.scatter(
+        salt_percent,
+        cloud_rh,
+        s=8,
+        color=plotting.COLORS["teal"],
+        linewidths=0,
+        alpha=0.8,
+        label="Equilibrium onset",
+    )
+    humidity.set(xlabel="Salt (% of retained mass)", ylabel="Ambient RH (%)")
+    plotting.legend(humidity, placement="inside", loc="upper right")
+    plotting.fit(fig)
     return fig
 
 
@@ -432,6 +486,11 @@ if __name__ == "__main__":
 # Median salt content was 19.8% of retained mass among those first 14
 # particles and 35.4% among the last 25. Consecutive observations
 # differ by 0.25 RH percentage points. No onset was censored in this run.
+#
+# Initial wet diameters ranged from 3.80 to 4.98 µm. At the first two-liquid
+# observation they spanned 3.46 to 4.48 µm, with a median of 3.99 µm.
+# The median droplet retained 90.7% of its initial diameter. The median
+# diameter change across an onset sampling interval was 0.020 µm.
 #
 # The independent equilibrium cloud points span **85.13% to 86.21% RH**
 # across the same 1,000 dry inventories, with curvature included. Water

@@ -113,13 +113,18 @@ def simulate():
 # and its share of total liquid mass answer different questions. A small
 # organic-rich phase can already differ sharply from the aqueous phase.
 # %%
+@plt.style.context("particula.default")
 def plot_results(data):
     """Plot component mass fractions and the extent of the phase split."""
+    from particula import plotting
+
     rh = 100 * np.asarray(data["humidity"])
-    fig, (left, right) = plt.subplots(
-        1, 2, figsize=(9.2, 3.8), constrained_layout=True
-    )
-    colors = ["#17678a", "#a24426", "#487b43"]
+    fig, (left, right) = plotting.subplots(1, 2, size="wide")
+    colors = [
+        plotting.COLORS["teal"],
+        plotting.COLORS["rust"],
+        plotting.COLORS["indigo"],
+    ]
     for j, (name, color) in enumerate(zip(GROUPS, colors, strict=True)):
         left.plot(
             rh, np.array(data["alpha"])[:, j], "o-", color=color, label=name
@@ -128,9 +133,9 @@ def plot_results(data):
             rh, np.array(data["beta"], dtype=float)[:, j], "x--", color=color
         )
     left.set(ylabel="Component mass fraction", ylim=(0, 1))
-    left.legend(frameon=False)
+    plotting.legend(left, placement="inside")
     left.set_title("Water-rich (solid) and organic-rich (dashed)")
-    right.plot(rh, data["beta_share"], "s-", color="#a24426")
+    right.plot(rh, data["beta_share"], "s-", color=plotting.COLORS["rust"])
     right.set(ylabel="Organic-rich share of liquid mass", ylim=(0, 1))
     right.set_title("How much of the droplet separates?")
     for ax in (left, right):
@@ -141,6 +146,7 @@ def plot_results(data):
         )
         ax.set_xlabel("Relative humidity (%)")
         ax.invert_xaxis()
+    plotting.fit(fig)
     return fig
 
 
