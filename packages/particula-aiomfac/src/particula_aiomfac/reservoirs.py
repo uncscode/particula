@@ -154,29 +154,12 @@ def _direct_vapor_names(reactions, neutral_names):
     return neutral_gases
 
 
-def _neutral_partition(
-    provider,
-    conserved,
-    matrix,
-    mw,
-    gas_mw,
-    reactions,
-    neutral_gases,
-    temperature,
-    options,
-    liquid,
-):
-    """Share the flat-surface neutral solver, including the vapor-only limit."""
-    p = provider.prepared
-    neutral_names = list(p.neutrals)
-    n = len(neutral_names)
-    gas_names = list(reactions)
+def _analytical_feed(p, names, conserved, mw):
+    """Convert conserved neutral and ion moles to analytical masses."""
     feed = np.zeros(p.ncomponents)
-    for i, key in enumerate(neutral_names):
-        feed[tuple(provider.mixture.components).index(key)] = (
-            conserved[i] * mw[i] * 1e9
-        )
-    levels = conserved[n:]
+    for i, key in enumerate(p.neutrals):
+        feed[names.index(key)] = conserved[i] * mw[i] * 1e9
+    levels = conserved[len(p.neutrals) :]
     if np.any(levels):
         real = p.salt_indices < p.ncomponents
         scale = levels.max()
@@ -205,6 +188,39 @@ def _neutral_partition(
                 "closed neutral vapors require a balanced analytical salt basis"
             )
         feed[p.salt_indices[real]] = pair.x * scale * p.salt_mw[real] * 1e9
+    return feed
+
+
+def _neutral_partition(
+    provider,
+    conserved,
+    matrix,
+    mw,
+    gas_mw,
+    reactions,
+    neutral_gases,
+    temperature,
+    options,
+    liquid,
+):
+    """Share the flat-surface neutral solver, including the vapor-only limit."""
+    p = provider.prepared
+    neutral_names = list(p.neutrals)
+    n = len(neutral_names)
+    gas_names = list(reactions)
+    names = tuple(provider.mixture.components)
+    water_exchanges = names[provider.water_index] in neutral_gases
+    if not water_exchanges and (
+        np.any(conserved[n:])
+        or any(
+            conserved[i] and key not in neutral_gases
+            for i, key in enumerate(neutral_names)
+        )
+    ):
+        # This inventory contains permanent condensed material. Let the
+        # physical-species solver keep water and ions in their original lanes.
+        return None
+    feed = _analytical_feed(p, names, conserved, mw)
     saturations = {
         key: reactions[name].standard_pressure_pa
         * np.exp(-reactions[name].log_k)
@@ -213,26 +229,53 @@ def _neutral_partition(
         / (R * temperature)
         for key, name in neutral_gases.items()
     }
-    bulk = provider.solve_partitioning(
-        inventories=feed,
-        temperature=temperature,
-        saturation_concentrations=saturations,
-        **options,
-    )
+    if water_exchanges:
+        bulk = provider.solve_partitioning(
+            inventories=feed,
+            temperature=temperature,
+            saturation_concentrations=saturations,
+            **options,
+        )
+        vapor = bulk.gas_concentrations
+        result = bulk.solid_liquid
+        vapor_only = bulk.liquids is None
+        error = bulk.vapor_residual
+    else:
+        from .partitioning import _vapor_only_state
+
+        # Every occupied component can enter the gas. Test the tangent plane
+        # at that boundary before asking the wet solver for a positive liquid.
+        cstar = np.array([saturations.get(key, 0.0) for key in names])
+        backend = provider.equilibrium_backend(
+            options["execution"], options["device"]
+        )
+
+        def state(masses):
+            physical = liquid(
+                masses[p.neutral_indices] * 1e-9 / mw[:n], conserved[n:]
+            )
+            return physical.liquids, physical
+
+        boundary = _vapor_only_state(
+            provider, backend, state, feed, cstar, feed, temperature, None
+        )
+        if boundary is None:
+            return None
+        vapor, _, phases, result = boundary
+        vapor_only = phases is None
+        error = 0.0
+
     gas = np.zeros(len(gas_names))
     for key, name in neutral_gases.items():
         j = gas_names.index(name)
-        lane = tuple(provider.mixture.components).index(key)
-        gas[j] = bulk.gas_concentrations[lane] * 1e-9 / gas_mw[j]
-    result = bulk.solid_liquid
+        gas[j] = vapor[names.index(key)] * 1e-9 / gas_mw[j]
     if result is None:
         condensed = conserved - matrix @ gas
-        # The reservoir solve can return a vapor-only state. Avoid roundoff
-        # from subtracting equal independently converted trace inventories.
-        if bulk.liquids is None:
+        # Avoid roundoff from independently converted trace inventories.
+        if vapor_only:
             condensed[:] = 0.0
         result = liquid(np.maximum(condensed[:n], 0.0), condensed[n:])
-    return result, gas, bulk.vapor_residual
+    return result, gas, error
 
 
 def _log_activities(chemistry):
@@ -555,16 +598,15 @@ def equilibrate_species(
             **extra,
         )
 
-    # Water and other neutral vapors share the analytical deliquescence solve.
+    # Direct neutral vapors can equilibrate at the vapor-only boundary.
     neutral_gases = _direct_vapor_names(reactions, neutral_names)
-    water_name = tuple(provider.mixture.components)[provider.water_index]
     if (
-        surface is None
+        reactions
+        and surface is None
         and len(neutral_gases) == len(reactions)
-        and water_name in neutral_gases
         and not (p.carbonate or p.sulfate)
     ):
-        result, gas, error = _neutral_partition(
+        partition = _neutral_partition(
             provider,
             conserved,
             matrix,
@@ -581,10 +623,12 @@ def equilibrate_species(
             ),
             liquid,
         )
-        residue = result.dry_ion_masses * 1e-9 / mw[n:]
-        return assemble(
-            result, gas, np.zeros_like(dry), residue, 0.0, 0.0, error
-        )
+        if partition is not None:
+            result, gas, error = partition
+            residue = result.dry_ion_masses * 1e-9 / mw[n:]
+            return assemble(
+                result, gas, np.zeros_like(dry), residue, 0.0, 0.0, error
+            )
 
     if not np.any(aqueous[:n]) and not any(
         any(k in neutral_names for k in g.aqueous) and gas0[j]
