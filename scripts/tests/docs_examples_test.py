@@ -634,6 +634,23 @@ def test_historical_replot_checks_original_inputs_and_pinned_data(tmp_path):
         )
 
     assert load_archive(current)[2] == {"observation": 3}
+    # A run on dirty sources can be archived at their exact next commit.
+    git(
+        "-c",
+        "user.name=Test",
+        "-c",
+        "user.email=test@example.org",
+        "commit",
+        "--allow-empty",
+        "-qm",
+        "Archive exact executed inputs",
+    )
+    pin["revision"] = git("rev-parse", "HEAD")
+    with pytest.raises(ValueError, match="pinned historical run"):
+        load_archive(current)
+    manifest["package_dirty"] = True
+    (directory / "manifest.json").write_text(json.dumps(manifest))
+    assert load_archive(current)[2] == {"observation": 3}
     with pytest.raises(ValueError, match="no pinned"):
         load_archive(config)
     pin["data_sha256"] = "0" * 64

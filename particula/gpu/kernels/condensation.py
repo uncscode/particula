@@ -3081,6 +3081,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
 
 
 @wp.kernel(enable_backward=False)
+@no_type_check
 def _commit_provider_step(
     staged: wp.array(dtype=Any),
     live: wp.array(dtype=Any),

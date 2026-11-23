@@ -69,7 +69,7 @@ def test_upstream_version_increase(
 
     def git(*args):
         calls.append(args)
-        return f'__version__ = "{previous}"\n'
+        return f'__version__ = "{current if args[-1].startswith(SHA) else previous}"\n'
 
     monkeypatch.setattr(release, "command", git)
     result = release.plan(
@@ -81,7 +81,10 @@ def test_upstream_version_increase(
         "build": publish,
         "publish": publish,
     }
-    assert calls == [("git", "show", f"{'a' * 40}:{release.VERSION_PATH}")]
+    assert calls == [
+        ("git", "show", f"{SHA}:{release.VERSION_PATH}"),
+        ("git", "show", f"{'a' * 40}:{release.VERSION_PATH}"),
+    ]
 
 
 @pytest.mark.parametrize(
@@ -97,9 +100,12 @@ def test_upstream_version_increase(
 )
 def test_nonpublication_events(source, monkeypatch, event, repo, ref, build):
     """PRs build, but forks, branches and unrelated events never publish."""
-    monkeypatch.setattr(
-        release, "command", lambda *args: pytest.fail("Unexpected Git access")
-    )
+
+    def git(*args):
+        assert args == ("git", "show", f"{SHA}:{release.VERSION_PATH}")
+        return '__version__ = "0.3.2"'
+
+    monkeypatch.setattr(release, "command", git)
     result = release.plan(event, {}, repo, ref, SHA)
     assert result["build"] == build
     assert result["publish"] == "false"
@@ -107,6 +113,13 @@ def test_nonpublication_events(source, monkeypatch, event, repo, ref, build):
 
 def test_unknown_before_and_downgrades_fail(source, monkeypatch):
     """A missing comparison or downgrade cannot silently ship."""
+
+    def git(*args):
+        if args[-1].startswith(SHA):
+            return '__version__ = "0.3.2"'
+        return '__version__ = "0.4.0"'
+
+    monkeypatch.setattr(release, "command", git)
     for before in ("", "0" * 40, "not-a-sha"):
         with pytest.raises(ValueError, match="previous main"):
             release.plan(
@@ -116,9 +129,6 @@ def test_unknown_before_and_downgrades_fail(source, monkeypatch):
                 "refs/heads/main",
                 SHA,
             )
-    monkeypatch.setattr(
-        release, "command", lambda *args: '__version__ = "0.4.0"'
-    )
     with pytest.raises(ValueError, match="must not decrease"):
         release.plan(
             "push",
@@ -143,7 +153,11 @@ def test_manual_release_must_match_source(
     source, monkeypatch, tag, sha, prerelease, expected
 ):
     """Keep manual library publication, excluding plugins and mismatched tags."""
-    monkeypatch.setattr(release, "command", lambda *args: sha)
+    monkeypatch.setattr(
+        release,
+        "command",
+        lambda *args: '__version__ = "0.3.2"' if args[1] == "show" else sha,
+    )
     event = {
         "release": {"tag_name": tag, "prerelease": prerelease, "draft": False}
     }
@@ -458,13 +472,16 @@ def test_joint_and_independent_versions(repository, source):
     backend.write_text('__version__ = "0.1.4"')
 
     def decisions(before):
+        git("add", ".")
+        git("commit", "--allow-empty", "-m", "Release candidate")
+        after = git("rev-parse", "HEAD")
         return tuple(
             release.plan(
                 "push",
                 {"before": before},
                 release.REPOSITORY,
                 "refs/heads/main",
-                SHA,
+                after,
                 project,
             )["publish"]
             for project in release.VERSION_PATHS
@@ -473,8 +490,6 @@ def test_joint_and_independent_versions(repository, source):
     assert decisions(base_sha) == ("false", "true")
     (source / release.VERSION_PATH).write_text('__version__ = "0.3.5"')
     assert decisions(base_sha) == ("true", "true")
-    git("add", ".")
-    git("commit", "-m", "First joint release")
     joint = git("rev-parse", "HEAD")
     assert decisions(joint) == ("false", "false")
     (source / release.VERSION_PATH).write_text('__version__ = "0.3.6"')
@@ -488,7 +503,7 @@ def test_joint_and_independent_versions(repository, source):
             {"before": "e" * 40},
             release.REPOSITORY,
             "refs/heads/main",
-            SHA,
+            git("rev-parse", "HEAD"),
             release.BACKEND,
         )
 

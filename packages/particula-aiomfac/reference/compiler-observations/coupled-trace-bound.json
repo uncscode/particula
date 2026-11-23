@@ -1,0 +1,11 @@
+{
+  "compiler": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "canonical_sha256": "b1d3897b5e5af75ce4a9bcb0156a9b58586806e21b522d3746d71510d1003759",
+  "source": "https://github.com/uncscode/particula/actions/runs/45093663412/job/137428595837",
+  "carbon_relative_balance": 0.07262807409220419,
+  "carbonate_residuals": {
+    "0": -0.062539979442505,
+    "1": -0.051897280443803595,
+    "3": -0.05920596848842319
+  }
+}

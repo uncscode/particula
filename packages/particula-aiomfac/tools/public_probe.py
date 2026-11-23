@@ -7,7 +7,7 @@ import math
 import os
 from pathlib import Path
 import subprocess
-import sys
+import time
 import tempfile
 import venv
 
@@ -86,22 +86,31 @@ def main():
     with tempfile.TemporaryDirectory() as root:
         venv.EnvBuilder(with_pip=True).create(root)
         python = Path(root) / "bin/python"
-        subprocess.run(
-            [
-                python,
-                "-I",
-                "-m",
-                "pip",
-                "install",
-                "--no-cache-dir",
-                "--index-url",
-                "https://pypi.org/simple",
-                *requirements,
-            ],
-            cwd=root,
-            env=env,
-            check=True,
-        )
+        # Simple-index visibility can lag behind version-specific JSON metadata.
+        command = [
+            python,
+            "-I",
+            "-m",
+            "pip",
+            "install",
+            "--no-cache-dir",
+            "--index-url",
+            "https://pypi.org/simple",
+            *requirements,
+        ]
+        for attempt in range(6):
+            install = subprocess.run(
+                command, cwd=root, env=env, capture_output=True, text=True
+            )
+            if install.returncode == 0:
+                break
+            print(install.stderr, flush=True)
+            if (
+                attempt == 5
+                or "No matching distribution found" not in install.stderr
+            ):
+                install.check_returncode()
+            time.sleep(10)
         subprocess.run(
             [python, "-I", "-m", "pip", "check"], cwd=root, env=env, check=True
         )

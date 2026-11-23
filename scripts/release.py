@@ -101,7 +101,7 @@ def plan(
 ) -> dict:
     """Gate publication on an upstream version increase or matching release."""
     path = VERSION_PATHS[project]
-    version = read_version((ROOT / path).read_text())
+    version = read_version(command("git", "show", f"{sha}:{path}"))
     result = {
         "version": version,
         "tag": release_tag(project, version),
@@ -219,7 +219,17 @@ def check_pypi(
                 f"PyPI already has different bytes for {path.name}"
             )
 
-    return all(path.name in existing for path in files)
+    complete = all(path.name in existing for path in files)
+    if complete and (summary := os.environ.get("GITHUB_STEP_SUMMARY")):
+        with Path(summary).open("a") as stream:
+            stream.write(
+                f"Verified public PyPI files for {project} {version}\n\n"
+            )
+            for path in files:
+                sha256 = existing[path.name]["digests"]["sha256"]
+                stream.write(f"- `{path.name}` SHA-256 `{sha256}`\n")
+            stream.write("\n")
+    return complete
 
 
 def ensure_tag(version: str, sha: str, project: str = "particula") -> str:

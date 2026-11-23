@@ -104,7 +104,13 @@ jobs:
           python scripts/check_doc_bundle.py --wheel candidates/base/*.whl --sdist candidates/base/*.tar.gz --report candidates/docs-bundle.json
           python packages/particula-aiomfac/tools/qualify_packages.py --from-dist candidates --audit-only --manifest candidates/release.json
           (cd candidates && sha256sum base/* backend/* *.json > SHA256SUMS)
-          cat candidates/release.json >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo 'For joint releases, publish the backend, verify its public hashes, then publish Particula and check the public extra.'
+            echo 'This run authorizes base publication: ${{ needs.release-plan.outputs.publish }}. Backend publication: ${{ needs.release-plan.outputs.backend-publish }}.'
+            echo '~~~json'
+            cat candidates/release.json
+            echo '~~~'
+          } >> "$GITHUB_STEP_SUMMARY"
       - name: Retain the exact candidate files for qualification and publication
         uses: actions/upload-artifact@v7
         with:

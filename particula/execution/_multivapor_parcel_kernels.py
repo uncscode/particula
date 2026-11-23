@@ -1,5 +1,7 @@
 """Float64 multivapor parcel kernels and resident trial controller."""
 
+from typing import TYPE_CHECKING, Any
+
 import warp as wp
 
 from particula.execution._ros3_coefficients import (
@@ -13,10 +15,18 @@ from particula.execution._ros3_coefficients import (
     M3,
 )
 
-Vector = wp.array(dtype=wp.float64)
-Matrix = wp.array2d(dtype=wp.float64)
-Cube = wp.array3d(dtype=wp.float64)
-Ints = wp.array(dtype=int)
+if TYPE_CHECKING:
+    Vector = Any
+    Matrix = Any
+    Cube = Any
+    Ints = Any
+    IntMatrix = Any
+else:
+    Vector = wp.array(dtype=wp.float64)
+    Matrix = wp.array2d(dtype=wp.float64)
+    Cube = wp.array3d(dtype=wp.float64)
+    Ints = wp.array(dtype=int)
+    IntMatrix = wp.array2d(dtype=int)
 
 # y contains scaled pressure, temperature and the exchangeable material masses
 # in class-major order. Gas inventories follow from exact species conservation.
@@ -443,7 +453,7 @@ def flux_guard(
     slopes: Matrix,
     flux: Matrix,
     errors: Cube,
-    uncertain: wp.array2d(dtype=int),
+    uncertain: IntMatrix,
 ):
     """Bound heat and mass flux errors about the trial surface solution."""
     c = wp.tid()

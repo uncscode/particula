@@ -91,6 +91,24 @@ def check_build():
     return meta
 
 
+def expected_state(name, compiler):
+    """Select recorded diagnostics for the failed trace solve by toolchain."""
+    path = REFERENCE / "expected" / (name + ".json")
+    state = read(path)
+    if name != "coupled-trace-bound":
+        return state
+    observation = read(REFERENCE / "compiler-observations" / path.name)
+    if compiler != observation["compiler"]:
+        return state
+    if builder.sha(path) != observation["canonical_sha256"]:
+        raise ValueError("Trace fixture changed: review the compiler observation")
+    equilibrium = state["equilibrium"]
+    equilibrium["carbon"]["relative_balance"] = observation["carbon_relative_balance"]
+    for index, value in observation["carbonate_residuals"].items():
+        equilibrium["carbonate"]["residual_vector"][int(index)] = value
+    return state
+
+
 def qualify(update=False):
     meta = check_build()
     inputs = cases()
@@ -145,7 +163,7 @@ def qualify(update=False):
         saved.pop("compiler")
         errors.extend(differences(saved, stable, "generation"))
         for name, state in data.items():
-            errors.extend(differences(read(expected / (name + ".json")), state, name))
+            errors.extend(differences(expected_state(name, meta["compiler"]), state, name))
         if errors:
             raise ValueError("\n".join(errors))
     print(

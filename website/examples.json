@@ -1876,6 +1876,11 @@
     ],
     "plot_inputs": [],
     "full_canvas": true,
+    "historical_run": {
+      "revision": "49afcbd19ff7032ff545a3d96e57ddca6baef7c2",
+      "package_source_sha256": "c288cfd8eea2dfd7ab9f60ea95359d22a128d2a744b59b0c4f33fedf6503fd79",
+      "data_sha256": "5f1fecc49b642368bee4c548205dd7ee97e770f9fe4c0294723e13801b030540"
+    },
     "science_inputs": [
       "packages/particula-aiomfac/src/particula_aiomfac/__init__.py",
       "packages/particula-aiomfac/src/particula_aiomfac/_condensation.py",
@@ -1912,6 +1917,11 @@
     ],
     "plot_inputs": [],
     "full_canvas": true,
+    "historical_run": {
+      "revision": "49afcbd19ff7032ff545a3d96e57ddca6baef7c2",
+      "package_source_sha256": "c288cfd8eea2dfd7ab9f60ea95359d22a128d2a744b59b0c4f33fedf6503fd79",
+      "data_sha256": "8ebef42ed8435a0c9a79eee779b06064539764ba110967bb6c7a1257589b215f"
+    },
     "science_inputs": [
       "packages/particula-aiomfac/src/particula_aiomfac/__init__.py",
       "packages/particula-aiomfac/src/particula_aiomfac/_condensation.py",

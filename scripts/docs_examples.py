@@ -381,7 +381,23 @@ def historical_study_inputs(example_id, config, root, science_root, original):
         recorded_package_hash=original["package_source_sha256"],
     )
     if original["revision"] != pin["revision"]:
-        raise ValueError("Saved data does not match the pinned historical run")
+        # A simulation run before committing records its parent revision.
+        # Accept the immediately following commit only with the observed bytes.
+        if not original.get("package_dirty") or original[
+            "package_source_sha256"
+        ] != pin.get("package_source_sha256"):
+            raise ValueError(
+                "Saved data does not match the pinned historical run"
+            )
+        parents = subprocess.check_output(  # noqa: S603 -- pinned Git checkout
+            [GIT, "show", "-s", "--format=%P", "HEAD"],
+            cwd=science_root,
+            text=True,
+        ).split()
+        if parents != [original["revision"]]:
+            raise ValueError(
+                "Saved data does not match the pinned historical run"
+            )
 
     # A fresh archived-library run executes the study in the author checkout.
     # Its observed data may include new timings. Keep its execution digest

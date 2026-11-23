@@ -85,6 +85,17 @@ The equilibrium residual gate is 1e-8 and normalized balance gates are 1e-10.
 A discrepant upstream result requires case-specific review and recording the
 discrepancy before any acceptance change.
 
+The trace-bound sulfate–carbonate stress case stops with upstream error 17 and
+MINPACK status 4. The GNU 13.3 Ubuntu build stops at a slightly different
+unsuccessful iterate from the canonical GNU 16.2 build. The largest observed
+difference in its residual vector was 3.324e-9. Both builds leave a carbon
+imbalance of about 7.26%. The [compiler observation](compiler-observations/coupled-trace-bound.json)
+records the four affected diagnostics, exact compiler identity and canonical
+fixture digest. Verification uses the same field tolerances and still checks
+the complete failure status, remaining species and balances. Converged reference
+cases continue to use one fixture across compilers.
+[Original GNU 13 comparison](https://github.com/uncscode/particula/actions/runs/45093663412/job/137428595837)
+
 ## Package qualification
 
 From the repository root, run
