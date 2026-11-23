@@ -13,6 +13,7 @@ on:
       - conda/**
       - scripts/**
       - website/examples.json
+      - studies/aiomfac-mixing-state/*.py
       - "particula/**/tests/**"
       - "particula/**/integration_tests/**"
       - docs/**
