@@ -373,37 +373,73 @@ auto resolve_split = [&](int attempt) __attribute__((noinline)) {
     for (int j = 0; j < D; ++j)
         if (feed[j] > 0.)
             step = fmin(step, feed[j] / seed[j]);
-    for (int reductions = 0; reductions < 20; ++reductions) {
-        for (int j = 0; j < D; ++j) {
-            double f = feed[j] > 0. ? .7 * step * seed[j] / feed[j] : .5;
-            if (attempt > 0) {
-                // Enrich one neutral while maintaining local charge closure.
-                f = (j == attempt - 1 ? .03 : .85);
+    if (attempt >= 0) {
+        for (int reductions = 0; reductions < 20; ++reductions) {
+            for (int j = 0; j < D; ++j) {
+                double f = feed[j] > 0. ? .7 * step * seed[j] / feed[j] : .5;
+                if (attempt > 0) {
+                    // Enrich one neutral while maintaining local charge closure.
+                    f = (j == attempt - 1 ? .03 : .85);
+                }
+                z[j] = log(f / (1. - f));
             }
-            z[j] = log(f / (1. - f));
+            if (charged_anchor >= 0) {
+                double voltage = z[charged_anchor] / valence[charged_anchor];
+                for (int j = 0; j < D; ++j)
+                    z[j] -= voltage * valence[j];
+            }
+            // Negative TPD guarantees a downhill *infinitesimal* phase. Near the
+            // binodal its finite lever-rule initialization must be backtracked.
+            if (attempt > 0 || objective(true, z, grad) < homogeneous)
+                break;
+            step *= .2;
         }
-        if (charged_anchor >= 0) {
-            double voltage = z[charged_anchor] / valence[charged_anchor];
+        for (int j = 0; j < D; ++j)
+            best[j] = z[j];
+        double energy = optimize(true);
+        if (!isfinite(energy) || energy >= homogeneous) {
+            // The extensive gain at phase birth can be below the optimizer's
+            // precision. Refine the chemical potentials directly from the
+            // downhill tangent-plane seed before declaring coexistence unresolved.
             for (int j = 0; j < D; ++j)
-                z[j] -= voltage * valence[j];
+                z[j] = best[j];
         }
-        // Negative TPD guarantees a downhill *infinitesimal* phase. Near the
-        // binodal its finite lever-rule initialization must be backtracked.
-        if (attempt > 0 || objective(true, z, grad) < homogeneous)
-            break;
-        step *= .2;
     }
-    double energy = optimize(true);
-    if (!isfinite(energy) || energy >= homogeneous) {
-        status.data[row] = -12;
-        return;
+    int pivot_component = 0;
+    if (attempt < 0) {
+        // A vanishing phase is ill-conditioned in independent component
+        // log-odds. The minority mole fraction remains well conditioned as
+        // it tends to zero. Represent its normalized composition by logits.
+        for (int j = 1; j < D; ++j)
+            if (seed[j] > seed[pivot_component])
+                pivot_component = j;
+        for (int j = 0; j < D; ++j)
+            z[j] = feed[j] > 0. ? log(seed[j] / seed[pivot_component]) : 0.;
+        z[pivot_component] = fmin(.001, .2 * step);
     }
 
     // Polish equality of component potentials. Minimizing Gibbs alone underweights
     // the residual of a trace constituent or nearly vanished phase.
     auto residual = [&](const double *coord, double *r) __attribute__((noinline)) {
-        double e = objective(true, coord, gnew);
-        if (!isfinite(e))
+        if (attempt < 0) {
+            const double share = coord[pivot_component];
+            if (!(share > 0. && share < 1.))
+                return infinity;
+            double den = 0.;
+            for (int j = 0; j < D; ++j) {
+                xA[j] = feed[j] == 0. ? 0. : exp(j == pivot_component ? 0. : coord[j]);
+                den += xA[j];
+            }
+            for (int j = 0; j < D; ++j) {
+                xA[j] *= share / den;
+                xB[j] = feed[j] - xA[j];
+                if (feed[j] > 0. && xB[j] <= 0.)
+                    return infinity;
+                fraction[j] = feed[j] > 0. ? xA[j] / feed[j] : 0.;
+            }
+            if (!potentials(xA, muA) || !potentials(xB, muB))
+                return infinity;
+        } else if (!isfinite(objective(true, coord, gnew)))
             return infinity;
         double err = 0.;
         double potential =
@@ -481,7 +517,20 @@ auto resolve_split = [&](int attempt) __attribute__((noinline)) {
         if (!accepted)
             break;
     }
-    if (!(err < 1.e-7) || objective(true, z, grad) >= homogeneous) {
+    err = residual(z, grad);
+    double coexist_g = 0.;
+    for (int j = 0; j < D; ++j)
+        coexist_g += xA[j] * muA[j] + xB[j] * muB[j];
+    const double energy_roundoff = 8. * 2.220446049250313e-16 * (1. + fabs(homogeneous));
+    double amountA = 0., amountB = 0., composition_gap = 0.;
+    for (int j = 0; j < D; ++j) {
+        amountA += xA[j];
+        amountB += xB[j];
+    }
+    for (int j = 0; j < D; ++j)
+        composition_gap = fmax(composition_gap, fabs(xA[j] / amountA - xB[j] / amountB));
+    if (!(err < 1.e-7) || !(composition_gap > 1.e-5) || !isfinite(coexist_g) ||
+        coexist_g > homogeneous + energy_roundoff) {
         status.data[row] = -12;
         return;
     }
@@ -543,6 +592,13 @@ auto resolve_split = [&](int attempt) __attribute__((noinline)) {
     result[D + 1] = err;
 };
 resolve_split(0);
+if (status.data[row] < 0 && charged_anchor < 0 && potentials(feed, reference_mu)) {
+    const double downhill = stability();
+    if (isfinite(downhill) && downhill < -1.e-8)
+        resolve_split(-1);
+    else
+        status.data[row] = -11;
+}
 for (int j = 0; status.data[row] < 0 && j < D; ++j) {
     if (feed[j] == 0.)
         continue;
