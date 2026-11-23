@@ -14,7 +14,7 @@ from particula_aiomfac import (
     SpeciesInventory,
     SpeciesLayout,
 )
-from particula_aiomfac.reservoirs import HCL_298
+from particula_aiomfac.reservoirs import HCL_298, _ion_mw
 
 pytest.importorskip("particula")
 from particula.equilibria import Equilibria, EquilibriaFactory
@@ -110,9 +110,8 @@ def charged_options():
     )
 
 
-@pytest.mark.parametrize(
-    "execution",
-    [
+@pytest.fixture(
+    params=[
         "cpu",
         pytest.param(
             "cuda",
@@ -123,6 +122,10 @@ def charged_options():
         ),
     ],
 )
+def execution(request):
+    return request.param
+
+
 def test_individual_ion_transfer_keeps_charge_and_each_element(execution):
     """A sodium ion can enter the gas while chloride stays on the particle."""
     model = provider()
@@ -289,8 +292,6 @@ def test_bicarbonate_supplies_co2_gas_and_restarts_from_actual_species():
     co2 = model.neutrals[model.co2]
     sodium = 2.3
     # kg/mol from the pinned ion parameter table, scaled to µg/m³.
-    from particula_aiomfac.reservoirs import _ion_mw
-
     ion_masses = _ion_mw([202, 250])
     feed = SpeciesInventory(
         liquid_neutrals={"water": 1000.0},
@@ -339,8 +340,6 @@ def test_dry_halite_seed_uses_deliquescence_activity():
 
 def test_charged_gas_from_reacting_brine():
     """Conserve Na, carbon and charge across bicarbonate surface adsorption."""
-    from particula_aiomfac.reservoirs import _ion_mw
-
     groups = {"water": {16: 1}, "NaHCO3": {202: 1, 250: 1}, "CO2": {173: 1}}
     model = ActivityFactory().get_strategy(
         "aiomfac",
@@ -387,23 +386,70 @@ def test_charged_gas_from_reacting_brine():
         )
 
 
-@pytest.mark.parametrize(
-    "initial_water, expected_gas", [(3.0, 3.0), (15.0, 10.0)]
-)
-def test_physical_pure_water_vapor_limit(initial_water, expected_gas):
-    model = provider()
+def bisulfate_provider():
+    """Prepare a sulfate reaction that may or may not have inventory."""
+    groups = {"water": {16: 1}, "NH4HSO4": {204: 1, 248: 1}}
+    return ActivityFactory().get_strategy(
+        "aiomfac",
+        {
+            "mixture": MixtureSpec(groups),
+            "material_mapping": dict(enumerate(groups)),
+            "phase_mode": "stable",
+        },
+    )
+
+
+def water_vapor_at_ten(model):
+    """Return a 298.15 K water reaction with saturation at 10 µg/m³."""
     mw = model.prepared.neutral_mw[model.prepared.neutrals.index("water")]
     ln_k = np.log(101325 * mw * 1e9 / (R * 298.15 * 10))
+    return GasReaction({"water": 1}, ln_k, 298.15)
+
+
+@pytest.mark.parametrize("make_model", [provider, bisulfate_provider])
+@pytest.mark.parametrize(
+    "initial_water, expected_gas", [(3.0, 3.0), (10.0, 10.0), (15.0, 10.0)]
+)
+def test_physical_pure_water_vapor_limit(
+    make_model, initial_water, expected_gas, execution
+):
+    """An unoccupied salt leaves the pure-water dew point unchanged."""
+    model = make_model()
     out = model.equilibrate_species(
         species_inventory=SpeciesInventory(gases={"vapor": initial_water}),
         temperature=298.15,
         solids={},
-        gas_reactions={"vapor": GasReaction({"water": 1}, ln_k, 298.15)},
+        gas_reactions={"vapor": water_vapor_at_ten(model)},
+        execution=execution,
     )
     assert out.inventory.gases["vapor"] == pytest.approx(expected_gas)
     assert out.inventory.liquid_neutrals["water"] == pytest.approx(
         initial_water - expected_gas
     )
+    assert (out.condensed.liquids is None) == (initial_water <= 10.0)
+    assert sum(out.inventory.liquid_ions.values()) == 0
+    assert out.inventory.total_mass == pytest.approx(initial_water)
+
+
+def test_occupied_bisulfate_speciates_with_closed_water_vapor(execution):
+    """Dissolved bisulfate still dissociates and lowers the water pressure."""
+    model = bisulfate_provider()
+    ammonium, bisulfate, sulfate = _ion_mw([204, 248, 261])
+    initial = SpeciesInventory(
+        liquid_neutrals={"water": 100.0},
+        liquid_ions={204: ammonium, 248: bisulfate},
+    )
+    out = model.equilibrate_species(
+        species_inventory=initial,
+        temperature=298.15,
+        gas_reactions={"vapor": water_vapor_at_ten(model)},
+        execution=execution,
+    )
+    ions = out.inventory.liquid_ions
+    assert ions[205] > 0 and ions[248] > 0 and ions[261] > 0
+    assert ions[248] / bisulfate + ions[261] / sulfate == pytest.approx(1.0)
+    assert 0 < out.inventory.gases["vapor"] < 10
+    assert out.inventory.total_mass == pytest.approx(initial.total_mass)
 
 
 @pytest.mark.parametrize(
