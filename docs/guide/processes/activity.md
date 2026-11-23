@@ -52,18 +52,31 @@ Internal equilibration is instantaneous. The particle retains one total mass
 per material. At every gas exchange step, coexisting liquids give the same
 neutral chemical potential. The transport model applies its own curvature term.
 
-With a configured provider `activity`, the following calls distinguish a
-fixed condensed inventory from a gas–liquid equilibrium with a finite reservoir.
-Here the mixture and native layout are both water, 2-propanol, ammonium sulfate.
+Configure the provider for water, 2-propanol and ammonium sulfate in native
+material order. Use the same provider for a fixed condensed inventory and
+for gas–liquid partitioning.
 The first two calls accept masses in any common unit. The bulk solver accepts
 analytical concentrations and pure-vapor saturation concentrations in µg/m³.
 
-```python
+```python title="Requires particula-aiomfac"
+from particula.equilibria import EquilibriaFactory
+from particula.particles import ActivityFactory
+from particula_aiomfac import MixtureSpec
+
+groups = {
+    "water": {16: 1},
+    "2-propanol": {141: 2, 151: 1, 153: 1},
+    "ammonium sulfate": {204: 2, 261: 1},
+}
+activity = ActivityFactory().get_strategy("aiomfac", {
+    "mixture": MixtureSpec(groups),
+    "material_mapping": dict(enumerate(groups)),
+    "phase_mode": "stable",
+})
 liquids = activity.phase_equilibrium([0.40, 0.42, 0.18], 303.15)
 water_activity = activity.activities_at_temperature(
     [0.40, 0.42, 0.18], 303.15, ["water"]
 )
-from particula.equilibria import EquilibriaFactory
 strategy = EquilibriaFactory().get_strategy(
     "liquid_vapor", {"activity_model": activity}
 )
@@ -90,6 +103,7 @@ a dissolved mixture. Inspect reported solver failures at unsupported states.
 [Derivation and equilibrium assumptions](../../theory/thermodynamics/equilibria-theory.md)
 · [Humidity sweep](../../studies/examples/thermodynamics/equilibria/aiomfac_humidity_sweep.py)
 · [Closed evaporating droplet](../../studies/examples/thermodynamics/equilibria/aiomfac_evaporating_droplet.py)
+· [Humidity ramp for 1,000 individual droplets](../../studies/examples/thermodynamics/equilibria/aiomfac_mixing_state_ramp.py)
 
 ### Select the carbonate reference
 
@@ -111,7 +125,7 @@ fields are disjoint. To supply solid NaCl, put its mass in `solids`. Dissolved
 Na⁺ and Cl⁻ use AIOMFAC IDs 202 and 242 in `liquid_ions`. To supply an
 already dissolved sample, put its mass directly into those ion fields.
 
-```python
+```python title="Requires particula-aiomfac"
 from particula.particles import ActivityFactory
 from particula_aiomfac import MixtureSpec, SpeciesInventory
 

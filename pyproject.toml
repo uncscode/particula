@@ -161,6 +161,7 @@ include = [
     "_particula_build.py", "particula_docs.py",
     "docs/index.md", "docs/guide/", "docs/theory/", "docs/contribute/",
     "docs/studies/", "docs/data/", "docs/images/",
+    "studies/aiomfac-mixing-state/",
     "website/examples.json", "scripts/", "examples_tests/", "conda/", "conftest.py",
 ]
 exclude = [

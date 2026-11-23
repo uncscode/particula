@@ -8,11 +8,13 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def execute_page(relative_path):
-    """Execute actual Python fences, excluding explicitly textual pseudocode."""
+def execute_page(relative_path, fence="python"):
+    """Execute the guide snippets for the selected installation."""
     page = ROOT / relative_path
     namespace = {}
-    snippets = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
+    snippets = re.findall(
+        rf"```{re.escape(fence)}\n(.*?)\n```", page.read_text(), re.DOTALL
+    )
     assert snippets
     for snippet in snippets:
         exec(compile(snippet, str(page), "exec"), namespace)  # noqa: S102
@@ -93,6 +95,22 @@ def test_activity_feature_equilibrium_organic_balance():
         rtol=1e-12,
     )
     assert sum(phase.water_concentration for phase in phases) > 0
+
+
+def test_activity_guide_aiomfac_phase_and_salt_examples():
+    """Follow both optional recipes and check the physical inventories."""
+    import pytest
+
+    pytest.importorskip("particula_aiomfac")
+    namespace = execute_page(
+        "docs/guide/processes/activity.md",
+        fence='python title="Requires particula-aiomfac"',
+    )
+    assert namespace["liquids"].beta is not None
+    assert namespace["result"].relative_humidity == pytest.approx(0.77)
+    inventory = namespace["state"].inventory
+    assert sum(inventory.solids.values()) == pytest.approx(0)
+    assert sum(inventory.liquid_ions.values()) == pytest.approx(1.0)
 
 
 def test_activity_theory_coefficient_identity():

@@ -15,4 +15,5 @@ Begin with phase properties and activities, then use those properties to calcula
 - [How long does an evaporating droplet take to reach two-liquid equilibrium?](aiomfac_evaporating_droplet.py)
 - [Separate water uptake from organic partitioning](equilibria_example.py)
 - [When does drying split an alcohol–salt droplet into two liquids?](aiomfac_humidity_sweep.py)
+- [Which of 1,000 drying droplets first separate into two liquids?](aiomfac_mixing_state_ramp.py)
 <!-- STUDY_LIST_END -->

@@ -5732,6 +5732,10 @@
           {
             "target": "docs/studies/examples/thermodynamics/equilibria/aiomfac_evaporating_droplet.py",
             "label": "Follow the same mixture during evaporation"
+          },
+          {
+            "target": "docs/studies/examples/thermodynamics/equilibria/aiomfac_mixing_state_ramp.py",
+            "label": "Compare 1,000 particle mixing states during drying"
           }
         ]
       }
@@ -5759,6 +5763,47 @@
           {
             "target": "docs/studies/examples/thermodynamics/equilibria/aiomfac_humidity_sweep.py",
             "label": "Find the phase boundary at prescribed humidity"
+          },
+          {
+            "target": "docs/studies/examples/thermodynamics/equilibria/aiomfac_mixing_state_ramp.py",
+            "label": "Compare 1,000 particle mixing states during drying"
+          }
+        ]
+      }
+    },
+    {
+      "source": "docs/studies/examples/thermodynamics/equilibria/aiomfac_mixing_state_ramp.py",
+      "title": "Which of 1,000 drying droplets first separate into two liquids?",
+      "topic": "condensation-reservoirs",
+      "also": [
+        "activity-nonideal",
+        "partitioning",
+        "gpu"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "aiomfac-mixing-state-ramp",
+        "runs": [
+          "aiomfac-mixing-state-ramp"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/activity.md",
+            "label": "Choose the phase-aware activity model"
+          },
+          {
+            "target": "docs/theory/thermodynamics/equilibria-theory.md",
+            "label": "Stability and coexistence in the liquid phases"
+          },
+          {
+            "target": "docs/studies/examples/thermodynamics/equilibria/aiomfac_humidity_sweep.py",
+            "label": "Compare with a single-inventory equilibrium sweep"
+          },
+          {
+            "target": "docs/studies/examples/thermodynamics/equilibria/aiomfac_evaporating_droplet.py",
+            "label": "Follow evaporation in a single particle"
           }
         ]
       }

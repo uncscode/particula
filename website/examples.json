@@ -2020,5 +2020,50 @@
       "packages/particula-aiomfac/src/particula_aiomfac/data/parameters.npz",
       "packages/particula-aiomfac/src/particula_aiomfac/data/manifest.json"
     ]
+  },
+  "aiomfac-mixing-state-ramp": {
+    "title": "Which of 1,000 drying droplets first separate into two liquids?",
+    "source": "docs/studies/examples/thermodynamics/equilibria/aiomfac_mixing_state_ramp.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 14400,
+    "inputs": [
+      "studies/aiomfac-mixing-state/ramp.py",
+      "studies/aiomfac-mixing-state/equilibrium.py"
+    ],
+    "invoke": "report = run_example()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nmixing = plot_mixing(report)\nhistory = plot_history(report)\ncloud_points = plot_cloud_points(report)",
+    "render_functions": [
+      "plot_mixing",
+      "plot_history",
+      "plot_cloud_points"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true,
+    "science_inputs": [
+      "packages/particula-aiomfac/src/particula_aiomfac/__init__.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/_condensation.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/_cuda.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/_cuda_phases.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/_equilibrium.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/_terms.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/adapter.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/data/manifest.json",
+      "packages/particula-aiomfac/src/particula_aiomfac/data/parameters.npz",
+      "packages/particula-aiomfac/src/particula_aiomfac/kernels/activity.inc",
+      "packages/particula-aiomfac/src/particula_aiomfac/kernels/equilibrium.inc",
+      "packages/particula-aiomfac/src/particula_aiomfac/kernels/output.inc",
+      "packages/particula-aiomfac/src/particula_aiomfac/kernels/phases.inc",
+      "packages/particula-aiomfac/src/particula_aiomfac/model.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/phases.py",
+      "packages/particula-aiomfac/src/particula_aiomfac/reciprocal.py",
+      "particula/dynamics/condensation/condensation_strategies.py",
+      "particula/execution/_adaptive_condensation_physics.py",
+      "particula/execution/gpu_resident_condensation.py",
+      "particula/gpu/kernels/_condensation_native.py",
+      "particula/gpu/kernels/condensation.py",
+      "particula/particles/prepared_activity.py"
+    ]
   }
 }
