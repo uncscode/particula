@@ -7,7 +7,8 @@
 # The initial dry mass ratio and temperature match the
 # [humidity sweep](aiomfac_humidity_sweep.py). Here the gas humidity evolves
 # as water evaporates. A liquid split can occur during a continuous change in
-# particle mass.
+# particle mass. A second closed-box experiment lets 2-propanol exchange
+# with the gas as well and tracks both vapor inventories.
 #
 # ## Set up a finite reservoir
 #
@@ -58,7 +59,7 @@ GROUPS = {
 }
 
 
-def prepare_box():
+def prepare_box(*, exchange_alcohol=False):
     """Make the initial state, stable activity provider and native process."""
     activity = ActivityFactory().get_strategy(
         "aiomfac",
@@ -70,10 +71,17 @@ def prepare_box():
     )
     start = DRY_MASS * np.array([0.61 / 0.39, 0.70, 0.30])
     target = DRY_MASS * np.array([0.43 / 0.57, 0.70, 0.30])
-    phase = activity.phase_equilibrium(target, TEMPERATURE)
-    water_index = phase.alpha.neutral_ids.index("water")
-    equilibrium_gas = phase.alpha.neutral_activities[water_index] * WATER_CSTAR
-    initial_gas = equilibrium_gas - NUMBER * (start[0] - target[0])
+    names = ("water", "2-propanol") if exchange_alcohol else ("water",)
+    count = len(names)
+    molar_mass = np.array([WATER_MW, 0.060095])[:count]
+    pressures = np.array([VAPOR_PRESSURE, 7859.0])[:count]
+    if exchange_alcohol:
+        start[1] *= 0.8
+    activities = activity.activities_at_temperature(target, TEMPERATURE, names)
+    saturation = pressures * molar_mass / (GAS_CONSTANT * TEMPERATURE)
+    initial_gas = activities * saturation + NUMBER * (
+        target[:count] - start[:count]
+    )
     particles = ParticleData(
         masses=start[None, None, :],
         concentration=np.array([[NUMBER]]),
@@ -85,25 +93,29 @@ def prepare_box():
     box = Aerosol(
         particles=particles,
         gas=GasData(
-            ["water"],
-            np.array([WATER_MW]),
-            np.array([[initial_gas]]),
-            np.array([True]),
+            list(names),
+            molar_mass,
+            initial_gas[None, :],
+            np.ones(count, dtype=bool),
         ),
         environment=EnvironmentData(
-            [TEMPERATURE], [101325.0], [[initial_gas / WATER_CSTAR]]
+            [TEMPERATURE], [101325.0], (initial_gas / saturation)[None, :]
         ),
     )
     process = CondensationIsothermal(
-        molar_mass=np.array([WATER_MW]),
-        diffusion_coefficient=2.5e-5,
+        molar_mass=molar_mass,
+        diffusion_coefficient=np.array([2.5e-5, 1.0e-5])[:count],
         accommodation_coefficient=1.0,
-        vapor_pressure_strategy=ConstantVaporPressureStrategy(VAPOR_PRESSURE),
+        vapor_pressure_strategy=[
+            ConstantVaporPressureStrategy(p) for p in pressures
+        ],
         activity_strategy=activity,
         surface_strategy=SurfaceStrategyVolume(
             density=DENSITY, surface_tension=SIGMA
         ),
-        species_map=CondensationSpeciesMap(("water",), ((0, 0),)),
+        species_map=CondensationSpeciesMap(
+            names, tuple((i, i) for i in range(count))
+        ),
         update_gases=True,
     )
     return box, process
@@ -191,6 +203,94 @@ def simulate():
 
 
 # %% [markdown]
+# ## Let the alcohol exchange with the gas
+#
+# Start a second box with 20% less particle alcohol and the same water and
+# salt masses. Supply enough vapor to target the same two-liquid endpoint.
+# At 303.15 K the measured pure 2-propanol vapor pressure is 7.859 kPa.
+# The prescribed gas diffusivities are 2.5 × 10⁻⁵ m²/s for water and
+# 1.0 × 10⁻⁵ m²/s for alcohol. Water and alcohol have independently closed
+# inventories. Their fluxes are coupled through the evolving liquid
+# activities. Ammonium sulfate stays in the droplet.
+# [Vapor pressure measurements, Table 4](https://doi.org/10.1021/je034197x)
+# %%
+def simulate_two_vapors():
+    """Track three particle materials and both gas inventories in a closed box."""
+    box, process = prepare_box(exchange_alcohol=True)
+    activity = process.activity_strategy
+    inventory = box.particles.species_mass_density[0].copy()
+    inventory[:2] += box.gas.concentration[0]
+    names = ("water", "2-propanol")
+    saturation = (
+        np.array([VAPOR_PRESSURE, 7859.0])
+        * box.gas.molar_mass
+        / (GAS_CONSTANT * TEMPERATURE)
+    )
+    bulk = (
+        EquilibriaFactory()
+        .get_strategy("liquid_vapor", {"activity_model": activity})
+        .solve(
+            inventories=inventory * 1e9,
+            temperature=TEMPERATURE,
+            saturation_concentrations=dict(
+                zip(names, saturation * 1e9, strict=True)
+            ),
+        )
+    )
+    owner = CondensationODE(
+        box,
+        process,
+        method="rk23",
+        rtol=5e-5,
+        particle_atol=1e-21,
+        gas_atol=1e-10,
+        first_step=0.0005,
+    )
+    times = [0, 0.005, 0.015, 0.04, 0.1, 0.2, 0.4, 0.8, 1.5, 3.0]
+    particle, vapor, phase_share = [], [], []
+    for time in times:
+        if time:
+            run_until(owner, time)
+        state = owner.snapshot()
+        mass = state.particles.masses[0, 0]
+        split = activity.phase_equilibrium(mass, TEMPERATURE)
+        particle.append(mass.copy())
+        vapor.append(state.gas.concentration[0].copy())
+        phase_share.append(
+            float(split.beta_masses.sum() / mass.sum())
+            if split.beta is not None
+            else 0.0
+        )
+    particle = np.asarray(particle)
+    vapor = np.asarray(vapor)
+    np.testing.assert_allclose(
+        particle[:, 2], particle[0, 2], rtol=1e-12, atol=0.0
+    )
+    delta_particle = (particle[:, :2] - particle[0, :2]) * NUMBER
+    delta_vapor = vapor - vapor[0]
+    closure = np.max(np.abs(delta_particle + delta_vapor), axis=0) / np.max(
+        np.abs(delta_particle), axis=0
+    )
+    np.testing.assert_allclose(closure, 0.0, atol=1e-8)
+    assert np.all(np.max(np.abs(delta_particle), axis=0) > 0)
+    assert bulk.liquids.beta is not None
+    eq_pg = (
+        (bulk.liquids.alpha_masses + bulk.liquids.beta_masses) * 1e6 / NUMBER
+    )
+    np.testing.assert_allclose(particle[-1] * 1e15, eq_pg, rtol=2e-5, atol=0.0)
+    if phase_share[0] != 0.0 or not any(phase_share):
+        raise ArithmeticError("Expected to cross into the two-liquid region")
+    return {
+        "time_s": times,
+        "particle_pg": (particle * 1e15).tolist(),
+        "gas_change_mg_m3": (delta_vapor * 1e6).tolist(),
+        "beta_share": phase_share,
+        "equilibrium_pg": eq_pg.tolist(),
+        "relative_transfer_residual": closure.tolist(),
+    }
+
+
+# %% [markdown]
 # ## Identify when the second liquid appears
 #
 # The falling water fraction and rising vapor RH follow the same transfer of
@@ -223,12 +323,55 @@ def plot_results(data):
         ax.set_xscale("symlog", linthresh=0.02)
         ax.set_xlim(0, 3.2)
         ax.set_xlabel("Time (s)")
-    return fig
+    multi = data["two_vapors"]
+    transfer, (part, air) = plt.subplots(
+        1, 2, figsize=(8.8, 3.7), constrained_layout=True
+    )
+    colors = ("#17678a", "#a24426", "#715688")
+    labels = ("Water", "2-propanol", "Ammonium sulfate")
+    for i, (label, color) in enumerate(zip(labels, colors, strict=True)):
+        part.plot(
+            multi["time_s"],
+            np.asarray(multi["particle_pg"])[:, i],
+            marker=("o", "s", "^")[i],
+            color=color,
+            label=label,
+        )
+        part.axhline(multi["equilibrium_pg"][i], ls=":", color=color, lw=1.0)
+        if i < 2:
+            air.plot(
+                multi["time_s"],
+                np.asarray(multi["gas_change_mg_m3"])[:, i],
+                marker=("o", "s")[i],
+                color=color,
+                label=label,
+            )
+    first_split = next(
+        i for i, share in enumerate(multi["beta_share"]) if share > 0
+    )
+    for axis in (part, air):
+        axis.axvspan(
+            multi["time_s"][first_split - 1],
+            multi["time_s"][first_split],
+            color="0.35",
+            alpha=0.12,
+            lw=0,
+        )
+    part.set_ylabel("Mass per droplet (pg)")
+    part.legend(frameon=False)
+    air.axhline(0, color="0.55", lw=0.7)
+    air.set_ylabel("Change in vapor mass (mg/m³)")
+    for axis in (part, air):
+        axis.set_xscale("symlog", linthresh=0.02)
+        axis.set_xlim(0, 3.2)
+        axis.set_xlabel("Time (s)")
+    return fig, transfer
 
 
 def run_example():
     """Report the independent endpoint and normalized water-budget residual."""
     data = simulate()
+    data["two_vapors"] = simulate_two_vapors()
     print(
         f"Closed equilibrium water mass fraction: {data['equilibrium_water']:.5f}"
     )
@@ -249,7 +392,20 @@ if __name__ == "__main__":
 # integration. Matching the terminal water mass checks that the standalone equilibrium
 # and the finite-reservoir transport calculation describe the same endpoint.
 # The model assigns no time to forming an internal interface. The elapsed
-# time in the figure belongs to gas–particle water transport. A finite
+# time in the first figure belongs to gas–particle water transport. A finite
 # interfacial barrier or diffusion through a viscous organic shell could
 # delay the transition in a real particle. The predicted drying time also
 # depends on the specified particle size, abundance and transport constants.
+
+#
+# In the two-vapor figure, water falls from 156.4 to 75.4 pg per droplet.
+# Alcohol first rises from 56 to 137.5 pg at the 40 ms sample, then falls
+# toward 70 pg as the mixture dries. The shaded interval from 5 to 15 ms
+# brackets the first detected second liquid. Dotted lines give the particle
+# mass endpoints from the bulk equilibrium calculation. The vapor panel measures each gas relative
+# to its initial inventory. Opposite signs indicate that one vapor enters the
+# droplets while the other leaves. Comparing both changes with their
+# respective particle transfers tests conservation even when the background
+# vapor mass is large.
+# To follow the onset across different dry compositions, see the
+# [1,000-droplet humidity ramp](aiomfac_mixing_state_ramp.py).
