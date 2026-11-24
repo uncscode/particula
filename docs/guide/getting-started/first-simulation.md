@@ -132,10 +132,14 @@ They share the variables defined inside its functions.
 
 ### Represent a population with one particle size
 
-In `build_case`, the first calculation turns the radius of a spherical particle
-into its mass. The constructor then needs to know how many particles that mass represents.
+Inside `build_case`, `c` is a short local name for `CONFIGURATION`, the
+dictionary of physical inputs defined near the top of the script. For example,
+`c["radius_m"]` reads the starting particle radius in meters (100 nm, or
+1 × 10⁻⁷ m). The next lines use that radius and the material density to compute
+the mass of one spherical particle.
 
 ```python
+c = CONFIGURATION
 density = c["material_density_kg_m3"]
 mass = 4 * np.pi * density * c["radius_m"] ** 3 / 3
 particles = par.particles.create_resolved_particle_data(
