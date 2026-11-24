@@ -13,6 +13,15 @@ from scipy.integrate import solve_ivp
 from particula.dynamics.parcel import RD, RV, ParcelInitialState, _initial_radii
 from particula.dynamics.parcel_trace import ParcelTrace
 
+SOUNDING_COLUMNS = (
+    "height_m",
+    "temperature_K",
+    "pressure_Pa",
+    "vapor_kg_per_kg_dry_air",
+    "east_m_s",
+    "north_m_s",
+)
+
 
 @dataclass(frozen=True)
 class Sounding:
@@ -52,17 +61,9 @@ class Sounding:
     def from_csv(cls, path):
         """Read a normalized radiosonde table with named SI columns."""
         table = np.genfromtxt(path, delimiter=",", names=True, ndmin=1)
-        names = (
-            "height_m",
-            "temperature_K",
-            "pressure_Pa",
-            "vapor_kg_per_kg_dry_air",
-            "east_m_s",
-            "north_m_s",
-        )
-        if not set(names).issubset(table.dtype.names or ()):
+        if not set(SOUNDING_COLUMNS).issubset(table.dtype.names or ()):
             raise ValueError("missing required SI sounding columns")
-        return cls(*(table[name] for name in names))
+        return cls(*(table[name] for name in SOUNDING_COLUMNS))
 
     def thermodynamics(self, z):
         """Interpolate T, p and vapor at geometric heights in metres."""

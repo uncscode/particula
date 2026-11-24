@@ -1,0 +1,62 @@
+{
+  "schema": "particula-openfoam-cavity-v1",
+  "image": "opencfd/openfoam-default@sha256:097e45046a74ee1dae3e6135df0c42723ba55092d246e7c9932f3bfa1e89b7b2",
+  "build": "OpenCFD v2312 c39a0f64-20231220; linux64GccDPInt32Opt",
+  "solver": "icoFoam, then scalarTransportFoam with frozen phi and U",
+  "rights": "Original case inputs and numerical output distributed under the repository MIT license.",
+  "shape": [
+    16,
+    16,
+    1
+  ],
+  "bounds": [
+    [
+      0,
+      0.1
+    ],
+    [
+      0,
+      0.1
+    ],
+    [
+      0,
+      0.01
+    ]
+  ],
+  "first_step": 500,
+  "last_step": 540,
+  "units": {
+    "time": "s",
+    "centres": "m",
+    "volumes": "m3",
+    "face_centres": "m",
+    "area_vectors": "m2",
+    "phi": "m3/s",
+    "velocity": "m/s",
+    "scalar": "kg/m3",
+    "kinematic_pressure": "m2/s2"
+  },
+  "patches": [
+    "internal",
+    "lid",
+    "walls",
+    "frontBack"
+  ],
+  "phi_convention": "constant over each accepted interval, positive out of owner",
+  "diffusivity_m2_s": 1e-05,
+  "temperature_K": 293.15,
+  "pressure_Pa": 101325.0,
+  "vapor_kg_per_kg_dry_air": 0.005,
+  "sha256": "a751851b8bbb3583d8a00abe526e0b2c9f12e693d1ab0ab4fe4efea87c77492d",
+  "refinement": {
+    "half_step_l1": 0.00937328948121571,
+    "half_step_centroid_m": 8.538519848452029e-05,
+    "fine_mesh_l1": 0.1858704426506775,
+    "fine_mesh_centroid_m": 0.0008952388196793197
+  },
+  "limits": {
+    "relative_l1": 0.1858704426506775,
+    "centroid_m": 0.0008952388196793197,
+    "relative_mass": 1e-09
+  }
+}
