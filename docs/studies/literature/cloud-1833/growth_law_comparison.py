@@ -13,6 +13,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from particula import plotting
 
 table_path = Path("stage-scores.csv")
 if not table_path.is_file():
@@ -43,19 +44,26 @@ for law in laws:
 # the pooled result. Markers help distinguish the models at low light,
 # where the shape differences between collision treatments are smallest.
 # %%
-fig, ax = plt.subplots(figsize=(6.2, 3.5), layout="constrained")
-for law, marker, color in zip(
-    laws, ("o", "s", "^"), ("#446c9c", "#b96925", "#007974")
+plt.style.use("particula.default")
+fig, ax = plotting.subplots(size="wide")
+for law, marker, color, stroke in zip(
+    laws, ("o", "s", "^"), ("indigo", "rust", "teal"), ("-.", "--", "-")
 ):
     ax.plot(
-        by_stage.index, by_stage[law], marker=marker, color=color, label=law
+        by_stage.index,
+        by_stage[law],
+        marker=marker,
+        color=plotting.COLORS[color],
+        linestyle=stroke,
+        label=law,
     )
 ax.set(
     xlabel="Excimer stage",
     ylabel="Size-distribution mismatch (%)",
     xticks=by_stage.index,
 )
-ax.legend(frameon=False)
+plotting.legend(ax)
+plotting.fit(fig)
 plt.show()
 
 # %% [markdown]

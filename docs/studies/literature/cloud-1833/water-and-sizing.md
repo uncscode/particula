@@ -8,7 +8,7 @@ Donahue et al. measured the experiment at 297.8 K and 58% relative humidity. For
 
 ![Water content as a function of diameter, counts above 9.7 nm and size-resolved errors for the wet and partly dried simulations.](../../../images/cloud-1833/water-and-sizing.png)
 
-The upper right panel applies three sizing treatments to the attractive-capture replay. The lower panels show excess predicted particles in red and deficits in blue. The time axes show hours from the start of run 1833.
+The upper right panel applies three sizing treatments to the attractive-capture replay. The lower panels show excess predicted particles in teal and deficits in rust. The time axes show hours from the start of run 1833.
 
 ## Wet sizing and partially dried sizing favor different diagnostics
 

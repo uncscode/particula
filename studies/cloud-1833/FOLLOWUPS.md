@@ -4,7 +4,7 @@ Three figures trace how the study tested explanations for the residual in the ma
 
 ## Redraw the three published figures on CPU
 
-Start in `studies/cloud-1833` in the publication checkout, in a Python environment with NumPy, pandas and Matplotlib. Each command reads final numeric results from this directory. The PNGs use hours since the start of run 1833. To convert the archived `archive_h` column to this clock, add 6.5 h.
+Start in `studies/cloud-1833` in the publication checkout, in a Python environment with NumPy, pandas and the Particula plotting extra. Each command reads final numeric results from this directory. The PNGs use hours since the start of run 1833. To convert the archived `archive_h` column to this clock, add 6.5 h.
 
 ```bash
 out="$(mktemp -d)"
