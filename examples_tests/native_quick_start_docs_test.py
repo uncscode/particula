@@ -44,11 +44,15 @@ def test_published_reload_and_resume_snippets(workflow, monkeypatch):
     directory, _ = workflow
     root = Path(__file__).resolve().parents[1]
     page = root / "docs/guide/getting-started/first-simulation.md"
-    snippets = re.findall(r"```python\n(.*?)\n```", page.read_text(), re.DOTALL)
-    assert len(snippets) == 2
+    guide = page.read_text()
     monkeypatch.chdir(directory)
     monkeypatch.syspath_prepend(str(root / "docs/studies/tutorials"))
-    namespace = {}
-    for snippet in snippets:
+    for heading in (
+        "Reload and inspect results",
+        "Resume the five-minute checkpoint",
+    ):
+        section = guide.split(f"\n## {heading}\n", 1)[1].split("\n## ", 1)[0]
+        (snippet,) = re.findall(r"```python\n(.*?)\n```", section, re.DOTALL)
+        namespace = {}
         exec(compile(snippet, str(page), "exec"), namespace)  # noqa: S102
     assert namespace["resumed"].time == 600
