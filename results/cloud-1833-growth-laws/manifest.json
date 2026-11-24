@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.9242610349319875,
+  "package_source_sha256": "ed70c732e419c05fc561ac942723e152241d8ed45161f696c43e184615615b45",
+  "scientific_source_sha256": "f2fa51d77bead033405ae3d98ff68893d21cfb1feddb41549d4ca0a29679d979",
+  "input_sha256": {
+    "studies/cloud-1833/full-transfer/stage-scores.csv": "7041d88e5c90ec10a2ef95b7984a058787c99e7e87c1075b4e6cb66ff32bd7aa"
+  },
+  "example": "cloud-1833-growth-laws",
+  "fingerprint": "975a6272b058999503413a51a2016d0ff88c757172be293a045c688f110a43e9",
+  "source": "docs/studies/literature/cloud-1833/growth_law_comparison.py",
+  "revision": "8d3b8dab48cebca900f9b537c82fb3571c617bf9",
+  "package_dirty": false,
+  "executed_at": "2026-11-24T00:58:23.683262+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.5",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "text": "Vapor transfer: 27.0% mismatch\nHard sphere: 21.0% mismatch\nAttraction: 12.6% mismatch\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-3-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-3-1.png": "8cb44eb3932f03fb7cedccd60fd7dd9034bcf9982b138f6226a777208aba1417",
+    "source.py": "4272a7277dcd0b0f2fcd823ffc85c7c75d337bd1b0c3d1e1214da4f067acd9a5"
+  }
+}
