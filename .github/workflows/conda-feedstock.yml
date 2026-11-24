@@ -14,6 +14,7 @@ on:
       - scripts/**
       - website/examples.json
       - studies/aiomfac-mixing-state/*.py
+      - studies/cloud-1833/full-transfer/stage-scores.csv
       - "particula/**/tests/**"
       - "particula/**/integration_tests/**"
       - docs/**
