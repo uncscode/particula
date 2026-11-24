@@ -4,21 +4,24 @@ Follow a finite vapor reservoir as it grows 100 nm organic particles over ten
 minutes. The [complete executable example](../../studies/tutorials/first_cpu_workflow.py)
 creates native state, records a time series, saves and reloads results, and
 checks an exact restart at five minutes. Its published page includes the plots.
-This workflow requires a development checkout containing the new concrete
-`particula.execution` modules; it is not a claim about an older installed release.
 
 ## Run and save the experiment
 
-Download the example's Python source as `first_cpu_workflow.py`, install
-Particula and Matplotlib in the selected environment, and run:
+Start with Python 3.12 or newer and an active virtual environment. To run
+the release example, install Particula with plotting support, save the
+[version 0.3.5 script](https://raw.githubusercontent.com/uncscode/particula/v0.3.5/docs/studies/tutorials/first_cpu_workflow.py)
+as `first_cpu_workflow.py`, and run it from the directory where you saved it:
 
 ```bash
+python -m pip install "particula[plot]==0.3.5"
 python first_cpu_workflow.py
 ```
 
-In a repository checkout, the equivalent command is:
+If you are working from a repository checkout, run its matching package and
+example together from the repository root:
 
 ```bash
+python -m pip install -e ".[plot]"
 python docs/studies/tutorials/first_cpu_workflow.py
 ```
 
@@ -74,16 +77,20 @@ real organic aerosol or an independent numerical reference.
 
 ## Resume the five-minute checkpoint
 
-Place the downloaded example beside your script so its explicit physics setup
-can be imported. From a checkout, add `docs/studies/tutorials` to the Python
-module search path, or run this beside that source file with an absolute result
-path. Keep the same physical configuration and subsequent output boundaries:
+Start Python in the directory containing both the downloaded script and
+`first-cpu-results/`. For the checkout route, start Python from the repository
+root with `PYTHONPATH=docs/studies/tutorials python` (Bash). The example
+supplies the same physical configuration used to write the checkpoint.
+Load the saved analysis to compare the gas history from 300 to 600 seconds:
 
 ```python
+import numpy as np
+from particula.execution.analysis_io import load_analysis
 from first_cpu_workflow import build_case
 from particula.execution.cpu_restart import load_cpu_checkpoint, resume_condensation
 from particula.execution.recording import Recorder, run_until
 
+result = load_analysis("first-cpu-results/organic-10.analysis")
 _, strategy = build_case(10.0)
 saved = load_cpu_checkpoint("first-cpu-results/organic-10.restart")
 resumed = resume_condensation(saved, strategy)
