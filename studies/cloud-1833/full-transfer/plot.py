@@ -22,30 +22,24 @@ from compare import (
 from matplotlib.colors import ListedColormap, TwoSlopeNorm
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
+from particula import plotting
+
+plt.style.use("particula.default")
 
 FIGURES.mkdir(parents=True, exist_ok=True)
 elapsed = time + 6.5
 styles = {
-    "Vapor transfer": ("#446c9c", "--"),
-    "Hard sphere": ("#b96925", "-."),
-    "Attraction": ("#007974", "-"),
-    "Donahue fit": ("#81477e", ":"),
+    "Vapor transfer": (plotting.COLORS["indigo"], "-."),
+    "Hard sphere": (plotting.COLORS["rust"], "--"),
+    "Attraction": (plotting.COLORS["teal"], "-"),
+    "Donahue fit": (plotting.COLORS["berry"], ":"),
 }
-plt.rcParams.update(
-    {
-        "font.size": 10,
-        "axes.spines.top": False,
-        "axes.spines.right": False,
-        "figure.facecolor": "white",
-        "savefig.dpi": 180,
-    }
-)
 series = pd.read_csv(RESULTS / "matched-series.csv.gz")
 keep = series[(series.cells != 192) & (series.segment != "excimer_led_hold")]
 fig, axs = plt.subplots(
     2,
     1,
-    figsize=(9.5, 6.6),
+    figsize=(10.8, 7.8),
     layout="constrained",
     gridspec_kw={"height_ratios": [1.4, 1]},
 )
@@ -58,12 +52,11 @@ fig.suptitle(
 )
 for ax in axs:
     ax.set_ylabel("Particles/cm³, 9.7–64.7 nm")
-    ax.grid(axis="y", alpha=0.22)
     ax.set_xlabel("Time from run start (hours)")
     for name, group in keep.groupby("model", sort=False):
         for seg, pts in group.groupby("segment"):
             c, ls = styles[name]
-            ax.plot(pts.paper_h, pts.model_tail, color=c, ls=ls, lw=1.8)
+            ax.plot(pts.paper_h, pts.model_tail, color=c, ls=ls, lw=2)
     ax.scatter(
         elapsed,
         observed @ tail,
@@ -82,13 +75,13 @@ for lo, hi in [(6.36, 10.79), (23.26, 26.37)]:
         "Cleaning",
         ha="center",
         color="#59666b",
-        fontsize=9,
+        fontsize=11,
     )
-ax.text(2.6, 23700, "Calibration", ha="center", color="#475960", fontsize=9)
+ax.text(2.6, 23700, "Calibration", ha="center", color="#475960", fontsize=11)
 ax.text(
-    16.4, 23700, "Excimer transfer", ha="center", color="#475960", fontsize=9
+    16.4, 23700, "Excimer transfer", ha="center", color="#475960", fontsize=11
 )
-ax.text(29.7, 23700, "Mixed light", ha="center", color="#475960", fontsize=9)
+ax.text(29.7, 23700, "Mixed light", ha="center", color="#475960", fontsize=11)
 ax.set_xlim(0, 33)
 ax.set_ylim(-700, 25500)
 ax.set_title(
@@ -103,7 +96,7 @@ handles = [
     Line2D([], [], color=c, ls=ls, lw=2, label=k)
     for k, (c, ls) in styles.items()
 ]
-fig.legend(handles=handles, loc="outside lower center", ncol=5, frameon=False)
+fig.legend(handles=handles, loc="outside lower center", ncol=5)
 fig.savefig(FIGURES / "count-comparison.png")
 plt.close(fig)
 
@@ -136,7 +129,7 @@ for cutoff, filename in [
     (50, "spectrum-comparison.png"),
 ]:
     fig, axs = plt.subplots(
-        5, 1, sharex=True, figsize=(10.6, 9), layout="constrained"
+        5, 1, sharex=True, figsize=(11.5, 11.4), layout="constrained"
     )
     fig.suptitle(
         "Where the size distributions agree and diverge",
@@ -152,7 +145,8 @@ for cutoff, filename in [
     ]
 
     def paint(ax, v, cmap, **kwargs):
-        color = plt.get_cmap(cmap).copy()
+        ax.grid(False)
+        color = plotting.colormap(cmap)
         color.set_bad("#e3e7e6")
         q = ax.pcolormesh(
             x,
@@ -170,12 +164,12 @@ for cutoff, filename in [
 
     measured = observed.copy()
     measured[missing, :7] = np.nan
-    q = paint(axs[0], np.log10(1 + measured), "viridis", vmin=0, vmax=5)
+    q = paint(axs[0], np.log10(1 + measured), "magnitude", vmin=0, vmax=5)
     axs[0].set_title("CLOUD run 1833 · measurements", loc="left")
     axs[0].set_title(
         "Three separate Particula runs · same particle entry at 2.9 nm",
         loc="right",
-        fontsize=9,
+        fontsize=11,
         color="#3c555c",
     )
     cb = fig.colorbar(q, ax=axs[0], ticks=[0, 2, 4], pad=0.015)
@@ -184,7 +178,10 @@ for cutoff, filename in [
     for ax, (name, arr) in zip(axs[1:], matrix.items(), strict=True):
         val = np.log10((1 + arr) / (1 + measured))
         q = paint(
-            ax, val, "RdBu_r", norm=TwoSlopeNorm(vmin=-1.5, vcenter=0, vmax=1.5)
+            ax,
+            val,
+            "difference",
+            norm=TwoSlopeNorm(vmin=-1.5, vcenter=0, vmax=1.5),
         )
         if cutoff is not None:
             weak = np.isfinite(arr) & (measured <= cutoff)
@@ -193,7 +190,7 @@ for cutoff, filename in [
                 x,
                 10 ** edges[4:],
                 flags[:, 4:].T,
-                cmap=ListedColormap(["#eae4d3", "#9862ab"]),
+                cmap=ListedColormap(["#eae4d3", plotting.COLORS["indigo"]]),
                 vmin=0,
                 vmax=1,
                 shading="flat",
@@ -210,7 +207,7 @@ for cutoff, filename in [
     if cutoff is not None:
         labels = [
             ("#eae4d3", "Both ≤50"),
-            ("#9862ab", "Only model >50"),
+            (plotting.COLORS["indigo"], "Only model >50"),
             ("#e3e7e6", "Unavailable"),
         ]
         fig.legend(
@@ -223,7 +220,7 @@ for cutoff, filename in [
     fig.savefig(FIGURES / filename)
     plt.close(fig)
 
-fig, (ax, bx) = plt.subplots(1, 2, figsize=(10, 4), layout="constrained")
+fig, (ax, bx) = plt.subplots(1, 2, figsize=(11.5, 4.6), layout="constrained")
 fig.suptitle(
     "How the capture law changes the distribution", fontsize=15, weight="bold"
 )
@@ -235,7 +232,7 @@ for model, arr in [("Measured", observed), *matrix.items()]:
         )
     else:
         c, ls = styles[model]
-        ax.plot(diameter[4:], curve, color=c, ls=ls, label=model, lw=1.8)
+        ax.plot(diameter[4:], curve, color=c, ls=ls, label=model, lw=2)
 ax.set_xscale("log")
 ax.set_xlim(3.7, 65)
 ax.set_xticks([4, 8, 15, 30, 60], labels=["4", "8", "15", "30", "60"])
@@ -256,8 +253,6 @@ bx.set_xlabel("Excimer stage")
 bx.set_xticks(range(9, 18))
 bx.set_ylabel("Size-distribution mismatch (%)")
 bx.set_title("Shape at equal particle entry")
-for a in (ax, bx):
-    a.grid(axis="y", alpha=0.2)
-fig.legend(handles=handles, loc="outside lower center", ncol=5, frameon=False)
+fig.legend(handles=handles, loc="outside lower center", ncol=5)
 fig.savefig(FIGURES / "capture-comparison.png")
 plt.close(fig)
