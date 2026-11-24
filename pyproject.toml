@@ -162,6 +162,7 @@ include = [
     "docs/index.md", "docs/guide/", "docs/theory/", "docs/contribute/",
     "docs/studies/", "docs/data/", "docs/images/",
     "studies/aiomfac-mixing-state/",
+    "studies/cloud-1833/full-transfer/stage-scores.csv",
     "website/examples.json", "scripts/", "examples_tests/", "conda/", "conftest.py",
 ]
 exclude = [
