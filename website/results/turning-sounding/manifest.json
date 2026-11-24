@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 4.814772546989843,
+  "package_source_sha256": "841c1775d6227322e530d09807c54db7f7199d1a51685974cf43799a6ebdca98",
+  "scientific_source_sha256": "28bb842dbc955f89330469f25a8f0a0a026fecdd78fc9f8695dc3de55b4a1735",
+  "input_sha256": {
+    "docs/data/prescribed-flow/turning-soundings.csv": "a78070e6db031717ad29e7af76b60594b88f146bdba01aa8bd471e94d867a43c"
+  },
+  "example": "turning-sounding",
+  "fingerprint": "e516c30a7bc13943315671d32fdc118851e901912504791cf8410af80459a6a4",
+  "source": "docs/studies/examples/gas-transport/turning_sounding.py",
+  "revision": "bac5acf6bb55fdea8df8a7cdb40c9ca488120867",
+  "package_dirty": false,
+  "executed_at": "2026-11-24T16:55:57.019046+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.6",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.parcel_replay ce03a29 load on device 'cuda:0' took 0.85 ms  (cached)\nModule particula.coupling.grid_warp d9d0eac load on device 'cuda:0' took 1.07 ms  (cached)\nFinal grid centroid (m) [-0. 20.]\nMaximum relative dry-mass error 5.55e-16\n"
+      },
+      {
+        "image": "figure-5-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "196dc15887b0be021e48127fda17ae2e13ae2ebc83394e27f8a4f59c8395b7d5",
+    "data.json": "68bd33e87fb0d6b1ee167b631d0f8abaf8f80a30c4ab6a9f23ccabfd51d244f6",
+    "figure-5-1.png": "4dd246791dbaa829b0aa756f832997d84675d72d15d8b5478aeba4084e6e9730"
+  },
+  "simulation_fingerprint": "762ebebd26b8bddfe603ef8f85de06078e62b4a16c63c1a77e83dd154d103ca5"
+}

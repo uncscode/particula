@@ -226,8 +226,7 @@ an external driver. [Turning wind and wet radius](../../studies/examples/gas-tra
 
 To compare a resolved puff with a gridded one, give both runs the same
 diffusivity and release mass. Enable particle dispersion on the resolved
-run and inspect both variance and boundary losses. [Particle and grid
-dispersion](../../studies/examples/gas-transport/turbulent_puff.py)
+run and inspect both variance and boundary losses. [Particle and grid dispersion](../../studies/examples/gas-transport/turbulent_puff.py)
 
 For finite bed patches, specify a mass and threshold for each size class.
 Use the remaining bed inventory and the airborne, deposited and exported
@@ -235,5 +234,4 @@ totals to check what each gust removed. [Two gusts over a dune](../../studies/ex
 
 For an independent CFD comparison, import the pressure-corrected face fluxes
 and compare the replay with the scalar transported by the host at the same
-time. The example download supplies the frozen cavity data. [OpenFOAM cavity
-replay](../../studies/validation/prescribed-flow/cavity_replay.py)
+time. The example download supplies the frozen cavity data. [OpenFOAM cavity replay](../../studies/validation/prescribed-flow/cavity_replay.py)

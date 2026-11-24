@@ -143,15 +143,15 @@ def simulate(device="cuda:0", sequence=None, height=5.0):
 # %% [markdown]
 # The arrows show wind vectors at the initial position, the turn and the
 # endpoint. The grid centroids are plotted every two seconds so the parcel
-# track remains visible. The second panel shows how quickly the hygroscopic
-# class adjusts to the external water supply.
+# track remains visible. Compare the vapor history with the wet-radius panel
+# to see how quickly the hygroscopic class adjusts to the external water supply.
 
 
 # %%
 @mplstyle.context("particula.default")
 def plot_results(report):
     """Plot wind and displacement in plan view beside the wet-radius history."""
-    fig, (path, radius) = plotting.subplots(1, 2)
+    fig, (path, vapor, radius) = plotting.subplots(1, 3)
     xy = np.asarray(report["xy_m"])
     centroid = np.asarray(report["centroid_m"])
     t = np.asarray(report["time_s"])
@@ -170,21 +170,21 @@ def plot_results(report):
         width=0.009,
         color="0.25",
     )
+    points = np.vstack((xy, xy[idx] + duration * np.column_stack((u, v))))
+    center = (points.min(axis=0) + points.max(axis=0)) / 2
+    half_width = max(1.0, 0.60 * np.ptp(points, axis=0).max())
     path.set(
         xlabel="East (m)",
         ylabel="North (m)",
         aspect="equal",
+        xlim=(center[0] - half_width, center[0] + half_width),
+        ylim=(center[1] - half_width, center[1] + half_width),
     )
-    path.update_datalim(xy[idx] + duration * np.column_stack((u, v)))
-    path.set_aspect("equal", adjustable="datalim")
-    path.margins(0.13)
-    path.autoscale_view()
     plotting.legend(path)
+    vapor.plot(t, report["vapor_g_kg"], "--", color="C1")
+    vapor.set(xlabel="Time (s)", ylabel="Vapor (g/kg dry air)")
     radius.plot(t, report["wet_radius_nm"], color="C0")
     radius.set(xlabel="Time (s)", ylabel="Wet radius (nm)")
-    vapor = radius.twinx()
-    vapor.plot(t, report["vapor_g_kg"], "--", color="C1")
-    vapor.set_ylabel("Vapor (g/kg dry air)", color="C1")
     plotting.fit(fig)
     return fig
 
