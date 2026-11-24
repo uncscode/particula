@@ -530,8 +530,8 @@ def prepare():
                 ),
                 "actions": [
                     {
-                        "text": "Explore topics",
-                        "link": BASE + "guide/topics/",
+                        "text": "Get Particula Helper",
+                        "link": BASE + "guide/agent-plugins/",
                         "icon": "right-arrow",
                     },
                     {
