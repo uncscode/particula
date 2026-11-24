@@ -2954,6 +2954,80 @@
       "start_here": false
     },
     {
+      "source": "docs/studies/literature/cloud-1833/index.md",
+      "title": "How sulfuric acid capture shapes particle growth in CLOUD run 1833",
+      "topic": "condensation",
+      "also": [
+        "chambers",
+        "nucleation",
+        "interparticle-forces"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "cloud-1833",
+        "runs": [
+          "cloud-1833-growth-laws"
+        ],
+        "companions": [
+          "docs/studies/literature/cloud-1833/water-and-sizing.md",
+          "docs/studies/literature/cloud-1833/particle-entry.md",
+          "docs/studies/literature/cloud-1833/wall-loss.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/processes/condensation.md",
+            "label": "Condensation guide"
+          }
+        ]
+      },
+      "tocFigure": "cloud-1833/CLOUD-1833-growth-TOC.png",
+      "tocSource": "studies/cloud-1833/source/cloud_growth_toc.py"
+    },
+    {
+      "source": "docs/studies/literature/cloud-1833/growth_law_comparison.py",
+      "title": "Compare particle capture laws at the same incoming flux",
+      "topic": "condensation",
+      "also": [
+        "chambers"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/cloud-1833/water-and-sizing.md",
+      "title": "Water uptake changes the measured diameter, but the larger particles still accumulate late",
+      "topic": "activity-nonideal",
+      "also": [
+        "condensation",
+        "chambers"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/cloud-1833/particle-entry.md",
+      "title": "Changing particle entry timing shortens the simulated rise from 134 to 36 minutes",
+      "topic": "nucleation",
+      "also": [
+        "chambers",
+        "charged"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/cloud-1833/wall-loss.md",
+      "title": "Similar dark particle counts admit different wall-loss rates",
+      "topic": "losses-deposition",
+      "also": [
+        "chambers",
+        "losses-dilution"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
       "source": "docs/studies/literature/dunne-cloud/index.md",
       "title": "At 248 K, similar CLOUD formation rates admit different chemical pathways",
       "topic": "nucleation",

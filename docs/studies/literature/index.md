@@ -4,6 +4,9 @@ Follow comparisons with published measurements, reference calculations and datas
 
 <div class="study-figures">
 
+[![At the same 2.9 nm entry flux, size-distribution mismatch falls from 27% with vapor transfer to 21% with hard-sphere capture and 13% with attraction. The attractive model reaches 5,000 particles/cm³ in the 9.7–64.7 nm range 34 minutes after CLOUD.](../../images/cloud-1833/CLOUD-1833-growth-TOC.png)\
+How sulfuric acid capture shapes particle growth in CLOUD run 1833](cloud-1833/index.md)
+
 [![At 0.4% full coating reduces mean CCN bias. Both adjacent rises move farther from the measurements at nominal calibration.](../../images/antarctic-ccn/graphical-abstract.png)\
 How an organic film can improve one Antarctic CCN count and worsen the activation spectrum](antarctic-ccn/index.md)
 
@@ -87,6 +90,7 @@ At the inferred Π Chamber humidity, modeled sulfate haze falls below the optica
 - [Evaporation and reactive uptake](evaporation-and-uptake/index.md)
 - [Fitting mean drop mass with a constant collision rate leaves a sixfold shortfall in counts at twice the starting radius](shear-drop-spectrum/index.md)
 - [How an organic film can improve one Antarctic CCN count and worsen the activation spectrum](antarctic-ccn/index.md)
+- [How sulfuric acid capture shapes particle growth in CLOUD run 1833](cloud-1833/index.md)
 - [Particle water uptake and activation](particle-water-uptake/index.md)
 - [Particula fits the measured rise in particle number with sulfur dioxide in a straw-combustion analogue](straw-combustion/index.md)
 - [Particula predicts water-drop fall speeds within 4.2% at nine diameters from 0.20 to 1.00 mm](drizzle-settling/index.md)

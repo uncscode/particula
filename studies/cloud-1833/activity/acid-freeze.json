@@ -1,0 +1,7 @@
+{
+  "scenario": "acidic liquid, 1.5 NH3 per sulfate, measured wet, independent sensitivity",
+  "cuda_boxes": 8,
+  "max_balance_error": 5.168780526821405e-15,
+  "seconds": 19.631153060123324,
+  "decision": "Carry this specified acidic sensitivity into both entry and chamber comparisons. Composition is an assumption."
+}

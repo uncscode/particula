@@ -1,0 +1,12 @@
+{
+  "revision": "4403136e17df574a63ba4d2096281f16dc19f6ad",
+  "source_version": "0.3.5",
+  "common_growth": 1.1,
+  "common_wall": 0.5,
+  "alternative_vapor_fit": [
+    1.2,
+    0.5
+  ],
+  "training_cases": 50,
+  "cuda_cases": 97
+}
