@@ -29,7 +29,7 @@ test('blocked or malformed session storage still produces a valid scene', () => 
 });
 
 test('randomized scenes stay finite and inside the intended illustration area', () => {
-  for (const { id } of SCENES) {
+  for (const { id } of SCENES.filter((scene) => !scene.diagram)) {
     for (let seed = 1; seed <= 100; seed++) {
       const particles = createParticles(id, seededRandom(seed));
       assert.equal(particles.length, 112);
@@ -65,6 +65,18 @@ test('like-charge pairs separate and opposite-charge pairs approach', () => {
     assert.equal(left.phase, right.phase);
     assert.equal(left.duration, right.duration);
   }
+});
+
+test('the highlighted opposite charges reach surface contact together', () => {
+  const partners = createParticles('charge', seededRandom(65))
+    .filter((p) => p.kind === 'collision-partner');
+  assert.equal(partners.length, 2);
+  const [left, right] = partners;
+  assert.notEqual(left.sign, right.sign);
+  assert.equal(left.y, right.y);
+  assert.equal((right.x + right.dx) - (left.x + left.dx), right.r + left.r);
+  assert.equal(left.phase, right.phase);
+  assert.equal(left.duration, right.duration);
 });
 
 test('larger condensation droplets settle faster with their vapor envelopes', () => {

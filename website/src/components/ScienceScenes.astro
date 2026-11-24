@@ -1,0 +1,78 @@
+---
+import ChamberScene from './ChamberScene.astro';
+import NucleationScene from './NucleationScene.astro';
+import ReactionScene from './ReactionScene.astro';
+import SizeDistributionScene from './SizeDistributionScene.astro';
+const wave = Array.from({ length: 151 }, (_, i) => {
+  const x = 28 + i * 1.15;
+  return `${i ? 'L' : 'M'}${x.toFixed(1)} ${(169 + 6 * Math.sin(i * Math.PI / 15)).toFixed(1)}`;
+}).join(' ');
+const mixture = Array.from({ length: 60 }, (_, i) => {
+  const angle = i * Math.PI * (3 - Math.sqrt(5));
+  const radius = Math.sqrt((i + .5) / 60);
+  return { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius };
+});
+
+---
+<svg class="diagram scattering" viewBox="0 0 500 340" role="img" aria-label="An incident light wave meets a spherical particle and scatters into a range of angles.">
+  <defs>
+    <radialGradient id="optical-sphere" cx=".35" cy=".28" r=".8">
+      <stop stop-color="var(--cloud-highlight)" /><stop offset=".5" stop-color="var(--cloud-teal)" /><stop offset="1" stop-color="var(--cloud-shadow)" />
+    </radialGradient>
+  </defs>
+  <g fill="none" stroke="var(--cloud-teal)">
+    <circle cx="231" cy="169" r="114" opacity=".16" stroke-dasharray="2 7" />
+    <path d="M26 169 H470" opacity=".26" stroke-dasharray="3 6" />
+    <path d={wave} stroke-width="2.5" />
+    {[-56,-28,0,28,56,150,-150].map((angle) => <g transform={`rotate(${angle} 231 169)`}>
+      <path d={Math.abs(angle) > 100 ? 'M276 169 H308' : 'M276 169 H418'} opacity=".33" />
+    </g>)}
+    {[64, 88, 112, 136, 160, 184].map((r, i) => <g transform="translate(231 169)">
+      <path class="wavefront" style={`--delay:${i * .55 - 4}s`} d={`M${.83*r} ${-.56*r} A${r} ${r} 0 0 1 ${.83*r} ${.56*r}`} stroke-width={2.8-i*.22} />
+    </g>)}
+  </g>
+  <circle cx="231" cy="169" r="40" fill="url(#optical-sphere)" />
+  <path d="M203 165 Q207 144 223 140" fill="none" stroke="var(--cloud-highlight)" stroke-width="2" opacity=".8" />
+</svg>
+
+<ReactionScene />
+<NucleationScene />
+
+<svg class="diagram liquids" viewBox="0 0 500 340" role="img" aria-label="A mixed droplet loses water. Two liquid regions with different compositions coexist within the smaller droplet.">
+  <defs><clipPath id="phase-interior"><circle r="69" /></clipPath></defs>
+  <g transform="translate(125 168)">
+    <circle r="86" fill="var(--cloud-teal)" fill-opacity=".19" stroke="var(--cloud-teal)" stroke-width="2" />
+    {mixture.map(({x,y},i) => <circle cx={x*77} cy={y*77} r={i%3===0 ? 4 : 2.7} fill={i%3===0 ? 'var(--cloud-dust)' : 'var(--cloud-teal)'} />)}
+  </g>
+  <path d="M230 168 H266 m-7 -6 7 6 -7 6" fill="none" stroke="var(--cloud-dust)" stroke-width="2" />
+  <g transform="translate(366 168)">
+    <circle r="69" fill="var(--cloud-teal)" fill-opacity=".2" />
+    <g clip-path="url(#phase-interior)">
+      <path d="M16 -75 Q-32 0 16 75 H80 V-75 Z" fill="var(--cloud-dust)" fill-opacity=".34" stroke="var(--cloud-dust)" stroke-width="1.5" />
+      {mixture.map(({x,y},i) => <circle cx={x*62} cy={y*62} r={x > .05 ? 3.8 : 2.7} fill={(x > .05) !== (i%11===0) ? 'var(--cloud-dust)' : 'var(--cloud-teal)'} />)}
+    </g>
+    <circle r="69" fill="none" stroke="var(--cloud-teal)" stroke-width="2" />
+
+  </g>
+  {[[125,86],[366,69]].map(([cx,radius])=><g transform={`translate(${cx} 168)`}>
+    {[-53,-24,4,32,61].map((angle,i)=><g transform={`rotate(${angle})`}>
+      <circle class="escaping" style={`--delay:${-i*1.13}s`} cy={-radius-3} r="3.4" fill="var(--cloud-negative)" />
+    </g>)}
+  </g>)}
+  <g class="annotation" text-anchor="middle"><text x="125" y="281">One liquid</text><text x="366" y="281">Two liquids</text></g>
+</svg>
+
+<SizeDistributionScene />
+<ChamberScene />
+
+<style>
+  .diagram { display:none; }
+  :global([data-scene='scattering']) .scattering, :global([data-scene='liquids']) .liquids { display: block; }
+  .annotation { fill: var(--sl-color-gray-2); font: 17px var(--sl-font); }
+  .wavefront { animation: wave 4s ease-in-out var(--delay) infinite both; }
+  .escaping { animation: evaporate 6s ease-out var(--delay) infinite both; }
+  .diagram * { animation-play-state: paused; }
+  :global([data-motion='running']) .diagram * { animation-play-state: running; }
+  @keyframes wave { 0%, 100% { opacity: .25; } 45% { opacity: 1; } }
+  @keyframes evaporate { from { transform: translateY(0); opacity: .9; } to { transform: translateY(-30px); opacity: 0; } }
+</style>

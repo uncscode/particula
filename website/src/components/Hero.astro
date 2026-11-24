@@ -17,7 +17,7 @@ const { title = data.title, tagline, actions = [] } = data.hero ?? {};
 </div>
 
 <style>
-  .particle-hero { position: relative; display: grid; grid-template-columns: 1fr; gap: 2rem; align-items: center; padding-block: 2rem 3rem; }
+  .particle-hero { position: relative; isolation: isolate; margin-block-start: clamp(1rem, 2vw, 1.5rem); display: grid; grid-template-columns: 1fr; gap: 2rem; align-items: center; padding-block: 2rem 3rem; }
   .hero-copy { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 1.5rem; }
   h1 { color: var(--sl-color-white); font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 600; white-space: pre-line; }
   .tagline { color: var(--sl-color-gray-2); font-size: clamp(1rem, 1.6vw, 1.2rem); }
@@ -28,6 +28,16 @@ const { title = data.title, tagline, actions = [] } = data.hero ?? {};
     height: 1.375rem;
     border-radius: .25rem;
     background: center / contain no-repeat url('../../../plugins/particula-helper/assets/icon.png');
+  }
+  .hero-copy::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: -1.4rem -.75rem -1.4rem -1.4rem;
+    background: var(--sl-color-bg);
+    opacity: .8;
+    mask-image: linear-gradient(to right, black 0 95%, transparent);
+    pointer-events: none;
   }
   @media (min-width: 50rem) {
     .particle-hero { grid-template-columns: 1.15fr 1fr; gap: 1.5rem; min-height: 29rem; padding-block: 3rem 4rem; }
