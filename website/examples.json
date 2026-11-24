@@ -2098,5 +2098,26 @@
     "render_functions": [],
     "plot_inputs": [],
     "full_canvas": true
+  },
+  "pallas-cloud-probes": {
+    "title": "Compare Pallas cloud-probe spectra and optical sizing",
+    "source": "docs/studies/literature/pallas-cloud-probes/pallas_cloud_probes.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 120,
+    "inputs": [
+      "docs/data/pallas-cloud-probes/distributions.csv",
+      "docs/data/pallas-cloud-probes/method-sizing.csv",
+      "docs/data/pallas-cloud-probes/method-budget.csv"
+    ],
+    "input_destinations": {
+      "docs/data/pallas-cloud-probes/distributions.csv": "distributions.csv",
+      "docs/data/pallas-cloud-probes/method-sizing.csv": "method-sizing.csv",
+      "docs/data/pallas-cloud-probes/method-budget.csv": "method-budget.csv"
+    },
+    "data_expression": "report",
+    "render_functions": [],
+    "plot_inputs": [],
+    "full_canvas": true
   }
 }

@@ -75,6 +75,9 @@ A cloud activation fit predicts 49% more water than BAT at 95% humidity for one 
 
 <div class="study-figures">
 
+[![At 633 nm in both simulations, the same 11.97 µm droplet has mean reported sizes of 12.55 and 13.42 µm, on opposite sides of the 13 µm threshold.](../../images/pallas-cloud-probes/study-toc.png)\
+One droplet, two reported sizes: Simulating the Pallas cloud probes](pallas-cloud-probes/index.md)
+
 [![Measured cloud droplets per cm³ rise from fresh water to salt water (solid line, dense cluster of filled droplets). Separate haze fits predict a decline (dashed line, sparse outlined cluster).](../../images/pi-chamber/graphical-abstract.svg)\
 Π Chamber cloud counts rose over salt water, but separate haze fits predicted a decline](pi-chamber/haze-and-cloud/index.md)
 
@@ -111,21 +114,47 @@ Adding settling and diffusion lowers predicted one-hour survival of 1 µm partic
 </div>
 
 <!-- STUDY_LIST_START -->
-- [A 35% polarization effect for a charged 4 nm NaCl tracer shrinks to 0.06% in the modeled chamber scan](nacl-scavenging/index.md)
-- [A delayed source predicts 19 minutes of the 21-minute gap between two chamber isomer signals](pinic-isomers/index.md)
-- [After a day in simulated polluted air, archived MAM4xx retains nearly three times the sub-100 nm count predicted by two models with attraction](mam4xx-coagulation/index.md)
+**Particle formation and growth**
+
 - [At 248 K, similar CLOUD formation rates admit different chemical pathways](dunne-cloud/index.md)
-- [At low ion production, CLOUD’s 70% humidity measurement exceeds the ceiling set by the reported wall loss](cloud-ion-humidity/index.md)
-- [Evaporation and reactive uptake](evaporation-and-uptake/index.md)
-- [Fitting mean drop mass with a constant collision rate leaves a sixfold shortfall in counts at twice the starting radius](shear-drop-spectrum/index.md)
-- [How an organic film can improve one Antarctic CCN count and worsen the activation spectrum](antarctic-ccn/index.md)
 - [How sulfuric acid capture shapes particle growth in CLOUD run 1833](cloud-1833/index.md)
-- [Particle water uptake and activation](particle-water-uptake/index.md)
+- [At low ion production, CLOUD’s 70% humidity measurement exceeds the ceiling set by the reported wall loss](cloud-ion-humidity/index.md)
 - [Particula fits the measured rise in particle number with sulfur dioxide in a straw-combustion analogue](straw-combustion/index.md)
-- [Particula predicts water-drop fall speeds within 4.2% at nine diameters from 0.20 to 1.00 mm](drizzle-settling/index.md)
-- [Particula reproduces the polluted Π Chamber’s droplet gain but underestimates the background count](pi-chamber-lidar/index.md)
-- [Particula sizes a 100.7 nm PSL standard at about 102 nm near atmospheric pressure](dry-psl-mobility/index.md)
 - [Sea2Cloud’s March 22 spectra favor earlier arrival of larger particles in a two-hour exchange model](sea2cloud-events/index.md)
-- [Π Chamber experiments and modeling](pi-chamber/index.md)
+
+**Organic chemistry and evaporation**
+
+- [How well does Particula reproduce organic aerosol formation in the Manchester chamber?](evaporation-and-uptake/manchester-soa/index.md)
+- [Manchester’s ternary aerosol declined while the fitted reaction network still predicted growth](evaporation-and-uptake/manchester-network-growth/index.md)
+- [Twelve of 15 Manchester runs improved, yet the average joint error rose](evaporation-and-uptake/manchester-campaign-performance/index.md)
+- [A delayed source predicts 19 minutes of the 21-minute gap between two chamber isomer signals](pinic-isomers/index.md)
+- [After glyoxal dilution, two models predict rising organic mass per sulfate as measurements fall](evaporation-and-uptake/glyoxal_chamber.py)
+- [Modeled convection supplies only a third of the heat needed for the reported pentane drop evaporation rate](evaporation-and-uptake/pendant-drop/index.md)
+
+**Water uptake and cloud activation**
+
+- [At Mt. Soledad, the denuded path counted fewer droplets of nearly unchanged mean size](particle-water-uptake/mt-soledad/index.md)
+- [How an organic film can improve one Antarctic CCN count and worsen the activation spectrum](antarctic-ccn/index.md)
+- [Liquid salt mixing widens the winter foothill growth-factor bias at Mt. Hua from +0.54 to +0.72](particle-water-uptake/mt-hua/index.md)
+- [BAT and AIOMFAC both overpredict water activity at all 12 measured citric acid concentrations](particle-water-uptake/citric-acid/index.md)
+- [BAT reverses the measured ordering of pinic and phthalic acid hygroscopicity at cloud activation](particle-water-uptake/bat-ccn.md)
+- [A cloud activation fit predicts 49% more water than BAT at 95% humidity for one organic](particle-water-uptake/ccn-retrieval/index.md)
+
+**Cloud droplets and precipitation**
+
+- [One droplet, two reported sizes: Simulating the Pallas cloud probes](pallas-cloud-probes/index.md)
+- [Π Chamber cloud counts rose over salt water, but separate haze fits predicted a decline](pi-chamber/haze-and-cloud/index.md)
+- [At the inferred Π Chamber humidity, modeled sulfate haze falls below the optical detection limit](pi-chamber/seed-chemistry.md)
+- [Particula reproduces the polluted Π Chamber’s droplet gain but underestimates the background count](pi-chamber-lidar/index.md)
+- [Fitting mean drop mass with a constant collision rate leaves a sixfold shortfall in counts at twice the starting radius](shear-drop-spectrum/index.md)
+- [Particula predicts water-drop fall speeds within 4.2% at nine diameters from 0.20 to 1.00 mm](drizzle-settling/index.md)
+
+**Particle collisions, transport, and loss**
+
+- [After a day in simulated polluted air, archived MAM4xx retains nearly three times the sub-100 nm count predicted by two models with attraction](mam4xx-coagulation/index.md)
+- [A 35% polarization effect for a charged 4 nm NaCl tracer shrinks to 0.06% in the modeled chamber scan](nacl-scavenging/index.md)
+- [Particula sizes a 100.7 nm PSL standard at about 102 nm near atmospheric pressure](dry-psl-mobility/index.md)
 - [Adding settling and diffusion lowers predicted one-hour survival of 1 µm particles from 68% to 58% in a spherical chamber](../validation/wall-loss/index.md)
+
+Related collections: [Evaporation and reactive uptake](evaporation-and-uptake/index.md) · [Particle water uptake and activation](particle-water-uptake/index.md) · [Π Chamber experiments and modeling](pi-chamber/index.md)
 <!-- STUDY_LIST_END -->

@@ -5921,6 +5921,53 @@
           }
         ]
       }
+    },
+    {
+      "source": "docs/studies/literature/pallas-cloud-probes/index.md",
+      "title": "One droplet, two reported sizes: Simulating the Pallas cloud probes",
+      "topic": "optics",
+      "also": [
+        "size"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "pallas-cloud-probes",
+        "runs": [
+          "pallas-cloud-probes"
+        ],
+        "companions": [
+          "docs/studies/literature/pallas-cloud-probes/specification.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/optics/index.md",
+            "label": "Light scattering by spherical particles"
+          }
+        ]
+      },
+      "tocFigure": "pallas-cloud-probes/study-toc.png",
+      "tocSource": "studies/pallas-cloud-probes/figures/make_toc.py"
+    },
+    {
+      "source": "docs/studies/literature/pallas-cloud-probes/specification.md",
+      "title": "Reproduce the Pallas cloud probe comparison",
+      "topic": "optics",
+      "also": [
+        "size"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/pallas-cloud-probes/pallas_cloud_probes.py",
+      "title": "Compare Pallas cloud-probe spectra and optical sizing",
+      "topic": "optics",
+      "also": [
+        "size"
+      ],
+      "role": "Studies",
+      "start_here": false
     }
   ],
   "supporting": [
@@ -6195,7 +6242,6 @@
   ],
   "study_group_exceptions": {
     "docs/studies/validation/condensation": "The sparse-activity benchmark compares chemistry construction, lookup and fallback costs across both parcel and box workflows. Its reference and timing matrix are shared across integrators.",
-    "docs/studies/literature": "Six primary choices cover distinct measurement or process families. The seventh is a cross-listed validation against wall loss theory.",
     "docs/studies/validation": "Eight study collections distinguish mechanism inference and optical validation from the existing physical-process and workflow qualifications."
   }
 }
