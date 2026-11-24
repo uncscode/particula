@@ -163,6 +163,8 @@ include = [
     "docs/studies/", "docs/data/", "docs/images/",
     "studies/aiomfac-mixing-state/",
     "studies/cloud-1833/full-transfer/stage-scores.csv",
+    "studies/mt-soledad/figures/optical-spectrum.csv",
+    "studies/mt-soledad/figures/optical-summary.csv",
     "website/examples.json", "scripts/", "examples_tests/", "conda/", "conftest.py",
 ]
 exclude = [
