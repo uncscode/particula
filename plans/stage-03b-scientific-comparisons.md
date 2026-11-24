@@ -37,6 +37,59 @@ specific qualified capability, not every proposed thermodynamics extension.
 Recurring paper discovery and selection follow the
 [literature workflow](README.md#continuous-literature-discovery-outside-the-stages).
 
+## Prompt for a literature comparison
+
+*What did the paper establish?* Select one published claim. Identify the
+observations or theory behind it, the authors' model or fit where available,
+its inputs and its domain. Record the exact release, figure panel or equation.
+
+*Can we repeat the comparison?* Put the published reference and the Particula
+baseline on the same time origin, axes and sampling basis. Include the measured
+series and authors' modeled series where both exist. Check a reported value or
+curve feature within a stated tolerance. Identify whether the reference comes
+from a rerun, archived output or digitization. Explain any missing input and
+how it limits the reproduction.
+
+*What does Particula add?* Identify a gap, such as an omitted process, an
+untested regime or an unexplained discrepancy. Explain why resolving it
+would change how someone uses the paper's result. Test a physical explanation
+or proposed solution through controlled simulation or reanalysis. State the process changed,
+what stays fixed, the observable and the outcomes that separate the competing
+explanations. Evaluate the relevant record, including the conditions where
+the effect weakens. Report the uncertainty relative to the effect and what
+entered each fit. Where supported, use a second diagnostic or test transfer
+to a reserved period or run. Keep explanations tied when the evidence cannot
+distinguish them. For a proposed solution, define success before tuning,
+compare against the original treatment, report tradeoffs and identify which
+benefits have only been demonstrated in simulation.
+
+*What can we learn next with the evidence available?* Specify a simulation
+or a comparison against an identified existing dataset. Give the observable
+and the result that would change the conclusion. Record missing measurements
+as limits on inference. Summarize the answer and the remaining uncertainty
+in the main report and link detailed follow-ups from the question they address.
+
+**Run the investigation autonomously.** Set one study goal from the paper and
+its baseline. Write down the observable and what would count as answering the
+question. Spend three hours of active simulation and analysis pursuing it
+while informative tests remain. In each cycle, predict what would distinguish
+the explanations, execute a controlled comparison, inspect the result against
+uncertainty, and choose the next test from what happened. For example, if
+changing particle arrival times improves a count threshold, use the saved
+size spectra to check whether that change also preserves the observed growth.
+Keep a compact record of decisions, including failed hypotheses. Use the
+[research loop](../plugins/particula-helper/skills/particula-studies-literature/SKILL.md#run-a-self-directed-research-loop)
+for checkpointing, early stopping and resumption.
+
+**Build the publication draft.** At the end of the loop, synthesize the
+findings in the packet's `review.md` or its existing linked main analysis.
+Write for a researcher encountering the paper and Particula comparison for
+the first time. Show what the paper established, what the new evidence
+changes and where the interpretation breaks down. Use the decisive figure
+and uncertainty to support that argument. Identify a concrete result or
+method another group can use and link what they need to reproduce and
+extend it. Deliver that manuscript for the researcher's publication decision.
+
 ## First deliverable: select and specify a case
 
 Screen a small shortlist before committing to a full simulation. Chamber

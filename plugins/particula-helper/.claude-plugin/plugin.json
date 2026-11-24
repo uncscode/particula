@@ -1,6 +1,6 @@
 {
   "name": "particula-helper",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "description": "Build, run and analyze aerosol simulations; report concerns; develop, test and document Particula with illustrated examples.",
   "author": {
     "email": "kkgorkow@gmail.com",
