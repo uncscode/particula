@@ -81,8 +81,7 @@ and the upstream velocity over time gives the parcel endpoint. At a fixed
 grid face the normal volume flux varies linearly between sounding times.
 The grid records a new interval at each knot and each reversal. A positive
 transfer followed by an equal negative transfer can mix two different
-donor concentrations even though the net air volume is zero. [Turning-wind
-experiment](../../studies/examples/gas-transport/turning_sounding.py)
+donor concentrations even though the net air volume is zero. [Turning-wind experiment](../../studies/examples/gas-transport/turning_sounding.py)
 
 ## Exchange between parcels
 
