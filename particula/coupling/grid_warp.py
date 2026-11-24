@@ -14,11 +14,13 @@ from particula.execution._condensation_ode_kernels import (
 
 if TYPE_CHECKING:
     IntMatrix = Any
+    Keys = Any
     Index3 = Any
     Position3 = Any
     F = Any
 else:
     IntMatrix = wp.array2d(dtype=wp.int32)
+    Keys = wp.array(dtype=wp.uint64)
     Index3 = wp.vec3i
     Position3 = wp.vec3d
     F = wp.float64
@@ -136,9 +138,45 @@ def uptake(
         state[i, material] += amount
 
 
+# Typed constants prevent Warp from narrowing Python literals in device code.
+_MIX_FIRST = wp.constant(wp.uint64(0xBF58476D1CE4E5B9))
+_MIX_SECOND = wp.constant(wp.uint64(0x94D049BB133111EB))
+_TWO_PI = wp.constant(wp.float64(2.0 * np.pi))
+
+
+@wp.func
+def _mix64(x: wp.uint64):
+    # SplitMix64 finalizer; unsigned arithmetic wraps on both devices.
+    x = (wp.bit_xor(x, wp.rshift(x, wp.uint64(30)))) * _MIX_FIRST
+    x = (wp.bit_xor(x, wp.rshift(x, wp.uint64(27)))) * _MIX_SECOND
+    return wp.bit_xor(x, wp.rshift(x, wp.uint64(31)))
+
+
+@wp.func
+def _uniform_draw(key: wp.uint64, interval: int, step: int, lane: int):
+    counter = wp.bit_or(
+        wp.lshift(wp.uint64(interval), wp.uint64(32)), wp.uint64(step)
+    )
+    bits = _mix64(_mix64(wp.bit_xor(key, counter)) + wp.uint64(lane))
+    # Midpoints of equal 52-bit bins are strictly inside (0,1).
+    return (F(wp.rshift(bits, wp.uint64(12))) + F(0.5)) * F(
+        2.220446049250313e-16
+    )
+
+
+@wp.func
+def _normal_draw(key: wp.uint64, interval: int, step: int, axis: int):
+    u = _uniform_draw(key, interval, step, 2 * axis)
+    v = _uniform_draw(key, interval, step, 2 * axis + 1)
+    return wp.sqrt(F(-2.0) * wp.log(u)) * wp.cos(_TWO_PI * v)
+
+
 @wp.kernel
 def move_particles(  # noqa: C901 - single-device face traversal
     interval: int,
+    step: int,
+    keys: Keys,
+    diffusivity: Position3,
     start: F,
     dt: F,
     shape: Index3,
@@ -169,6 +207,11 @@ def move_particles(  # noqa: C901 - single-device face traversal
     vel = Position3(
         speed[old, 0], speed[old, 1], speed[old, 2] - slip[p] / jac[old]
     )
+    for a in range(3):
+        if diffusivity[a] > F(0.0):
+            vel[a] += wp.sqrt(F(2.0) * diffusivity[a] / dt) * _normal_draw(
+                keys[p], interval, step, a
+            )
     point = Position3(pos[p, 0], pos[p, 1], pos[p, 2])
     # Frozen cell velocity for a bounded substep. Traverse every crossed
     # face in reference coordinates; the physical bottom is the mapped bed.
@@ -213,7 +256,10 @@ def move_particles(  # noqa: C901 - single-device face traversal
                 idx[axis] = (dest + shape[axis]) % shape[axis]
                 point[axis] -= F(sign * shape[axis]) * width[axis]
             elif mode == 0:
-                vel[axis] = F(0.0)
+                if diffusivity[axis] > F(0.0):
+                    vel[axis] = -vel[axis]
+                else:
+                    vel[axis] = F(0.0)
             else:
                 status[p] = mode
                 event_time[p] = start + (dt - remaining)
@@ -221,6 +267,75 @@ def move_particles(  # noqa: C901 - single-device face traversal
     cell[p] = (idx[0] * shape[1] + idx[1]) * shape[2] + idx[2]
     for a in range(3):
         pos[p, a] = point[a]
+
+
+@wp.kernel
+def diffuse_cells(
+    interval: int,
+    step: int,
+    end: F,
+    keys: Keys,
+    fraction: FloatMatrix,
+    neighbors: IntMatrix,
+    shape: Index3,
+    lo: Position3,
+    width: Position3,
+    jac_edge: FloatVector,
+    bc: IntVector,
+    pos: FloatMatrix,
+    cells: IntVector,
+    status: IntVector,
+    event_time: FloatVector,
+):
+    """Sample conservative face exchanges on variable-K or mapped cells."""
+    p = wp.tid()
+    if status[p] != 1:
+        return
+    old = cells[p]
+    draw = _uniform_draw(keys[p], interval, step, 6)
+    for side in range(6):
+        draw -= fraction[old, side]
+        if draw < F(0.0):
+            axis = side // 2
+            stride = int(1)
+            if axis == 0:
+                stride = shape[1] * shape[2]
+            elif axis == 1:
+                stride = shape[2]
+            index = (old // stride) % shape[axis]
+            dest = neighbors[old, side]
+            if dest < 0:
+                pos[p, axis] = lo[axis] + F(index + side % 2) * width[axis]
+                status[p] = bc[side]
+                event_time[p] = end
+            else:
+                new_index = (dest // stride) % shape[axis]
+                location = (pos[p, axis] - lo[axis]) / width[axis] - F(index)
+                if axis == 0:
+                    location = wp.clamp(location, F(0.0), F(1.0))
+                    # Carry the physical-volume quantile across the sloped cell.
+                    a = jac_edge[index]
+                    b = jac_edge[index + 1]
+                    area_rank = (
+                        location * (F(2.0) * a + (b - a) * location) / (a + b)
+                    )
+                    c = jac_edge[new_index]
+                    d = jac_edge[new_index + 1]
+                    location = (
+                        area_rank
+                        * (c + d)
+                        / (
+                            c
+                            + wp.sqrt(
+                                c * c * (F(1.0) - area_rank) + d * d * area_rank
+                            )
+                        )
+                    )
+                pos[p, axis] = (
+                    lo[axis] + (F(new_index) + location) * width[axis]
+                )
+                cells[p] = dest
+            break
 
 
 @wp.kernel

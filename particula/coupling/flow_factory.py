@@ -5,6 +5,10 @@ from particula.abc_factory import StrategyFactoryABC
 from particula.coupling.flow_replay import GridReplay, TrajectoryReplay
 from particula.coupling.flows import DuneFlowStrategy, SoundingFlow, UniformFlow
 from particula.coupling.prescribed import DuneFlow, Sounding
+from particula.coupling.sounding_sequence import (
+    ChangingSoundingFlow,
+    SoundingSequence,
+)
 from particula.dynamics.parcel_trace import ParcelTrace
 from particula.util.convert_units import get_unit_conversion
 
@@ -74,6 +78,27 @@ class SoundingFlowBuilder(BuilderABC):
         return SoundingFlow(self.sounding)
 
 
+class SoundingSequenceBuilder(BuilderABC):
+    """Construct time-indexed profile forcing with explicit provenance."""
+
+    def __init__(self):
+        """Require the timestamped set of normalized SI profiles."""
+        super().__init__(["sequence"])
+        self.sequence = None
+
+    def set_sequence(self, value):
+        """Bind a SoundingSequence."""
+        if not isinstance(value, SoundingSequence):
+            raise TypeError("supply a SoundingSequence")
+        self.sequence = value
+        return self
+
+    def build(self):
+        """Construct time-dependent spatial forcing."""
+        self.pre_build_check()
+        return ChangingSoundingFlow(self.sequence)
+
+
 class DuneFlowBuilder(SoundingFlowBuilder):
     """Build the Gaussian dune with a vertical sounding."""
 
@@ -82,6 +107,13 @@ class DuneFlowBuilder(SoundingFlowBuilder):
         super().__init__()
         self.required_parameters += ["height", "width", "lid"]
         self.height = self.width = self.lid = None
+
+    def set_sounding(self, value):
+        """Use either a steady profile or timestamped profiles."""
+        if isinstance(value, SoundingSequence):
+            self.sounding = value
+            return self
+        return super().set_sounding(value)
 
     def set_height(self, value, units="m"):
         """Set crest elevation."""
@@ -101,6 +133,10 @@ class DuneFlowBuilder(SoundingFlowBuilder):
     def build(self):
         """Construct terrain-following forcing."""
         self.pre_build_check()
+        if isinstance(self.sounding, SoundingSequence):
+            return ChangingSoundingFlow(
+                self.sounding, (self.height, self.width, self.lid)
+            )
         return DuneFlowStrategy(
             DuneFlow(self.sounding, self.height, self.width, self.lid)
         )
@@ -142,6 +178,7 @@ class FlowFactory(StrategyFactoryABC):
         return {
             "uniform": UniformFlowBuilder(),
             "sounding": SoundingFlowBuilder(),
+            "sounding_sequence": SoundingSequenceBuilder(),
             "dune": DuneFlowBuilder(),
             "trajectory_replay": TrajectoryReplayBuilder(),
             "grid_replay": GridReplayBuilder(),

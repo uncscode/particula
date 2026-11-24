@@ -60,8 +60,10 @@ class GridRun:
         *,
         releases=(),
         bed=None,
+        surface=None,
         inlet=None,
         uptake=None,
+        dispersion=None,
         owner="particula",
         device="cpu",
     ):
@@ -76,9 +78,18 @@ class GridRun:
         self.owner = owner
         self.index = 0
         self._faulted = False
+        self.dispersion = dispersion
         self.uptake = uptake
         self.lanes = uptake.bind(layout) if uptake else ()
         self.releases = tuple(releases)
+        self.surface = surface
+        self.manual_records = len(self.releases)
+        if surface is not None:
+            if owner == "host" and surface.representation == "binned":
+                raise ValueError(
+                    "binned surface emission requires Particula transport"
+                )
+            self.releases += surface.bind(forcing, layout)
         n = len(self.grid.volume)
         a = layout.validate(inventory, n)
         inlet = np.broadcast_to(
@@ -98,6 +109,10 @@ class GridRun:
             releases=[asdict(r) for r in self.releases],
             forcing=forcing.identity,
         )
+        if dispersion is not None:
+            cfg["dispersion"] = dispersion.configuration()
+        if surface is not None:
+            cfg["surface"] = surface.identity
         self._init_particles(bed)
         digest = hashlib.sha256(
             json.dumps(cfg, sort_keys=True, allow_nan=False).encode()
@@ -110,6 +125,12 @@ class GridRun:
                 setattr(self, name, self._device_array(getattr(self, name)))
             self.neighbor = self._device_array(self.neighbor, wp.int32)
             self.scratch = wp.empty_like(self.state)
+        if self.releases and self.dispersion:
+            self.jump_neighbors = (
+                self.neighbor
+                if self.gpu
+                else self._device_array(self.neighbor, wp.int32)
+            )
 
     def _device_array(self, a, dtype=wp.float64):
         return wp.array(
@@ -127,8 +148,16 @@ class GridRun:
             if releases
             else len(bed)
             if bed is not None
+            else len(self.surface.materials)
+            if self.surface is not None
             else 0
         )
+        if self.surface is not None and materials != len(
+            self.surface.materials
+        ):
+            raise ValueError(
+                "resolved particle and surface material order must match"
+            )
         self.payload = np.zeros((len(ids), materials + 2))
         cells = []
         positions = []
@@ -169,7 +198,10 @@ class GridRun:
         status = np.array(
             [int(r.interval < 0) for r in releases], dtype=np.int32
         )
-        reserved = self.payload[status == 0, 2:].sum(axis=0)
+        # The patch inventory independently funds every generated source slot.
+        reserved = self.payload[: self.manual_records, 2:][
+            status[: self.manual_records] == 0
+        ].sum(axis=0)
         bed = np.array(reserved if bed is None else bed, dtype=float)
         if (
             bed.shape != reserved.shape
@@ -194,6 +226,10 @@ class GridRun:
                 [codes[b] for b in grid.boundaries], wp.int32
             )
             self.jac = self._device_array(grid.jacobian(grid.coordinates[:, 0]))
+            keys = self.dispersion.keys(ids) if self.dispersion else []
+            self.dispersion_keys = self._device_array(keys, wp.uint64)
+            if self.dispersion:
+                self.edge_jac = self._device_array(grid.jacobian(grid.edges[0]))
 
     def advance(self, host=None):
         """Advance one accepted interval, then apply the local uptake once."""
@@ -233,15 +269,10 @@ class GridRun:
             if host is None
             else 0
         )
-        if self.releases:
-            rate = np.max(np.abs(f.speed), axis=0)
-            rate[2] += self.max_slip / min(
-                self.grid.jacobian(self.grid.coordinates[:, 0])
-            )
-            cfl = max(cfl, dt * np.max(rate / self.grid.spacing))
-        sub = max(1, int(np.ceil(cfl / 0.8)))
+        sub, k, jumps = self._step_schedule(f, dt, cfl)
         host_data = self._validate_host(f, host) if host is not None else None
         self._faulted = True
+        self._emit_binned()
         if host is not None:
             self._install_host(*host_data)
         else:
@@ -255,28 +286,8 @@ class GridRun:
             if host is None:
                 self._transport(outgoing, incoming)
             if self.releases:
-                g = self.grid
-                wp.launch(
-                    kernels.move_particles,
-                    len(self.releases),
-                    [
-                        self.index,
-                        f.start + i * dt / sub,
-                        dt / sub,
-                        wp.vec3i(*g.shape),
-                        wp.vec3d(*np.asarray(g.bounds)[:, 0]),
-                        wp.vec3d(*g.spacing),
-                        self.bc,
-                        self.jac,
-                        speed,
-                        self.slip,
-                        self.release,
-                        self.positions,
-                        self.cells,
-                        self.status,
-                        self.event_time,
-                    ],
-                    device=self.device,
+                self._advance_particles(
+                    i, f.start + i * dt / sub, dt / sub, speed, k, jumps
                 )
         if self.uptake:
             self._apply_uptake(dt)
@@ -285,6 +296,95 @@ class GridRun:
         self._faulted = False
         self.index += 1
         return f.end
+
+    def _step_schedule(self, f, dt, cfl):
+        """Bound the outgoing fraction and stochastic first-contact step."""
+        if self.releases:
+            rate = np.max(np.abs(f.speed), axis=0)
+            rate[2] += self.max_slip / min(
+                self.grid.jacobian(self.grid.coordinates[:, 0])
+            )
+            cfl = max(cfl, dt * np.max(rate / self.grid.spacing))
+        k = np.zeros(3)
+        jumps = None
+        dispersion_steps = 1
+        if self.dispersion and self.releases:
+            k, jumps = self.dispersion.coefficients(self.grid, f)
+            if jumps is not None:
+                cfl = max(cfl, np.max(jumps.sum(axis=1)))
+            if np.any(k) or (jumps is not None and np.any(jumps)):
+                dispersion_steps = int(np.ceil(dt / self.dispersion.max_step))
+        sub = max(1, dispersion_steps, int(np.ceil(cfl / 0.8)))
+        if jumps is not None:
+            jumps = self._device_array(jumps / sub)
+        return sub, k, jumps
+
+    def _advance_particles(self, i, start, step_dt, speed, k, jumps):
+        """Traverse physical boundaries, then sample mapped mixing faces."""
+        g = self.grid
+        wp.launch(
+            kernels.move_particles,
+            len(self.releases),
+            [
+                self.index,
+                i,
+                self.dispersion_keys,
+                wp.vec3d(*k),
+                start,
+                step_dt,
+                wp.vec3i(*g.shape),
+                wp.vec3d(*np.asarray(g.bounds)[:, 0]),
+                wp.vec3d(*g.spacing),
+                self.bc,
+                self.jac,
+                speed,
+                self.slip,
+                self.release,
+                self.positions,
+                self.cells,
+                self.status,
+                self.event_time,
+            ],
+            device=self.device,
+        )
+        if jumps is not None:
+            wp.launch(
+                kernels.diffuse_cells,
+                len(self.releases),
+                [
+                    self.index,
+                    i,
+                    start + step_dt,
+                    self.dispersion_keys,
+                    jumps,
+                    self.jump_neighbors,
+                    wp.vec3i(*g.shape),
+                    wp.vec3d(*np.asarray(g.bounds)[:, 0]),
+                    wp.vec3d(*g.spacing),
+                    self.edge_jac,
+                    self.bc,
+                    self.positions,
+                    self.cells,
+                    self.status,
+                    self.event_time,
+                ],
+                device=self.device,
+            )
+
+    def _emit_binned(self):
+        if self.surface is not None and self.surface.representation == "binned":
+            increment = self.surface.field_increment(
+                self.index, self.layout, len(self.grid.volume)
+            )
+            if self.gpu:
+                wp.launch(
+                    kernels.accumulate,
+                    self.state.shape,
+                    [self.state, self._device_array(increment)],
+                    device=self.device,
+                )
+            else:
+                self.state += increment
 
     def _apply_uptake(self, dt):
         fraction = -np.expm1(-self.uptake.rate * dt)
@@ -421,6 +521,21 @@ class GridRun:
         ):
             result[key] = row
         result["bed_mass"] = self.bed_residual + totals[0, 2:]
+        if self.surface is not None:
+            remaining = self.surface.remaining[self.index]
+            result["surface_bed_kg"] = remaining.copy()
+            result["surface_emitted_kg"] = self.surface.emitted[
+                : self.index
+            ].sum(axis=0)
+            # Future resolved slots are already represented in "pending".
+            free = (
+                self.surface.remaining[-1]
+                if self.surface.representation == "resolved"
+                else remaining
+            )
+            result["bed_mass"] += free.sum(axis=0) @ np.array(
+                [d.fractions for d in self.surface.classes]
+            )
         return result
 
     def snapshot(self):
@@ -449,11 +564,16 @@ class GridRun:
             data["bed_mass"] += self.payload[data["status"] == 0, 2:].sum(
                 axis=0
             )
+        if self.surface is not None:
+            data["surface_bed_kg"] = self.surface.remaining[self.index]
         data.pop("world", None)
         save_archive(
             path,
             dict(
                 schema=1,
+                dispersion=self.dispersion.configuration()
+                if self.dispersion
+                else None,
                 index=self.index,
                 signature=self.signature,
                 history=self._history_id(self.index),
@@ -468,12 +588,22 @@ class GridRun:
             idx = meta["index"]
             if (
                 meta["schema"] != 1
+                or meta.get("dispersion")
+                != (
+                    self.dispersion.configuration() if self.dispersion else None
+                )
                 or meta["signature"] != self.signature
                 or type(idx) is not int
                 or not 0 <= idx <= len(self.forcing.frames)
                 or meta["history"] != self._history_id(idx)
             ):
                 raise ValueError("checkpoint configuration or time mismatch")
+            if self.surface is not None and not np.array_equal(
+                archive["surface_bed_kg"], self.surface.remaining[idx]
+            ):
+                raise ValueError(
+                    "checkpoint surface bed disagrees with source phase"
+                )
             names = ["state", "imports", "exports"]
             if self.releases:
                 names += ["positions", "cells", "status", "event_time"]
