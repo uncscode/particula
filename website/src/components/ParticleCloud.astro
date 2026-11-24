@@ -1,18 +1,22 @@
 ---
-import { createParticles, particleStyle, particleFill } from './hero-scenes.mjs';
+import ScienceScenes from './ScienceScenes.astro';
+import { SCENES, createParticles, particleStyle, particleFill } from './hero-scenes.mjs';
 // A static first frame is available before JavaScript loads.
 let seed = 314159;
 const random = () => ((seed = (1664525 * seed + 1013904223) >>> 0) / 4294967296);
 const particles = createParticles('cloud', random);
-const wisps = Array.from({ length: 32 }, (_, i) => {
-  const y = 350 + i * 17;
-  return { x: 495 + Math.sin(i * .27) * 65 + random() * 65, y, r: 1.2 + random() * 2.8, opacity: .36 * (1 - i / 36), phase: -random() * 30 };
-});
+const descriptions: Record<string,string> = {
+  cloud: 'Three drifting air parcels each carry their own population of particles.',
+  charge: 'Two like-charged droplets repel. Oppositely charged droplets touch and coalesce into one neutral droplet.',
+  condensation: 'Vapor converges on growing droplets as they settle.',
+  scavenging: 'Droplets settle through an aerosol and collect small particles along their paths.',
+};
 ---
 
 <particle-cloud data-motion="paused" data-scene="cloud">
-  <svg class="cloud-art" viewBox="0 0 600 600" role="img" aria-labelledby="particle-cloud-title">
-    <title id="particle-cloud-title">A loose cloud of aerosol particles, with small teal particles and larger droplets</title>
+  <div class="hero-art">
+  <svg class="cloud-art" viewBox={SCENES.find(({ id }) => id === 'cloud')!.viewBox} role="img" aria-labelledby="particle-cloud-title">
+    <title id="particle-cloud-title">{descriptions.cloud}</title>
     <defs>
       <radialGradient id="cloud-haze">
         <stop stop-color="var(--cloud-haze)" stop-opacity=".19" />
@@ -27,11 +31,30 @@ const wisps = Array.from({ length: 32 }, (_, i) => {
         <stop stop-color="#fff0bd" /><stop offset=".5" stop-color="#d7bb75" /><stop offset="1" stop-color="#8d7040" stop-opacity=".8" />
       </radialGradient>
     </defs>
-    <ellipse cx="330" cy="275" rx="240" ry="185" fill="url(#cloud-haze)" />
-    <ellipse cx="380" cy="320" rx="170" ry="125" fill="url(#cloud-haze)" opacity=".6" />
-    <path class="dust-ground" d="M135 400 Q310 387 510 400" fill="none" stroke="var(--cloud-dust)" stroke-width="1" opacity=".25" />
-    <g class="charge-field" fill="none" stroke="var(--cloud-teal)" stroke-width=".7" stroke-dasharray="3 9" opacity=".2">
-      <path d="M130 180 Q330 110 535 180 M130 270 Q330 200 535 270 M130 360 Q330 290 535 360" />
+    <g class="moving-field">
+    <g class="backdrop parcels">
+      {[0,1,2].map(i=><g transform={`translate(${118+138*i} ${218-40*i})`}>
+        <path class="parcel-face" d="M0 0 l17 -14 h111 l-17 14 Z M111 0 l17 -14 v99 l-17 14 Z" />
+        <path class="parcel-front" d="M0 0 h111 v99 H0 Z" />
+        <path class="guide-line" d="M0 99 l17 -14 V-14 M17 85 h111" stroke-dasharray="3 5"/>
+      </g>)}
+    </g>
+    <g class="backdrop pairs">
+      {[208,409].map(x=><g transform={`translate(${x} 238)`}>
+        <ellipse class="guide-line" rx="89" ry="67" stroke-dasharray="3 6" />
+        <path class="guide-line" d="M-69 0 H69" />
+      </g>)}
+    </g>
+    <g class="backdrop pairs" transform="translate(409 238)">
+      <circle class="collision-product" r={16*Math.cbrt(2)} fill="url(#cloud-teal)" />
+    </g>
+    <g class="backdrop uptake">
+      <ellipse class="guide-line" cx="330" cy="252" rx="132" ry="101" stroke-dasharray="2 6" />
+      <g class="guide-line"><path d="M143 182 Q165 192 186 218 m-10 -3 10 3 -1 -10 M503 182 Q477 191 460 218 m1 -10 -1 10 10 -3"/></g>
+    </g>
+    <g class="backdrop collection">
+      {[180,225,270,315,360,405,450].map(x=><path class="guide-line" d={`M${x} 102 V393`} stroke-dasharray="2 8"/>)}
+      <path class="leader" d="M493 185 v89 m-6 -9 6 9 6 -9"/>
     </g>
     <g class="cloud-core">
       {particles.map((p) => <g class="particle-anchor" transform={`translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`} opacity={p.opacity.toFixed(2)} style={particleStyle(p)}>
@@ -41,13 +64,14 @@ const wisps = Array.from({ length: 32 }, (_, i) => {
         </g></g>
       </g>)}
     </g>
-    <g class="cloud-wisps" aria-hidden="true">
-      {wisps.map((p) => <g transform={`translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`} opacity={p.opacity.toFixed(2)}>
-        <circle class="cloud-particle" style={`--dx:14px;--dy:-12px;--duration:32s;--phase:${p.phase.toFixed(1)}s`} r={p.r.toFixed(1)} fill="var(--cloud-teal)" />
-      </g>)}
     </g>
   </svg>
-  <span class="scene-caption" title="Process-inspired illustration">Cloud drift</span>
+  <ScienceScenes />
+  </div>
+  <select class="scene-picker" aria-label="Homepage illustration" hidden>
+    {SCENES.map(({ id, label }) => <option value={id} data-description={descriptions[id]}>{label}</option>)}
+  </select>
+  <span class="scene-caption" title="Process-inspired illustration">Cloud parcels</span>
   <button class="cloud-motion-toggle" hidden aria-label="Pause particle motion" title="Pause particle motion" aria-pressed="false">
     <span class="motion-symbol" aria-hidden="true">Ⅱ</span>
   </button>
@@ -58,14 +82,18 @@ const wisps = Array.from({ length: 32 }, (_, i) => {
   class ParticleCloud extends HTMLElement {
     connectedCallback() {
       this.cleanup?.();
-      const showNextScene = () => {
-        let storage;
-        try { storage = sessionStorage; } catch {}
-        const scene = nextScene(storage);
+      let storage;
+      try { storage = sessionStorage; } catch {}
+      const picker = this.querySelector<HTMLSelectElement>('.scene-picker')!;
+      const showScene = (scene: string) => {
+        const entry = SCENES.find(({ id }) => id === scene)!;
+        picker.value = scene;
+        this.toggleAttribute('data-diagram', Boolean(entry.diagram));
         this.dataset.scene = scene;
-        const label = SCENES.find(({ id }) => id === scene)!.label;
-        this.querySelector('.scene-caption')!.textContent = label;
-        this.querySelector('title')!.textContent = `${label}: a process-inspired particle illustration`;
+        if (entry.diagram) return;
+        const canvas = this.querySelector<SVGSVGElement>('.cloud-art')!;
+        canvas.setAttribute('viewBox', entry.viewBox!);
+        canvas.querySelector('title')!.textContent = picker.selectedOptions[0].dataset.description || entry.label;
         const particles = createParticles(scene);
         this.querySelectorAll<SVGGElement>('.particle-anchor').forEach((anchor, i) => {
           const p = particles[i];
@@ -79,15 +107,12 @@ const wisps = Array.from({ length: 32 }, (_, i) => {
           circle.setAttribute('fill', particleFill(p));
           motion.querySelector('text')!.textContent = p.sign;
         });
-        this.querySelectorAll<SVGCircleElement>('.cloud-wisps circle').forEach((circle) => {
-          circle.style.setProperty('--phase', `${-Math.random() * 32}s`);
-          circle.style.setProperty('--dx', `${8 + Math.random() * 20}px`);
-        });
       };
-      if (!this.initialized) {
-        showNextScene();
-        this.initialized = true;
-      }
+      showScene(this.initialized ? this.dataset.scene! : nextScene(storage));
+      this.initialized = true;
+      picker.hidden = false;
+      const selectScene = () => { this.manuallySelected = true; showScene(picker.value); };
+      picker.addEventListener('change', selectScene);
       const button = this.querySelector<HTMLButtonElement>('button')!;
       const symbol = button.querySelector('.motion-symbol')!;
       const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -111,19 +136,21 @@ const wisps = Array.from({ length: 32 }, (_, i) => {
       observer.observe(this);
       const timer = setTimeout(() => { ready = true; update(); }, 500);
       const rotationTimer = setInterval(() => {
-        if (this.dataset.motion === 'running') showNextScene();
+        if (this.dataset.motion === 'running' && !this.manuallySelected && document.activeElement !== picker) showScene(nextScene(storage));
       }, 30_000);
       update();
       this.cleanup = () => {
         clearTimeout(timer);
         clearInterval(rotationTimer);
         observer.disconnect();
+        picker.removeEventListener('change', selectScene);
         button.removeEventListener('click', toggle);
         reducedMotion.removeEventListener('change', preferenceChanged);
         document.removeEventListener('visibilitychange', update);
       };
     }
     initialized = false;
+    manuallySelected = false;
     cleanup?: () => void;
     disconnectedCallback() { this.cleanup?.(); }
   }
@@ -136,8 +163,6 @@ const wisps = Array.from({ length: 32 }, (_, i) => {
     --cloud-highlight: #d5fff0;
     --cloud-shadow: #23796f;
     --cloud-haze: #57b9a6;
-    --cloud-ember: #f39761;
-    --cloud-smoke: #9eaaa7;
     --cloud-dust: #c9ab77;
     --cloud-positive: #efaa8c;
     --cloud-negative: #80bfdf;
@@ -153,23 +178,52 @@ const wisps = Array.from({ length: 32 }, (_, i) => {
     --cloud-highlight: #cbf4e6;
     --cloud-shadow: #18574d;
     --cloud-haze: #4caa94;
-    --cloud-ember: #bc5429;
-    --cloud-smoke: #6a7773;
     --cloud-dust: #90703e;
     --cloud-positive: #b75b40;
     --cloud-negative: #357eaa;
   }
-  particle-cloud[data-scene='fire'] { --cloud-haze: #bd693c; --cloud-teal: var(--cloud-ember); }
-  particle-cloud[data-scene='dust'] { --cloud-haze: #ac905f; --cloud-teal: var(--cloud-dust); }
-  .dust-ground, .charge-field { display: none; }
-  [data-scene='dust'] .dust-ground, [data-scene='charge'] .charge-field { display: block; }
-  .charge-sign { fill: var(--sl-color-bg); font: 600 11px system-ui; }
-  .scene-caption { position: absolute; right: 3.5rem; bottom: .2rem; color: var(--sl-color-gray-2); font-size: .75rem; letter-spacing: .02em; }
-  .cloud-art { position: absolute; top: -15%; left: -20%; width: 145%; height: 145%; max-width: none; overflow: visible; }
+  .backdrop {display:none}
+  [data-scene='cloud'] .parcels, [data-scene='charge'] .pairs,
+  [data-scene='condensation'] .uptake, [data-scene='scavenging'] .collection {display:block}
+  .parcel-face,.parcel-front {stroke:var(--cloud-teal);stroke-width:1.4;fill:var(--cloud-teal);fill-opacity:.09}
+  .parcel-front {fill-opacity:.045}
+  .guide-line,.leader {stroke:var(--cloud-teal);stroke-width:1.4;fill:none;opacity:.38}
+  .leader {stroke:var(--cloud-dust);opacity:.75}
+  [data-scene='cloud'] .moving-field {animation:parcel-drift 11s ease-in-out infinite alternate paused}
+  [data-motion='running'][data-scene='cloud'] .moving-field {animation-play-state:running}
+  @keyframes parcel-drift {from {transform:translate(-6px,4px)} to {transform:translate(7px,-5px)}}
+  .charge-sign { fill: var(--sl-color-bg); font: 600 18px system-ui; }
+  [data-diagram] .cloud-art, .scene-picker:not([hidden]) + .scene-caption { display: none; }
+  .scene-picker {
+    appearance: none;
+    pointer-events: auto;
+    z-index: 2;
+    padding: .35rem 1.1rem .35rem .2rem;
+    border: 0;
+    background: var(--sl-color-bg) radial-gradient(circle, var(--cloud-teal) 50%, transparent 65%) right .2rem center / .48rem .48rem no-repeat;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: right;
+    text-align-last: right;
+  }
+  .scene-picker:focus-visible { outline: 2px solid var(--sl-color-text-accent); outline-offset: 2px; }
+  .scene-picker, .scene-caption { position: absolute; right: 3.5rem; bottom: .2rem; color: var(--sl-color-gray-2); font-size: .75rem; letter-spacing: .02em; }
+  .hero-art { position:absolute; inset:-8% -12% 2.5rem; }
+  .hero-art :global(svg[role='img']) { position:absolute; inset:0; width:100%; height:100%; }
+  @media (min-width:50rem) {
+    /* Cross the grid gap and overlap the copy by about an eighth of the stage. */
+    particle-cloud { --art-overhang: calc(12% - .375rem); }
+    .hero-art { inset:calc(0px - var(--art-overhang)) -36% calc(0px - var(--art-overhang)) calc(-19.5% - 1.72rem); }
+    .cloud-motion-toggle, .scene-picker, .scene-caption {
+      top: calc(100% + var(--art-overhang) + .25rem);
+      bottom: auto;
+    }
+    .scene-picker, .scene-caption { margin-top:.6rem; }
+  }
+  @media (max-width:49.999rem) {
+    .hero-art { inset:-6% max(-.8rem, -3.5vw) 2.2rem; }
+  }
   .cloud-particle { animation: cloud-drift var(--duration) ease-in-out var(--phase) infinite; animation-play-state: paused; }
-  [data-scene='plume'] .cloud-core .cloud-particle,
-  [data-scene='fire'] .cloud-core .cloud-particle { animation-name: particle-rise; animation-timing-function: linear; }
-  [data-scene='dust'] .cloud-core .cloud-particle { animation-name: dust-lift; animation-timing-function: linear; }
   [data-scene='charge'] .cloud-core .cloud-particle { animation-name: charge-drift; }
   [data-scene='condensation'] [data-kind='droplet'] { animation-name: droplet-grow; }
   [data-scene='condensation'] [data-kind='vapor'] { animation-name: vapor-uptake; animation-timing-function: linear; }
@@ -182,22 +236,26 @@ const wisps = Array.from({ length: 32 }, (_, i) => {
     35% { transform: translate(var(--dx), var(--dy)); }
     70% { transform: translate(calc(var(--dx) * -.5), calc(var(--dy) * .6)); }
   }
-  @keyframes particle-rise {
-    0% { transform: translate(0, 0) scale(.5); opacity: 0; }
-    12% { opacity: 1; }
-    50% { transform: translate(calc(var(--dx) * .35), calc(var(--dy) * .5)) scale(.85); }
-    80% { opacity: .7; }
-    100% { transform: translate(var(--dx), var(--dy)) scale(1.2); opacity: 0; }
+
+  [data-scene='charge'] .cloud-core [data-kind='collision-partner'] { animation-name:collide; }
+  [data-scene='charge'] .collision-product { animation:coalesce 8s ease-in-out infinite paused; }
+  [data-motion='running'][data-scene='charge'] .collision-product { animation-play-state:running; }
+  @keyframes collide {
+    0%, 12% { transform:translateX(0); opacity:1; }
+    44% { transform:translateX(var(--dx)); opacity:1; }
+    54%, 93% { transform:translateX(calc(var(--dx) * 1.38)); opacity:0; }
+    94% { transform:translateX(0); opacity:0; }
+    100% { transform:translateX(0); opacity:1; }
+  }
+  @keyframes coalesce {
+    0%, 44% { transform:scale(.75); opacity:0; }
+    54% { transform:scale(1); opacity:1; }
+    85% { transform:translate(11px,-5px); opacity:1; }
+    94%,100% { transform:translate(15px,-7px); opacity:0; }
   }
   @keyframes charge-drift {
     0%, 100% { transform: translate(0, 0); }
     50% { transform: translate(var(--dx), var(--dy)); }
-  }
-  @keyframes dust-lift {
-    0% { transform: translate(0, 0); opacity: 0; }
-    12% { opacity: 1; }
-    50% { transform: translate(calc(var(--dx) * .5), var(--dy)); opacity: .8; }
-    100% { transform: translate(var(--dx), calc(var(--dy) * .2)); opacity: 0; }
   }
   @keyframes droplet-grow {
     0% { transform: translate(0, 0) scale(.55); opacity: 0; }
@@ -229,13 +287,8 @@ const wisps = Array.from({ length: 32 }, (_, i) => {
   .cloud-motion-toggle { position: absolute; right: 0; bottom: -.5rem; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; padding: 0; border: 1px solid var(--sl-color-gray-5); border-radius: 50%; color: var(--sl-color-gray-2); background: color-mix(in srgb, var(--sl-color-bg) 85%, transparent); font: inherit; font-size: 1rem; pointer-events: auto; cursor: pointer; z-index: 2; }
   .cloud-motion-toggle[hidden] { display: none; }
   .cloud-motion-toggle:hover { color: var(--sl-color-white); border-color: var(--sl-color-gray-3); }
-  @media (min-width: 64rem) {
-    .cloud-art { top: -45%; left: -85%; width: 220%; height: 220%; }
-  }
   @media (max-width: 49.999rem) {
-    particle-cloud { width: min(100%, 23rem); height: 16rem; aspect-ratio: auto; margin-inline: auto; }
-    .cloud-art { width: 120%; height: auto; top: -25%; left: -10%; }
-    .cloud-wisps { display: none; }
+    particle-cloud { width: min(100%, 28rem); height: clamp(17rem, 58vw, 20rem); aspect-ratio: auto; margin-inline: auto; }
     .cloud-motion-toggle { bottom: -.5rem; }
   }
   @media print { .cloud-particle, .particle-settling { animation: none !important; } .cloud-motion-toggle { display: none; } }

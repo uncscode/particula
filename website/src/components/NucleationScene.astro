@@ -1,0 +1,60 @@
+---
+// The electron leaves first; neutral vapor molecules subsequently join the ion.
+const monomers = Array.from({ length: 9 }, (_, i) => {
+  const angle = i * 2.4;
+  const radius = 14 * Math.sqrt(i + 1);
+  const start = 98 + i % 3 * 16;
+  return {
+    x: 253 + Math.cos(angle) * radius,
+    y: 170 + Math.sin(angle) * radius,
+    dx: Math.cos(angle) * start,
+    dy: Math.sin(angle) * start * .72,
+    begin: 22 + i * 5,
+    end: 35 + i * 5,
+  };
+});
+---
+<svg class="nucleation" viewBox="0 0 500 340" role="img" aria-label="Ionization ejects an electron. Neutral vapor molecules collect around the remaining positive ion and form a charged molecular cluster.">
+  <g class="cycle">
+    <path class="ion-track" d="M99 83 L239 161" fill="none" stroke="var(--cloud-dust)" stroke-width="2" stroke-dasharray="5 7" />
+    <g transform="translate(253 170)">
+      <circle r="24" fill="var(--cloud-teal)" fill-opacity=".24" stroke="var(--cloud-teal)" stroke-width="2"/>
+      <g class="ionized">
+        <path d="M-7 0 H7 M0 -7 V7" stroke="var(--cloud-positive)" stroke-width="2.5"/>
+      </g>
+      <g class="electron">
+        <circle r="8" fill="var(--sl-color-bg)" stroke="var(--cloud-negative)" />
+        <path d="M-4 0 H4" stroke="var(--cloud-negative)" stroke-width="1.75"/>
+      </g>
+    </g>
+    {monomers.map(p=><g transform={`translate(${p.x} ${p.y})`}>
+      <g class="vapor" style={`--from-x:${p.dx}px;--from-y:${p.dy}px;--flight:linear(0 0% ${p.begin}%, 1 ${p.end}% 100%)`}>
+        <circle r="8.5" fill="var(--cloud-teal)" fill-opacity=".7" />
+        <circle cx="7" cy="-4" r="4" fill="var(--cloud-highlight)" />
+      </g>
+    </g>)}
+  </g>
+</svg>
+<style>
+  .nucleation { display:none; }
+  :global([data-scene='nucleation']) .nucleation { display:block; }
+  .cycle { animation:reset-cluster 12s linear infinite; }
+  .ion-track { animation:pulse 12s linear infinite; }
+  .ionized { animation:charge 12s linear infinite; }
+  .electron { animation:eject 12s ease-out infinite; }
+  .vapor { animation:condense 12s var(--flight) infinite; }
+  .nucleation * { animation-play-state:paused; }
+  :global([data-motion='running']) .nucleation * { animation-play-state:running; }
+  @keyframes reset-cluster { 0%,91% {opacity:1} 100% {opacity:0} }
+  @keyframes pulse { 0%,8%,18%,100% {opacity:0} 13% {opacity:.8} }
+  @keyframes charge { 0%,12% {opacity:0} 15%,100% {opacity:1} }
+  @keyframes eject {
+    0%,12% {opacity:0; transform:translate(0,0)}
+    15% {opacity:1}
+    33%,100% {opacity:0; transform:translate(119px,-90px)}
+  }
+  @keyframes condense {
+    from {transform:translate(var(--from-x),var(--from-y))}
+    to {transform:translate(0,0)}
+  }
+</style>

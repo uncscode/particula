@@ -1,0 +1,82 @@
+---
+// Equal-weight quantiles of a smooth, normalized density on scaled diameter [0,1].
+// Its CDF is the integral of 2 sin²(πx). Each dot belongs to exactly one bin.
+const total = 96;
+const bins = 12;
+const left = 48;
+const width = 408;
+const floor = 249;
+const counts = Array(bins).fill(0);
+const particles = Array.from({ length: total }, (_, i) => {
+  const quantile = (i + .5) / total;
+  let low = 0, high = 1;
+  for (let j = 0; j < 28; j++) {
+    const mid = (low + high) / 2;
+    const cumulative = mid - Math.sin(2 * Math.PI * mid) / (2 * Math.PI);
+    if (cumulative < quantile) low = mid;
+    else high = mid;
+  }
+  const diameter = (low + high) / 2;
+  const bin = Math.floor(diameter * bins);
+  const rank = counts[bin]++;
+  return { diameter, bin, rank };
+});
+const binWidth = width / bins;
+const heightPerParticle = 9.25;
+// Matching vertices let the density silhouette turn into the tops and sides
+// of the actual occupied bins. Both shapes have the same area to sampling error.
+function outline(sectional: boolean) {
+  const points = [`M ${left} ${floor}`];
+  counts.forEach((count, bin) => {
+    for (let step = 0; step <= 8; step++) {
+      const t = (bin + step / 8) / bins;
+      const height = sectional ? count : total / bins * 2 * Math.sin(Math.PI * t) ** 2;
+      points.push(`L ${(left + width * t).toFixed(2)} ${(floor - height * heightPerParticle).toFixed(2)}`);
+    }
+  });
+  return points.join(' ') + ` L ${left + width} ${floor} Z`;
+}
+const density = outline(false);
+const histogram = outline(true);
+---
+<svg class="size-scene" viewBox="0 -29 500 340" role="img" aria-label="One population changes from a continuous probability density to sectional bins and then to 96 individual particles on the same diameter axis.">
+  <g fill="none" stroke="var(--cloud-teal)">
+    <path d="M48 64 V249 H461 m-7 -5 7 5 -7 5" opacity=".65"/>
+    {[103,152,201].map(y=><path d={`M48 ${y} H456`} opacity=".16" stroke-dasharray="2 6"/>)}
+  </g>
+  <path class="silhouette" d={density} style={`--pdf:path('${density}');--bins:path('${histogram}')`} />
+  <g class="dividers" stroke="var(--cloud-dust)" opacity=".8">
+    {counts.slice(1).map((n,i)=><path d={`M${left+(i+1)*binWidth} ${floor} v${-Math.min(n,counts[i])*heightPerParticle}`} />)}
+  </g>
+  <g class="dots">
+    {particles.map(({diameter,bin,rank})=><circle cx={left+diameter*width} cy={floor-(rank+.5)*heightPerParticle}
+      r={2.1+diameter*2.6} style={`--gather:${((bin+.5)*binWidth-diameter*width).toFixed(1)}px`} fill="var(--cloud-teal)"/>)}
+  </g>
+  <g class="axis-type" transform={`translate(${left + width} 45)`} text-anchor="end">
+    <text class="pdf-label">Continuous PDF</text>
+    <text class="bin-label">Sectional bins</text>
+    <text class="resolved-label">Particle resolved</text>
+  </g>
+</svg>
+<style>
+  .size-scene { display:none; }
+  :global([data-scene='sizes']) .size-scene { display:block; }
+  .axis-type { font:17px var(--sl-font); fill:var(--sl-color-gray-2); }
+  .silhouette { fill:var(--cloud-teal); fill-opacity:.17; stroke:var(--cloud-teal); stroke-width:2.4; animation:reshape 15s ease-in-out infinite; }
+  .dividers,.bin-label { animation:bins 15s ease-in-out infinite; }
+  .dots,.resolved-label { animation:resolved 15s ease-in-out infinite; }
+  .dots circle { animation:spread 15s ease-in-out infinite; }
+  .pdf-label { animation:pdf 15s ease-in-out infinite; }
+  .size-scene * { animation-play-state:paused; }
+  :global([data-motion='running']) .size-scene * { animation-play-state:running; }
+  @keyframes reshape {
+    0%,21%,100% { d:var(--pdf); opacity:1; }
+    32%,53% { d:var(--bins); opacity:1; }
+    64%,83% { d:var(--bins); opacity:0; }
+    91% { d:var(--pdf); opacity:0; }
+  }
+  @keyframes pdf { 0%,21%,100% {opacity:1} 29%,90% {opacity:0} }
+  @keyframes bins { 0%,23%,65%,100% {opacity:0} 32%,53% {opacity:1} }
+  @keyframes resolved { 0%,54%,96%,100% {opacity:0} 65%,84% {opacity:1} }
+  @keyframes spread { 0%,54%,100% {transform:translateX(var(--gather))} 67%,85% {transform:translateX(0)} }
+</style>

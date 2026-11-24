@@ -1,0 +1,50 @@
+---
+// Stagger particles along mixing loops so the paused frame also shows a mixed chamber.
+const currents = [
+  { path: 'M119 146 C133 99 260 112 272 149 S246 231 195 224 S105 191 119 146 Z', count: 13, period: 21 },
+  { path: 'M137 186 C111 155 178 120 224 138 S278 190 240 210 S157 214 137 186 Z', count: 10, period: 17 },
+  { path: 'M158 163 C173 141 237 151 236 175 S205 200 179 189 S148 177 158 163 Z', count: 7, period: 14 },
+];
+---
+<svg class="chamber" viewBox="0 0 500 340" role="img" aria-label="Particles mix inside an aerosol chamber. A sampling line carries aerosol to an instrument that records a signal over time.">
+  <defs>
+    <linearGradient id="chamber-glass">
+      <stop stop-color="var(--cloud-teal)" stop-opacity=".2" />
+      <stop offset=".25" stop-color="var(--cloud-teal)" stop-opacity=".04" />
+      <stop offset=".72" stop-color="var(--cloud-negative)" stop-opacity=".08" />
+      <stop offset="1" stop-color="var(--cloud-teal)" stop-opacity=".22" />
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Vessel, lid flange and feet -->
+    <path d="M126 246 V266 H143 V251 M251 251 V266 H268 V246" stroke="currentColor" opacity=".55" />
+    <path d="M88 95 V230 A110 27 0 0 0 308 230 V95" fill="url(#chamber-glass)" stroke="currentColor" stroke-width="2" />
+    <path d="M88 230 A110 27 0 0 1 308 230" stroke="currentColor" opacity=".22" stroke-dasharray="3 5" />
+    <ellipse cx="198" cy="95" rx="110" ry="25" fill="var(--cloud-teal)" fill-opacity=".1" stroke="currentColor" stroke-width="2" />
+    <path d="M88 101 A110 25 0 0 0 308 101 M97 124 V216" stroke="currentColor" opacity=".5" />
+    <!-- Inlet and sampling line -->
+    <path d="M39 166 H89 M306 165 H329 Q340 165 340 176 V193 Q340 203 350 203 H369" stroke="currentColor" stroke-width="7" opacity=".45" />
+    <path class="flow" d="M39 166 H89 M306 165 H329 Q340 165 340 176 V193 Q340 203 350 203 H369" stroke="var(--cloud-dust)" stroke-width="2.5" stroke-dasharray="3 15" />
+    <path d="M82 160 V172 M312 159 V171" stroke="currentColor" stroke-width="3" />
+    {currents.map(({ path, count, period }) =>
+      Array.from({ length: count }, (_, i) => (
+        <circle class="aerosol" r={2.2 + (i % 4) * .7}
+          fill={i % 4 === 0 ? 'var(--cloud-dust)' : 'var(--cloud-teal)'}
+          style={`offset-path:path('${path}');animation-duration:${period}s;animation-delay:${-period * (i + .5) / count}s`} />
+      ))
+    )}
+    <!-- Sampling instrument with a strip-chart display -->
+    <rect x="369" y="177" width="86" height="53" rx="6" fill="url(#chamber-glass)" stroke="currentColor" stroke-width="1.8" />
+    <path d="M379 187 V216 H445" stroke="currentColor" opacity=".5" />
+    <path d="M381 210 L389 209 L394 211 L400 202 L405 206 L412 190 L417 196 L423 194 L430 201 L436 198 L443 199" stroke="var(--cloud-dust)" stroke-width="2" />
+  </g>
+</svg>
+<style>
+  .chamber { display: none; color: var(--cloud-teal); }
+  :global([data-scene='chamber']) .chamber { display: block; }
+  .flow { animation: sample 2s linear infinite paused; }
+  .aerosol { animation: circulate linear infinite both paused; }
+  :global([data-motion='running']) :is(.flow, .aerosol) { animation-play-state: running; }
+  @keyframes circulate { from { offset-distance: 0%; } to { offset-distance: 100%; } }
+  @keyframes sample { to { stroke-dashoffset: -18; } }
+</style>

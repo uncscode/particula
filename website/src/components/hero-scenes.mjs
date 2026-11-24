@@ -1,15 +1,18 @@
 // Decorative process illustrations, not numerical simulation results.
 export const SCENES = [
-  { id: 'cloud', label: 'Cloud drift' },
-  { id: 'plume', label: 'Rising plume' },
-  { id: 'fire', label: 'Fire & smoke' },
-  { id: 'dust', label: 'Emissions' },
-  { id: 'charge', label: 'Charged particles' },
-  { id: 'condensation', label: 'Condensation' },
-  { id: 'scavenging', label: 'Scavenging' },
+  { id: 'scattering', label: 'Light scattering', diagram: true },
+  { id: 'pathways', label: 'Reaction pathways', diagram: true },
+  { id: 'liquids', label: 'Liquid phase separation', diagram: true },
+  { id: 'sizes', label: 'Size distributions', diagram: true },
+  { id: 'chamber', label: 'Aerosol chamber', diagram: true },
+  { id: 'cloud', label: 'Cloud parcels', viewBox: '78 38 484 366' },
+  { id: 'charge', label: 'Charged collisions', viewBox: '78 47 484 366' },
+  { id: 'nucleation', label: 'Ion-induced nucleation', diagram: true },
+  { id: 'condensation', label: 'Condensation', viewBox: '78 69 484 366' },
+  { id: 'scavenging', label: 'Scavenging', viewBox: '78 65 484 366' },
 ];
 
-const STORAGE_KEY = 'particula:hero-scenes:v2';
+const STORAGE_KEY = 'particula:hero-scenes:v3';
 
 /** Visit every scene in a shuffled order before repeating, even across reloads. */
 export function nextScene(storage, random = Math.random) {
@@ -42,11 +45,16 @@ export function nextScene(storage, random = Math.random) {
 
 export function createParticles(scene, random = Math.random) {
   const between = (a, b) => a + random() * (b - a);
-  const lobes = [[220, 270, 115, 70], [320, 220, 120, 100], [420, 285, 95, 70], [310, 320, 140, 62]];
-  const droplets = Array.from({ length: 28 }, () => ({
-    x: between(185, 475), y: between(155, 365), r: between(5, 11),
-    phase: between(-30, 0),
-  }));
+  const droplets = Array.from({ length: 28 }, (_, i) => {
+    const r = i === 0 ? 16 : between(4, 9);
+    const fall = .25 * r * r;
+    // Center the whole settling track in the drawing, including the vapor envelope.
+    const midY = i === 0 ? 252 : between(198, 306);
+    return {
+      x: i === 0 ? 330 : between(184, 472), y: midY - fall / 2,
+      r, fall, phase: between(-30, 0),
+    };
+  });
   const pairs = Array.from({ length: 56 }, () => ({
     x: between(-9, 9), y: between(-8, 8), phase: between(-15, 0),
   }));
@@ -56,50 +64,43 @@ export function createParticles(scene, random = Math.random) {
     return { x: 180 + i * 45, r, duration, phase: -random() * duration };
   });
   return Array.from({ length: 112 }, (_, i) => {
-    const [cx, cy, rx, ry] = lobes[i % lobes.length];
+    const parcel = i % 3;
     const angle = between(0, Math.PI * 2);
-    const radius = Math.sqrt(random());
     const p = {
-      x: cx + Math.cos(angle) * radius * rx,
-      y: cy + Math.sin(angle) * radius * ry,
-      r: i % 17 === 0 ? between(10, 20) : between(1.1, 4.5),
-      opacity: between(.28, .85), dx: between(6, 22), dy: between(-20, -8),
+      x: 134 + parcel * 138 + between(0, 78),
+      y: 238 - parcel * 40 + between(0, 65),
+      r: i % 17 === 0 ? between(5, 8) : between(1.2, 3.6),
+      opacity: between(.28, .85), dx: between(2, 9), dy: between(-9, -2),
       duration: between(18, 36), phase: 0,
       kind: 'particle', tone: i % 13 === 0 ? 'gold' : 'teal', sign: '',
       fall: 0, settlePhase: 0,
     };
-    if (scene === 'plume' || scene === 'fire') {
-      p.x = between(290, 365);
-      p.y = between(370, 410);
-      p.dx = between(-125, 135);
-      p.dy = between(-290, -175);
-      p.duration = scene === 'fire' ? between(7, 15) : between(13, 25);
-      p.r = i % 9 === 0 ? between(10, 19) : between(1.5, 6);
-      p.tone = scene === 'fire' ? (i % 9 === 0 ? 'smoke' : i % 3 ? 'ember' : 'gold') : 'teal';
-    } else if (scene === 'dust') {
-      p.x = between(145, 400);
-      p.y = between(365, 395);
-      p.dx = between(95, 185);
-      p.dy = between(-175, -55);
-      p.r = between(1.8, 6.5);
-      p.duration = between(11, 23);
-      p.tone = i % 3 ? 'dust' : 'gold';
-    } else if (scene === 'charge') {
-      // Neighbouring pairs alternately approach and separate; signs move with them.
+    if (scene === 'charge') {
+      // Compare repulsion with capture by two oppositely charged droplets.
       const pair = Math.floor(i / 2);
       const side = i % 2 ? 1 : -1;
-      const row = Math.floor(pair / 8);
-      const repels = pair % 3 === 0;
+      const repels = pair < 28;
+      const local = pair % 28;
+      const focus = local === 0;
       const positive = repels ? pair % 2 === 0 : i % 2 === 1;
-      p.x = 175 + (pair % 8) * 42 + side * 13 + pairs[pair].x;
-      p.y = 155 + row * 35 + pairs[pair].y;
-      p.r = pair % 5 === 0 ? 8 : between(2, 4);
-      p.dx = side * (repels ? 12 : -4);
-      p.dy = Math.sin(pair) * 12;
+      const centerX = repels ? 208 : 409;
+      p.x = focus ? centerX + side * 31 : centerX + (local % 5 - 2) * 29 + side * 6 + pairs[pair].x;
+      p.y = focus ? 238 : 135 + Math.floor(local / 5) * 38 + pairs[pair].y;
+      p.opacity = focus ? 1 : .28;
+      p.r = focus ? 16 : between(1.3, 3.2);
+      p.dx = side * (repels ? 14 : -10);
+      p.dy = focus ? 0 : Math.sin(pair) * 6;
       p.duration = 16 + pair % 7;
       p.phase = pairs[pair].phase;
       p.tone = positive ? 'positive' : 'negative';
-      if (p.r === 8) p.sign = positive ? '+' : '−';
+      if (focus) p.sign = positive ? '+' : '−';
+      if (focus && !repels) {
+        p.kind = 'collision-partner';
+        p.x = centerX + side * 57;
+        p.dx = -side * (57 - p.r);
+        p.phase = 0;
+        p.duration = 8;
+      }
     } else if (scene === 'condensation') {
       const drop = droplets[Math.floor(i / 4)];
       p.x = drop.x;
@@ -107,7 +108,7 @@ export function createParticles(scene, random = Math.random) {
       p.tone = 'teal';
       // Shared settling keeps each vapor envelope aligned with its growing drop.
       // The size-based speed is illustrative, not a terminal-velocity calculation.
-      p.fall = drop.r * drop.r;
+      p.fall = drop.fall;
       p.settlePhase = drop.phase;
       if (i % 4 === 0) {
         p.kind = 'droplet';

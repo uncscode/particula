@@ -1,0 +1,45 @@
+---
+const species = [
+  { x: 61, y: 176, color: 'teal', beads: [[-7, 0], [7, 0]] },
+  { x: 166, y: 176, color: 'teal', beads: [[-7, 4], [7, 4], [0, -8]] },
+  { x: 280, y: 94, color: 'gold', beads: [[-11, 0], [0, -7], [11, 0], [0, 7]] },
+  { x: 280, y: 250, color: 'blue', beads: [[-10, 5], [0, -4], [10, 5]] },
+  { x: 420, y: 130, color: 'gold', beads: [[-12, 0], [0, 0], [12, 0], [6, -10]] },
+  { x: 420, y: 225, color: 'blue', beads: [[-6, -6], [6, 6], [6, -6], [-6, 6]] },
+];
+const routes = [
+  'M61 176 H166',
+  'M166 176 C220 176 219 94 280 94',
+  'M166 176 C221 176 218 250 280 250',
+  'M280 94 C342 94 361 130 420 130',
+  'M280 250 C336 250 355 225 420 225',
+  'M280 94 C344 94 351 225 420 225',
+];
+---
+<svg class="reaction-scene" viewBox="0 6 500 340" role="img" aria-label="A precursor branches through intermediates into two products. Pulses trace the reaction pathways.">
+  {routes.map((d, i) => <g fill="none">
+    <path {d} stroke="var(--cloud-teal)" stroke-width="2" opacity=".5" />
+    <path {d} class="flux" pathLength="100" style={`--delay:${-i * .83}s`}
+      stroke="var(--cloud-dust)" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 96" />
+  </g>)}
+  {species.map(({ x, y, color, beads }) => <g transform={`translate(${x} ${y})`} class={color}>
+    <circle r="28" fill="var(--sl-color-bg)" stroke="currentColor" stroke-opacity=".65" />
+    <circle r="24" fill="currentColor" fill-opacity=".1" />
+    {beads.map(([cx, cy]) => <circle {cx} {cy} r="5.5" fill="currentColor" />)}
+  </g>)}
+  <g class="annotation" text-anchor="middle">
+    <text x="61" y="227">Precursor</text>
+    <text x="420" y="282">Products</text>
+  </g>
+</svg>
+<style>
+  .reaction-scene { display: none; }
+  :global([data-scene='pathways']) .reaction-scene { display: block; }
+  .annotation { fill: var(--sl-color-gray-2); font: 17px var(--sl-font); }
+  .teal { color: var(--cloud-teal); }
+  .gold { color: var(--cloud-dust); }
+  .blue { color: var(--cloud-negative); }
+  .flux { animation: travel 5s linear var(--delay) infinite both paused; }
+  :global([data-motion='running']) .flux { animation-play-state: running; }
+  @keyframes travel { to { stroke-dashoffset: -100; } }
+</style>
