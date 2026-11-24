@@ -76,7 +76,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   .peek img { opacity: .52; }
   .peek:hover img, .peek:focus-visible img { opacity: .85; }
   .slide:hover .study-title, .slide:focus-visible .study-title { text-decoration: underline; text-decoration-thickness: .08em; text-underline-offset: .16em; }
-  .carousel-footer { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; column-gap: .45rem; }
+  .carousel-footer { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; column-gap: .45rem; }
   .literature-link { grid-column: 2; justify-self: center; display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 50%; color: var(--sl-color-text); }
   .controls:not([hidden]) + .literature-link { grid-column: 3; justify-self: start; }
   .literature-link:hover { color: var(--sl-color-text-accent); background: var(--sl-color-gray-6); }
