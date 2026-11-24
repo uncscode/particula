@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 4.522375700995326,
+  "package_source_sha256": "b6205b767b9e0515ccb3897e553f92a4b9b903a358c46ef3968e0624614ab668",
+  "scientific_source_sha256": "f4dcc52edcb7cc5be19955508fb571294e53286fe325a014c83f75b7f908089f",
+  "input_sha256": {
+    "docs/data/pallas-cloud-probes/distributions.csv": "28401d99d31a7363c027e14e193fd5a28603858345580957c88913952070932a",
+    "docs/data/pallas-cloud-probes/method-sizing.csv": "c51fa9439f09aa678faa021b2674ab183ae79d46f0497db7ba178ac40dff9cba",
+    "docs/data/pallas-cloud-probes/method-budget.csv": "2d2667e744e3b8d821cfca5f2c14473880dfdf52464ea7efc489716c5ad97a54"
+  },
+  "example": "pallas-cloud-probes",
+  "fingerprint": "ce584260adda5d4c4a2fe69e7479da41e55c3e3083a07601ecc48420d1a1ec9d",
+  "source": "docs/studies/literature/pallas-cloud-probes/pallas_cloud_probes.py",
+  "revision": "3435f653ae2606c4eeef23bdf55b617d2ac58586",
+  "package_dirty": false,
+  "executed_at": "2026-11-24T12:43:08.077727+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.6",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [
+      {
+        "image": "figure-3-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-4-1.png"
+      }
+    ],
+    [
+      {
+        "image": "figure-5-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-5-1.png": "1e440b70bfcc76749d3d660e4c01772507f62977c80e3cc0804ea8cc465f0f8b",
+    "figure-4-1.png": "607a9b1bb7f27b7c9733ba379d2ac09fed233c3759fdbad97701f3cf6a980122",
+    "figure-3-1.png": "df57ea342bf867c7f1f1ffbbff366b1c891d35ed2cac4523b4c5cf999c73c317",
+    "data.json": "a9ba6269c7d7ee817a654694a6172ca19eef484d098e842d5ddb2edf34eca304",
+    "source.py": "e7b570d23c0aac1dcc13948bcd58cfd06405d2abb1e8432932d4026fb471e6d7"
+  },
+  "simulation_fingerprint": "1fc718fef11abffbd1498e38468278993b6a9a6ed45a7f832084e678abf833ec"
+}
