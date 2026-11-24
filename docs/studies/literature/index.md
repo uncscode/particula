@@ -99,6 +99,9 @@ Particula predicts water-drop fall speeds within 4.2% at nine diameters from 0.2
 
 <div class="study-figures">
 
+[![Wind-tunnel schematic with airflow, airborne dust and a floor tray. Across the four winds, the predicted median diameter of dust retained on the trays at three hours missed the measured median by an average of 4.48 µm when the 30-minute median was carried forward and 2.84 µm with Particula-based transport and retention. The largest improvement occurred at 6 m/s.](../../images/dust-tray-retention/analysis-toc.png)\
+A Particula-based model reduces mean error in three-hour dust median diameter by 37%](dust-tray-retention/index.md)
+
 [![Sub-100 nm particles per cubic centimetre after 24 hours in polluted air. Archived MAM4xx gives 3,379. With coarse collisions and neutral attraction, extended MAM4xx gives 2,424, the sectional model 1,187 and the particle-resolved model 1,180.](../../images/mam4xx-coagulation/graphical-abstract.svg)\
 After a day in simulated polluted air, archived MAM4xx retains nearly three times the sub-100 nm count predicted by two models with attraction](mam4xx-coagulation/index.md)
 
@@ -151,6 +154,7 @@ Adding settling and diffusion lowers predicted one-hour survival of 1 µm partic
 
 **Particle collisions, transport, and loss**
 
+- [A Particula-based model reduces mean error in three-hour dust median diameter by 37%](dust-tray-retention/index.md)
 - [After a day in simulated polluted air, archived MAM4xx retains nearly three times the sub-100 nm count predicted by two models with attraction](mam4xx-coagulation/index.md)
 - [A 35% polarization effect for a charged 4 nm NaCl tracer shrinks to 0.06% in the modeled chamber scan](nacl-scavenging/index.md)
 - [Particula sizes a 100.7 nm PSL standard at about 102 nm near atmospheric pressure](dry-psl-mobility/index.md)
