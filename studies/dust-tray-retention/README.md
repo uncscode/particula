@@ -6,6 +6,8 @@ The packet includes the original 49,294-byte workbook. To replace a missing copy
 
 Run the following from this directory in the publication checkout. For an exact physics replay, use a separate checkout of Particula at revision `3435f653ae2606c4eeef23bdf55b617d2ac58586`. Install it in a Python 3.12 environment with NumPy 2.3.4, SciPy 1.16.2 and Matplotlib. The blocked fits also use PyTorch 2.10.0 on CPU. Set JIA_PY to the interpreter for that environment. The saved results suffice for the two synthesis figures and the graphical abstract.
 
+The replay records the imported Particula version in `run.json`. It records the Git commit for a source checkout or for a non-editable Git installation with a commit in its package metadata. For wheels and local-directory installations without a recorded commit, `revision` is `null`. Use the pinned checkout above when exact source provenance is required.
+
 ```bash
 JIA_PY=python
 "$JIA_PY" analysis_figures.py

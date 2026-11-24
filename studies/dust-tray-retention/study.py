@@ -5,10 +5,12 @@ import argparse
 import csv
 import hashlib
 import json
+from importlib import metadata
 from itertools import permutations
 import platform
 import re
 import subprocess
+import tomllib
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from zipfile import ZipFile
@@ -108,9 +110,54 @@ def tv(a, b):
 
 def save(name, entries):
     with (ROOT / name).open("w") as out:
-        writer = csv.DictWriter(out, fieldnames=list(entries[0]), lineterminator="\n")
+        writer = csv.DictWriter(
+            out, fieldnames=list(entries[0]), lineterminator="\n"
+        )
         writer.writeheader()
         writer.writerows(entries)
+
+
+def particula_revision() -> str | None:
+    """Return the Git revision of the imported Particula when verifiable."""
+    module = Path(par.__file__).resolve()
+    # A source import can shadow a different installed distribution. Check
+    # the project beside the imported package, never an enclosing repository.
+    root = module.parent.parent
+    git_dir = root / ".git"
+    project = root / "pyproject.toml"
+    if git_dir.exists() and project.is_file():
+        with project.open("rb") as stream:
+            if (
+                tomllib.load(stream).get("project", {}).get("name")
+                != "particula"
+            ):
+                return None
+        try:
+            return subprocess.check_output(
+                [
+                    "git",
+                    f"--git-dir={git_dir}",
+                    "rev-parse",
+                    "--verify",
+                    "HEAD",
+                ],
+                stderr=subprocess.DEVNULL,
+                text=True,
+            ).strip()
+        except (FileNotFoundError, subprocess.CalledProcessError):
+            return None
+    try:
+        dist = metadata.distribution("particula")
+    except metadata.PackageNotFoundError:
+        return None
+    if dist.locate_file("particula/__init__.py").resolve() != module:
+        return None
+    direct_url = dist.read_text("direct_url.json")
+    if direct_url:
+        vcs = json.loads(direct_url).get("vcs_info", {})
+        if vcs.get("vcs") == "git":
+            return vcs.get("commit_id")
+    return None
 
 
 # %% Reference and transfer scores
@@ -347,6 +394,7 @@ def run(winds):
         save("still-air.csv", scores)
         print(scores[0])
         return
+    revision = particula_revision()
     for filename, data in (
         ("scores", scores),
         ("channels", spectra),
@@ -360,16 +408,6 @@ def run(winds):
         ("middle-band-spread", spread),
     ):
         save(filename + ".csv", data)
-    revision = subprocess.check_output(
-        [
-            "git",
-            "-C",
-            str(Path(par.__file__).resolve().parent),
-            "rev-parse",
-            "HEAD",
-        ],
-        text=True,
-    ).strip()
     meta = dict(
         python=platform.python_version(),
         particula=par.__version__,
