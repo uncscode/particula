@@ -2079,5 +2079,24 @@
       "studies/cloud-1833/full-transfer/stage-scores.csv": "stage-scores.csv"
     },
     "full_canvas": true
+  },
+  "mt-soledad-droplet-response": {
+    "title": "Compare count loss and droplet growth at Mt. Soledad",
+    "source": "docs/studies/literature/particle-water-uptake/mt-soledad/droplet_response.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 120,
+    "inputs": [
+      "studies/mt-soledad/figures/optical-spectrum.csv",
+      "studies/mt-soledad/figures/optical-summary.csv"
+    ],
+    "input_destinations": {
+      "studies/mt-soledad/figures/optical-spectrum.csv": "optical-spectrum.csv",
+      "studies/mt-soledad/figures/optical-summary.csv": "optical-summary.csv"
+    },
+    "data_expression": "report",
+    "render_functions": [],
+    "plot_inputs": [],
+    "full_canvas": true
   }
 }

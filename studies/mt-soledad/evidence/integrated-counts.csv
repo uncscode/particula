@@ -1,0 +1,6 @@
+band,metric,estimate,low,high,pairs,days,scenario,split
+all,obs,-182.7681058,-237.4551886,-133.4142473,483,21,may,held
+all,bypass_obs,805.8203276,594.9297467,1045.060953,483,21,may,held
+all,denuded_obs,623.0522218,458.4090234,809.6606862,483,21,may,held
+all,common,-3.657273236,-11.78458935,4.454852089,483,21,may,held
+all,rh,-161.2277728,-229.6685382,-107.7322141,483,21,may,held

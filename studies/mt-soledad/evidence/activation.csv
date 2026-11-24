@@ -1,0 +1,5 @@
+clock,cut_nm,held,recipe,closure,model,population,S,mapping,mean_dry_threshold_nm,obs_mid,obs_width,pred_mid,pred_width,rmse,ae_mid,ae_width
+raw_UTC,1000,True,low,sodium,full,two_class,0.8,previous_mapping,39.5825437,45.1703537,14.5597953,44.75787,14.2833912,0.124626979,3.49266721,4.28167438
+raw_UTC,1000,True,low,sodium,full,uniform,0.8,previous_mapping,38.4763493,45.1703537,14.5597953,43.9027078,11.6520392,0.13074102,3.57360435,4.40537792
+raw_UTC,1000,True,low,sodium,ideal,uniform,0.8,previous_mapping,36.2193636,45.1703537,14.5597953,41.3275036,10.9668391,0.154111612,4.63499287,4.65810522
+raw_UTC,1000,True,low,sodium,two_pool,uniform,0.8,previous_mapping,38.6245012,45.1703537,14.5597953,44.0717981,11.6957079,0.129089986,3.48370716,4.39322127
