@@ -524,9 +524,9 @@ def prepare():
             "hero": {
                 "title": "Small particles.\nBig questions.",
                 "tagline": (
-                    "Model how particles form, grow, collide, and evolve. "
-                    "Build a simulation from physical processes, then "
-                    "explore the science behind the results."
+                    "Model how aerosol particles form, react, and grow. "
+                    "Compare predictions of cloud activation and light "
+                    "scattering with laboratory and field measurements."
                 ),
                 "actions": [
                     {
