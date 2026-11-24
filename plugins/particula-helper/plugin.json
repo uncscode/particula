@@ -25,7 +25,7 @@
       },
       "requires_local_executor": true,
       "publication": {
-        "release_notes": "The TOC figure skill now uses a shared Matplotlib style and the Particula dots logo. It explains how to commit an editable generator with each literature figure and how to place the figure beside a wrapping study abstract."
+        "release_notes": "Literature studies reproduce a published comparison, then spend three hours testing a scientific question with existing data and controlled simulations. The research loop records competing explanations and uncertainty, and produces a reproducible publication draft showing what other researchers can learn and build on."
       }
     }
   },
@@ -37,7 +37,7 @@
     "scientific-computing"
   ],
   "name": "particula-helper",
-  "version": "0.3.9",
+  "version": "0.3.10",
   "license": "MIT",
   "homepage": "https://uncscode.github.io/particula/guide/agent-plugins/",
   "repository": "https://github.com/uncscode/particula"

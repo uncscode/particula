@@ -46,7 +46,7 @@ Use the page's existing formatting and citation conventions.
 
 Let the scientific finding carry the contribution. Start from what the
 original study established, then show what the comparison reveals about a
-physical assumption, a prediction or a measurement worth making. Name
+physical assumption, a prediction or a proposed solution to an open problem. Name
 Particula where it identifies a calculation the reader needs to distinguish
 or reproduce. Give the scientific consequence its own sentence when it matters.
 
@@ -54,10 +54,10 @@ For example, “In the Π Chamber experiments, the salt-water case had more
 cloud droplets than the fresh-water case. With interior forcing held fixed
 in the simulations, the predicted difference changed from 362 more droplets
 per cm³ with a drier salt-water floor to 379 fewer with a slightly
-supersaturated floor. Measuring the wet size distribution near the floor
-would help distinguish those scenarios.” The floor humidity was an assumption
-in these runs, so the comparison motivates a measurement without assigning a
-cause to the experimental result.
+supersaturated floor.” Floor humidity was an assumption in these runs. A
+simulation could now vary it between those limits to locate the reversal.
+That calculation would establish the model's sensitivity. The actual floor
+humidity would remain unknown.
 
 For literature studies, draft the opening alongside the TOC figure. Use the
 first descriptive heading to introduce the original paper. Give the analysis
@@ -68,7 +68,7 @@ Write the opening and closing paragraphs with three reader questions in mind.
 | --- | --- |
 | What did the comparison show? | In the summary, identify the observable, who measured or predicted it, the decisive condition, and the magnitude or direction of the result. For a qualitative or inconclusive result, state the distinction the evidence could resolve and what remains open. |
 | What can I conclude or do with that result? | Answer the opening question, explain why the finding matters for a particular use, and name the assumption or uncertainty that bounds that use. Bring together the strongest evidence already shown in the body. |
-| What would change that conclusion? | Where a consequential uncertainty remains, propose a specific measurement, calculation or comparison. Name the observable and the result that would favor one interpretation, reveal a limitation or justify extending the finding. Mark it as proposed. |
+| What would change that conclusion? | For a literature study, specify an available dataset to reanalyze or a simulation that tests the remaining uncertainty. Name the observable and the result that would favor one interpretation, reveal a limitation or justify extending the finding. Mark it as proposed. |
 
 For example, two models can agree closely while both overpredict measured
 water activity. A reader choosing a model needs to know that switching between

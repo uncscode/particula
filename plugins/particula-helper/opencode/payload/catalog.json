@@ -52,7 +52,7 @@
     "name": "particula-setup"
   },
   {
-    "description": "Analyze Particula simulations and write literature studies comparing model predictions with published measurements or theory. Use for quantitative figures, conservation, convergence, uncertainty and finding-led research reports.",
+    "description": "Reproduce a published aerosol comparison and extend it with existing data and controlled Particula simulations. Use for process discovery, uncertainty analysis and finding-led literature reports.",
     "name": "particula-studies-literature"
   },
   {
