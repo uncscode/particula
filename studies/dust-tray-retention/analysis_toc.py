@@ -1,6 +1,7 @@
 """Draw the graphical abstract from the three-hour wind-holdout forecasts."""
 
 import csv
+from io import StringIO
 from pathlib import Path
 from statistics import mean
 
@@ -11,6 +12,11 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Circle, Ellipse, Polygon
 from particula.plotting.toc import add_toc_logo
 
+if __package__:
+    from .study_data import result_text
+else:
+    from study_data import result_text
+
 ROOT = Path(__file__).resolve().parent
 IMAGES = ROOT.parents[1] / "docs" / "images" / "dust-tray-retention"
 WINDS = (0, 2, 4, 6)
@@ -18,8 +24,9 @@ WINDS = (0, 2, 4, 6)
 
 def forecast_errors():
     """Score early-tray persistence and the model on the same omitted winds."""
-    with (ROOT / "global-comparisons.csv").open(newline="") as stream:
-        records = list(csv.DictReader(stream))
+    records = list(
+        csv.DictReader(StringIO(result_text("global-comparisons.csv")))
+    )
     errors = {}
     for case in ("persist", "conditional"):
         values = []
@@ -120,7 +127,8 @@ def export_tunnel():
         )
     vector = IMAGES / "wind-tunnel-icon.svg"
     vector.write_text(
-        "\n".join(line.rstrip() for line in vector.read_text().splitlines()) + "\n"
+        "\n".join(line.rstrip() for line in vector.read_text().splitlines())
+        + "\n"
     )
     plt.close(fig)
 

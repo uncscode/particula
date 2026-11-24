@@ -1,6 +1,7 @@
 """Replot the integrated paper from archived forecasts and tray data."""
 
 import csv
+from io import StringIO
 import json
 from pathlib import Path
 
@@ -10,6 +11,11 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
+if __package__:
+    from .study_data import result_text
+else:
+    from study_data import result_text
+
 ROOT = Path(__file__).resolve().parent
 IMAGES = ROOT.parents[1] / "docs" / "images" / "dust-tray-retention"
 WINDS = (0, 2, 4, 6)
@@ -18,8 +24,7 @@ TEAL, ORANGE, PURPLE, GRAY = "#116d76", "#bc6325", "#69539a", "#424b54"
 
 def rows(name):
     """Read a CSV table from the study packet."""
-    with (ROOT / name).open(newline="") as stream:
-        return list(csv.DictReader(stream))
+    return list(csv.DictReader(StringIO(result_text(name))))
 
 
 def save(fig, name):
@@ -31,7 +36,7 @@ def save(fig, name):
 def forecast_bands():
     """Compare the observed and predicted redistribution by size and wind."""
     data = rows("channels.csv")
-    fits = json.loads((ROOT / "global-core.json").read_text())["results"]
+    fits = json.loads(result_text("global-core.json"))["results"]
     scores = rows("global-comparisons.csv")
     fig, axes = plt.subplots(2, 2, figsize=(9.3, 6.3), sharex=True, sharey=True)
     fig.subplots_adjust(
