@@ -1,14 +1,20 @@
 # Setup Particula
 
-To run the examples from source, clone the repository and install Particula:
+## Run the first CPU simulation
+
+With Python 3.12 or newer in an active virtual environment, install the
+tutorial’s verified release and its plotting dependency:
 
 ```bash
-git clone https://github.com/uncscode/particula.git
-cd particula
-python -m pip install -e ".[extra]"
+python -m pip install "particula[plot]==0.3.5"
 ```
 
-Then [run your first CPU simulation](../first-simulation.md).
+Then [download and run the first CPU simulation](../first-simulation.md).
+If you already work in a development checkout, install its matching source
+and plotting dependency from the repository root with
+`python -m pip install -e ".[plot]"` and use the checkout command in the guide.
+
+## Other installation options
 
 Choose the route that matches your comfort level:
 
