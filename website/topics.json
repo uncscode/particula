@@ -5388,6 +5388,31 @@
       "tocSource": "docs/studies/literature/drizzle-settling/toc.svg.in"
     },
     {
+      "source": "docs/studies/literature/dust-tray-retention/index.md",
+      "title": "A Particula-based model reduces mean error in three-hour dust median diameter by 37%",
+      "topic": "losses-deposition",
+      "also": [
+        "transport",
+        "optics",
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "dust-tray-retention",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/wall-loss.md",
+            "label": "Size-dependent particle deposition"
+          }
+        ]
+      },
+      "tocFigure": "dust-tray-retention/analysis-toc.png",
+      "tocSource": "studies/dust-tray-retention/analysis_toc.py"
+    },
+    {
       "source": "docs/studies/examples/thermodynamics/moist_parcel.py",
       "title": "How does a faster updraft change cloud water at a fixed time?",
       "topic": "parcels",

@@ -1,0 +1,7 @@
+{
+  "cases": 552,
+  "retrieval_pairs": 276,
+  "noise_retrievals": 512,
+  "max_energy_relative_error": 8.158688169501715e-10,
+  "transit_max_matrix_entry_refinement": 0.0017675598323959596
+}
