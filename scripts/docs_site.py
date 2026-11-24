@@ -522,22 +522,22 @@ def prepare():
         {
             "template": "splash",
             "hero": {
-                "title": "Small particles.\nBig questions.",
+                "title": "Simulate aerosol\nparticles",
                 "tagline": (
-                    "Model how particles form, grow, collide, and evolve. "
-                    "Build a simulation from physical processes, then "
-                    "explore the science behind the results."
+                    "Build a particle population in Python. Follow its size "
+                    "and composition as vapors condense, particles collide, "
+                    "and droplets form."
                 ),
                 "actions": [
                     {
-                        "text": "Explore topics",
-                        "link": BASE + "guide/topics/",
+                        "text": "Run your first simulation",
+                        "link": BASE
+                        + "guide/getting-started/first-simulation/",
                         "icon": "right-arrow",
                     },
                     {
-                        "text": "Getting started",
-                        "link": BASE
-                        + "guide/getting-started/first-simulation/",
+                        "text": "Explore topics",
+                        "link": BASE + "guide/topics/",
                         "variant": "minimal",
                     },
                 ],
