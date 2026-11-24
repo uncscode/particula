@@ -1,6 +1,7 @@
 """Independent physical controls for spatial providers, fixed grids and replay."""
 
 from dataclasses import replace
+from importlib.util import find_spec
 
 import numpy as np
 import pytest
@@ -46,11 +47,10 @@ def record(grid, flow=WIND, times=(0, 1), mix=None, device="cpu"):
 def test_factory_and_trajectory(tmp_path):
     """Check all construction routes, path replay and capability rejection."""
     direct = UniformFlow(**PARAMS)
-    params = dict(PARAMS, pressure=1000, pressure_units="hPa")
     for flow in (
         direct,
-        UniformFlowBuilder().set_parameters(params).build(),
-        FlowFactory().get_strategy("uniform", params),
+        UniformFlowBuilder().set_parameters(PARAMS).build(),
+        FlowFactory().get_strategy("uniform", PARAMS),
     ):
         np.testing.assert_allclose(
             flow.sample([[0, 1, 2]], 0)[0], [1, 0, 0, 290, 1e5, 0.008]
@@ -75,6 +75,18 @@ def test_factory_and_trajectory(tmp_path):
         trajectory.trajectory("other")
     with pytest.raises(ValueError):
         FlowFactory().get_strategy("uniform", {"vapor": 0})
+
+
+def test_uniform_pressure_conversion():
+    """Non-SI input converts through Pint or identifies the missing extra."""
+    params = dict(PARAMS, pressure=1000, pressure_units="hPa")
+    factory = FlowFactory()
+    if find_spec("pint") is None:
+        with pytest.raises(ImportError, match="Install pint"):
+            factory.get_strategy("uniform", params)
+    else:
+        flow = factory.get_strategy("uniform", params)
+        np.testing.assert_allclose(flow.sample([[0, 0, 0]], 0)[0, 4], 1e5)
 
 
 def test_periodic_translation_and_numerical_spread(device):
