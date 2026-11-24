@@ -7,6 +7,7 @@ import os
 import re
 from collections import Counter, defaultdict
 from pathlib import Path
+from urllib.parse import urlsplit
 
 CATEGORIES = {
     "examples": "Worked examples",
@@ -16,6 +17,7 @@ CATEGORIES = {
     "benchmarks": "Benchmarks",
 }
 STUDIES = "docs/studies"
+LITERATURE = f"{STUDIES}/literature"
 SCRIPT_INDEX = f"{STUDIES}/scripts.md"
 
 
@@ -73,8 +75,10 @@ class StudyCatalog:
         self.by_collection = defaultdict(list)
         self.secondary = defaultdict(list)
         self.collections = {}
+        self.study_by_source = {r["source"]: r["study"] for r in self.studies}
         self._collect()
         self._resolve()
+        self.literature_groups = self._literature_groups()
         self._group()
 
     @classmethod
@@ -212,6 +216,64 @@ class StudyCatalog:
         if reverse not in self.backlinks[target]:
             self.backlinks[target].append(reverse)
 
+    def _literature_groups(self):
+        """Read the gallery's ordered headings and illustrated study links."""
+        gallery = self.root / LITERATURE / "index.md"
+        expected = {
+            r["source"]
+            for r in self.studies
+            if r["source"].startswith(LITERATURE + "/")
+            or r["study"].get("secondary_category") == "literature"
+        }
+        if not gallery.is_file():
+            return []
+        by_route = {route(source): source for source in expected}
+        content = gallery.read_text().split("<!-- STUDY_LIST_START -->")[0]
+        sections = re.split(r"^## (.+)$", content, flags=re.M)
+        groups = []
+        seen = set()
+        for label, section in zip(sections[1::2], sections[2::2], strict=True):
+            cards = re.search(
+                r'<div class="study-figures">(.*?)</div>', section, flags=re.S
+            )
+            if not cards:
+                continue
+            sources = []
+            for card in cards[1].strip().split("\n\n"):
+                link = re.search(r"\]\(([^()\s]+)\)\s*$", card)
+                if not card.startswith("[![") or not link:
+                    self.errors.append(f"{label}: malformed literature card")
+                    continue
+                url = urlsplit(link[1])
+                if url.netloc == "uncscode.github.io" and url.path.startswith(
+                    "/particula/"
+                ):
+                    slug = url.path.removeprefix("/particula/").rstrip("/")
+                elif not url.netloc and not url.scheme:
+                    target = os.path.normpath(
+                        os.path.join(LITERATURE, url.path)
+                    )
+                    slug = route(target)
+                else:
+                    slug = ""
+                source = by_route.get(slug)
+                if not source or source in seen:
+                    self.errors.append(
+                        f"{label}: unknown or duplicate literature study "
+                        f"{link[1]}"
+                    )
+                    continue
+                sources.append(source)
+                seen.add(source)
+            self._check_choices(
+                f"{LITERATURE}#{self._gallery_anchor(label)}",
+                [self.title(s) for s in sources],
+            )
+            groups.append((label, sources))
+        for source in sorted(expected - seen):
+            self.errors.append(f"{source}: missing literature gallery card")
+        return groups
+
     def _group(self):
         orders = {}
         for resource in self.studies:
@@ -249,13 +311,25 @@ class StudyCatalog:
                     else 100
                 )
                 children.insert(0, SCRIPT_INDEX)
-            listings = self.children(folder)
-            if len(listings) > 6 and not self.exceptions.get(folder):
-                titles = ", ".join(self.title(s) for s in listings)
-                self.errors.append(
-                    f"{folder}: review {len(listings)} immediate choices: "
-                    + titles
+            if folder == LITERATURE:
+                self._check_choices(
+                    folder, [g[0] for g in self.literature_groups]
                 )
+            else:
+                self._check_choices(
+                    folder, [self.title(s) for s in self.children(folder)]
+                )
+
+    def _check_choices(self, folder, titles):
+        if len(titles) > 6 and not self.exceptions.get(folder):
+            self.errors.append(
+                f"{folder}: review {len(titles)} immediate choices: "
+                + ", ".join(titles)
+            )
+
+    @staticmethod
+    def _gallery_anchor(label):
+        return re.sub(r"[^\w -]", "", label.lower()).replace(" ", "-")
 
     def children(self, folder):
         """List primary children and secondary entries in this directory."""
@@ -265,13 +339,44 @@ class StudyCatalog:
 
     def navigation(self, folder=STUDIES):
         """Build the sidebar from primary study homes."""
-        items = []
-        for source in self.by_collection[folder]:
-            item = {"label": self.title(source), "slug": route(source)}
-            if source in self.collections.values():
-                item["items"] = self.navigation(str(Path(source).parent))
-            items.append(item)
-        return items
+        if folder == LITERATURE:
+            groups = []
+            for label, sources in self.literature_groups:
+                items = []
+                for source in sources:
+                    item = self._menu_entry(source)
+                    if source in self.secondary[folder]:
+                        item["secondary"] = True
+                    items.append(item)
+                groups.append(
+                    {
+                        "label": label,
+                        "slug": route(folder),
+                        "anchor": self._gallery_anchor(label),
+                        "items": items,
+                    }
+                )
+            return groups
+        return [
+            self._menu_entry(source) for source in self.by_collection[folder]
+        ]
+
+    def _menu_entry(self, source):
+        item = {"label": self.title(source), "slug": route(source)}
+        if source in self.collections.values():
+            item["items"] = self.navigation(str(Path(source).parent))
+        elif study := self.study_by_source.get(source):
+            # A companion can live outside its owning report's directory.
+            owned = list(study.get("companions", []))
+            owned.extend(
+                self.runs[key]["source"]
+                for key in study.get("runs", [])
+                if key in self.runs
+            )
+            related = sorted({route(s) for s in owned if s != source})
+            if related:
+                item["ownedSlugs"] = related
+        return item
 
     def breadcrumb(self, source, base):
         """Link directly to parent collections and the owning study."""
@@ -344,6 +449,28 @@ class StudyCatalog:
         return "\n\n" + "\n\n".join(sections) if sections else ""
 
 
+def _portable_listing(catalog, source, links):
+    """Use gallery group order for the portable literature directory."""
+
+    def link(title, target):
+        return f"[{title}]({os.path.relpath(target, Path(source).parent)})"
+
+    if source == f"{LITERATURE}/index.md":
+        groups = []
+        for label, sources in catalog.literature_groups:
+            items = [f"- {link(catalog.title(s), s)}" for s in sources]
+            groups.append(f"**{label}**\n\n" + "\n".join(items))
+        collections = [
+            link(title, target)
+            for title, target in links
+            if target in catalog.collections.values()
+        ]
+        if collections:
+            groups.append("Related collections: " + " · ".join(collections))
+        return "\n\n".join(groups)
+    return "\n".join(f"- {link(title, target)}" for title, target in links)
+
+
 def offline_indexes(catalog, *, write=False):
     """Generate or verify the portable Markdown directories in the bundle."""
     errors = []
@@ -360,10 +487,8 @@ def offline_indexes(catalog, *, write=False):
         if text.count(start) != 1 or text.count(end) != 1:
             errors.append(f"{source}: missing unique offline listing markers")
             continue
-        listing = "\n".join(
-            f"- [{title}]({os.path.relpath(target, Path(source).parent)})"
-            for title, target in links
-        )
+
+        listing = _portable_listing(catalog, source, links)
         before, after = text.split(start)
         _, after = after.split(end)
         current = f"{before}{start}\n{listing}\n{end}{after}"

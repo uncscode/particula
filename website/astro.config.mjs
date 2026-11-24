@@ -14,7 +14,7 @@ import catalog from './.cache/studies.json';
 function sidebarItem(entry) {
   return entry.items
     ? { label: entry.label, collapsed: true, items: entry.items.map(sidebarItem) }
-    : entry;
+    : { label: entry.label, slug: entry.slug };
 }
 
 export default defineConfig({

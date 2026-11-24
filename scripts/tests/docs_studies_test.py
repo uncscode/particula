@@ -70,11 +70,37 @@ def test_shared_companion_multiscript_and_prose_only_studies(tmp_path):
         for key in ["run-a", "run-b"]
     }
     runs["run-b"]["inputs"] = ["measurements.csv"]
+    gallery = tmp_path / base / "literature/index.md"
+    gallery.write_text(
+        gallery.read_text().replace(
+            "<!-- STUDY_LIST_START -->",
+            '## Particle measurements\n\n<div class="study-figures">\n\n'
+            "[![Paper](paper.png) Paper](paper.md)\n\n"
+            "[![Mobility](mobility.png) Mobility](../validation/mobility/index.md)"
+            "\n\n</div>\n\n<!-- STUDY_LIST_START -->",
+        )
+    )
     catalog = docs_studies.StudyCatalog(graph, runs, tmp_path)
     assert not catalog.errors
     assert [r["key"] for r in catalog.rows] == ["run-a", "run-b"]
     assert catalog.rows[0]["topics"] == ["transport", "verification"]
     assert catalog.children(f"{base}/literature") == [comparison, report]
+    (group,) = catalog.navigation(f"{base}/literature")
+    assert (group["label"], group["slug"], group["anchor"]) == (
+        "Particle measurements",
+        "studies/literature",
+        "particle-measurements",
+    )
+    paper, mobility = group["items"]
+    assert paper["slug"] == docs_studies.route(comparison)
+    assert paper["ownedSlugs"] == [docs_studies.route(spec)]
+    assert mobility["secondary"] and mobility["slug"] == docs_studies.route(
+        report
+    )
+    assert set(mobility["ownedSlugs"]) == {
+        docs_studies.route(s)
+        for s in (spec, runs["run-a"]["source"], runs["run-b"]["source"])
+    }
     assert catalog.children(f"{base}/validation") == [report]
     assert set(catalog.backlinks[spec]) == {
         ("paper", "studies/literature/paper/"),
@@ -106,6 +132,9 @@ def test_shared_companion_multiscript_and_prose_only_studies(tmp_path):
         "[run-a](validation/mobility/run-a.py)"
         in (tmp_path / docs_studies.SCRIPT_INDEX).read_text()
     )
+    gallery.write_text(
+        gallery.read_text().replace("](paper.md)", "](missing.md)", 1)
+    )
     graph["resources"][1]["study"]["runs"] = ["run-a", "absent"]
     graph["resources"][0]["study"]["relations"].append(
         {"target": "docs/missing.md", "label": "Missing"}
@@ -114,6 +143,10 @@ def test_shared_companion_multiscript_and_prose_only_studies(tmp_path):
     assert any("missing study target" in e for e in errors)
     assert any("expected one owning study, found 2" in e for e in errors)
     assert any("unknown execution absent" in e for e in errors)
+    assert any("missing literature gallery card" in e for e in errors)
+    assert any(
+        "unknown or duplicate literature study missing.md" in e for e in errors
+    )
 
 
 def test_six_immediate_choices_review_seventh_but_catalog_unbounded(tmp_path):
@@ -148,3 +181,50 @@ def test_six_immediate_choices_review_seventh_but_catalog_unbounded(tmp_path):
         folder: "A published seven-stage sequence."
     }
     assert docs_studies.StudyCatalog(graph, runs, tmp_path).errors == []
+
+
+def test_portable_literature_groups_follow_gallery_across_directories(tmp_path):
+    """Nested and executable studies stay under the gallery's chosen headings."""
+    literature = docs_studies.LITERATURE
+    source(tmp_path, docs_studies.STUDIES + "/index.md")
+    source(tmp_path, docs_studies.SCRIPT_INDEX)
+    gallery = source(tmp_path, literature + "/index.md")
+    source(tmp_path, literature + "/archive/index.md", "Historical collection")
+    first = source(tmp_path, literature + "/archive/first.md")
+    second = source(tmp_path, literature + "/second.py")
+    absolute = "https://uncscode.github.io/particula/studies/literature/second/"
+    path = tmp_path / gallery
+    path.write_text(
+        "# Literature analyses\n\n## Measured drops\n\n"
+        '<div class="study-figures">\n\n'
+        f"[![Drops](drops.png) Drops]({absolute})\n\n</div>\n\n"
+        '## Organic aerosols\n\n<div class="study-figures">\n\n'
+        "[![Aerosols](aerosols.png) Aerosols](archive/first.md)\n\n</div>\n\n"
+        "<!-- STUDY_LIST_START -->\n<!-- STUDY_LIST_END -->\n"
+    )
+    catalog = docs_studies.StudyCatalog(
+        {
+            "topics": [],
+            "resources": [record(first, "Aerosols"), record(second, "Drops")],
+        },
+        {},
+        tmp_path,
+    )
+    assert catalog.errors == []
+    groups = catalog.navigation(literature)
+    assert [group["label"] for group in groups] == [
+        "Measured drops",
+        "Organic aerosols",
+    ]
+    assert [group["items"][0]["slug"] for group in groups] == [
+        docs_studies.route(second),
+        docs_studies.route(first),
+    ]
+    assert docs_studies.offline_indexes(catalog, write=True) == []
+    listing = path.read_text().split("<!-- STUDY_LIST_START -->")[1].strip()
+    assert listing == (
+        "**Measured drops**\n\n- [Drops](second.py)\n\n"
+        "**Organic aerosols**\n\n- [Aerosols](archive/first.md)\n\n"
+        "Related collections: [Historical collection](archive/index.md)\n"
+        "<!-- STUDY_LIST_END -->"
+    )
