@@ -7,13 +7,13 @@ checks an exact restart at five minutes. Its published page includes the plots.
 
 ## Run and save the experiment
 
-Start with Python 3.12 or newer and an active virtual environment. To run
-the release example, install Particula with plotting support, save the
-[version 0.3.5 script](https://raw.githubusercontent.com/uncscode/particula/v0.3.5/docs/studies/tutorials/first_cpu_workflow.py)
-as `first_cpu_workflow.py`, and run it from the directory where you saved it:
+Start with Python 3.12 or newer and an active virtual environment. On the
+[worked example page](../../studies/tutorials/first_cpu_workflow.py), download
+the Python script and save it as `first_cpu_workflow.py`. From the directory
+where you saved it, install Particula and run the example:
 
 ```bash
-python -m pip install "particula[plot]==0.3.5"
+python -m pip install "particula>=0.3.5"
 python first_cpu_workflow.py
 ```
 
@@ -21,12 +21,14 @@ If you are working from a repository checkout, run its matching package and
 example together from the repository root:
 
 ```bash
-python -m pip install -e ".[plot]"
+python -m pip install -e .
 python docs/studies/tutorials/first_cpu_workflow.py
 ```
 
-The script creates `first-cpu-results/` containing a growth figure, an analysis
-file and a separate restart file for each of two initial vapor concentrations.
+The script creates `first-cpu-results/` with an analysis file and a restart file for each
+initial vapor concentration. If Matplotlib is installed, the script also saves
+`growth.png`. To add the graph to a run, install the plotting extra with
+`python -m pip install "particula[plot]>=0.3.5"` and rerun the script.
 The publication pipeline uses temporary storage and retains only compact plot
 data, never the full restart files.
 
@@ -66,6 +68,8 @@ measure, volume, physical configuration, numerical settings and source/package
 identity. Histories contain selected diagnostics; full particle arrays are
 opt-in and storage is bounded. Analysis files cannot be used as exact restarts.
 The files use ZIP, JSON and numeric arrays and never require pickle to load.
+
+![Particle radius rises as gas condenses. The case starting at 20 µg m⁻³ grows larger particles than the 10 µg m⁻³ case.](../../../website/results/first-cpu-workflow/figure-4-1.png)
 
 The saved calculation reaches radii of about 136.69 nm and 162.13 nm for the
 10 and 20 µg m⁻³ cases. Remaining vapor is about 0.89 and 0.87 µg m⁻³.

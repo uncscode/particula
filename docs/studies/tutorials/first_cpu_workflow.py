@@ -18,10 +18,10 @@
 
 # %%
 import hashlib
+from importlib.util import find_spec
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-import matplotlib.pyplot as plt
 import numpy as np
 import particula as par
 from particula.dynamics.condensation.species_mapping import (
@@ -217,49 +217,57 @@ def simulate(output_directory=None):
 
 
 # %%
-@plt.style.context("particula.default")
 def plot_results(report):
     """Plot only the saved compact diagnostic histories."""
+    import matplotlib.pyplot as plt
     from particula import plotting
 
-    fig, axes = plotting.subplots(2, 1)
-    colors = tuple(plotting.COLORS.values())
-    for index, case in enumerate(report["cases"]):
-        color = colors[index % len(colors)]
-        label = f"{case['initial_vapor_ug_m3']:g} µg m⁻³ initial vapor"
-        minutes = np.asarray(case["time_s"]) / 60
-        axes[0].plot(minutes, case["radius_nm"], color=color, label=label)
-        axes[1].plot(
-            minutes,
-            case["gas_ug_m3"],
-            color=color,
-            linestyle="-",
-            label=f"Gas, {case['initial_vapor_ug_m3']:g} µg m⁻³",
-        )
-        axes[1].plot(
-            minutes,
-            case["particle_ug_m3"],
-            color=color,
-            linestyle=":",
-            label=f"Particles, {case['initial_vapor_ug_m3']:g} µg m⁻³",
-        )
-    axes[0].set(xlabel="Time (min)", ylabel="Particle radius (nm)")
-    axes[1].set(xlabel="Time (min)", ylabel="Mass concentration (µg m⁻³)")
-    for axis in axes:
-        plotting.legend(axis)
-    plotting.fit(fig)
+    with plt.style.context("particula.default"):
+        fig, axes = plotting.subplots(2, 1)
+        colors = tuple(plotting.COLORS.values())
+        for index, case in enumerate(report["cases"]):
+            color = colors[index % len(colors)]
+            label = f"{case['initial_vapor_ug_m3']:g} µg m⁻³ initial vapor"
+            minutes = np.asarray(case["time_s"]) / 60
+            axes[0].plot(minutes, case["radius_nm"], color=color, label=label)
+            axes[1].plot(
+                minutes,
+                case["gas_ug_m3"],
+                color=color,
+                linestyle="-",
+                label=f"Gas, {case['initial_vapor_ug_m3']:g} µg m⁻³",
+            )
+            axes[1].plot(
+                minutes,
+                case["particle_ug_m3"],
+                color=color,
+                linestyle=":",
+                label=f"Particles, {case['initial_vapor_ug_m3']:g} µg m⁻³",
+            )
+        axes[0].set(xlabel="Time (min)", ylabel="Particle radius (nm)")
+        axes[1].set(xlabel="Time (min)", ylabel="Mass concentration (µg m⁻³)")
+        for axis in axes:
+            plotting.legend(axis)
+        plotting.fit(fig)
     return fig
 
 
 if __name__ == "__main__":
     report = simulate("first-cpu-results")
-    figure = plot_results(report)
-    figure.savefig("first-cpu-results/growth.png", dpi=300)
-    plt.show()
+    if find_spec("matplotlib") is None:
+        print(
+            "Results saved. Install matplotlib and rerun to create growth.png."
+        )
+    else:
+        import matplotlib.pyplot as plt
+
+        figure = plot_results(report)
+        figure.savefig("first-cpu-results/growth.png", dpi=300)
+        plt.show()
 
 # %% [markdown]
 # Run this downloaded script to retain two analysis files, two exact-restart
-# files and a PNG in `first-cpu-results/`. In a checkout, import `simulate` and
+# files in `first-cpu-results/`. With Matplotlib installed, it also saves a PNG. In a checkout, import `simulate` and
 # supply your own destination. To investigate volatility next, change the
 # saturation vapor pressure, rerun, and compare the remaining vapor as well as
 # radius. This run grows the particles from 100 nm to about 136.69 nm for

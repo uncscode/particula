@@ -1,20 +1,20 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 4.441945262020454,
-  "package_source_sha256": "e7a8dec04ec165d4dd632a008f2c0bcbb2eeeefb92d0cacb704ceb94f8bd3be3",
-  "scientific_source_sha256": "a3ab2110331b437c679cb2b93c8ac67790e4239e684691704b25f61cc5640285",
+  "elapsed_seconds": 4.8419947328511626,
+  "package_source_sha256": "b6205b767b9e0515ccb3897e553f92a4b9b903a358c46ef3968e0624614ab668",
+  "scientific_source_sha256": "f4dcc52edcb7cc5be19955508fb571294e53286fe325a014c83f75b7f908089f",
   "input_sha256": {},
   "example": "first-cpu-workflow",
-  "fingerprint": "e526d9e502fbe2c7d09a53f8d6c72181f06ab64e3c422ce553f8ed294930e51f",
+  "fingerprint": "57f2a1ee36b61fda6823d7d1dd229c217ab5487e590408b4d324c8a6a9d61cbe",
   "source": "docs/studies/tutorials/first_cpu_workflow.py",
-  "revision": "b0776abeadbd9167a91e5b4f92ef618efd73689f",
+  "revision": "ff8be72e9a07836dd34151ba85bb54ae443ade93",
   "package_dirty": false,
-  "executed_at": "2026-11-20T12:53:50.404818+00:00",
+  "executed_at": "2026-11-24T11:44:20.396863+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.3",
+    "particula": "0.3.6",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -34,9 +34,9 @@
     ]
   ],
   "files": {
-    "figure-4-1.png": "62639bb618e1c4a0f6552da652d6b7446a98df3cc1c4feaa38ea319b7afc639b",
-    "data.json": "aa5329c2eb479e59791f9ec2f607c60e02129bc32141aaab8067cfd4e6d80f33",
-    "source.py": "8cfc7a283dbcf5ebbb117f69b6a8ab06fd0f4cd3bd214dbfa4df54521391a9b3"
+    "source.py": "d34f330648d0c5b611824fb109ca921701d703886205284b01a41c2d74234b3f",
+    "data.json": "288e8e69e21e7426be9ce802c2181c6fe523675e5eb68ac28edd038fb561a6f1",
+    "figure-4-1.png": "62639bb618e1c4a0f6552da652d6b7446a98df3cc1c4feaa38ea319b7afc639b"
   },
-  "simulation_fingerprint": "7b577b5c0a70bf5f65df61593c60994396f761a51f75fd30e4c53acef1ce1172"
+  "simulation_fingerprint": "eff828b9fc00cd7a48a11e59ec4dcb549d083be1e02210847006f72d76f24b98"
 }

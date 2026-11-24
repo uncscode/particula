@@ -2,17 +2,16 @@
 
 ## Run the first CPU simulation
 
-With Python 3.12 or newer in an active virtual environment, install the
-tutorial’s verified release and its plotting dependency:
+With Python 3.12 or newer in an active virtual environment, install Particula 0.3.5 or newer:
 
 ```bash
-python -m pip install "particula[plot]==0.3.5"
+python -m pip install "particula>=0.3.5"
 ```
 
 Then [download and run the first CPU simulation](../first-simulation.md).
 If you already work in a development checkout, install its matching source
-and plotting dependency from the repository root with
-`python -m pip install -e ".[plot]"` and use the checkout command in the guide.
+from the repository root with
+`python -m pip install -e .` and use the checkout command in the guide.
 
 ## Other installation options
 
