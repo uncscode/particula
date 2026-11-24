@@ -5993,6 +5993,144 @@
       ],
       "role": "Studies",
       "start_here": false
+    },
+    {
+      "source": "docs/theory/dynamics/prescribed-transport.md",
+      "title": "Transport in prescribed wind fields",
+      "topic": "transport",
+      "also": [
+        "parcels",
+        "atmosphere"
+      ],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "docs/theory/dynamics/surface-emission.md",
+      "title": "Wind-driven emission from a finite dust bed",
+      "topic": "atmosphere",
+      "also": [
+        "parcels",
+        "transport"
+      ],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/examples/gas-transport/turning_sounding.py",
+      "title": "Where does a dust puff go when the wind turns?",
+      "topic": "parcels",
+      "also": [
+        "atmosphere",
+        "transport"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "turning-sounding",
+        "runs": [
+          "turning-sounding"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/thermodynamics/parcel-dynamics.md",
+            "label": "Interpolate measured heights and times"
+          },
+          {
+            "target": "docs/guide/processes/parcels.md",
+            "label": "Configure the prescribed flow and its transport",
+            "fragment": "use-one-flow-for-parcels-and-stationary-grids"
+          }
+        ]
+      }
+    },
+    {
+      "source": "docs/studies/examples/gas-transport/turbulent_puff.py",
+      "title": "How wide is the same puff on a grid and as individual particles?",
+      "topic": "transport",
+      "also": [
+        "parcels",
+        "atmosphere"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "turbulent-puff",
+        "runs": [
+          "turbulent-puff"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/dynamics/prescribed-transport.md",
+            "label": "Derive particle and grid moments"
+          },
+          {
+            "target": "docs/guide/processes/parcels.md",
+            "label": "Configure the prescribed flow and its transport",
+            "fragment": "use-one-flow-for-parcels-and-stationary-grids"
+          }
+        ]
+      }
+    },
+    {
+      "source": "docs/studies/examples/particle-processes/gust_dust_emission.py",
+      "title": "What does the second gust lift from a partly depleted dune?",
+      "topic": "atmosphere",
+      "also": [
+        "parcels",
+        "transport"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "gust-dust-emission",
+        "runs": [
+          "gust-dust-emission"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/dynamics/surface-emission.md",
+            "label": "Relate shear and area to the emitted mass"
+          },
+          {
+            "target": "docs/guide/processes/parcels.md",
+            "label": "Configure the prescribed flow and its transport",
+            "fragment": "use-one-flow-for-parcels-and-stationary-grids"
+          }
+        ]
+      }
+    },
+    {
+      "source": "docs/studies/validation/prescribed-flow/cavity_replay.py",
+      "title": "Can Particula reproduce the cavity’s tracer circulation?",
+      "topic": "transport",
+      "also": [
+        "parcels",
+        "gpu"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "cavity-replay",
+        "runs": [
+          "cavity-replay"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/dynamics/prescribed-transport.md",
+            "label": "Track inventory through each CFD face"
+          },
+          {
+            "target": "docs/guide/processes/parcels.md",
+            "label": "Configure the prescribed flow and its transport",
+            "fragment": "use-one-flow-for-parcels-and-stationary-grids"
+          }
+        ]
+      }
     }
   ],
   "supporting": [
@@ -6263,10 +6401,14 @@
     {
       "source": "docs/studies/validation/chemistry/index.md",
       "reason": "Browsing directory for mechanism discovery validation."
+    },
+    {
+      "source": "docs/studies/validation/prescribed-flow/index.md",
+      "reason": "Browsing directory for prescribed-flow validation."
     }
   ],
   "study_group_exceptions": {
     "docs/studies/validation/condensation": "The sparse-activity benchmark compares chemistry construction, lookup and fallback costs across both parcel and box workflows. Its reference and timing matrix are shared across integrators.",
-    "docs/studies/validation": "Eight study collections distinguish mechanism inference and optical validation from the existing physical-process and workflow qualifications."
+    "docs/studies/validation": "The validation collections distinguish prescribed-flow replay against external CFD from local process tests, optics and release qualification."
   }
 }

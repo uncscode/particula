@@ -1,6 +1,6 @@
 # Particula parcels, parcel clusters and CFD coupling
 
-The prescribed-flow milestone now includes a closed warm-cloud ascent, offline replay, conservative parcel clusters, and size-dependent particle crossings. A 100-second Particula-generated trajectory supplies the controlled forcing. Independent CFD input and live coupling remain future work. [Replay study](../docs/studies/examples/thermodynamics/parcel-experiments/parcel_replay.py) · [Cluster study](../docs/studies/examples/thermodynamics/parcel-experiments/parcel_cluster.py)
+The prescribed-flow milestone now includes a closed warm-cloud ascent, offline replay, conservative parcel clusters, and size-dependent particle crossings. A 100-second Particula-generated trajectory supplies the controlled forcing. A pinned OpenFOAM cavity export now provides an independent passive-tracer comparison. Live solver coupling remains a later step. [Replay study](../docs/studies/examples/thermodynamics/parcel-experiments/parcel_replay.py) · [Cluster study](../docs/studies/examples/thermodynamics/parcel-experiments/parcel_cluster.py)
 
 ## First implementation PR — one differentiable moist parcel on CUDA
 
@@ -109,8 +109,9 @@ velocity threshold. A grain and fine mineral dust start at a prescribed
 ejection height with size-dependent terminal slip, and first contact with
 the bed ends each track. The bed, airborne and redeposited masses close the
 source budget. Threshold, drag coefficient, launch height and available mass
-are experimental inputs. Calibration of sand flux, ballistic saltation,
-lee-side separation and turbulent particle motion over the dune remain open.
+are experimental inputs. Calibration of sand flux, ballistic saltation
+and lee-side separation remain open. The extension below adds turbulent
+particle motion with a prescribed diffusivity over the mapped dune.
 
 Flat-terrain controls in `particula.coupling.dispersion` describe a
 continuous source with Pasquill A–F open-country widths and an instantaneous
@@ -148,8 +149,15 @@ first-order upwind with explicit diffusion. Particle motion freezes local
 velocity over a bounded substep and traverses each crossed face. The
 terrain surface is piecewise linear between supplied bed vertices.
 Grid refinement and independent wind and sediment observations address
-different sources of uncertainty. Host-driven EAMxx, multi-rank transport
-and independent CFD data remain future milestones.
+different sources of uncertainty. The independent cavity replay extends these controls to a frozen OpenFOAM
+flow. Host-driven EAMxx and multi-rank transport remain future milestones.
+
+The [prescribed-flow extensions](prescribed-flow-extensions.md) add a seeded
+turbulent particle mover, time-varying sounding profiles and finite dust sources.
+A [lid-driven cavity replay](../docs/studies/validation/prescribed-flow/cavity_replay.py)
+imports native OpenFOAM face fluxes and compares against the host scalar.
+The pinned [case and export recipe](../studies/prescribed-flow/openfoam-cavity/README.md)
+reproduce the reference, half-step and finer-mesh comparisons.
 
 ## Later live coupling interface
 
@@ -201,13 +209,14 @@ For the first two-way transport test, use isothermal uptake of a dilute, non-wat
 | Step | Experiment and decision |
 | --- | --- |
 | 1. Parcel rise | Implemented for one closed, soluble warm-cloud mode. The worked example and tests above exercise budgets, activation, CPU/CUDA agreement and updraft sensitivity. |
-| 2. Offline replay | Implemented for prescribed water and a named, internally carried organic tracer. The 100-second ascent, cadence sweep, reservoir correction, restart around an injection and humidity sensitivity are in the [replay study](../docs/studies/examples/thermodynamics/parcel-experiments/parcel_replay.py). An independent CFD export remains pending. |
+| 2. Offline replay | Implemented for prescribed water and a named, internally carried organic tracer. The 100-second ascent, cadence sweep, reservoir correction, restart around an injection and humidity sensitivity are in the [replay study](../docs/studies/examples/thermodynamics/parcel-experiments/parcel_replay.py). The prescribed-flow extension below adds an independent fixed-cell CFD export. |
 | 2b. Parcel cluster | Implemented for regular and custom layouts, specified contacts and unequal volumes. [Cluster controls](../particula/dynamics/tests/parcel_cluster_test.py) cover independent histories, dry material, number, water, organic mass, row permutation, overdraw and smooth CUDA sensitivities. |
 | 2c. Differential particle motion | Implemented for creeping-flow terminal settling, constant velocity per cell and axis-aligned bounds. Moving-frame, capacity, corner, periodic, open, deposition and restart cases have [regression controls](../particula/dynamics/tests/parcel_motion_test.py). The [two-cell experiment](../docs/studies/examples/thermodynamics/parcel-experiments/parcel_cluster.py) compares positions and crossing time with the constant-velocity solution. |
 | 2d. Prescribed spatial flow | CPU prototype with flat plume and puff controls, sounding-driven dune trajectories, parcel replay and budgeted pickup/deposition. Compare against measured wind and sediment flux before treating the dune as a predictive case. |
 | 2e. Flow strategies and fixed grids | CPU and CUDA conservative grid transport, particle crossings, two mixing strategies and recorded replay. The comparison uses one prescribed dune atmosphere across moving parcels, a fixed section and a volume. |
+| 2f. Prescribed-flow extensions | Turbulent particles, changing soundings and finite dust release use the shared 2D/3D grid. The independent passive-tracer cavity compares both devices with frozen OpenFOAM data. [Milestones, theory and examples](prescribed-flow-extensions.md) |
 | 3. Define the live interface | Use the parcel and replay results to specify forcing and diagnostics. Add the fields that conservative transport requires, including cell IDs, volumes, tracer inventories and accepted exchange times. Check unequal volumes, empty cells, padded fields and CPU/CUDA parity before connecting a solver. [Condensation validation](../docs/guide/gpu/direct/condensation.md) |
 | 4. DP-SCREAMv1 on NVIDIA | Reproduce an unmodified small BOMEX case using the published script and save a control. Build a minimal EAMxx atmosphere process that calls Particula’s EAMxx adapter, with Python enabled and a Particula-compatible interpreter. Pass one strided device input to Warp and write a distinct diagnostic output, verified by the host. Then register the test tracers in host transport and restart, run passive and active experiments, and compare 1-rank and multi-rank budgets. Confirm the case's forcing, nudging and boundary sources for each budget. [BOMEX script](https://github.com/E3SM-Project/scmlib/blob/master/DPxx_SCREAM_SCRIPTS/run_dpxx_scream_BOMEX.csh) · [DP run guide](https://github.com/E3SM-Project/scmlib/wiki/Running-the-DP-SCREAM-Configuration) |
 | 5. Global EAMxx | Reuse Particula’s EAMxx adapter, the compiled atmosphere process and the tracer names in a short, affordable global atmosphere-only case. Test transport across cubed-sphere face and MPI boundaries, restart, and MPI repartition. Compare mass-weighted global inventories and vertical profiles. Measure incremental bytes per cell, transport cost per tracer, adapter time and total step time against a host-only control. For B bins, S particulate species and G gases, a number-and-species-mass representation requires B × (1 + S) + G transported fields. Use measured costs to choose bin/species counts and resolution before a global storm-resolving run. |
 
-For each numerical comparison, set tolerances from precision, independent reference error and timestep refinement before evaluating the coupled result. Budget forcing and boundaries explicitly. Record the code revisions, device, configuration and observed transfers. The next external milestone needs an independently documented forcing export. Live two-way transport begins with a passive tracer pulse crossing a periodic boundary in the host solver.
+For each numerical comparison, set tolerances from precision, independent reference error and timestep refinement before evaluating the coupled result. Budget forcing and boundaries explicitly. Record the code revisions, device, configuration and observed transfers. The OpenFOAM replay supplies the independently documented single-domain forcing export. Live two-way transport begins with a passive tracer pulse crossing a periodic boundary in the host solver.

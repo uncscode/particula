@@ -53,8 +53,9 @@ Each CSV contains one parcel ID and strictly increasing times. Its header is
 The JSON carries the initial aerosol spectrum, initial wet radii, species
 ownership, units, sampling rule and provenance. The supplied trace was generated
 by Particula. A researcher preparing an external history can use the CSV/JSON
-pair in the replay study download as a template. Independent CFD replay remains
-an open validation step.
+pair in the replay study download as a template. For an independent
+fixed-grid reference, the [cavity study](../../studies/validation/prescribed-flow/cavity_replay.py)
+uses face transfers and scalar snapshots from OpenFOAM.
 
 Temperature, pressure, vapor and volume are prescribed. Supersaturation at a
 record checks consistency with those inputs. Wet-radius and liquid histories
@@ -177,7 +178,7 @@ flat grid, steady positive x wind, and an inlet downstream of the source.
 Initialize the inlet with the plume width at that fetch. Upwind advection
 adds numerical spreading that decreases with cell size. For example, for
 uniform one-dimensional advection its added variance is
-(|U|\,\Delta x\,(1-|U|\Delta t/\Delta x)t), using the actual substep.
+$|U|\,\Delta x\,(1-|U|\Delta t/\Delta x)t$, using the actual substep.
 
 `InventoryLayout` maps named gases, bins and materials to extensive lanes.
 For neutral native discrete boxes, `pack` converts gas and number densities
@@ -210,3 +211,29 @@ geometry and conservation rules as offline runs. The binding retains the
 accepted forcing until `recording().save(path)`. For a host restart, load the
 matching forcing prefix into `LiveGrid(..., history=prefix)` before restoring
 the aerosol checkpoint.
+
+### Changing wind, turbulent spread and finite dust sources
+
+Use the `sounding_sequence` factory entry to drive parcels and fixed grids
+from the same set of profiles. Read a CSV with `SoundingSequence.from_csv`
+from `particula.coupling.sounding_sequence`, supplying `time_origin` and
+`provenance`. Pass the returned object as `{"sequence": sequence}`. For a
+dune, pass it as the existing builder's `sounding` parameter alongside the
+crest height, width and lid. Record the supplied time origin and source in
+the archive provenance. The provider advances as far as the next profile
+knot or reversal of a face flux. Always use the accepted time when stepping
+an external driver. [Turning wind and wet radius](../../studies/examples/gas-transport/turning_sounding.py)
+
+To compare a resolved puff with a gridded one, give both runs the same
+diffusivity and release mass. Enable particle dispersion on the resolved
+run and inspect both variance and boundary losses. [Particle and grid
+dispersion](../../studies/examples/gas-transport/turbulent_puff.py)
+
+For finite bed patches, specify a mass and threshold for each size class.
+Use the remaining bed inventory and the airborne, deposited and exported
+totals to check what each gust removed. [Two gusts over a dune](../../studies/examples/particle-processes/gust_dust_emission.py)
+
+For an independent CFD comparison, import the pressure-corrected face fluxes
+and compare the replay with the scalar transported by the host at the same
+time. The example download supplies the frozen cavity data. [OpenFOAM cavity
+replay](../../studies/validation/prescribed-flow/cavity_replay.py)
