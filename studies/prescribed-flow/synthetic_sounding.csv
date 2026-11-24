@@ -1,0 +1,5 @@
+height_m,temperature_K,pressure_Pa,vapor_kg_per_kg_dry_air,east_m_s,north_m_s
+0,290,100000,0.0080,4,0
+10,289.94,99883,0.0079,7,0.5
+40,289.75,99530,0.0075,8,1
+100,289.35,98830,0.0070,9,2

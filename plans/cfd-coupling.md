@@ -84,6 +84,73 @@ A resolved particle crossing a face retains its identity, represented count, spe
 
 **First resolved-particle cluster experiment.** Use two fixed vertical cells in a parcel stack on a closed or explicitly budgeted column and prescribe uniform upward air velocity. Start small and large particles together just above their shared face. Choose an updraft between their terminal settling speeds so the small particle rises and the large one crosses into the lower cell. With constant properties and no aerosol reactions, compare positions and crossing time to the constant-velocity solution. Check each ID arrives exactly once and that represented number, species masses and charge sum to their initial values including any recorded exits. Run the same test on CPU and CUDA. A single parcel trace suffices for the air history inside that parcel. Following a particle after it leaves requires a neighboring parcel or a spatially sampled flow field.
 
+## Intermediate experiment with prescribed spatial flow
+
+A CPU provider in `particula.coupling.prescribed` samples a steady sounding and
+moves named parcel centers over a Gaussian dune. The air accelerates through
+the reduced cross-section and follows the bed slope. Each center supplies the
+existing parcel replay with temperature, pressure, vapor mixing ratio and
+physical volume for a fixed mass of dry air. Geometric streamlines conserve
+volume flux under an incompressible approximation. Replay diagnoses the
+thermodynamic volume separately. The moving centers represent independent
+air parcels. Their positions alone define neither shared faces nor exchange.
+
+The [dune experiment](../studies/prescribed-flow/dune.py) loads a
+[synthetic sounding](../studies/prescribed-flow/synthetic_sounding.csv).
+From the worktree root, run `PYTHONPATH=. python studies/prescribed-flow/dune.py`
+to generate `.artifacts/prescribed-flow/dune.png` and the bed mass budget.
+An observed radiosonde can supply the same named columns after quality
+control and conversion to the common height datum, SI wind components and
+water mixing ratio per kg dry air. Profile coverage must include the bed
+datum and lid. Wet aerosol initialization requires subsaturation.
+
+The illustrative bed patch releases a specified mass pulse above a friction
+velocity threshold. A grain and fine mineral dust start at a prescribed
+ejection height with size-dependent terminal slip, and first contact with
+the bed ends each track. The bed, airborne and redeposited masses close the
+source budget. Threshold, drag coefficient, launch height and available mass
+are experimental inputs. Calibration of sand flux, ballistic saltation,
+lee-side separation and turbulent particle motion over the dune remain open.
+
+Flat-terrain controls in `particula.coupling.dispersion` describe a
+continuous source with Pasquill A–F open-country widths and an instantaneous
+puff with constant directional diffusivities. The puff can also use a uniform ellipsoid with the same free-air variances.
+The ground-image solutions
+predict cross-section mass flux and puff mass, respectively. Stability class
+sets continuous-plume spread. The dune takes its wind and thermodynamics
+from the sounding. [Briggs widths, Table A-1](https://www.pnnl.gov/main/publications/external/technical_reports/pnnl-20990.pdf)
+· [NOAA Gaussian dispersion overview](https://www.arl.noaa.gov/hysplit/)
+
+### Strategies, stationary grids and recorded forcing
+
+The [parcel and grid guide](../docs/guide/processes/parcels.md#use-one-flow-for-parcels-and-stationary-grids)
+uses the same flow factory for uniform wind, soundings, dunes and replay.
+Concrete builders validate the provider inputs. A spatial flow can move a
+parcel or provide air and shared-face transfers to a stationary x–z section,
+x–y layer or x–y–z volume. Trajectory records retain one parcel identity.
+Independent gridded replay uses accepted intervals and physical volumes with
+stable C-order cell IDs. A host can return a shorter interval or supply
+already transported inventory and its boundary ledger.
+
+Run `PYTHONPATH=. python studies/prescribed-flow/grid_comparison.py` from the
+checkout for the CPU comparison. Add `--device cuda:0 --output .artifacts/prescribed-flow/grid-cuda`
+for native CUDA. The [comparison script](../studies/prescribed-flow/grid_comparison.py)
+writes a parcel CSV/JSON pair, section and volume forcing archives, a figure
+and a numerical summary. It replays each archive and checks the final field
+and resolved-particle inventories. The initial binned dust cloud and the two
+bed pulses have independent budgets.
+
+The analytical controls cover periodic displacement and numerical variance,
+directional diffusion, A–F transverse widths in flat steady flow, uniform
+concentration over the mapped dune, extrusion of both 2D orientations,
+restart around pickup and CPU/CUDA agreement. The finite-volume method is
+first-order upwind with explicit diffusion. Particle motion freezes local
+velocity over a bounded substep and traverses each crossed face. The
+terrain surface is piecewise linear between supplied bed vertices.
+Grid refinement and independent wind and sediment observations address
+different sources of uncertainty. Host-driven EAMxx, multi-rank transport
+and independent CFD data remain future milestones.
+
 ## Later live coupling interface
 
 For live coupling, each owned CFD physics cell maps to one logical Particula box. The solver supplies flow and transports the inventories delegated to it. Particula can move resolved particles through that flow. The parcel and replay studies establish the fields and units that the eventual adapter must carry.
@@ -137,6 +204,8 @@ For the first two-way transport test, use isothermal uptake of a dilute, non-wat
 | 2. Offline replay | Implemented for prescribed water and a named, internally carried organic tracer. The 100-second ascent, cadence sweep, reservoir correction, restart around an injection and humidity sensitivity are in the [replay study](../docs/studies/examples/thermodynamics/parcel-experiments/parcel_replay.py). An independent CFD export remains pending. |
 | 2b. Parcel cluster | Implemented for regular and custom layouts, specified contacts and unequal volumes. [Cluster controls](../particula/dynamics/tests/parcel_cluster_test.py) cover independent histories, dry material, number, water, organic mass, row permutation, overdraw and smooth CUDA sensitivities. |
 | 2c. Differential particle motion | Implemented for creeping-flow terminal settling, constant velocity per cell and axis-aligned bounds. Moving-frame, capacity, corner, periodic, open, deposition and restart cases have [regression controls](../particula/dynamics/tests/parcel_motion_test.py). The [two-cell experiment](../docs/studies/examples/thermodynamics/parcel-experiments/parcel_cluster.py) compares positions and crossing time with the constant-velocity solution. |
+| 2d. Prescribed spatial flow | CPU prototype with flat plume and puff controls, sounding-driven dune trajectories, parcel replay and budgeted pickup/deposition. Compare against measured wind and sediment flux before treating the dune as a predictive case. |
+| 2e. Flow strategies and fixed grids | CPU and CUDA conservative grid transport, particle crossings, two mixing strategies and recorded replay. The comparison uses one prescribed dune atmosphere across moving parcels, a fixed section and a volume. |
 | 3. Define the live interface | Use the parcel and replay results to specify forcing and diagnostics. Add the fields that conservative transport requires, including cell IDs, volumes, tracer inventories and accepted exchange times. Check unequal volumes, empty cells, padded fields and CPU/CUDA parity before connecting a solver. [Condensation validation](../docs/guide/gpu/direct/condensation.md) |
 | 4. DP-SCREAMv1 on NVIDIA | Reproduce an unmodified small BOMEX case using the published script and save a control. Build a minimal EAMxx atmosphere process that calls Particula’s EAMxx adapter, with Python enabled and a Particula-compatible interpreter. Pass one strided device input to Warp and write a distinct diagnostic output, verified by the host. Then register the test tracers in host transport and restart, run passive and active experiments, and compare 1-rank and multi-rank budgets. Confirm the case's forcing, nudging and boundary sources for each budget. [BOMEX script](https://github.com/E3SM-Project/scmlib/blob/master/DPxx_SCREAM_SCRIPTS/run_dpxx_scream_BOMEX.csh) · [DP run guide](https://github.com/E3SM-Project/scmlib/wiki/Running-the-DP-SCREAM-Configuration) |
 | 5. Global EAMxx | Reuse Particula’s EAMxx adapter, the compiled atmosphere process and the tracer names in a short, affordable global atmosphere-only case. Test transport across cubed-sphere face and MPI boundaries, restart, and MPI repartition. Compare mass-weighted global inventories and vertical profiles. Measure incremental bytes per cell, transport cost per tracer, adapter time and total step time against a host-only control. For B bins, S particulate species and G gases, a number-and-species-mass representation requires B × (1 + S) + G transported fields. Use measured costs to choose bin/species counts and resolution before a global storm-resolving run. |
