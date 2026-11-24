@@ -1,7 +1,6 @@
 """Verify the independent OpenFOAM fixture, transfer mapping and replay."""
 
 import json
-from pathlib import Path
 
 import numpy as np
 import pytest
@@ -9,8 +8,9 @@ import warp as wp
 from particula.coupling.cavity_replay import map_cavity, read_cavity
 from particula.coupling.grid_inventory import InventoryLayout, Uptake
 from particula.coupling.grid_run import GridRun
+from particula_docs import documentation_path
 
-DATA = Path(__file__).resolve().parents[3] / "docs/data/prescribed-flow-cavity"
+DATA = documentation_path() / "data/prescribed-flow-cavity"
 
 
 @pytest.fixture
