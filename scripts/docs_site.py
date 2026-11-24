@@ -532,7 +532,7 @@ def prepare():
                     {
                         "text": "Get Particula Helper",
                         "link": BASE + "guide/agent-plugins/",
-                        "icon": "right-arrow",
+                        "attrs": {"class": "particula-helper-link"},
                     },
                     {
                         "text": "Getting started",
