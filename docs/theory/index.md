@@ -4,6 +4,8 @@ Scientific equations, assumptions, and validation comparisons for aerosol work.
 Use the [Guide](../guide/index.md) for APIs and [Studies](../studies/index.md)
 for runnable workflows.
 
+- [Turbulent dispersion and conservative flow replay](dynamics/prescribed-transport.md)
+- [Dust emission from a finite bed](dynamics/surface-emission.md)
 - [Water, aerosol, and motion in a parcel](thermodynamics/parcel-dynamics.md)
 - [Activity and equilibria](thermodynamics/index.md)
 - [Condensation](dynamics/condensation-equations.md)

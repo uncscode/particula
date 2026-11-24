@@ -15,4 +15,5 @@ Start with one mechanism and a quantity it must conserve or transfer. Condensati
 - [Coagulation](coagulation/index.md)
 - [Condensation](condensation/index.md)
 - [Sources and dilution](sources-and-dilution/index.md)
+- [What does the second gust lift from a partly depleted dune?](gust_dust_emission.py)
 <!-- STUDY_LIST_END -->

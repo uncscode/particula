@@ -2119,5 +2119,74 @@
     "render_functions": [],
     "plot_inputs": [],
     "full_canvas": true
+  },
+  "turning-sounding": {
+    "title": "Where does a dust puff go when the wind turns?",
+    "source": "docs/studies/examples/gas-transport/turning_sounding.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1800,
+    "inputs": [
+      "docs/data/prescribed-flow/turning-soundings.csv"
+    ],
+    "invoke": "report = run_example()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nplot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
+  },
+  "turbulent-puff": {
+    "title": "How wide is the same puff on a grid and as individual particles?",
+    "source": "docs/studies/examples/gas-transport/turbulent_puff.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1800,
+    "inputs": [],
+    "invoke": "report = simulate(device=\"cuda:0\")\nplot_results(report)\nplt.show()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nplot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
+  },
+  "gust-dust-emission": {
+    "title": "What does the second gust lift from a partly depleted dune?",
+    "source": "docs/studies/examples/particle-processes/gust_dust_emission.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1800,
+    "inputs": [],
+    "invoke": "report = simulate(device=\"cuda:0\")\nplot_results(report)\nplt.show()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nplot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
+  },
+  "cavity-replay": {
+    "title": "Can Particula reproduce the cavity’s tracer circulation?",
+    "source": "docs/studies/validation/prescribed-flow/cavity_replay.py",
+    "policy": "cuda",
+    "device": "cuda",
+    "timeout": 1800,
+    "inputs": [
+      "docs/data/prescribed-flow-cavity/cavity.npz",
+      "docs/data/prescribed-flow-cavity/cavity.json"
+    ],
+    "invoke": "report = simulate(device=\"cuda:0\")\nplot_results(report)\nplt.show()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nplot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
   }
 }

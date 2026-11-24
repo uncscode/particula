@@ -52,6 +52,38 @@ Positive restoration supplies water to the parcel. Negative restoration removes 
 
 A second, dilute organic vapor can have its own evolving gas inventory. In the worked experiment a prescribed first-order uptake coefficient $k$ (s⁻¹) gives condensed mass $M_{\rm available}(1-e^{-k\Delta t})$ on a step with particles present. A rate source contributes to available gas over that interval. A prescribed pulse enters the gas at the right endpoint and is available for uptake on the next step. Gas plus particulate organic mass accounts for both types of source. The replay study checks that budget before and after restarting at the pulse. [Offline replay and mixed-species budgets](../../studies/examples/thermodynamics/parcel-experiments/parcel_replay.py)
 
+## Turning winds from successive soundings
+
+Each sounding supplies eastward and northward wind, temperature, absolute
+pressure and water-vapor mixing ratio per kg dry air. For field $f$, let
+$I_k(f,z)$ be linear interpolation between the measured heights of profile
+$k$. At a time between records $t_k$ and $t_{k+1}$, prescribe
+
+$$
+f(z,t)=(1-w)I_k(f,z)+wI_{k+1}(f,z),\qquad
+w=\frac{t-t_k}{t_{k+1}-t_k}.
+$$
+
+All profiles must share a height datum and overlap across the modeled
+layer. Interpolating the east and north components permits a continuous
+turn through geographic north. A parcel samples thermodynamics at its
+moving physical height $z(t)$. A stationary cell samples its center. An
+air parcel over the prescribed dune follows a streamline with constant
+upstream height $\eta$, so a change of physical height can change its
+temperature and humidity even within a single sounding. The replay water
+reservoir supplies or removes the mass needed to enforce this humidity.
+
+For uniform horizontal wind the displacement over one linear segment is
+$\Delta\mathbf x=(\mathbf u_a+\mathbf u_b)\Delta t/2$. With the mapped
+dune wind, $J(x)\,dx/dt=U(\eta,t)$, where $J=1-h(x)/H$, $h$ is bed
+height and $H$ is lid height. Integrating $J$ over horizontal displacement
+and the upstream velocity over time gives the parcel endpoint. At a fixed
+grid face the normal volume flux varies linearly between sounding times.
+The grid records a new interval at each knot and each reversal. A positive
+transfer followed by an equal negative transfer can mix two different
+donor concentrations even though the net air volume is zero. [Turning-wind
+experiment](../../studies/examples/gas-transport/turning_sounding.py)
+
 ## Exchange between parcels
 
 Let $Q_{ij}$ (m³/s) be prescribed flow on a directed connection from parcel $i$ to parcel $j$. During a substep, an enabled inventory $X$ moves by the donor fraction

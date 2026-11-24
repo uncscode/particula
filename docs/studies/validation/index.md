@@ -13,5 +13,6 @@ Inspect what was compared, which reference was used, and the range of workloads 
 - [Material properties and reference checks](material-properties/index.md)
 - [Mechanism discovery](chemistry/index.md)
 - [Optics](optics/index.md)
+- [Prescribed flow and CFD replay](prescribed-flow/index.md)
 - [Workflow and release qualification](workflows-and-releases/index.md)
 <!-- STUDY_LIST_END -->
