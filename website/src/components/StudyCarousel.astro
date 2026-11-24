@@ -1,4 +1,5 @@
 ---
+import { Icon } from '@astrojs/starlight/components';
 import { graph, resourcePath } from './topic-model.mjs';
 
 interface Resource {
@@ -54,7 +55,9 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       </button>
       <span class="sr-only" aria-live="polite" aria-atomic="true"></span>
     </div>}
-    {literatureLink && <a class="literature-link" href={`${base}/studies/literature/`}>All literature studies</a>}
+    {literatureLink && <a class="literature-link" href={`${base}/studies/literature/`} aria-label="All literature studies" title="All literature studies">
+      <Icon name="open-book" size="1.125rem" />
+    </a>}
   </div>
 </study-carousel>}
 
@@ -73,17 +76,19 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   .peek img { opacity: .52; }
   .peek:hover img, .peek:focus-visible img { opacity: .85; }
   .slide:hover .study-title, .slide:focus-visible .study-title { text-decoration: underline; text-decoration-thickness: .08em; text-underline-offset: .16em; }
-  .carousel-footer { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .45rem .9rem; }
-  .literature-link { font-size: .85rem; padding-block: .4rem; text-underline-offset: .18em; }
+  .carousel-footer { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; column-gap: .45rem; }
+  .literature-link { grid-column: 2; justify-self: center; display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 50%; color: var(--sl-color-text); }
+  .controls:not([hidden]) + .literature-link { grid-column: 3; justify-self: start; }
+  .literature-link:hover { color: var(--sl-color-text-accent); background: var(--sl-color-gray-6); }
   .carousel-footer > * { margin-block: 0; }
-  .controls { display: flex; justify-content: center; align-items: center; gap: .45rem; }
+  .controls { grid-column: 2; display: flex; justify-content: center; align-items: center; gap: .45rem; }
   .controls[hidden], .play-mark, [data-paused] .pause-mark { display: none; }
   [data-paused] .play-mark { display: inline; }
   .controls button { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; padding: 0; margin: 0; border: 1px solid var(--sl-color-gray-5); border-radius: 50%; background: var(--sl-color-bg); color: var(--sl-color-text); font: inherit; cursor: pointer; }
-  .controls button svg { width: 1rem; height: 1rem; fill: currentColor; }
+  .controls button svg { width: 1rem; height: 1rem; margin: 0; fill: currentColor; }
   .controls button:hover { color: var(--sl-color-text-accent); border-color: currentColor; }
-  button:focus-visible, .slide:focus-visible { outline: 2px solid var(--sl-color-text-accent); outline-offset: 3px; }
-  .position { font-size: .82rem; min-width: 3.8em; text-align: center; font-variant-numeric: tabular-nums; color: var(--sl-color-gray-2); }
+  button:focus-visible, .slide:focus-visible, .literature-link:focus-visible { outline: 2px solid var(--sl-color-text-accent); outline-offset: 3px; }
+  .position { margin: 0; font-size: .82rem; min-width: 3.8em; text-align: center; font-variant-numeric: tabular-nums; color: var(--sl-color-gray-2); }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 </style>
 
