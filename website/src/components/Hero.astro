@@ -22,7 +22,7 @@ const { title = data.title, tagline, actions = [] } = data.hero ?? {};
   h1 { color: var(--sl-color-white); font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 600; white-space: pre-line; }
   .tagline { color: var(--sl-color-gray-2); font-size: clamp(1rem, 1.6vw, 1.2rem); }
   .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
-  .hero-actions :global(.particula-helper-link)::before {
+  .hero-actions :global([data-plugin-icon="particula-helper"])::before {
     content: '';
     width: 1.375rem;
     height: 1.375rem;
