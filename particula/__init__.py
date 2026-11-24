@@ -58,7 +58,7 @@ from particula.box_process import BoxProcess, FunctionProcess, BoxContext
 import logging
 from particula.logger_setup import setup
 
-__version__ = "0.3.5"
+__version__ = "0.3.6"
 
 # Libraries leave logging configuration and output destinations to callers.
 logger = logging.getLogger("particula")

@@ -1,29 +1,22 @@
 # Particula
 
-A simple, fast, and powerful particle simulator for aerosol science.
-
-**Development version:** 0.3.0 · **Requires:** Python 3.12+
+Particula is a Python library for simulating how aerosol particles form, grow,
+collide, and deposit. Combine physical processes in a simulation, track how
+particle size and composition change, and compare the results with laboratory
+measurements and field observations.
 
 <!-- RECENT_NEWS_START -->
-## Recent news
-
-- **Prepared CUDA simulations (development):** upload a native aerosol once,
-  evolve supported processes on the GPU, and download analysis snapshots.
-  Explore [the workflow](https://uncscode.github.io/particula/guide/gpu/prepared/)
-  and [illustrated GPU studies](https://uncscode.github.io/particula/examples/gpu/).
-- **Agent plugins:** added setup, simulation, analysis, and development skills
-  through [Particula Helper](https://uncscode.github.io/particula/guide/agent-plugins/).
-- **Native data storage:** the 0.3.0 development version uses particle, gas, and
-  environment containers. See the [migration guide](https://uncscode.github.io/particula/guide/migration/v0.3.0/).
 <!-- RECENT_NEWS_END -->
 
 ## Installation
+
+Particula requires Python 3.12 or later.
 
 ```bash
 pip install particula
 ```
 
-or via conda:
+Or install from conda-forge.
 
 ```bash
 conda install -c conda-forge particula
@@ -31,13 +24,11 @@ conda install -c conda-forge particula
 
 ## Documentation
 
-[Read the documentation](https://uncscode.github.io/particula/).
-
-- [Explore topics](https://uncscode.github.io/particula/guide/topics/) — browse aerosol properties, processes, modeling methods, and research applications.
-- [Installation](https://uncscode.github.io/particula/guide/getting-started/installation/) and [your first simulation](https://uncscode.github.io/particula/guide/getting-started/first-simulation/)
-- [Examples](https://uncscode.github.io/particula/examples/), [theory](https://uncscode.github.io/particula/theory/), and [API reference](https://uncscode.github.io/particula/api/)
-- [Agent plugins](https://uncscode.github.io/particula/guide/agent-plugins/) and [migration to 0.3.0](https://uncscode.github.io/particula/guide/migration/v0.3.0/)
-- [Contributing](https://uncscode.github.io/particula/contribute/CONTRIBUTING/)
+- [Run your first simulation](https://uncscode.github.io/particula/guide/getting-started/first-simulation/) or explore the [user guide](https://uncscode.github.io/particula/guide/).
+- [Browse literature studies](https://uncscode.github.io/particula/studies/literature/) for comparisons with published experiments and models.
+- [Find runnable studies](https://uncscode.github.io/particula/studies/) and the [theory behind the models](https://uncscode.github.io/particula/theory/).
+- [Explore aerosol topics](https://uncscode.github.io/particula/guide/topics/) or look up a function in the [API reference](https://uncscode.github.io/particula/api/).
+- [Set up Particula Helper](https://uncscode.github.io/particula/guide/agent-plugins/) or [contribute to Particula](https://uncscode.github.io/particula/contribute/CONTRIBUTING/).
 
 ## Citation
 
