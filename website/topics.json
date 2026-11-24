@@ -5134,6 +5134,46 @@
       "start_here": false
     },
     {
+      "source": "docs/studies/literature/particle-water-uptake/mt-soledad/index.md",
+      "title": "At Mt. Soledad, the denuded path counted fewer droplets of nearly unchanged mean size",
+      "topic": "activity-kappa",
+      "also": [
+        "activity-nonideal",
+        "condensation"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "mt-soledad",
+        "runs": [
+          "mt-soledad-droplet-response"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/processes/activity.md",
+            "label": "Water activity and hygroscopicity"
+          },
+          {
+            "target": "docs/guide/processes/condensation.md",
+            "label": "Condensational growth"
+          }
+        ]
+      },
+      "tocFigure": "mt-soledad/graphical-abstract.svg",
+      "tocSource": "studies/mt-soledad/figures/toc.py"
+    },
+    {
+      "source": "docs/studies/literature/particle-water-uptake/mt-soledad/droplet_response.py",
+      "title": "Compare count loss and droplet growth at Mt. Soledad",
+      "topic": "condensation",
+      "also": [
+        "activity-kappa"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
       "source": "docs/studies/literature/mam4xx-coagulation/mam4xx_coagulation.py",
       "title": "Compare MAM4xx and particle-resolved Brownian coagulation",
       "topic": "brownian",

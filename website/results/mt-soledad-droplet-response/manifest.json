@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.7872893679887056,
+  "package_source_sha256": "ed70c732e419c05fc561ac942723e152241d8ed45161f696c43e184615615b45",
+  "scientific_source_sha256": "f2fa51d77bead033405ae3d98ff68893d21cfb1feddb41549d4ca0a29679d979",
+  "input_sha256": {
+    "studies/mt-soledad/figures/optical-spectrum.csv": "70974a150a933f61ffdec6f08012a2cb293df3f03a1521f26026c992a139b6eb",
+    "studies/mt-soledad/figures/optical-summary.csv": "563fc14fa975afd20d5910cfef7ad2b443374663eda450d7d1b462ae72c00283"
+  },
+  "example": "mt-soledad-droplet-response",
+  "fingerprint": "7688129b3806aaeb997b37ac7b8f46a347f892516aa9ce59b4d2896ea8663a63",
+  "source": "docs/studies/literature/particle-water-uptake/mt-soledad/droplet_response.py",
+  "revision": "f799a7e4e6f4dbaf9653ca0fd9a626dc4f3ef1a6",
+  "package_dirty": false,
+  "executed_at": "2026-11-24T02:59:54.470874+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.5",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "text": "Measured: count ratio 0.796 at 0.4%, 0.776 at 0.8%; held diameter change -0.013 \u00b5m\nSize-independent count loss: count ratio 0.796 at 0.4%, 0.796 at 0.8%; held diameter change +0.000 \u00b5m\nCommon growth delay: count ratio 0.796 at 0.4%, 0.999 at 0.8%; held diameter change -1.541 \u00b5m\n"
+      }
+    ],
+    [
+      {
+        "image": "figure-3-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-3-1.png": "1f8aee74da48c99809af71962ce32bf8e8c3785c862c12f64af7b85f6b7e6b97",
+    "executed_source.py": "2d288218db8d3f72973cd10d06c108bb0ece962499843cd9e1f405f69484d6fd",
+    "data.json": "fbde14202d4c66beb4d15ad78fc5df00aba642abecbcd85dadf67d59a5fa4618",
+    "source.py": "2d288218db8d3f72973cd10d06c108bb0ece962499843cd9e1f405f69484d6fd"
+  },
+  "simulation_fingerprint": "f1e80085a4b062bbd1555f832b2e09a1f380317498f149e17e17577067b88be3",
+  "render_versions": {
+    "particula": "0.3.5",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {
+    "studies/mt-soledad/figures/optical-spectrum.csv": "70974a150a933f61ffdec6f08012a2cb293df3f03a1521f26026c992a139b6eb",
+    "studies/mt-soledad/figures/optical-summary.csv": "563fc14fa975afd20d5910cfef7ad2b443374663eda450d7d1b462ae72c00283"
+  },
+  "rendered_at": "2026-11-24T02:59:59.605249+00:00",
+  "render_revision": "f799a7e4e6f4dbaf9653ca0fd9a626dc4f3ef1a6",
+  "render_elapsed_seconds": 3.887704746099189
+}

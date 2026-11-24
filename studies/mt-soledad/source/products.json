@@ -1,0 +1,46 @@
+{
+  "ccn-processed.zip": {
+    "url": "https://library.ucsd.edu/dc/object/bb34239266/_9_1.zip/download",
+    "sha256": "9f94d7f3e1e66bbb7d5149fd3b9e3f2eea776dd9f898f3af6d185ceca9c53800"
+  },
+  "ccn-raw.zip": {
+    "url": "https://library.ucsd.edu/dc/object/bb34239266/_11_1.zip/download",
+    "sha256": "9327375ae24a99f3e1abe6b1fa640ef48fa991894e40c4bfb9397a122f942edf"
+  },
+  "ams.nc": {
+    "url": "https://library.ucsd.edu/dc/object/bb2743661p/_16_1.nc/download",
+    "sha256": "8ed0442af97ac227ae3cdb6f49b8b491ce47aef14f359ce504cae2217b01ee53"
+  },
+  "ams-kappa.nc": {
+    "url": "https://library.ucsd.edu/dc/object/bb2743661p/_37_1.nc/download",
+    "sha256": "cd3167e127762b8873a792f1190a00cb099240a2270ba809d2cc75b18fff531d"
+  },
+  "gas.zip": {
+    "url": "https://library.ucsd.edu/dc/object/bb1788023c/_2_1.zip/download",
+    "sha256": "615ecc549846186fc5eba6634b30d3e9a1c7801e4c5c05be19648339b1d189eb"
+  },
+  "ftir.csv": {
+    "url": "https://library.ucsd.edu/dc/object/bb56775006/_15_1.csv/download",
+    "sha256": "4c21a42d854f5d18660f3c49600b3f90fc28094efd84e84f064f0928bf7e0d9c"
+  },
+  "organic-nitrate.csv": {
+    "url": "https://library.ucsd.edu/dc/object/bb56775006/_19_1.csv/download",
+    "sha256": "9aa93165471d6609dfae04d0827e5bca6a371bacf70963ae23d823442f0cb308"
+  },
+  "xrf.nc": {
+    "url": "https://library.ucsd.edu/dc/object/bb56775006/_12_1.nc/download",
+    "sha256": "e8413d6ffa7cca505528f4df51cdff2475cf9a70edcd96e0ebe1567676a6ec62"
+  },
+  "growth.zip": {
+    "url": "https://library.ucsd.edu/dc/object/bb35956742/_7_1.zip/download",
+    "sha256": "e9036e09d47303347213dcec5bd5357822801f218d46b2c22cdc6688e3e801e6"
+  },
+  "htdma-summary.png": {
+    "url": "https://library.ucsd.edu/dc/object/bb35956742/_6_1.png/download",
+    "sha256": "e2028846888b7e8a98ff6d4fd0243387bc8fded965cae5afa24c7cb4730b7440"
+  },
+  "filter-flow.zip": {
+    "url": "https://library.ucsd.edu/dc/object/bb56775006/_13_1.zip/download",
+    "sha256": null
+  }
+}

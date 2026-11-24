@@ -1,0 +1,4 @@
+clock,cut_nm,held,recipe,closure,size_nm,metric,dates,difference,lower,upper
+raw_UTC,1000,True,low,sodium,60,ae_pred_mean,8,0.0378286583,0.0236836462,0.0520076126
+raw_UTC,1000,True,low,sodium,60,ae_pred_mean_RH_AS,8,0.0359570187,0.0227692485,0.0501898008
+raw_UTC,1000,True,low,sodium,60,ae_pred_mean_RH_NaCl,8,0.0316894761,0.0174601876,0.046942358

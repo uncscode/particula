@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Droplets counted after gas removal at Mt. Soledad</title>
+  <desc id="desc">Illustrated coastal hillside and sampling inlet. For 120–250 nm selected particles at 0.8% supersaturation, normalized optical response is 0.78 of bypass. Diameter-scaled circles show nearly identical mean detected droplet diameters of 5.18 and 5.17 micrometres. SS denotes supersaturation.</desc>
+  <defs>
+    <clipPath id="coast"><rect x="0" y="0" width="300" height="100"/></clipPath>
+  </defs>
+  <rect width="300" height="300" fill="#FBF2E3"/>
+  <g font-family="DejaVu Sans, sans-serif" fill="#243E43">
+    <text x="16" y="27" font-size="15.5" font-weight="bold">Mt. Soledad</text>
+    <text x="16" y="44" font-size="10.2">120–250 nm aerosol · 0.8% SS</text>
+    <g transform="translate(258,14)"><image width="22.5" height="17.1" aria-hidden="true" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMyIgZGF0YS1uYW1lPSJMYXllciAzIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OC45MyAzNy4xMSI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogIzExNWY1YTsKICAgICAgfQogICAgPC9zdHlsZT4KICA8L2RlZnM+CiAgPGNpcmNsZSBjbGFzcz0iY2xzLTEiIGN4PSI0LjU5IiBjeT0iNC41OSIgcj0iNC41OSIvPgogIDxjaXJjbGUgY2xhc3M9ImNscy0xIiBjeD0iMTguMzQiIGN5PSI0LjU5IiByPSI0LjU5Ii8+CiAgPGNpcmNsZSBjbGFzcz0iY2xzLTEiIGN4PSI0LjU5IiBjeT0iMTguMzQiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjMxLjU2IiBjeT0iMzIuNTMiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjQ0LjI4IiBjeT0iMTguNzgiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjQ0LjI4IiBjeT0iNS4wMiIgcj0iNC41OSIvPgogIDxjaXJjbGUgY2xhc3M9ImNscy0xIiBjeD0iNC41OSIgY3k9IjMyLjA5IiByPSI0LjU5Ii8+Cjwvc3ZnPg=="/></g>
+    <g clip-path="url(#coast)" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M0 77 H121 L135 99 H0Z" fill="#D9E5DE"/>
+      <path d="M0 78 H114 M9 84h18 m17 4h20 m-47 6h19 m45-13h11" fill="none" stroke="#617679" stroke-width="1.1"/>
+      <path d="M39 100 Q73 77 89 79 Q104 81 130 69 Q154 56 175 59 Q197 61 212 54 Q241 45 261 59 Q281 71 300 68 V100Z" fill="#CAD9D2" stroke="#617679" stroke-width="1.3"/>
+      <path d="M77 102 Q103 82 126 84 Q148 84 163 77 Q182 64 205 66 Q226 68 243 62 Q271 51 300 62 V104Z" fill="#C2CBB8" stroke="#536962" stroke-width="1.3"/>
+      <path d="M125 100 Q147 95 162 87 Q177 78 196 80 Q211 80 222 76 Q253 60 285 68 L300 70 V104Z" fill="#A6B5A6"/>
+      <path d="M212 58h20v9h-20z" fill="#FBF2E3" stroke="#243E43" stroke-width="1.4"/>
+      <path d="M210 58l4-3h16l4 3 M224 55V41m-4 1h8m-7-2h6" fill="none" stroke="#243E43" stroke-width="1.6"/>
+    </g>
+    <g text-anchor="middle">
+      <text x="80" y="119" font-size="13" font-weight="bold">Bypass</text>
+      <text x="220" y="119" font-size="13" font-weight="bold">Denuder</text>
+      <g fill="#CAD9D2" stroke="#135963" stroke-width="1.8">
+        <circle cx="80" cy="153" r="22"/><circle cx="220" cy="153" r="21.9452"/>
+      </g>
+      <g stroke="#FBF2E3" stroke-width="3.3" stroke-linecap="round" fill="none">
+        <path d="M66 150q1-8 9-11 M206 150q1-8 9-11"/>
+      </g>
+      <text x="80" y="194" font-size="16.5" font-weight="bold">5.18 µm</text>
+      <text x="220" y="194" font-size="16.5" font-weight="bold">5.17 µm</text>
+      <text x="150" y="213" font-size="11">Mean detected droplet diameter</text>
+    </g>
+    <path d="M16 227h268" fill="none" stroke="#B6B6A6"/>
+    <text x="16" y="246" font-size="11.0">Relative droplet count response</text>
+    <path d="M16 263h104 M160 263h104" stroke="#D9D8C8" stroke-width="8"/>
+    <path d="M16 263h104" stroke="#243E43" stroke-width="8"/>
+    <path d="M160 263h80.6955" stroke="#135963" stroke-width="8"/>
+    <text x="16" y="285" font-size="12.4" font-weight="bold">1.00</text>
+    <text x="160" y="285" font-size="12.4" font-weight="bold">0.78</text>
+  </g>
+</svg>

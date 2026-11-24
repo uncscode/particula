@@ -1,0 +1,9 @@
+source,floor,model,counted_fraction,delay_s,delayed_fraction
+selected,0.5,unchanged,1,0,0
+selected,0.5,scalar_loss,0.7962667346,0,0
+selected,0.5,scalar_count_efficiency,0.7962667346,0,0
+selected,0.5,never_activated_subset,0.7962667346,0,0
+selected,0.5,uniform_amplitude,1,1.600231715,1
+selected,0.5,uniform_joint,1,0.01984824437,1
+selected,0.5,thinning_plus_delay,0.7905441242,0.0198199962,1
+selected,0.5,partially_delayed,1,7.151240668,0.2106558748

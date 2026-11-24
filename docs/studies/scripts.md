@@ -40,6 +40,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Compare activity rules along a composition path](examples/thermodynamics/particle-properties/activity_functions.py)
 - [Compare chamber geometry and competing particle processes](examples/particle-processes/wall-loss/wall_loss_tutorial.py)
 - [Compare coagulation after matching distribution units](tutorials/coagulation-populations/coagulation_4_compared.py)
+- [Compare count loss and droplet growth at Mt. Soledad](literature/particle-water-uptake/mt-soledad/droplet_response.py)
 - [Compare drizzle fall speeds and model evaporating drop sizes](literature/drizzle-settling/drizzle_settling.py)
 - [Compare ideal and nonideal organic activity](examples/thermodynamics/activity/bat_activity_example.py)
 - [Compare MAM4xx and particle-resolved Brownian coagulation](literature/mam4xx-coagulation/mam4xx_coagulation.py)
