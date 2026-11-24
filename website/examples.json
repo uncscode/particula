@@ -2065,5 +2065,19 @@
       "particula/gpu/kernels/condensation.py",
       "particula/particles/prepared_activity.py"
     ]
+  },
+  "cloud-1833-growth-laws": {
+    "title": "Compare particle capture laws at the same incoming flux",
+    "source": "docs/studies/literature/cloud-1833/growth_law_comparison.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 120,
+    "inputs": [
+      "studies/cloud-1833/full-transfer/stage-scores.csv"
+    ],
+    "input_destinations": {
+      "studies/cloud-1833/full-transfer/stage-scores.csv": "stage-scores.csv"
+    },
+    "full_canvas": true
   }
 }

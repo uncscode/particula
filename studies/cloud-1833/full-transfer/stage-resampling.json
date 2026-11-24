@@ -1,0 +1,14 @@
+[
+  {
+    "segment": "excimer_led",
+    "vapor_error_factor_over_attraction": 1.4413626743687311,
+    "low": 1.2237372842735255,
+    "high": 1.6588974901367963
+  },
+  {
+    "segment": "mixed",
+    "vapor_error_factor_over_attraction": 0.965620480008505,
+    "low": 0.9347604475726429,
+    "high": 0.9959285148375173
+  }
+]

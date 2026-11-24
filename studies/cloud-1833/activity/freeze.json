@@ -1,0 +1,32 @@
+{
+  "revision": "af0dc67bf7",
+  "scenarios": [
+    [
+      "original",
+      1.0
+    ],
+    [
+      "aiomfac",
+      1.0
+    ],
+    [
+      "aiomfac",
+      0.5
+    ],
+    [
+      "aiomfac",
+      0.0
+    ],
+    [
+      "dry",
+      1.0
+    ]
+  ],
+  "decision": "Keep all calibrated and uncalibrated measurement endpoints, dry control and intermediate retention; no excimer-based elimination.",
+  "cpu_port": "direct homogeneous liquid: fixed fully neutralized sulfate",
+  "device": "NVIDIA GeForce RTX 5060",
+  "cuda_boxes": 44,
+  "max_balance_error": 6.735696112800475e-15,
+  "baseline_max_abs_density_difference": 1.0186340659856796e-10,
+  "elapsed_s": 22.368808645987883
+}

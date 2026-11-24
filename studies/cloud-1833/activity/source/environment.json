@@ -1,0 +1,13 @@
+{
+  "revision": "af0dc67bf7faa3013292659ee15872483a0a6d9a",
+  "platform": "linux",
+  "python": "3.12.12",
+  "numpy": "2.3.4",
+  "scipy": "1.16.2",
+  "pandas": "2.3.3",
+  "warp": "1.11.1",
+  "matplotlib": "3.10.7",
+  "cuda_device": "NVIDIA GeForce RTX 5060",
+  "native_cuda_compiler_arch": "sm_120",
+  "activity_backend": "particula-aiomfac bundled in the pinned checkout"
+}

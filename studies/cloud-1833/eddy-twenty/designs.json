@@ -1,0 +1,977 @@
+[
+  {
+    "id": "01-native-rate",
+    "question": "Which native eddy rate fits the final dark size bands?",
+    "reason": "The archived 0.35 coefficient was an empirical scale; fit the native wall parameter directly on an equivalent cylindrical geometry.",
+    "grid": {
+      "eddy": [
+        0.005,
+        0.015,
+        0.03,
+        0.05,
+        0.08,
+        0.15,
+        0.4,
+        1
+      ]
+    },
+    "test": [
+      "X",
+      "18"
+    ]
+  },
+  {
+    "id": "02-local-profile",
+    "question": "Where is the dark-stage minimum between neighboring eddy rates?",
+    "reason": "The coarse fit selected 0.05 per second. Resolve its local profile and compare the first and sustained crossings.",
+    "grid": {
+      "eddy": [
+        0.03,
+        0.035,
+        0.04,
+        0.045,
+        0.05,
+        0.055,
+        0.06,
+        0.065,
+        0.07
+      ]
+    },
+    "parent": "01-native-rate",
+    "test": [
+      "X",
+      "18"
+    ]
+  },
+  {
+    "id": "03-all-dark-channels",
+    "question": "Does fitting each measured channel across all four dark stages change the rate?",
+    "reason": "Stage 18 band counts preferred 0.045 per second. Give each stage equal weight and score the 52 channels from 9.9 to 63.5 nm.",
+    "grid": {
+      "eddy": [
+        0.02,
+        0.03,
+        0.04,
+        0.045,
+        0.05,
+        0.06,
+        0.075,
+        0.09,
+        0.12
+      ]
+    },
+    "fit": [
+      {
+        "window": "7",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "13",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "16",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "18",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "18"
+    ]
+  },
+  {
+    "id": "04-hold-final-dark",
+    "question": "Can the three earlier dark intervals predict the terminal decay?",
+    "reason": "The pooled channel fit selected 0.05 per second. Omit stage 18 from estimation, then evaluate its separately initialized spectrum and the continuous trajectory.",
+    "grid": {
+      "eddy": [
+        0.02,
+        0.03,
+        0.04,
+        0.05,
+        0.06,
+        0.075,
+        0.09,
+        0.12
+      ]
+    },
+    "fit": [
+      {
+        "window": "7",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "13",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "16",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "18"
+    ]
+  },
+  {
+    "id": "05-small-channel",
+    "question": "Does the same eddy parameter fit the smallest observed particles?",
+    "reason": "Holding back the terminal dark stage preserved 0.05 per second. Test the extrapolation to 7.7\u20139.52 nm with flagged missing readings excluded.",
+    "grid": {
+      "eddy": [
+        0.02,
+        0.035,
+        0.05,
+        0.075,
+        0.1,
+        0.15,
+        0.22,
+        0.35
+      ]
+    },
+    "fit": [
+      {
+        "window": "7",
+        "channels_nm": [
+          7.6,
+          9.6
+        ],
+        "floor": 2
+      },
+      {
+        "window": "13",
+        "channels_nm": [
+          7.6,
+          9.6
+        ],
+        "floor": 2
+      },
+      {
+        "window": "16",
+        "channels_nm": [
+          7.6,
+          9.6
+        ],
+        "floor": 2
+      },
+      {
+        "window": "18",
+        "channels_nm": [
+          7.6,
+          9.6
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "18"
+    ]
+  },
+  {
+    "id": "06-small-growth",
+    "question": "Could uncertainty in growth account for the higher small-channel eddy estimate?",
+    "reason": "The small channels selected 0.15 per second and delayed the later crossing to +42 minutes. Fit the wall rate jointly with subthreshold capture.",
+    "grid": {
+      "eddy": [
+        0.035,
+        0.05,
+        0.075,
+        0.1,
+        0.15,
+        0.22
+      ],
+      "low_capture": [
+        0.85,
+        1,
+        1.15
+      ]
+    },
+    "fit": [
+      {
+        "window": "7",
+        "channels_nm": [
+          7.6,
+          9.6
+        ],
+        "floor": 2
+      },
+      {
+        "window": "13",
+        "channels_nm": [
+          7.6,
+          9.6
+        ],
+        "floor": 2
+      },
+      {
+        "window": "16",
+        "channels_nm": [
+          7.6,
+          9.6
+        ],
+        "floor": 2
+      },
+      {
+        "window": "18",
+        "channels_nm": [
+          7.6,
+          9.6
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "18"
+    ]
+  },
+  {
+    "id": "07-dilution-profile",
+    "question": "How strongly does fixed chamber dilution determine the fitted eddy parameter?",
+    "reason": "The small-channel rate moved when capture varied. Return to the larger channels and profile \u00b110% dilution with nominal capture.",
+    "grid": {
+      "eddy": [
+        0.015,
+        0.025,
+        0.035,
+        0.045,
+        0.05,
+        0.065,
+        0.085,
+        0.11,
+        0.15
+      ],
+      "dilution": [
+        0.9,
+        1,
+        1.1
+      ]
+    },
+    "fit": [
+      {
+        "window": "7",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "13",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "16",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "18",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "18"
+    ]
+  },
+  {
+    "id": "08-wall-geometry",
+    "question": "How much does geometric representation change the fitted eddy rate while the measured flow is fixed?",
+    "reason": "Dilution traded against wall transport. Restore nominal dilution and independently refit the effective cylinder, nominal-height cylinder, volume-matched square box, and volume-matched sphere.",
+    "grid": {
+      "shape": [
+        "cylinder",
+        "height4",
+        "volume-box",
+        "sphere"
+      ],
+      "eddy": [
+        0.025,
+        0.035,
+        0.045,
+        0.05,
+        0.055,
+        0.065,
+        0.075,
+        0.09
+      ]
+    },
+    "fit": [
+      {
+        "window": "7",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "13",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "16",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "18",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "18"
+    ]
+  },
+  {
+    "id": "09-external-law",
+    "question": "Does an independently reported CLOUD wall coefficient reproduce this run?",
+    "reason": "Geometry can be offset by changing the eddy rate. Freeze the effective cylinder and compare its dark fit with the prior empirical scale and the published 0.770 SI square-root-diffusion coefficient.",
+    "grid": {},
+    "variants": [
+      {
+        "scale": 0.35
+      },
+      {
+        "eddy": 0.045
+      },
+      {
+        "eddy": 0.05
+      },
+      {
+        "eddy": 0.15
+      },
+      {
+        "eddy": 0.416,
+        "shape": "literature"
+      }
+    ],
+    "fit": [
+      {
+        "window": "7",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "13",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "16",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "18",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "18"
+    ]
+  },
+  {
+    "id": "10-freeze-profile",
+    "question": "Which upper-channel native rate should accompany the small-channel alternative in the pulse tests?",
+    "reason": "The published vapor-scaled curve left the late threshold 134 minutes late. Refine the four-dark-channel optimum on the known cylinder before any pulse scoring.",
+    "grid": {
+      "eddy": [
+        0.045,
+        0.0475,
+        0.05,
+        0.0525,
+        0.055,
+        0.0575,
+        0.06,
+        0.0625
+      ]
+    },
+    "fit": [
+      {
+        "window": "7",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "13",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "16",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "18",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "18"
+    ]
+  },
+  {
+    "id": "11-equal-pulses",
+    "question": "At fixed added number, how much does entry time change crossing of 9.7 nm?",
+    "reason": "Use 700 particles/cm\u00b3, close to 5% of the central stage-11 supply. Track marked lineages entering in equal 12-minute pulses centered 20 minutes before or after the first stage-12 sample.",
+    "grid": {},
+    "parent": "10-freeze-profile",
+    "variants": [
+      {},
+      {
+        "dose": 700,
+        "offset": -20
+      },
+      {
+        "dose": 700,
+        "offset": 20
+      }
+    ],
+    "choice": 0,
+    "test": [
+      "X"
+    ],
+    "keep_all": true
+  },
+  {
+    "id": "12-arrival-window",
+    "question": "Which entry times deliver the most tags above 9.7 nm at the observed 5,000 crossing?",
+    "reason": "A pulse 20 minutes early delivered 374 tagged lineages/cm\u00b3 by the crossing; the +20 minute pulse delivered less than one. Map a wider range, keeping the dose fixed.",
+    "grid": {},
+    "parent": "10-freeze-profile",
+    "variants": [
+      {},
+      {
+        "dose": 700,
+        "offset": -90
+      },
+      {
+        "dose": 700,
+        "offset": -60
+      },
+      {
+        "dose": 700,
+        "offset": -40
+      },
+      {
+        "dose": 700,
+        "offset": -20
+      },
+      {
+        "dose": 700,
+        "offset": 0
+      },
+      {
+        "dose": 700,
+        "offset": 20
+      }
+    ],
+    "choice": 0,
+    "test": [
+      "X"
+    ],
+    "keep_all": true
+  },
+  {
+    "id": "13-peak-arrival",
+    "question": "How narrow is the most effective entry window for the observed crossing?",
+    "reason": "The \u221220 minute cohort delivered more tags at the measured crossing than earlier arrivals or the transition cohort. Resolve the peak in six-minute increments.",
+    "grid": {},
+    "parent": "10-freeze-profile",
+    "variants": [
+      {},
+      {
+        "dose": 700,
+        "offset": -36
+      },
+      {
+        "dose": 700,
+        "offset": -30
+      },
+      {
+        "dose": 700,
+        "offset": -24
+      },
+      {
+        "dose": 700,
+        "offset": -18
+      },
+      {
+        "dose": 700,
+        "offset": -12
+      },
+      {
+        "dose": 700,
+        "offset": -6
+      }
+    ],
+    "choice": 0,
+    "test": [
+      "X"
+    ],
+    "keep_all": true
+  },
+  {
+    "id": "14-pulse-duration",
+    "question": "Does spreading the same pulse over a longer interval change arrival or inferred timing?",
+    "reason": "The \u221218 and \u221224 minute cohorts delivered similar numbers. Hold their central time at \u221220 minutes and vary the width around it.",
+    "grid": {},
+    "parent": "10-freeze-profile",
+    "variants": [
+      {},
+      {
+        "dose": 700,
+        "offset": -20,
+        "width": 6
+      },
+      {
+        "dose": 700,
+        "offset": -20,
+        "width": 12
+      },
+      {
+        "dose": 700,
+        "offset": -20,
+        "width": 24
+      },
+      {
+        "dose": 700,
+        "offset": -20,
+        "width": 40
+      }
+    ],
+    "choice": 0,
+    "test": [
+      "X"
+    ],
+    "keep_all": true
+  },
+  {
+    "id": "15-dose-response",
+    "question": "Is cohort survival linear in pulse size while the threshold time changes nonlinearly?",
+    "reason": "Wider pulses delivered fewer tags but shifted the first crossing only one sample. Reduce and double the 12-minute dose at a fixed early arrival.",
+    "grid": {},
+    "parent": "10-freeze-profile",
+    "variants": [
+      {},
+      {
+        "dose": 175,
+        "offset": -20
+      },
+      {
+        "dose": 350,
+        "offset": -20
+      },
+      {
+        "dose": 700,
+        "offset": -20
+      },
+      {
+        "dose": 1400,
+        "offset": -20
+      }
+    ],
+    "choice": 0,
+    "test": [
+      "X"
+    ],
+    "keep_all": true
+  },
+  {
+    "id": "16-wall-robustness",
+    "question": "Does earlier supply still matter with the faster loss preferred by the small particles?",
+    "reason": "Half the reference dose gives a nearly proportional arrival count. Repeat the full-dose pair at the stage-18 band rate, pooled-channel rate, and small-channel rate.",
+    "grid": {},
+    "parent": "10-freeze-profile",
+    "variants": [
+      {
+        "eddy": 0.045
+      },
+      {
+        "eddy": 0.045,
+        "dose": 700,
+        "offset": -20
+      },
+      {
+        "eddy": 0.045,
+        "dose": 700,
+        "offset": 20
+      },
+      {
+        "eddy": 0.0525
+      },
+      {
+        "eddy": 0.0525,
+        "dose": 700,
+        "offset": -20
+      },
+      {
+        "eddy": 0.0525,
+        "dose": 700,
+        "offset": 20
+      },
+      {
+        "eddy": 0.15
+      },
+      {
+        "eddy": 0.15,
+        "dose": 700,
+        "offset": -20
+      },
+      {
+        "eddy": 0.15,
+        "dose": 700,
+        "offset": 20
+      }
+    ],
+    "choice": 0,
+    "test": [
+      "X"
+    ],
+    "keep_all": true
+  },
+  {
+    "id": "17-equal-age-acid",
+    "question": "After matching cohort age, does the acid history explain the residual early\u2013late survival difference?",
+    "reason": "With measured acid the two cohorts were much closer at age 40 minutes than at the observed threshold. Hold gas acid at 60 million molecules/cm\u00b3 and compare each pulse against its corresponding no-pulse control.",
+    "grid": {},
+    "parent": "10-freeze-profile",
+    "variants": [
+      {},
+      {
+        "dose": 700,
+        "offset": -20
+      },
+      {
+        "dose": 700,
+        "offset": 20
+      },
+      {
+        "constant_acid": 60000000
+      },
+      {
+        "constant_acid": 60000000,
+        "dose": 700,
+        "offset": -20
+      },
+      {
+        "constant_acid": 60000000,
+        "dose": 700,
+        "offset": 20
+      }
+    ],
+    "choice": 0,
+    "test": [
+      "X"
+    ],
+    "keep_all": true
+  },
+  {
+    "id": "18-fixed-total",
+    "question": "Can redistributing the same existing 5 nm entry change both crossings without adding any particles overall?",
+    "reason": "At equal age both pulses had nearly identical survival under fixed acid. Move a finite fraction of the original influx between the two windows with zero net added number.",
+    "grid": {},
+    "parent": "10-freeze-profile",
+    "variants": [
+      {},
+      {
+        "dose": 175,
+        "offset": -20,
+        "remove_offset": 20
+      },
+      {
+        "dose": 175,
+        "offset": 20,
+        "remove_offset": -20
+      },
+      {
+        "dose": 350,
+        "offset": -20,
+        "remove_offset": 20
+      },
+      {
+        "dose": 350,
+        "offset": 20,
+        "remove_offset": -20
+      },
+      {
+        "dose": 700,
+        "offset": -20,
+        "remove_offset": 20
+      },
+      {
+        "dose": 700,
+        "offset": 20,
+        "remove_offset": -20
+      }
+    ],
+    "choice": 0,
+    "test": [
+      "X"
+    ],
+    "keep_all": true
+  },
+  {
+    "id": "19-inlet-transfer",
+    "question": "Does shifting an existing cohort earlier give the same improvement with independently reconstructed inlet shapes?",
+    "reason": "With the direct inlet, moving 350 particles/cm\u00b3 earlier changed the second crossing from +16 to +2 minutes. Compare that same move across central, 4 nm and retrospective 5.9 nm reconstructions.",
+    "grid": {},
+    "parent": "10-freeze-profile",
+    "variants": [
+      {
+        "inlet": "direct"
+      },
+      {
+        "inlet": "direct",
+        "dose": 350,
+        "offset": -20,
+        "remove_offset": 20
+      },
+      {
+        "inlet": "direct",
+        "dose": 350,
+        "offset": 20,
+        "remove_offset": -20
+      },
+      {
+        "inlet": "from4"
+      },
+      {
+        "inlet": "from4",
+        "dose": 350,
+        "offset": -20,
+        "remove_offset": 20
+      },
+      {
+        "inlet": "from4",
+        "dose": 350,
+        "offset": 20,
+        "remove_offset": -20
+      },
+      {
+        "inlet": "from5p9"
+      },
+      {
+        "inlet": "from5p9",
+        "dose": 350,
+        "offset": -20,
+        "remove_offset": 20
+      },
+      {
+        "inlet": "from5p9",
+        "dose": 350,
+        "offset": 20,
+        "remove_offset": -20
+      }
+    ],
+    "choice": 0,
+    "test": [
+      "X"
+    ],
+    "keep_all": true
+  },
+  {
+    "id": "20-refined-rates-pulses",
+    "question": "Do the calibrated eddy rate, tagged arrivals, and the timing shift from redistribution survive finer resolution?",
+    "reason": "All three inlets responded to a 350-particle/cm\u00b3 shift. Refit the upper dark channels and replay the paired pulse, redistribution, and small-channel wall alternatives on 288 cells and six-second steps.",
+    "grid": {},
+    "cells": 288,
+    "variants": [
+      {
+        "eddy": 0.035
+      },
+      {
+        "eddy": 0.045
+      },
+      {
+        "eddy": 0.05
+      },
+      {
+        "eddy": 0.0525
+      },
+      {
+        "eddy": 0.055
+      },
+      {
+        "eddy": 0.0575
+      },
+      {
+        "eddy": 0.065
+      },
+      {
+        "eddy": 0.15
+      },
+      {
+        "eddy": 0.0525,
+        "dose": 700,
+        "offset": -20
+      },
+      {
+        "eddy": 0.0525,
+        "dose": 700,
+        "offset": 20
+      },
+      {
+        "eddy": 0.0525,
+        "dose": 350,
+        "offset": -20,
+        "remove_offset": 20
+      },
+      {
+        "eddy": 0.0525,
+        "dose": 350,
+        "offset": 20,
+        "remove_offset": -20
+      },
+      {
+        "eddy": 0.15,
+        "dose": 700,
+        "offset": -20
+      },
+      {
+        "eddy": 0.15,
+        "dose": 700,
+        "offset": 20
+      },
+      {
+        "eddy": 0.15,
+        "dose": 350,
+        "offset": -20,
+        "remove_offset": 20
+      },
+      {
+        "eddy": 0.15,
+        "dose": 350,
+        "offset": 20,
+        "remove_offset": -20
+      }
+    ],
+    "fit": [
+      {
+        "window": "7",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "13",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "16",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "18",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "18"
+    ],
+    "keep_all": true
+  }
+]

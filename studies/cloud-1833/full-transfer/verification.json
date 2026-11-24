@@ -1,0 +1,12 @@
+{
+  "arrays": "All four segments at both resolutions exactly reproduced",
+  "cpu_gpu_pilot_max": 2.2737367544323206e-13,
+  "cases_per_execution": 25,
+  "seconds_per_execution": [
+    7.730732819996774,
+    7.777941154083237
+  ],
+  "device": "NVIDIA GeForce RTX 5060",
+  "ledger_replay": "identical",
+  "max_relative_number_residual": 1.0219449001797283e-14
+}

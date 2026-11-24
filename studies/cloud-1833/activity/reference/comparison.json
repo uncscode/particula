@@ -1,0 +1,28 @@
+{
+  "Chan1992_standardized_mol_kg": {
+    "n": 2,
+    "mean_absolute_error_aw": 0.013084832407205593,
+    "median_signed_error_aw": 0.013084832407205593
+  },
+  "Clegg1995_standardized_mol_kg": {
+    "n": 14,
+    "mean_absolute_error_aw": 0.012193090671319125,
+    "median_signed_error_aw": 0.010117533596313233
+  },
+  "Tang1994_original_mol_kg": {
+    "n": 24,
+    "mean_absolute_error_aw": 0.005483668623515281,
+    "median_signed_error_aw": -0.006092798109885611
+  },
+  "Tang1994_standardized_mol_kg": {
+    "n": 24,
+    "mean_absolute_error_aw": 0.010936706695468089,
+    "median_signed_error_aw": -0.01151752456327218
+  },
+  "Cheng_band_reading_sensitivity": {
+    "max_outside_cloud_diameter_nm": 3.682683904321872,
+    "min_inside_cloud_diameter_nm": 3.7348086178643207,
+    "points_outside_by_more_than_0p003": 18,
+    "computed_grid_points": 250
+  }
+}

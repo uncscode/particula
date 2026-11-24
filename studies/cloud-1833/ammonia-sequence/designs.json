@@ -1,0 +1,307 @@
+{
+  "00-exchange/dynamic": {
+    "name": "dynamic",
+    "dt": 15
+  },
+  "00-exchange/refined": {
+    "name": "refined",
+    "dt": 7.5,
+    "particle_dt": 4,
+    "grid": 768,
+    "volume": 0.08
+  },
+  "01-abundance/high": {
+    "name": "high",
+    "dt": 15,
+    "ppb": 4
+  },
+  "01-abundance/low": {
+    "name": "low",
+    "dt": 15,
+    "ppb": 1
+  },
+  "02-exchange-clock/fast": {
+    "name": "fast",
+    "dt": 15,
+    "exchange_speed": 10
+  },
+  "02-exchange-clock/slow": {
+    "name": "slow",
+    "dt": 15,
+    "exchange_speed": 0.01
+  },
+  "03-binding/all": {
+    "name": "all",
+    "dt": 15,
+    "energy_shifts": {
+      "(2, 1, 0)": -0.397,
+      "(3, 2, 0)": -1.913,
+      "(4, 3, 0)": -3.93
+    }
+  },
+  "03-binding/small": {
+    "name": "small",
+    "dt": 15,
+    "energy_shifts": {
+      "(2, 1, 0)": -0.397,
+      "(3, 2, 0)": -1.913
+    }
+  },
+  "03-binding/tetramer": {
+    "name": "tetramer",
+    "dt": 15,
+    "energy_shifts": {
+      "(4, 3, 0)": -3.93
+    }
+  },
+  "04-birth-pathways/negative": {
+    "name": "negative",
+    "dt": 15,
+    "neutral_source": 0,
+    "positive_source": 0
+  },
+  "04-birth-pathways/neutral": {
+    "name": "neutral",
+    "dt": 15,
+    "negative_source": 0,
+    "positive_source": 0
+  },
+  "04-birth-pathways/positive": {
+    "name": "positive",
+    "dt": 15,
+    "neutral_source": 0,
+    "negative_source": 0
+  },
+  "05-neutral-embryo/dimer": {
+    "name": "dimer",
+    "dt": 15,
+    "neutral_n": 2,
+    "source_N": 1
+  },
+  "05-neutral-embryo/paired": {
+    "name": "paired",
+    "dt": 15,
+    "neutral_n": 4,
+    "source_N": 4
+  },
+  "05-neutral-embryo/tetramer": {
+    "name": "tetramer",
+    "dt": 15,
+    "neutral_n": 4,
+    "source_N": 3
+  },
+  "06-rate-diameter/full": {
+    "name": "full",
+    "dt": 15,
+    "mature_share": [
+      0,
+      1,
+      0
+    ]
+  },
+  "06-rate-diameter/half": {
+    "name": "half",
+    "dt": 15,
+    "mature_share": [
+      0,
+      0.5,
+      0
+    ]
+  },
+  "06-rate-diameter/quarter": {
+    "name": "quarter",
+    "dt": 15,
+    "mature_share": [
+      0,
+      0.25,
+      0
+    ]
+  },
+  "07-acid-history/all": {
+    "name": "all",
+    "dt": 15,
+    "mature_share": [
+      0,
+      0.75,
+      0
+    ],
+    "measured_acid": "all"
+  },
+  "07-acid-history/embryos": {
+    "name": "embryos",
+    "dt": 15,
+    "mature_share": [
+      0,
+      0.75,
+      0
+    ],
+    "measured_acid": "molecular"
+  },
+  "07-acid-history/reference": {
+    "name": "reference",
+    "dt": 15,
+    "mature_share": [
+      0,
+      0.75,
+      0
+    ]
+  },
+  "08-lamp-mixing/meanbirth": {
+    "name": "meanbirth",
+    "dt": 15,
+    "mature_share": [
+      0,
+      0.75,
+      0
+    ],
+    "measured_acid": "all",
+    "contrast": 0.5,
+    "mix_s": 80,
+    "mean_births": true
+  },
+  "08-lamp-mixing/moderate": {
+    "name": "moderate",
+    "dt": 15,
+    "mature_share": [
+      0,
+      0.75,
+      0
+    ],
+    "measured_acid": "all",
+    "contrast": 0.25,
+    "mix_s": 80
+  },
+  "08-lamp-mixing/strong": {
+    "name": "strong",
+    "dt": 15,
+    "mature_share": [
+      0,
+      0.75,
+      0
+    ],
+    "measured_acid": "all",
+    "contrast": 0.5,
+    "mix_s": 80
+  },
+  "09-ion-turnover/attachment": {
+    "name": "attachment",
+    "dt": 15,
+    "mature_share": [
+      0,
+      0.75,
+      0
+    ],
+    "measured_acid": "all",
+    "contrast": 0.25,
+    "mix_s": 80,
+    "attach": 3
+  },
+  "09-ion-turnover/both": {
+    "name": "both",
+    "dt": 15,
+    "mature_share": [
+      0,
+      0.75,
+      0
+    ],
+    "measured_acid": "all",
+    "contrast": 0.25,
+    "mix_s": 80,
+    "attach": 3,
+    "neutralize": 0.5
+  },
+  "09-ion-turnover/neutralization": {
+    "name": "neutralization",
+    "dt": 15,
+    "mature_share": [
+      0,
+      0.75,
+      0
+    ],
+    "measured_acid": "all",
+    "contrast": 0.25,
+    "mix_s": 80,
+    "neutralize": 0.5
+  },
+  "10-signed-transfer/all_mature": {
+    "name": "all_mature",
+    "dt": 15,
+    "mature_share": [
+      1,
+      0.75,
+      1
+    ],
+    "measured_acid": "all",
+    "contrast": 0.25,
+    "mix_s": 80
+  },
+  "10-signed-transfer/all_mature_refined": {
+    "name": "all_mature_refined",
+    "dt": 7.5,
+    "mature_share": [
+      1,
+      0.75,
+      1
+    ],
+    "measured_acid": "all",
+    "contrast": 0.25,
+    "mix_s": 80,
+    "particle_dt": 4,
+    "grid": 768,
+    "volume": 0.08
+  },
+  "10-signed-transfer/all_slow": {
+    "name": "all_slow",
+    "dt": 15,
+    "mature_share": [
+      1,
+      0.75,
+      1
+    ],
+    "measured_acid": "all",
+    "contrast": 0.25,
+    "mix_s": 80,
+    "neutralize": 0.5
+  },
+  "10-signed-transfer/half_mature": {
+    "name": "half_mature",
+    "dt": 15,
+    "mature_share": [
+      0.5,
+      0.75,
+      0.5
+    ],
+    "measured_acid": "all",
+    "contrast": 0.25,
+    "mix_s": 80
+  },
+  "10-signed-transfer/half_slow": {
+    "name": "half_slow",
+    "dt": 15,
+    "mature_share": [
+      0.5,
+      0.75,
+      0.5
+    ],
+    "measured_acid": "all",
+    "contrast": 0.25,
+    "mix_s": 80,
+    "neutralize": 0.5
+  },
+  "10-signed-transfer/half_slow_refined": {
+    "name": "half_slow_refined",
+    "dt": 7.5,
+    "mature_share": [
+      0.5,
+      0.75,
+      0.5
+    ],
+    "measured_acid": "all",
+    "contrast": 0.25,
+    "mix_s": 80,
+    "neutralize": 0.5,
+    "particle_dt": 4,
+    "grid": 768,
+    "volume": 0.08
+  }
+}

@@ -1,0 +1,808 @@
+[
+  {
+    "id": "01-dark-scale",
+    "question": "Which overall wall-loss multiplier reproduces the final dark size bands?",
+    "reason": "The 96-cell pilot reproduced the 32-minute delay. Fit only the independently initialized final dark period and transfer each rate to the light sequence.",
+    "grid": {
+      "scale": [
+        0.2,
+        0.35,
+        0.5,
+        0.7,
+        1,
+        1.43
+      ]
+    },
+    "test": [
+      "X",
+      "18"
+    ]
+  },
+  {
+    "id": "02-wall-shape",
+    "parent": "01-dark-scale",
+    "question": "Can the diameter dependence of wall loss explain residuals across dark size bands?",
+    "reason": "A multiplier of 0.35 predicted the later crossing within six minutes. Check whether allowing a slope changes that transfer.",
+    "grid": {
+      "scale": [
+        0.25,
+        0.35,
+        0.45,
+        0.55
+      ],
+      "tilt": [
+        -0.6,
+        0,
+        0.6
+      ]
+    },
+    "test": [
+      "X",
+      "18"
+    ]
+  },
+  {
+    "id": "03-early-dark",
+    "parent": "02-wall-shape",
+    "question": "Does the first half-hour in darkness select the same deposition law?",
+    "reason": "The slope improving the full dark fit delayed the second crossing from six to thirty minutes. Test which part of the decay demands it.",
+    "grid": {
+      "scale": [
+        0.25,
+        0.35,
+        0.45,
+        0.55
+      ],
+      "tilt": [
+        -1.2,
+        -0.6,
+        0
+      ]
+    },
+    "fit": [
+      {
+        "window": "18",
+        "minutes": [
+          0,
+          28
+        ]
+      }
+    ],
+    "test": [
+      "X",
+      "18"
+    ]
+  },
+  {
+    "id": "04-late-dark",
+    "parent": "03-early-dark",
+    "question": "Does fitting only the second half of the final decay reverse the steep early-law preference?",
+    "reason": "The early half picked the steepest tested slope and moved the first threshold ten minutes late. Keep the same rates and initialization, then score the last 28 minutes.",
+    "grid": {
+      "scale": [
+        0.25,
+        0.35,
+        0.45,
+        0.55
+      ],
+      "tilt": [
+        -1.2,
+        -0.6,
+        0
+      ]
+    },
+    "fit": [
+      {
+        "window": "18",
+        "minutes": [
+          28.01,
+          57
+        ]
+      }
+    ],
+    "test": [
+      "X",
+      "18"
+    ]
+  },
+  {
+    "id": "05-other-dark",
+    "parent": "04-late-dark",
+    "question": "Do dark interruptions earlier in the excimer sequence predict the final decay and rise?",
+    "reason": "Both final-dark halves favored the steepest slope. Independently initialize stages 13 and 16 and give each interruption equal weight.",
+    "grid": {
+      "scale": [
+        0.2,
+        0.35,
+        0.5,
+        0.7
+      ],
+      "tilt": [
+        -1.2,
+        -0.6,
+        0,
+        0.6
+      ]
+    },
+    "fit": [
+      {
+        "window": "13"
+      },
+      {
+        "window": "16"
+      }
+    ],
+    "test": [
+      "X",
+      "18"
+    ]
+  },
+  {
+    "id": "06-mercury-dark",
+    "parent": "05-other-dark",
+    "question": "Does the independent mercury\u2013xenon dark interval identify the slope?",
+    "reason": "The two shorter excimer interruptions preferred the opposite slope. Fit stage 7 by itself to test transfer across lamp histories.",
+    "grid": {
+      "scale": [
+        0.2,
+        0.35,
+        0.5,
+        0.7
+      ],
+      "tilt": [
+        -1.2,
+        -0.6,
+        0,
+        0.6
+      ]
+    },
+    "fit": [
+      {
+        "window": "7"
+      }
+    ],
+    "test": [
+      "X",
+      "18",
+      "7"
+    ]
+  },
+  {
+    "id": "07-channel-decay",
+    "parent": "06-mercury-dark",
+    "question": "What slope follows from fitting the individual diameter channels across four dark intervals?",
+    "reason": "Different dark intervals preferred opposite slopes in broad size bands. Give each 9.9\u201363.5 nm channel equal weight, floor 2 particles/cm\u00b3 per bin, then weight the four stages equally.",
+    "grid": {
+      "scale": [
+        0.25,
+        0.35,
+        0.45,
+        0.55
+      ],
+      "tilt": [
+        -1.2,
+        -0.6,
+        0,
+        0.6
+      ]
+    },
+    "fit": [
+      {
+        "window": "7",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "13",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "16",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "18",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "18"
+    ]
+  },
+  {
+    "id": "08-dilution",
+    "parent": "07-channel-decay",
+    "question": "Can modest changes in dilution be distinguished from the wall-loss rate?",
+    "reason": "Channel errors nearly tied over slopes producing very different crossing times. Profile a \u00b120% dilution sensitivity and refit the wall multiplier.",
+    "grid": {
+      "dilution": [
+        0.8,
+        1,
+        1.2
+      ],
+      "scale": [
+        0.2,
+        0.35,
+        0.5,
+        0.65
+      ]
+    },
+    "fit": [
+      {
+        "window": "7",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "13",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "16",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "18",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "18"
+    ]
+  },
+  {
+    "id": "09-mergers",
+    "parent": "08-dilution",
+    "question": "Could particle mergers account for the remaining diameter-dependent decay?",
+    "reason": "Nominal dilution ranked first. Keep it fixed and compare no mergers, standard Brownian mergers and a doubled rate while refitting the wall scale.",
+    "grid": {
+      "coag": [
+        0,
+        1,
+        2
+      ],
+      "scale": [
+        0.25,
+        0.35,
+        0.45
+      ]
+    },
+    "fit": [
+      {
+        "window": "7",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "13",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "16",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "18",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "18"
+    ]
+  },
+  {
+    "id": "10-dark-growth",
+    "parent": "09-mergers",
+    "question": "How much can continuing sulfuric-acid growth during darkness bias inferred wall loss?",
+    "reason": "The standard merger kernel ranked first but traded against wall scale. Fix it and vary residual dark condensation at the same 5 nm entry.",
+    "grid": {
+      "dark_acid": [
+        0,
+        0.5,
+        1,
+        1.5
+      ],
+      "scale": [
+        0.25,
+        0.35,
+        0.45
+      ]
+    },
+    "fit": [
+      {
+        "window": "7",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "13",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "16",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "18",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "18"
+    ]
+  },
+  {
+    "id": "11-small-dark",
+    "parent": "10-dark-growth",
+    "question": "Can near-threshold dark channels identify relative wall losses below 9.7 nm?",
+    "reason": "Dark acid and merger controls retained their nominal rates. Hold them fixed and score the 7.7\u20139.52 nm channels where extrapolating the upper-band slope matters most.",
+    "grid": {
+      "low_wall": [
+        0.25,
+        0.5,
+        0.75,
+        1,
+        1.25,
+        1.5
+      ]
+    },
+    "fit": [
+      {
+        "window": "7",
+        "channels_nm": [
+          7.6,
+          9.6
+        ],
+        "floor": 2
+      },
+      {
+        "window": "13",
+        "channels_nm": [
+          7.6,
+          9.6
+        ],
+        "floor": 2
+      },
+      {
+        "window": "16",
+        "channels_nm": [
+          7.6,
+          9.6
+        ],
+        "floor": 2
+      },
+      {
+        "window": "18",
+        "channels_nm": [
+          7.6,
+          9.6
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "18"
+    ]
+  },
+  {
+    "id": "12-small-light",
+    "parent": "11-small-dark",
+    "question": "Do the mercury\u2013xenon illuminated spectra require the same loss below 9.7 nm?",
+    "reason": "After excluding eleven missing readings, cycle 11 selected 1.25 instead of 1.50. Include 1.25 explicitly in the earlier-lamp transfer comparison and retain the original test range.",
+    "grid": {
+      "low_wall": [
+        0.5,
+        1,
+        1.25,
+        1.5,
+        2,
+        3
+      ]
+    },
+    "fit": [
+      {
+        "window": "H",
+        "stages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "channels_nm": [
+          7.6,
+          9.6
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "H"
+    ],
+    "initial_reason": "Small dark channels picked the upper edge 1.5. Extend the range and fit the independent earlier lamp sequence using the same channels, before transferring to the excimer."
+  },
+  {
+    "id": "13-growth-below",
+    "parent": "12-small-light",
+    "question": "Can a change in condensational capture below the threshold predict the rise under a different lamp?",
+    "reason": "Unmodified small-particle loss transferred better across the earlier illuminated sequence. Fit a size-localized capture multiplier using its channels below the threshold.",
+    "grid": {
+      "low_capture": [
+        0.7,
+        0.85,
+        1,
+        1.15,
+        1.3
+      ]
+    },
+    "fit": [
+      {
+        "window": "H",
+        "stages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "channels_nm": [
+          7.6,
+          9.6
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "H"
+    ]
+  },
+  {
+    "id": "14-growth-above",
+    "parent": "13-growth-below",
+    "question": "Could excessive growth out of the measured upper channels account for the remaining delay?",
+    "reason": "Changing subthreshold capture to speed the late crossing worsened the earlier-lamp fit. Keep that capture fixed and fit capture above 9.7 nm using upper channels.",
+    "grid": {
+      "high_capture": [
+        0.7,
+        0.85,
+        1,
+        1.15,
+        1.3
+      ]
+    },
+    "fit": [
+      {
+        "window": "H",
+        "stages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "H"
+    ]
+  },
+  {
+    "id": "15-gas-forcing",
+    "parent": "14-growth-above",
+    "question": "Would a different sulfuric-acid time history transfer better than changing capture?",
+    "reason": "Both halves of the diameter range retained nominal capture on the earlier lamp. Compare archived gas forcing alternatives with one common observation-derived entry series.",
+    "grid": {
+      "acid": [
+        "measured_cal",
+        "author_chem",
+        "integrated_chem",
+        "uhel_gapfill"
+      ]
+    },
+    "fit": [
+      {
+        "window": "H",
+        "stages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "channels_nm": [
+          7.6,
+          64
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "H"
+    ]
+  },
+  {
+    "id": "16-inlet-brackets",
+    "parent": "15-gas-forcing",
+    "question": "Can the shape of the 5 nm influx inferred from neighboring channels explain the late crossing?",
+    "reason": "Changing acid histories shifted the second crossing by only two minutes. Compare alternative estimates of entry using only stage 9 for scoring before the rise.",
+    "grid": {
+      "inlet": [
+        "direct",
+        "from4",
+        "from5p9",
+        "balance",
+        "direct_plus_coag",
+        "prior_passages"
+      ]
+    },
+    "fit": [
+      {
+        "window": "9",
+        "channels_nm": [
+          7.6,
+          15
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "11"
+    ]
+  },
+  {
+    "id": "17-inlet-phase",
+    "parent": "16-inlet-brackets",
+    "question": "Is a timing offset in the reconstructed 5 nm influx sufficient to repair the rise?",
+    "reason": "The downstream 5.9 nm reconstruction won stage 9 but still crossed 5,000 thirty minutes late. Shift that inlet by up to two archived samples either way and select on stage 10 before the second threshold.",
+    "grid": {
+      "shift_min": [
+        -4,
+        -2,
+        0,
+        2,
+        4
+      ]
+    },
+    "fit": [
+      {
+        "window": "10",
+        "channels_nm": [
+          7.6,
+          15
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "10",
+      "11"
+    ]
+  },
+  {
+    "id": "18-stage-memory",
+    "parent": "17-inlet-phase",
+    "question": "Is late crossing in stage 12 inherited from the size spectrum entering that stage?",
+    "reason": "A two-minute advance moved the second crossing only two minutes. Compare a continuous trajectory with simulations initialized from the measured stage 11 or 12 spectrum. Keep each inlet and all physics fixed.",
+    "grid": {},
+    "variants": [
+      {
+        "inlet": "direct",
+        "shift_min": 0
+      },
+      {
+        "inlet": "from4",
+        "shift_min": 0
+      },
+      {
+        "inlet": "from5p9",
+        "shift_min": -2
+      }
+    ],
+    "choice": 2,
+    "fit": [
+      {
+        "window": "10",
+        "channels_nm": [
+          7.6,
+          15
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "11",
+      "12"
+    ]
+  },
+  {
+    "id": "19-pulse-sensitivity",
+    "parent": "18-stage-memory",
+    "question": "Does a small error in particle supply before or during the stage-12 plateau have greater leverage over first and sustained crossings?",
+    "reason": "Resetting stage 12 left an 18-minute error for the shifted 5.9 nm inlet and the measurements recrossed the threshold. Perturb the supplied flux by \u00b15% in stage 11 or stage 12 separately. Keep the unperturbed trajectory as the reference.",
+    "grid": {},
+    "variants": [
+      {},
+      {
+        "mid_factor": 0.95
+      },
+      {
+        "mid_factor": 1.05
+      },
+      {
+        "late_factor": 0.95
+      },
+      {
+        "late_factor": 1.05
+      }
+    ],
+    "choice": 0,
+    "fit": [
+      {
+        "window": "10",
+        "channels_nm": [
+          7.6,
+          15
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "12"
+    ]
+  },
+  {
+    "id": "20-refined-transfer",
+    "question": "Do the simple dark calibration and the greater timing sensitivity to stage-11 supply survive grid refinement?",
+    "reason": "On 192 cells, 5% more stage-11 supply advanced the second crossing 14 minutes, versus four minutes for a stage-12 increase. Replay the stage-11 pair on 288 cells with six-second steps, together with the original wall reference and both dark-inferred loss laws. Compare first and sustained thresholds and stage-local restarts.",
+    "cells": 288,
+    "grid": {},
+    "variants": [
+      {
+        "scale": 0.5,
+        "tilt": 0
+      },
+      {
+        "scale": 0.35,
+        "tilt": 0
+      },
+      {
+        "scale": 0.35,
+        "tilt": -0.6
+      },
+      {
+        "scale": 0.35,
+        "tilt": -0.6,
+        "inlet": "from5p9",
+        "shift_min": -2
+      },
+      {
+        "scale": 0.35,
+        "tilt": -0.6,
+        "inlet": "from5p9",
+        "shift_min": -2,
+        "mid_factor": 1.05
+      },
+      {
+        "scale": 0.35,
+        "tilt": -0.6,
+        "inlet": "from5p9",
+        "shift_min": -2,
+        "late_factor": 1.05
+      }
+    ],
+    "choice": 1,
+    "fit": [
+      {
+        "window": "13",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "16",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      },
+      {
+        "window": "18",
+        "channels_nm": [
+          9.8,
+          64
+        ],
+        "floor": 2
+      }
+    ],
+    "test": [
+      "X",
+      "18",
+      "12"
+    ]
+  }
+]

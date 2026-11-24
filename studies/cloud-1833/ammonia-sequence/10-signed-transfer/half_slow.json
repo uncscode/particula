@@ -1,0 +1,13 @@
+{
+  "name": "half_slow",
+  "dt": 15,
+  "mature_share": [
+    0.5,
+    0.75,
+    0.5
+  ],
+  "measured_acid": "all",
+  "contrast": 0.25,
+  "mix_s": 80,
+  "neutralize": 0.5
+}

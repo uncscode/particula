@@ -45,6 +45,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Compare MAM4xx and particle-resolved Brownian coagulation](literature/mam4xx-coagulation/mam4xx_coagulation.py)
 - [Compare neutral salt pairings with Mt. Hua growth measurements](literature/particle-water-uptake/mt-hua/mt_hua_salts.py)
 - [Compare observed isomer timing and conditional organic partitioning](literature/pinic-isomers/pinic_isomers.py)
+- [Compare particle capture laws at the same incoming flux](literature/cloud-1833/growth_law_comparison.py)
 - [Compare two Sea2Cloud event peaks with finite local production](literature/sea2cloud-events/sea2cloud_events.py)
 - [Competition for a finite water-vapor reservoir](tutorials/condensation/condensation_3_massresolved.py)
 - [Condensation in radius bins](tutorials/condensation/condensation_1_bin.py)
