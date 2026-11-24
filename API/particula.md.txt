@@ -56,6 +56,7 @@ Expose prepared simulation types without loading optional runtimes.
 - `particula.aerosol_validation`
 - `particula.box_process`
 - `particula.builder_mixin`
+- `particula.coupling`
 - `particula.cpu_transfer`
 - `particula.dynamics`
 - `particula.equilibria`

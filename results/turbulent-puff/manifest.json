@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 5.524014509981498,
+  "package_source_sha256": "841c1775d6227322e530d09807c54db7f7199d1a51685974cf43799a6ebdca98",
+  "scientific_source_sha256": "28bb842dbc955f89330469f25a8f0a0a026fecdd78fc9f8695dc3de55b4a1735",
+  "input_sha256": {},
+  "example": "turbulent-puff",
+  "fingerprint": "d898f0f06e715bd6bba629d8654f73a5fe5db56af50e9efa8e1d936638fc4d0d",
+  "source": "docs/studies/examples/gas-transport/turbulent_puff.py",
+  "revision": "bac5acf6bb55fdea8df8a7cdb40c9ca488120867",
+  "package_dirty": false,
+  "executed_at": "2026-11-24T16:55:17.185000+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.6",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.coupling.grid_warp d9d0eac load on device 'cuda:0' took 1.15 ms  (cached)\n"
+      },
+      {
+        "image": "figure-7-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "1e39dc12c3a753892d709d2029165857e0142df5acebf5fa68414bbcd5bf7f71",
+    "data.json": "8eeffdf2f7b1c4e9bfcc1fcba33f16562c97e5b0bc8e8eb4ec827058abaac6da",
+    "figure-7-1.png": "bc0959e273926777ba738fbb0c2e61b8ab2768647d4427d6af76d7ee7bef3b64"
+  },
+  "simulation_fingerprint": "8bf26a66d1d082792b1a9a4490c474c39ad2ecebab4f8877e7e55825cc641f0c"
+}

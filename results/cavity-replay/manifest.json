@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 5.381080724997446,
+  "package_source_sha256": "841c1775d6227322e530d09807c54db7f7199d1a51685974cf43799a6ebdca98",
+  "scientific_source_sha256": "28bb842dbc955f89330469f25a8f0a0a026fecdd78fc9f8695dc3de55b4a1735",
+  "input_sha256": {
+    "docs/data/prescribed-flow-cavity/cavity.npz": "a751851b8bbb3583d8a00abe526e0b2c9f12e693d1ab0ab4fe4efea87c77492d",
+    "docs/data/prescribed-flow-cavity/cavity.json": "283058265f572f3702eba521bef8f20e147b750c310c08bf5f435dfeae039651"
+  },
+  "example": "cavity-replay",
+  "fingerprint": "a8e858e0e0cab62f8ca2941f36bc022b401c79b75e2f42dd2100a584305fec6f",
+  "source": "docs/studies/validation/prescribed-flow/cavity_replay.py",
+  "revision": "bac5acf6bb55fdea8df8a7cdb40c9ca488120867",
+  "package_dirty": false,
+  "executed_at": "2026-11-24T16:55:30.339624+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.6",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.coupling.grid_warp d9d0eac load on device 'cuda:0' took 1.22 ms  (cached)\n"
+      },
+      {
+        "image": "figure-5-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "a1d24f3cbc12475550ab24841dfd9afdfbfb51fedd54777caa69abc2eac2076c",
+    "data.json": "7dc59ad89b382ce817bd5efad347cfb44ef39c12c2fc7ab318f821d9874a38f3",
+    "figure-5-1.png": "3d99605ffc62cd9b35d0bd80774ac29c7f501001845d63d32a35864500ba8e28"
+  },
+  "simulation_fingerprint": "8a8e2e9df50811a90ae1d63a31dd19d561f777758610737c5d5180e63cda2460"
+}

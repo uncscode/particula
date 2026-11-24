@@ -61,6 +61,7 @@ Expose prepared simulation types without loading optional runtimes.
 - `particula.aerosol_validation`
 - `particula.box_process`
 - `particula.builder_mixin`
+- `particula.coupling`
 - `particula.cpu_transfer`
 - `particula.dynamics`
 - `particula.equilibria`
@@ -4954,6 +4955,5280 @@ Set wall potential in volts.
 - `self` (`BuilderWallPotentialMixin`) — Self for method chaining.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/builder_mixin.py#L797-L820)
+
+---
+
+# particula.coupling
+
+*module*
+
+Strategies, builders and fixed-grid geometry for prescribed air flows.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/__init__.py#L1-L1)
+
+## particula.coupling.FlowFactory
+
+*class*
+
+```python
+class FlowFactory(StrategyFactoryABC)
+```
+
+Bases: `particula.abc_factory.StrategyFactoryABC`
+
+Re-exported from: `particula.coupling.flow_factory`
+
+Construct an independent builder for each supported flow provider.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L173-L185)
+
+### particula.coupling.FlowFactory.get_builders
+
+*method*
+
+```python
+def get_builders()
+```
+
+Map flow names to fresh builders.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L176-L185)
+
+### particula.coupling.FlowFactory.get_strategy
+
+*method*
+
+```python
+def get_strategy(strategy_type: str, parameters: Optional[Dict[str, Any]] = None) -> StrategyT
+```
+
+Inherited from: `particula.abc_factory.StrategyFactoryABC`
+
+Create a strategy instance using its corresponding builder.
+
+**Parameters**
+
+- `strategy_type` (`str`) — Name of the strategy to build.
+- `parameters` (`Dict[str, Any]`) (default: `None`) — Dictionary of parameters to configure the chosen builder.
+
+**Returns**
+
+- `StrategyT` (`StrategyT`) — The built strategy object corresponding to the specified type.
+
+**Raises**
+
+- `ValueError` — If the `strategy_type` is unknown, or if any required
+parameter is invalid/missing for the chosen builder.
+
+**Examples**
+
+```py title="Strategy Creation Example"
+my_factory = SomeStrategyFactory()
+my_strategy = my_factory.get_strategy(
+    "desired_strategy", {"param_x": 42}
+)
+# my_strategy is now an instance configured with param_x=42
+```
+
+> **References**
+>
+> - "Factory Method Pattern,"
+> [Wikipedia](https://en.wikipedia.org/wiki/Factory_method_pattern)
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_factory.py#L69-L110)
+
+## particula.coupling.FlowGrid
+
+*class* · *dataclass*
+
+```python
+class FlowGrid
+```
+
+Re-exported from: `particula.coupling.grid`
+
+Uniform reference edges and optional piecewise-linear bed elevations.
+
+A singleton axis has the physical thickness in the supplied bounds. For a
+terrain grid the third coordinate spans zero to the level lid in metres.
+Boundaries are ordered west/east, south/north, bottom/top. Open faces
+accept prescribed inlet concentrations; closed faces have zero transfer.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L9-L163)
+
+### particula.coupling.FlowGrid.bed
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+bed: tuple = ()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L22-L22)
+
+### particula.coupling.FlowGrid.boundaries
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+boundaries: tuple = ('closed') * 6
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L21-L21)
+
+### particula.coupling.FlowGrid.bounds
+
+*attribute* · *instance attribute*
+
+```python
+bounds: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L20-L20)
+
+### particula.coupling.FlowGrid.shape
+
+*attribute* · *instance attribute*
+
+```python
+shape: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L19-L19)
+
+### particula.coupling.FlowGrid.centers
+
+*property* · *cached*
+
+```python
+centers
+```
+
+Physical center coordinates (m), one row per cell.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L116-L118)
+
+### particula.coupling.FlowGrid.coordinates
+
+*property* · *cached*
+
+```python
+coordinates
+```
+
+Reference cell centers (ncell,3) in metres.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L85-L92)
+
+### particula.coupling.FlowGrid.edges
+
+*property* · *cached*
+
+```python
+edges
+```
+
+Reference edge coordinates in metres.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L67-L72)
+
+### particula.coupling.FlowGrid.neighbors
+
+*property* · *cached*
+
+```python
+neighbors
+```
+
+Six neighboring row IDs; exterior faces use -1.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L126-L139)
+
+### particula.coupling.FlowGrid.spacing
+
+*property* · *cached*
+
+```python
+spacing
+```
+
+Reference cell widths in metres.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L75-L82)
+
+### particula.coupling.FlowGrid.volume
+
+*property* · *cached*
+
+```python
+volume
+```
+
+Exact physical volume (m³) of each mapped cell.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L121-L123)
+
+### particula.coupling.FlowGrid.__init__
+
+*method*
+
+```python
+def __init__(shape: tuple, bounds: tuple, boundaries: tuple = ('closed') * 6, bed: tuple = ()) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L0-L0)
+
+### particula.coupling.FlowGrid.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Validate geometry and opposite periodic faces before allocation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L24-L64)
+
+### particula.coupling.FlowGrid.face_geometry
+
+*method*
+
+```python
+def face_geometry(side)
+```
+
+Return reference centers and oriented physical area vectors (m²).
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L141-L163)
+
+### particula.coupling.FlowGrid.ground
+
+*method*
+
+```python
+def ground(x)
+```
+
+Piecewise-linear physical bed ordinate in metres.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L94-L98)
+
+### particula.coupling.FlowGrid.jacobian
+
+*method*
+
+```python
+def jacobian(x)
+```
+
+Ratio of physical to reference column thickness.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L100-L104)
+
+### particula.coupling.FlowGrid.world
+
+*method*
+
+```python
+def world(coord)
+```
+
+Convert (...,3) reference metres into world xyz.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L106-L113)
+
+## particula.coupling.FlowStrategy
+
+*class*
+
+```python
+class FlowStrategy
+```
+
+Re-exported from: `particula.coupling.flows`
+
+A forcing provider exposing the operations its data support.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L29-L38)
+
+### particula.coupling.FlowStrategy.interval
+
+*method*
+
+```python
+def interval(grid, start, end, mixing, *, device='cpu')
+```
+
+Offer a grid interval or reject an incompatible provider.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L32-L34)
+
+### particula.coupling.FlowStrategy.trajectory
+
+*method*
+
+```python
+def trajectory(parcel_id)
+```
+
+Return a recorded native parcel history by stable identity.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L36-L38)
+
+**Modules**
+
+- `particula.coupling.cavity_replay`
+- `particula.coupling.dispersion`
+- `particula.coupling.flow_factory`
+- `particula.coupling.flow_replay`
+- `particula.coupling.flows`
+- `particula.coupling.grid`
+- `particula.coupling.grid_inventory`
+- `particula.coupling.grid_run`
+- `particula.coupling.grid_warp`
+- `particula.coupling.particle_dispersion`
+- `particula.coupling.prescribed`
+- `particula.coupling.sounding_sequence`
+- `particula.coupling.surface_emission`
+
+---
+
+# particula.coupling.cavity_replay
+
+*module*
+
+Map a stationary Cartesian OpenFOAM cavity export to SI forcing.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/cavity_replay.py#L1-L1)
+
+## particula.coupling.cavity_replay._UNITS
+
+*attribute* · *module attribute*
+
+```python
+_UNITS = {'time': 's', 'centres': 'm', 'volumes': 'm3', 'face_centres': 'm', 'area_vectors': 'm2', 'phi': 'm3/s', 'velocity': 'm/s', 'scalar': 'kg/m3', 'kinematic_pressure': 'm2/s2'}
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/cavity_replay.py#L14-L24)
+
+## particula.coupling.cavity_replay.CavityReference
+
+*class* · *dataclass*
+
+```python
+class CavityReference
+```
+
+Forcing and independent scalar histories (kg/m³) in grid row order.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/cavity_replay.py#L27-L35)
+
+### particula.coupling.cavity_replay.CavityReference.concentration
+
+*attribute* · *instance attribute*
+
+```python
+concentration: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/cavity_replay.py#L32-L32)
+
+### particula.coupling.cavity_replay.CavityReference.fine_restricted
+
+*attribute* · *instance attribute*
+
+```python
+fine_restricted: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/cavity_replay.py#L34-L34)
+
+### particula.coupling.cavity_replay.CavityReference.forcing
+
+*attribute* · *instance attribute*
+
+```python
+forcing: GridReplay
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/cavity_replay.py#L31-L31)
+
+### particula.coupling.cavity_replay.CavityReference.half_step
+
+*attribute* · *instance attribute*
+
+```python
+half_step: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/cavity_replay.py#L33-L33)
+
+### particula.coupling.cavity_replay.CavityReference.metadata
+
+*attribute* · *instance attribute*
+
+```python
+metadata: dict
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/cavity_replay.py#L35-L35)
+
+### particula.coupling.cavity_replay.CavityReference.__init__
+
+*method*
+
+```python
+def __init__(forcing: GridReplay, concentration: np.ndarray, half_step: np.ndarray, fine_restricted: np.ndarray, metadata: dict) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/cavity_replay.py#L0-L0)
+
+## particula.coupling.cavity_replay._array
+
+*function*
+
+```python
+def _array(data, key, shape, *, integer=False)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/cavity_replay.py#L49-L58)
+
+## particula.coupling.cavity_replay._cell_mapping
+
+*function*
+
+```python
+def _cell_mapping(grid, data)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/cavity_replay.py#L61-L81)
+
+## particula.coupling.cavity_replay._face_rates
+
+*function*
+
+```python
+def _face_rates(grid, data, lookup, diffusivity)
+```
+
+Require a single owner-outward face for every logical cell side.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/cavity_replay.py#L84-L141)
+
+## particula.coupling.cavity_replay.map_cavity
+
+*function*
+
+```python
+def map_cavity(metadata, data)
+```
+
+Map every native scalar step in a stationary cavity export.
+
+Cell IDs may be permuted. Internal face owner/neighbour may be exchanged
+if the area vector and signed flux are reversed together. This adapter
+uses volume-based concentrations and frozen pressure-corrected face rates.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/cavity_replay.py#L144-L214)
+
+## particula.coupling.cavity_replay.read_cavity
+
+*function*
+
+```python
+def read_cavity(directory)
+```
+
+Verify the exported archive SHA-256 before mapping native cell IDs.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/cavity_replay.py#L38-L46)
+
+---
+
+# particula.coupling.dispersion
+
+*module*
+
+Flat, reflecting-ground reference solutions for passive aerosol mass.
+
+The steady plume uses Briggs open-country spreads (PNNL-20990, Table A-1).
+The Gaussian puff solves constant-diffusivity advection and diffusion. A
+uniform ellipsoid provides a finite-width alternative with the same free-air
+second moments. All three assume uniform horizontal wind and a ground image.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/dispersion.py#L1-L1)
+
+## particula.coupling.dispersion._BRIGGS
+
+*attribute* · *module attribute*
+
+```python
+_BRIGGS = {'A': (0.22, 0.2, 0.0, 0.0), 'B': (0.16, 0.12, 0.0, 0.0), 'C': (0.11, 0.08, 0.0002, -0.5), 'D': (0.08, 0.06, 0.0015, -0.5), 'E': (0.06, 0.03, 0.0003, -1.0), 'F': (0.04, 0.016, 0.0003, -1.0)}
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/dispersion.py#L12-L19)
+
+## particula.coupling.dispersion._coordinates
+
+*function*
+
+```python
+def _coordinates(x, y, z, height)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/dispersion.py#L22-L30)
+
+## particula.coupling.dispersion._normal
+
+*function*
+
+```python
+def _normal(distance, sigma)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/dispersion.py#L33-L34)
+
+## particula.coupling.dispersion.gaussian_plume
+
+*function*
+
+```python
+def gaussian_plume(x, y, z, *, rate, wind, height, stability)
+```
+
+Return kg/m³ at downwind x, crosswind y and height z (metres).
+
+rate is the continuous source (kg/s), wind the downwind speed (m/s),
+height the effective source height (m), and stability the Pasquill class
+A–F. The point-source plane and upwind half-space return zero.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/dispersion.py#L37-L64)
+
+## particula.coupling.dispersion.puff_concentration
+
+*function*
+
+```python
+def puff_concentration(x, y, z, *, mass, age, wind, height, diffusivity, shape='gaussian')
+```
+
+Return kg/m³ from one instantaneous release at (0, 0, height) in m.
+
+mass is kg, age is seconds after release, wind is signed x velocity
+(m/s), and diffusivity gives positive x, y, z diffusivities (m²/s).
+A top_hat has uniform density inside an ellipsoid of semi-axes
+sqrt(5) times the Gaussian widths, so both have variance 2 K t in
+free air. Ground reflection folds the vertical distribution.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/dispersion.py#L67-L101)
+
+---
+
+# particula.coupling.flow_factory
+
+*module*
+
+Particula builders for spatial flow and recorded forcing providers.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L1-L1)
+
+## particula.coupling.flow_factory.DuneFlowBuilder
+
+*class*
+
+```python
+class DuneFlowBuilder(SoundingFlowBuilder)
+```
+
+Bases: `particula.coupling.flow_factory.SoundingFlowBuilder`
+
+Build the Gaussian dune with a vertical sounding.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L102-L142)
+
+### particula.coupling.flow_factory.DuneFlowBuilder.height
+
+*attribute* · *instance attribute*
+
+```python
+height = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L109-L109)
+
+### particula.coupling.flow_factory.DuneFlowBuilder.lid
+
+*attribute* · *instance attribute*
+
+```python
+lid = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L109-L109)
+
+### particula.coupling.flow_factory.DuneFlowBuilder.width
+
+*attribute* · *instance attribute*
+
+```python
+width = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L109-L109)
+
+### particula.coupling.flow_factory.DuneFlowBuilder.sounding
+
+*attribute* · *instance attribute*
+
+```python
+sounding = None
+```
+
+Inherited from: `particula.coupling.flow_factory.SoundingFlowBuilder`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L66-L66)
+
+### particula.coupling.flow_factory.DuneFlowBuilder.required_parameters
+
+*attribute* · *instance attribute*
+
+```python
+required_parameters = required_parameters or []
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L51-L51)
+
+### particula.coupling.flow_factory.DuneFlowBuilder.__init__
+
+*method*
+
+```python
+def __init__()
+```
+
+Declare the parameters required by this provider.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L105-L109)
+
+### particula.coupling.flow_factory.DuneFlowBuilder.build
+
+*method*
+
+```python
+def build()
+```
+
+Construct terrain-following forcing.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L133-L142)
+
+### particula.coupling.flow_factory.DuneFlowBuilder.set_height
+
+*method*
+
+```python
+def set_height(value, units='m')
+```
+
+Set crest elevation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L118-L121)
+
+### particula.coupling.flow_factory.DuneFlowBuilder.set_lid
+
+*method*
+
+```python
+def set_lid(value, units='m')
+```
+
+Set lid height above datum.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L128-L131)
+
+### particula.coupling.flow_factory.DuneFlowBuilder.set_sounding
+
+*method*
+
+```python
+def set_sounding(value)
+```
+
+Use either a steady profile or timestamped profiles.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L111-L116)
+
+### particula.coupling.flow_factory.DuneFlowBuilder.set_width
+
+*method*
+
+```python
+def set_width(value, units='m')
+```
+
+Set the Gaussian standard deviation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L123-L126)
+
+### particula.coupling.flow_factory.DuneFlowBuilder.check_keys
+
+*method*
+
+```python
+def check_keys(parameters: dict[str, Any]) -> None
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+Check if the keys are present and valid.
+
+**Parameters**
+
+- `parameters` (`dict[str, Any]`) — The parameters dictionary to check.
+
+**Raises**
+
+- `ValueError` — If any required key is missing or if trying to set
+an invalid parameter.
+
+**Examples**
+
+```py
+builder = Builder()
+builder.check_keys({
+    "parameter1": 1,
+    "parameter2": 2,
+})
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L53-L94)
+
+### particula.coupling.flow_factory.DuneFlowBuilder.pre_build_check
+
+*method*
+
+```python
+def pre_build_check() -> None
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+Check if all required attribute parameters are set before building.
+
+**Raises**
+
+- `ValueError` — If any required parameter is missing.
+
+**Examples**
+
+```py
+builder = Builder()
+builder.pre_build_check()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L132-L151)
+
+### particula.coupling.flow_factory.DuneFlowBuilder.set_parameters
+
+*method*
+
+```python
+def set_parameters(parameters: dict[str, Any]) -> BuilderABC
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+Set parameters from a dictionary, handling any '_units' suffix.
+
+**Parameters**
+
+- `parameters` (`dict[str, Any]`) — The parameters dictionary to set.
+
+**Returns**
+
+- `BuilderABC` (`BuilderABC`) — This builder object with the set parameters.
+
+**Raises**
+
+- `ValueError` — If any required key is missing.
+- `Warning` — If using default units for any parameter.
+
+**Examples**
+
+```py
+builder = Builder().set_parameters({
+    "parameter1": 1,
+    "parameter2": 2,
+    "parameter2_units": "K",
+})
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L96-L130)
+
+## particula.coupling.flow_factory.FlowFactory
+
+*class*
+
+```python
+class FlowFactory(StrategyFactoryABC)
+```
+
+Bases: `particula.abc_factory.StrategyFactoryABC`
+
+Construct an independent builder for each supported flow provider.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L173-L185)
+
+### particula.coupling.flow_factory.FlowFactory.get_builders
+
+*method*
+
+```python
+def get_builders()
+```
+
+Map flow names to fresh builders.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L176-L185)
+
+### particula.coupling.flow_factory.FlowFactory.get_strategy
+
+*method*
+
+```python
+def get_strategy(strategy_type: str, parameters: Optional[Dict[str, Any]] = None) -> StrategyT
+```
+
+Inherited from: `particula.abc_factory.StrategyFactoryABC`
+
+Create a strategy instance using its corresponding builder.
+
+**Parameters**
+
+- `strategy_type` (`str`) — Name of the strategy to build.
+- `parameters` (`Dict[str, Any]`) (default: `None`) — Dictionary of parameters to configure the chosen builder.
+
+**Returns**
+
+- `StrategyT` (`StrategyT`) — The built strategy object corresponding to the specified type.
+
+**Raises**
+
+- `ValueError` — If the `strategy_type` is unknown, or if any required
+parameter is invalid/missing for the chosen builder.
+
+**Examples**
+
+```py title="Strategy Creation Example"
+my_factory = SomeStrategyFactory()
+my_strategy = my_factory.get_strategy(
+    "desired_strategy", {"param_x": 42}
+)
+# my_strategy is now an instance configured with param_x=42
+```
+
+> **References**
+>
+> - "Factory Method Pattern,"
+> [Wikipedia](https://en.wikipedia.org/wiki/Factory_method_pattern)
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_factory.py#L69-L110)
+
+## particula.coupling.flow_factory.GridReplayBuilder
+
+*class*
+
+```python
+class GridReplayBuilder(TrajectoryReplayBuilder)
+```
+
+Bases: `particula.coupling.flow_factory.TrajectoryReplayBuilder`
+
+Load accepted grid forcing from its numerical archive.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L164-L170)
+
+### particula.coupling.flow_factory.GridReplayBuilder.path
+
+*attribute* · *instance attribute*
+
+```python
+path = None
+```
+
+Inherited from: `particula.coupling.flow_factory.TrajectoryReplayBuilder`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L151-L151)
+
+### particula.coupling.flow_factory.GridReplayBuilder.required_parameters
+
+*attribute* · *instance attribute*
+
+```python
+required_parameters = required_parameters or []
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L51-L51)
+
+### particula.coupling.flow_factory.GridReplayBuilder.build
+
+*method*
+
+```python
+def build()
+```
+
+Validate and return exact gridded forcing.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L167-L170)
+
+### particula.coupling.flow_factory.GridReplayBuilder.__init__
+
+*method*
+
+```python
+def __init__()
+```
+
+Inherited from: `particula.coupling.flow_factory.TrajectoryReplayBuilder`
+
+Declare the parameters required by this provider.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L148-L151)
+
+### particula.coupling.flow_factory.GridReplayBuilder.set_path
+
+*method*
+
+```python
+def set_path(value)
+```
+
+Inherited from: `particula.coupling.flow_factory.TrajectoryReplayBuilder`
+
+Select the forcing archive.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L153-L156)
+
+### particula.coupling.flow_factory.GridReplayBuilder.check_keys
+
+*method*
+
+```python
+def check_keys(parameters: dict[str, Any]) -> None
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+Check if the keys are present and valid.
+
+**Parameters**
+
+- `parameters` (`dict[str, Any]`) — The parameters dictionary to check.
+
+**Raises**
+
+- `ValueError` — If any required key is missing or if trying to set
+an invalid parameter.
+
+**Examples**
+
+```py
+builder = Builder()
+builder.check_keys({
+    "parameter1": 1,
+    "parameter2": 2,
+})
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L53-L94)
+
+### particula.coupling.flow_factory.GridReplayBuilder.pre_build_check
+
+*method*
+
+```python
+def pre_build_check() -> None
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+Check if all required attribute parameters are set before building.
+
+**Raises**
+
+- `ValueError` — If any required parameter is missing.
+
+**Examples**
+
+```py
+builder = Builder()
+builder.pre_build_check()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L132-L151)
+
+### particula.coupling.flow_factory.GridReplayBuilder.set_parameters
+
+*method*
+
+```python
+def set_parameters(parameters: dict[str, Any]) -> BuilderABC
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+Set parameters from a dictionary, handling any '_units' suffix.
+
+**Parameters**
+
+- `parameters` (`dict[str, Any]`) — The parameters dictionary to set.
+
+**Returns**
+
+- `BuilderABC` (`BuilderABC`) — This builder object with the set parameters.
+
+**Raises**
+
+- `ValueError` — If any required key is missing.
+- `Warning` — If using default units for any parameter.
+
+**Examples**
+
+```py
+builder = Builder().set_parameters({
+    "parameter1": 1,
+    "parameter2": 2,
+    "parameter2_units": "K",
+})
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L96-L130)
+
+## particula.coupling.flow_factory.SoundingFlowBuilder
+
+*class*
+
+```python
+class SoundingFlowBuilder(BuilderABC)
+```
+
+Bases: `particula.abc_builder.BuilderABC`
+
+Build from a normalized SI sounding object or CSV path.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L60-L78)
+
+### particula.coupling.flow_factory.SoundingFlowBuilder.sounding
+
+*attribute* · *instance attribute*
+
+```python
+sounding = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L66-L66)
+
+### particula.coupling.flow_factory.SoundingFlowBuilder.required_parameters
+
+*attribute* · *instance attribute*
+
+```python
+required_parameters = required_parameters or []
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L51-L51)
+
+### particula.coupling.flow_factory.SoundingFlowBuilder.__init__
+
+*method*
+
+```python
+def __init__()
+```
+
+Declare the parameters required by this provider.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L63-L66)
+
+### particula.coupling.flow_factory.SoundingFlowBuilder.build
+
+*method*
+
+```python
+def build()
+```
+
+Construct horizontally uniform profile forcing.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L75-L78)
+
+### particula.coupling.flow_factory.SoundingFlowBuilder.set_sounding
+
+*method*
+
+```python
+def set_sounding(value)
+```
+
+Supply a sounding or normalized CSV.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L68-L73)
+
+### particula.coupling.flow_factory.SoundingFlowBuilder.check_keys
+
+*method*
+
+```python
+def check_keys(parameters: dict[str, Any]) -> None
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+Check if the keys are present and valid.
+
+**Parameters**
+
+- `parameters` (`dict[str, Any]`) — The parameters dictionary to check.
+
+**Raises**
+
+- `ValueError` — If any required key is missing or if trying to set
+an invalid parameter.
+
+**Examples**
+
+```py
+builder = Builder()
+builder.check_keys({
+    "parameter1": 1,
+    "parameter2": 2,
+})
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L53-L94)
+
+### particula.coupling.flow_factory.SoundingFlowBuilder.pre_build_check
+
+*method*
+
+```python
+def pre_build_check() -> None
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+Check if all required attribute parameters are set before building.
+
+**Raises**
+
+- `ValueError` — If any required parameter is missing.
+
+**Examples**
+
+```py
+builder = Builder()
+builder.pre_build_check()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L132-L151)
+
+### particula.coupling.flow_factory.SoundingFlowBuilder.set_parameters
+
+*method*
+
+```python
+def set_parameters(parameters: dict[str, Any]) -> BuilderABC
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+Set parameters from a dictionary, handling any '_units' suffix.
+
+**Parameters**
+
+- `parameters` (`dict[str, Any]`) — The parameters dictionary to set.
+
+**Returns**
+
+- `BuilderABC` (`BuilderABC`) — This builder object with the set parameters.
+
+**Raises**
+
+- `ValueError` — If any required key is missing.
+- `Warning` — If using default units for any parameter.
+
+**Examples**
+
+```py
+builder = Builder().set_parameters({
+    "parameter1": 1,
+    "parameter2": 2,
+    "parameter2_units": "K",
+})
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L96-L130)
+
+## particula.coupling.flow_factory.SoundingSequenceBuilder
+
+*class*
+
+```python
+class SoundingSequenceBuilder(BuilderABC)
+```
+
+Bases: `particula.abc_builder.BuilderABC`
+
+Construct time-indexed profile forcing with explicit provenance.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L81-L99)
+
+### particula.coupling.flow_factory.SoundingSequenceBuilder.sequence
+
+*attribute* · *instance attribute*
+
+```python
+sequence = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L87-L87)
+
+### particula.coupling.flow_factory.SoundingSequenceBuilder.required_parameters
+
+*attribute* · *instance attribute*
+
+```python
+required_parameters = required_parameters or []
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L51-L51)
+
+### particula.coupling.flow_factory.SoundingSequenceBuilder.__init__
+
+*method*
+
+```python
+def __init__()
+```
+
+Require the timestamped set of normalized SI profiles.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L84-L87)
+
+### particula.coupling.flow_factory.SoundingSequenceBuilder.build
+
+*method*
+
+```python
+def build()
+```
+
+Construct time-dependent spatial forcing.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L96-L99)
+
+### particula.coupling.flow_factory.SoundingSequenceBuilder.set_sequence
+
+*method*
+
+```python
+def set_sequence(value)
+```
+
+Bind a SoundingSequence.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L89-L94)
+
+### particula.coupling.flow_factory.SoundingSequenceBuilder.check_keys
+
+*method*
+
+```python
+def check_keys(parameters: dict[str, Any]) -> None
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+Check if the keys are present and valid.
+
+**Parameters**
+
+- `parameters` (`dict[str, Any]`) — The parameters dictionary to check.
+
+**Raises**
+
+- `ValueError` — If any required key is missing or if trying to set
+an invalid parameter.
+
+**Examples**
+
+```py
+builder = Builder()
+builder.check_keys({
+    "parameter1": 1,
+    "parameter2": 2,
+})
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L53-L94)
+
+### particula.coupling.flow_factory.SoundingSequenceBuilder.pre_build_check
+
+*method*
+
+```python
+def pre_build_check() -> None
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+Check if all required attribute parameters are set before building.
+
+**Raises**
+
+- `ValueError` — If any required parameter is missing.
+
+**Examples**
+
+```py
+builder = Builder()
+builder.pre_build_check()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L132-L151)
+
+### particula.coupling.flow_factory.SoundingSequenceBuilder.set_parameters
+
+*method*
+
+```python
+def set_parameters(parameters: dict[str, Any]) -> BuilderABC
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+Set parameters from a dictionary, handling any '_units' suffix.
+
+**Parameters**
+
+- `parameters` (`dict[str, Any]`) — The parameters dictionary to set.
+
+**Returns**
+
+- `BuilderABC` (`BuilderABC`) — This builder object with the set parameters.
+
+**Raises**
+
+- `ValueError` — If any required key is missing.
+- `Warning` — If using default units for any parameter.
+
+**Examples**
+
+```py
+builder = Builder().set_parameters({
+    "parameter1": 1,
+    "parameter2": 2,
+    "parameter2_units": "K",
+})
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L96-L130)
+
+## particula.coupling.flow_factory.TrajectoryReplayBuilder
+
+*class*
+
+```python
+class TrajectoryReplayBuilder(BuilderABC)
+```
+
+Bases: `particula.abc_builder.BuilderABC`
+
+Build from a native parcel CSV and its sibling metadata.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L145-L161)
+
+### particula.coupling.flow_factory.TrajectoryReplayBuilder.path
+
+*attribute* · *instance attribute*
+
+```python
+path = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L151-L151)
+
+### particula.coupling.flow_factory.TrajectoryReplayBuilder.required_parameters
+
+*attribute* · *instance attribute*
+
+```python
+required_parameters = required_parameters or []
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L51-L51)
+
+### particula.coupling.flow_factory.TrajectoryReplayBuilder.__init__
+
+*method*
+
+```python
+def __init__()
+```
+
+Declare the parameters required by this provider.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L148-L151)
+
+### particula.coupling.flow_factory.TrajectoryReplayBuilder.build
+
+*method*
+
+```python
+def build()
+```
+
+Load a trajectory by its recorded identity.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L158-L161)
+
+### particula.coupling.flow_factory.TrajectoryReplayBuilder.set_path
+
+*method*
+
+```python
+def set_path(value)
+```
+
+Select the forcing archive.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L153-L156)
+
+### particula.coupling.flow_factory.TrajectoryReplayBuilder.check_keys
+
+*method*
+
+```python
+def check_keys(parameters: dict[str, Any]) -> None
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+Check if the keys are present and valid.
+
+**Parameters**
+
+- `parameters` (`dict[str, Any]`) — The parameters dictionary to check.
+
+**Raises**
+
+- `ValueError` — If any required key is missing or if trying to set
+an invalid parameter.
+
+**Examples**
+
+```py
+builder = Builder()
+builder.check_keys({
+    "parameter1": 1,
+    "parameter2": 2,
+})
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L53-L94)
+
+### particula.coupling.flow_factory.TrajectoryReplayBuilder.pre_build_check
+
+*method*
+
+```python
+def pre_build_check() -> None
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+Check if all required attribute parameters are set before building.
+
+**Raises**
+
+- `ValueError` — If any required parameter is missing.
+
+**Examples**
+
+```py
+builder = Builder()
+builder.pre_build_check()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L132-L151)
+
+### particula.coupling.flow_factory.TrajectoryReplayBuilder.set_parameters
+
+*method*
+
+```python
+def set_parameters(parameters: dict[str, Any]) -> BuilderABC
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+Set parameters from a dictionary, handling any '_units' suffix.
+
+**Parameters**
+
+- `parameters` (`dict[str, Any]`) — The parameters dictionary to set.
+
+**Returns**
+
+- `BuilderABC` (`BuilderABC`) — This builder object with the set parameters.
+
+**Raises**
+
+- `ValueError` — If any required key is missing.
+- `Warning` — If using default units for any parameter.
+
+**Examples**
+
+```py
+builder = Builder().set_parameters({
+    "parameter1": 1,
+    "parameter2": 2,
+    "parameter2_units": "K",
+})
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L96-L130)
+
+## particula.coupling.flow_factory.UniformFlowBuilder
+
+*class*
+
+```python
+class UniformFlowBuilder(BuilderABC)
+```
+
+Bases: `particula.abc_builder.BuilderABC`
+
+Build a spatially uniform flow with conversion to SI.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L24-L57)
+
+### particula.coupling.flow_factory.UniformFlowBuilder.pressure
+
+*attribute* · *instance attribute*
+
+```python
+pressure = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L30-L30)
+
+### particula.coupling.flow_factory.UniformFlowBuilder.temperature
+
+*attribute* · *instance attribute*
+
+```python
+temperature = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L30-L30)
+
+### particula.coupling.flow_factory.UniformFlowBuilder.vapor
+
+*attribute* · *instance attribute*
+
+```python
+vapor = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L30-L30)
+
+### particula.coupling.flow_factory.UniformFlowBuilder.velocity
+
+*attribute* · *instance attribute*
+
+```python
+velocity = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L30-L30)
+
+### particula.coupling.flow_factory.UniformFlowBuilder.required_parameters
+
+*attribute* · *instance attribute*
+
+```python
+required_parameters = required_parameters or []
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L51-L51)
+
+### particula.coupling.flow_factory.UniformFlowBuilder.__init__
+
+*method*
+
+```python
+def __init__()
+```
+
+Declare the parameters required by this provider.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L27-L30)
+
+### particula.coupling.flow_factory.UniformFlowBuilder.build
+
+*method*
+
+```python
+def build()
+```
+
+Construct validated constant fields.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L52-L57)
+
+### particula.coupling.flow_factory.UniformFlowBuilder.set_pressure
+
+*method*
+
+```python
+def set_pressure(value, units='Pa')
+```
+
+Set the total pressure.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L42-L45)
+
+### particula.coupling.flow_factory.UniformFlowBuilder.set_temperature
+
+*method*
+
+```python
+def set_temperature(value, units='K')
+```
+
+Set the air temperature.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L37-L40)
+
+### particula.coupling.flow_factory.UniformFlowBuilder.set_vapor
+
+*method*
+
+```python
+def set_vapor(value, units='kg/kg')
+```
+
+Set water mass per kg dry air.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L47-L50)
+
+### particula.coupling.flow_factory.UniformFlowBuilder.set_velocity
+
+*method*
+
+```python
+def set_velocity(value, units='m/s')
+```
+
+Set the east, north and vertical wind components.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L32-L35)
+
+### particula.coupling.flow_factory.UniformFlowBuilder.check_keys
+
+*method*
+
+```python
+def check_keys(parameters: dict[str, Any]) -> None
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+Check if the keys are present and valid.
+
+**Parameters**
+
+- `parameters` (`dict[str, Any]`) — The parameters dictionary to check.
+
+**Raises**
+
+- `ValueError` — If any required key is missing or if trying to set
+an invalid parameter.
+
+**Examples**
+
+```py
+builder = Builder()
+builder.check_keys({
+    "parameter1": 1,
+    "parameter2": 2,
+})
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L53-L94)
+
+### particula.coupling.flow_factory.UniformFlowBuilder.pre_build_check
+
+*method*
+
+```python
+def pre_build_check() -> None
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+Check if all required attribute parameters are set before building.
+
+**Raises**
+
+- `ValueError` — If any required parameter is missing.
+
+**Examples**
+
+```py
+builder = Builder()
+builder.pre_build_check()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L132-L151)
+
+### particula.coupling.flow_factory.UniformFlowBuilder.set_parameters
+
+*method*
+
+```python
+def set_parameters(parameters: dict[str, Any]) -> BuilderABC
+```
+
+Inherited from: `particula.abc_builder.BuilderABC`
+
+Set parameters from a dictionary, handling any '_units' suffix.
+
+**Parameters**
+
+- `parameters` (`dict[str, Any]`) — The parameters dictionary to set.
+
+**Returns**
+
+- `BuilderABC` (`BuilderABC`) — This builder object with the set parameters.
+
+**Raises**
+
+- `ValueError` — If any required key is missing.
+- `Warning` — If using default units for any parameter.
+
+**Examples**
+
+```py
+builder = Builder().set_parameters({
+    "parameter1": 1,
+    "parameter2": 2,
+    "parameter2_units": "K",
+})
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/abc_builder.py#L96-L130)
+
+## particula.coupling.flow_factory._convert
+
+*function*
+
+```python
+def _convert(units, target, *, value)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_factory.py#L16-L21)
+
+---
+
+# particula.coupling.flow_replay
+
+*module*
+
+Accepted grid intervals and native trajectory replay, with SI metadata.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L1-L1)
+
+## particula.coupling.flow_replay._UNITS
+
+*attribute* · *module attribute*
+
+```python
+_UNITS = {'air': ['m/s', 'm/s', 'm/s', 'K', 'Pa', 'kg/kg dry air'], 'time': 's', 'coordinates': 'm', 'transfer': 'm3 outward', 'mixing': 'm3', 'diffusivity': 'm2/s along grid lines', 'speed': 'm/s reference'}
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L18-L26)
+
+## particula.coupling.flow_replay.GridReplay
+
+*class*
+
+```python
+class GridReplay(FlowStrategy)
+```
+
+Bases: `particula.coupling.flows.FlowStrategy`
+
+Immutable forcing with fixed geometry and exact interval transfers.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L94-L213)
+
+### particula.coupling.flow_replay.GridReplay.frames
+
+*attribute* · *instance attribute*
+
+```python
+frames = tuple((validated_interval(grid, f) for f in frames))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L103-L103)
+
+### particula.coupling.flow_replay.GridReplay.grid
+
+*attribute* · *instance attribute*
+
+```python
+grid = grid
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L101-L101)
+
+### particula.coupling.flow_replay.GridReplay.identity
+
+*attribute* · *instance attribute*
+
+```python
+identity = digest.hexdigest()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L121-L121)
+
+### particula.coupling.flow_replay.GridReplay.provenance
+
+*attribute* · *instance attribute*
+
+```python
+provenance = provenance
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L102-L102)
+
+### particula.coupling.flow_replay.GridReplay.times
+
+*attribute* · *instance attribute*
+
+```python
+times = np.array([self.frames[0].start, *[f.end for f in self.frames]], dtype=np.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L109-L112)
+
+### particula.coupling.flow_replay.GridReplay.__init__
+
+*method*
+
+```python
+def __init__(grid, frames, provenance)
+```
+
+Validate field alignment, shared faces and accepted times.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L97-L121)
+
+### particula.coupling.flow_replay.GridReplay.interval
+
+*method*
+
+```python
+def interval(grid, start, end, mixing=None, *, device='cpu')
+```
+
+Return the exact next recorded interval on matching geometry.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L153-L167)
+
+### particula.coupling.flow_replay.GridReplay.load
+
+*method* · *classmethod*
+
+```python
+def load(path)
+```
+
+Read versioned numerical data without pickle.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L189-L213)
+
+### particula.coupling.flow_replay.GridReplay.record
+
+*method* · *classmethod*
+
+```python
+def record(grid, provider, times, mixing=None, *, provenance, device='cpu')
+```
+
+Record forcing through each endpoint, honoring short advances.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L123-L151)
+
+### particula.coupling.flow_replay.GridReplay.save
+
+*method*
+
+```python
+def save(path)
+```
+
+Write the forcing, geometry, conventions and provenance.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L169-L187)
+
+### particula.coupling.flow_replay.GridReplay.trajectory
+
+*method*
+
+```python
+def trajectory(parcel_id)
+```
+
+Inherited from: `particula.coupling.flows.FlowStrategy`
+
+Return a recorded native parcel history by stable identity.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L36-L38)
+
+## particula.coupling.flow_replay.LiveGrid
+
+*class*
+
+```python
+class LiveGrid
+```
+
+A host-driven grid binding, retaining accepted forcing for replay.
+
+Supply a matched recorded prefix when reopening a host restart. The source
+ID identifies the host experiment and its authoritative field schema.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L216-L255)
+
+### particula.coupling.flow_replay.LiveGrid.frames
+
+*attribute* · *instance attribute*
+
+```python
+frames = list(history.frames) if history else []
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L245-L245)
+
+### particula.coupling.flow_replay.LiveGrid.grid
+
+*attribute* · *instance attribute*
+
+```python
+grid = grid
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L231-L231)
+
+### particula.coupling.flow_replay.LiveGrid.identity
+
+*attribute* · *instance attribute*
+
+```python
+identity = digest.hexdigest()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L238-L238)
+
+### particula.coupling.flow_replay.LiveGrid.provenance
+
+*attribute* · *instance attribute*
+
+```python
+provenance = source_id
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L232-L232)
+
+### particula.coupling.flow_replay.LiveGrid.start
+
+*attribute* · *instance attribute*
+
+```python
+start = float(start)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L233-L233)
+
+### particula.coupling.flow_replay.LiveGrid.times
+
+*attribute* · *instance attribute*
+
+```python
+times = [self.start, *[f.end for f in self.frames]]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L246-L246)
+
+### particula.coupling.flow_replay.LiveGrid.__init__
+
+*method*
+
+```python
+def __init__(grid, start, source_id, history=None)
+```
+
+Bind geometry and optionally restore its accepted history.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L223-L246)
+
+### particula.coupling.flow_replay.LiveGrid.commit
+
+*method*
+
+```python
+def commit(frame)
+```
+
+Retain the accepted immutable forcing after a successful step.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L252-L255)
+
+### particula.coupling.flow_replay.LiveGrid.recording
+
+*method*
+
+```python
+def recording()
+```
+
+Export the accepted history through the standard replay path.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L248-L250)
+
+## particula.coupling.flow_replay.TrajectoryReplay
+
+*class* · *dataclass*
+
+```python
+class TrajectoryReplay(FlowStrategy)
+```
+
+Bases: `particula.coupling.flows.FlowStrategy`
+
+Offer one named trajectory using the existing CSV/JSON record.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L53-L63)
+
+### particula.coupling.flow_replay.TrajectoryReplay.trace
+
+*attribute* · *instance attribute*
+
+```python
+trace: ParcelTrace
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L57-L57)
+
+### particula.coupling.flow_replay.TrajectoryReplay.__init__
+
+*method*
+
+```python
+def __init__(trace: ParcelTrace) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L0-L0)
+
+### particula.coupling.flow_replay.TrajectoryReplay.trajectory
+
+*method*
+
+```python
+def trajectory(parcel_id)
+```
+
+Retrieve the recorded forcing without spatial extrapolation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L59-L63)
+
+### particula.coupling.flow_replay.TrajectoryReplay.interval
+
+*method*
+
+```python
+def interval(grid, start, end, mixing, *, device='cpu')
+```
+
+Inherited from: `particula.coupling.flows.FlowStrategy`
+
+Offer a grid interval or reject an incompatible provider.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L32-L34)
+
+## particula.coupling.flow_replay.frozen_array
+
+*function*
+
+```python
+def frozen_array(value, shape)
+```
+
+Validate, copy and freeze a finite float64 array.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L44-L50)
+
+## particula.coupling.flow_replay.save_archive
+
+*function*
+
+```python
+def save_archive(path, metadata, **arrays)
+```
+
+Atomically replace an archive after all arrays have been written.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L29-L41)
+
+## particula.coupling.flow_replay.validated_interval
+
+*function*
+
+```python
+def validated_interval(grid, f)
+```
+
+Own one accepted interval and check volume and mixing conservation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flow_replay.py#L66-L91)
+
+---
+
+# particula.coupling.flows
+
+*module*
+
+Flow strategies for point observations and accepted grid intervals.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L1-L1)
+
+## particula.coupling.flows.DirectionalMixing
+
+*class* · *dataclass*
+
+```python
+class DirectionalMixing
+```
+
+Prescribed directional K in m²/s along x, y and layer coordinates.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L282-L297)
+
+### particula.coupling.flows.DirectionalMixing.diffusivity
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+diffusivity: tuple = (0.0, 0.0, 0.0)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L286-L286)
+
+### particula.coupling.flows.DirectionalMixing.__init__
+
+*method*
+
+```python
+def __init__(diffusivity: tuple = (0.0, 0.0, 0.0)) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L0-L0)
+
+### particula.coupling.flows.DirectionalMixing.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Require three finite nonnegative coefficients.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L288-L293)
+
+### particula.coupling.flows.DirectionalMixing.coefficient
+
+*method*
+
+```python
+def coefficient(flow, grid, ref, axis)
+```
+
+Return K for one face direction.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L295-L297)
+
+## particula.coupling.flows.DuneFlowStrategy
+
+*class* · *dataclass*
+
+```python
+class DuneFlowStrategy(SpatialFlow)
+```
+
+Bases: `particula.coupling.flows.SpatialFlow`
+
+Adapt the moving-parcel dune to point and terrain-grid sampling.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L226-L279)
+
+### particula.coupling.flows.DuneFlowStrategy.dune
+
+*attribute* · *instance attribute*
+
+```python
+dune: DuneFlow
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L230-L230)
+
+### particula.coupling.flows.DuneFlowStrategy.__init__
+
+*method*
+
+```python
+def __init__(dune: DuneFlow) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L0-L0)
+
+### particula.coupling.flows.DuneFlowStrategy.parcel_trace
+
+*method*
+
+```python
+def parcel_trace(parcel_id, xyz, time, aerosol, *, provenance)
+```
+
+Use the terrain-coordinate integrator on continuous streamlines.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L232-L236)
+
+### particula.coupling.flows.DuneFlowStrategy.reference_air
+
+*method*
+
+```python
+def reference_air(grid, coord, time, device)
+```
+
+Evaluate the same streamlines on the piecewise-linear grid bed.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L250-L279)
+
+### particula.coupling.flows.DuneFlowStrategy.sample
+
+*method*
+
+```python
+def sample(xyz, time, *, device='cpu')
+```
+
+Sample the continuous Gaussian dune at physical xyz.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L238-L248)
+
+### particula.coupling.flows.DuneFlowStrategy.interval
+
+*method*
+
+```python
+def interval(grid, start, end, mixing, *, device='cpu')
+```
+
+Inherited from: `particula.coupling.flows.SpatialFlow`
+
+Integrate steady face volume flux and mixing across one interval.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L89-L133)
+
+### particula.coupling.flows.DuneFlowStrategy.trajectory
+
+*method*
+
+```python
+def trajectory(parcel_id)
+```
+
+Inherited from: `particula.coupling.flows.FlowStrategy`
+
+Return a recorded native parcel history by stable identity.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L36-L38)
+
+## particula.coupling.flows.FlowStrategy
+
+*class*
+
+```python
+class FlowStrategy
+```
+
+A forcing provider exposing the operations its data support.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L29-L38)
+
+### particula.coupling.flows.FlowStrategy.interval
+
+*method*
+
+```python
+def interval(grid, start, end, mixing, *, device='cpu')
+```
+
+Offer a grid interval or reject an incompatible provider.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L32-L34)
+
+### particula.coupling.flows.FlowStrategy.trajectory
+
+*method*
+
+```python
+def trajectory(parcel_id)
+```
+
+Return a recorded native parcel history by stable identity.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L36-L38)
+
+## particula.coupling.flows.GridInterval
+
+*class* · *dataclass*
+
+```python
+class GridInterval
+```
+
+Accepted forcing. Face values are outward signed m³ and mixing m³.
+
+air columns are u,v,w (m/s), T (K), p (Pa), vapor (kg/kg dry air).
+speed contains cell-centered reference-coordinate velocities (m/s).
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L12-L26)
+
+### particula.coupling.flows.GridInterval.air
+
+*attribute* · *instance attribute*
+
+```python
+air: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L22-L22)
+
+### particula.coupling.flows.GridInterval.diffusivity
+
+*attribute* · *instance attribute*
+
+```python
+diffusivity: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L26-L26)
+
+### particula.coupling.flows.GridInterval.end
+
+*attribute* · *instance attribute*
+
+```python
+end: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L21-L21)
+
+### particula.coupling.flows.GridInterval.mixing
+
+*attribute* · *instance attribute*
+
+```python
+mixing: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L24-L24)
+
+### particula.coupling.flows.GridInterval.speed
+
+*attribute* · *instance attribute*
+
+```python
+speed: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L25-L25)
+
+### particula.coupling.flows.GridInterval.start
+
+*attribute* · *instance attribute*
+
+```python
+start: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L20-L20)
+
+### particula.coupling.flows.GridInterval.transfer
+
+*attribute* · *instance attribute*
+
+```python
+transfer: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L23-L23)
+
+### particula.coupling.flows.GridInterval.__init__
+
+*method*
+
+```python
+def __init__(start: float, end: float, air: np.ndarray, transfer: np.ndarray, mixing: np.ndarray, speed: np.ndarray, diffusivity: np.ndarray) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L0-L0)
+
+## particula.coupling.flows.SoundingFlow
+
+*class* · *dataclass*
+
+```python
+class SoundingFlow(SpatialFlow)
+```
+
+Bases: `particula.coupling.flows.SpatialFlow`
+
+Steady horizontally uniform measured or synthetic vertical profile.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L183-L195)
+
+### particula.coupling.flows.SoundingFlow.sounding
+
+*attribute* · *instance attribute*
+
+```python
+sounding: Sounding
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L187-L187)
+
+### particula.coupling.flows.SoundingFlow.__init__
+
+*method*
+
+```python
+def __init__(sounding: Sounding) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L0-L0)
+
+### particula.coupling.flows.SoundingFlow.sample
+
+*method*
+
+```python
+def sample(xyz, time, *, device='cpu')
+```
+
+Interpolate wind and thermodynamics against geometric height.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L189-L195)
+
+### particula.coupling.flows.SoundingFlow.interval
+
+*method*
+
+```python
+def interval(grid, start, end, mixing, *, device='cpu')
+```
+
+Inherited from: `particula.coupling.flows.SpatialFlow`
+
+Integrate steady face volume flux and mixing across one interval.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L89-L133)
+
+### particula.coupling.flows.SoundingFlow.parcel_trace
+
+*method*
+
+```python
+def parcel_trace(parcel_id, xyz, time, aerosol, *, provenance)
+```
+
+Inherited from: `particula.coupling.flows.SpatialFlow`
+
+Follow air with the point sampler and build a native replay trace.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L48-L81)
+
+### particula.coupling.flows.SoundingFlow.reference_air
+
+*method*
+
+```python
+def reference_air(grid, coord, time, device)
+```
+
+Inherited from: `particula.coupling.flows.SpatialFlow`
+
+Sample physical fields on a flat grid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L83-L87)
+
+### particula.coupling.flows.SoundingFlow.trajectory
+
+*method*
+
+```python
+def trajectory(parcel_id)
+```
+
+Inherited from: `particula.coupling.flows.FlowStrategy`
+
+Return a recorded native parcel history by stable identity.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L36-L38)
+
+## particula.coupling.flows.SpatialFlow
+
+*class*
+
+```python
+class SpatialFlow(FlowStrategy, ABC)
+```
+
+Bases: `particula.coupling.flows.FlowStrategy`, `ABC`
+
+Spatial air sampling and fixed-grid face quadrature.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L41-L133)
+
+### particula.coupling.flows.SpatialFlow.interval
+
+*method*
+
+```python
+def interval(grid, start, end, mixing, *, device='cpu')
+```
+
+Integrate steady face volume flux and mixing across one interval.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L89-L133)
+
+### particula.coupling.flows.SpatialFlow.parcel_trace
+
+*method*
+
+```python
+def parcel_trace(parcel_id, xyz, time, aerosol, *, provenance)
+```
+
+Follow air with the point sampler and build a native replay trace.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L48-L81)
+
+### particula.coupling.flows.SpatialFlow.reference_air
+
+*method*
+
+```python
+def reference_air(grid, coord, time, device)
+```
+
+Sample physical fields on a flat grid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L83-L87)
+
+### particula.coupling.flows.SpatialFlow.sample
+
+*method* · *abstract*
+
+```python
+def sample(xyz, time, *, device='cpu')
+```
+
+Sample the six air fields at (n,3) points in metres and seconds.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L44-L46)
+
+### particula.coupling.flows.SpatialFlow.trajectory
+
+*method*
+
+```python
+def trajectory(parcel_id)
+```
+
+Inherited from: `particula.coupling.flows.FlowStrategy`
+
+Return a recorded native parcel history by stable identity.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L36-L38)
+
+## particula.coupling.flows.StabilityMixing
+
+*class* · *dataclass*
+
+```python
+class StabilityMixing
+```
+
+Effective transverse K = U/2 d(sigma²)/dx for a flat rural plume.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L300-L339)
+
+### particula.coupling.flows.StabilityMixing.source_x
+
+*attribute* · *instance attribute*
+
+```python
+source_x: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L305-L305)
+
+### particula.coupling.flows.StabilityMixing.stability
+
+*attribute* · *instance attribute*
+
+```python
+stability: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L304-L304)
+
+### particula.coupling.flows.StabilityMixing.__init__
+
+*method*
+
+```python
+def __init__(stability: str, source_x: float) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L0-L0)
+
+### particula.coupling.flows.StabilityMixing.coefficient
+
+*method*
+
+```python
+def coefficient(flow, grid, ref, axis)
+```
+
+Differentiate the Briggs open-country variance at positive fetch.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L307-L339)
+
+## particula.coupling.flows.UniformFlow
+
+*class* · *dataclass*
+
+```python
+class UniformFlow(SpatialFlow)
+```
+
+Bases: `particula.coupling.flows.SpatialFlow`
+
+Uniform velocity (m/s), T (K), p (Pa) and dry-air vapor ratio.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L148-L180)
+
+### particula.coupling.flows.UniformFlow.pressure
+
+*attribute* · *instance attribute*
+
+```python
+pressure: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L154-L154)
+
+### particula.coupling.flows.UniformFlow.temperature
+
+*attribute* · *instance attribute*
+
+```python
+temperature: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L153-L153)
+
+### particula.coupling.flows.UniformFlow.vapor
+
+*attribute* · *instance attribute*
+
+```python
+vapor: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L155-L155)
+
+### particula.coupling.flows.UniformFlow.velocity
+
+*attribute* · *instance attribute*
+
+```python
+velocity: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L152-L152)
+
+### particula.coupling.flows.UniformFlow.__init__
+
+*method*
+
+```python
+def __init__(velocity: tuple, temperature: float, pressure: float, vapor: float) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L0-L0)
+
+### particula.coupling.flows.UniformFlow.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Check velocity and positive thermodynamic inputs.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L157-L170)
+
+### particula.coupling.flows.UniformFlow.sample
+
+*method*
+
+```python
+def sample(xyz, time, *, device='cpu')
+```
+
+Broadcast uniform air to each world point.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L172-L180)
+
+### particula.coupling.flows.UniformFlow.interval
+
+*method*
+
+```python
+def interval(grid, start, end, mixing, *, device='cpu')
+```
+
+Inherited from: `particula.coupling.flows.SpatialFlow`
+
+Integrate steady face volume flux and mixing across one interval.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L89-L133)
+
+### particula.coupling.flows.UniformFlow.parcel_trace
+
+*method*
+
+```python
+def parcel_trace(parcel_id, xyz, time, aerosol, *, provenance)
+```
+
+Inherited from: `particula.coupling.flows.SpatialFlow`
+
+Follow air with the point sampler and build a native replay trace.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L48-L81)
+
+### particula.coupling.flows.UniformFlow.reference_air
+
+*method*
+
+```python
+def reference_air(grid, coord, time, device)
+```
+
+Inherited from: `particula.coupling.flows.SpatialFlow`
+
+Sample physical fields on a flat grid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L83-L87)
+
+### particula.coupling.flows.UniformFlow.trajectory
+
+*method*
+
+```python
+def trajectory(parcel_id)
+```
+
+Inherited from: `particula.coupling.flows.FlowStrategy`
+
+Return a recorded native parcel history by stable identity.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L36-L38)
+
+## particula.coupling.flows._points
+
+*function*
+
+```python
+def _points(xyz, time)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L136-L145)
+
+## particula.coupling.flows._profile
+
+*function*
+
+```python
+def _profile(sounding, z, eta, jac, gradient, device)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L198-L223)
+
+---
+
+# particula.coupling.grid
+
+*module*
+
+Stationary structured finite volumes. SI lengths; C-order (x,y,layer) IDs.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L1-L1)
+
+## particula.coupling.grid.FlowGrid
+
+*class* · *dataclass*
+
+```python
+class FlowGrid
+```
+
+Uniform reference edges and optional piecewise-linear bed elevations.
+
+A singleton axis has the physical thickness in the supplied bounds. For a
+terrain grid the third coordinate spans zero to the level lid in metres.
+Boundaries are ordered west/east, south/north, bottom/top. Open faces
+accept prescribed inlet concentrations; closed faces have zero transfer.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L9-L163)
+
+### particula.coupling.grid.FlowGrid.bed
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+bed: tuple = ()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L22-L22)
+
+### particula.coupling.grid.FlowGrid.boundaries
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+boundaries: tuple = ('closed') * 6
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L21-L21)
+
+### particula.coupling.grid.FlowGrid.bounds
+
+*attribute* · *instance attribute*
+
+```python
+bounds: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L20-L20)
+
+### particula.coupling.grid.FlowGrid.shape
+
+*attribute* · *instance attribute*
+
+```python
+shape: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L19-L19)
+
+### particula.coupling.grid.FlowGrid.centers
+
+*property* · *cached*
+
+```python
+centers
+```
+
+Physical center coordinates (m), one row per cell.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L116-L118)
+
+### particula.coupling.grid.FlowGrid.coordinates
+
+*property* · *cached*
+
+```python
+coordinates
+```
+
+Reference cell centers (ncell,3) in metres.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L85-L92)
+
+### particula.coupling.grid.FlowGrid.edges
+
+*property* · *cached*
+
+```python
+edges
+```
+
+Reference edge coordinates in metres.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L67-L72)
+
+### particula.coupling.grid.FlowGrid.neighbors
+
+*property* · *cached*
+
+```python
+neighbors
+```
+
+Six neighboring row IDs; exterior faces use -1.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L126-L139)
+
+### particula.coupling.grid.FlowGrid.spacing
+
+*property* · *cached*
+
+```python
+spacing
+```
+
+Reference cell widths in metres.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L75-L82)
+
+### particula.coupling.grid.FlowGrid.volume
+
+*property* · *cached*
+
+```python
+volume
+```
+
+Exact physical volume (m³) of each mapped cell.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L121-L123)
+
+### particula.coupling.grid.FlowGrid.__init__
+
+*method*
+
+```python
+def __init__(shape: tuple, bounds: tuple, boundaries: tuple = ('closed') * 6, bed: tuple = ()) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L0-L0)
+
+### particula.coupling.grid.FlowGrid.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Validate geometry and opposite periodic faces before allocation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L24-L64)
+
+### particula.coupling.grid.FlowGrid.face_geometry
+
+*method*
+
+```python
+def face_geometry(side)
+```
+
+Return reference centers and oriented physical area vectors (m²).
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L141-L163)
+
+### particula.coupling.grid.FlowGrid.ground
+
+*method*
+
+```python
+def ground(x)
+```
+
+Piecewise-linear physical bed ordinate in metres.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L94-L98)
+
+### particula.coupling.grid.FlowGrid.jacobian
+
+*method*
+
+```python
+def jacobian(x)
+```
+
+Ratio of physical to reference column thickness.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L100-L104)
+
+### particula.coupling.grid.FlowGrid.world
+
+*method*
+
+```python
+def world(coord)
+```
+
+Convert (...,3) reference metres into world xyz.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid.py#L106-L113)
+
+---
+
+# particula.coupling.grid_inventory
+
+*module*
+
+Conservative grid inventories and native discrete boxes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L1-L1)
+
+## particula.coupling.grid_inventory.InventoryLayout
+
+*class* · *dataclass*
+
+```python
+class InventoryLayout
+```
+
+Ordered gases, dry size classes and particle materials.
+
+Lanes contain extensive gas kg, then represented counts by bin, then
+particulate kg in bin-major/material-minor order. Native discrete boxes
+store gas kg/m³, number/m³ and kg per individual particle.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L8-L103)
+
+### particula.coupling.grid_inventory.InventoryLayout.bins
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+bins: tuple = ()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L18-L18)
+
+### particula.coupling.grid_inventory.InventoryLayout.gases
+
+*attribute* · *instance attribute*
+
+```python
+gases: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L17-L17)
+
+### particula.coupling.grid_inventory.InventoryLayout.materials
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+materials: tuple = ()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L19-L19)
+
+### particula.coupling.grid_inventory.InventoryLayout.width
+
+*property*
+
+```python
+width
+```
+
+Number of extensive lanes per cell.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L36-L38)
+
+### particula.coupling.grid_inventory.InventoryLayout.__init__
+
+*method*
+
+```python
+def __init__(gases: tuple, bins: tuple = (), materials: tuple = ()) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L0-L0)
+
+### particula.coupling.grid_inventory.InventoryLayout.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Require unique named lanes and coherent bin/material axes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L21-L33)
+
+### particula.coupling.grid_inventory.InventoryLayout._check_native
+
+*method*
+
+```python
+def _check_native(grid, gas, particles)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L58-L71)
+
+### particula.coupling.grid_inventory.InventoryLayout.pack
+
+*method*
+
+```python
+def pack(grid, gas, particles)
+```
+
+Convert native neutral discrete boxes to extensive quantities.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L73-L84)
+
+### particula.coupling.grid_inventory.InventoryLayout.unpack
+
+*method*
+
+```python
+def unpack(grid, inventory, gas, particles)
+```
+
+Return detached native gas and particle copies in the same order.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L86-L103)
+
+### particula.coupling.grid_inventory.InventoryLayout.validate
+
+*method*
+
+```python
+def validate(inventory, n)
+```
+
+Reject nonphysical inventories including mass in an empty bin.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L40-L56)
+
+## particula.coupling.grid_inventory.Uptake
+
+*class* · *dataclass*
+
+```python
+class Uptake
+```
+
+First-order gas uptake (s⁻¹) into one occupied particle class.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L106-L126)
+
+### particula.coupling.grid_inventory.Uptake.gas
+
+*attribute* · *instance attribute*
+
+```python
+gas: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L110-L110)
+
+### particula.coupling.grid_inventory.Uptake.material
+
+*attribute* · *instance attribute*
+
+```python
+material: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L112-L112)
+
+### particula.coupling.grid_inventory.Uptake.rate
+
+*attribute* · *instance attribute*
+
+```python
+rate: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L113-L113)
+
+### particula.coupling.grid_inventory.Uptake.size_bin
+
+*attribute* · *instance attribute*
+
+```python
+size_bin: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L111-L111)
+
+### particula.coupling.grid_inventory.Uptake.__init__
+
+*method*
+
+```python
+def __init__(gas: str, size_bin: str, material: str, rate: float) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L0-L0)
+
+### particula.coupling.grid_inventory.Uptake.bind
+
+*method*
+
+```python
+def bind(layout)
+```
+
+Resolve named lanes once before transport.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L115-L126)
+
+---
+
+# particula.coupling.grid_run
+
+*module*
+
+Conservative fixed-grid execution and completed-interval checkpoints.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L1-L1)
+
+## particula.coupling.grid_run.GridRun
+
+*class*
+
+```python
+class GridRun
+```
+
+Carry named inventory and stable particles across accepted intervals.
+
+CPU uses NumPy for conservative transport. Particle face traversal uses
+the same compiled Warp operation on CPU and CUDA. Observation, checkpoint
+and host-owned input are explicit synchronization boundaries.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L47-L666)
+
+### particula.coupling.grid_run.GridRun._faulted
+
+*attribute* · *instance attribute*
+
+```python
+_faulted = False
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L80-L80)
+
+### particula.coupling.grid_run.GridRun.device
+
+*attribute* · *instance attribute*
+
+```python
+device = wp.get_device(device)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L74-L74)
+
+### particula.coupling.grid_run.GridRun.dispersion
+
+*attribute* · *instance attribute*
+
+```python
+dispersion = dispersion
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L81-L81)
+
+### particula.coupling.grid_run.GridRun.exports
+
+*attribute* · *instance attribute*
+
+```python
+exports = np.zeros_like(a)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L104-L104)
+
+### particula.coupling.grid_run.GridRun.forcing
+
+*attribute* · *instance attribute*
+
+```python
+forcing = forcing
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L71-L71)
+
+### particula.coupling.grid_run.GridRun.gpu
+
+*attribute* · *instance attribute*
+
+```python
+gpu = self.device.is_cuda
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L75-L75)
+
+### particula.coupling.grid_run.GridRun.grid
+
+*attribute* · *instance attribute*
+
+```python
+grid = forcing.grid
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L72-L72)
+
+### particula.coupling.grid_run.GridRun.imports
+
+*attribute* · *instance attribute*
+
+```python
+imports = np.zeros_like(a)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L103-L103)
+
+### particula.coupling.grid_run.GridRun.index
+
+*attribute* · *instance attribute*
+
+```python
+index = 0
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L79-L79)
+
+### particula.coupling.grid_run.GridRun.inlet
+
+*attribute* · *instance attribute*
+
+```python
+inlet = inlet
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L99-L99)
+
+### particula.coupling.grid_run.GridRun.jump_neighbors
+
+*attribute* · *instance attribute*
+
+```python
+jump_neighbors = self.neighbor if self.gpu else self._device_array(self.neighbor, wp.int32)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L129-L133)
+
+### particula.coupling.grid_run.GridRun.lanes
+
+*attribute* · *instance attribute*
+
+```python
+lanes = uptake.bind(layout) if uptake else ()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L83-L83)
+
+### particula.coupling.grid_run.GridRun.layout
+
+*attribute* · *instance attribute*
+
+```python
+layout = layout
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L73-L73)
+
+### particula.coupling.grid_run.GridRun.manual_records
+
+*attribute* · *instance attribute*
+
+```python
+manual_records = len(self.releases)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L86-L86)
+
+### particula.coupling.grid_run.GridRun.neighbor
+
+*attribute* · *instance attribute*
+
+```python
+neighbor = self.grid.neighbors
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L100-L100)
+
+### particula.coupling.grid_run.GridRun.owner
+
+*attribute* · *instance attribute*
+
+```python
+owner = owner
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L78-L78)
+
+### particula.coupling.grid_run.GridRun.releases
+
+*attribute* · *instance attribute*
+
+```python
+releases = tuple(releases)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L84-L84)
+
+### particula.coupling.grid_run.GridRun.scratch
+
+*attribute* · *instance attribute*
+
+```python
+scratch = wp.empty_like(self.state)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L127-L127)
+
+### particula.coupling.grid_run.GridRun.signature
+
+*attribute* · *instance attribute*
+
+```python
+signature = digest.hexdigest()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L122-L122)
+
+### particula.coupling.grid_run.GridRun.state
+
+*attribute* · *instance attribute*
+
+```python
+state = a.copy()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L102-L102)
+
+### particula.coupling.grid_run.GridRun.surface
+
+*attribute* · *instance attribute*
+
+```python
+surface = surface
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L85-L85)
+
+### particula.coupling.grid_run.GridRun.uptake
+
+*attribute* · *instance attribute*
+
+```python
+uptake = uptake
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L82-L82)
+
+### particula.coupling.grid_run.GridRun.volume
+
+*attribute* · *instance attribute*
+
+```python
+volume = self.grid.volume
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L101-L101)
+
+### particula.coupling.grid_run.GridRun.__init__
+
+*method*
+
+```python
+def __init__(forcing, layout, inventory, *, releases=(), bed=None, surface=None, inlet=None, uptake=None, dispersion=None, owner='particula', device='cpu')
+```
+
+Bind the forcing, native inventory layout and execution device.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L55-L133)
+
+### particula.coupling.grid_run.GridRun._advance_frame
+
+*method*
+
+```python
+def _advance_frame(f, host)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L257-L298)
+
+### particula.coupling.grid_run.GridRun._advance_particles
+
+*method*
+
+```python
+def _advance_particles(i, start, step_dt, speed, k, jumps)
+```
+
+Traverse physical boundaries, then sample mapped mixing faces.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L322-L372)
+
+### particula.coupling.grid_run.GridRun._apply_uptake
+
+*method*
+
+```python
+def _apply_uptake(dt)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L389-L402)
+
+### particula.coupling.grid_run.GridRun._check_checkpoint_particles
+
+*method*
+
+```python
+def _check_checkpoint_particles(values, bed_mass, index)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L632-L666)
+
+### particula.coupling.grid_run.GridRun._device_array
+
+*method*
+
+```python
+def _device_array(a, dtype=wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L135-L138)
+
+### particula.coupling.grid_run.GridRun._emit_binned
+
+*method*
+
+```python
+def _emit_binned()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L374-L387)
+
+### particula.coupling.grid_run.GridRun._field_total
+
+*method*
+
+```python
+def _field_total(a)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L493-L500)
+
+### particula.coupling.grid_run.GridRun._history_id
+
+*method*
+
+```python
+def _history_id(index)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L481-L488)
+
+### particula.coupling.grid_run.GridRun._init_particles
+
+*method*
+
+```python
+def _init_particles(bed)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L140-L232)
+
+### particula.coupling.grid_run.GridRun._install_host
+
+*method*
+
+```python
+def _install_host(a, imp, exp)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L425-L438)
+
+### particula.coupling.grid_run.GridRun._read
+
+*method*
+
+```python
+def _read(a)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L490-L491)
+
+### particula.coupling.grid_run.GridRun._require_consistent
+
+*method*
+
+```python
+def _require_consistent()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L475-L479)
+
+### particula.coupling.grid_run.GridRun._step_schedule
+
+*method*
+
+```python
+def _step_schedule(f, dt, cfl)
+```
+
+Bound the outgoing fraction and stochastic first-contact step.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L300-L320)
+
+### particula.coupling.grid_run.GridRun._transport
+
+*method*
+
+```python
+def _transport(outgoing, incoming)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L440-L473)
+
+### particula.coupling.grid_run.GridRun._validate_host
+
+*method*
+
+```python
+def _validate_host(f, h)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L404-L423)
+
+### particula.coupling.grid_run.GridRun.advance
+
+*method*
+
+```python
+def advance(host=None)
+```
+
+Advance one accepted interval, then apply the local uptake once.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L234-L239)
+
+### particula.coupling.grid_run.GridRun.advance_interval
+
+*method*
+
+```python
+def advance_interval(frame, host=None)
+```
+
+Accept one live host interval and retain forcing for exact replay.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L241-L255)
+
+### particula.coupling.grid_run.GridRun.budget
+
+*method*
+
+```python
+def budget()
+```
+
+Reduce fields and resolved count, charge and kg by fate.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L502-L539)
+
+### particula.coupling.grid_run.GridRun.checkpoint
+
+*method*
+
+```python
+def checkpoint(path)
+```
+
+Write the state at a completed coupling boundary.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L559-L582)
+
+### particula.coupling.grid_run.GridRun.restore
+
+*method*
+
+```python
+def restore(path)
+```
+
+Restore matching state at an accepted interval boundary.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L584-L630)
+
+### particula.coupling.grid_run.GridRun.snapshot
+
+*method*
+
+```python
+def snapshot()
+```
+
+Download fields, stable IDs, xyz and event times.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L541-L557)
+
+## particula.coupling.grid_run.HostTransport
+
+*class* · *dataclass*
+
+```python
+class HostTransport
+```
+
+Already transported extensive inventories at a completed host interval.
+
+imports and exports are nonnegative per-cell boundary totals over the
+interval. Internal redistribution belongs to the host.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L32-L44)
+
+### particula.coupling.grid_run.HostTransport.end
+
+*attribute* · *instance attribute*
+
+```python
+end: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L41-L41)
+
+### particula.coupling.grid_run.HostTransport.exports
+
+*attribute* · *instance attribute*
+
+```python
+exports: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L44-L44)
+
+### particula.coupling.grid_run.HostTransport.imports
+
+*attribute* · *instance attribute*
+
+```python
+imports: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L43-L43)
+
+### particula.coupling.grid_run.HostTransport.inventories
+
+*attribute* · *instance attribute*
+
+```python
+inventories: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L42-L42)
+
+### particula.coupling.grid_run.HostTransport.start
+
+*attribute* · *instance attribute*
+
+```python
+start: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L40-L40)
+
+### particula.coupling.grid_run.HostTransport.__init__
+
+*method*
+
+```python
+def __init__(start: float, end: float, inventories: np.ndarray, imports: np.ndarray, exports: np.ndarray) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L0-L0)
+
+## particula.coupling.grid_run.Release
+
+*class* · *dataclass*
+
+```python
+class Release
+```
+
+One stable particle record, slip (m/s) and launch interval.
+
+A launch interval of -1 means initially airborne. Other records reserve
+the specified particle inventory in the bed until that interval begins.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L19-L29)
+
+### particula.coupling.grid_run.Release.interval
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+interval: int = -1
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L29-L29)
+
+### particula.coupling.grid_run.Release.particle
+
+*attribute* · *instance attribute*
+
+```python
+particle: Particle
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L27-L27)
+
+### particula.coupling.grid_run.Release.slip
+
+*attribute* · *instance attribute*
+
+```python
+slip: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L28-L28)
+
+### particula.coupling.grid_run.Release.__init__
+
+*method*
+
+```python
+def __init__(particle: Particle, slip: float, interval: int = -1) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_run.py#L0-L0)
+
+---
+
+# particula.coupling.grid_warp
+
+*module*
+
+Float64 Warp operations for prescribed field sampling and transport.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L1-L1)
+
+## particula.coupling.grid_warp.F
+
+*attribute* · *module attribute*
+
+```python
+F = Any
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L20-L20)
+
+## particula.coupling.grid_warp.Index3
+
+*attribute* · *module attribute*
+
+```python
+Index3 = Any
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L18-L18)
+
+## particula.coupling.grid_warp.IntMatrix
+
+*attribute* · *module attribute*
+
+```python
+IntMatrix = Any
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L16-L16)
+
+## particula.coupling.grid_warp.Keys
+
+*attribute* · *module attribute*
+
+```python
+Keys = Any
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L17-L17)
+
+## particula.coupling.grid_warp.Position3
+
+*attribute* · *module attribute*
+
+```python
+Position3 = Any
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L19-L19)
+
+## particula.coupling.grid_warp._MIX_FIRST
+
+*attribute* · *module attribute*
+
+```python
+_MIX_FIRST = wp.constant(wp.uint64(13787848793156543929))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L142-L142)
+
+## particula.coupling.grid_warp._MIX_SECOND
+
+*attribute* · *module attribute*
+
+```python
+_MIX_SECOND = wp.constant(wp.uint64(10723151780598845931))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L143-L143)
+
+## particula.coupling.grid_warp._TWO_PI
+
+*attribute* · *module attribute*
+
+```python
+_TWO_PI = wp.constant(wp.float64(2.0 * np.pi))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L144-L144)
+
+## particula.coupling.grid_warp._array
+
+*function*
+
+```python
+def _array(values, device, dtype=F)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L29-L30)
+
+## particula.coupling.grid_warp._interp
+
+*function*
+
+```python
+def _interp(table: FloatMatrix, z: F, col: int)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L46-L61)
+
+## particula.coupling.grid_warp._mix64
+
+*function*
+
+```python
+def _mix64(x: wp.uint64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L147-L152)
+
+## particula.coupling.grid_warp._normal_draw
+
+*function*
+
+```python
+def _normal_draw(key: wp.uint64, interval: int, step: int, axis: int)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L167-L171)
+
+## particula.coupling.grid_warp._profile
+
+*function*
+
+```python
+def _profile(table: FloatMatrix, query: FloatMatrix, out: FloatMatrix)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L64-L76)
+
+## particula.coupling.grid_warp._uniform
+
+*function*
+
+```python
+def _uniform(row: FloatVector, out: FloatMatrix)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L33-L36)
+
+## particula.coupling.grid_warp._uniform_draw
+
+*function*
+
+```python
+def _uniform_draw(key: wp.uint64, interval: int, step: int, lane: int)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L155-L164)
+
+## particula.coupling.grid_warp.accumulate
+
+*function*
+
+```python
+def accumulate(ledger: FloatMatrix, increment: FloatMatrix)
+```
+
+Accumulate host-reported boundary totals on device.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L359-L363)
+
+## particula.coupling.grid_warp.diffuse_cells
+
+*function*
+
+```python
+def diffuse_cells(interval: int, step: int, end: F, keys: Keys, fraction: FloatMatrix, neighbors: IntMatrix, shape: Index3, lo: Position3, width: Position3, jac_edge: FloatVector, bc: IntVector, pos: FloatMatrix, cells: IntVector, status: IntVector, event_time: FloatVector)
+```
+
+Sample conservative face exchanges on variable-K or mapped cells.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L272-L338)
+
+## particula.coupling.grid_warp.field_totals
+
+*function*
+
+```python
+def field_totals(state: FloatMatrix, total: FloatVector)
+```
+
+Reduce extensive fields at an observation boundary.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L341-L345)
+
+## particula.coupling.grid_warp.move_particles
+
+*function*
+
+```python
+def move_particles(interval: int, step: int, keys: Keys, diffusivity: Position3, start: F, dt: F, shape: Index3, lo: Position3, width: Position3, bc: IntVector, jac: FloatVector, speed: FloatMatrix, slip: FloatVector, release: IntVector, pos: FloatMatrix, cell: IntVector, status: IntVector, event_time: FloatVector)
+```
+
+Advance each stable record through mapped cell faces.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L174-L269)
+
+## particula.coupling.grid_warp.particle_totals
+
+*function*
+
+```python
+def particle_totals(state: IntVector, inventory: FloatMatrix, total: FloatMatrix)
+```
+
+Reduce particle payloads by transport fate.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L348-L356)
+
+## particula.coupling.grid_warp.profile_sample
+
+*function*
+
+```python
+def profile_sample(s, z, eta, jac, gradient, device)
+```
+
+Interpolate wind and thermodynamics using the explicit device.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L79-L92)
+
+## particula.coupling.grid_warp.transport
+
+*function*
+
+```python
+def transport(nb: IntMatrix, incoming: FloatMatrix, outgoing: FloatMatrix, volume: FloatVector, inlet: FloatTensor, old: FloatMatrix, updated: FloatMatrix, imports: FloatMatrix, exports: FloatMatrix)
+```
+
+Gather one conservative substep per cell and inventory lane.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L95-L122)
+
+## particula.coupling.grid_warp.uniform_sample
+
+*function*
+
+```python
+def uniform_sample(n, row, device)
+```
+
+Sample uniform forcing on the selected device.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L39-L43)
+
+## particula.coupling.grid_warp.uptake
+
+*function*
+
+```python
+def uptake(state: FloatMatrix, gas: int, number: int, material: int, fraction: F)
+```
+
+Transfer gas once into an occupied particle bin.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_warp.py#L125-L138)
+
+---
+
+# particula.coupling.particle_dispersion
+
+*module*
+
+Resolved particle transport using prescribed eddy diffusivity.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/particle_dispersion.py#L1-L1)
+
+## particula.coupling.particle_dispersion.ParticleDispersion
+
+*class* · *dataclass*
+
+```python
+class ParticleDispersion
+```
+
+Configure seeded particle dispersion on the accepted forcing sequence.
+
+**Parameters**
+
+- `seed` (`int`) — Unsigned 64-bit integer selecting an independent ensemble.
+- `max_step` (`float`) — Maximum particle substep in seconds. Decrease this when resolving first contact with an open or depositing boundary.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/particle_dispersion.py#L10-L106)
+
+### particula.coupling.particle_dispersion.ParticleDispersion.algorithm
+
+*attribute* · *class attribute*
+
+```python
+algorithm: str = 'prescribed-dispersion-v1'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/particle_dispersion.py#L22-L22)
+
+### particula.coupling.particle_dispersion.ParticleDispersion.max_step
+
+*attribute* · *instance attribute*
+
+```python
+max_step: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/particle_dispersion.py#L21-L21)
+
+### particula.coupling.particle_dispersion.ParticleDispersion.seed
+
+*attribute* · *instance attribute*
+
+```python
+seed: int
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/particle_dispersion.py#L20-L20)
+
+### particula.coupling.particle_dispersion.ParticleDispersion.__init__
+
+*method*
+
+```python
+def __init__(seed: int, max_step: float) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/particle_dispersion.py#L0-L0)
+
+### particula.coupling.particle_dispersion.ParticleDispersion.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Validate the seed and duration before allocating particle arrays.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/particle_dispersion.py#L24-L31)
+
+### particula.coupling.particle_dispersion.ParticleDispersion._uniform_cartesian
+
+*method* · *staticmethod*
+
+```python
+def _uniform_cartesian(grid, frame, k, active)
+```
+
+Check both cell samples and face conductances against constant K.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/particle_dispersion.py#L83-L106)
+
+### particula.coupling.particle_dispersion.ParticleDispersion.coefficients
+
+*method*
+
+```python
+def coefficients(grid, frame)
+```
+
+Return constant Cartesian K or full-interval jump fractions.
+
+Each shared face moves an equal fraction of the same physical volume
+in either direction. An absorbing exterior uses the distance from
+the cell center to the face; reflecting faces transfer zero mass.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/particle_dispersion.py#L55-L81)
+
+### particula.coupling.particle_dispersion.ParticleDispersion.configuration
+
+*method*
+
+```python
+def configuration()
+```
+
+Return the restart contract for counter-based particle draws.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/particle_dispersion.py#L33-L37)
+
+### particula.coupling.particle_dispersion.ParticleDispersion.keys
+
+*method*
+
+```python
+def keys(particle_ids)
+```
+
+Derive one stable key per identity, independent of storage order.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/particle_dispersion.py#L39-L53)
+
+---
+
+# particula.coupling.prescribed
+
+*module*
+
+One-way, terrain-following air and settling-particle trajectories.
+
+Map upstream streamline height eta to z = h(x) + J(x) eta with
+J = 1 - h/lid. Conserving horizontal volume flux gives u = U(eta)/J.
+The fixed lid and Gaussian ridge bound a kinematic, attached flow.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L1-L1)
+
+## particula.coupling.prescribed.SOUNDING_COLUMNS
+
+*attribute* · *module attribute*
+
+```python
+SOUNDING_COLUMNS = ('height_m', 'temperature_K', 'pressure_Pa', 'vapor_kg_per_kg_dry_air', 'east_m_s', 'north_m_s')
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L16-L23)
+
+## particula.coupling.prescribed.DuneFlow
+
+*class* · *dataclass*
+
+```python
+class DuneFlow
+```
+
+Gaussian ridge centered at x=0 and uniform along y, in metres.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L91-L240)
+
+### particula.coupling.prescribed.DuneFlow.height
+
+*attribute* · *instance attribute*
+
+```python
+height: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L96-L96)
+
+### particula.coupling.prescribed.DuneFlow.lid
+
+*attribute* · *instance attribute*
+
+```python
+lid: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L98-L98)
+
+### particula.coupling.prescribed.DuneFlow.sounding
+
+*attribute* · *instance attribute*
+
+```python
+sounding: Sounding
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L95-L95)
+
+### particula.coupling.prescribed.DuneFlow.width
+
+*attribute* · *instance attribute*
+
+```python
+width: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L97-L97)
+
+### particula.coupling.prescribed.DuneFlow.__init__
+
+*method*
+
+```python
+def __init__(sounding: Sounding, height: float, width: float, lid: float) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L0-L0)
+
+### particula.coupling.prescribed.DuneFlow.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Require an open passage and sounding coverage of the layer.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L100-L108)
+
+### particula.coupling.prescribed.DuneFlow._wind
+
+*method*
+
+```python
+def _wind(x, eta)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L114-L118)
+
+### particula.coupling.prescribed.DuneFlow.ground
+
+*method*
+
+```python
+def ground(x)
+```
+
+Return bed elevation above the sounding datum in metres.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L110-L112)
+
+### particula.coupling.prescribed.DuneFlow.parcel_trace
+
+*method*
+
+```python
+def parcel_trace(parcel_id, xyz, time, aerosol: ParcelInitialState, *, provenance)
+```
+
+Return a moving center and replay trace with fixed dry-air mass.
+
+The sounding supplies initial and subsequent thermodynamics. The
+aerosol template supplies dry mass, represented counts, radii and κ.
+Volume follows the moist gas law. Replay owns aerosol water exchange.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L190-L204)
+
+### particula.coupling.prescribed.DuneFlow.pickup
+
+*method*
+
+```python
+def pickup(x, *, reference_height, drag_coefficient, threshold, available_mass, pulse_mass)
+```
+
+Return lifted mass (kg) from a finite dry bed patch in one pulse.
+
+Diagnose friction velocity as sqrt(Cd) times the horizontal wind at
+reference_height (m above bed). Above threshold (m/s), release the
+requested pulse capped by available mass (both kg). The caller debits
+the bed once. Cd, threshold and pulse size are experiment inputs.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L206-L240)
+
+### particula.coupling.prescribed.DuneFlow.track
+
+*method*
+
+```python
+def track(xyz, time, *, settling=0.0)
+```
+
+Advect one center or particle with constant downward slip (m/s).
+
+xyz is a world position in metres and time contains increasing sample
+seconds. After first impact a settling particle stays at its impact
+point. A zero-slip air marker follows its initial streamline.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L130-L188)
+
+### particula.coupling.prescribed.DuneFlow.velocity
+
+*method*
+
+```python
+def velocity(x, z)
+```
+
+Sample east, north and vertical wind (m/s) at one world position.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L120-L128)
+
+## particula.coupling.prescribed.Sounding
+
+*class* · *dataclass*
+
+```python
+class Sounding
+```
+
+Height above a common datum (m), T (K), p (Pa), vapor (kg/kg dry air)
+and east/north wind components (m/s) at each level.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L26-L79)
+
+### particula.coupling.prescribed.Sounding.east
+
+*attribute* · *instance attribute*
+
+```python
+east: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L36-L36)
+
+### particula.coupling.prescribed.Sounding.height
+
+*attribute* · *instance attribute*
+
+```python
+height: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L32-L32)
+
+### particula.coupling.prescribed.Sounding.north
+
+*attribute* · *instance attribute*
+
+```python
+north: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L37-L37)
+
+### particula.coupling.prescribed.Sounding.pressure
+
+*attribute* · *instance attribute*
+
+```python
+pressure: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L34-L34)
+
+### particula.coupling.prescribed.Sounding.temperature
+
+*attribute* · *instance attribute*
+
+```python
+temperature: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L33-L33)
+
+### particula.coupling.prescribed.Sounding.vapor
+
+*attribute* · *instance attribute*
+
+```python
+vapor: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L35-L35)
+
+### particula.coupling.prescribed.Sounding.__init__
+
+*method*
+
+```python
+def __init__(height: np.ndarray, temperature: np.ndarray, pressure: np.ndarray, vapor: np.ndarray, east: np.ndarray, north: np.ndarray) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L0-L0)
+
+### particula.coupling.prescribed.Sounding.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Own a finite sorted column and reject invalid thermodynamics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L39-L58)
+
+### particula.coupling.prescribed.Sounding.from_csv
+
+*method* · *classmethod*
+
+```python
+def from_csv(path)
+```
+
+Read a normalized radiosonde table with named SI columns.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L60-L66)
+
+### particula.coupling.prescribed.Sounding.thermodynamics
+
+*method*
+
+```python
+def thermodynamics(z)
+```
+
+Interpolate T, p and vapor at geometric heights in metres.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L68-L79)
+
+## particula.coupling.prescribed.Track
+
+*class* · *dataclass*
+
+```python
+class Track
+```
+
+World positions (m), sample times (s), and optional impact time (s).
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L82-L88)
+
+### particula.coupling.prescribed.Track.deposition_time
+
+*attribute* · *instance attribute*
+
+```python
+deposition_time: float | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L88-L88)
+
+### particula.coupling.prescribed.Track.time
+
+*attribute* · *instance attribute*
+
+```python
+time: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L86-L86)
+
+### particula.coupling.prescribed.Track.xyz
+
+*attribute* · *instance attribute*
+
+```python
+xyz: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L87-L87)
+
+### particula.coupling.prescribed.Track.__init__
+
+*method*
+
+```python
+def __init__(time: np.ndarray, xyz: np.ndarray, deposition_time: float | None) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L0-L0)
+
+## particula.coupling.prescribed.make_parcel_trace
+
+*function*
+
+```python
+def make_parcel_trace(parcel_id, track, aerosol, provenance, temperature, pressure, vapor)
+```
+
+Bind sampled SI thermodynamics and fixed dry air to native replay.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/prescribed.py#L243-L267)
+
+---
+
+# particula.coupling.sounding_sequence
+
+*module*
+
+Time-dependent profile forcing for moving air and fixed finite volumes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L1-L1)
+
+## particula.coupling.sounding_sequence.ChangingSoundingFlow
+
+*class* · *dataclass*
+
+```python
+class ChangingSoundingFlow(SpatialFlow)
+```
+
+Bases: `particula.coupling.flows.SpatialFlow`
+
+Interpolate atmospheric profiles over level ground or a fixed dune.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L117-L271)
+
+### particula.coupling.sounding_sequence.ChangingSoundingFlow.sequence
+
+*attribute* · *instance attribute*
+
+```python
+sequence: SoundingSequence
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L121-L121)
+
+### particula.coupling.sounding_sequence.ChangingSoundingFlow.terrain
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+terrain: tuple | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L122-L122)
+
+### particula.coupling.sounding_sequence.ChangingSoundingFlow.__init__
+
+*method*
+
+```python
+def __init__(sequence: SoundingSequence, terrain: tuple | None = None) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L0-L0)
+
+### particula.coupling.sounding_sequence.ChangingSoundingFlow.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Check that the common profile spans the entire prescribed dune.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L124-L129)
+
+### particula.coupling.sounding_sequence.ChangingSoundingFlow._provider
+
+*method*
+
+```python
+def _provider(profile)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L131-L134)
+
+### particula.coupling.sounding_sequence.ChangingSoundingFlow.interval
+
+*method*
+
+```python
+def interval(grid, start, end, mixing=None, *, device='cpu')
+```
+
+Split at knots and face reversals before integrating linear flux.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L243-L271)
+
+### particula.coupling.sounding_sequence.ChangingSoundingFlow.parcel_trace
+
+*method*
+
+```python
+def parcel_trace(parcel_id, xyz, time, aerosol, *, provenance)
+```
+
+Integrate each linear time segment and retain the profile knots.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L148-L241)
+
+### particula.coupling.sounding_sequence.ChangingSoundingFlow.reference_air
+
+*method*
+
+```python
+def reference_air(grid, coord, time, device)
+```
+
+Sample pointwise atmosphere on the fixed grid geometry.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L142-L146)
+
+### particula.coupling.sounding_sequence.ChangingSoundingFlow.sample
+
+*method*
+
+```python
+def sample(xyz, time, *, device='cpu')
+```
+
+Sample world positions within the common profile coverage.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L136-L140)
+
+### particula.coupling.sounding_sequence.ChangingSoundingFlow.trajectory
+
+*method*
+
+```python
+def trajectory(parcel_id)
+```
+
+Inherited from: `particula.coupling.flows.FlowStrategy`
+
+Return a recorded native parcel history by stable identity.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/flows.py#L36-L38)
+
+## particula.coupling.sounding_sequence.SoundingSequence
+
+*class* · *dataclass*
+
+```python
+class SoundingSequence
+```
+
+Profiles on a common height datum, timed in seconds since time_origin.
+
+Profiles may have different vertical sampling. All queries use the
+intersection of their height ranges. The caller supplies the common
+height datum and measurement or synthetic origin in the provenance.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L13-L114)
+
+### particula.coupling.sounding_sequence.SoundingSequence.profiles
+
+*attribute* · *instance attribute*
+
+```python
+profiles: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L23-L23)
+
+### particula.coupling.sounding_sequence.SoundingSequence.provenance
+
+*attribute* · *instance attribute*
+
+```python
+provenance: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L25-L25)
+
+### particula.coupling.sounding_sequence.SoundingSequence.time_origin
+
+*attribute* · *instance attribute*
+
+```python
+time_origin: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L24-L24)
+
+### particula.coupling.sounding_sequence.SoundingSequence.times
+
+*attribute* · *instance attribute*
+
+```python
+times: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L22-L22)
+
+### particula.coupling.sounding_sequence.SoundingSequence.__init__
+
+*method*
+
+```python
+def __init__(times: tuple, profiles: tuple, time_origin: str, provenance: str) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L0-L0)
+
+### particula.coupling.sounding_sequence.SoundingSequence.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Check that every profile shares a nonempty height/time domain.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L27-L72)
+
+### particula.coupling.sounding_sequence.SoundingSequence.at
+
+*method*
+
+```python
+def at(time)
+```
+
+Return the interpolated SI column at one time in seconds.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L99-L114)
+
+### particula.coupling.sounding_sequence.SoundingSequence.bracket
+
+*method*
+
+```python
+def bracket(time)
+```
+
+Return the lower interval index, including at the last record.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L90-L97)
+
+### particula.coupling.sounding_sequence.SoundingSequence.from_csv
+
+*method* · *classmethod*
+
+```python
+def from_csv(path, *, time_origin, provenance)
+```
+
+Read profiles grouped by increasing time_s using named SI columns.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/sounding_sequence.py#L74-L88)
+
+---
+
+# particula.coupling.surface_emission
+
+*module*
+
+Finite-bed dust emission under a prescribed piecewise-linear wind.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L1-L1)
+
+## particula.coupling.surface_emission.BedPatch
+
+*class* · *dataclass*
+
+```python
+class BedPatch
+```
+
+A bottom cell's erodible slope area (m²) and initial kg per class.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L58-L80)
+
+### particula.coupling.surface_emission.BedPatch.area
+
+*attribute* · *instance attribute*
+
+```python
+area: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L64-L64)
+
+### particula.coupling.surface_emission.BedPatch.available
+
+*attribute* · *instance attribute*
+
+```python
+available: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L65-L65)
+
+### particula.coupling.surface_emission.BedPatch.cell
+
+*attribute* · *instance attribute*
+
+```python
+cell: int
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L63-L63)
+
+### particula.coupling.surface_emission.BedPatch.name
+
+*attribute* · *instance attribute*
+
+```python
+name: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L62-L62)
+
+### particula.coupling.surface_emission.BedPatch.__init__
+
+*method*
+
+```python
+def __init__(name: str, cell: int, area: float, available: tuple) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L0-L0)
+
+### particula.coupling.surface_emission.BedPatch.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Check patch identity, physical surface area and inventory.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L67-L80)
+
+## particula.coupling.surface_emission.DustClass
+
+*class* · *dataclass*
+
+```python
+class DustClass
+```
+
+Properties of an emitted dry spherical class in SI units.
+
+threshold is friction velocity (m/s), coefficient is kg/m²/s above
+normalized excess shear, diameter is m, density is kg/m³, slip is
+prescribed downward terminal speed (m/s), fractions are dry mass fractions.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L13-L55)
+
+### particula.coupling.surface_emission.DustClass.coefficient
+
+*attribute* · *instance attribute*
+
+```python
+coefficient: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L24-L24)
+
+### particula.coupling.surface_emission.DustClass.density
+
+*attribute* · *instance attribute*
+
+```python
+density: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L26-L26)
+
+### particula.coupling.surface_emission.DustClass.diameter
+
+*attribute* · *instance attribute*
+
+```python
+diameter: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L25-L25)
+
+### particula.coupling.surface_emission.DustClass.fractions
+
+*attribute* · *instance attribute*
+
+```python
+fractions: tuple
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L27-L27)
+
+### particula.coupling.surface_emission.DustClass.name
+
+*attribute* · *instance attribute*
+
+```python
+name: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L22-L22)
+
+### particula.coupling.surface_emission.DustClass.slip
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+slip: float = 0.0
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L28-L28)
+
+### particula.coupling.surface_emission.DustClass.threshold
+
+*attribute* · *instance attribute*
+
+```python
+threshold: float
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L23-L23)
+
+### particula.coupling.surface_emission.DustClass.mass
+
+*property*
+
+```python
+mass
+```
+
+Return kg per physical grain of the emitted diameter.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L53-L55)
+
+### particula.coupling.surface_emission.DustClass.__init__
+
+*method*
+
+```python
+def __init__(name: str, threshold: float, coefficient: float, diameter: float, density: float, fractions: tuple, slip: float = 0.0) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L0-L0)
+
+### particula.coupling.surface_emission.DustClass.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Validate the dry mass and material partition.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L30-L50)
+
+## particula.coupling.surface_emission.SurfaceEmission
+
+*class*
+
+```python
+class SurfaceEmission
+```
+
+Prescribed bed exchange integrated over accepted replay intervals.
+
+Each interval's integrated release enters at its left endpoint. Refining
+accepted intervals refines the resulting transport timing. Forcing and
+emission have independent outputs and share the same fixed grid and clock.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L107-L321)
+
+### particula.coupling.surface_emission.SurfaceEmission.forcing_id
+
+*attribute* · *instance attribute*
+
+```python
+forcing_id = forcing.identity
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L174-L174)
+
+### particula.coupling.surface_emission.SurfaceEmission.friction_velocity
+
+*attribute* · *instance attribute*
+
+```python
+friction_velocity = np.sqrt(drag_coefficient) * np.linalg.norm(wind, axis=2)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L188-L190)
+
+### particula.coupling.surface_emission.SurfaceEmission.identity
+
+*attribute* · *instance attribute*
+
+```python
+identity = digest.hexdigest()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L223-L223)
+
+### particula.coupling.surface_emission.SurfaceEmission.materials
+
+*attribute* · *instance attribute*
+
+```python
+materials = tuple(materials)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L142-L142)
+
+### particula.coupling.surface_emission.SurfaceEmission.records
+
+*attribute* · *instance attribute*
+
+```python
+records = np.argwhere(self.emitted > 0) if representation == 'resolved' else np.empty((0, 3), dtype=int)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L192-L196)
+
+### particula.coupling.surface_emission.SurfaceEmission.representation
+
+*attribute* · *instance attribute*
+
+```python
+representation = representation
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L173-L173)
+
+### particula.coupling.surface_emission.SurfaceEmission.wind_times
+
+*attribute* · *instance attribute*
+
+```python
+wind_times = knots.copy()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L187-L187)
+
+### particula.coupling.surface_emission.SurfaceEmission.__init__
+
+*method*
+
+```python
+def __init__(forcing, flow, patches, classes, materials, *, drag_coefficient, reference_height, ejection_height, representation, capacity=None, device='cpu')
+```
+
+Sample wind above the bed, integrate gusts and reserve record slots.
+
+reference_height and ejection_height are physical metres above bed.
+capacity limits all resolved source records across the recording.
+Per-class rates use piecewise linear horizontal winds between knots.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L115-L223)
+
+### particula.coupling.surface_emission.SurfaceEmission._integrate
+
+*method*
+
+```python
+def _integrate(forcing, knots, wind, drag_coefficient)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L252-L279)
+
+### particula.coupling.surface_emission.SurfaceEmission._reference_points
+
+*method*
+
+```python
+def _reference_points(grid, ejection_height, reference_height)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L225-L250)
+
+### particula.coupling.surface_emission.SurfaceEmission.bind
+
+*method*
+
+```python
+def bind(forcing, layout)
+```
+
+Check compatibility and construct stable weighted resolved slots.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L281-L307)
+
+### particula.coupling.surface_emission.SurfaceEmission.field_increment
+
+*method*
+
+```python
+def field_increment(index, layout, n)
+```
+
+Convert emitted kg to count and dry-material lanes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L309-L321)
+
+## particula.coupling.surface_emission._excess_integral
+
+*function*
+
+```python
+def _excess_integral(u0, u1, threshold, cd)
+```
+
+Integrate positive normalized excess shear over unit linear-wind time.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/surface_emission.py#L83-L104)
 
 ---
 
