@@ -132,7 +132,10 @@ results. After a plotting-only replot, validation reuses saved data and does
 not repeat the simulation. Declared CUDA or long-running examples report an
 explicit execution skip. Syntax, saved-file integrity, and freshness are checked
 for every example.
-Use `--base` with the pull request base revision in CI.
+For pull requests, `--base` identifies the revision used to compare each
+registry entry, its executable source and its declared inputs. Adding one entry
+selects that example. A manual documentation workflow or a change to the shared
+example runner pushed to `main` validates the full CPU collection.
 
 The example registry declares its source, execution policy, device, timeout,
 optional invocation, and input/helper files. Executable changes and declared

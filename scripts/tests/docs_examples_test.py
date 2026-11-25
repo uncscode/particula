@@ -143,6 +143,10 @@ def test_changed_selection_excludes_prose_only_and_includes_inputs(example):
             [examples.GIT, *args], cwd=root, check=True, capture_output=True
         )
 
+    registry_file = root / "website" / "examples.json"
+    registry_file.parent.mkdir()
+    configs = {"demo": config, "other": config, "retired": config}
+    registry_file.write_text(json.dumps(configs))
     git("init", "-q")
     git("add", ".")
     git(
@@ -158,15 +162,24 @@ def test_changed_selection_excludes_prose_only_and_includes_inputs(example):
     source.write_text(
         source.read_text().replace("Explanation", "Revised prose")
     )
-    assert examples.selected_changed({"demo": config}, "HEAD", root) == []
+    assert examples.selected_changed(configs, "HEAD", root) == []
+    # Adding, editing and removing entries leaves other examples unselected.
+    configs = {
+        "other": config,
+        "demo": {**config, "timeout": 3},
+        "added": config,
+    }
+    registry_file.write_text(json.dumps(configs, indent=2))
+    assert examples.selected_changed(configs, "HEAD", root) == ["demo", "added"]
     (root / "input.txt").write_text("changed")
-    assert examples.selected_changed({"demo": config}, "HEAD", root) == ["demo"]
+    assert examples.selected_changed(configs, "HEAD", root) == list(configs)
 
 
-def test_policy_skips_cuda_without_invoking_runner(monkeypatch, capsys):
-    """Policy skips cuda without invoking runner."""
+@pytest.mark.parametrize("policy", ["cuda", "long"])
+def test_explicit_refresh_policies_skip_execution(policy, monkeypatch, capsys):
+    """Long and CUDA examples still verify their saved bundle during checks."""
     monkeypatch.setattr(
-        examples, "registry", lambda: {"gpu": {"policy": "cuda"}}
+        examples, "registry", lambda: {"demo": {"policy": policy}}
     )
     monkeypatch.setattr(examples, "fingerprint", lambda *args: "hash")
     monkeypatch.setattr(
@@ -175,11 +188,13 @@ def test_policy_skips_cuda_without_invoking_runner(monkeypatch, capsys):
     monkeypatch.setattr(
         examples,
         "execute",
-        lambda _: pytest.fail("CUDA must not execute in check"),
+        lambda _: pytest.fail(f"{policy} must not execute in check"),
     )
     monkeypatch.setattr(sys, "argv", ["docs_examples", "check"])
     examples.main()
-    assert "SKIP gpu" in capsys.readouterr().out
+    output = capsys.readouterr().out
+    assert "RESULTS demo: current" in output
+    assert f"SKIP demo: {policy}" in output
 
 
 def test_output_redaction_preserves_scientific_warning_details(tmp_path):

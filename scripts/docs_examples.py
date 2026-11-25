@@ -759,15 +759,30 @@ def selected_changed(configs, base, root=ROOT):
         .strip("\0")
         .split("\0")
     )
-    all_changed = bool(
-        changed & {"website/examples.json", "scripts/docs_examples.py"}
-    )
+    registry_path = CONFIG.relative_to(ROOT).as_posix()
+    previous_configs = configs
+    if registry_path in changed:
+        previous_registry = subprocess.run(  # noqa: S603 -- fixed Git argv
+            [GIT, "show", f"{base}:{registry_path}"],
+            cwd=root,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        # With no registry at the base revision, every current entry is new.
+        previous_configs = (
+            json.loads(previous_registry.stdout)
+            if previous_registry.returncode == 0
+            else {}
+        )
     selected = []
     for key, config in configs.items():
         dependencies = set(scientific_inputs(config))
         if config.get("full_canvas"):
             dependencies.update(STYLE_INPUTS)
-        if all_changed or changed.intersection(dependencies):
+        if previous_configs.get(key) != config or changed.intersection(
+            dependencies
+        ):
             selected.append(key)
         elif config["source"] in changed:
             previous = subprocess.run(  # noqa: S603 -- Git argv without a shell
@@ -848,7 +863,6 @@ def main():
         selected_changed(configs, args.base) if args.changed else list(configs)
     )
     for key, config in configs.items():
-        fingerprint(config)
         _, manifest = bundle(key)
         state = result_state(config, manifest)
         print(f"RESULTS {key}: {state}")

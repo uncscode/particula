@@ -50,7 +50,12 @@ jobs:
           if [ -z "$base" ] || ! git cat-file -e "$base^{commit}" 2>/dev/null; then
             base=HEAD^
           fi
-          python scripts/docs_examples.py check --changed --base "$base"
+          if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]] ||
+             { [[ "$GITHUB_EVENT_NAME" == push ]] && ! git diff --quiet "$base" HEAD -- scripts/docs_examples.py; }; then
+            python scripts/docs_examples.py check
+          else
+            python scripts/docs_examples.py check --changed --base "$base"
+          fi
       - name: Build and verify the full site
         run: npm --prefix website run build
       - name: Generate execution inventory
