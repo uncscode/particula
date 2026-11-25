@@ -7,8 +7,8 @@ interface Entry {
   ownedSlugs?: string[];
   items?: Entry[];
 }
-interface Props { entry: Entry }
-const { entry } = Astro.props;
+interface Props { entry: Entry; topLevel?: boolean }
+const { entry, topLevel } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const currentSlug = Astro.url.pathname.slice(base.length).replace(/^\/|\/$/g, '');
 const href = `${base}/${entry.slug}/${entry.anchor ? '#' + entry.anchor : ''}`;
@@ -23,7 +23,7 @@ const open = containsCurrent(entry)
 ---
 {entry.items ?
   <div class="study-group">
-    <a class="landing" {href} aria-current={current ? 'page' : undefined}>{entry.label}</a>
+    <a class:list={['landing', { 'top-level': topLevel }]} {href} aria-current={current ? 'page' : undefined}>{entry.label}</a>
     <details open={open}>
       <summary aria-label={`Toggle ${entry.label} menu`}><span aria-hidden="true">›</span></summary>
       <ul>{entry.items.map((child) => <li><Astro.self entry={child} /></li>)}</ul>
@@ -35,6 +35,10 @@ const open = containsCurrent(entry)
   a:hover, a:focus-visible { color: var(--sl-color-text-accent); }
   a[aria-current="page"] { font-weight: 650; color: var(--sl-color-text-accent); }
   .landing { margin-inline-end: 2rem; font-weight: 650; }
+  .top-level { font-size: var(--sl-text-lg); }
+  @media (min-width: 50rem) {
+    .top-level { font-size: var(--sl-text-base); }
+  }
   summary { position: absolute; top: 0; inset-inline-end: 0; width: 2rem; min-height: 1.8rem; display: grid; place-items: center; cursor: pointer; list-style: none; }
   summary::-webkit-details-marker { display: none; }
   summary span { font-size: 1.35em; }

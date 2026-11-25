@@ -467,7 +467,7 @@ def prepare_article(page, catalog):
         text = (
             "import StudyCarousel from '@components/StudyCarousel.astro';\n\n"
             + text
-            + '\n\n<StudyCarousel label="Illustrated studies" />'
+            + '\n\n<StudyCarousel label="Illustrated studies" literatureLink />'
         )
         page = str(Path(page).with_suffix(".mdx"))
     # The literature gallery already links every study through a figure card.
