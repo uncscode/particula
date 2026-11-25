@@ -51,7 +51,7 @@ Modeled convection supplies only a third of the heat needed for the reported pen
 
 <div class="study-figures">
 
-[![Head-and-tail symbols on the droplet surface also mark the two cloud-model cases containing surfactant. Dodecyl sulfate lowered surface tension more than octyl sulfate at one tenth the molar dose. Shifting dry inflow in the simulated smoke cloud added 89.0 droplets/cm³ for both matched acid and finite surfactant supply, and 66.7/cm³ with surface tension fixed at the measured laboratory values.](../../images/cloud-edge-surfactants/toc.png)\
+[![Head-and-tail symbols on the droplet surface also mark the two cloud-model cases containing surfactant. Dodecyl sulfate lowered surface tension more than octyl sulfate at one tenth the molar dose. Moving where dry, smoky air entered the cloud increased the total at 100 m above cloud base by 89.0 droplets/cm³ with matched acid seeds or finite surfactant supply, and by 66.7/cm³ with surface tension fixed at the laboratory values.](../../images/cloud-edge-surfactants/toc.png)\
 Two surfactants lower surface tension yet scarcely change droplet counts at a simulated smoke-cloud edge](cloud-edge-surfactants/index.md)
 
 [![Pallas fits place 9.8% salt at 50 nm and 49.6% at 120 nm.](../../images/pallas-activation/salt-toc.png)\

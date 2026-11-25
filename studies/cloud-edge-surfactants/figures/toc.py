@@ -126,15 +126,19 @@ def render():
         )
         ax.add_patch(PathPatch(edge, facecolor="#E1E9E2", edgecolor="none"))
         ax.text(
-            0.06, 0.455, "Modeled smoke-cloud edge", size=11.6, weight="bold"
+            0.06, 0.466, "Modeled smoke-cloud edge", size=11.6, weight="bold"
         )
         ax.text(
-            0.06, 0.397, "Extra droplets/cm³ when dry inflow shifts", size=8.5
+            0.06,
+            0.409,
+            "Shift where dry, smoky air enters the cloud.",
+            size=8.5,
         )
+        ax.text(0.06, 0.357, "Change at +100 m (droplets/cm³)", size=8.5)
         for y, control, label, color in (
-            (0.303, "acid", "Citric acid alone", INK),
-            (0.187, "finite", "Surfactants with finite supply", TEAL),
-            (0.071, "fixed70", "Surface tension fixed at lab values", RUST),
+            (0.272, "acid", "Citric acid seeds", INK),
+            (0.165, "finite", "Surfactants with finite supply", TEAL),
+            (0.058, "fixed70", "Surface tension fixed at lab values", RUST),
         ):
             gain = gains[control]
             label_x = 0.06
