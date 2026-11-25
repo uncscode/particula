@@ -1,0 +1,7 @@
+# Publisher downloads, locally reconstructed tables and simulation products.
+/publisher/
+/*.csv
+/*.json
+/*.png
+/results/
+/cloud/results/
