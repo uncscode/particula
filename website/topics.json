@@ -6181,6 +6181,78 @@
       ],
       "role": "Studies",
       "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/cloud-edge-surfactants/index.md",
+      "title": "Two surfactants lower surface tension yet scarcely change droplet counts at a simulated smoke-cloud edge",
+      "topic": "surface",
+      "also": [
+        "parcels",
+        "activity-kappa"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "cloud-edge-surfactants",
+        "runs": [],
+        "companions": [
+          "docs/studies/literature/cloud-edge-surfactants/molecule-budget.md",
+          "docs/studies/literature/cloud-edge-surfactants/backgrounds.md",
+          "docs/studies/literature/cloud-edge-surfactants/cloud-edge.md",
+          "docs/studies/literature/cloud-edge-surfactants/reproduction.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/processes/parcels.md",
+            "label": "Follow water and particle inventories along a parcel trajectory"
+          }
+        ]
+      },
+      "tocFigure": "cloud-edge-surfactants/toc.png",
+      "tocSource": "studies/cloud-edge-surfactants/figures/toc.py"
+    },
+    {
+      "source": "docs/studies/literature/cloud-edge-surfactants/molecule-budget.md",
+      "title": "Can a small seed sustain the measured surface tension?",
+      "topic": "surface",
+      "also": [
+        "activity-kappa",
+        "size"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/cloud-edge-surfactants/cloud-edge.md",
+      "title": "Which particles account for the 89 extra droplets at the smoke-cloud edge?",
+      "topic": "parcels",
+      "also": [
+        "surface",
+        "transport"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/cloud-edge-surfactants/reproduction.md",
+      "title": "Reproducing the surfactant and cloud-edge comparisons",
+      "topic": "surface",
+      "also": [
+        "parcels"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/cloud-edge-surfactants/backgrounds.md",
+      "title": "How do competing particles and condensable organics change the droplet count?",
+      "topic": "condensation",
+      "also": [
+        "parcels",
+        "activity-kappa"
+      ],
+      "role": "Studies",
+      "start_here": false
     }
   ],
   "supporting": [
