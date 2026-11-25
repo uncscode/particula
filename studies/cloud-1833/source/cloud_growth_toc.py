@@ -6,7 +6,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.patches import Circle, Ellipse, Rectangle
-from particula.plotting.toc import add_toc_logo
+from particula.plotting.toc import add_toc_logo, save_toc_svg
 
 root = Path(__file__).resolve().parents[1]
 results = Path(os.environ.get("CLOUD_RESULTS", root / "full-transfer"))
@@ -102,5 +102,18 @@ with plt.style.context("particula.toc"):
     text(64, 270, "CLOUD measured", 8.5, color=ink, align="center")
     text(228, 270, "Particula · attraction", 8.5, color=teal, align="center")
     add_toc_logo(fig, corner="top right")
-    fig.savefig(figures / "CLOUD-1833-growth-TOC.png", dpi=300)
+    save_toc_svg(
+        fig,
+        figures / "CLOUD-1833-growth-TOC.svg",
+        title=(
+            "How sulfuric acid capture shapes particle growth in CLOUD run 1833"
+        ),
+        description=(
+            "At the same 2.9 nm entry flux, size-distribution "
+            "mismatch falls from 27% with vapor transfer to 21% with "
+            "hard-sphere capture and 13% with attraction. The "
+            "attractive model reaches 5,000 particles/cm³ in the "
+            "9.7–64.7 nm range 34 minutes after CLOUD."
+        ),
+    )
     plt.close(fig)

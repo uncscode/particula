@@ -5,7 +5,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle, FancyBboxPatch, Rectangle
-from particula.plotting.toc import add_toc_logo
+from particula.plotting.toc import add_toc_logo, save_toc_svg
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "website/public/study-data/straw-combustion/measurements.csv"
@@ -154,7 +154,20 @@ def draw_toc(rows):
     chart.set_axisbelow(True)
     label(53, 6.4, "Sulfur dioxide in the feed (ppm)", 8, weight="bold")
     add_toc_logo(figure, corner="bottom left")
-    figure.savefig(IMAGES / "toc.png")
+    save_toc_svg(
+        figure,
+        IMAGES / "toc.svg",
+        title=(
+            "Particula fits the measured rise in particle number with "
+            "sulfur dioxide in a straw-combustion analogue"
+        ),
+        description=(
+            "Measured and fitted two-path outlet counts at 0, 50 and "
+            "500 ppm sulfur dioxide. The measurements rise from 3.0 "
+            "to 14.7 to 29.2 million particles per cm³. Particula "
+            "gives 5.2, 12.3 and 27.8 million per cm³."
+        ),
+    )
     plt.close(figure)
 
 

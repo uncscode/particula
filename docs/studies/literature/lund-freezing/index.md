@@ -1,6 +1,6 @@
 # Fresh aerosol can form ice while entrainment reduces freezing across the cloud
 
-![Six-hour change in primary freezing relative to a closed cloud top. Fresh dust-like inflow increased freezing in the reference eddy and reduced it in the rapid-exchange ISDAC and M-PACE simulations.](../../../images/lund-freezing/cloud-toc.png)
+![Six-hour change in primary freezing relative to a closed cloud top. Fresh dust-like inflow increased freezing in the reference eddy and reduced it in the rapid-exchange ISDAC and M-PACE simulations.](../../../images/lund-freezing/cloud-toc.svg)
 
 Jakobsson and colleagues showed that droplets containing ambient aerosol continued to freeze for hours at constant temperature. We used their repeated measurements to identify which surviving droplets were most likely to freeze next, then asked whether bringing fresh aerosol into a cloud would replenish that activity. Fresh dust-like aerosol increased six-hour primary freezing by 45% in a simulated eddy when it replaced equally abundant, previously exposed aerosol in the same inflow. Opening the cloud top also introduced dry air. Compared with keeping the top closed, the same fresh source produced 0.0635 more freezing events per litre of air in the reference eddy and 0.032 fewer in a thin Arctic cloud profile. The sign depended on whether the incoming particles formed enough ice to offset the freezing lost as resident droplets dried or left the cloud.
 

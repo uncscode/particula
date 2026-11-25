@@ -8,7 +8,15 @@
   <g font-family="DejaVu Sans, sans-serif" fill="#243E43">
     <text x="16" y="27" font-size="15.5" font-weight="bold">Mt. Soledad</text>
     <text x="16" y="44" font-size="10.2">120–250 nm aerosol · 0.8% SS</text>
-    <g transform="translate(258,14)"><image width="22.5" height="17.1" aria-hidden="true" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMyIgZGF0YS1uYW1lPSJMYXllciAzIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OC45MyAzNy4xMSI+CiAgPGRlZnM+CiAgICA8c3R5bGU+CiAgICAgIC5jbHMtMSB7CiAgICAgICAgZmlsbDogIzExNWY1YTsKICAgICAgfQogICAgPC9zdHlsZT4KICA8L2RlZnM+CiAgPGNpcmNsZSBjbGFzcz0iY2xzLTEiIGN4PSI0LjU5IiBjeT0iNC41OSIgcj0iNC41OSIvPgogIDxjaXJjbGUgY2xhc3M9ImNscy0xIiBjeD0iMTguMzQiIGN5PSI0LjU5IiByPSI0LjU5Ii8+CiAgPGNpcmNsZSBjbGFzcz0iY2xzLTEiIGN4PSI0LjU5IiBjeT0iMTguMzQiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjMxLjU2IiBjeT0iMzIuNTMiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjQ0LjI4IiBjeT0iMTguNzgiIHI9IjQuNTkiLz4KICA8Y2lyY2xlIGNsYXNzPSJjbHMtMSIgY3g9IjQ0LjI4IiBjeT0iNS4wMiIgcj0iNC41OSIvPgogIDxjaXJjbGUgY2xhc3M9ImNscy0xIiBjeD0iNC41OSIgY3k9IjMyLjA5IiByPSI0LjU5Ii8+Cjwvc3ZnPg=="/></g>
+    <g transform="translate(258,14)"><svg width="22.5" height="17.1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48.93 37.11" fill="#115f5a">
+  <circle cx="4.59" cy="4.59" r="4.59"/>
+  <circle cx="18.34" cy="4.59" r="4.59"/>
+  <circle cx="4.59" cy="18.34" r="4.59"/>
+  <circle cx="31.56" cy="32.53" r="4.59"/>
+  <circle cx="44.28" cy="18.78" r="4.59"/>
+  <circle cx="44.28" cy="5.02" r="4.59"/>
+  <circle cx="4.59" cy="32.09" r="4.59"/>
+</svg></g>
     <g clip-path="url(#coast)" stroke-linejoin="round" stroke-linecap="round">
       <path d="M0 77 H121 L135 99 H0Z" fill="#D9E5DE"/>
       <path d="M0 78 H114 M9 84h18 m17 4h20 m-47 6h19 m45-13h11" fill="none" stroke="#617679" stroke-width="1.1"/>

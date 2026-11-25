@@ -1,6 +1,6 @@
 # Manchester’s ternary aerosol declined while the fitted reaction network still predicted growth
 
-![From the measured peak to the final sample, measured and fitted binary aerosol mass fell by 30.9 and 32.5 µg m⁻³. Ternary mass fell by 10.2 µg m⁻³ while the fit gained 7.6 µg m⁻³.](../../../../images/manchester-soa/network-growth-toc.png)
+![From the measured peak to the final sample, measured and fitted binary aerosol mass fell by 30.9 and 32.5 µg m⁻³. Ternary mass fell by 10.2 µg m⁻³ while the fit gained 7.6 µg m⁻³.](../../../../images/manchester-soa/network-growth-toc.svg)
 
 The ternary Manchester chamber experiment provides a test that a single overall error can hide. After its organic aerosol concentration peaked at 3.42 hours, the instrument recorded a 10.23 µg m⁻³ decline. Over that same interval the selected network predicted a rise of 7.6 µg m⁻³. We tested whether additional reactions could resolve this discrepancy while fitting suspended mass and particle counts across all 15 experiments. Two additional vapor-to-particle transfers brought the network from 38 to 40 channels. The worst normalized trajectory error moved from 17.751% to 17.701%. With size measurements reserved from fitting, the model predicted a five-hour ternary geometric mean diameter of 216.6–216.8 nm against 222.5 nm measured, yet its spectrum showed too many particles near the two-hour peak. Similar final mean diameters can follow different histories of organic mass and particle growth.
 

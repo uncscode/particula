@@ -1,6 +1,6 @@
 # One droplet, two reported sizes: Simulating the Pallas cloud probes
 
-![At a common simulated wavelength of 633 nm, a droplet 11.97 µm across is sized at 12.55 µm on average by FSSP and 13.42 µm by ICEMET, on opposite sides of the 13 µm cutoff.](../../../images/pallas-cloud-probes/study-toc.png)
+![At a common simulated wavelength of 633 nm, a droplet 11.97 µm across is sized at 12.55 µm on average by FSSP and 13.42 µm by ICEMET, on opposite sides of the 13 µm cutoff.](../../../images/pallas-cloud-probes/study-toc.svg)
 
 At Pallas, Finland, the forward-scattering probe used 633 nm light and the ICEMET holographic imager used 660 nm. To compare how the two methods size a droplet at the same wavelength, we set both probe models to 633 nm in Particula. Both models detected a simulated water droplet 11.97 µm across. The scattering model assigned it a mean diameter of 12.55 µm and the imaging model assigned it 13.42 µm, on opposite sides of the 13 µm cutoff. Using a droplet distribution measured at Pallas on 15 September 2022, the two models predicted 6–13 µm counts that differed by 13% of their mean in this same-wavelength test, with each model retaining its native calibration. The field measurements pose a harder question. The scattering probe counted fewer small droplets than the imager that day and more the next day. The nominal simulation predicted an excess on both days. Pallas thus gives us both a reason to model how a probe sizes droplets and a direct test of how much that model explains.
 

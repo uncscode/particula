@@ -112,6 +112,7 @@ def check_toc(resource, root):
     if (
         resource["role"] != "Studies"
         or not image.resolve().is_relative_to(images)
+        or image.suffix != ".svg"
         or not image.is_file()
     ):
         errors.append(f"{source}: invalid study TOC figure")

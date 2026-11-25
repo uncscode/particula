@@ -8,7 +8,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
-from particula.plotting.toc import add_toc_logo
+from particula.plotting.toc import add_toc_logo, save_toc_svg
 from study import SAMPLES
 
 NAMES=['Marine','Mineral dust','Continental pristine','Continental polluted','Combustion','Rural continental']
@@ -32,7 +32,10 @@ def render(out):
         ax.set(ylim=(0,76),xticks=[0,1],xticklabels=['0–30 min','2–10 h'],yticks=[0,25,50,75])
         ax.spines[['top','right']].set_visible(False);ax.grid(False)
         handles,labels=ax.get_legend_handles_labels();fig.legend(handles,labels,loc='lower center',bbox_to_anchor=(.52,.015),ncol=2,frameon=False,fontsize=8,handlelength=1)
-        add_toc_logo(fig,corner='top right');fig.savefig(out/'toc.png',dpi=300);plt.close(fig)
+        add_toc_logo(fig, corner="top right")
+        save_toc_svg(fig, out / "toc.svg", title="Lund droplet arrays",
+                     description="Measured fractions freezing in the early and late hold intervals for high- and low-risk wells.")
+        plt.close(fig)
     plt.rcParams.update({'font.size':10,'axes.spines.top':False,'axes.spines.right':False,'savefig.facecolor':'white'})
     ref=pd.read_csv(out/'paper_reference.csv')
     summaries = out / 'well-means.csv'
