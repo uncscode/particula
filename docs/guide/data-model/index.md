@@ -110,8 +110,7 @@ Native `Aerosol` holds `ParticleData`, `GasData` and `EnvironmentData` by
 identity. Scientific strategies own their physics and validate single-box inputs.
 CPU runnables stage and iterate every box through these strategies, publishing
 each process substep only after all boxes succeed. Incomplete CPU material scratch storage may omit a tag,
-but it is not an executable or transferable population. This guide describes
-the selected checkout; release publication remains a separate decision.
+but it is not an executable or transferable population.
 
 ### Stored units and physical inventories
 
