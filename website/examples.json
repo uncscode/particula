@@ -2230,5 +2230,26 @@
     ],
     "plot_inputs": [],
     "full_canvas": true
+  },
+  "bai-limonene-energy": {
+    "title": "How much less energy does the modeled summer cloud reflect in a day?",
+    "source": "docs/studies/literature/bai-limonene/reflected_energy.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 120,
+    "inputs": [
+      "website/public/study-data/bai-limonene/monthly.csv"
+    ],
+    "input_destinations": {
+      "website/public/study-data/bai-limonene/monthly.csv": "monthly.csv"
+    },
+    "invoke": "report = run_example()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nplot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
   }
 }

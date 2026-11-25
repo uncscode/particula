@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 5.450128244003281,
+  "package_source_sha256": "c1916ec81d3ac2ffb85ca895df99c645585fefbf3414f6a5ed21f4d47f1670f1",
+  "scientific_source_sha256": "9857656f2a372282f30a8c554c28279eca58292741d12a574e872b902608b3e3",
+  "input_sha256": {
+    "website/public/study-data/bai-limonene/monthly.csv": "1307ced309fe686281e7e57ba094c02322af22ced74cdf4864ef72a9a4a79a6e"
+  },
+  "example": "bai-limonene-energy",
+  "fingerprint": "bc07f81f09d0341dbd5a844b17f0deae35fbe6f5e925ab3bf210f14320b562f6",
+  "source": "docs/studies/literature/bai-limonene/reflected_energy.py",
+  "revision": "5da6b2658cb5cbb01550ae25a902b10b95e7b8a7",
+  "package_dirty": false,
+  "executed_at": "2026-11-25T22:57:09.153895+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.6",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [
+      {
+        "image": "figure-3-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "074d479fa20128868726461fc4f24fb1a50944d32676656e36361c62e6ec05bc",
+    "data.json": "e02b27573a4b74a677c86ff0dfcaa959e21eda838a54d72bbdad5dcdffdd62b2",
+    "figure-3-1.png": "7868fa23b53fad11cb0d4bdca796e52e5062b05b370a5ef8553c18b6e178ea44"
+  },
+  "simulation_fingerprint": "172fffe794a073f79fe083204b291f9d97ab0d66a86842dfcc7c359185c88fb2"
+}
