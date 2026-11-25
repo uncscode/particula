@@ -16,9 +16,10 @@ pressure and saturation ratios to `EnvironmentData`.
   `aerosol.particles.total_mass` for kg per particle or
   `aerosol.particles.species_mass_inventory` for kg per species in each box.
 
-For a runnable walkthrough of native single-box container construction and
-optional Warp CPU-backend round trips, see the
-[Data Containers example](../../studies/tutorials/building-an-aerosol/containers/data-containers.md) and run:
+Particula uses NVIDIA Warp for its GPU kernels. The
+[Data Containers example](../../studies/tutorials/building-an-aerosol/containers/data-containers.md)
+constructs single-box containers and can optionally use Warp’s CPU backend
+to transfer their data to Warp and back. Run it from the repository root:
 
 ```bash
 python docs/studies/tutorials/building-an-aerosol/containers/data_containers.py
@@ -78,7 +79,7 @@ zero PDF and zero population mass.
 Call `validate_representation()` after directly constructing or mutating
 writable particle arrays; new population helpers call it on each read and
 reject invalid interpretation without repairing input. The caller owns
-representation-consistent changes. Native Warp transfers preserve the explicit
+representation-consistent changes. Transferring particle data to Warp and back preserves the declared
 `discrete` or `particle_resolved` kind and its volume interpretation. Continuous
 PDF upload is unsupported. Missing or untagged population metadata rejects
 before transfer setup or readback; clearing a tag cannot bypass admission.
