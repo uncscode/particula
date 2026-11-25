@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.670724960975349,
+  "package_source_sha256": "c1916ec81d3ac2ffb85ca895df99c645585fefbf3414f6a5ed21f4d47f1670f1",
+  "scientific_source_sha256": "9857656f2a372282f30a8c554c28279eca58292741d12a574e872b902608b3e3",
+  "input_sha256": {
+    "docs/data/pallas-activation/daily.csv": "d8ec189b6d6176cb77dba8d483b81af86593a322fc69700c60c4fdf435383b26"
+  },
+  "example": "pallas-activation",
+  "fingerprint": "d694dd5b35adbc2118ba23266cfbf1cd6f55e18491dabce143b8cbae11715997",
+  "source": "docs/studies/literature/pallas-activation/daily_salt.py",
+  "revision": "14821e062e96f06383f5d1ff5e0f0664e00c1f93",
+  "package_dirty": false,
+  "executed_at": "2026-11-25T03:48:38.698058+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.6",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [
+      {
+        "image": "figure-3-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "figure-3-1.png": "e53dadc17138840b7caec5f0bed9a2313895828e7bd35a8a9aaebabf74ca8b7d",
+    "data.json": "bbc0600bd6c95081d93b8014758d156465483e1090aa11409b4f047135f6f189",
+    "source.py": "6c41c3231a2d3381c97eadbaf34fe0824dd9159d57804aeb35b4cb01ed6405e3"
+  },
+  "simulation_fingerprint": "f1b586c7b97271c1d40f5e4959e167559865866a27a301d65bf3ee7102450c81"
+}
