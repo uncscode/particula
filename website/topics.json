@@ -6181,6 +6181,92 @@
       ],
       "role": "Studies",
       "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/lund-freezing/index.md",
+      "title": "Fresh aerosol can form ice while entrainment reduces freezing across the cloud",
+      "topic": "transport",
+      "also": [
+        "condensation",
+        "parcels"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "lund-freezing",
+        "runs": [
+          "lund-freezing"
+        ],
+        "companions": [
+          "docs/studies/literature/lund-freezing/assay-and-pulse.md",
+          "docs/studies/literature/lund-freezing/reference-eddy.md",
+          "docs/studies/literature/lund-freezing/cloud-sensitivity.md",
+          "docs/studies/literature/lund-freezing/reproducibility.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/theory/dynamics/prescribed-transport.md",
+            "label": "Follow water vapor through the prescribed flow"
+          }
+        ]
+      },
+      "tocFigure": "lund-freezing/cloud-toc.png",
+      "tocSource": "studies/lund-freezing/cloud-sources/plots.py"
+    },
+    {
+      "source": "docs/studies/literature/lund-freezing/assay-and-pulse.md",
+      "title": "Short freezing histories identify which droplets still form ice hours later",
+      "topic": "transport",
+      "also": [
+        "condensation",
+        "parcels"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/lund-freezing/reference-eddy.md",
+      "title": "Fresh dust-like aerosol increases primary ice while entrained air controls cloud water",
+      "topic": "transport",
+      "also": [
+        "condensation",
+        "parcels"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/lund-freezing/cloud-sensitivity.md",
+      "title": "How aerosol source, cloud water and circulation change the response to entrainment",
+      "topic": "transport",
+      "also": [
+        "condensation",
+        "parcels"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/lund-freezing/reproducibility.md",
+      "title": "Reproduce the Lund freezing and entrainment comparisons",
+      "topic": "transport",
+      "also": [
+        "condensation",
+        "parcels"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/lund-freezing/compare_baselines.py",
+      "title": "Does the same fresh dust increase freezing against both controls?",
+      "topic": "transport",
+      "also": [
+        "condensation",
+        "parcels"
+      ],
+      "role": "Studies",
+      "start_here": false
     }
   ],
   "supporting": [

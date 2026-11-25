@@ -2209,5 +2209,26 @@
     ],
     "plot_inputs": [],
     "full_canvas": true
+  },
+  "lund-freezing": {
+    "title": "Does the same fresh dust increase freezing against both controls?",
+    "source": "docs/studies/literature/lund-freezing/compare_baselines.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 120,
+    "inputs": [
+      "docs/data/lund-freezing/entrainment-baselines.csv"
+    ],
+    "input_destinations": {
+      "docs/data/lund-freezing/entrainment-baselines.csv": "entrainment-baselines.csv"
+    },
+    "invoke": "report = run_example()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nplot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
   }
 }

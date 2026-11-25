@@ -84,6 +84,9 @@ A cloud activation fit predicts 49% more water than BAT at 95% humidity for one 
 
 <div class="study-figures">
 
+[![Fresh dust inflow produces more primary freezing than a closed top in the reference eddy and less in two rapidly exchanging Arctic cloud profiles.](../../images/lund-freezing/cloud-toc.png)\
+Fresh aerosol can form ice while entrainment reduces freezing across the cloud](lund-freezing/index.md)
+
 [![At 633 nm in both simulations, the same 11.97 µm droplet has mean reported sizes of 12.55 and 13.42 µm, on opposite sides of the 13 µm threshold.](../../images/pallas-cloud-probes/study-toc.png)\
 One droplet, two reported sizes: Simulating the Pallas cloud probes](pallas-cloud-probes/index.md)
 
@@ -96,9 +99,6 @@ At the inferred Π Chamber humidity, modeled sulfate haze falls below the optica
 [![In polluted air the observed and simulated cloud counts rise by 72 and 73 per cm³ from backgrounds of 1,562 and 456.](../../images/pi-chamber-lidar/graphical-abstract.svg)\
 Particula reproduces the polluted Π Chamber’s droplet gain but underestimates the background count](pi-chamber-lidar/index.md)
 
-[![Schematic eddies bring cloud droplets together above two bars. For drops of exactly twice the starting radius, size-dependent shear gives about six times the count from a constant rate fitted to the same mean mass.](../../images/shear-drop-spectrum/graphical-abstract.svg)\
-Fitting mean drop mass with a constant collision rate leaves a sixfold shortfall in counts at twice the starting radius](shear-drop-spectrum/index.md)
-
 [![A water drop falls through still air. At 0.20 mm diameter the measured speed is 0.72 m/s, Particula sphere drag gives 0.706 m/s, and Stokes’ law gives 1.20 m/s.](../../images/drizzle-settling.svg)\
 Particula predicts water-drop fall speeds within 4.2% at nine diameters from 0.20 to 1.00 mm](drizzle-settling/index.md)
 
@@ -107,6 +107,9 @@ Particula predicts water-drop fall speeds within 4.2% at nine diameters from 0.2
 ## Particle collisions, transport, and loss
 
 <div class="study-figures">
+
+[![Schematic eddies bring cloud droplets together above two bars. For drops of exactly twice the starting radius, size-dependent shear gives about six times the count from a constant rate fitted to the same mean mass.](../../images/shear-drop-spectrum/graphical-abstract.svg)\
+Fitting mean drop mass with a constant collision rate leaves a sixfold shortfall in counts at twice the starting radius](shear-drop-spectrum/index.md)
 
 [![Wind-tunnel schematic with airflow, airborne dust and a floor tray. Across the four winds, the predicted median diameter of dust retained on the trays at three hours missed the measured median by an average of 4.48 µm when the 30-minute median was carried forward and 2.84 µm with Particula-based transport and retention. The largest improvement occurred at 6 m/s.](../../images/dust-tray-retention/analysis-toc.png)\
 A Particula-based model reduces mean error in three-hour dust median diameter by 37%](dust-tray-retention/index.md)
@@ -158,15 +161,16 @@ Adding settling and diffusion lowers predicted one-hour survival of 1 µm partic
 
 **Cloud droplets and precipitation**
 
+- [Fresh aerosol can form ice while entrainment reduces freezing across the cloud](lund-freezing/index.md)
 - [One droplet, two reported sizes: Simulating the Pallas cloud probes](pallas-cloud-probes/index.md)
 - [Π Chamber cloud counts rose over salt water, but separate haze fits predicted a decline](pi-chamber/haze-and-cloud/index.md)
 - [At the inferred Π Chamber humidity, modeled sulfate haze falls below the optical detection limit](pi-chamber/seed-chemistry.md)
 - [Particula reproduces the polluted Π Chamber’s droplet gain but underestimates the background count](pi-chamber-lidar/index.md)
-- [Fitting mean drop mass with a constant collision rate leaves a sixfold shortfall in counts at twice the starting radius](shear-drop-spectrum/index.md)
 - [Particula predicts water-drop fall speeds within 4.2% at nine diameters from 0.20 to 1.00 mm](drizzle-settling/index.md)
 
 **Particle collisions, transport, and loss**
 
+- [Fitting mean drop mass with a constant collision rate leaves a sixfold shortfall in counts at twice the starting radius](shear-drop-spectrum/index.md)
 - [A Particula-based model reduces mean error in three-hour dust median diameter by 37%](dust-tray-retention/index.md)
 - [After a day in simulated polluted air, archived MAM4xx retains nearly three times the sub-100 nm count predicted by two models with attraction](mam4xx-coagulation/index.md)
 - [A 35% polarization effect for a charged 4 nm NaCl tracer shrinks to 0.06% in the modeled chamber scan](nacl-scavenging/index.md)
