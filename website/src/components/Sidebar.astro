@@ -15,6 +15,6 @@ function collapseGroups(entries: typeof sidebar): typeof sidebar {
 ---
 
 {collapseGroups(sidebar).map((entry) => entry.label === 'Studies'
-  ? <StudySidebar entry={{ label: 'Studies', slug: 'studies', items: catalog.navigation }} />
+  ? <StudySidebar topLevel entry={{ label: 'Studies', slug: 'studies', items: catalog.navigation }} />
   : <SidebarSublist sublist={[entry]} />)}
 <div class="md:sl-hidden"><MobileMenuFooter /></div>
