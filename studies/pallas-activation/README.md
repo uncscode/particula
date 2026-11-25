@@ -33,6 +33,7 @@ python tables.py
 python study.py --pilot
 python study.py
 python boundaries.py
+python midpoints.py
 python between.py
 python summarize.py
 python figures/export.py "$PALLAS_RUN" --out "$PALLAS_RUN/figure-data"
@@ -42,16 +43,17 @@ python figures/export.py "$PALLAS_RUN" --out "$PALLAS_RUN/figure-data"
 | --- | --- | --- |
 | [Thermodynamics](tables.py) | Compare CPU and CUDA critical diameters for a six-composition pilot. Tabulate the Köhler maximum over 385 water volumes using AIOMFAC aqueous water activity, a separate pure-squalane reservoir and water surface tension at 298.15 K. Double the water-grid resolution for one salt blend. | `thresholds.npz`, `thermodynamics.json` |
 | [Daily calibration](study.py) and [loss derivatives](calibration.py) | Minimize mean squared activated-fraction error, weighting the five supersaturations equally within each date. Particle-class fractions sum to one at each of five log-diameter knots. The primary model has 15 compositions, with 12 model sensitivities. Warp differentiates the loss on CUDA and SciPy constrains the fit. An independent linear bound checks the numerical optimum. Fit a two-parameter κ(D) power law using the same log-diameter response width (0.2572664) inherited from the earlier 17-date glutaric-acid model. | `fits.csv`, `comparator.csv`, `curves.csv`, `shares.csv.gz`, `samples.csv`, `run.json` |
+| [Five midpoints versus full curves](midpoints.py) | At each of five archived D₅₀ values per date, fit a 50% activated fraction using the same population, uptake physics and regional chemistry. Refit with the 120 nm salt fraction bounded above by the 50 nm fraction. Compare the within-objective penalty with the same constraint applied to full curves. The central D₅₀ values are inputs and their fit errors in nm are not propagated. | `midpoint-check.csv`, midpoint-constraint figure and TOC counts |
 | [Daily feasible ranges](study.py) and [boundary checks](boundaries.py) | Allow daily RMSE to rise by 0.01 in fraction units. Vary salt enrichment and organic ratio separately. Hold daily fitted inventories fixed when optimizing the mass-weighted three-group Riemer–West index. Refit the no-enrichment and externally mixed boundaries. | `profiles.csv`, `boundary-checks.csv` |
 | [Omission and bulk replay](study.py) | Refit each model after omitting one setting, then predict its observations. Match a bulk-counter minute midpoint to the first subsequent DMPS scan end within 390 s. Convert spectral shape to number using measured ambient CN and integrate the response with 12-point quadrature in each log-diameter bin. The ten later dates yield 4,110 minutes at four settings. | `omitted.csv`, `comparator-omitted.csv`, `bulk.csv`, `comparator-bulk.csv` |
 | [Between-channel redistribution](between.py) | Choose the median-error day, insert two DMPS channel centers between observed activation sizes, and redistribute two particle classes while preserving their integrated histograms. Independently check activation at each observed size and predict experimental setpoints at the inserted sizes. | `between.json`, `between-curves.csv`, `new-size-test.csv` |
-| [Headline calculation](summarize.py) and [figure export](figures/export.py) | Recompute the primary daily RMSE from individual measured fractions. Use 20,000 paired date resamples for the difference from empirical κ(D). Export only the plotted quantities. | `headline.json`, `figure-data/{daily,activation,between-sizes,new-size-test}.csv` |
+| [Headline calculation](summarize.py) and [figure export](figures/export.py) | Recompute the primary daily RMSE from individual measured fractions. Use 20,000 paired date resamples for the difference from empirical κ(D). Export only the plotted quantities. | `headline.json`, `figure-data/{daily,activation,between-sizes,new-size-test,midpoint-check}.csv` |
 
 The input-to-output replay reproduced daily mean RMSEs of 8.52295 and 9.68232 percentage points, with mean salt volume of 9.77865% at 50 nm and 49.59081% at 120 nm. Twelve daily solutions require enrichment within the chosen one-point tolerance. For September 16, the exact redistribution changes the salt allocation at 112.20 and 130.50 nm while preserving the measured-size responses. Decimal round-off in fitted class abundances can vary across compatible optimizers and CUDA drivers.
 
 ## Redraw the published figures on CPU
 
-From this directory, run the following commands with the checkout installed. The four small [plot tables](../../website/public/study-data/pallas-activation) ship with the manuscript. To check a new calibration, compare its exported tables with those files at the displayed precision.
+From this directory, run the following commands with the checkout installed. The five small [plot tables](../../website/public/study-data/pallas-activation) ship with the manuscript. To check a new calibration, compare its exported tables with those files at the displayed precision.
 
 ```bash
 python figures/replot.py
@@ -59,7 +61,7 @@ python figures/toc.py
 python ../../docs/studies/literature/pallas-activation/daily_salt.py
 ```
 
-The [manuscript plotting script](figures/replot.py) combines the 16 September scan in `activation.csv` with daily salt profiles from `daily.csv` for Figure 1. The same daily table supplies the mixing-index ranges in Figure 2. Figure 3 plots the two salt allocations in `between-sizes.csv` and the manuscript quotes the activation predictions from `new-size-test.csv`. The [TOC source](figures/toc.py) uses the matched daily errors and salt fractions. All scientific plots use `particula.default`, and the TOC uses `particula.toc`.
+The [manuscript plotting script](figures/replot.py) combines the 16 September scan in `activation.csv` with daily salt profiles from `daily.csv` for Figure 1. The same daily table supplies the mixing-index ranges in Figure 2. Figure 3 plots the two salt allocations in `between-sizes.csv` and the manuscript quotes the activation predictions from `new-size-test.csv`. The [TOC source](figures/toc.py) pairs the counts of dates requiring enrichment with the mean full-curve salt fractions. All scientific plots use `particula.default`, and the TOC uses `particula.toc`.
 
 ## Check the chemical surrogates and the eight-ion regional budget
 

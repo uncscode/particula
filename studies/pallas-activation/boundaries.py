@@ -8,6 +8,27 @@ from scipy.optimize import minimize
 from study import PRIMARY, Population
 
 
+def minimum_rmse(z, A, b, M, t, extras=()):
+    """Minimize weighted fraction error with linear inventory constraints."""
+
+    def objective(w):
+        e = M @ w - t
+        return 100 * (e @ e), 200 * M.T @ e
+
+    eq = dict(type="eq", fun=lambda w: A @ w - b, jac=lambda w: A)
+    res = minimize(
+        objective,
+        z,
+        jac=True,
+        bounds=[(0, 1)] * len(z),
+        constraints=[eq, *extras],
+        method="SLSQP",
+        options={"ftol": 1e-10, "maxiter": 500},
+    )
+    assert res.success and max(abs(A @ res.x - b)) < 1e-8
+    return np.sqrt(res.fun / 100.0)
+
+
 def main():
     fits = pd.read_csv(P / "fits.csv").pivot(
         index="date", columns="model", values="rmse"
@@ -32,29 +53,12 @@ def main():
             pop.c[:, 0],
         )
 
-        def optimize(z, A, b, M, extras=()):
-            def objective(w):
-                e = M @ w - t
-                return 100 * (e @ e), 200 * M.T @ e
-
-            eq = dict(type="eq", fun=lambda w: A @ w - b, jac=lambda w: A)
-            res = minimize(
-                objective,
-                z,
-                jac=True,
-                bounds=[(0, 1)] * len(z),
-                constraints=[eq, *extras],
-                method="SLSQP",
-                options={"ftol": 1e-10, "maxiter": 500},
-            )
-            assert res.success and max(abs(A @ res.x - b)) < 1e-8
-            return np.sqrt(res.fun / 100.0)
-
-        sign = optimize(
+        sign = minimum_rmse(
             pop.seed,
             pop.A,
             pop.b,
             M,
+            t,
             [dict(type="ineq", fun=lambda w: -delta @ w, jac=lambda w: -delta)],
         )
         mask = np.tile(pop.c.max(axis=1) == 1, len(pop.knots))
@@ -65,7 +69,7 @@ def main():
         seed = np.tile(
             pop.c[pop.c.max(axis=1) == 1] @ inventories, len(pop.knots)
         )
-        pure = optimize(seed, A, b, M[:, mask])
+        pure = minimum_rmse(seed, A, b, M[:, mask], t)
         cap = fits.loc[date, PRIMARY] + 0.01
         both = (fits.loc[date, ["sorbitol only", "squalane only"]] > cap).all()
         assert (sign > cap) == (pr.loc[date, "delta_lo"] > 1e-6)
