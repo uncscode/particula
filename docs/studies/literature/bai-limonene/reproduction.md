@@ -29,6 +29,8 @@ python studies/bai-limonene/replay.py "$work" inputs smoke
 python studies/bai-limonene/replay.py "$work" july-week
 ```
 
+Bai et al.'s supporting information supplies the digitized series in the film figure under CC BY-NC 4.0. PaCE v4 and the Finnish Meteorological Institute supply the particle and radiation observations under CC BY 4.0. The source guide identifies the specific records and how the inputs were transformed. [Bai supporting information](https://doi.org/10.1021/acs.est.5c16671.s001) · [PaCE v4](https://doi.org/10.5281/zenodo.23309964) · [FMI terms](https://en.ilmatieteenlaitos.fi/open-data-licence)
+
 ## Redraw a figure from the published values
 
 From a Particula checkout with the plotting dependencies installed, run the plotting script to regenerate the study figures from their compact inputs. This step runs on CPU. To change an environmental or chemical assumption, use the simulation replay before regenerating the plot inputs.

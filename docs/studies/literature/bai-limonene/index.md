@@ -14,7 +14,7 @@ Wilson et al.’s suspended-particle evaporation data constrained how much low-v
 
 ## One week per month under northern Finnish sunlight
 
-We chose northern Finland because it had the sunlight record and aerosol measurements needed for the comparison. We used the 12th–18th of every month of 2022 at Sodankylä and the actual preceding days for each exposure. We added the same 300 limonene-derived particles/cm³ to either of two measured Pallas background size distributions. Each modeled liquid parcel started at 285 K and 90 kPa and rose 100 m. Holding the source and cloud conditions fixed across months isolates what the change in sunlight can do. [Solar observations and seasonal design](seasonal-light.md)
+We chose northern Finland because it had the sunlight record and aerosol measurements needed for the comparison. We used the 12th–18th of every month of 2022 at Sodankylä and the actual preceding days for each exposure. We added the same 300 limonene-derived particles/cm³ to either of two measured Pallas background size distributions. The clean and accumulation-rich backgrounds contained 13.3 and 141.5 particles/cm³ between 100 and 400 nm, respectively. Each modeled liquid parcel started at 285 K and 90 kPa and rose 100 m. Holding the source and cloud conditions fixed across months isolates what the change in sunlight can do. [Solar observations and seasonal design](seasonal-light.md)
 
 ![Monthly changes in droplet number, median wet diameter and reflected shortwave for clean and accumulation-rich backgrounds rising at 0.25 and 2 m/s.](../../../images/bai-limonene/monthly-response.png)
 
