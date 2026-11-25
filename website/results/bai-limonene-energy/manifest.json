@@ -8,7 +8,7 @@
     "website/public/study-data/bai-limonene/monthly.csv": "1307ced309fe686281e7e57ba094c02322af22ced74cdf4864ef72a9a4a79a6e"
   },
   "example": "bai-limonene-energy",
-  "fingerprint": "bc07f81f09d0341dbd5a844b17f0deae35fbe6f5e925ab3bf210f14320b562f6",
+  "fingerprint": "38d5cd30bb3379172b388b79f3cbe9cfcd7afcf7b3c0a0a9b6bb0da1086d4197",
   "source": "docs/studies/literature/bai-limonene/reflected_energy.py",
   "revision": "5da6b2658cb5cbb01550ae25a902b10b95e7b8a7",
   "package_dirty": false,
@@ -35,9 +35,27 @@
     ]
   ],
   "files": {
-    "source.py": "074d479fa20128868726461fc4f24fb1a50944d32676656e36361c62e6ec05bc",
+    "source.py": "6cb96fd7032b49a3df8bb3d356b03673f6eda0e73bd938488c3404c1210a888e",
     "data.json": "e02b27573a4b74a677c86ff0dfcaa959e21eda838a54d72bbdad5dcdffdd62b2",
-    "figure-3-1.png": "7868fa23b53fad11cb0d4bdca796e52e5062b05b370a5ef8553c18b6e178ea44"
+    "executed_source.py": "074d479fa20128868726461fc4f24fb1a50944d32676656e36361c62e6ec05bc",
+    "figure-3-1.png": "ab9a0f7295d7558568ec1e7e294bde6cd1969a0fd7c1c18e98e2dd9a899b52d2"
   },
-  "simulation_fingerprint": "172fffe794a073f79fe083204b291f9d97ab0d66a86842dfcc7c359185c88fb2"
+  "simulation_fingerprint": "172fffe794a073f79fe083204b291f9d97ab0d66a86842dfcc7c359185c88fb2",
+  "render_versions": {
+    "particula": "0.3.6",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {
+    "website/public/study-data/bai-limonene/monthly.csv": "1307ced309fe686281e7e57ba094c02322af22ced74cdf4864ef72a9a4a79a6e"
+  },
+  "rendered_at": "2026-11-25T23:43:55.316299+00:00",
+  "render_revision": "703b32dd6ad338b6455574cde3cff4e7ff1ff6c6",
+  "render_elapsed_seconds": 3.8152069950010628
 }

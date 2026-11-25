@@ -71,19 +71,14 @@ def cloud_legend(fig, first, y):
 def monthly(data):
     """Compare seven-day means for all months in the solar record."""
     table = pd.read_csv(data / "monthly.csv")
-    fig, axes = plt.subplots(3, 1, figsize=(7.9, 8.1), sharex=True)
+    fig, axes = plt.subplots(3, 1, figsize=(7.9, 7.5), sharex=True)
     for ax, metric, ylabel in zip(axes, METRICS, YLABELS, strict=True):
         cloud_curves(ax, table, "month", metric)
         ax.set_ylabel(ylabel)
     axes[-1].set_xticks(range(1, 13), list(month_abbr)[1:])
-    fig.suptitle(
-        "One week per month under northern Finnish sunlight",
-        weight="bold",
-        fontsize=16,
-    )
-    cloud_legend(fig, axes[0], 0.922)
+    cloud_legend(fig, axes[0], 0.987)
     fig.subplots_adjust(
-        left=0.15, right=0.985, top=0.815, bottom=0.06, hspace=0.20
+        left=0.15, right=0.985, top=0.895, bottom=0.06, hspace=0.20
     )
     return fig
 
@@ -92,28 +87,26 @@ def diurnal(data):
     """Compare hourly seasonal cloud responses in local apparent solar time."""
     table = pd.read_csv(data / "diurnal.csv")
     fig, axes = plt.subplots(
-        3, 4, figsize=(9.5, 7.3), sharex=True, sharey="row"
+        3, 4, figsize=(9.5, 6.4), sharex=True, sharey="row"
     )
-    for j, (season, name) in enumerate(SEASONS.items()):
+    for j, season in enumerate(SEASONS):
         group = table[table.season == season]
         for i, metric in enumerate(METRICS):
             ax = axes[i, j]
             cloud_curves(ax, group, "solar_hour", metric, hourly=True)
             ax.set_xticks([0, 12, 24])
             ax.set_xlim(0, 24)
-            if i == 0:
-                ax.set_title(name)
             if j == 0:
                 ax.set_ylabel(YLABELS[i])
-    fig.suptitle(
-        "Cloud droplets and reflected sunlight through the day",
-        weight="bold",
-        fontsize=16,
-    )
-    cloud_legend(fig, axes[0, 0], 0.923)
+    cloud_legend(fig, axes[0, 0], 0.987)
     fig.supxlabel("Local apparent solar hour", y=0.015)
     fig.subplots_adjust(
-        left=0.115, right=0.978, top=0.76, bottom=0.11, hspace=0.28, wspace=0.17
+        left=0.115,
+        right=0.978,
+        top=0.885,
+        bottom=0.11,
+        hspace=0.28,
+        wspace=0.17,
     )
     return fig
 
@@ -121,7 +114,7 @@ def diurnal(data):
 def size_spectra(data):
     """Plot the change in number in each quarter-micrometre diameter bin."""
     table = pd.read_csv(data / "size-spectra.csv.gz")
-    fig, axes = plt.subplots(2, 2, figsize=(8.0, 6.9))
+    fig, axes = plt.subplots(2, 2, figsize=(8.0, 5.8))
     # Line patterns and names remain distinct in grayscale.
     seasonal_styles = [
         ("DJF", "indigo", ":"),
@@ -150,7 +143,6 @@ def size_spectra(data):
             )
         ax.axhline(0, color="#566661", lw=0.8, linestyle="-", zorder=0)
         ax.set_xlim(visible.min() - 0.25, visible.max() + 0.75)
-        ax.set_title(f"{profile.capitalize()}, {speed:g} m/s")
     for ax in axes[:, 0]:
         ax.set_ylabel("Δ number per bin\n(cm⁻³)")
     fig.supxlabel("Wet diameter (µm)", y=0.014)
@@ -160,16 +152,11 @@ def size_spectra(data):
         labels,
         ncol=4,
         loc="upper center",
-        bbox_to_anchor=(0.53, 0.922),
+        bbox_to_anchor=(0.53, 0.996),
         handlelength=3,
     )
-    fig.suptitle(
-        "Which droplet sizes gain or lose number under sunlight?",
-        fontsize=16,
-        weight="bold",
-    )
     fig.subplots_adjust(
-        left=0.15, right=0.981, top=0.785, bottom=0.10, hspace=0.41, wspace=0.25
+        left=0.15, right=0.981, top=0.915, bottom=0.10, hspace=0.26, wspace=0.25
     )
     return fig
 
@@ -177,7 +164,7 @@ def size_spectra(data):
 def cohorts(data):
     """Separate tagged and background counts and common-cohort growth."""
     july = pd.read_csv(data / "july-cohorts.csv").sort_values(["profile", "w"])
-    fig, axes = plt.subplots(2, 1, figsize=(7.7, 6.9))
+    fig, axes = plt.subplots(2, 1, figsize=(7.7, 5.9))
     y = np.arange(len(july))
     labels = [
         f"{p.capitalize()}, {w:g} m/s"
@@ -191,7 +178,6 @@ def cohorts(data):
             "Tagged seeds leaving",
             "Background entering",
             "Number change (cm⁻³)",
-            "Which droplets leave or enter the size window?",
         ),
         (
             axes[1],
@@ -200,10 +186,9 @@ def cohorts(data):
             "Growth of shared cohorts",
             "Entries and exits",
             "Change in median wet diameter (µm)",
-            "What moves the median droplet size?",
         ),
     ]
-    for ax, first, second, name1, name2, xlabel, title in panels:
+    for ax, first, second, name1, name2, xlabel in panels:
         ax.grid(axis="y", visible=False)
         ax.grid(axis="x", visible=True)
         ax.barh(
@@ -222,21 +207,15 @@ def cohorts(data):
         ax.set_yticks(y, labels)
         ax.invert_yaxis()
         ax.set_xlabel(xlabel)
-        ax.set_title(title)
         ax.axvline(0, linewidth=0.8, color="#566661", linestyle="-")
         ax.legend(
             loc="lower center",
-            bbox_to_anchor=(0.5, 1.13),
+            bbox_to_anchor=(0.5, 1.015),
             ncol=2,
             handlelength=1.5,
         )
-    fig.suptitle(
-        "What changes when July aerosol sees sunlight?",
-        fontsize=16,
-        weight="bold",
-    )
     fig.subplots_adjust(
-        left=0.23, right=0.98, top=0.81, bottom=0.11, hspace=1.05
+        left=0.23, right=0.98, top=0.925, bottom=0.105, hspace=0.60
     )
     return fig
 
@@ -244,7 +223,7 @@ def cohorts(data):
 def film(data):
     """Plot the three constant-humidity limonene film reconstructions."""
     table = pd.read_csv(data / "film-water.csv")
-    fig, axes = plt.subplots(2, 1, figsize=(6.8, 6.2), sharex=True)
+    fig, axes = plt.subplots(2, 1, figsize=(6.8, 5.65), sharex=True)
     for trial, marker, color in [
         ("S4", "o", "teal"),
         ("S5", "s", "rust"),
@@ -278,17 +257,12 @@ def film(data):
     axes[1].set_xlim(1.025, table.mass_fraction.min() - 0.018)
     for ax in axes:
         ax.axvline(0.3, ls=":", lw=1, color="#798782")
-    fig.suptitle(
-        "Limonene films gain water affinity as they lose mass",
-        weight="bold",
-        fontsize=15,
-    )
     handles, names = axes[1].get_legend_handles_labels()
     fig.legend(
-        handles, names, ncol=3, loc="upper center", bbox_to_anchor=(0.54, 0.93)
+        handles, names, ncol=3, loc="upper center", bbox_to_anchor=(0.54, 0.996)
     )
     fig.subplots_adjust(
-        left=0.19, right=0.975, top=0.805, bottom=0.13, hspace=0.23
+        left=0.19, right=0.975, top=0.913, bottom=0.13, hspace=0.23
     )
     return fig
 

@@ -80,7 +80,6 @@ def plot_results(report):
                 )
             ax.axhline(0, lw=0.7, color="#243e43")
             ax.set_xticks(np.arange(4), SEASONS, rotation=25)
-            ax.set_title(f"{speed:g} m/s ascent")
         axs[0].set_ylabel("Change in reflected energy\n(kJ/m² per sampled day)")
         axs[0].legend(loc="lower left", frameon=False, fontsize=8)
         plt.show()
@@ -105,7 +104,8 @@ if __name__ == "__main__":
 
 # %% [markdown]
 # *Figure 1. Each bar is the sun-aged minus dark-aged difference above the
-# modeled cloud and its local surface. Summer in the clean, slow-ascent case
+# modeled cloud and its local surface. Ascent is 0.25 m/s in the left panel
+# and 2 m/s in the right. Summer in the clean, slow-ascent case
 # gives about 125 kJ/m² less reflected energy per sampled day. The
 # accumulation-rich, slowly rising cloud reflects about 3 kJ/m² less.*
 #
