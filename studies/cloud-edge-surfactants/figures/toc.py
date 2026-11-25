@@ -1,16 +1,43 @@
 """Draw the measured dose comparison and the modeled cloud-edge response."""
 
 import csv
+from math import cos, radians, sin
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 from matplotlib.patches import Arc, Circle, PathPatch
 from matplotlib.path import Path as DrawingPath
+from matplotlib.transforms import Affine2D
 from particula.plotting.toc import add_toc_logo
 
 STUDY = Path(__file__).resolve().parents[1]
 INK, TEAL, RUST = "#243E43", "#135963", "#A44D21"
 PALE = "#CAD9D2"
+
+
+def surfactant(ax, x, y, angle):
+    """Draw a schematic sulfate head and alkyl tail pointing outwards."""
+    transform = Affine2D().rotate_deg(angle).translate(x, y) + ax.transData
+    ax.plot(
+        [0, 0.012, 0.020, 0.030, 0.040],
+        [0, 0.005, -0.004, 0.005, 0],
+        color=INK,
+        linewidth=1.25,
+        solid_capstyle="round",
+        transform=transform,
+        zorder=4,
+    )
+    ax.add_patch(
+        Circle(
+            (0, 0),
+            0.009,
+            facecolor="#E6A159",
+            edgecolor=INK,
+            lw=0.8,
+            transform=transform,
+            zorder=5,
+        )
+    )
 
 
 def render():
@@ -38,6 +65,15 @@ def render():
                 capstyle="round",
             )
         )
+        # Sulfate heads sit inside the water boundary, tails extend into air.
+        for angle in (12, 67, 122, 175, 224, 314):
+            theta = radians(angle)
+            surfactant(
+                ax,
+                0.164 + 0.087 * cos(theta),
+                0.747 + 0.087 * sin(theta),
+                angle,
+            )
         ax.text(0.164, 0.60, "5–10 µm", ha="center", size=8.3)
         ax.text(
             0.31,
@@ -101,7 +137,11 @@ def render():
             (0.071, "fixed70", "Surface tension fixed at lab values", RUST),
         ):
             gain = gains[control]
-            ax.text(0.06, y + 0.023, label, size=8.6)
+            label_x = 0.06
+            if control in ("finite", "fixed70"):
+                surfactant(ax, 0.069, y + 0.037, 0)
+                label_x = 0.127
+            ax.text(label_x, y + 0.023, label, size=8.6)
             width = 0.75 * gain / 100
             ax.barh(y - 0.008, width, left=0.06, height=0.029, color=color)
             ax.text(
