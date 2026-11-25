@@ -53,7 +53,7 @@ The input-to-output replay reproduced daily mean RMSEs of 8.52295 and 9.68232 pe
 
 ## Redraw the published figures on CPU
 
-From this directory, run the following commands with the checkout installed. The five small [plot tables](../../website/public/study-data/pallas-activation) ship with the manuscript. To check a new calibration, compare its exported tables with those files at the displayed precision.
+From this directory, run the following commands with the checkout installed. The five small [plot tables](../../docs/data/pallas-activation) ship with the manuscript. To check a new calibration, compare its exported tables with those files at the displayed precision.
 
 ```bash
 python figures/replot.py
@@ -61,7 +61,7 @@ python figures/toc.py
 python ../../docs/studies/literature/pallas-activation/daily_salt.py
 ```
 
-The [manuscript plotting script](figures/replot.py) combines the 16 September scan in `activation.csv` with daily salt profiles from `daily.csv` for Figure 1. The same daily table supplies the mixing-index ranges in Figure 2. Figure 3 plots the two salt allocations in `between-sizes.csv` and the manuscript quotes the activation predictions from `new-size-test.csv`. The [TOC source](figures/toc.py) pairs the counts of dates requiring enrichment with the mean full-curve salt fractions. All scientific plots use `particula.default`, and the TOC uses `particula.toc`.
+The [manuscript plotting script](figures/replot.py) uses `midpoint-check.csv` for the paired penalties in Figure 1. It combines the 16 September scan in `activation.csv` with daily salt profiles from `daily.csv` for Figure 1. The same daily table supplies the mixing-index ranges in Figure 3. Figure 4 plots the two salt allocations in `between-sizes.csv` and the manuscript quotes the activation predictions from `new-size-test.csv`. The [TOC source](figures/toc.py) pairs the counts of dates requiring enrichment with the mean full-curve salt fractions. All scientific plots use `particula.default`, and the TOC uses `particula.toc`.
 
 ## Check the chemical surrogates and the eight-ion regional budget
 

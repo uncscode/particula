@@ -12,7 +12,7 @@ from matplotlib.patches import Arc, Circle
 from particula.plotting.toc import add_toc_logo
 
 ROOT = Path(__file__).resolve().parents[3]
-DATA = ROOT / "website/public/study-data/pallas-activation"
+DATA = ROOT / "docs/data/pallas-activation"
 IMAGES = ROOT / "docs/images/pallas-activation"
 PAPER = "#FBF2E3"
 INK = "#243E43"

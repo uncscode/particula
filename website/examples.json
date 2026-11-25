@@ -2196,10 +2196,10 @@
     "device": "cpu",
     "timeout": 120,
     "inputs": [
-      "website/public/study-data/pallas-activation/daily.csv"
+      "docs/data/pallas-activation/daily.csv"
     ],
     "input_destinations": {
-      "website/public/study-data/pallas-activation/daily.csv": "daily.csv"
+      "docs/data/pallas-activation/daily.csv": "daily.csv"
     },
     "invoke": "report = run_example()",
     "data_expression": "report",

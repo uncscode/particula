@@ -9,7 +9,7 @@ import pandas as pd
 
 DATA = (
     Path(__file__).resolve().parents[3]
-    / "website/public/study-data/pallas-activation"
+    / "docs/data/pallas-activation"
 )
 
 
