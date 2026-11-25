@@ -135,20 +135,21 @@ def mineral_figure(out,d):
 
 
 def supply_figure(out,summary):
-    fig,axs=plt.subplots(1,3,figsize=(11.6,3.9),layout='constrained',sharey=True)
+    fig,axs=plt.subplots(1,3,figsize=(11.6,4.15),layout='constrained',sharey=True)
+    fig.get_layout_engine().set(wspace=.09)
     volume=pd.read_csv(out/'air-volume.csv').set_index('source').loc[SAMPLES]
     y=np.arange(len(SAMPLES))
     axs[0].barh(y,volume.litres_per_well,color=BLUE,height=.52)
-    axs[0].set(title='Air represented by each well',xlabel='Sampled air (L per well)')
+    axs[0].set(title='Air per well', xlabel='Sampled volume\n(L per well)')
     axs[1].barh(y,volume.entry_per_litre,color=BLUE,height=.52)
-    axs[1].set(title='Liquid wells at hold entry',xlabel='Surviving well equivalents per L of air')
+    axs[1].set(title='Liquid wells at hold entry', xlabel='Well equivalents\nper L of sampled air')
     arrivals=summary[(summary.sky=='reference') & (summary.metric=='fresh_primary') &
                     (summary.grid==10) & (summary.comparison=='closed') &
                     (summary.abundance=='air_volume')].set_index('source').loc[SAMPLES]
     np.testing.assert_allclose(arrivals.control, 0.)
     axs[2].errorbar(arrivals.value,y,xerr=[arrivals.value-arrivals.lo,arrivals.hi-arrivals.value],
                     fmt='o',color=TEAL,capsize=2)
-    axs[2].set(title='Ice formed on arrivals',xlabel='Six-hour freezing events per L of cloud air',xlim=(0,None))
+    axs[2].set(title='Ice formed on arrivals', xlabel='Six-hour freezing events\nper L of cloud air',xlim=(0,None))
     axs[0].set_yticks(y,[LABELS[s] for s in SAMPLES]);axs[0].set_ylim(5.65,-.65)
     for a in axs:a.grid(axis='x',alpha=.15)
     fig.savefig(out/'sample-volume.png',dpi=190);plt.close(fig)
