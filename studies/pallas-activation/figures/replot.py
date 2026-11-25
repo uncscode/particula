@@ -142,26 +142,67 @@ def midpoint_constraint():
     scores = pd.read_csv(DATA / "midpoint-check.csv").set_index("date")
     x = 100 * (scores.midpoint_no_enrichment - scores.midpoint_rmse)
     y = 100 * (scores.curve_no_enrichment - scores.curve_rmse)
-    fig, ax = plotting.subplots(size="square")
-    top = max(x.max(), y.max()) + 0.35
-    ax.plot([0, top], [0, top], color="#AAB3B1", linewidth=1, linestyle=":")
-    ax.axhline(1, color="#526164", linewidth=1, linestyle="--")
-    ax.axvline(1, color="#526164", linewidth=1, linestyle="--")
-    ax.scatter(x, y, color=RUST, alpha=0.8, s=26, zorder=3)
+    fig, ax = plotting.subplots(size="wide")
+    tolerance = 1.0
+    high_x, high_y = x > tolerance, y > tolerance
+    extra = high_y & ~high_x
+    top = max(x.max(), y.max()) + 0.75
+    low = -0.14
+    ax.fill_between(
+        [low, tolerance], tolerance, top, color=TEAL, alpha=0.11, linewidth=0
+    )
+    ax.axhline(tolerance, color="#526164", linewidth=1, linestyle="--")
+    ax.axvline(tolerance, color="#526164", linewidth=1, linestyle="--")
+
+    for mask, name, marker, color in [
+        (extra, "Full curve only", "D", TEAL),
+        (high_x & high_y, "Both fits", "o", "#48535B"),
+        (high_x & ~high_y, "Midpoints only", "^", "#48535B"),
+        (~high_x & ~high_y, "Neither fit", "o", "none"),
+    ]:
+        ax.scatter(
+            x[mask],
+            y[mask],
+            marker=marker,
+            facecolor=color,
+            edgecolor=TEAL if color == TEAL else "#48535B",
+            s=30,
+            zorder=3,
+            label=f"{name} ({int(mask.sum())} days)",
+        )
+
     date = "2022-10-20"
     ax.annotate(
-        "20 Oct",
-        (x[date], y[date]),
-        xytext=(8, 7),
-        textcoords="offset points",
-        fontsize=9,
+        "20 Oct · only the full curve requires\nat 120 nm than at 50 nm",
+        xy=(x[date], y[date]),
+        xytext=(1.35, top - 0.33),
+        va="top",
+        color=TEAL,
+        fontsize=10,
+        fontweight="bold",
+        arrowprops=dict(
+            arrowstyle="->",
+            color=TEAL,
+            lw=1.2,
+            shrinkB=5,
+            connectionstyle="arc3,rad=0.1",
+        ),
+        zorder=4,
     )
     ax.set(
-        xlim=(-0.12, top),
-        ylim=(-0.12, top),
-        title="Ruling out salt enrichment",
-        xlabel="Midpoint penalty (pp)",
-        ylabel="Full-curve penalty (pp)",
+        xlim=(low, top),
+        ylim=(low, top),
+        title="Cost of ruling out salt enrichment",
+        xlabel="Five midpoints: increase in RMSE (pp)",
+        ylabel="Full curve: increase in RMSE (pp)",
+    )
+    plotting.legend(
+        ax,
+        placement="right",
+        title="Which fit requires\nenrichment?",
+        fontsize=9,
+        title_fontsize=10,
+        labelspacing=0.9,
     )
     save(fig, "midpoint-constraint.png")
 
