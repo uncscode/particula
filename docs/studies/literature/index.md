@@ -52,7 +52,7 @@ Modeled convection supplies only a third of the heat needed for the reported pen
 <div class="study-figures">
 
 [![Pallas fits place 9.8% salt at 50 nm and 49.6% at 120 nm.](../../images/pallas-activation/salt-toc.png)\
-Which particles carry the salt? A chemical interpretation of size-dependent κ at Pallas](pallas-activation/index.md)
+Which particles carry the salt? What the Pallas activation curves reveal beyond their midpoints](pallas-activation/index.md)
 
 [![At Mt. Soledad, detected droplets averaged 5.18 µm on bypass and 5.17 µm after the denuder. The count response fell to 0.78 of bypass.](../../images/mt-soledad/graphical-abstract.svg)\
 At Mt. Soledad, the denuded path counted fewer droplets of nearly unchanged mean size](particle-water-uptake/mt-soledad/index.md)
@@ -145,7 +145,7 @@ Adding settling and diffusion lowers predicted one-hour survival of 1 µm partic
 
 **Water uptake and cloud activation**
 
-- [Which particles carry the salt? A chemical interpretation of size-dependent κ at Pallas](pallas-activation/index.md)
+- [Which particles carry the salt? What the Pallas activation curves reveal beyond their midpoints](pallas-activation/index.md)
 - [At Mt. Soledad, the denuded path counted fewer droplets of nearly unchanged mean size](particle-water-uptake/mt-soledad/index.md)
 - [How an organic film can improve one Antarctic CCN count and worsen the activation spectrum](antarctic-ccn/index.md)
 - [Liquid salt mixing widens the winter foothill growth-factor bias at Mt. Hua from +0.54 to +0.72](particle-water-uptake/mt-hua/index.md)

@@ -1,4 +1,4 @@
-"""Pallas TOC: matched activation-fit errors and two diameter-scaled salt-fraction gauges."""
+"""Pallas TOC: midpoint and full-curve salt-enrichment constraints."""
 
 from pathlib import Path
 
@@ -89,6 +89,8 @@ def particle(ax, x, diameter, fraction):
 
 def draw():
     days = pd.read_csv(DATA / "daily.csv")
+    scores = pd.read_csv(DATA / "midpoint-check.csv")
+    assert set(scores.date) == set(days.date)
     with plt.style.context("particula.toc"):
         fig = plt.figure(figsize=(3, 3), facecolor=PAPER)
         ax = fig.add_axes(
@@ -105,38 +107,34 @@ def draw():
         )
         ax.text(
             17,
-            251,
-            "Activation-fraction RMSE (percentage points)",
-            fontsize=8.4,
+            252,
+            "Salt enrichment required at 120 vs 50 nm",
+            fontsize=8.05,
             color=INK,
         )
-        for x, label, error in [
-            (76, "Empirical κ(D) refit", days.empirical_rmse.mean()),
-            (212, "Salt + two organics", days.rmse.mean()),
+        for x, label, kind in [
+            (76, "Five D₅₀ values", "midpoint"),
+            (212, "Full activation curves", "curve"),
         ]:
-            ax.text(x, 232, label, ha="center", fontsize=8.5, color=INK)
+            penalty = scores[f"{kind}_no_enrichment"] - scores[f"{kind}_rmse"]
+            count = int((penalty > 0.01).sum())
+            ax.text(x, 233, label, ha="center", fontsize=8.5, color=INK)
             ax.text(
                 x,
-                208,
-                f"{100 * error:.2f}",
+                210,
+                f"{count} of {len(scores)} days",
                 ha="center",
-                fontsize=17,
+                fontsize=12.3,
                 fontweight="bold",
                 color=INK,
             )
-        ax.annotate(
-            "",
-            xy=(166, 216),
-            xytext=(134, 216),
-            arrowprops=dict(arrowstyle="->", lw=1, color=INK),
-        )
         ax.plot([16, 284], [198, 198], color=PALE, lw=0.7)
         particle(ax, 76, 50, days.salt50.mean())
         particle(ax, 212, 120, days.salt120.mean())
         ax.text(
             150,
             12,
-            "Dry volume · mean of 27 daily fits",
+            "Dry volume · mean of 27 full-curve fits",
             ha="center",
             fontsize=8.2,
             color=INK,

@@ -1,4 +1,4 @@
-"""Render the three manuscript figures from the published numeric summaries."""
+"""Render the manuscript figures from the published numeric summaries."""
 
 from pathlib import Path
 
@@ -137,9 +137,39 @@ def same_index():
     save(fig, "same-index-example.png")
 
 
+def midpoint_constraint():
+    """Compare like-for-like penalties for ruling out salt enrichment."""
+    scores = pd.read_csv(DATA / "midpoint-check.csv").set_index("date")
+    x = 100 * (scores.midpoint_no_enrichment - scores.midpoint_rmse)
+    y = 100 * (scores.curve_no_enrichment - scores.curve_rmse)
+    fig, ax = plotting.subplots(size="square")
+    top = max(x.max(), y.max()) + 0.35
+    ax.plot([0, top], [0, top], color="#AAB3B1", linewidth=1, linestyle=":")
+    ax.axhline(1, color="#526164", linewidth=1, linestyle="--")
+    ax.axvline(1, color="#526164", linewidth=1, linestyle="--")
+    ax.scatter(x, y, color=RUST, alpha=0.8, s=26, zorder=3)
+    date = "2022-10-20"
+    ax.annotate(
+        "20 Oct",
+        (x[date], y[date]),
+        xytext=(8, 7),
+        textcoords="offset points",
+        fontsize=9,
+    )
+    ax.set(
+        xlim=(-0.12, top),
+        ylim=(-0.12, top),
+        title="Ruling out salt enrichment",
+        xlabel="Midpoint penalty (pp)",
+        ylabel="Full-curve penalty (pp)",
+    )
+    save(fig, "midpoint-constraint.png")
+
+
 if __name__ == "__main__":
     with plt.style.context("particula.default"):
         days = pd.read_csv(DATA / "daily.csv")
         activation_and_salt(days)
         daily_mixing(days)
         same_index()
+        midpoint_constraint()

@@ -71,6 +71,9 @@ def export(run, comparator, destination):
         paired.index.to_numpy()[:, None], illustrated.D.unique(), rtol=1e-9
     ).any(axis=1)
     paired.to_csv(destination / "between-sizes.csv", float_format="%.10g")
+    pd.read_csv(run / "midpoint-check.csv").to_csv(
+        destination / "midpoint-check.csv", index=False, float_format="%.10g"
+    )
     pd.read_csv(run / "new-size-test.csv").to_csv(
         destination / "new-size-test.csv", index=False, float_format="%.10g"
     )
