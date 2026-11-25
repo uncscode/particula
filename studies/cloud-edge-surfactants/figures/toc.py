@@ -66,7 +66,7 @@ def render():
             )
         )
         # Sulfate heads sit inside the water boundary, tails extend into air.
-        for angle in (12, 67, 122, 175, 224, 314):
+        for angle in range(33, 99, 13):
             theta = radians(angle)
             surfactant(
                 ax,
