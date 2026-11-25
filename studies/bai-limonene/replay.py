@@ -97,6 +97,7 @@ def main():
             "inputs",
             "smoke",
             "july-week",
+            "solar-controls",
             "cloud",
             "radiation",
             "film-parcels",
@@ -376,6 +377,25 @@ def main():
                     "--redo",
                 )
             python("seasonal/radiation/refinement_summary.py")
+        elif stage == "solar-controls":
+            extra = json.loads(
+                (HERE / "solar-control-sources.json").read_text()
+            )
+            fetch(downloads, extra)
+            python(
+                "seasonal/forcing/sensitivity.py",
+                "--raw-ozone",
+                downloads / "ozone.dat",
+            )
+            python(
+                "seasonal/radiation/clear_inputs.py",
+                downloads / "clear-sky.json",
+            )
+            native("seasonal/transport.cpp", "aging.so")
+            native("seasonal/parcel_cpu.cpp", "parcel_cpu.so")
+            native("seasonal/radiation/transfer.cpp", "radiation/transfer.so")
+            python("seasonal/radiation/sphere_table.py")
+            python("solar_controls.py")
         elif stage == "film-parcels":
             python(
                 "campaign.py",

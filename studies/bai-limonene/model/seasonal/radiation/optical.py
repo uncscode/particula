@@ -301,7 +301,14 @@ def radiance(optics, forcing, bands, streams, order, thin=2e-5):
         if np.min(spectral_surface) < 0 or np.max(spectral_surface) > 1:
             raise ValueError("Two-band surface exceeded physical limits")
         outputs[day, 14] = reflected(spectral_surface)
-        if "ceres_color_valid" in forcing:
+        # The independent clear-sky test has no measured spectral correction.
+        # Its color-control columns therefore equal the baseline beam/sky result.
+        outputs[day, 15] = outputs[day, 0]
+        outputs[day, 16] = outputs[day, 9]
+        if (
+            "ceres_color_valid" in forcing
+            and forcing.loc[day, "ceres_color_valid"].any()
+        ):
             cbeam, csky = spectral_boundaries(
                 wave, weighted_beam, weighted_sky, forcing.loc[day]
             )

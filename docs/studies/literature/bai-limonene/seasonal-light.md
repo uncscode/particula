@@ -4,7 +4,7 @@ A cloud reflects the light reaching it at that hour. The sizes and numbers of it
 
 ![Four seasonal columns comparing daily changes in droplet number, median wet diameter and reflected sunlight for clean and accumulation-rich backgrounds. The summer flux loss in the clean, weak updraft peaks in the early afternoon.](../../../images/bai-limonene/seasonal-diurnal.png)
 
-*Each point in a daily cycle averages the same local apparent solar hour across 21 sampled dates. Differences are sun-aged minus dark-aged. Open squares on dashed lines indicate 0.25 m/s ascent and filled circles on solid lines indicate 2 m/s. Wet diameter and number refer to cloud top. Reflected shortwave includes the cloud and local surface. The paired clouds at each hour receive the same incoming sunlight.* [Figure data](../../../../website/public/study-data/bai-limonene/diurnal.csv)
+*Each point in a daily cycle averages the same local apparent solar hour across 21 sampled dates. Differences are sun-aged minus dark-aged. Open squares on dashed lines indicate 0.25 m/s ascent and filled circles on solid lines indicate 2 m/s. Wet diameter and number refer to cloud top. Reflected shortwave includes the cloud and local surface. The paired clouds at each hour receive the same incoming sunlight.* [Figure data](../../../../website/public/study-data/bai-limonene/diurnal.csv) [Full-size figure](../../../images/bai-limonene/seasonal-diurnal.png)
 
 ## Why use this sunlight record?
 

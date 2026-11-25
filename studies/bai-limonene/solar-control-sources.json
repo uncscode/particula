@@ -1,0 +1,11 @@
+{
+  "clear-sky.json": {
+    "url": "https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=CLRSKY_SFC_SW_DWN,CLRSKY_SFC_SW_DIFF,CLRSKY_SFC_SW_DNI&community=RE&longitude=26.62901&latitude=67.36663&start=20220101&end=20221231&format=JSON&time-standard=UTC",
+    "sha256": "f117b5c96e47cb8dcad2aa7d3e2a186a79ea4c9ea006be6805937be2d29fda78",
+    "data_sha256": "13e19f0bef4d7f0f1ba0a550467511715bf5f34b41a7ad0b6f9c557b0f9bd88b"
+  },
+  "ozone.dat": {
+    "url": "https://zenodo.org/records/5793207/files/SerdyuchenkoGorshelev5digits_latest.dat",
+    "sha256": "b5001c303b8cd74e92b906e443f30b7141432d9f5ff2071e248351f77db51fdb"
+  }
+}
