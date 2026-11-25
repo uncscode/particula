@@ -51,7 +51,7 @@ Modeled convection supplies only a third of the heat needed for the reported pen
 
 <div class="study-figures">
 
-[![Dodecyl sulfate lowered tension more than octyl sulfate at one tenth the molar dose in trapped droplets. Shifting dry inflow in the simulated smoke cloud added 89.0 droplets/cm³ for both matched acid and finite surfactant supply, and 66.7/cm³ with tensions held fixed.](../../images/cloud-edge-surfactants/toc.png)\
+[![At one tenth the molar dose, dodecyl sulfate lowered the air–water surface tension of trapped citric-acid droplets more than octyl sulfate did. Shifting dry inflow in the simulated smoke cloud added 89.0 droplets/cm³ for both matched acid and finite surfactant supply, and 66.7/cm³ with surface tension fixed at the measured laboratory values.](../../images/cloud-edge-surfactants/toc.png)\
 Two surfactants lower surface tension yet scarcely change droplet counts at a simulated smoke-cloud edge](cloud-edge-surfactants/index.md)
 
 [![Pallas fits place 9.8% salt at 50 nm and 49.6% at 120 nm.](../../images/pallas-activation/salt-toc.png)\

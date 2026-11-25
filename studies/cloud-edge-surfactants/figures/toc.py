@@ -40,7 +40,12 @@ def render():
         )
         ax.text(0.164, 0.60, "5–10 µm", ha="center", size=8.3)
         ax.text(
-            0.31, 0.775, "Lower tension", size=14.5, weight="bold", color=TEAL
+            0.31,
+            0.775,
+            "Lower surface tension",
+            size=11.0,
+            weight="bold",
+            color=TEAL,
         )
         ax.text(
             0.31,
@@ -93,7 +98,7 @@ def render():
         for y, control, label, color in (
             (0.303, "acid", "Citric acid alone", INK),
             (0.187, "finite", "Surfactants with finite supply", TEAL),
-            (0.071, "fixed70", "Lab tensions held through growth", RUST),
+            (0.071, "fixed70", "Surface tension fixed at lab values", RUST),
         ):
             gain = gains[control]
             ax.text(0.06, y + 0.023, label, size=8.6)
