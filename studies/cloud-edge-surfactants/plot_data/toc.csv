@@ -1,7 +1,4 @@
-placement,control,total_cm3
-patterned,acid,352
-patterned,finite,352
-patterned,fixed70,327
-opposed,acid,441
-opposed,finite,441
-opposed,fixed70,394
+control,shift_gain_cm3
+acid,89.00514887764524
+finite,89.00848706232733
+fixed70,66.720321812843

@@ -1,10 +1,10 @@
 # Two surfactants lower surface tension yet scarcely change droplet counts at a simulated smoke-cloud edge
 
-![Moving a dry-air intrusion raised simulated droplet counts from 352 to 441 per cm³ for both pure citric acid and the two surfactant recipes. Holding the laboratory tensions fixed gave 327 to 394 per cm³.](../../../images/cloud-edge-surfactants/toc.png)
+![Dodecyl sulfate lowered tension more than octyl sulfate at one tenth the molar dose in trapped droplets. Shifting dry inflow in the simulated smoke cloud added 89.0 droplets/cm³ for both matched acid and finite surfactant supply, and 66.7/cm³ with tensions held fixed.](../../../images/cloud-edge-surfactants/toc.png)
 
 A tenfold smaller molar dose of sodium dodecyl sulfate lowered the surface tension of a micrometre citric-acid droplet more than sodium octyl sulfate did. Would the stronger surfactant also produce more cloud droplets? We followed both recipes into simulated rising air, where condensing water diluted their contents and neighboring particles competed for the same vapor. In weak marine ascent, 89 droplets/cm³ formed on the added seeds. The seeds raised total droplet number by 80/cm³, and the surfactants accounted for an estimated 0.20/cm³ relative to the same number of pure citric-acid seeds. At a simulated smoke-cloud edge, shifting the position of a dry-air intrusion increased droplet number by **89.0/cm³** with either the surfactant recipes or matched acid. Carrying the concentrated laboratory tensions unchanged through growth gave **66.7/cm³**. The treatment of dilution changed the predicted response to dry air and the identities of the seeds that activated. [Shahabadi et al., original measurements](https://doi.org/10.5194/acp-25-14301-2025)
 
-*The graphic compares droplet concentrations 100 m above cloud base for two placements of the same dry-air intrusion. Each mean weights incoming parcels by their upward air flux.*
+*The bars show the change in droplet number 100 m above cloud base when the dry inflow moves. The two seed recipes compete in the same parcel. Each response is the difference between inlet-flux-weighted means for the two placements.*
 
 ## Why a better surfactant can lose its advantage as a seed grows
 

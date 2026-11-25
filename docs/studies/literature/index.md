@@ -51,7 +51,7 @@ Modeled convection supplies only a third of the heat needed for the reported pen
 
 <div class="study-figures">
 
-[![Shifting the dry-air intrusion added 89 droplets/cm³ with either finite surfactant supply or matched acid seeds. Assuming fixed tensions gave 67 extra droplets/cm³.](../../images/cloud-edge-surfactants/toc.png)\
+[![Dodecyl sulfate lowered tension more than octyl sulfate at one tenth the molar dose in trapped droplets. Shifting dry inflow in the simulated smoke cloud added 89.0 droplets/cm³ for both matched acid and finite surfactant supply, and 66.7/cm³ with tensions held fixed.](../../images/cloud-edge-surfactants/toc.png)\
 Two surfactants lower surface tension yet scarcely change droplet counts at a simulated smoke-cloud edge](cloud-edge-surfactants/index.md)
 
 [![Pallas fits place 9.8% salt at 50 nm and 49.6% at 120 nm.](../../images/pallas-activation/salt-toc.png)\

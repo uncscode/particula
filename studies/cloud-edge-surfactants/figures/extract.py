@@ -188,8 +188,11 @@ def attribution(source, dest):
                 for k in ("total_cm3", "target_cm3")
             }
     toc = [
-        dict(placement=p, control=c, total_cm3=round(means[p, c]["total_cm3"]))
-        for p in PLACEMENTS
+        dict(
+            control=c,
+            shift_gain_cm3=means["opposed", c]["total_cm3"]
+            - means["patterned", c]["total_cm3"],
+        )
         for c in ("acid", "finite", "fixed70")
     ]
     save(dest, "toc.csv", toc)
