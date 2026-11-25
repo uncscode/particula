@@ -52,7 +52,7 @@ sum PDF nodes. Discrete/PDF volume is exactly 1 m³. See
 
 ## Executable access and replacement walkthrough
 
-Run from the selected native checkout:
+Run the example from the repository root.
 
 ```bash
 python docs/studies/tutorials/building-an-aerosol/native_state_access.py
