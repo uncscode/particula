@@ -151,5 +151,6 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Which coagulation processes matter in three atmospheric regimes?](literature/mam4xx-coagulation/regimes.py)
 - [Which composition rule controls equilibrium pressure?](examples/thermodynamics/particle-properties/activity_tutorial.py)
 - [Which of 1,000 drying droplets first separate into two liquids?](examples/thermodynamics/equilibria/aiomfac_mixing_state_ramp.py)
+- [Which Pallas dates require salt enrichment at 120 nm?](literature/pallas-activation/daily_salt.py)
 - [Which parcel solver reaches the same accuracy targets faster?](examples/thermodynamics/adaptive_moist_parcel.py)
 <!-- STUDY_LIST_END -->
