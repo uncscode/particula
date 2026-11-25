@@ -2188,5 +2188,26 @@
     ],
     "plot_inputs": [],
     "full_canvas": true
+  },
+  "pallas-activation": {
+    "title": "Which Pallas dates require salt enrichment at 120 nm?",
+    "source": "docs/studies/literature/pallas-activation/daily_salt.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 120,
+    "inputs": [
+      "website/public/study-data/pallas-activation/daily.csv"
+    ],
+    "input_destinations": {
+      "website/public/study-data/pallas-activation/daily.csv": "daily.csv"
+    },
+    "invoke": "report = run_example()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nplot_results(report)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
   }
 }

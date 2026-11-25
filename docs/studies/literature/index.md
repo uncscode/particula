@@ -51,6 +51,9 @@ Modeled convection supplies only a third of the heat needed for the reported pen
 
 <div class="study-figures">
 
+[![Pallas fits place 9.8% salt at 50 nm and 49.6% at 120 nm.](../../images/pallas-activation/salt-toc.png)\
+Which particles carry the salt? A chemical interpretation of size-dependent κ at Pallas](pallas-activation/index.md)
+
 [![At Mt. Soledad, detected droplets averaged 5.18 µm on bypass and 5.17 µm after the denuder. The count response fell to 0.78 of bypass.](../../images/mt-soledad/graphical-abstract.svg)\
 At Mt. Soledad, the denuded path counted fewer droplets of nearly unchanged mean size](particle-water-uptake/mt-soledad/index.md)
 
@@ -59,6 +62,12 @@ How an organic film can improve one Antarctic CCN count and worsen the activatio
 
 [![Above the Mt. Hua ridge, three particles show mean wet diameters at 90% relative humidity for 18 winter foothill extracts. Dashed rings repeat the measured 157 nm diameter inside the larger pure-salt (212 nm) and liquid-mixture (229 nm) predictions.](../../images/mt-hua-salts/graphical-abstract.svg)\
 Liquid salt mixing widens the winter foothill growth-factor bias at Mt. Hua from +0.54 to +0.72](particle-water-uptake/mt-hua/index.md)
+
+</div>
+
+## Water uptake by organic compounds
+
+<div class="study-figures">
 
 [![Water activity declines as citric acid mass fraction rises. The BAT line and AIOMFAC ticks sit close together and above all 12 measured points. The largest separation from the measurements occurs toward concentrated acid.](../../images/citric-acid-activity/graphical-abstract.svg)\
 BAT and AIOMFAC both overpredict water activity at all 12 measured citric acid concentrations](particle-water-uptake/citric-acid/index.md)
@@ -136,9 +145,13 @@ Adding settling and diffusion lowers predicted one-hour survival of 1 µm partic
 
 **Water uptake and cloud activation**
 
+- [Which particles carry the salt? A chemical interpretation of size-dependent κ at Pallas](pallas-activation/index.md)
 - [At Mt. Soledad, the denuded path counted fewer droplets of nearly unchanged mean size](particle-water-uptake/mt-soledad/index.md)
 - [How an organic film can improve one Antarctic CCN count and worsen the activation spectrum](antarctic-ccn/index.md)
 - [Liquid salt mixing widens the winter foothill growth-factor bias at Mt. Hua from +0.54 to +0.72](particle-water-uptake/mt-hua/index.md)
+
+**Water uptake by organic compounds**
+
 - [BAT and AIOMFAC both overpredict water activity at all 12 measured citric acid concentrations](particle-water-uptake/citric-acid/index.md)
 - [BAT reverses the measured ordering of pinic and phthalic acid hygroscopicity at cloud activation](particle-water-uptake/bat-ccn.md)
 - [A cloud activation fit predicts 49% more water than BAT at 95% humidity for one organic](particle-water-uptake/ccn-retrieval/index.md)

@@ -6131,6 +6131,56 @@
           }
         ]
       }
+    },
+    {
+      "source": "docs/studies/literature/pallas-activation/index.md",
+      "title": "Which particles carry the salt? A chemical interpretation of size-dependent κ at Pallas",
+      "topic": "activity-kappa",
+      "also": [
+        "activity-nonideal",
+        "size"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "pallas-activation",
+        "runs": [
+          "pallas-activation"
+        ],
+        "companions": [
+          "docs/studies/literature/pallas-activation/chemistry.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/processes/ccn-retrieval.md",
+            "label": "Retrieve hygroscopicity from cloud activation"
+          }
+        ]
+      },
+      "tocFigure": "pallas-activation/salt-toc.png",
+      "tocSource": "studies/pallas-activation/figures/toc.py"
+    },
+    {
+      "source": "docs/studies/literature/pallas-activation/chemistry.md",
+      "title": "How the regional chemistry bounds the inferred salt allocation",
+      "topic": "activity-kappa",
+      "also": [
+        "activity-nonideal",
+        "size"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/pallas-activation/daily_salt.py",
+      "title": "Which Pallas dates require salt enrichment at 120 nm?",
+      "topic": "activity-kappa",
+      "also": [
+        "activity-nonideal",
+        "size"
+      ],
+      "role": "Studies",
+      "start_here": false
     }
   ],
   "supporting": [
