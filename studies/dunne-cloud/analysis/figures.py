@@ -8,6 +8,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
+from particula.plotting.toc import add_toc_logo, save_toc_svg
 from summarize import read, vals, grouped
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -319,9 +320,12 @@ def toc():
     fig.text(0.11, 0.85, "CLOUD chamber", weight="bold", size=15, color=INK)
     fig.text(0.11, 0.77, "248.3 K  ·  0.38 pptv ammonia", size=9)
     fig.text(0.11, 0.70, "1.80 × 10⁷ H₂SO₄ molecules cm⁻³", size=8)
-    fig.savefig(
-        DEST / "graphical-abstract.png", dpi=300, facecolor=fig.get_facecolor()
-    )
+    add_toc_logo(fig, corner="top right")
+    with plt.rc_context({"savefig.facecolor": "auto"}):
+        save_toc_svg(
+            fig, DEST / "graphical-abstract.svg", title="CLOUD chamber",
+            description="Measured and modeled formation rates for two pathways at 248.3 K.",
+        )
     plt.close(fig)
 
 

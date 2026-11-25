@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.patches import Arc, Circle
-from particula.plotting.toc import add_toc_logo
+from particula.plotting.toc import add_toc_logo, save_toc_svg
 
 ROOT = Path(__file__).resolve().parents[3]
 DATA = ROOT / "docs/data/pallas-activation"
@@ -140,7 +140,21 @@ def draw():
             color=INK,
         )
         add_toc_logo(fig, corner="top right")
-        fig.savefig(IMAGES / "salt-toc.png", dpi=300)
+        save_toc_svg(
+            fig,
+            IMAGES / "salt-toc.svg",
+            title=(
+                "Which particles carry the salt? What the Pallas "
+                "activation curves reveal beyond their midpoints"
+            ),
+            description=(
+                "A chemical fit requires a greater salt fraction at "
+                "120 than at 50 nm on 8 of 27 dates using five "
+                "published activation midpoints and on 12 using the "
+                "full curves. Mean best-fit salt fractions from the "
+                "full curves are 9.8% and 49.6% at 50 and 120 nm."
+            ),
+        )
         plt.close(fig)
 
 

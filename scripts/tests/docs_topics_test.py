@@ -179,6 +179,22 @@ def test_toc_figure_must_belong_to_a_study_and_exist():
     )
 
 
+def test_gallery_artwork_is_vector():
+    """Catch bitmap exports, including PNGs wrapped in an SVG container."""
+    for row in docs_topics.load()["resources"]:
+        if "tocFigure" not in row:
+            continue
+        path = docs_topics.ROOT / "docs/images" / row["tocFigure"]
+        assert path.suffix == ".svg", path
+        svg = ET.fromstring(path.read_bytes())  # noqa: S314 - repository assets
+        assert svg.tag == "{http://www.w3.org/2000/svg}svg", path
+        for image in svg.iter("{http://www.w3.org/2000/svg}image"):
+            href = image.get("href") or image.get(
+                "{http://www.w3.org/1999/xlink}href", ""
+            )
+            assert href.startswith(("#", "data:image/svg+xml")), path
+
+
 def test_literature_card_requires_its_renderer():
     """A published illustration must retain an editable source in its study."""
     graph = docs_topics.load()

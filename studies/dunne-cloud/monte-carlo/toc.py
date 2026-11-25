@@ -4,11 +4,11 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from particula.plotting.toc import add_toc_logo
+from particula.plotting.toc import add_toc_logo, save_toc_svg
 
 ROOT = Path(__file__).resolve().parents[3]
 DATA = ROOT / "website/public/study-data/dunne-cloud/formation-overview.csv"
-OUTPUT = ROOT / "docs/images/dunne-cloud/formation-toc.png"
+OUTPUT = ROOT / "docs/images/dunne-cloud/formation-toc.svg"
 
 
 @plt.style.context("particula.toc")
@@ -55,7 +55,21 @@ def render():
         va="center",
         size=8,
     )
-    fig.savefig(OUTPUT)
+    save_toc_svg(
+        fig,
+        OUTPUT,
+        title=(
+            "At 248 K, similar CLOUD formation rates admit different "
+            "chemical pathways"
+        ),
+        description=(
+            "At 248.3 K, 0.38 pptv ammonia and 1.80 × 10⁷ sulfuric "
+            "acid molecules cm⁻³, both models’ 90% scenario intervals "
+            "for the formation rate overlap. The diamond marks the "
+            "archived 0.030 particles per cubic centimetre per "
+            "second."
+        ),
+    )
     plt.close(fig)
 
 

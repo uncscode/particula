@@ -74,24 +74,25 @@ and 80% opacity. The PDF recipe above retains vector lines and text.
 ## Square table-of-contents figures
 
 Use `particula.toc` for study cards. The full canvas measures 3 × 3 inches
-and exports at 900 × 900 pixels. The style sets the paper-yellow background,
+and exports as a self-contained SVG. The style sets the paper-yellow background,
 dark lettering, teal and rust color cycle, and line and marker sizes.
 Use a distinct shape, line pattern or direct label for each comparison.
 
 ```python
 import matplotlib.pyplot as plt
-from particula.plotting.toc import add_toc_logo
+from particula.plotting.toc import add_toc_logo, save_toc_svg
 
 with plt.style.context("particula.toc"):
     fig, ax = plt.subplots()
     ax.plot([0, 1, 2], [1, 3, 2], marker="o")
     ax.set(xlabel="Time (h)", ylabel="Particle count (cm⁻³)")
     add_toc_logo(fig, corner="top left")
-    fig.savefig("study-toc.png")
+    save_toc_svg(fig, "study-toc.svg", title="Particle count over time",
+                 description="The count rises to a peak at one hour and falls by two hours.")
 ```
 
 Place the Particula dots in an open `top left`, `top right`, `bottom left`, or
-`bottom right` corner. Omit the logo call for an unbranded figure. Export the
+`bottom right` corner. The helper draws the official SVG dots as vector paths. Export the
 full canvas and check the figure beside its title at two inches across.
 
 ### Regenerate a literature card
@@ -101,7 +102,6 @@ and the published `tocFigure`. Python renderers read the archived study data.
 Vector templates keep the editable diagram beside the study and embed the
 Particula dots at export. From the checkout root, render a single card or the
 whole literature gallery with the plotting environment and pandas installed.
-The Manchester size study uses Inkscape for its print PNG.
 
 ```bash
 python -m scripts.render_literature_tocs manchester-soa

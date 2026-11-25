@@ -21,4 +21,13 @@
     <circle cx="53" cy="142" r="5" fill="#333b40" stroke="none" stroke-width="2"/>
     <circle cx="46" cy="149" r="4" fill="#333b40" stroke="none" stroke-width="2"/>
   </g>
+  <g transform="translate(264 13)"><svg width="22.5" height="17.1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48.93 37.11" fill="#115f5a">
+  <circle cx="4.59" cy="4.59" r="4.59"/>
+  <circle cx="18.34" cy="4.59" r="4.59"/>
+  <circle cx="4.59" cy="18.34" r="4.59"/>
+  <circle cx="31.56" cy="32.53" r="4.59"/>
+  <circle cx="44.28" cy="18.78" r="4.59"/>
+  <circle cx="44.28" cy="5.02" r="4.59"/>
+  <circle cx="4.59" cy="32.09" r="4.59"/>
+</svg></g>
 </svg>

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.patches import Arc, Circle, Rectangle
-from particula.plotting.toc import add_toc_logo
+from particula.plotting.toc import add_toc_logo, save_toc_svg
 
 DOCS = Path(__file__).resolve().parents[3] / "docs"
 PAPER, INK, TEAL, RUST = "#FBF2E3", "#243E43", "#135963", "#A44D21"
@@ -31,17 +31,18 @@ def ridge(ax):
 
 def sphere(ax, x, y, r):
     """Shade a spherical water droplet with a small specular highlight."""
-    yy, xx = np.mgrid[-1:1:320j, -1:1:320j]
+    yy, xx = np.mgrid[-1:1:96j, -1:1:96j]
     z = np.sqrt(np.maximum(0, 1 - xx**2 - yy**2))
     light = np.clip(-0.42 * xx - 0.62 * yy + 0.64 * z, 0, 1)
-    tint = (0.20 + 0.79 * light)[..., None]
     dark, bright = np.array([0.12, 0.37, 0.40]), np.array([0.86, 0.95, 0.92])
-    rgba = np.ones((*xx.shape, 4))
-    rgba[:, :, :3] = dark + (bright - dark) * tint
-    rgba[:, :, 3] = xx**2 + yy**2 <= 1
-    ax.imshow(
-        rgba, extent=(x - r, x + r, y + r, y - r), origin="upper", zorder=4
+    levels = np.linspace(0, 1, 33)
+    tints = 0.20 + 0.79 * (levels[1:] + levels[:-1]) / 2
+    colors = dark + (bright - dark) * tints[:, None]
+    outline = Circle((x, y), r, transform=ax.transData)
+    shading = ax.contourf(
+        x + r * xx, y + r * yy, light, levels, colors=colors, zorder=4
     )
+    shading.set_clip_path(outline)
     ax.add_patch(Circle((x, y), r, fc="none", ec=TEAL, lw=0.95, zorder=5))
     ax.add_patch(
         Arc(
@@ -178,7 +179,20 @@ def draw():
             fontsize=9,
         )
         add_toc_logo(fig, corner="top right")
-        fig.savefig(DOCS / "images/pallas-cloud-probes/study-toc.png", dpi=300)
+        save_toc_svg(
+            fig,
+            DOCS / "images/pallas-cloud-probes/study-toc.svg",
+            title=(
+                "One droplet, two reported sizes: Simulating the "
+                "Pallas cloud probes"
+            ),
+            description=(
+                "At a common simulated wavelength of 633 nm, a "
+                "droplet 11.97 µm across is sized at 12.55 µm on "
+                "average by FSSP and 13.42 µm by ICEMET, on opposite "
+                "sides of the 13 µm cutoff."
+            ),
+        )
         plt.close(fig)
 
 

@@ -1,5 +1,6 @@
 # The complete canvas is three inches square, including margins and branding.
 figure.figsize: 3, 3
+savefig.format: svg
 savefig.dpi: 300
 savefig.bbox: standard
 savefig.transparent: False

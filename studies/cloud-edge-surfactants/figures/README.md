@@ -13,7 +13,7 @@ After the study's input fetch creates local `figure5.csv`, `python studies/cloud
 
 | Image | Saved graph data in the study's `plot_data/` directory |
 | --- | --- |
-| `toc.png` | `toc.csv` gives the shift in flux-weighted droplet concentration for each of the three seed treatments. Differences are calculated before rounding. |
+| `toc.svg` | `toc.csv` gives the shift in flux-weighted droplet concentration for each of the three seed treatments. Differences are calculated before rounding. |
 | `equilibrium.png` | `inventory.csv`, `tension-contrast.csv` and `activation-shift.csv` give the modeled inventory bounds, tension differences and critical supersaturation shifts relative to pure acid. The first panel also needs the locally fetched observations. |
 | `identity.png` | `identity.csv` gives activated octyl, dodecyl and background droplet counts in the marine and urban calculations. |
 | `edge-attribution.png` | `edge-attribution-paths.csv` gives two paired shifts per inlet. `edge-attribution-effects.csv` gives the three contrasts for each dry-inflow placement. |

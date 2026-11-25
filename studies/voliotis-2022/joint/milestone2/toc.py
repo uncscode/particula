@@ -4,10 +4,10 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from particula.plotting.toc import add_toc_logo
+from particula.plotting.toc import add_toc_logo, save_toc_svg
 
 HERE = Path(__file__).resolve().parent
-OUTPUT = HERE.parents[3] / "docs/images/manchester-soa/network-growth-toc.png"
+OUTPUT = HERE.parents[3] / "docs/images/manchester-soa/network-growth-toc.svg"
 
 
 @plt.style.context("particula.toc")
@@ -59,7 +59,20 @@ def render():
                 size=7.3,
                 color=fig.get_facecolor() if inside else color,
             )
-    fig.savefig(OUTPUT)
+    save_toc_svg(
+        fig,
+        OUTPUT,
+        title=(
+            "Manchester’s ternary aerosol declined while the fitted "
+            "reaction network still predicted growth"
+        ),
+        description=(
+            "From the measured peak to the final sample, measured and "
+            "fitted binary aerosol mass fell by 30.9 and 32.5 µg m⁻³. "
+            "Ternary mass fell by 10.2 µg m⁻³ while the fit gained "
+            "7.6 µg m⁻³."
+        ),
+    )
     plt.close(fig)
 
 

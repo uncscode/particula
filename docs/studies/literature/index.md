@@ -6,16 +6,16 @@ Compare Particula calculations with chamber experiments, field measurements, and
 
 <div class="study-figures">
 
-[![At 248.3 K, 0.38 pptv ammonia and 1.80 × 10⁷ sulfuric acid molecules cm⁻³, both models’ 90% scenario intervals for the formation rate overlap. The diamond marks the archived 0.030 particles per cubic centimetre per second.](../../images/dunne-cloud/formation-toc.png)\
+[![At 248.3 K, 0.38 pptv ammonia and 1.80 × 10⁷ sulfuric acid molecules cm⁻³, both models’ 90% scenario intervals for the formation rate overlap. The diamond marks the archived 0.030 particles per cubic centimetre per second.](../../images/dunne-cloud/formation-toc.svg)\
 At 248 K, similar CLOUD formation rates admit different chemical pathways](dunne-cloud/index.md)
 
-[![At the same 2.9 nm entry flux, size-distribution mismatch falls from 27% with vapor transfer to 21% with hard-sphere capture and 13% with attraction. The attractive model reaches 5,000 particles/cm³ in the 9.7–64.7 nm range 34 minutes after CLOUD.](../../images/cloud-1833/CLOUD-1833-growth-TOC.png)\
+[![At the same 2.9 nm entry flux, size-distribution mismatch falls from 27% with vapor transfer to 21% with hard-sphere capture and 13% with attraction. The attractive model reaches 5,000 particles/cm³ in the 9.7–64.7 nm range 34 minutes after CLOUD.](../../images/cloud-1833/CLOUD-1833-growth-TOC.svg)\
 How sulfuric acid capture shapes particle growth in CLOUD run 1833](cloud-1833/index.md)
 
 [![A beam produces positive and negative ions. At high ion production, CLOUD measured a larger rise in ion concentration from 7% to 70% relative humidity than Particula predicted.](../../images/cloud-ion-humidity/graphical-abstract.svg)\
 At low ion production, CLOUD’s 70% humidity measurement exceeds the ceiling set by the reported wall loss](cloud-ion-humidity/index.md)
 
-[![After a cooling tube, measured and fitted particle counts rise from 3.0 and 5.2 million per cm³ at zero added sulfur dioxide to 29.2 and 27.8 million per cm³ at 500 ppm.](../../images/straw-combustion/toc.png)\
+[![After a cooling tube, measured and fitted particle counts rise from 3.0 and 5.2 million per cm³ at zero added sulfur dioxide to 29.2 and 27.8 million per cm³ at 500 ppm.](../../images/straw-combustion/toc.svg)\
 Particula fits the measured rise in particle number with sulfur dioxide in a straw-combustion analogue](straw-combustion/index.md)
 
 [![At 06:30 UTC the ship recorded 28 particles/cm³ at 12–25 nm. After matching the previous spectrum, the model predicts 300 for simultaneous arrival and 36 when 16 nm particles arrive one hour before the small-particle pulse.](../../images/sea2cloud-events/graphical-abstract.svg)\
@@ -30,7 +30,7 @@ Sea2Cloud’s March 22 spectra favor earlier arrival of larger particles in a tw
 [![Manchester ternary mixture with a measured aerosol yield of 11.7%, a single-precursor estimate of 16.1% and a Particula bulk fit of 13.8%. At two hours, the measured and refitted size distributions peak in the same diameter bin. The model using bulk-fit chemistry peaks one bin larger.](../../images/manchester-soa/graphical-abstract.svg)\
 How well does Particula reproduce organic aerosol formation in the Manchester chamber?](evaporation-and-uptake/manchester-soa/index.md)
 
-[![From the measured peak to the final sample, measured and fitted binary aerosol mass fell by 30.9 and 32.5 µg m⁻³. Ternary mass fell by 10.2 µg m⁻³ while the fit gained 7.6 µg m⁻³.](../../images/manchester-soa/network-growth-toc.png)\
+[![From the measured peak to the final sample, measured and fitted binary aerosol mass fell by 30.9 and 32.5 µg m⁻³. Ternary mass fell by 10.2 µg m⁻³ while the fit gained 7.6 µg m⁻³.](../../images/manchester-soa/network-growth-toc.svg)\
 Manchester’s ternary aerosol declined while the fitted reaction network still predicted growth](evaporation-and-uptake/manchester-network-growth/index.md)
 
 [![The fitted Manchester network grew from 38 to 40 channels as α-pinene vapor returned to labile particle material and o-cresol dimer-family vapor returned to retained material. Refitting accounted for about 90% of the reduction in worst joint error and the added channels for 10%. Joint error fell in 12 of 15 experiments.](../../images/manchester-soa/campaign-performance-toc.svg)\
@@ -51,16 +51,16 @@ Modeled convection supplies only a third of the heat needed for the reported pen
 
 <div class="study-figures">
 
-[![Head-and-tail symbols grouped along a short arc of the droplet surface also mark the two cloud-model cases containing surfactant. Dodecyl sulfate lowered surface tension more than octyl sulfate at one tenth the molar dose. Moving where dry, smoky air entered the cloud increased the total at 100 m above cloud base by 89.0 droplets/cm³ with matched acid seeds or finite surfactant supply, and by 66.7/cm³ with surface tension fixed at the laboratory values.](../../images/cloud-edge-surfactants/toc.png)\
+[![Head-and-tail symbols grouped along a short arc of the droplet surface also mark the two cloud-model cases containing surfactant. Dodecyl sulfate lowered surface tension more than octyl sulfate at one tenth the molar dose. Moving where dry, smoky air entered the cloud increased the total at 100 m above cloud base by 89.0 droplets/cm³ with matched acid seeds or finite surfactant supply, and by 66.7/cm³ with surface tension fixed at the laboratory values.](../../images/cloud-edge-surfactants/toc.svg)\
 Two surfactants lower surface tension yet scarcely change droplet counts at a simulated smoke-cloud edge](cloud-edge-surfactants/index.md)
 
-[![Pallas fits place 9.8% salt at 50 nm and 49.6% at 120 nm.](../../images/pallas-activation/salt-toc.png)\
+[![Pallas fits place 9.8% salt at 50 nm and 49.6% at 120 nm.](../../images/pallas-activation/salt-toc.svg)\
 Which particles carry the salt? What the Pallas activation curves reveal beyond their midpoints](pallas-activation/index.md)
 
 [![At Mt. Soledad, detected droplets averaged 5.18 µm on bypass and 5.17 µm after the denuder. The count response fell to 0.78 of bypass.](../../images/mt-soledad/graphical-abstract.svg)\
 At Mt. Soledad, the denuded path counted fewer droplets of nearly unchanged mean size](particle-water-uptake/mt-soledad/index.md)
 
-[![At 0.4% full coating reduces mean CCN bias. Both adjacent rises move farther from the measurements at nominal calibration.](../../images/antarctic-ccn/graphical-abstract.png)\
+[![At 0.4% full coating reduces mean CCN bias. Both adjacent rises move farther from the measurements at nominal calibration.](../../images/antarctic-ccn/graphical-abstract.svg)\
 How an organic film can improve one Antarctic CCN count and worsen the activation spectrum](antarctic-ccn/index.md)
 
 [![Above the Mt. Hua ridge, three particles show mean wet diameters at 90% relative humidity for 18 winter foothill extracts. Dashed rings repeat the measured 157 nm diameter inside the larger pure-salt (212 nm) and liquid-mixture (229 nm) predictions.](../../images/mt-hua-salts/graphical-abstract.svg)\
@@ -87,10 +87,10 @@ A cloud activation fit predicts 49% more water than BAT at 95% humidity for one 
 
 <div class="study-figures">
 
-[![Fresh dust inflow produces more primary freezing than a closed top in the reference eddy and less in two rapidly exchanging Arctic cloud profiles.](../../images/lund-freezing/cloud-toc.png)\
+[![Fresh dust inflow produces more primary freezing than a closed top in the reference eddy and less in two rapidly exchanging Arctic cloud profiles.](../../images/lund-freezing/cloud-toc.svg)\
 Fresh aerosol can form ice while entrainment reduces freezing across the cloud](lund-freezing/index.md)
 
-[![At 633 nm in both simulations, the same 11.97 µm droplet has mean reported sizes of 12.55 and 13.42 µm, on opposite sides of the 13 µm threshold.](../../images/pallas-cloud-probes/study-toc.png)\
+[![At 633 nm in both simulations, the same 11.97 µm droplet has mean reported sizes of 12.55 and 13.42 µm, on opposite sides of the 13 µm threshold.](../../images/pallas-cloud-probes/study-toc.svg)\
 One droplet, two reported sizes: Simulating the Pallas cloud probes](pallas-cloud-probes/index.md)
 
 [![Measured cloud droplets per cm³ rise from fresh water to salt water (solid line, dense cluster of filled droplets). Separate haze fits predict a decline (dashed line, sparse outlined cluster).](../../images/pi-chamber/graphical-abstract.svg)\
@@ -114,7 +114,7 @@ Particula predicts water-drop fall speeds within 4.2% at nine diameters from 0.2
 [![Schematic eddies bring cloud droplets together above two bars. For drops of exactly twice the starting radius, size-dependent shear gives about six times the count from a constant rate fitted to the same mean mass.](../../images/shear-drop-spectrum/graphical-abstract.svg)\
 Fitting mean drop mass with a constant collision rate leaves a sixfold shortfall in counts at twice the starting radius](shear-drop-spectrum/index.md)
 
-[![Wind-tunnel schematic with airflow, airborne dust and a floor tray. Across the four winds, the predicted median diameter of dust retained on the trays at three hours missed the measured median by an average of 4.48 µm when the 30-minute median was carried forward and 2.84 µm with Particula-based transport and retention. The largest improvement occurred at 6 m/s.](../../images/dust-tray-retention/analysis-toc.png)\
+[![Wind-tunnel schematic with airflow, airborne dust and a floor tray. Across the four winds, the predicted median diameter of dust retained on the trays at three hours missed the measured median by an average of 4.48 µm when the 30-minute median was carried forward and 2.84 µm with Particula-based transport and retention. The largest improvement occurred at 6 m/s.](../../images/dust-tray-retention/analysis-toc.svg)\
 A Particula-based model reduces mean error in three-hour dust median diameter by 37%](dust-tray-retention/index.md)
 
 [![Sub-100 nm particles per cubic centimetre after 24 hours in polluted air. Archived MAM4xx gives 3,379. With coarse collisions and neutral attraction, extended MAM4xx gives 2,424, the sectional model 1,187 and the particle-resolved model 1,180.](../../images/mam4xx-coagulation/graphical-abstract.svg)\
