@@ -63,7 +63,7 @@ def run_example():
     if not path.exists():
         path = (
             Path(__file__).resolve().parents[4]
-            / "website/public/study-data/pallas-activation/daily.csv"
+            / "docs/data/pallas-activation/daily.csv"
         )
     fields = ["date", "salt120", "salt50", "delta_lo", "delta_hi"]
     report = pd.read_csv(path, usecols=fields).to_dict("records")
@@ -76,6 +76,11 @@ if __name__ == "__main__":
 
 
 # %% [markdown]
+# *Figure S1. Each dot gives the fitted salt-volume fraction at 120 nm minus
+# the fraction at 50 nm on one sampling date, in percentage points. Each bar
+# spans the differences allowed by a one-point increase in activation RMSE.
+# A bar entirely above zero requires more salt by dry volume at 120 nm.*
+#
 # All 27 best fits lie above zero. On 12 dates the full range also lies
 # above zero. Those dates would be particularly informative for comparing
 # the inferred enrichment with size-selected chemistry at the summit.
