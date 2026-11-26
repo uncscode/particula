@@ -25,4 +25,23 @@ Place the Particula dots inside the figure margin.
 
 - The logo axes, excluded from the scientific layout.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/plotting/toc.py#L8-L39)
+[View source](https://github.com/uncscode/particula/blob/main/particula/plotting/toc.py#L13-L62)
+
+## particula.plotting.toc.save_toc_svg
+
+*function*
+
+```python
+def save_toc_svg(fig, path, *, title, description)
+```
+
+Save the full TOC canvas as a reproducible SVG with accessible metadata.
+
+**Parameters**
+
+- `fig` — Completed Matplotlib figure.
+- `path` — Destination SVG file.
+- `title` — Short title for the standalone artwork.
+- `description` — Accessible description of the scientific comparison.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/plotting/toc.py#L65-L88)
