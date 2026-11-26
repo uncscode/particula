@@ -15,12 +15,15 @@
     "@astrojs/starlight": "0.42.11",
     "@expressive-code/plugin-collapsible-sections": "^0.41.0",
     "astro": "7.4.11",
-    "mermaid": "^11.17.2",
+    "mermaid": "^12.3.0",
     "rehype-mathjax": "^7.0.0",
     "remark-math": "^6.0.0",
     "starlight-pydocs": "0.3.0"
   },
   "engines": {
     "node": "26.13.0"
+  },
+  "overrides": {
+    "katex": "0.18.10"
   }
 }

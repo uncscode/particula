@@ -12,7 +12,7 @@ from matplotlib.lines import Line2D
 import numpy as np
 import pandas as pd
 
-from particula.plotting.toc import add_toc_logo
+from cloud_toc import toc
 from campaign import SAMPLES, DUST, BASE_SEED, Experiment
 from summarize import load, lookup, paired, EXPERIMENT
 
@@ -153,39 +153,6 @@ def supply_figure(out,summary):
     axs[0].set_yticks(y,[LABELS[s] for s in SAMPLES]);axs[0].set_ylim(5.65,-.65)
     for a in axs:a.grid(axis='x',alpha=.15)
     fig.savefig(out/'sample-volume.png',dpi=190);plt.close(fig)
-
-
-def toc(out, c):
-    clouds = [('reference', 'Reference eddy'), ('isdac', 'ISDAC profile'),
-              ('mpace', 'M-PACE profile')]
-    with plt.style.context('particula.toc'):
-        fig, ax = plt.subplots(figsize=(3, 3))
-        fig.subplots_adjust(left=.37, right=.97, top=.66, bottom=.26)
-        fig.text(.05, .89, 'Fresh dust inflow', fontsize=12, weight='bold')
-        fig.text(.05, .81, 'Compared with a closed cloud top', fontsize=8.6)
-        fig.text(.05, .692, 'Simulated case', fontsize=7.3, weight='bold')
-        ax.text(-.025, 1.08, 'Fewer freezes', ha='center', fontsize=7.2,
-                color=RUST, transform=ax.get_xaxis_transform())
-        ax.text(.052, 1.08, 'More freezes', ha='center', fontsize=7.2,
-                color=TEAL, transform=ax.get_xaxis_transform())
-        values = []
-        for sky, _ in clouds:
-            rows = c[(c.sky == sky) & (c.grid == 10) & (c.abundance == 'equal') &
-                     (c.source == DUST) & (c.metric == 'primary') & (c.comparison == 'closed')]
-            values.append(rows.delta.item())
-        ax.barh(range(3), values, color=[TEAL if v >= 0 else RUST for v in values], height=.48)
-        ax.set_yticks(range(3), [label for _, label in clouds], fontsize=7.5)
-        ax.tick_params(axis='y', length=0, pad=4)
-        ax.tick_params(axis='x', labelsize=7.5)
-        ax.set(ylim=(2.55, -.55), xlim=(-.057, .085), xticks=[-.04, 0, .04, .08])
-        ax.axvline(0, lw=1.1, c=INK)
-        ax.spines[['top', 'right', 'left']].set_visible(False)
-        ax.set_xlabel('Effect of entrainment on primary ice formation', fontsize=8.1)
-        ax.xaxis.set_label_coords(.5, .14, transform=fig.transFigure)
-        fig.text(.5, .055, 'Six-hour change (freezing events L⁻¹)', ha='center', fontsize=7.8)
-        add_toc_logo(fig, corner='top right')
-        fig.savefig(out/'cloud-toc.png', dpi=300)
-        plt.close(fig)
 
 
 if __name__=='__main__':

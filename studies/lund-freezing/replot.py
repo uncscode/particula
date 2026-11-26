@@ -142,10 +142,9 @@ def render(data, output):
             cloud.water_figure(work, paired, None, None)
             cloud.mineral_figure(work, None)
             baselines(work, paired)
-        cloud.toc(work, paired)
+        cloud.toc(output, paired)
         for image in sorted(work.glob("*.png")):
-            if image.name != "toc.png":
-                shutil.copyfile(image, output / image.name)
+            shutil.copyfile(image, output / image.name)
 
 
 if __name__ == "__main__":

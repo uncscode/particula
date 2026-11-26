@@ -24,16 +24,16 @@ Use `plt.style.context("particula.toc")` around figure creation and export. Its 
 
 ```python
 from matplotlib import pyplot as plt
-from particula.plotting.toc import add_toc_logo
+from particula.plotting.toc import add_toc_logo, save_toc_svg
 
 with plt.style.context("particula.toc"):
     fig, ax = plt.subplots()
     # Draw the study comparison from its saved results.
     add_toc_logo(fig, corner="top right")
-    fig.savefig("study-toc.png")
+    fig.savefig("study-toc.svg")
 ```
 
-Choose `top left`, `top right`, `bottom left`, or `bottom right`. For a vector illustration, position `$dots` in a translated SVG group. The literature renderer embeds the official transparent dots at 22.5 × 17.1 units in a 300-unit square.
+Choose `top left`, `top right`, `bottom left`, or `bottom right`. For a vector illustration, position `$dots` in a translated SVG group. Both paths use the official vector artwork in `particula/plotting/brand/dots.svg`. Matplotlib draws its seven circles as vector paths. The literature renderer inlines the SVG at 22.5 × 17.1 units in a 300-unit square.
 
 Let the title state the finding. Keep visible words that answer a question the picture leaves open about where the sample came from, what was measured, or which condition changed. A shared unit and short labels beside the marks usually suffice. Add the few words needed to distinguish a measurement from a model or a diameter from a water volume. Cut repeated headlines and move secondary conditions and precision into the accessible description and report. See the [Sea2Cloud and particle-growth examples](../../references/toc-design.md#labeling-the-comparison).
 
@@ -45,8 +45,8 @@ Record the repository-relative generator as `tocSource` alongside `tocFigure` in
 
 ## Export and check
 
-For Particula, produce a **3 × 3 inch square**. Use a self-contained SVG with equal physical dimensions (for example, `width="3in" height="3in" viewBox="0 0 300 300"`), or a **900 × 900 pixel** raster with **300 pixels/inch** set on both axes. Export square corners and leave enough inset for the labels and dots logo. The website rounds the displayed corners on study pages, in galleries and in carousels. Keep the detailed quantitative figure in the report.
+For Particula, produce a **3 × 3 inch square**. Publish a self-contained SVG with equal physical dimensions (for example, `width="3in" height="3in" viewBox="0 0 300 300"`). Preserve lettering, plotted marks and the dots as vector geometry. Regenerate from the editable source and point the report, gallery and `tocFigure` at the exported SVG. Inspect the SVG for embedded bitmap images before publishing. Export square corners and leave enough inset for the labels and dots logo. The website rounds the displayed corners on study pages, in galleries and in carousels. Keep the detailed quantitative figure in the report.
 
-Place the TOC image in its own paragraph below the study title, immediately followed by the opening abstract paragraph. The study-page template places the figure in the right 40% of the reading column and lets the abstract wrap beneath it. On narrow screens the abstract appears above the centered figure. Set `tocFigure` on the study’s resource entry in `website/topics.json` to its image path relative to `docs/images/` so the Studies and Topics carousels can display it with the study title. Supply concise alt text conveying the relationship; for standalone SVG include an accessible title and description. Inspect the 3 × 3 inch export and a **2 × 2 inch proof** beside the actual report title. At 300 pixels/inch the proof is 600 × 600 pixels. Display or print it at two inches across to judge readability. Check that labels, contextual details and the main relationship remain distinct in grayscale. Look at the title and proof together for three seconds. Could a new reader point to the study setting, say what a longer bar or larger particle means, and identify the reference and direction of the result? If one answer is missing, adjust that cue or its nearest label and look again.
+Place the TOC image in its own paragraph below the study title, immediately followed by the opening abstract paragraph. The study-page template places the figure in the right 40% of the reading column and lets the abstract wrap beneath it. On narrow screens the abstract appears above the centered figure. Set `tocFigure` on the study’s resource entry in `website/topics.json` to its image path relative to `docs/images/` so the Studies and Topics carousels can display it with the study title. Supply concise alt text conveying the relationship; for standalone SVG include an accessible title and description. Inspect the 3 × 3 inch export and a **2 × 2 inch proof** beside the actual report title. Display or print it at two inches across to judge readability. Check that labels, contextual details and the main relationship remain distinct in grayscale. Look at the title and proof together for three seconds. Could a new reader point to the study setting, say what a longer bar or larger particle means, and identify the reference and direction of the result? If one answer is missing, adjust that cue or its nearest label and look again.
 
 For the advertising, branding, signage and scientific publishing sources behind these choices, see `../../references/toc-design.md`.

@@ -1,10 +1,5 @@
-"""Render the Manchester yield and two-hour size TOC from the archived fits.
+"""Render the Manchester TOC from the archived fits."""
 
-The print PNG uses Inkscape at 300 dpi with the same SVG as the website.
-"""
-
-import shutil
-import subprocess
 from pathlib import Path
 
 import numpy as np
@@ -46,7 +41,7 @@ def spectrum_marks():
 
 
 def render():
-    """Write the gallery vector, study copy and matching print-size PNG."""
+    """Write the gallery vector and its print-ready study copy."""
     yields = pd.read_csv(HERE / "joint/companions/yield_points.csv")
     joint = yields.query("fit == 'joint' and run == 24")
     endpoint = joint.loc[joint.consumed.idxmax()]
@@ -62,18 +57,6 @@ def render():
     )
     print_svg = HERE / "results/figures/manchester-soa-toc.svg"
     print_svg.write_bytes(output.read_bytes())
-    inkscape = shutil.which("inkscape")
-    if inkscape is None:
-        raise RuntimeError("Install Inkscape to export the print PNG")
-    subprocess.run(  # noqa: S603 - fixed Inkscape export arguments
-        [
-            inkscape,
-            "--export-dpi=300",
-            f"--export-filename={print_svg.with_suffix('.png')}",
-            str(print_svg),
-        ],
-        check=True,
-    )
 
 
 if __name__ == "__main__":

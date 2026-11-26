@@ -15,7 +15,7 @@ test('keeps published-site links in the local preview without changing literals'
 
 test('gives registered TOCs their print size and leaves report plots at native size', () => {
   const processor = unified().use(remarkParse).use(remarkDocLinks);
-  const source = '![TOC](/particula/images/dunne-cloud/formation-toc.png)\n\n![Data](/particula/images/dunne-cloud/warm-ensemble.png)';
+  const source = '![TOC](/particula/images/dunne-cloud/formation-toc.svg)\n\n![Data](/particula/images/dunne-cloud/warm-ensemble.png)';
   const tree = processor.runSync(processor.parse(source), { path: '/site/src/content/docs/studies/test.md' });
   assert.deepEqual(tree.children[0].children[0].data.hProperties, { width: 288, height: 288 });
   assert.equal(tree.children[1].children[0].data, undefined);

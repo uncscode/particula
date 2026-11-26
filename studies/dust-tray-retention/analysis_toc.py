@@ -10,7 +10,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle, Ellipse, Polygon
-from particula.plotting.toc import add_toc_logo
+from particula.plotting.toc import add_toc_logo, save_toc_svg
 
 if __package__:
     from .study_data import result_text
@@ -220,7 +220,24 @@ def render():
             handlelength=1.3,
             handletextpad=0.45,
         )
-        fig.savefig(IMAGES / "analysis-toc.png", dpi=300)
+        save_toc_svg(
+            fig,
+            IMAGES / "analysis-toc.svg",
+            title=(
+                "A Particula-based model reduces mean error in three- "
+                "hour dust median diameter by 37%"
+            ),
+            description=(
+                "Wind-tunnel schematic with airflow, airborne dust "
+                "and a floor tray. Across the four winds, the "
+                "predicted median diameter of dust retained on the "
+                "trays at three hours missed the measured median by "
+                "an average of 4.48 µm when the 30-minute median was "
+                "carried forward and 2.84 µm with Particula-based "
+                "transport and retention. The largest improvement "
+                "occurred at 6 m/s."
+            ),
+        )
         plt.close(fig)
 
 

@@ -2,7 +2,7 @@
 
 import pandas as pd
 from matplotlib import pyplot as plt
-from particula.plotting.toc import add_toc_logo
+from particula.plotting.toc import add_toc_logo, save_toc_svg
 from scripts.antarctic_ccn.plots import IMAGES, INK, RUST, TEAL
 
 
@@ -101,7 +101,21 @@ def render():
             "Lines show 95% paired date intervals cm⁻³",
             fontsize=7.3,
         )
-        fig.savefig(IMAGES / "graphical-abstract.png", dpi=300)
+        save_toc_svg(
+            fig,
+            IMAGES / "graphical-abstract.svg",
+            title=(
+                "How an organic film can improve one Antarctic CCN "
+                "count and worsen the activation spectrum"
+            ),
+            description=(
+                "King Sejong Station, 26 held-out dates. At 0.4% "
+                "supersaturation full coating moves the simulated "
+                "count toward the observation. The mean errors in the "
+                "rises on either side move farther from zero. "
+                "Intervals show uncertainty in the mean biases."
+            ),
+        )
         plt.close(fig)
 
 

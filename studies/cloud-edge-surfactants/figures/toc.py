@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Arc, Circle, PathPatch
 from matplotlib.path import Path as DrawingPath
 from matplotlib.transforms import Affine2D
-from particula.plotting.toc import add_toc_logo
+from particula.plotting.toc import add_toc_logo, save_toc_svg
 
 STUDY = Path(__file__).resolve().parents[1]
 INK, TEAL, RUST = "#243E43", "#135963", "#A44D21"
@@ -160,7 +160,26 @@ def render():
         add_toc_logo(fig, corner="top right")
         output = STUDY.parents[1] / "docs/images/cloud-edge-surfactants"
         output.mkdir(parents=True, exist_ok=True)
-        fig.savefig(output / "toc.png", dpi=300)
+        save_toc_svg(
+            fig,
+            output / "toc.svg",
+            title=(
+                "Two surfactants lower surface tension yet scarcely "
+                "change droplet counts at a simulated smoke-cloud "
+                "edge"
+            ),
+            description=(
+                "Head-and-tail symbols grouped along a short arc of "
+                "the droplet surface also mark the two cloud-model "
+                "cases containing surfactant. Dodecyl sulfate lowered "
+                "surface tension more than octyl sulfate at one tenth "
+                "the molar dose. Moving where dry, smoky air entered "
+                "the cloud increased the total at 100 m above cloud "
+                "base by 89.0 droplets/cm³ with matched acid seeds or "
+                "finite surfactant supply, and by 66.7/cm³ with "
+                "surface tension fixed at the laboratory values."
+            ),
+        )
         plt.close(fig)
 
 

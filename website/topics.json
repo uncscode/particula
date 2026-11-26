@@ -2981,7 +2981,7 @@
           }
         ]
       },
-      "tocFigure": "cloud-1833/CLOUD-1833-growth-TOC.png",
+      "tocFigure": "cloud-1833/CLOUD-1833-growth-TOC.svg",
       "tocSource": "studies/cloud-1833/source/cloud_growth_toc.py"
     },
     {
@@ -3044,7 +3044,7 @@
         "companions": [],
         "relations": []
       },
-      "tocFigure": "dunne-cloud/formation-toc.png",
+      "tocFigure": "dunne-cloud/formation-toc.svg",
       "tocSource": "studies/dunne-cloud/monte-carlo/toc.py"
     },
     {
@@ -3098,7 +3098,7 @@
           }
         ]
       },
-      "tocFigure": "manchester-soa/network-growth-toc.png",
+      "tocFigure": "manchester-soa/network-growth-toc.svg",
       "tocSource": "studies/voliotis-2022/joint/milestone2/toc.py"
     },
     {
@@ -5409,7 +5409,7 @@
           }
         ]
       },
-      "tocFigure": "dust-tray-retention/analysis-toc.png",
+      "tocFigure": "dust-tray-retention/analysis-toc.svg",
       "tocSource": "studies/dust-tray-retention/analysis_toc.py"
     },
     {
@@ -5674,7 +5674,7 @@
           }
         ]
       },
-      "tocFigure": "straw-combustion/toc.png",
+      "tocFigure": "straw-combustion/toc.svg",
       "tocSource": "scripts/straw_combustion/toc.py"
     },
     {
@@ -5845,7 +5845,7 @@
           }
         ]
       },
-      "tocFigure": "antarctic-ccn/graphical-abstract.png",
+      "tocFigure": "antarctic-ccn/graphical-abstract.svg",
       "tocSource": "scripts/antarctic_ccn/toc.py"
     },
     {
@@ -5971,7 +5971,7 @@
           }
         ]
       },
-      "tocFigure": "pallas-cloud-probes/study-toc.png",
+      "tocFigure": "pallas-cloud-probes/study-toc.svg",
       "tocSource": "studies/pallas-cloud-probes/figures/make_toc.py"
     },
     {
@@ -6157,7 +6157,7 @@
           }
         ]
       },
-      "tocFigure": "pallas-activation/salt-toc.png",
+      "tocFigure": "pallas-activation/salt-toc.svg",
       "tocSource": "studies/pallas-activation/figures/toc.py"
     },
     {
@@ -6210,8 +6210,8 @@
           }
         ]
       },
-      "tocFigure": "lund-freezing/cloud-toc.png",
-      "tocSource": "studies/lund-freezing/cloud-sources/plots.py"
+      "tocFigure": "lund-freezing/cloud-toc.svg",
+      "tocSource": "studies/lund-freezing/cloud-sources/cloud_toc.py"
     },
     {
       "source": "docs/studies/literature/lund-freezing/assay-and-pulse.md",
@@ -6294,7 +6294,7 @@
           }
         ]
       },
-      "tocFigure": "cloud-edge-surfactants/toc.png",
+      "tocFigure": "cloud-edge-surfactants/toc.svg",
       "tocSource": "studies/cloud-edge-surfactants/figures/toc.py"
     },
     {

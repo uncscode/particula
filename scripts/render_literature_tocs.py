@@ -4,7 +4,6 @@ Run from the repository root with python -m scripts.render_literature_tocs.
 """
 
 import argparse
-import base64
 import json
 import runpy
 from pathlib import Path
@@ -15,13 +14,12 @@ IMAGES = ROOT / "docs/images"
 
 
 def dots_svg():
-    """Embed the transparent vector logo with styles scoped to its own SVG."""
-    logo = (IMAGES / "icon_light_clear.svg").read_bytes()
-    encoded = base64.b64encode(logo).decode("ascii")
-    return (
-        '<image width="22.5" height="17.1" aria-hidden="true" '
-        'xmlns:xlink="http://www.w3.org/1999/xlink" '
-        f'xlink:href="data:image/svg+xml;base64,{encoded}"/>'
+    """Embed the packaged vector dots at gallery scale."""
+    asset = ROOT / "particula/plotting/brand/dots.svg"
+    # Inline geometry keeps the mark scalable even in standalone SVG viewers.
+    logo = asset.read_text().strip()
+    return logo.replace(
+        "<svg ", '<svg width="22.5" height="17.1" aria-hidden="true" ', 1
     )
 
 
