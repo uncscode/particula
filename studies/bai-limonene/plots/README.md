@@ -6,7 +6,7 @@ The [compact plot tables](../../../website/public/study-data/bai-limonene/) are 
 python studies/bai-limonene/plots/render.py
 ```
 
-The default destination is [docs/images/bai-limonene](../../../docs/images/bai-limonene/). Pass `--data DIRECTORY` or `--output DIRECTORY` to use a different copy. The publication charts use `particula.default`. The independent gallery entry point, `python -m scripts.render_literature_tocs bai-limonene`, draws the 3-inch square at 300 dpi using `particula.toc`.
+The default destination is [docs/images/bai-limonene](../../../docs/images/bai-limonene/). Pass `--data DIRECTORY` or `--output DIRECTORY` to use a different copy. The publication charts use `particula.default`. The independent gallery entry point, `python -m scripts.render_literature_tocs bai-limonene`, exports the 3-inch square as a self-contained SVG using `particula.toc`.
 
 | Figure | Plot table | Source and observable |
 | --- | --- | --- |

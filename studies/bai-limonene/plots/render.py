@@ -285,7 +285,7 @@ def main():
             fig = draw(args.data)
             fig.savefig(args.output / f"{name}.png", dpi=185)
             plt.close(fig)
-    render_toc(args.data, args.output / "seasonal-toc.png")
+    render_toc(args.data, args.output / "seasonal-toc.svg")
 
 
 if __name__ == "__main__":

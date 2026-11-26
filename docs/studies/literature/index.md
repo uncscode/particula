@@ -51,7 +51,7 @@ Modeled convection supplies only a third of the heat needed for the reported pen
 
 <div class="study-figures">
 
-[![For the same clean summer parcel, sun-aged aerosol gives fewer, larger droplets and reduces reflected sunlight from 52.02 to 50.57 W/m² compared with dark aging.](../../images/bai-limonene/seasonal-toc.png)\
+[![For the same clean summer parcel, sun-aged aerosol gives fewer, larger droplets and reduces reflected sunlight from 52.02 to 50.57 W/m² compared with dark aging.](../../images/bai-limonene/seasonal-toc.svg)\
 Sun-aged limonene aerosol yields fewer droplets and less reflected sunlight in modeled summer clouds](bai-limonene/index.md)
 
 [![Head-and-tail symbols grouped along a short arc of the droplet surface also mark the two cloud-model cases containing surfactant. Dodecyl sulfate lowered surface tension more than octyl sulfate at one tenth the molar dose. Moving where dry, smoky air entered the cloud increased the total at 100 m above cloud base by 89.0 droplets/cm³ with matched acid seeds or finite surfactant supply, and by 66.7/cm³ with surface tension fixed at the laboratory values.](../../images/cloud-edge-surfactants/toc.svg)\

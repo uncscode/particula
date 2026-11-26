@@ -6,14 +6,14 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.patches import Circle, PathPatch
 from matplotlib.path import Path as MplPath
-from particula.plotting.toc import add_toc_logo
+from particula.plotting.toc import add_toc_logo, save_toc_svg
 
 ROOT = Path(__file__).resolve().parents[3]
 DATA = ROOT / "website/public/study-data/bai-limonene"
 IMAGES = ROOT / "docs/images/bai-limonene"
 
 
-def render(data=DATA, output=IMAGES / "seasonal-toc.png"):
+def render(data=DATA, output=IMAGES / "seasonal-toc.svg"):
     """Compare the dark and sunlit summer parcels in the same cloud regime."""
     case = pd.read_csv(data / "summer-pair.csv").iloc[0]
     ink, teal, rust = "#243e43", "#135963", "#a44d21"
@@ -112,7 +112,21 @@ def render(data=DATA, output=IMAGES / "seasonal-toc.png"):
         label(0.5, 0.267, "Reflected sunlight (W/m²)", 9, weight="bold")
         label(0.5, 0.065, "Circles show median wet diameter (µm).", 7)
         add_toc_logo(fig, corner="top right")
-        fig.savefig(output, dpi=300)
+        save_toc_svg(
+            fig,
+            output,
+            title="A clean summer cloud after dark or sunlit aerosol aging",
+            description=(
+                "After 72 hours of aerosol aging, the modeled parcel rises at "
+                "0.25 m/s. From dark to sunlit aging, droplet number falls "
+                f"from {case.dark_activated_cm3:.1f} to "
+                f"{case.activated_cm3:.1f} per cubic centimetre, "
+                "median wet diameter rises from "
+                f"{case.dark_median_um:.1f} to {case.median_um:.1f} µm, and "
+                f"reflected sunlight falls from {case.dark_up_site_wm2:.2f} to "
+                f"{case.dark_up_site_wm2 + case.delta_up_site_wm2:.2f} W/m²."
+            ),
+        )
         plt.close(fig)
 
 
