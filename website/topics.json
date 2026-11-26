@@ -6339,6 +6339,89 @@
       ],
       "role": "Studies",
       "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/bai-limonene/index.md",
+      "title": "Sun-aged limonene aerosol yields fewer droplets and less reflected sunlight in modeled summer clouds",
+      "topic": "parcels",
+      "also": [
+        "optics",
+        "activity-kappa"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "bai-limonene",
+        "runs": [
+          "bai-limonene-energy"
+        ],
+        "companions": [
+          "docs/studies/literature/bai-limonene/film-and-airborne.md",
+          "docs/studies/literature/bai-limonene/seasonal-light.md",
+          "docs/studies/literature/bai-limonene/uncertainty.md",
+          "docs/studies/literature/bai-limonene/reproduction.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/processes/parcels.md",
+            "label": "Follow competing droplets through a rising parcel"
+          }
+        ]
+      },
+      "tocFigure": "bai-limonene/seasonal-toc.svg",
+      "tocSource": "studies/bai-limonene/plots/toc.py"
+    },
+    {
+      "source": "docs/studies/literature/bai-limonene/film-and-airborne.md",
+      "title": "Which particles retain the light-sensitive material?",
+      "topic": "activity-kappa",
+      "also": [
+        "condensation",
+        "parcels"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/bai-limonene/seasonal-light.md",
+      "title": "How aerosol exposure and reflected sunlight change through the day",
+      "topic": "optics",
+      "also": [
+        "parcels"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/bai-limonene/uncertainty.md",
+      "title": "Which uncertainties could change the cloud result?",
+      "topic": "parcels",
+      "also": [
+        "optics",
+        "size"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/bai-limonene/reproduction.md",
+      "title": "Reproduce the limonene aerosol and cloud study",
+      "topic": "parcels",
+      "also": [
+        "optics"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/bai-limonene/reflected_energy.py",
+      "title": "How much less energy does the modeled summer cloud reflect in a day?",
+      "topic": "optics",
+      "also": [
+        "parcels"
+      ],
+      "role": "Studies",
+      "start_here": false
     }
   ],
   "supporting": [

@@ -165,6 +165,7 @@ include = [
     "studies/cloud-1833/full-transfer/stage-scores.csv",
     "studies/mt-soledad/figures/optical-spectrum.csv",
     "studies/mt-soledad/figures/optical-summary.csv",
+    "website/public/study-data/bai-limonene/monthly.csv",
     "website/examples.json", "scripts/", "examples_tests/", "conda/", "conftest.py",
 ]
 exclude = [

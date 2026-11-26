@@ -1,0 +1,35 @@
+{
+  "bai.pdf": {
+    "url": "https://repository.library.noaa.gov/view/noaa/77111/noaa_77111_DS1.pdf",
+    "sha256": "1c58775829762acab04e4391dcd38da77ec16f2bee0b753c66021397cf763ed5"
+  },
+  "bai-si.pdf": {
+    "url": "https://ndownloader.figshare.com/files/61999763",
+    "sha256": "c0a06cbe2e8ceb9b5654f0579e8bcfdf830bd425254b48acda5465bfeb44d8e3"
+  },
+  "bohn.pdf": {
+    "url": "https://amt.copernicus.org/articles/10/3151/2017/amt-10-3151-2017.pdf",
+    "sha256": "02e89b0a179aa267a7fca1b690e5cc6499911ed3c62d9b8643e29681a6425d8a"
+  },
+  "power.json": {
+    "url": "https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=ALLSKY_SFC_UVA,ALLSKY_SFC_UVB,ALLSKY_SFC_UV_INDEX,ALLSKY_SFC_SW_DWN&community=RE&longitude=26.63&latitude=67.37&start=20220101&end=20221231&format=JSON&time-standard=UTC",
+    "sha256": "b7ada42604f764e2eeb7b8d2294685afc0db1557100c6e10b493d775ac8b6723",
+    "data_sha256": "e026aaca19fbe8e17232cdee7b404e81adc2c8074b6846ead8f5d26b983e48e3"
+  },
+  "dmps_pm25_PaCE2022.zip": {
+    "url": "https://zenodo.org/records/23309964/files/dmps_pm25_PaCE2022.zip",
+    "sha256": "33f77ce0b02488b769976695bcbf14d3971fea4feed29058cfd931193619d6e3"
+  },
+  "CCN_tot_size_resolved_PaCE2022.zip": {
+    "url": "https://zenodo.org/records/23309964/files/CCN_tot_size_resolved_PaCE2022.zip",
+    "sha256": "1348a4c76ce2ba9c0062aa7727e4b2a67176d546037c614a713ab8795ea429d1"
+  },
+  "astmg173.csv": {
+    "url": "https://raw.githubusercontent.com/pvlib/pvlib-python/b8a02a404ca3dc1bcb32437f3138d4d749c53f96/pvlib/data/ASTMG173.csv",
+    "sha256": "91964ac23c0ec82dbbda4a7f160a5f5faf551dfe18ffae7e2446d74b57ee7859"
+  },
+  "water_hale.yml": {
+    "url": "https://raw.githubusercontent.com/polyanskiy/refractiveindex.info-database/e6d15e364f70de1cad8a96a20f75689f2fba8b21/database/data/main/H2O/nk/Hale.yml",
+    "sha256": "df1af6b4352c3378cf81b149ac2280de30d80e2941d147786d5e7cd5044a8847"
+  }
+}

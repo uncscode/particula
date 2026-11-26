@@ -100,6 +100,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [How illumination warms and evaporates a wet aerosol](validation/material-properties/optical-heating/illuminated_evaporation.py)
 - [How long does an evaporating droplet take to reach two-liquid equilibrium?](examples/thermodynamics/equilibria/aiomfac_evaporating_droplet.py)
 - [How much energy accompanies a condensation step?](examples/particle-processes/condensation/condensation_latent_heat.py)
+- [How much less energy does the modeled summer cloud reflect in a day?](literature/bai-limonene/reflected_energy.py)
 - [How strongly does curvature raise equilibrium vapor pressure?](examples/thermodynamics/particle-properties/particle_surface_tutorial.py)
 - [How two particle sizes share a reactive gas](examples/custom-processes/resolved_reactive_uptake.py)
 - [How wide is the same puff on a grid and as individual particles?](examples/gas-transport/turbulent_puff.py)
