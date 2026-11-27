@@ -39,6 +39,9 @@ Twelve of 15 Manchester runs improved, yet the average joint error rose](evapora
 [![A batch chamber holds aerosol formed during α-pinene oxidation. In sampled particles, cis-pinic acid reaches half its late signal 20.7 minutes after the unidentified isomer. The common-source and delayed-source models predict gaps of 0.11 and 19.11 minutes, respectively.](../../images/pinic-isomers/graphical-abstract.svg)\
 A delayed source predicts 19 minutes of the 21-minute gap between two chamber isomer signals](pinic-isomers/index.md)
 
+[![Humid ocimene aerosol retained about 41% overnight at 220 nm. At 60 nm the models predict 23–28% remaining with slower internal mixing and 34–38% with lower volatility.](../../images/liu-terpene/toc.svg)\
+Two mechanisms fit the 220 nm β-ocimene residue and predict different losses at 60 nm](evaporation-and-uptake/liu-terpene/index.md)
+
 [![Change in organic mass per sulfate after dilution: the chamber measurement and growth-calibrated fit fall below their starting values. The reversible-pool model and its imidazole-producing variant (IC) both rise.](../../images/glyoxal-chamber/graphical-abstract.svg)\
 After glyoxal dilution, two models predict rising organic mass per sulfate as measurements fall](https://uncscode.github.io/particula/studies/literature/evaporation-and-uptake/glyoxal_chamber/)
 
@@ -149,6 +152,7 @@ Adding settling and diffusion lowers predicted one-hour survival of 1 µm partic
 - [Manchester’s ternary aerosol declined while the fitted reaction network still predicted growth](evaporation-and-uptake/manchester-network-growth/index.md)
 - [Twelve of 15 Manchester runs improved, yet the average joint error rose](evaporation-and-uptake/manchester-campaign-performance/index.md)
 - [A delayed source predicts 19 minutes of the 21-minute gap between two chamber isomer signals](pinic-isomers/index.md)
+- [Two mechanisms fit the 220 nm β-ocimene residue and predict different losses at 60 nm](evaporation-and-uptake/liu-terpene/index.md)
 - [After glyoxal dilution, two models predict rising organic mass per sulfate as measurements fall](evaporation-and-uptake/glyoxal_chamber.py)
 - [Modeled convection supplies only a third of the heat needed for the reported pentane drop evaporation rate](evaporation-and-uptake/pendant-drop/index.md)
 

@@ -3048,6 +3048,102 @@
       "tocSource": "studies/dunne-cloud/monte-carlo/toc.py"
     },
     {
+      "source": "docs/studies/literature/evaporation-and-uptake/liu-terpene/index.md",
+      "title": "Two mechanisms fit the 220 nm β-ocimene residue and predict different losses at 60 nm",
+      "topic": "condensation",
+      "also": [
+        "partitioning",
+        "chambers"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "liu-terpene",
+        "runs": [
+          "liu-terpene-residues"
+        ],
+        "companions": [
+          "docs/studies/literature/evaporation-and-uptake/liu-terpene/sources.md",
+          "docs/studies/literature/evaporation-and-uptake/liu-terpene/chamber.md",
+          "docs/studies/literature/evaporation-and-uptake/liu-terpene/size-test.md",
+          "docs/studies/literature/evaporation-and-uptake/liu-terpene/viscosity.md",
+          "docs/studies/literature/evaporation-and-uptake/liu-terpene/cloud.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/processes/condensation.md",
+            "label": "Gas–particle mass transfer"
+          },
+          {
+            "target": "docs/guide/processes/parcels.md",
+            "label": "Cloud activation in a rising parcel"
+          }
+        ]
+      },
+      "tocFigure": "liu-terpene/toc.svg",
+      "tocSource": "scripts/liu_terpene_toc.py"
+    },
+    {
+      "source": "docs/studies/literature/evaporation-and-uptake/liu-terpene/compare_residues.py",
+      "title": "Compare the 220 nm ocimene measurements with two 60 nm forecasts",
+      "topic": "condensation",
+      "also": [
+        "chambers"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/evaporation-and-uptake/liu-terpene/sources.md",
+      "title": "What the published diameters tell us about evaporation",
+      "topic": "chambers",
+      "also": [
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/evaporation-and-uptake/liu-terpene/chamber.md",
+      "title": "Both acyclic aerosols retain more volume in the common-size reconstruction",
+      "topic": "condensation",
+      "also": [
+        "chambers"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/evaporation-and-uptake/liu-terpene/size-test.md",
+      "title": "A 60 nm ocimene cohort could separate internal mixing from lower volatility",
+      "topic": "condensation",
+      "also": [
+        "partitioning"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/evaporation-and-uptake/liu-terpene/viscosity.md",
+      "title": "Dry farnesene viscosity constrains overnight loss more closely than early loss",
+      "topic": "partitioning",
+      "also": [
+        "condensation"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/evaporation-and-uptake/liu-terpene/cloud.md",
+      "title": "Larger residues can activate more particles, but lower water affinity can reverse the effect",
+      "topic": "parcels",
+      "also": [
+        "chambers"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
       "source": "docs/studies/literature/evaporation-and-uptake/manchester-soa/index.md",
       "title": "How well does Particula reproduce organic aerosol formation in the Manchester chamber?",
       "topic": "chambers",
@@ -6700,6 +6796,7 @@
   ],
   "study_group_exceptions": {
     "docs/studies/validation/condensation": "The sparse-activity benchmark compares chemistry construction, lookup and fallback costs across both parcel and box workflows. Its reference and timing matrix are shared across integrators.",
-    "docs/studies/validation": "The validation collections distinguish prescribed-flow replay against external CFD from local process tests, optics and release qualification."
+    "docs/studies/validation": "The validation collections distinguish prescribed-flow replay against external CFD from local process tests, optics and release qualification.",
+    "docs/studies/literature#organic-chemistry-and-evaporation": "The seven studies share a chamber or evaporation comparison. Keeping the three related Manchester reports together preserves navigation alongside the four independent experiments."
   }
 }
