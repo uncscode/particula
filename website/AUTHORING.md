@@ -5,10 +5,12 @@ The source remains downloadable and executable with Python.
 ## Register a study
 
 Choose one primary home below `docs/studies/`: `examples/`, `tutorials/`,
-`literature/`, `validation/`, or `benchmarks/`. The main resource in
+`literature/`, `explorations/`, `validation/`, or `benchmarks/`. The main resource in
 `website/topics.json` owns its stable study ID, topics, script keys and
-companion sources. A report can own several runs or have no code. Register
-each runnable Python source once in `website/examples.json`, preserving its
+companion sources. A report can own several runs or have no code. For an
+exploratory study, register its square graphical abstract with
+`tocFigure` and its generator with `tocSource` to include it in the collection
+carousel. Register each runnable Python source once in `website/examples.json`, preserving its
 execution key when moving or renaming a source. Use precise relationships
 for supporting guides, equations, API symbols and evidence. Verify the reverse
 link at the target. Theory pages retain derivations and link at the equation;
