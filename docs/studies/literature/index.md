@@ -74,6 +74,8 @@ Liquid salt mixing widens the winter foothill growth-factor bias at Mt. Hua from
 
 </div>
 
+The Pallas activation measurements motivate a related exploration of which particle properties a compact checkpoint must preserve. [Regenerating a particle-resolved aerosol](../explorations/parcel-composition/index.md)
+
 ## Water uptake by organic compounds
 
 <div class="study-figures">

@@ -6614,6 +6614,94 @@
       "start_here": false
     },
     {
+      "source": "docs/studies/explorations/parcel-composition/redraw-qualification.md",
+      "title": "How much aerosol state survives a random redraw?",
+      "topic": "activity-kappa",
+      "also": ["size"],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/explorations/parcel-composition/black-carbon-restarts.md",
+      "title": "Which black-carbon particles explain the six absorption misses?",
+      "topic": "activity-kappa",
+      "also": ["size"],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/explorations/parcel-composition/stage-two.md",
+      "title": "Which water and new-particle measurements improve a parcel restart?",
+      "topic": "activity-kappa",
+      "also": ["size"],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/explorations/parcel-composition/boreal-challenge.md",
+      "title": "Do 16 representatives and six χ knots survive a boreal cloud cycle?",
+      "topic": "activity-kappa",
+      "also": ["size"],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/explorations/parcel-composition/six-hour-aging.md",
+      "title": "How many particles preserve activation and absorption after six hours of aging?",
+      "topic": "activity-kappa",
+      "also": ["size"],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/explorations/parcel-composition/population-metrics.md",
+      "title": "Which population metrics tell us where aerosol species reside?",
+      "topic": "size",
+      "also": [
+        "activity-kappa"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/explorations/parcel-composition/exchange.md",
+      "title": "Which particles carry the salt when two aerosols have the same χ?",
+      "topic": "activity-kappa",
+      "also": ["size"],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/explorations/parcel-composition/index.md",
+      "title": "Regenerating a particle-resolved aerosol from a compact checkpoint",
+      "tocFigure": "parcel-checkpoint-toc.svg",
+      "tocSource": "studies/parcel-composition/overview_figures.py",
+      "topic": "activity-kappa",
+      "also": [
+        "size"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "parcel-composition-exchange",
+        "companions": [
+          "docs/studies/explorations/parcel-composition/exchange.md",
+          "docs/studies/explorations/parcel-composition/population-metrics.md",
+          "docs/studies/explorations/parcel-composition/six-hour-aging.md",
+          "docs/studies/explorations/parcel-composition/boreal-challenge.md",
+          "docs/studies/explorations/parcel-composition/stage-two.md",
+          "docs/studies/explorations/parcel-composition/black-carbon-restarts.md",
+          "docs/studies/explorations/parcel-composition/redraw-qualification.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/studies/literature/pallas-activation/index.md",
+            "label": "Compare the Pallas activation fits"
+          }
+        ]
+      }
+    },
+    {
       "source": "docs/studies/explorations/weighted-particle-embedding/index.md",
       "title": "A hybrid neural forecast for one million aerosol particles",
       "topic": "representations",
