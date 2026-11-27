@@ -1,26 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
-  <title id="title">Unsalted ambient air in K-CPEC</title>
-  <desc id="desc">Run 1 record-mean Welas optical size distribution and the pooled six-run fit, on the same absolute concentration scale. Both distributions peak in the 14.9 µm bin. The model undercounts particles on the smaller-diameter side of the peak. The horizontal axis is logarithmic and vertical axis linear.</desc>
+  <title id="title">Jeju Island Chamber</title>
+  <desc id="desc">A sampling tube draws from a cloud inside K-CPEC. For the unsalted ambient-air run, the measured and simulated record-mean spectra share a droplet peak. The six-run fit undercounts the smaller side of the peak. Both curves group the 70 optical bins into 18 bands, conserving particle number.</desc>
   <rect width="300" height="300" fill="#FBF2E3"/>
   <g stroke-linejoin="round" stroke-linecap="round">
-    <path d="M18 19 Q18 14 26 12 Q48 7 70 12 Q78 14 78 19 V50 Q77 57 48 58 Q19 57 18 50Z" fill="#CAD9D2" stroke="#243E43" stroke-width="2"/>
-    <path d="M20 17 Q48 25 76 17 M24 46 Q48 51 72 46" fill="none" stroke="#617679" stroke-width="1.3"/>
-    <path d="M48 52 V65 H78" fill="none" stroke="#135963" stroke-width="2.4"/>
+    <path d="M16 18 Q16 12 25 10 Q50 5 75 10 Q83 12 83 18 V54 Q82 62 50 63 Q17 62 16 54Z" fill="#CAD9D2" stroke="#243E43" stroke-width="2"/>
+    <path d="M18 16 Q50 24 81 16" fill="none" stroke="#617679" stroke-width="1.3"/>
+    <path d="M35 39 C28 39 27 30 35 28 C36 21 47 20 51 26 C57 21 65 25 65 30 C74 31 72 39 65 39Z" fill="#FFF9EC" stroke="#315F65" stroke-width="1.45"/>
+    <path d="M75 35V64Q75 68 79 68H87 M83 65L87 68L83 71" fill="none" stroke="#135963" stroke-width="1.8"/>
   </g>
   <g font-family="DejaVu Sans, sans-serif" fill="#243E43">
-    <text x="48" y="38" text-anchor="middle" font-size="13" font-weight="bold">K-CPEC</text>
-    <text x="91" y="31" font-size="17.5" font-weight="bold">Unsalted ambient air</text>
-    <text x="91" y="51" font-size="13">Jeju · Run 1</text>
+    <text x="47" y="55" text-anchor="middle" font-size="12.5" font-weight="bold">K-CPEC</text>
+    <text x="92" y="31" font-size="17.5" font-weight="bold">Jeju Island Chamber</text>
+    <text x="92" y="51" font-size="13">Run 1 · Unsalted ambient air</text>
+    <text x="92" y="71" fill="#135963" font-size="11">Cloud sample</text>
     <g font-size="12.5">
       <path d="M36 83H58" stroke="#243E43" stroke-width="2.5"/><text x="64" y="87">Measured</text>
-      <path d="M163 83H186" stroke="#135963" stroke-width="2.5" stroke-dasharray="5 3"/><text x="192" y="87">Shared fit</text>
+      <path d="M163 83H186" stroke="#135963" stroke-width="2.5" stroke-dasharray="5 3"/><text x="192" y="87">Simulated</text>
     </g>
     <text x="51" y="112" font-size="12">Particles/cm³ per decade of diameter</text>
     <g fill="none" stroke="#CFD3C8" stroke-width="0.8"><path d="M51 124H282 M51 162H282 M51 200H282"/></g>
     <path d="M51 124V238H282" fill="none" stroke="#617679" stroke-width="1"/>
     <g id="spectra" fill="none" stroke-width="2.2" stroke-linejoin="round">
-      <path id="measured" stroke="#243E43" d="M51 238.000V238.000H54.300V238.000H57.600V238.000H60.900V238.000H64.200V238.000H67.500V238.000H70.800V238.000H74.100V238.000H77.400V238.000H80.700V238.000H84.000V238.000H87.300V237.973H90.600V237.874H93.900V237.723H97.200V237.537H100.500V237.314H103.800V237.145H107.100V237.106H110.400V237.104H113.700V237.103H117.000V236.612H120.300V235.867H123.600V234.926H126.900V234.183H130.200V234.190H133.500V233.878H136.800V233.484H140.100V232.557H143.400V231.110H146.700V229.136H150.000V225.802H153.300V220.386H156.600V215.152H159.900V206.980H163.200V191.652H166.500V184.673H169.800V184.979H173.100V186.304H176.400V181.427H179.700V176.460H183.000V164.003H186.300V147.078H189.600V139.366H192.900V143.075H196.200V166.226H199.500V177.808H202.800V190.449H206.100V200.939H209.400V215.368H212.700V226.523H216.000V234.488H219.300V236.889H222.600V237.577H225.900V237.851H229.200V237.964H232.500V237.987H235.800V237.997H239.100V238.000H242.400V238.000H245.700V238.000H249.000V238.000H252.300V237.998H255.600V237.999H258.900V238.000H262.200V238.000H265.500V238.000H268.800V238.000H272.100V238.000H275.400V238.000H278.700V238.000H282.000"/>
-      <path id="shared" stroke="#135963" stroke-dasharray="5 2.5" d="M51 237.882V237.882H54.300V237.870H57.600V237.853H60.900V237.838H64.200V237.772H67.500V237.744H70.800V237.768H74.100V237.761H77.400V237.752H80.700V237.701H84.000V237.656H87.300V237.568H90.600V237.481H93.900V237.393H97.200V237.301H100.500V237.263H103.800V237.105H107.100V236.994H110.400V236.905H113.700V236.770H117.000V236.605H120.300V236.449H123.600V236.151H126.900V235.873H130.200V235.429H133.500V234.853H136.800V233.976H140.100V232.814H143.400V231.245H146.700V229.395H150.000V227.581H153.300V225.773H156.600V224.026H159.900V221.767H163.200V218.327H166.500V213.350H169.800V207.052H173.100V199.069H176.400V189.491H179.700V179.849H183.000V170.410H186.300V162.809H189.600V160.150H192.900V163.909H196.200V173.380H199.500V184.945H202.800V196.630H206.100V208.927H209.400V219.791H212.700V227.127H216.000V231.674H219.300V234.885H222.600V236.758H225.900V237.552H229.200V237.844H232.500V237.961H235.800V237.993H239.100V237.999H242.400V238.000H245.700V238.000H249.000V238.000H252.300V238.000H255.600V238.000H258.900V238.000H262.200V238.000H265.500V238.000H268.800V238.000H272.100V238.000H275.400V238.000H278.700V238.000H282.000"/>
+      <path id="measured" stroke="#243E43" d="M51 238.000V238.000H64.200V238.000H77.400V237.993H90.600V237.612H103.800V237.115H117.000V235.397H130.200V233.527H143.400V226.609H156.600V199.614H169.800V182.292H183.000V148.380H196.200V183.855H209.400V228.317H222.600V237.845H235.800V237.999H249.000V237.999H262.200V238.000H275.400V238.000H282.000"/>
+      <path id="shared" stroke="#135963" stroke-dasharray="5 2.5" d="M51 237.861V237.861H64.200V237.761H77.400V237.669H90.600V237.359H103.800V236.944H117.000V236.269H130.200V234.268H143.400V228.498H156.600V219.367H169.800V193.865H183.000V164.320H196.200V190.971H209.400V228.369H222.600V237.529H235.800V237.998H249.000V238.000H262.200V238.000H275.400V238.000H282.000"/>
     </g>
     <g font-size="11" text-anchor="end">
       <text x="45" y="128">600</text><text x="45" y="166">400</text>

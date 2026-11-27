@@ -1,4 +1,4 @@
-"""Refresh the original-bin curves in the gallery artwork from a whole-record replay."""
+"""Refresh the number-conserving, reduced-resolution curves in the gallery artwork from a whole-record replay."""
 
 import argparse
 from pathlib import Path
@@ -21,14 +21,26 @@ def refresh(results):
         edges = obs["edges"]
         widths = np.diff(np.log10(edges))
         assert fit["runs"][0] == 0
-        curves = [
-            a[0, valid].mean(axis=0, dtype=float) / widths
+        mean_counts = [
+            a[0, valid].mean(axis=0, dtype=float)
             for a in (obs["y"], fit["y"])
         ]
+        curves = mean_counts / widths
         peak = obs["d"][np.argmax(curves[0])]
         assert round(peak, 1) == 14.9 and np.argmax(curves[0]) == np.argmax(
             curves[1]
         )
+
+    # Sum number before converting to density, including the last partial group.
+    starts = np.arange(0, len(widths), 4)
+    display_edges = np.r_[edges[starts], edges[-1]]
+    display_widths = np.diff(np.log10(display_edges))
+    display_curves = np.add.reduceat(mean_counts, starts, axis=1) / display_widths
+    np.testing.assert_allclose(
+        (display_curves * display_widths).sum(axis=1),
+        np.sum(mean_counts, axis=1),
+        rtol=1e-12,
+    )
 
     def x(diameter):
         return 51 + 231 * np.log10(diameter / edges[0]) / np.log10(
@@ -36,7 +48,7 @@ def refresh(results):
         )
 
     svg = TEMPLATE.read_text()
-    for key, density in zip(("measured", "shared"), curves):
+    for key, density in zip(("measured", "shared"), display_curves):
         assert (
             np.isfinite(density).all()
             and density.min() >= 0
@@ -45,7 +57,7 @@ def refresh(results):
         y = 238 - density * 114 / 600
         path = f"M51 {y[0]:.3f}" + "".join(
             f"V{height:.3f}H{x(right):.3f}"
-            for height, right in zip(y, edges[1:])
+            for height, right in zip(y, display_edges[1:])
         )
         svg, n = re.subn(
             rf'(<path id="{key}"[^>]*? d=")[^"]*', rf"\g<1>{path}", svg
