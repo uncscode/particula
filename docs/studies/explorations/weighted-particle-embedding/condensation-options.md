@@ -1,6 +1,6 @@
 # Which part of condensation is worth approximating?
 
-The fastest way to reproduce the original physical forecast was to keep its transfer law and combine GPU operations. A ten-second forecast fell from 8.37 s to 5.17 s (1.62× speedup). That still left a 1.23% phase-mass difference from a finer clock. For the 0.1% target, correcting the time step worked better. A fixed physical correction took 15.25 s and a fitted correction took 15.24 s. Both passed against the 16-substep reference across three seeds.
+During condensation, particles take up material from a shared supply of vapor. Particles can also return material to that supply by evaporation. The solver has two jobs. It estimates how readily each vapor can cross each particle’s surface, then balances the transfers so that the mass gained by one phase equals the mass lost by the other. We tested whether a network could estimate part of the transfer coefficient more cheaply. A second experiment used a fitted weight to correct the error from advancing those masses over a finite time step.
 
 All methods used one million initial particles in 1 cm³, 32 vapors and the same collision and nucleation clocks. Sixteen vapors started condensing, eight evaporating and eight near equilibrium. Every 0.125 s interval had two vapor half steps. The main comparison uses three paired event seeds on an RTX 5060. The [coupled forecast comparison](process-comparisons.md) describes the vapor mixture and particle population.
 
@@ -21,7 +21,7 @@ The two-pass physical solver instead reduced how much data the calculation moved
 
 ## Can precomputation give a network a head start?
 
-A smaller network reduced the cost of estimating conductance, but the physical calculation was still much faster. An eight-unit network took 55.2 s per coupled forecast, down from 276 s for the earlier 128-unit head in the same box. Even the smaller network took 6.6 times the original physical runtime.
+At fixed temperature, a growing particle changes size while the vapor’s transport properties stay fixed. We tested two ways to use that regularity. One gave a small network a physical estimate to correct. The other evaluated the fitted network in advance over a range of radii, so the forecast could look up the coefficient as particles grew. A smaller network reduced the cost of estimating conductance, but the physical calculation was still much faster. An eight-unit network took 55.2 s per coupled forecast, down from 276 s for the earlier 128-unit head in the same box. Even the smaller network took 6.6 times the original physical runtime.
 
 The eight- and 24-unit networks had 41 and 121 parameters. Both learned a multiplicative correction to the positive physical approximation *α/(α + Kn)*, where *α* is accommodation and *Kn* is the mean-free-path to radius ratio. After training on 24,000 physical labels, their 99th-percentile coefficient errors on 12,000 independent labels were 3.05% and 0.38%, respectively. These figures describe the rates supplied to the solver. The phase-mass errors below measure what happened when those rates were used throughout a forecast.
 

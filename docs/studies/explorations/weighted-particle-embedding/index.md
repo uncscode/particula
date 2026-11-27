@@ -13,7 +13,7 @@ A forecast coupling a neural collision term to physical vapor transfer took 7.11
 <span id="where-did-the-speedup-come-from"></span>
 <span id="full-native-baseline--1-simulated-second"></span>
 
-At each collision step the hybrid shuffled the particles and paired adjacent entries. For each candidate pair, a neural network estimated the jump-distance term in its Brownian collision rate. The solver used that rate and the pair’s probability of selection to draw mergers. Physical rules combined the partners’ masses and charges, and the native vapor solver advanced the particles between collision steps. All one million initially neutral particles remained individually represented in the 1 cm³ box until they merged.
+Brownian motion brings particles together as gas molecules jostle them. To simulate those encounters, the hybrid shuffled the particles and paired adjacent entries. For each candidate pair, a neural network estimated the jump-distance term in the physical collision formula. This term accounts for the distance a particle travels as its Brownian motion changes direction. The solver used that rate and the pair’s probability of selection to draw mergers. Physical rules combined the partners’ masses and charges, and the native vapor solver advanced the particles between collision steps. All one million initially neutral particles remained individually represented in the 1 cm³ box until they merged.
 
 <figure class="scientific-figure">
 
@@ -28,7 +28,7 @@ The hybrid met both accuracy targets on its single timed run. Against the time-r
 
 ### What did the sampled-physics control show?
 
-With the same candidate pairs and random draws, evaluating the full physical Brownian rate took 7.07 minutes (5.02× faster than full native physics). The physical control and the hybrid each accepted 1,092 mergers and agreed on particle counts and phase masses at every observation. Sampling alone therefore reproduced the speed gain. Whether changing the rate gives the same merger outcomes on fresh draws remains open.
+To isolate the contribution of the network, we kept the candidate pairs and random draws fixed and switched back to the physical formula for jump distance. The resulting forecast took 7.07 minutes (5.02× faster than full native physics). The physical control and the hybrid each accepted 1,092 mergers and agreed on particle counts and phase masses at every observation. Sampling alone therefore reproduced the speed gain. Whether changing the rate gives the same merger outcomes on fresh draws remains open.
 
 Skipping collisions altogether saved little more time and pushed a gas species past the error limit. Turning mergers off saved another 12.2 seconds relative to sampled physics, but the largest phase-mass discrepancy rose from 0.0750% to 0.1103%, above the 0.1% target. Particle count stayed within its limit. A merger changes the surface available for subsequent vapor exchange, so the error can appear in the gas before it becomes apparent in the count. [Collision timers and the limiting gas species](coagulation.md)
 
@@ -36,7 +36,7 @@ Shima and colleagues used random pairs of weighted computational droplets to sim
 
 ### How does the speedup vary by coagulation kernel?
 
-Drawing disjoint pairs saved the most time for charged Brownian collisions. At 32,768 particles the full native forecast took about 22 seconds with charged Brownian motion and about one second with differential settling. Sampling pairs with physical rates brought both forecasts to about 0.4 seconds. That difference in baseline cost explains why the same approach yielded a 54.28× speedup for charged Brownian motion and 2.62× for settling. Switching the sampled rates to neural estimates had little effect on either time.
+A coagulation kernel gives the rate at which two particles collide. Charge can change that rate through attraction or repulsion, and particles that settle at different speeds can overtake one another. We kept the pair sampler and changed the kernel to see whether the saving carried over. Drawing disjoint pairs saved the most time for charged Brownian collisions. At 32,768 particles the full native forecast took about 22 seconds with charged Brownian motion and about one second with differential settling. Sampling pairs with physical rates brought both forecasts to about 0.4 seconds. That difference in baseline cost explains why the same approach yielded a 54.28× speedup for charged Brownian motion and 2.62× for settling. Switching the sampled rates to neural estimates had little effect on either time.
 
 <figure class="scientific-figure">
 
@@ -51,7 +51,7 @@ The same shuffling rule worked across the five kernels because the collision law
 
 ## What happened when we replaced other process rates?
 
-A separate ten-second experiment started from a physical solver that already sampled collision pairs. The million-particle box contained 32 vapors, with 16 initially favoring condensation, eight favoring evaporation and eight near equilibrium. We changed one rate at a time while keeping the other processes physical. The times below are whole-forecast means over three matched seeds after setup and warm-up. This experiment used a different vapor solver and time step from the one-second native benchmark above.
+A separate ten-second experiment started from a physical solver that already sampled collision pairs. The million-particle box contained 32 vapors, with 16 initially favoring condensation, eight favoring evaporation and eight near equilibrium. A vapor can add mass to existing particles through condensation. A precursor can also form new particles through nucleation. For condensation, the network estimated a factor controlling how quickly mass crossed each particle surface. For nucleation, it estimated the rate at which new particles formed. Each run changed just one rate. The times below are whole-forecast means over three matched seeds after setup and warm-up. This experiment used a different vapor solver and time step from the one-second native benchmark above.
 
 | Rate changed in the ten-second forecast | Whole-forecast time |
 |---|---:|
@@ -64,13 +64,19 @@ Evaluating a neural transfer factor for each particle–vapor combination made t
 
 Fitting one coefficient in the birth-rate law reproduced the physical birth count on all three seeds and left the total time effectively tied. Physical nucleation took only 0.141 seconds of the original forecast. Survival after birth poses a different question. For that test we followed newborn particles through growth and scavenging and counted how many reached 5 and 10 nm. [Newborn growth and survival](formation.md)
 
-### Why was the condensation speedup smaller?
+### Where does a condensation step spend its time?
 
-Vapor transfer accounted for 87.4% of the physical forecast time, but evaluating its coefficient occupied only 36% of a vapor half step. With the coefficient known, the solver still had to balance the gas reservoir and update every exchanging particle. We tested whether combining those physical operations on the GPU could save time and whether correcting the finite time step could improve accuracy.
+<span id="why-was-the-condensation-speedup-smaller"></span>
 
-Combining the physical vapor calculations into two GPU passes cut the ten-second forecast to 5.17 seconds, a 1.62× speedup. The faster calculation reproduced the original coarse step, including its 1.23% phase-mass discrepancy from finer integration. Reaching the 0.1% target required improving the step itself.
+Consider one vapor shared by many particles. If its gas concentration exceeds the equilibrium concentration at a particle’s surface, it condenses there. If the gas concentration is lower, material evaporates from that particle. The concentration difference drives the exchange. A transfer coefficient, called *conductance*, sets how quickly it proceeds. It depends on particle size, how rapidly the vapor diffuses through the gas and how readily its molecules enter the particle on contact.
 
-At about 15.2 seconds per forecast, both a fixed correction and a learned correction brought the phase discrepancy below the target. The two comparisons ranked the corrections differently. Against 16 physical substeps across three seeds, the worst discrepancy was smaller for the fixed correction (0.0551% versus 0.0705%). Against 64 substeps on one seed, it was smaller for the learned correction (0.0325% versus 0.0525%). A test on an unfamiliar mixture and pulse history would show whether the learned correction offers a repeatable advantage. [Condensation formulas and time-step checks](condensation-options.md)
+The 128-unit network replaced one part of the conductance formula. From the vapor’s mean free path relative to the particle radius and the probability that a molecule enters on contact, it estimated a dimensionless transfer factor. The solver combined that factor with the radius and vapor diffusivity to get the conductance. The solver still had to determine how much of that vapor remained in the common gas reservoir and update the mass on every particle. What one particle takes up leaves less vapor available for the others. The solver balances those transfers so each species keeps its total mass.
+
+We timed these operations separately. In each 0.125-second model interval, vapor exchange ran for half the interval before collisions and new particle formation, then for the other half afterward. Across the ten-second physical forecast, vapor exchange took 87.4% of the runtime. Within a separately timed vapor half step, calculating conductance took 16.5 of 46.0 milliseconds (36%). Even an instantaneous conductance estimate would leave the gas balance and particle updates to do.
+
+The measured speedup came from combining physical operations on the GPU. One pass accumulated the contributions needed to solve for each vapor’s gas concentration. A second applied that solution to the particles, avoiding large intermediate arrays. This cut the forecast from 8.37 to 5.17 seconds (1.62×). It reproduced the same coarse time step, including its 1.23% phase-mass discrepancy from finer integration.
+
+We also tried learning a correction to the time step itself. Starting from the same masses, we advanced the vapor once over a half interval and again in two smaller steps. Their difference estimated the integration error. We used either a fixed weight or a single fitted weight to correct the result from the two smaller steps. Both forecasts took about 15.2 seconds and brought the phase discrepancy below the 0.1% target. The two comparisons ranked the corrections differently. Against 16 physical substeps across three seeds, the worst discrepancy was smaller for the fixed correction (0.0551% versus 0.0705%). Against 64 substeps on one seed, it was smaller for the learned correction (0.0325% versus 0.0525%). A test on an unfamiliar mixture and pulse history would show whether the learned correction offers a repeatable advantage. [Condensation formulas and time-step checks](condensation-options.md)
 
 ## Which details of an aerosol are worth carrying into a forecast?
 
