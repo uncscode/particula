@@ -17,6 +17,12 @@ The authors ran six expansions in October–November 2025 at Seogwipo, Jeju. The
 
 *Table 1. Inferred clocks are given to the minute. In run 5 coarse particles were present before injection. The renewed warm pulse helped locate addition. The source supplement could not be recovered for independent verification of the last two doses.*
 
+### From outdoor air to the initial particle population
+
+For ambient runs 1, 2, 3 and 6, we average the first 60 seconds of in-chamber Welas measurements in each optical diameter bin. These concentrations initialize the resolved particles in all 18 cells. Each run thus carries its own measured size distribution after filling. The fit adds a lognormal population of smaller cloud condensation nuclei (CCN) and estimates an effective ice-active abundance for each run. Salt introduced later enters as a separate population. Runs 4 and 5 use prepared sulfate and sulfate–dust fills, respectively.
+
+Park and colleagues report 2,400–8,100 ambient aerosol particles/cm³ and 580–1,370 CCN/cm³ at 0.6% water supersaturation across the ambient fills. These published ranges provide an independent reference. The fitting objective uses the chamber spectra, vapor and imager evidence. A quantitative check against the CCN observations would require evaluating activation at the counter’s 0.6% supersaturation for each corresponding fill. [Ambient measurements and Table S1](https://doi.org/10.1029/2026GL123395) · [Chamber observations](https://doi.org/10.6084/m9.figshare.31744108.v1)
+
 | Kind of evidence | What enters the calculation |
 |---|---|
 | Measured forcing and initial populations | Pressure, air and wall thermometry, pre-cloud optical distributions and available LI-COR water vapor. The A2 fill uses the supplier’s dry-volume grading and the measured pre-cloud mixture. |
