@@ -15,6 +15,7 @@ on:
       - website/examples.json
       - website/public/study-data/bai-limonene/monthly.csv
       - studies/aiomfac-mixing-state/*.py
+      - studies/liu-terpene/uncertainty/estimate.py
       - studies/cloud-1833/full-transfer/stage-scores.csv
       - studies/mt-soledad/figures/optical-spectrum.csv
       - studies/mt-soledad/figures/optical-summary.csv

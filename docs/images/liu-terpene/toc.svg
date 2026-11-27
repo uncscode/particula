@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+<title id="title">Dry volume remaining after β-ocimene aerosol evaporates</title>
+<desc id="desc">At 220 nm and 75% relative humidity the two same-fill overnight measurements were 41.6% at 1138 minutes and 41.0% at 1265 minutes. At 60 nm after 20 hours with efficient vapor removal the forecasts are 22.6–27.8% for slower mixing and 34.4–38.0% for lower volatility. Each dashed circle is the initial size for that drawing. Solid particle diameters scale with the cube root of the volume fraction. The model drawings show the midpoint of each range. The winding path and molecular symbols illustrate the hypotheses.</desc>
+<rect width="300" height="300" fill="#FBF2E3"/>
+<g fill="#243E43" font-family="DejaVu Sans, sans-serif">
+<text x="16" y="26" font-size="20" font-weight="bold">Dry volume remaining</text>
+<text x="17" y="46" font-size="12.5">β-Ocimene · 75% RH · overnight</text>
+<g transform="translate(74 95)">
+<path d="M-61 -4h13v8h-13m109 -8h13v8H48" fill="#CAD9D2" stroke="#243E43" stroke-width="1.6"/>
+<rect x="-48" y="-34" width="96" height="68" rx="18" fill="#E4ECE5" stroke="#243E43" stroke-width="2"/>
+<circle r="31" fill="none" stroke="#73817e" stroke-width="1.5" stroke-dasharray="4 4"/>
+<circle id="residue-measured" r="23.090" fill="#243E43"/></g>
+<text x="150" y="86" font-size="15">220 nm · measured</text>
+<text x="148" y="115" font-size="29" font-weight="bold">≈41%</text>
+<g text-anchor="middle">
+<path d="M26 148h46m156 0h46" stroke="#9EABA3"/>
+<text x="150" y="152" font-size="15" font-weight="bold">60 nm · predicted</text>
+<g transform="translate(78 198)">
+<circle r="37" fill="none" stroke="#73817e" stroke-width="1.5" stroke-dasharray="4 4"/>
+<circle id="residue-evolving_D" r="23.365" fill="#135963"/><path d="M-12 9C-21 -3 -2 -8 -4 1S11 10 14 -7" stroke="white" stroke-width="1.8" fill="none"/><path d="m9 -5 5 -4 2 6" stroke="white" stroke-width="1.8" fill="none"/>
+<text y="60" font-size="23" font-weight="bold" fill="#135963">23–28%</text>
+<text y="78" font-size="13.5">Slower mixing</text></g><g transform="translate(222 198)">
+<circle r="37" fill="none" stroke="#73817e" stroke-width="1.5" stroke-dasharray="4 4"/>
+<circle id="residue-long_lived_fraction" r="26.370" fill="#A44D21"/><path d="M-14 0l7 -8 10 3 8 -6 M3 -5l1 9 10 5" fill="none" stroke="white" stroke-width="1.7"/><g fill="white"><circle cx="-14" r="2.8"/><circle cx="-7" cy="-8" r="3.1"/><circle cx="3" cy="-5" r="3.1"/><circle cx="11" cy="-11" r="2.8"/><circle cx="4" cy="4" r="3.1"/><circle cx="14" cy="9" r="2.8"/></g>
+<text y="60" font-size="23" font-weight="bold" fill="#A44D21">34–38%</text>
+<text y="78" font-size="13.5">Lower volatility</text></g></g>
+<circle cx="19" cy="291" r="5.1" fill="none" stroke="#73817e" stroke-width="1.4" stroke-dasharray="3 2"/>
+<text x="30" y="295" font-size="10.7">Initial particle size</text>
+</g><g transform="translate(263 279) scale(.85)"><svg width="22.5" height="17.1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48.93 37.11" fill="#115f5a">
+  <circle cx="4.59" cy="4.59" r="4.59"/>
+  <circle cx="18.34" cy="4.59" r="4.59"/>
+  <circle cx="4.59" cy="18.34" r="4.59"/>
+  <circle cx="31.56" cy="32.53" r="4.59"/>
+  <circle cx="44.28" cy="18.78" r="4.59"/>
+  <circle cx="44.28" cy="5.02" r="4.59"/>
+  <circle cx="4.59" cy="32.09" r="4.59"/>
+</svg></g></svg>
