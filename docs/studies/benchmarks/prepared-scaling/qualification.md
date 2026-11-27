@@ -42,7 +42,10 @@ CPU reference. Native NumPy comparisons are limited to matching condensation
 and dilution semantics. Condensation workloads include exponential dilution and
 four equal coupled condensation substeps. Full-array CPU/CUDA parity is checked
 separately after timing. Direct/prepared/captured/legacy GPU results must match
-exactly within each common case before publication.
+exactly within each common case before publication. For Brownian comparisons,
+the current sampler determines the collision substeps that fit its trial
+budget. The serial comparison replays those durations with the same initial
+particles and RNG. The worker generates that schedule before timing.
 
 Campaign result hashes cover native aerosol arrays, ordered gas names and the
 population tag. They do not hash raw RNG words. Random-state equivalence and

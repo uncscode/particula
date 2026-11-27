@@ -202,3 +202,37 @@ def test_dense_inventory_limiter_matches_full_cpu_state():
         rtol=2e-12,
         atol=1e-30,
     )
+
+
+@pytest.mark.cuda
+def test_brownian_benchmark_modes_match_on_admitted_substeps():
+    """The archived serial selector must sample the same physical intervals."""
+    wp = pytest.importorskip("warp")
+    if not wp.is_cuda_available():
+        pytest.skip("CUDA unavailable")
+    from scripts.gpu_studies.validation import state_hash
+    from scripts.gpu_studies.worker import Driver, reset_buffers
+
+    case = StudyCase(
+        "benchmark-smoke",
+        "brownian",
+        4,
+        128,
+        occupancy=0.75,
+        time_step=1.0,
+        steps=2,
+        heterogeneous=True,
+    )
+    initial, process, _ = build_case(case)
+    hashes = set()
+    for mode in ("prepared", "captured", "direct", "legacy"):
+        with prepare_study(case, process, initial) as owner:
+            driver = Driver(owner, case, mode)
+            restore = reset_buffers(owner)
+            for _ in range(2):
+                restore()
+                driver.run()
+                result = owner.snapshot()
+                validate_evolution(case, initial, result)
+                hashes.add(state_hash(result))
+    assert len(hashes) == 1
