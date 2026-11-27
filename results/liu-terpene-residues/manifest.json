@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 1.874932069098577,
+  "package_source_sha256": "ea46832d9050b04cdee383d84a51c7b9814b96f1a5786a6832a8ec5497185e1b",
+  "scientific_source_sha256": "c6a8b84b824b7e6b22e5ed792971d24470a4e588373cedef6140df30a5e69ac0",
+  "input_sha256": {
+    "docs/data/liu-terpene/digitized.zip": "caa795628a70d67063a6463ca92642041b67bd06880793695eb278726976e544",
+    "docs/data/liu-terpene/figure2.csv": "62d5fac4ed76f8181c7bb72c9fab4a48e773d9a7adbb9c8d1228c95a3e8643a2",
+    "studies/liu-terpene/uncertainty/estimate.py": "d804ff2c9679b31e1274158a27e9ddf38056f95d962a647ae8227b0549fb66c2"
+  },
+  "example": "liu-terpene-residues",
+  "fingerprint": "557985e20ecbbf89acca7e8eb17f1f4d4c81594a9aa56e7f65b5a2fbc225b147",
+  "source": "docs/studies/literature/evaporation-and-uptake/liu-terpene/compare_residues.py",
+  "revision": "2e4bcacf11ff264f6833d20ffc2b49d2eb27383f",
+  "package_dirty": false,
+  "executed_at": "2026-11-27T16:55:44.765162+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.6",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "text": "220 nm at 1138 min: 41.6% measured (reading range 39.3\u201345.4%).\n220 nm at 1265 min: 41.0% measured (reading range 36.5\u201342.3%).\n60 nm, half-bin peaks: 22.6\u201327.8% slower mixing, 34.4\u201338.0% lower volatility. Gap: 6.6 percentage points.\n60 nm, full-bin peaks: 21.5\u201330.6% slower mixing, 31.8\u201341.7% lower volatility. Gap: 1.2 percentage points.\n"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "5919bb80e578a2943d90221dfb4e50ec6a8eb3f49ca026c46bfb2eba44f49f96"
+  }
+}
