@@ -2,6 +2,7 @@
 
 import ctypes
 import os
+from functools import cache
 
 import numpy as np
 from model import KAPPA, RHO, SS
@@ -11,9 +12,22 @@ EDGES = {
     0: np.geomspace(30, 450, 13),
     **{b: 1.7 * 10 ** (np.arange(3 * b + 1) / b) for b in (4, 8, 10, 12, 16)},
 }
-LIB = ctypes.CDLL(os.environ.get("BOREAL_TREE", ".artifacts/boreal/tree.so"))
-PTR = ctypes.c_void_p
-LIB.build.argtypes = [PTR] * 4 + [ctypes.c_int] * 3 + [PTR] * 3
+
+
+@cache
+def _tree_library():
+    """Load the native splitter when a calculation first needs it."""
+    lib = ctypes.CDLL(
+        os.environ.get("BOREAL_TREE", ".artifacts/boreal/tree.so")
+    )
+    ptr = ctypes.c_void_p
+    lib.build.argtypes = [ptr] * 4 + [ctypes.c_int] * 3 + [ptr] * 3
+    lib.build.restype = ctypes.c_int
+    lib.scores.argtypes = (
+        [ctypes.c_int] * 3 + [ptr] * 8 + [ctypes.c_double] * 2 + [ptr]
+    )
+    lib.scores.restype = None
+    return lib
 
 
 def critical(v):
@@ -51,7 +65,7 @@ def make_tree(prep, cap, rule):
     out = np.zeros((bins * (2 * cap - 1), 9))
     meta = np.zeros((len(out), 5), np.int32)
     args = [x.ctypes.data for x in (state, feat, flags, ends)]
-    n = LIB.build(
+    n = _tree_library().build(
         *args,
         bins,
         cap,
@@ -102,11 +116,6 @@ def compress(box, grid, cap, rule):
     return int(chosen.sum())
 
 
-LIB.scores.argtypes = (
-    [ctypes.c_int] * 3 + [PTR] * 8 + [ctypes.c_double] * 2 + [PTR]
-)
-
-
 def budget(ref, means, meta, opt, cap):
     """Score every integer cap from the same nested tree."""
     c, areas = ref
@@ -126,7 +135,7 @@ def budget(ref, means, meta, opt, cap):
         np.searchsorted(c, SS, "right").astype(np.int32),
     ]
     out = np.empty((cap, 6))
-    LIB.scores(
+    _tree_library().scores(
         len(x),
         cap,
         len(c),
