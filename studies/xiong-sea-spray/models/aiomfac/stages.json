@@ -1,0 +1,18 @@
+{
+  "primary": "--stage primary --steps 24 --names direct,chloride_activity,access_delay,siv_lag,siv_parallel,siv_sink,neutral,lag_neutral,parallel_neutral,activity_neutral",
+  "challenge": "--stage challenge --names direct,neutral,access_delay,siv_lag --variants dry_volume,liquid_training,liquid_dry,optical_only,train_early --steps 24 --starts 2",
+  "profile": "--stage profile --names neutral --variants profile_0,profile_0.25,profile_0.5,profile_1,profile_2,profile_4,profile_8 --steps 24 --starts 2",
+  "phase": "--stage phase --names direct,neutral --variants raw_halite,native_halite,separate,metastable,raw --steps 16 --starts 2",
+  "controls": "--stage controls --names siv_lag,siv_parallel,siv_sink --variants siv_dark,siv_bright,siv_free,ic_oxidized --steps 16 --starts 2",
+  "pilot": "--stage pilot --names direct,siv_lag,neutral --steps 8 --starts 1 --maxiter 90",
+  "refined": "--stage refined --names direct,neutral,parallel_neutral,chloride_activity --steps 48 --starts 3",
+  "size": "--stage size --names direct,neutral --variants omit200,omit300 --steps 24 --starts 2",
+  "peak150": "--stage peak150 --names direct,neutral --peak-nm 150 --steps 24 --starts 2",
+  "peak250": "--stage peak250 --names direct,neutral --peak-nm 250 --steps 24 --starts 2",
+  "retention": "--stage retention --names retention,retention_neutral,retention_activity --steps 24 --starts 3 --maxiter 200",
+  "blank": "--stage blank --names direct,neutral,parallel_neutral,retention,retention_neutral --variants ic_blank --steps 24 --starts 3 --maxiter 200",
+  "retctrl": "--stage retctrl --names retention,retention_neutral --variants dry_volume,optical_only,train_early,liquid_training,native_halite --steps 24 --starts 2",
+  "blankprofile": "--stage blankprofile --names direct,neutral --variants blank_0,blank_0.02,blank_0.05,blank_0.1,blank_0.2,blank_0.4,blank_1 --steps 24 --starts 3",
+  "retprofile": "--stage retprofile --names retention_neutral --variants retained_0,retained_0.05,retained_0.1,retained_0.2,retained_0.35,retained_0.5 --steps 24 --starts 3",
+  "eq8": "--stage eq8 --names direct,neutral,parallel_neutral,retention_neutral --variants eq8,eq8_blank --steps 24 --starts 3 --maxiter 200"
+}

@@ -45,6 +45,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Compare drizzle fall speeds and model evaporating drop sizes](literature/drizzle-settling/drizzle_settling.py)
 - [Compare ideal and nonideal organic activity](examples/thermodynamics/activity/bat_activity_example.py)
 - [Compare MAM4xx and particle-resolved Brownian coagulation](literature/mam4xx-coagulation/mam4xx_coagulation.py)
+- [Compare measured water uptake and ion peaks with the two fitted pathways](literature/particle-water-uptake/xiong-sea-spray/compare_growth.py)
 - [Compare neutral salt pairings with Mt. Hua growth measurements](literature/particle-water-uptake/mt-hua/mt_hua_salts.py)
 - [Compare observed isomer timing and conditional organic partitioning](literature/pinic-isomers/pinic_isomers.py)
 - [Compare Pallas cloud-probe spectra and optical sizing](literature/pallas-cloud-probes/pallas_cloud_probes.py)

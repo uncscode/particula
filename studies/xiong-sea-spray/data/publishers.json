@@ -1,0 +1,34 @@
+{
+  "xiong-main.pdf": {
+    "url": "https://acp.copernicus.org/articles/26/12183/2026/acp-26-12183-2026.pdf",
+    "sha256": "8263b19ed0689c2df9f2c3ab33beadadc6636ff5f5b0dfbc60ad1a6bd648eb79"
+  },
+  "xiong-supp.pdf": {
+    "url": "https://acp.copernicus.org/articles/26/12183/2026/acp-26-12183-2026-supplement.pdf",
+    "sha256": "1d675ad6f61d2348533e97d0e083003f5d45787e0da56b49ac0a9f9d3f23b4fb"
+  },
+  "xiong-zenodo-8079001.xlsx": {
+    "url": "https://zenodo.org/api/records/8079001/files/Data_Xiong%20et%20al_LLPS_2023.xlsx/content",
+    "sha256": "11bcc7467f8b6517d9db66d4798b55aa224f7bc9eb604cb9129b7c63be96d4c1"
+  },
+  "peng-2021-t01.xlsx": {
+    "url": "https://acp.copernicus.org/articles/21/7135/2021/acp-21-7135-2021-t01.xlsx",
+    "sha256": "8fb1823f8e6d6ffebcc80655721e8586bf7a7eeaaaa9952521bafaf1d18e30f9"
+  },
+  "peng-2021-t02.xlsx": {
+    "url": "https://acp.copernicus.org/articles/21/7135/2021/acp-21-7135-2021-t02.xlsx",
+    "sha256": "96b8523aed55a888a35f9cfbb28e5cf13b76e653ad44166ad7faf09b182bd94c"
+  },
+  "shahabadi-2025-supplement.zip": {
+    "url": "https://acp.copernicus.org/articles/25/14301/2025/acp-25-14301-2025-supplement.zip",
+    "sha256": "858763efe5f2383fa41b02bd4c789c1189480960a13fda7a75e9c95551fdd965"
+  },
+  "figure2.png": {
+    "url": "https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41598-021-89346-6/MediaObjects/41598_2021_89346_Fig2_HTML.png",
+    "sha256": "1dcb67d7740bed54faf7d8e4cbf9be4ed166ab1de1d0330f882eddb9e932a5d8"
+  },
+  "xiong-2023-figure6.png": {
+    "url": "https://acp.copernicus.org/articles/23/8979/2023/acp-23-8979-2023-f06-web.png",
+    "sha256": "a807f0793e7eb26465b7104ddf7382a2b46c555ac205e99b44cb92cc6d909867"
+  }
+}

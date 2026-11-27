@@ -2263,5 +2263,16 @@
       "docs/data/liu-terpene/figure2.csv",
       "studies/liu-terpene/uncertainty/estimate.py"
     ]
+  },
+  "xiong-sea-spray-growth": {
+    "title": "Compare measured water uptake and ion peaks with the two fitted pathways",
+    "source": "docs/studies/literature/particle-water-uptake/xiong-sea-spray/compare_growth.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 90,
+    "inputs": [
+      "docs/data/xiong-sea-spray/growth-time.csv",
+      "docs/data/xiong-sea-spray/ion-time.csv"
+    ]
   }
 }
