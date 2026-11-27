@@ -9,6 +9,12 @@ editor. A small correction can use the relevant check inline. If the host
 lacks delegation or a worker is unavailable, the owner can draft or review
 inline. Use an available independent reader for a fresh edit after drafting.
 
+When assigning a number-heavy results passage to a drafter, revision editor or
+specialist editor, include the [worked before-and-after edit](#worked-edit-of-a-number-heavy-result)
+in the handoff. If the agent cannot open the reference, include the example
+text. Ask the agent to apply the paragraph structure to the assigned passage
+and check its figures and uncertainty against that passage’s own evidence.
+
 ## Literature reader
 
 A reader question may come from the user, a previous independent literature
@@ -43,6 +49,53 @@ the decision it implements and interpret the result beside its output. For a
 guide, start with the reader's task and end with an observable check. For
 theory, connect the assumptions to the regime where the equation applies.
 Use the page's existing formatting and citation conventions.
+
+Keep running paragraphs in plain text. When a key phrase or take-home point
+deserves emphasis, set it on its own as a Markdown blockquote or a standalone
+bold line. Use at most two such highlights per page across both formats.
+One is typical, and a page can have none.
+
+Open a number-heavy paragraph with its conclusion in everyday words. Name the
+observable, the cases being compared and the direction of the difference so
+the reader can follow the finding before seeing the figures. Put the supporting
+counts, denominators, units and uncertainty in the middle. Close with what the
+comparison means or where it still leaves doubt. If a paragraph also answers a
+different question, such as how much extra storage the improvement costs, give
+that comparison its own paragraph or table.
+
+### Worked edit of a number-heavy result
+
+#### Before
+
+At 25,000, the 16-row recipe passed 33/40 burst-onset trajectories even though its pooled rate was 96%. At 50,000 it passed 37/40 at onset and 160/160 across the other four windows. The three onset misses all belonged to history 9341. Two redraws exceeded the 5% absorption gate, with the largest dry and wet errors reaching 7.07% and 7.08%. A third gave 508 births against 453 in the original next 75 s, a 12.1% discrepancy. Across all 200 forecasts at 50,000, chemistry and cloud activation each passed 200 times, nucleation 199 and absorption 198. The 32-row archive cost 113.1 kB at the median and passed two more trajectories. The four-history bootstrap interval for 16 rows at onset spans 77.5–100%.
+
+#### Revised
+
+The 16-row recipe was least reliable when new particles began to form. Doubling
+the run size improved its forecasts during that window. At the smaller size
+(25,000), only 33 of 40 onset forecasts passed, despite a 96% pass rate across
+all windows. At the larger size (50,000), 37 of 40 passed at onset and all 160
+passed across the other four windows. All three misses came from history 9341.
+With only four histories, the bootstrap interval for the onset pass rate spanned
+77.5–100%. How reliably the recipe handles onset across histories remains uncertain.
+
+Absorption accounted for two of the three misses at the larger size. The largest
+dry and wet absorption errors reached 7.07% and 7.08%, respectively, above the
+5% limit. In the third miss, the forecast produced 508 new particles over the
+next 75 seconds compared with 453 in the original trajectory, a 12.1% excess.
+Across all 200 forecasts, absorption passed in 198 and nucleation in 199.
+Chemistry and cloud activation passed every time.
+
+Doubling the archive to 32 rows yielded a modest gain. Two more trajectories
+passed, and the median archive size was 113.1 kB. Whether the extra storage is
+worthwhile depends on the cost of a missed forecast.
+
+#### Editorial check
+
+The opening identifies the difficult condition in words. Each paragraph then
+explains when reliability improved, which checks failed, or what the larger
+archive gained. Keep the uncertainty beside the finding it
+qualifies, where it can shape the reader’s interpretation.
 
 Let the scientific finding carry the contribution. Start from what the
 original study established, then show what the comparison reveals about a
@@ -92,6 +145,11 @@ specialties where they address a difficulty in the passage.
 | Coherence | Give a paragraph one job. Keep a result with the figure that establishes it and move an untested explanation into the interpretation. |
 | Concision | Cut repeated setup and generic claims. Retain conditions, units, uncertainty and qualifiers that limit the result. |
 | Cadence | Read dense passages aloud. Split competing comparisons and put the decisive finding where the reader can absorb it. |
+
+For a paragraph dense with results, read just the first and last sentences.
+Can a reader tell which case did better or worse, on what measure, and why
+the difference matters? Then check the middle: do the denominators and
+conditions support that reading, and could the uncertainty change it?
 
 For a difficult passage the editor can delegate selected specialties in
 parallel against the same text. Reviewers return the passage location, the
