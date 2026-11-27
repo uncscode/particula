@@ -1,0 +1,143 @@
+{
+  "doi": "10.6084/m9.figshare.31744108.v1",
+  "files": [
+    {
+      "name": "CPI_exp5.csv",
+      "id": 62817907,
+      "download_url": "https://ndownloader.figshare.com/files/62817907",
+      "computed_md5": "d373bb6f993e9cb8a11f627202b217d6"
+    },
+    {
+      "name": "CPI_exp6.csv",
+      "id": 62817910,
+      "download_url": "https://ndownloader.figshare.com/files/62817910",
+      "computed_md5": "f571612df216f9fb4fd224e7f7ad5681"
+    },
+    {
+      "name": "OPC_exp1.csv",
+      "id": 62817913,
+      "download_url": "https://ndownloader.figshare.com/files/62817913",
+      "computed_md5": "d9c8503e9e72a6e90ea5c46bf98133ba"
+    },
+    {
+      "name": "OPC_exp2.csv",
+      "id": 62817916,
+      "download_url": "https://ndownloader.figshare.com/files/62817916",
+      "computed_md5": "eb2a9542cbf9ca957d2fec27d13606e3"
+    },
+    {
+      "name": "OPC_exp3.csv",
+      "id": 62817919,
+      "download_url": "https://ndownloader.figshare.com/files/62817919",
+      "computed_md5": "3404c3dbfe69e3dbb5a633eec5b5be6e"
+    },
+    {
+      "name": "OPC_exp4.csv",
+      "id": 62817925,
+      "download_url": "https://ndownloader.figshare.com/files/62817925",
+      "computed_md5": "a3839b17fe57724153f081d85384c633"
+    },
+    {
+      "name": "OPC_exp5.csv",
+      "id": 62817922,
+      "download_url": "https://ndownloader.figshare.com/files/62817922",
+      "computed_md5": "80496e9cff353497ecc3e18d98471286"
+    },
+    {
+      "name": "OPC_exp6.csv",
+      "id": 62817928,
+      "download_url": "https://ndownloader.figshare.com/files/62817928",
+      "computed_md5": "e13fdb03a765852a68ee205a711108fd"
+    },
+    {
+      "name": "CPI_exp1.csv",
+      "id": 62817934,
+      "download_url": "https://ndownloader.figshare.com/files/62817934",
+      "computed_md5": "0f3b2bb0feeda3e376c81f38a55b993f"
+    },
+    {
+      "name": "CPI_exp2.csv",
+      "id": 62817940,
+      "download_url": "https://ndownloader.figshare.com/files/62817940",
+      "computed_md5": "472179c251488cb69d7a39e76d396dc4"
+    },
+    {
+      "name": "CPI_exp3.csv",
+      "id": 62817943,
+      "download_url": "https://ndownloader.figshare.com/files/62817943",
+      "computed_md5": "cd028bdaf1faf4472294ccde531ad468"
+    },
+    {
+      "name": "CPI_exp4.csv",
+      "id": 62817946,
+      "download_url": "https://ndownloader.figshare.com/files/62817946",
+      "computed_md5": "b2747f5c44ce26d790b084a036fc3d97"
+    },
+    {
+      "name": "Chamber_P,T_exp1.csv",
+      "id": 63392220,
+      "download_url": "https://ndownloader.figshare.com/files/63392220",
+      "computed_md5": "24561a4fdebefa39e3fe8cfc88b39816"
+    },
+    {
+      "name": "Chamber_P,T_exp2.csv",
+      "id": 63392235,
+      "download_url": "https://ndownloader.figshare.com/files/63392235",
+      "computed_md5": "d7a6ed57fa0f7fd3ddebd3ca82fe88d8"
+    },
+    {
+      "name": "LICOR_H2O_exp1.csv",
+      "id": 65383200,
+      "download_url": "https://ndownloader.figshare.com/files/65383200",
+      "computed_md5": "5c9221e96c21ed5d5d505fd3499f534c"
+    },
+    {
+      "name": "Chamber_P,T_exp3.csv",
+      "id": 63392238,
+      "download_url": "https://ndownloader.figshare.com/files/63392238",
+      "computed_md5": "6e4205af3054ade702523ef17a11a184"
+    },
+    {
+      "name": "Chamber_P,T_exp4.csv",
+      "id": 63392241,
+      "download_url": "https://ndownloader.figshare.com/files/63392241",
+      "computed_md5": "9131957c3274e707c1b6ab5dcdba7c23"
+    },
+    {
+      "name": "LICOR_H2O_exp2.csv",
+      "id": 65383203,
+      "download_url": "https://ndownloader.figshare.com/files/65383203",
+      "computed_md5": "0f66646258922f5c6ab5c77d89a7bb27"
+    },
+    {
+      "name": "Chamber_P,T_exp5.csv",
+      "id": 63392244,
+      "download_url": "https://ndownloader.figshare.com/files/63392244",
+      "computed_md5": "df8281b18c8b33ce8ed4357d7bfabe4a"
+    },
+    {
+      "name": "LICOR_H2O_exp3.csv",
+      "id": 65383206,
+      "download_url": "https://ndownloader.figshare.com/files/65383206",
+      "computed_md5": "2e0a270588ae229cebc6b8f28e7a02eb"
+    },
+    {
+      "name": "Chamber_P,T_exp6.csv",
+      "id": 63392250,
+      "download_url": "https://ndownloader.figshare.com/files/63392250",
+      "computed_md5": "4cec509aa0b8a2cf72ee397b657317ec"
+    },
+    {
+      "name": "LICOR_H2O_exp4.csv",
+      "id": 65383212,
+      "download_url": "https://ndownloader.figshare.com/files/65383212",
+      "computed_md5": "779d20d2794a50f1579242067ec2841f"
+    },
+    {
+      "name": "LICOR_H2O_exp5.csv",
+      "id": 65383215,
+      "download_url": "https://ndownloader.figshare.com/files/65383215",
+      "computed_md5": "8f645c53a2a770b35a41feae3b34463b"
+    }
+  ]
+}

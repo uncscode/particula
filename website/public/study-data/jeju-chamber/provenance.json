@@ -1,0 +1,410 @@
+{
+  "study": "Jeju expansions and ACTIVATE RF14",
+  "compiled": "2026-11-26",
+  "tables": [
+    {
+      "file": "jeju-cpi-annotations.csv",
+      "source": "Jeju CPI runs 2 and 6",
+      "source_refs": [
+        62817952,
+        62817931,
+        62817940,
+        62817910
+      ],
+      "adaptation": "human-selected shape and timestamp; source-image crop coordinates",
+      "rows": 6,
+      "columns": [
+        "experiment",
+        "image_time_utc",
+        "visual_reading",
+        "archive_member",
+        "left_px",
+        "top_px",
+        "right_px",
+        "bottom_px"
+      ],
+      "bytes": 666,
+      "sha256": "83462f6e1b313153619a7f862476ee8e276b05b0cbeabcf85df8a70cb60f532b"
+    },
+    {
+      "file": "rf14-size-traces.csv",
+      "source": "RF14",
+      "source_refs": [
+        "https://essd.copernicus.org/articles/15/3419/2023/essd-15-3419-2023-f12.png"
+      ],
+      "adaptation": "figure 12b; pixel and calibrated size-density coordinates",
+      "rows": 1799,
+      "columns": [
+        "pixel_x",
+        "pixel_y",
+        "phase",
+        "diameter_um",
+        "density_cm3_decade"
+      ],
+      "bytes": 77876,
+      "sha256": "7a7cf002ea55073dba6d27ca03074f2e931712e899175738562fda74a73993ae"
+    },
+    {
+      "file": "rf14-dropsondes.csv",
+      "source": "RF14",
+      "source_refs": [
+        "https://essd.copernicus.org/articles/15/3419/2023/essd-15-3419-2023-f10.png"
+      ],
+      "adaptation": "figure 10; two digitized traces sampled on a 50 m grid",
+      "rows": 50,
+      "columns": [
+        "sonde",
+        "altitude_m",
+        "temperature_c",
+        "relative_humidity_percent"
+      ],
+      "bytes": 1591,
+      "sha256": "b410303629e09cde67f4d1b3857110c33955d8ea6a91fde380155441e0030a3f"
+    },
+    {
+      "file": "rf14-flight-context.csv",
+      "source": "RF14",
+      "source_refs": [
+        "https://essd.copernicus.org/articles/15/3419/2023/essd-15-3419-2023-f11.png"
+      ],
+      "adaptation": "figure 11; color traces, pixel column and derived context flag",
+      "rows": 579,
+      "columns": [
+        "pixel_x",
+        "utc_minutes",
+        "altitude_m",
+        "temperature_c",
+        "water_vapor_g_kg",
+        "n_gt100_cm3",
+        "sodium_ug_m3",
+        "wind_low_m_s",
+        "wind_high_m_s",
+        "cloud_seen_by_fig11"
+      ],
+      "bytes": 52447,
+      "sha256": "0ae6a9e38a0b4c1ac8929812bf6f75399972c6a831c4b26833a18656aad5f20e"
+    }
+  ],
+  "license_sources": {
+    "Jeju": "Park et al. (2026), CC BY 4.0 https://creativecommons.org/licenses/by/4.0/",
+    "RF14": "Sorooshian et al. (2023), CC BY 4.0 https://creativecommons.org/licenses/by/4.0/"
+  },
+  "jeju": {
+    "citation": "Park, Minsu; Park, Sungmin; Kim, Jeonggyu; Ahn, Chanwoo; Seo, Pyosuk; Belorid, Miloslav; et al. (2026). Experimental datasets from cloud chamber studies on ice nucleation under high-salinity conditions (Oct.-Nov. 2025). figshare. Dataset. https://doi.org/10.6084/m9.figshare.31744108.v1",
+    "version": 1,
+    "doi": "10.6084/m9.figshare.31744108.v1",
+    "release_page": "https://figshare.com/articles/dataset/Experimental_datasets_from_cloud_chamber_studies_on_ice_nucleation_under_high-salinity_conditions_Oct_-Nov_2025_/31744108/1",
+    "version_api": "https://api.figshare.com/v2/articles/31744108/versions/1",
+    "literature_doi": "10.1029/2026GL123395",
+    "files": [
+      {
+        "id": 62817907,
+        "name": "CPI_exp5.csv",
+        "size": 1647569,
+        "supplied_md5": "d373bb6f993e9cb8a11f627202b217d6",
+        "download_url": "https://ndownloader.figshare.com/files/62817907"
+      },
+      {
+        "id": 62817937,
+        "name": "CPI_exp5_images.zip",
+        "size": 53616042,
+        "supplied_md5": "59801476ad2bb906004c639b9f2ecb55",
+        "download_url": "https://ndownloader.figshare.com/files/62817937"
+      },
+      {
+        "id": 62817910,
+        "name": "CPI_exp6.csv",
+        "size": 939033,
+        "supplied_md5": "f571612df216f9fb4fd224e7f7ad5681",
+        "download_url": "https://ndownloader.figshare.com/files/62817910"
+      },
+      {
+        "id": 62817931,
+        "name": "CPI_exp6_images.zip",
+        "size": 31261247,
+        "supplied_md5": "29a90a8f34467bdfe39de4641301a1c3",
+        "download_url": "https://ndownloader.figshare.com/files/62817931"
+      },
+      {
+        "id": 62817913,
+        "name": "OPC_exp1.csv",
+        "size": 735307,
+        "supplied_md5": "d9c8503e9e72a6e90ea5c46bf98133ba",
+        "download_url": "https://ndownloader.figshare.com/files/62817913"
+      },
+      {
+        "id": 62817916,
+        "name": "OPC_exp2.csv",
+        "size": 952290,
+        "supplied_md5": "eb2a9542cbf9ca957d2fec27d13606e3",
+        "download_url": "https://ndownloader.figshare.com/files/62817916"
+      },
+      {
+        "id": 62817919,
+        "name": "OPC_exp3.csv",
+        "size": 975940,
+        "supplied_md5": "3404c3dbfe69e3dbb5a633eec5b5be6e",
+        "download_url": "https://ndownloader.figshare.com/files/62817919"
+      },
+      {
+        "id": 62817925,
+        "name": "OPC_exp4.csv",
+        "size": 888167,
+        "supplied_md5": "a3839b17fe57724153f081d85384c633",
+        "download_url": "https://ndownloader.figshare.com/files/62817925"
+      },
+      {
+        "id": 62817922,
+        "name": "OPC_exp5.csv",
+        "size": 1348784,
+        "supplied_md5": "80496e9cff353497ecc3e18d98471286",
+        "download_url": "https://ndownloader.figshare.com/files/62817922"
+      },
+      {
+        "id": 62817928,
+        "name": "OPC_exp6.csv",
+        "size": 922306,
+        "supplied_md5": "e13fdb03a765852a68ee205a711108fd",
+        "download_url": "https://ndownloader.figshare.com/files/62817928"
+      },
+      {
+        "id": 62817934,
+        "name": "CPI_exp1.csv",
+        "size": 3516272,
+        "supplied_md5": "0f3b2bb0feeda3e376c81f38a55b993f",
+        "download_url": "https://ndownloader.figshare.com/files/62817934"
+      },
+      {
+        "id": 62817949,
+        "name": "CPI_exp1_images.zip",
+        "size": 54603551,
+        "supplied_md5": "cc0e54c7b9fee2e40900e071ae465fd4",
+        "download_url": "https://ndownloader.figshare.com/files/62817949"
+      },
+      {
+        "id": 62817940,
+        "name": "CPI_exp2.csv",
+        "size": 1804240,
+        "supplied_md5": "472179c251488cb69d7a39e76d396dc4",
+        "download_url": "https://ndownloader.figshare.com/files/62817940"
+      },
+      {
+        "id": 62817952,
+        "name": "CPI_exp2_images.zip",
+        "size": 59658264,
+        "supplied_md5": "922059ba2663f00a962deae3f5dd1958",
+        "download_url": "https://ndownloader.figshare.com/files/62817952"
+      },
+      {
+        "id": 62817943,
+        "name": "CPI_exp3.csv",
+        "size": 1668425,
+        "supplied_md5": "cd028bdaf1faf4472294ccde531ad468",
+        "download_url": "https://ndownloader.figshare.com/files/62817943"
+      },
+      {
+        "id": 62817955,
+        "name": "CPI_exp3_images.zip",
+        "size": 55937693,
+        "supplied_md5": "9b0ec9ca2051a47ec4178b2822535852",
+        "download_url": "https://ndownloader.figshare.com/files/62817955"
+      },
+      {
+        "id": 62817946,
+        "name": "CPI_exp4.csv",
+        "size": 4263522,
+        "supplied_md5": "b2747f5c44ce26d790b084a036fc3d97",
+        "download_url": "https://ndownloader.figshare.com/files/62817946"
+      },
+      {
+        "id": 62817958,
+        "name": "CPI_exp4_images.zip",
+        "size": 137776824,
+        "supplied_md5": "482341deeaf94d9e01cced40d1df45c8",
+        "download_url": "https://ndownloader.figshare.com/files/62817958"
+      },
+      {
+        "id": 63392220,
+        "name": "Chamber_P,T_exp1.csv",
+        "size": 147849,
+        "supplied_md5": "24561a4fdebefa39e3fe8cfc88b39816",
+        "download_url": "https://ndownloader.figshare.com/files/63392220"
+      },
+      {
+        "id": 63392235,
+        "name": "Chamber_P,T_exp2.csv",
+        "size": 163957,
+        "supplied_md5": "d7a6ed57fa0f7fd3ddebd3ca82fe88d8",
+        "download_url": "https://ndownloader.figshare.com/files/63392235"
+      },
+      {
+        "id": 65383200,
+        "name": "LICOR_H2O_exp1.csv",
+        "size": 74052,
+        "supplied_md5": "5c9221e96c21ed5d5d505fd3499f534c",
+        "download_url": "https://ndownloader.figshare.com/files/65383200"
+      },
+      {
+        "id": 63392238,
+        "name": "Chamber_P,T_exp3.csv",
+        "size": 153520,
+        "supplied_md5": "6e4205af3054ade702523ef17a11a184",
+        "download_url": "https://ndownloader.figshare.com/files/63392238"
+      },
+      {
+        "id": 63392241,
+        "name": "Chamber_P,T_exp4.csv",
+        "size": 153582,
+        "supplied_md5": "9131957c3274e707c1b6ab5dcdba7c23",
+        "download_url": "https://ndownloader.figshare.com/files/63392241"
+      },
+      {
+        "id": 65383203,
+        "name": "LICOR_H2O_exp2.csv",
+        "size": 82945,
+        "supplied_md5": "0f66646258922f5c6ab5c77d89a7bb27",
+        "download_url": "https://ndownloader.figshare.com/files/65383203"
+      },
+      {
+        "id": 63392244,
+        "name": "Chamber_P,T_exp5.csv",
+        "size": 150690,
+        "supplied_md5": "df8281b18c8b33ce8ed4357d7bfabe4a",
+        "download_url": "https://ndownloader.figshare.com/files/63392244"
+      },
+      {
+        "id": 65383206,
+        "name": "LICOR_H2O_exp3.csv",
+        "size": 82960,
+        "supplied_md5": "2e0a270588ae229cebc6b8f28e7a02eb",
+        "download_url": "https://ndownloader.figshare.com/files/65383206"
+      },
+      {
+        "id": 63392250,
+        "name": "Chamber_P,T_exp6.csv",
+        "size": 150639,
+        "supplied_md5": "4cec509aa0b8a2cf72ee397b657317ec",
+        "download_url": "https://ndownloader.figshare.com/files/63392250"
+      },
+      {
+        "id": 65383212,
+        "name": "LICOR_H2O_exp4.csv",
+        "size": 82933,
+        "supplied_md5": "779d20d2794a50f1579242067ec2841f",
+        "download_url": "https://ndownloader.figshare.com/files/65383212"
+      },
+      {
+        "id": 65383215,
+        "name": "LICOR_H2O_exp5.csv",
+        "size": 81195,
+        "supplied_md5": "8f645c53a2a770b35a41feae3b34463b",
+        "download_url": "https://ndownloader.figshare.com/files/65383215"
+      }
+    ]
+  },
+  "rf14": {
+    "doi": "10.5194/essd-15-3419-2023",
+    "campaign_doi": "10.5067/SUBORBITAL/ACTIVATE/DATA001",
+    "figures": {
+      "f10.png": {
+        "url": "https://essd.copernicus.org/articles/15/3419/2023/essd-15-3419-2023-f10.png",
+        "sha256": "5a6e5b5e0a0a6b9717a8097c6144d2988788f528e239c8cd905add09f1953b99"
+      },
+      "f11.png": {
+        "url": "https://essd.copernicus.org/articles/15/3419/2023/essd-15-3419-2023-f11.png",
+        "sha256": "d107df5778a18d59280e558f6b6ff0dffa055026753594db5c506816ce553122"
+      },
+      "f12.png": {
+        "url": "https://essd.copernicus.org/articles/15/3419/2023/essd-15-3419-2023-f12.png",
+        "sha256": "97d7b4977295bdc8a22891fe4ba8c8f94f9f39be3ec44d964c7e95b0854e899f"
+      }
+    },
+    "granule_access": "Earthdata sign-in; granule links are retrieval references. The comparison used published figures.",
+    "granules": [
+      {
+        "family": "cloud",
+        "file": "ACTIVATE-FCDP_HU25_20200301_R1_L2.ict",
+        "concept_id": "G4169014414-LARC_CLOUD",
+        "collection": "C3880544307-LARC_CLOUD",
+        "time_start": "2020-03-01T18:32:24.000Z",
+        "time_end": "2020-03-01T21:47:50.000Z",
+        "url": "https://data.asdc.earthdata.nasa.gov/asdc-prod-protected/ACTIVATE/ACTIVATE_Cloud_AircraftInSitu_Falcon_Data_1/ACTIVATE-FCDP_HU25_20200301_R1_L2.ict"
+      },
+      {
+        "family": "cloud",
+        "file": "ACTIVATE-2DS-H-Arm_HU25_20200301_R3_L2.ict",
+        "concept_id": "G4169012566-LARC_CLOUD",
+        "collection": "C3880544307-LARC_CLOUD",
+        "time_start": "2020-03-01T18:32:25.000Z",
+        "time_end": "2020-03-01T21:32:32.000Z",
+        "url": "https://data.asdc.earthdata.nasa.gov/asdc-prod-protected/ACTIVATE/ACTIVATE_Cloud_AircraftInSitu_Falcon_Data_1/ACTIVATE-2DS-H-Arm_HU25_20200301_R3_L2.ict"
+      },
+      {
+        "family": "meteorology",
+        "file": "ACTIVATE-DLH-H2O_HU25_20200301_R1_L2.ict",
+        "concept_id": "G4169017510-LARC_CLOUD",
+        "collection": "C3880544573-LARC_CLOUD",
+        "time_start": "2020-03-01T18:32:24.000Z",
+        "time_end": "2020-03-01T21:47:50.000Z",
+        "url": "https://data.asdc.earthdata.nasa.gov/asdc-prod-protected/ACTIVATE/ACTIVATE_MetNav_AircraftInSitu_Falcon_Data_1/ACTIVATE-DLH-H2O_HU25_20200301_R1_L2.ict"
+      },
+      {
+        "family": "meteorology",
+        "file": "ACTIVATE-WINDS_HU25_20200301_R4_L2.ict",
+        "concept_id": "G4169018357-LARC_CLOUD",
+        "collection": "C3880544573-LARC_CLOUD",
+        "time_start": "2020-03-01T18:32:24.000Z",
+        "time_end": "2020-03-01T21:47:50.000Z",
+        "url": "https://data.asdc.earthdata.nasa.gov/asdc-prod-protected/ACTIVATE/ACTIVATE_MetNav_AircraftInSitu_Falcon_Data_1/ACTIVATE-WINDS_HU25_20200301_R4_L2.ict"
+      },
+      {
+        "family": "meteorology",
+        "file": "ACTIVATE-SUMMARY_HU25_20200301_R4_L2.ict",
+        "concept_id": "G4169019386-LARC_CLOUD",
+        "collection": "C3880544573-LARC_CLOUD",
+        "time_start": "2020-03-01T18:32:24.000Z",
+        "time_end": "2020-03-01T21:47:50.000Z",
+        "url": "https://data.asdc.earthdata.nasa.gov/asdc-prod-protected/ACTIVATE/ACTIVATE_MetNav_AircraftInSitu_Falcon_Data_1/ACTIVATE-SUMMARY_HU25_20200301_R4_L2.ict"
+      },
+      {
+        "family": "aerosol",
+        "file": "ACTIVATE-LARGE-LAS_HU25_20200301_R3_L2.ict",
+        "concept_id": "G4168875504-LARC_CLOUD",
+        "collection": "C3880544188-LARC_CLOUD",
+        "time_start": "2020-03-01T18:32:24.000Z",
+        "time_end": "2020-03-01T21:47:50.000Z",
+        "url": "https://data.asdc.earthdata.nasa.gov/asdc-prod-protected/ACTIVATE/ACTIVATE_Aerosol_AircraftInSitu_Falcon_Data_1/ACTIVATE-LARGE-LAS_HU25_20200301_R3_L2.ict"
+      },
+      {
+        "family": "aerosol",
+        "file": "ACTIVATE-LARGE-PILS_HU25_20200301_R1_L2.ict",
+        "concept_id": "G4168878218-LARC_CLOUD",
+        "collection": "C3880544188-LARC_CLOUD",
+        "time_start": "2020-03-01T18:48:34.000Z",
+        "time_end": "2020-03-01T21:39:50.000Z",
+        "url": "https://data.asdc.earthdata.nasa.gov/asdc-prod-protected/ACTIVATE/ACTIVATE_Aerosol_AircraftInSitu_Falcon_Data_1/ACTIVATE-LARGE-PILS_HU25_20200301_R1_L2.ict"
+      },
+      {
+        "family": "leg_index",
+        "file": "ACTIVATE-mrgLegFlags-HU25_merge_20200301_R1.ict",
+        "concept_id": "G4168871520-LARC_CLOUD",
+        "collection": "C3880544062-LARC_CLOUD",
+        "time_start": "2020-03-01T13:31:37.000Z",
+        "time_end": "2020-03-01T21:43:36.000Z",
+        "url": "https://data.asdc.earthdata.nasa.gov/asdc-prod-protected/ACTIVATE/ACTIVATE_Merge_Data_1/ACTIVATE-mrgLegFlags-HU25_merge_20200301_R1.ict"
+      }
+    ]
+  },
+  "a2": {
+    "supplier": "Powder Technology, Inc.",
+    "material": "ISO 12103-1, A2 Fine Test Dust",
+    "publication_date_on_page": "2023-12-09",
+    "url": "https://www.powdertechnologyinc.com/product/iso-12103-1-a2-fine-test-dust/",
+    "quantity": "dry cumulative volume percent below supplier physical diameter (micrometers)"
+  },
+  "setup": {
+    "source_doi": "10.5194/amt-18-3781-2025",
+    "figure": 1,
+    "url": "https://amt.copernicus.org/articles/18/3781/2025/"
+  }
+}
