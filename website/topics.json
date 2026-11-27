@@ -6518,6 +6518,100 @@
       ],
       "role": "Studies",
       "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/jeju-chamber/index.md",
+      "title": "Reconstructing particle growth in the Jeju Island cloud chamber",
+      "topic": "chambers",
+      "also": [
+        "size",
+        "condensation"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "jeju-chamber",
+        "runs": [],
+        "companions": [
+          "docs/studies/literature/jeju-chamber/methods.md",
+          "docs/studies/literature/jeju-chamber/fitting.md",
+          "docs/studies/literature/jeju-chamber/spectra.md",
+          "docs/studies/literature/jeju-chamber/processes.md",
+          "docs/studies/literature/jeju-chamber/dust.md",
+          "docs/studies/literature/jeju-chamber/clouds.md",
+          "docs/studies/literature/jeju-chamber/sources.md",
+          "docs/studies/literature/jeju-chamber/replay.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/theory/dynamics/prescribed-transport.md",
+            "label": "Transport between chamber cells"
+          }
+        ]
+      },
+      "tocFigure": "jeju-chamber/toc.svg",
+      "tocSource": "docs/studies/literature/jeju-chamber/toc.svg.in"
+    },
+    {
+      "source": "docs/studies/literature/jeju-chamber/methods.md",
+      "title": "How the Jeju chamber and its instruments constrain the simulation",
+      "topic": "chambers",
+      "also": [
+        "transport"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/jeju-chamber/fitting.md",
+      "title": "What fitting each chamber run separately improves",
+      "topic": "chambers",
+      "also": [
+        "size"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/jeju-chamber/spectra.md",
+      "title": "The droplet peak and the missing 5–10 µm particles",
+      "topic": "size",
+      "also": [
+        "chambers"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/jeju-chamber/processes.md",
+      "title": "Why temperature differences broaden the chamber spectrum",
+      "topic": "chambers",
+      "also": [
+        "condensation",
+        "collisions"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/jeju-chamber/dust.md",
+      "title": "Why the A2 dust correction leaves a deficit in run 5",
+      "topic": "chambers",
+      "also": [
+        "size"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/jeju-chamber/clouds.md",
+      "title": "From Jeju chamber ice to marine clouds",
+      "topic": "parcels",
+      "also": [
+        "atmosphere"
+      ],
+      "role": "Studies",
+      "start_here": false
     }
   ],
   "supporting": [
@@ -6792,11 +6886,20 @@
     {
       "source": "docs/studies/validation/prescribed-flow/index.md",
       "reason": "Browsing directory for prescribed-flow validation."
+    },
+    {
+      "source": "docs/studies/literature/jeju-chamber/sources.md",
+      "reason": "Download provenance and the extracted observations for the Jeju chamber study."
+    },
+    {
+      "source": "docs/studies/literature/jeju-chamber/replay.md",
+      "reason": "Run the Jeju chamber model and reconstruct its six-run spectral comparisons."
     }
   ],
   "study_group_exceptions": {
     "docs/studies/validation/condensation": "The sparse-activity benchmark compares chemistry construction, lookup and fallback costs across both parcel and box workflows. Its reference and timing matrix are shared across integrators.",
     "docs/studies/validation": "The validation collections distinguish prescribed-flow replay against external CFD from local process tests, optics and release qualification.",
-    "docs/studies/literature#organic-chemistry-and-evaporation": "The seven studies share a chamber or evaporation comparison. Keeping the three related Manchester reports together preserves navigation alongside the four independent experiments."
+    "docs/studies/literature#organic-chemistry-and-evaporation": "The seven studies share a chamber or evaporation comparison. Keeping the three related Manchester reports together preserves navigation alongside the four independent experiments.",
+    "docs/studies/literature#cloud-droplets-and-precipitation": "Keep the seven cloud-droplet studies together so readers comparing measured spectra can move between the Jeju expansions, steady Π Chamber cases and field-probe comparisons."
   }
 }

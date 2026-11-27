@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Jeju Island Chamber</title>
+  <desc id="desc">A sampling tube draws from a cloud inside K-CPEC. For the unsalted ambient-air run, the measured and simulated record-mean spectra share a droplet peak. The six-run fit undercounts the smaller side of the peak. Both curves use the same grouped optical bins. The logarithmic diameter axis shows the range from 2 to 40 µm.</desc>
+  <rect width="300" height="300" fill="#FBF2E3"/>
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <path d="M16 18 Q16 12 25 10 Q50 5 75 10 Q83 12 83 18 V54 Q82 62 50 63 Q17 62 16 54Z" fill="#CAD9D2" stroke="#243E43" stroke-width="2"/>
+    <path d="M18 16 Q50 24 81 16" fill="none" stroke="#617679" stroke-width="1.3"/>
+    <path d="M35 39 C28 39 27 30 35 28 C36 21 47 20 51 26 C57 21 65 25 65 30 C74 31 72 39 65 39Z" fill="#FFF9EC" stroke="#315F65" stroke-width="1.45"/>
+    <path d="M67 33H72Q75 33 75 36V46Q75 50 79 50H89 M85 47L89 50L85 53" fill="none" stroke="#135963" stroke-width="1.8"/>
+  </g>
+  <g font-family="DejaVu Sans, sans-serif" fill="#243E43">
+    <text x="47" y="55" text-anchor="middle" font-size="12.5" font-weight="bold">K-CPEC</text>
+    <text x="96" y="29" font-size="17.5" font-weight="bold">Jeju Island Chamber</text>
+    <text x="96" y="54" fill="#135963" font-size="11">Cloud sample</text>
+    <g font-size="12.5">
+      <path d="M42 79H70" stroke="#135963" stroke-width="3.6"/><text x="77" y="83">Measured</text>
+      <path d="M164 79H192" stroke="#A44D21" stroke-width="1.9" stroke-dasharray="5 3"/><text x="199" y="83">Simulated</text>
+    </g>
+    <text x="42" y="105" font-size="12">Particles/cm³ per decade of diameter</text>
+    <g fill="none" stroke="#CFD3C8" stroke-width="0.8"><path d="M42 118H280 M42 159H280 M42 200H280"/></g>
+    <path d="M42 118V241H280" fill="none" stroke="#617679" stroke-width="1"/>
+    <g id="spectra" fill="none" stroke-linejoin="round">
+      <path id="measured" stroke-width="3.6" stroke="#135963" d="M42.000 240.581V240.581H49.866V240.045H72.733V238.191H95.599V236.174H118.466V228.709H141.332V199.584H164.199V180.894H187.065V144.305H209.932V182.581H232.798V230.553H255.665V240.832H278.531V240.999H280.000"/>
+      <path id="shared" stroke-width="1.9" stroke="#A44D21" stroke-dasharray="5 3" d="M42.000 240.309V240.309H49.866V239.860H72.733V239.133H95.599V236.973H118.466V230.748H141.332V220.896H164.199V193.381H187.065V161.503H209.932V190.258H232.798V230.609H255.665V240.492H278.531V240.998H280.000"/>
+    </g>
+    <g font-size="11" text-anchor="end">
+      <text x="35" y="122">600</text><text x="35" y="163">400</text>
+      <text x="35" y="204">200</text><text x="35" y="245">0</text>
+    </g>
+    <g id="diameter-ticks" font-size="11" text-anchor="middle">
+      <path d="M42.000 241v4" stroke="#617679"/><text x="42.000" y="260">2</text>
+      <path d="M114.796 241v4" stroke="#617679"/><text x="114.796" y="260">5</text>
+      <path d="M169.864 241v4" stroke="#617679"/><text x="169.864" y="260">10</text>
+      <path d="M224.932 241v4" stroke="#617679"/><text x="224.932" y="260">20</text>
+      <path d="M280.000 241v4" stroke="#617679"/><text x="280.000" y="260">40</text>
+    </g>
+    <text x="161" y="283" text-anchor="middle" font-size="13">Optical diameter (µm)</text>
+  </g>
+  <g transform="translate(266,272)">$dots</g>
+</svg>

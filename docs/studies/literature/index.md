@@ -93,6 +93,9 @@ A cloud activation fit predicts 49% more water than BAT at 95% humidity for one 
 
 <div class="study-figures">
 
+[![Jeju Island Chamber. A tube samples a cloud inside K-CPEC. The measured and simulated run-1 spectra share a peak, with fewer simulated particles on its smaller-diameter side.](../../images/jeju-chamber/toc.svg)\
+Reconstructing particle growth in the Jeju Island cloud chamber](jeju-chamber/index.md)
+
 [![Fresh dust inflow produces more primary freezing than a closed top in the reference eddy and less in two rapidly exchanging Arctic cloud profiles.](../../images/lund-freezing/cloud-toc.svg)\
 Fresh aerosol can form ice while entrainment reduces freezing across the cloud](lund-freezing/index.md)
 
@@ -173,6 +176,7 @@ Adding settling and diffusion lowers predicted one-hour survival of 1 µm partic
 
 **Cloud droplets and precipitation**
 
+- [Reconstructing particle growth in the Jeju Island cloud chamber](jeju-chamber/index.md)
 - [Fresh aerosol can form ice while entrainment reduces freezing across the cloud](lund-freezing/index.md)
 - [One droplet, two reported sizes: Simulating the Pallas cloud probes](pallas-cloud-probes/index.md)
 - [Π Chamber cloud counts rose over salt water, but separate haze fits predicted a decline](pi-chamber/haze-and-cloud/index.md)
