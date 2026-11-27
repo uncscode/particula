@@ -90,7 +90,7 @@ A cloud activation fit predicts 49% more water than BAT at 95% humidity for one 
 
 <div class="study-figures">
 
-[![Measured and shared-fit peaks both lie at 14.9 µm in unsalted air. The dusty run has 388 measured versus 141 modeled particles per cm³ at 5–10 µm.](../../images/jeju-chamber/toc.svg)\
+[![In K-CPEC’s unsalted ambient-air run, the measured and shared-fit size distributions peak in the same 14.9 µm bin, with fewer simulated particles on the smaller-diameter side.](../../images/jeju-chamber/toc.svg)\
 The Jeju chamber model matches the unsalted droplet peak and undercounts 5–10 µm particles in the dust run](jeju-chamber/index.md)
 
 [![Fresh dust inflow produces more primary freezing than a closed top in the reference eddy and less in two rapidly exchanging Arctic cloud profiles.](../../images/lund-freezing/cloud-toc.svg)\
