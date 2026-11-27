@@ -172,6 +172,14 @@ from particula.particles.properties.convert_size_distribution import (
     DNdlogDPtoPMFConversionStrategy,
     PMFtoPDFConversionStrategy,
 )
+from particula.particles.properties.number_spectrum import (
+    NumberSpectrum,
+    get_bin_number_density,
+    get_binned_number_spectrum,
+    get_number_per_decade,
+    get_particle_number_spectrum,
+    get_rebinned_number_spectrum,
+)
 from particula.particles.properties.organic_density_module import (
     get_organic_density_estimate,
     get_organic_density_array,
