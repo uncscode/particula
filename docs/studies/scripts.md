@@ -49,6 +49,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Compare observed isomer timing and conditional organic partitioning](literature/pinic-isomers/pinic_isomers.py)
 - [Compare Pallas cloud-probe spectra and optical sizing](literature/pallas-cloud-probes/pallas_cloud_probes.py)
 - [Compare particle capture laws at the same incoming flux](literature/cloud-1833/growth_law_comparison.py)
+- [Compare the 220 nm ocimene measurements with two 60 nm forecasts](literature/evaporation-and-uptake/liu-terpene/compare_residues.py)
 - [Compare two Sea2Cloud event peaks with finite local production](literature/sea2cloud-events/sea2cloud_events.py)
 - [Competition for a finite water-vapor reservoir](tutorials/condensation/condensation_3_massresolved.py)
 - [Condensation in radius bins](tutorials/condensation/condensation_1_bin.py)

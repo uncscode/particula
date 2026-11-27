@@ -2251,5 +2251,17 @@
     ],
     "plot_inputs": [],
     "full_canvas": true
+  },
+  "liu-terpene-residues": {
+    "title": "Compare the 220 nm ocimene measurements with two 60 nm forecasts",
+    "source": "docs/studies/literature/evaporation-and-uptake/liu-terpene/compare_residues.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 90,
+    "inputs": [
+      "docs/data/liu-terpene/digitized.zip",
+      "docs/data/liu-terpene/figure2.csv",
+      "studies/liu-terpene/uncertainty/estimate.py"
+    ]
   }
 }
