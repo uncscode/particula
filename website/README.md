@@ -11,15 +11,14 @@ Use the tested Node **26.13.0** and Python **3.12** environment:
 
 ```bash
 python3.12 -m venv .venv
-.venv/bin/python -m pip install -e '.[extra]' -r website/requirements.txt
+.venv/bin/python -m pip install -e '.[extra]' -e ./packages/particula-aiomfac -r website/requirements.txt
 npm --prefix website ci
 npm --prefix website run build
 npm --prefix website run preview -- --port 4321
 ```
 
-Open http://127.0.0.1:4321/particula/. The preview command manages a background
-server; `npm --prefix website run preview -- status` and
-`npm --prefix website run preview -- stop` inspect or stop it.
+Open the loopback URL printed by Astro, including the `/particula/` path.
+Keep the terminal open while reviewing and press Ctrl+C there to stop the server.
 
 `npm --prefix website run dev` watches authored sources. Verify search with the
 production build served by `preview`. The Python launcher uses the repository's
