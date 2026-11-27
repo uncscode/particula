@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 1.584572371095419,
+  "package_source_sha256": "d4849ffeb7f688f80c072e5440f387b64f4be422cea8c9437a2ca56952e019f3",
+  "scientific_source_sha256": "dabfdd2bd677c3fc02738b557c9f139a31fd177db9ff1f51b97566dfd290745d",
+  "input_sha256": {
+    "docs/data/xiong-sea-spray/growth-time.csv": "c8fd68477d36dfd1e4be559cbeeff9d21a365a2624b5c01c869c5cd288b18dc2",
+    "docs/data/xiong-sea-spray/ion-time.csv": "2a08b784e432469e6e97f7438271faceb65a15ad215f41c916301456fc6a8919"
+  },
+  "example": "xiong-sea-spray-growth",
+  "fingerprint": "9f3fccf7e60e1c67f67b8f90007aef7157ee433b1942b8aa10b46912a9e1a4be",
+  "source": "docs/studies/literature/particle-water-uptake/xiong-sea-spray/compare_growth.py",
+  "revision": "bf91687e521d24689486e721d6073250e6ce85f6",
+  "package_dirty": false,
+  "executed_at": "2026-11-27T20:31:10.625940+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.6",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "text": "Measured growth factor 1.67 \u00b1 0.02\nDirect with retained chloride: 1.657, difference -0.013\nParallel: 1.654, difference -0.016\n"
+      }
+    ],
+    [
+      {
+        "text": "Measured area ratio 2.62, reading range 1.49\u20135.00\nDirect with retained chloride: 5.13\nParallel: 7.60\n"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "18d36517af86125ea47a1174d921c8e13d8c792bdafa35f420bee729d4f34801"
+  }
+}
