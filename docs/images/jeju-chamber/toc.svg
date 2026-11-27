@@ -1,33 +1,41 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
-  <title id="title">Jeju chamber measurements and the shared six-run fit</title>
-  <desc id="desc">In the unsalted ambient run, both record-mean spectra peak in the 14.9 micrometre bin. In the sulfate and dust run, the optical counter measures 388 particles per cubic centimetre in the 5–10 micrometre band and the shared fit gives 141. Bars start at zero. Each pair has its own unit and scale. The chamber sketch is schematic.</desc>
+  <title id="title">Unsalted ambient air in K-CPEC</title>
+  <desc id="desc">Run 1 record-mean Welas optical size distribution and the pooled six-run fit, on the same absolute concentration scale. Both distributions peak in the 14.9 µm bin. The model undercounts particles on the smaller-diameter side of the peak. The horizontal axis is logarithmic and vertical axis linear.</desc>
   <rect width="300" height="300" fill="#FBF2E3"/>
-  <g fill="none" stroke="#243E43" stroke-linejoin="round" stroke-width="1.7">
-    <path d="M22 18 Q22 13 28 13 H55 Q61 13 61 18 V41 Q61 46 55 46 H28 Q22 46 22 41Z" fill="#CAD9D2"/>
-    <rect x="27" y="17" width="29" height="24" rx="4" fill="#FBF2E3"/>
-    <path d="M40 37V51H66" stroke="#135963"/>
-    <g fill="#617679" stroke="none"><circle cx="33" cy="24" r="1.8"/><circle cx="47" cy="22" r="2"/><circle cx="49" cy="33" r="2.4"/><circle cx="37" cy="30" r="2.3"/></g>
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <path d="M18 19 Q18 14 26 12 Q48 7 70 12 Q78 14 78 19 V50 Q77 57 48 58 Q19 57 18 50Z" fill="#CAD9D2" stroke="#243E43" stroke-width="2"/>
+    <path d="M20 17 Q48 25 76 17 M24 46 Q48 51 72 46" fill="none" stroke="#617679" stroke-width="1.3"/>
+    <path d="M48 52 V65 H78" fill="none" stroke="#135963" stroke-width="2.4"/>
   </g>
   <g font-family="DejaVu Sans, sans-serif" fill="#243E43">
-    <text x="73" y="29" font-size="17" font-weight="bold">Jeju cloud chamber</text>
-    <text x="73" y="48" font-size="12.5">Record-mean spectra</text>
+    <text x="48" y="38" text-anchor="middle" font-size="13" font-weight="bold">K-CPEC</text>
+    <text x="91" y="31" font-size="17.5" font-weight="bold">Unsalted ambient air</text>
+    <text x="91" y="51" font-size="13">Jeju · Run 1</text>
     <g font-size="12.5">
-      <rect x="22" y="63" width="15" height="9" fill="#243E43"/><text x="43" y="72">Measured</text>
-      <rect x="143" y="63" width="15" height="9" fill="#FBF2E3" stroke="#135963" stroke-width="1.8"/><text x="164" y="72">Shared fit</text>
+      <path d="M36 83H58" stroke="#243E43" stroke-width="2.5"/><text x="64" y="87">Measured</text>
+      <path d="M163 83H186" stroke="#135963" stroke-width="2.5" stroke-dasharray="5 3"/><text x="192" y="87">Shared fit</text>
     </g>
-    <path d="M21 83H279 M21 182H279" stroke="#BBC6BE" stroke-width="1.1"/>
-    <text x="22" y="106" font-size="17" font-weight="bold">Unsalted ambient air</text>
-    <text x="22" y="123" font-size="12.5">Diameter at the peak (µm)</text>
-    <rect x="23" y="134" width="180" height="10" fill="#243E43"/>
-    <rect x="23" y="154" width="180" height="10" fill="none" stroke="#135963" stroke-width="1.8"/>
-    <g font-size="14.5" font-weight="bold"><text x="213" y="145">14.9</text><text x="213" y="165" fill="#135963">14.9</text></g>
-    <text x="22" y="206" font-size="17" font-weight="bold">Sulfate and dust</text>
-    <text x="22" y="224" font-size="12.5">5–10 µm particles per cm³</text>
-    <rect x="23" y="235" width="180" height="10" fill="#243E43"/>
-    <rect x="23" y="255" width="65.41" height="10" fill="none" stroke="#135963" stroke-width="1.8"/>
-    <g font-size="14.5" font-weight="bold"><text x="213" y="246">388</text><text x="98" y="266" fill="#135963">141</text></g>
+    <text x="51" y="112" font-size="12">Particles/cm³ per decade of diameter</text>
+    <g fill="none" stroke="#CFD3C8" stroke-width="0.8"><path d="M51 124H282 M51 162H282 M51 200H282"/></g>
+    <path d="M51 124V238H282" fill="none" stroke="#617679" stroke-width="1"/>
+    <g id="spectra" fill="none" stroke-width="2.2" stroke-linejoin="round">
+      <path id="measured" stroke="#243E43" d="M51 238.000V238.000H54.300V238.000H57.600V238.000H60.900V238.000H64.200V238.000H67.500V238.000H70.800V238.000H74.100V238.000H77.400V238.000H80.700V238.000H84.000V238.000H87.300V237.973H90.600V237.874H93.900V237.723H97.200V237.537H100.500V237.314H103.800V237.145H107.100V237.106H110.400V237.104H113.700V237.103H117.000V236.612H120.300V235.867H123.600V234.926H126.900V234.183H130.200V234.190H133.500V233.878H136.800V233.484H140.100V232.557H143.400V231.110H146.700V229.136H150.000V225.802H153.300V220.386H156.600V215.152H159.900V206.980H163.200V191.652H166.500V184.673H169.800V184.979H173.100V186.304H176.400V181.427H179.700V176.460H183.000V164.003H186.300V147.078H189.600V139.366H192.900V143.075H196.200V166.226H199.500V177.808H202.800V190.449H206.100V200.939H209.400V215.368H212.700V226.523H216.000V234.488H219.300V236.889H222.600V237.577H225.900V237.851H229.200V237.964H232.500V237.987H235.800V237.997H239.100V238.000H242.400V238.000H245.700V238.000H249.000V238.000H252.300V237.998H255.600V237.999H258.900V238.000H262.200V238.000H265.500V238.000H268.800V238.000H272.100V238.000H275.400V238.000H278.700V238.000H282.000"/>
+      <path id="shared" stroke="#135963" stroke-dasharray="5 2.5" d="M51 237.882V237.882H54.300V237.870H57.600V237.853H60.900V237.838H64.200V237.772H67.500V237.744H70.800V237.768H74.100V237.761H77.400V237.752H80.700V237.701H84.000V237.656H87.300V237.568H90.600V237.481H93.900V237.393H97.200V237.301H100.500V237.263H103.800V237.105H107.100V236.994H110.400V236.905H113.700V236.770H117.000V236.605H120.300V236.449H123.600V236.151H126.900V235.873H130.200V235.429H133.500V234.853H136.800V233.976H140.100V232.814H143.400V231.245H146.700V229.395H150.000V227.581H153.300V225.773H156.600V224.026H159.900V221.767H163.200V218.327H166.500V213.350H169.800V207.052H173.100V199.069H176.400V189.491H179.700V179.849H183.000V170.410H186.300V162.809H189.600V160.150H192.900V163.909H196.200V173.380H199.500V184.945H202.800V196.630H206.100V208.927H209.400V219.791H212.700V227.127H216.000V231.674H219.300V234.885H222.600V236.758H225.900V237.552H229.200V237.844H232.500V237.961H235.800V237.993H239.100V237.999H242.400V238.000H245.700V238.000H249.000V238.000H252.300V238.000H255.600V238.000H258.900V238.000H262.200V238.000H265.500V238.000H268.800V238.000H272.100V238.000H275.400V238.000H278.700V238.000H282.000"/>
+    </g>
+    <g font-size="11" text-anchor="end">
+      <text x="45" y="128">600</text><text x="45" y="166">400</text>
+      <text x="45" y="204">200</text><text x="45" y="242">0</text>
+    </g>
+    <g id="diameter-ticks" font-size="11" text-anchor="middle">
+      <path d="M67.470 238v4" stroke="#617679"/><text x="67.470" y="256">1</text>
+      <path d="M117.854 238v4" stroke="#617679"/><text x="117.854" y="256">3</text>
+      <path d="M173.070 238v4" stroke="#617679"/><text x="173.070" y="256">10</text>
+      <path d="M223.454 238v4" stroke="#617679"/><text x="223.454" y="256">30</text>
+      <path d="M278.670 238v4" stroke="#617679"/><text x="278.670" y="256">100</text>
+    </g>
+    <text x="162" y="278" text-anchor="middle" font-size="13">Optical diameter (µm)</text>
   </g>
-  <g transform="translate(262,271)"><svg width="22.5" height="17.1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48.93 37.11" fill="#115f5a">
+  <g transform="translate(266,272)"><svg width="22.5" height="17.1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48.93 37.11" fill="#115f5a">
   <circle cx="4.59" cy="4.59" r="4.59"/>
   <circle cx="18.34" cy="4.59" r="4.59"/>
   <circle cx="4.59" cy="18.34" r="4.59"/>
