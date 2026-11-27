@@ -76,11 +76,25 @@ or plan completion with measured qualification.
 
 ## Check the change
 
+From the repository root, follow the [website setup instructions](../../website/README.md#run-locally)
+to install the documentation dependencies. In the development Python environment, run
+these checks against the sources and the built pages.
+
 ```bash
 python scripts/check_docs_structure.py
 npm --prefix website run build
 python scripts/check_docs_structure.py --site-dir website/dist
 ```
+
+To review the built pages in a browser, start the local preview.
+
+```bash
+npm --prefix website run preview -- --port 4321
+```
+
+Open the address Astro prints, including `/particula/`. To run a second preview,
+choose another available port. Keep the terminal open during review and press
+Ctrl+C there to stop that preview. Rebuild after editing the sources.
 
 The structural check covers navigation targets, authored-page reachability,
 local links, moved-path references, and registered Python sources. The rendered check also
