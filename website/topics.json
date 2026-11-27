@@ -6798,6 +6798,79 @@
       ],
       "role": "Studies",
       "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/particle-water-uptake/xiong-sea-spray/index.md",
+      "title": "Two reaction pathways fit water uptake in SO₂-aged sea salt",
+      "topic": "activity-nonideal",
+      "also": [
+        "chambers"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "xiong-sea-spray",
+        "runs": [
+          "xiong-sea-spray-growth"
+        ],
+        "companions": [
+          "docs/studies/literature/particle-water-uptake/xiong-sea-spray/pathway-checks.md",
+          "docs/studies/literature/particle-water-uptake/xiong-sea-spray/sulfate-by-size.md",
+          "docs/studies/literature/particle-water-uptake/xiong-sea-spray/organic-coatings.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/processes/activity.md",
+            "label": "Non-ideal solution activities"
+          },
+          {
+            "target": "docs/guide/processes/resolved-chemistry.md",
+            "label": "Particle reaction channels"
+          }
+        ]
+      },
+      "tocFigure": "xiong-sea-spray/toc.svg",
+      "tocSource": "studies/xiong-sea-spray/toc.py"
+    },
+    {
+      "source": "docs/studies/literature/particle-water-uptake/xiong-sea-spray/compare_growth.py",
+      "title": "Compare measured water uptake and ion peaks with the two fitted pathways",
+      "topic": "activity-nonideal",
+      "also": [
+        "chambers"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/particle-water-uptake/xiong-sea-spray/pathway-checks.md",
+      "title": "What the optical and ion measurements constrain about sulfur chemistry",
+      "topic": "activity-nonideal",
+      "also": [
+        "chambers"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/particle-water-uptake/xiong-sea-spray/sulfate-by-size.md",
+      "title": "A chamber sea-spray spectrum puts more sulfate at 300 nm than at 200 nm",
+      "topic": "activity-nonideal",
+      "also": [
+        "chambers"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/particle-water-uptake/xiong-sea-spray/organic-coatings.md",
+      "title": "An organic-rich particle reacts more slowly. Does it have a continuous coating?",
+      "topic": "activity-nonideal",
+      "also": [
+        "chambers"
+      ],
+      "role": "Studies",
+      "start_here": false
     }
   ],
   "supporting": [

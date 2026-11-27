@@ -76,9 +76,12 @@ Liquid salt mixing widens the winter foothill growth-factor bias at Mt. Hua from
 
 The Pallas activation measurements motivate a related exploration of which particle properties a compact checkpoint must preserve. [Regenerating a particle-resolved aerosol](../explorations/parcel-composition/index.md)
 
-## Water uptake by organic compounds
+## Water uptake by salts and organic compounds
 
 <div class="study-figures">
+
+[![Two sulfur pathways predict growth factors of 1.654 and 1.657, compared with the measured 1.67 ± 0.02.](../../images/xiong-sea-spray/toc.svg)\
+Two reaction pathways fit water uptake in SO₂-aged sea salt](particle-water-uptake/xiong-sea-spray/index.md)
 
 [![Water activity declines as citric acid mass fraction rises. The BAT line and AIOMFAC ticks sit close together and above all 12 measured points. The largest separation from the measurements occurs toward concentrated acid.](../../images/citric-acid-activity/graphical-abstract.svg)\
 BAT and AIOMFAC both overpredict water activity at all 12 measured citric acid concentrations](particle-water-uptake/citric-acid/index.md)
@@ -170,8 +173,9 @@ Adding settling and diffusion lowers predicted one-hour survival of 1 µm partic
 - [How an organic film can improve one Antarctic CCN count and worsen the activation spectrum](antarctic-ccn/index.md)
 - [Liquid salt mixing widens the winter foothill growth-factor bias at Mt. Hua from +0.54 to +0.72](particle-water-uptake/mt-hua/index.md)
 
-**Water uptake by organic compounds**
+**Water uptake by salts and organic compounds**
 
+- [Two reaction pathways fit water uptake in SO₂-aged sea salt](particle-water-uptake/xiong-sea-spray/index.md)
 - [BAT and AIOMFAC both overpredict water activity at all 12 measured citric acid concentrations](particle-water-uptake/citric-acid/index.md)
 - [BAT reverses the measured ordering of pinic and phthalic acid hygroscopicity at cloud activation](particle-water-uptake/bat-ccn.md)
 - [A cloud activation fit predicts 49% more water than BAT at 95% humidity for one organic](particle-water-uptake/ccn-retrieval/index.md)

@@ -1,0 +1,7 @@
+salt,ovf_pct,srh_status,srh_pct,srh_sd_pct,predicted_rh_pct,crystallization_rh_pct
+AS,50,observed,82.1,1.6,93.31889278,
+AS,70,observed,98.7,0.5,95.82219043,
+AS,90,observed,80,0.9,78.64676619,
+NaCl,50,observed,84,3.6,94.68121056,
+NaCl,70,observed,92.5,3.9,96.10965226,
+NaCl,90,not_observed,,,96.99947879,61.3

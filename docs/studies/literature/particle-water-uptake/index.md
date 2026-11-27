@@ -10,4 +10,5 @@ To see how activation, mixing and measurement cutoffs shape population spectra, 
 - [BAT and AIOMFAC both overpredict water activity at all 12 measured citric acid concentrations](citric-acid/index.md)
 - [BAT reverses the measured ordering of pinic and phthalic acid hygroscopicity at cloud activation](bat-ccn.md)
 - [Liquid salt mixing widens the winter foothill growth-factor bias at Mt. Hua from +0.54 to +0.72](mt-hua/index.md)
+- [Two reaction pathways fit water uptake in SO₂-aged sea salt](xiong-sea-spray/index.md)
 <!-- STUDY_LIST_END -->

@@ -1,0 +1,22 @@
+{
+  "xiong/endmember-pixels.csv": "0c8f0973627204552960cb64980294a5104aea2f6a05297ed0e919f7ba7ba960",
+  "xiong/endmembers.csv": "0f09569bcd571c9b2ac9e40ae81b7cbf4aa36be71de46f74b650901de3c2f3c6",
+  "xiong/fig3-100nm.csv": "d84f8a4e0e198eacb56ef760700b972f60ca1bca8314c47bc4c023cf611f2e39",
+  "xiong/fig4a-100nm.csv": "6d6ea71721fba3fd3ee8ddc4802f25174eff8cd5a9e7d8d96de4781f85aa1263",
+  "xiong/fig4b5c-100nm.csv": "b8906c6eb492d51cc6fc8f893579a1be7d10f4aa8c593341f5e336cb7138d974",
+  "xiong/fig5-log.csv": "05026e80d29bf84befb64316f3717ad007a018d7f5f254d3d6de2c88098b04d5",
+  "xiong/fig5-sulfate.csv": "b38258f46343a711058dd72136961a0823b62fc67ee35c9b371588d2dd40f7fe",
+  "xiong/figs19-ic-peaks.csv": "8e28ebd73b60d3c618b55d5d6e1f205cb3665d62f7c1dccacd8a9ee981dff419",
+  "xiong/size-rates.csv": "ab71cc699e9e4641ad3d6d82a2599fde345f7d097ffc624ef1af6f103b570bf0",
+  "rosati/spectra.csv": "6cac980f91f27f8dab355084696b4d6672daad6c16a85bbc24829fc24ae65170",
+  "aiomfac/low_so2/s20.csv": "e34b6f15e0e53611afbf54a73b4877c73d1d9a4a7c510558dc7ccd3669838a81",
+  "aiomfac/coating/figure6a.csv": "1126d0fc27bd7e5c6d1542a925e78c98cacfd89c6efcbfbbc9507f1432dd48cb",
+  "aiomfac/coating/figure6b.csv": "3f60235b36ae50411862125dc7197f8b8bcb36cf0191d422be3ded449e2738a9",
+  "aiomfac/coating/onset-observations.csv": "8ff65134dcbd32e90b2f6c2eec403b92cd5c664f7a71014034cdfbeadc332102",
+  "xiong/table-s1.csv": "8f7223967aadb8a2aeabc693bdbfd06b8bfea6b2925d816e54ce08f35f76da85",
+  "xiong/text-100nm.csv": "55fa46482108f9f4f45a38045b700bbfdb007d8b1bffee6c0b346a9f3464d849",
+  "aiomfac/coating/figure6-s2.csv": "308fc727b1d12c688cb129ca540ba1bc41492a9e9362a6c8312ff62cf8446ff4",
+  "aiomfac/coating/parameter-fit/binary-aerosol-check.csv": "e552f2c6161e172d69685adb94db1c5f93f88f62b468a5155f20fe51a91ef81a",
+  "aiomfac/coating/parameter-fit/binary-water.csv": "33df58d34004e47635317a12b3aff765abc9dc2d9203f51c610d839c9d622220",
+  "aiomfac/coating/parameter-fit/phase-data.csv": "01326bccaca2ded986c59004a284f9f157481387daf6971692e9dfd91f41f27f"
+}
