@@ -69,4 +69,4 @@ In a repeat with the same pressure and cooling history, the first comparison wou
 
 The chamber process comparisons test how wall loss, collisions and circulation affect spectral width. A separate analysis carries an earlier set of chamber fits into a measured marine cloud and into prescribed cloud flows. It compares suspended ice with the aircraft observations and follows liquid persistence and ice fallout in the simulated clouds. [Wall loss, collisions and circulation](processes.md) · [Ice, measured marine cloud and prescribed flows](clouds.md)
 
-The chamber spectra come from the authors’ original files. The accompanying data release contains our annotations of chamber images and readings from published aircraft figures. [Data downloads, attribution and checksums](sources.md) · [Source-to-figure and replay guide](replay.md)
+The chamber spectra come from the authors’ original files. Two compact downloads provide the data behind the plots and our annotations and digitizations of the published measurements. [Data downloads, attribution and checksums](sources.md) · [Source-to-figure and replay guide](replay.md)
