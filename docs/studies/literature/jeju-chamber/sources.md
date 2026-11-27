@@ -2,6 +2,10 @@
 
 [Download the annotated and figure-extracted observations (ZIP)](../../../../website/public/study-data/jeju-chamber/extracted-observations.zip) · [Input inventory and file checksums](../../../../website/public/study-data/jeju-chamber/provenance.json)
 
+## Values behind the figures
+
+The plot-data download contains 13 CSVs and a figure-by-figure guide. It includes the measured and fitted Welas spectra on the original bins, the held-out size distributions and the plotted dust, chamber temperature, aircraft and atmospheric comparisons. The same Welas table supplies the contours, minute cuts, record means and reduced-resolution TOC. The column guide gives units, averaging windows and the residual formula. [Download the plotted data (ZIP)](../../../../website/public/study-data/jeju-chamber/figure-data.zip)
+
 ## Chamber observations
 
 The six-run size–time plots and measured size-distribution cuts use the original optical-counter bins in Park et al.’s Figshare version 1. Download the six `OPC_exp*.csv` files for the Welas spectra, the six chamber pressure and temperature tables for forcing, and the six CPI particle tables for projected sizes. Five LI-COR tables give water vapor. Run 6 has no deposited analyzer record. The manifest links all 29 files, including six CPI image archives, and records the publisher’s MD5 checksum for each. [Park et al., experiment](https://doi.org/10.1029/2026GL123395) · [Version 1 data and license](https://doi.org/10.6084/m9.figshare.31744108.v1) · [Versioned file catalog](https://api.figshare.com/v2/articles/31744108/versions/1)
@@ -26,6 +30,6 @@ The field comparison uses the published RF14 case mean for 1 March 2020. NASA li
 
 All three field tables are numeric adaptations of Sorooshian et al.’s published figures. The authors’ articles and Park et al.’s Figshare record identify the source licenses. Credit Park et al. for the Jeju experiment and image sheets, Sorooshian et al. for the RF14 figures, and the Particula Jeju study for selecting, classifying and digitizing the readings. [RF14 article and license](https://essd.copernicus.org/articles/15/3419/2023/) · [Jeju dataset and license](https://api.figshare.com/v2/articles/31744108/versions/1) · [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 
-The ZIP contains four CSVs, provenance and reading notes. Use the SHA-256 checksums in the manifest to verify the extracted CSVs. The study scripts generate chamber averages, fitted spectra, sensitivity scores and figures from the cited inputs.
+The extracted-observations ZIP contains four CSVs, provenance and reading notes. Use the SHA-256 checksums in the manifest to verify the extracted CSVs. The study scripts generate chamber averages, fitted spectra, sensitivity scores and figures from the cited inputs.
 
 [Six-run results and conclusions](index.md)
