@@ -21,7 +21,12 @@ from pathlib import Path
 
 import numpy as np
 from particula._cpu_batch import detached
-from scripts.gpu_studies.cases import StudyCase, build_case, radius_histogram
+from scripts.gpu_studies.cases import (
+    StudyCase,
+    build_case,
+    prepare_study,
+    radius_histogram,
+)
 from scripts.gpu_studies.validation import (
     native_cpu_steps,
     require,
@@ -224,9 +229,7 @@ def _gpu(case, initial, process, mode, report):
     )
     resident, download = [], []
     print(f"Preparing {case.name} on cuda:0", flush=True)
-    with process.prepare(
-        initial, device="cuda:0", time_step=case.time_step, root_seed=case.seed
-    ) as owner:
+    with prepare_study(case, process, initial) as owner:
         print("Preparation complete", flush=True)
         driver = Driver(owner, case, mode)
         restore = reset_buffers(owner)
@@ -272,12 +275,7 @@ def _fresh_runs(case, initial, process, mode, report):
     setup, capture, overall = [], [], []
     for sample in range(SAMPLES):
         start = time.perf_counter()
-        with process.prepare(
-            initial,
-            device="cuda:0",
-            time_step=case.time_step,
-            root_seed=case.seed,
-        ) as owner:
+        with prepare_study(case, process, initial) as owner:
             owner.synchronize()
             ready = time.perf_counter()
             driver = Driver(owner, case, mode)

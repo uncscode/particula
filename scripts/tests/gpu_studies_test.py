@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 from particula._cpu_batch import detached
-from scripts.gpu_studies.cases import StudyCase, build_case
+from scripts.gpu_studies.cases import StudyCase, build_case, prepare_study
 from scripts.gpu_studies.validation import native_cpu_steps, validate_evolution
 
 
@@ -34,10 +34,14 @@ def test_study_has_real_physics_and_independent_inventories(
         heterogeneous=True,
     )
     initial, process, processes = build_case(case)
-    with process.prepare(
-        initial, device="cuda:0", time_step=case.time_step, root_seed=case.seed
-    ) as simulation:
+    with prepare_study(case, process, initial) as simulation:
         simulation.step()
+        if family == "brownian":
+            ledger = simulation.coagulation_diagnostics()
+            assert ledger["substep_count"] > 1
+            np.testing.assert_allclose(
+                sum(ledger["substep_sizes"]), case.time_step
+            )
         if family == "full":
             simulation.synchronize()
             np.testing.assert_array_equal(

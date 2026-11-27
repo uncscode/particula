@@ -54,6 +54,35 @@ class StudyCase:
     experiment: str = "steady"
 
 
+def prepare_study(case, process, aerosol, *, seed=None):
+    """Prepare a study interval with bounded Brownian collision passes."""
+    options = {}
+    if any(
+        isinstance(item, Coagulation)
+        for item in getattr(process, "processes", (process,))
+    ):
+        from particula.gpu.kernels import coagulation
+
+        # Archived engines use their original sampler. The current engine can
+        # split just the collisions while preserving the forcing/output clock.
+        policy = getattr(coagulation, "CoagulationSubcyclingConfig", None)
+        if policy is not None:
+            options["coagulation_subcycling"] = policy(
+                min_substep=case.time_step / 256,
+                max_subcycles=32,
+                # The 4096-box composed run reserves ~19.3 GiB on paper,
+                # including conservative bounds for source and rollback work.
+                max_device_bytes=24 * 1024**3,
+            )
+    return process.prepare(
+        aerosol,
+        device="cuda:0",
+        time_step=case.time_step,
+        root_seed=case.seed if seed is None else seed,
+        **options,
+    )
+
+
 def water_pressure(temperature):
     """Independent Buck water-pressure expression [Pa], temperature in K."""
     celsius = np.asarray(temperature) - 273.15

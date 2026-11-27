@@ -91,9 +91,8 @@ The current checkout supplies the renderer. The historical checkout supplies
 the scientific source and inputs for verification. The page identifies the
 historical simulation and links its executed source, arrays and original
 device. A full refresh with `--science-checkout` runs the current study script
-and its declared inputs against the pinned library. The four archived
-prepared GPU spectrum examples load their current CPU reporting functions
-alongside that engine. A full replay records the spectrum module digest in
+and its declared inputs against the pinned library. The four prepared GPU spectrum examples with historical pins
+load their current CPU reporting functions alongside that engine. A full replay records the spectrum module digest in
 `input_sha256` and the archived dynamics revision in `revision`. Replots check
 that study and the digest of its freshly recorded data. The registry's data
 digest identifies the original archive, whose timing fields may differ. To

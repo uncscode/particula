@@ -4,7 +4,7 @@ import hashlib
 
 import numpy as np
 from particula._cpu_batch import arrays
-from scripts.gpu_studies.cases import particle_inventory
+from scripts.gpu_studies.cases import particle_inventory, prepare_study
 
 
 def require(condition, message):
@@ -174,12 +174,7 @@ def validate_process_cycle(case, initial, processes):
     ledger = []
     for process in processes:
         before = current
-        with process.prepare(
-            before,
-            device="cuda:0",
-            time_step=case.time_step,
-            root_seed=case.seed,
-        ) as owner:
+        with prepare_study(case, process, before) as owner:
             owner.step()
             current = owner.snapshot()
         before_mass, before_number = particle_inventory(before)
