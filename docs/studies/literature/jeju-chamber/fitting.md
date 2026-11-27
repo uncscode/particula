@@ -1,17 +1,21 @@
-# How the six fits were scored and checked
+# What fitting each chamber run separately improves
 
-Each simulated minute contributes concentrations in the original 70 water-equivalent Welas bins. The search objective puts 65% of its weight on error across those bins and 20% on integrated counts in six diameter bands. Analyzer vapor and imager size and habit evidence receive 10% and 5% respectively, with the available terms renormalized when a channel is missing. Within the optical term, the represented time stages and eight logarithmic size groups receive equal weight. The six experiments receive equal weight in the shared fit. The reported optical errors isolate the spectral term from the rest of the objective.
+Fitting each expansion separately lowered the optical error in all six complete records. A different pattern emerged when we set the final ten measured minutes aside. With parameters fitted only to earlier observations, individual fits gave smaller late errors than the shared fit in runs 1–3 and larger errors in runs 4–6. The two comparisons answer different questions about the same experiments.
 
-The shared and individual searches each used two separated starts. Automatic differentiation of a local approximation to the objective proposed changes after paired perturbations of the particle solver. Leading candidates were reranked at 2 s. The selected parameters were checked at 1 s with doubled CCN, salt and ice size resolution. The 70 observation bins stayed fixed. Representative CPU/CUDA runs agreed to within 0.000001 decades in whole-record optical error. Across retained primary and comparator replays, maximum absolute water and particle budget residuals were 0.00134 g/m³ and 0.0357 cm⁻³.
+## How the measurements enter the fit
 
-## How well early parameters describe the last ten minutes
+Welas measures particle concentration in 70 bins of water-equivalent optical diameter. The fit gives 65% of its weight to error across these bins and 20% to integrated number in six diameter bands. Vapor contributes 10% and particle images contribute 5% through size and crystal habit. Where a channel is missing, the available weights are rescaled to sum to one. The optical-bin term weights each represented time stage and each of eight logarithmic size groups equally. In the shared fit each experiment has equal weight. The optical errors reported here measure the bin-by-bin part of the score, in decades of number density.
+
+We started each parameter search from two separated points. Paired changes to the particle-solver parameters supplied a local approximation to the score. Automatic differentiation of that approximation suggested the next parameter changes. We ranked the leading candidates with the particle solver at a 2 s timestep. We checked the selected fits at 1 s, doubling the resolution of cloud condensation nuclei, salt and ice while retaining the same 70 measurement bins. Representative CPU and GPU calculations agreed to within 0.000001 decades in whole-record optical error. The largest absolute discrepancies in the retained water and particle budgets were 0.00134 g/m³ and 0.0357 particles/cm³, respectively.
+
+## How much does the most recent spectrum tell us?
 
 ![Measured and simulated size distributions over the final ten valid minutes of six expansions](../../../images/jeju-chamber/forward-distributions.png)
 
-*Figure 1. All curves average the same ten valid measured minutes in each run. The physical models start from their initial pre-cloud spectra and continue with later measured forcing. Their parameter selection uses the earlier minutes. A separate simple baseline holds the final observed pre-cutoff spectrum constant.*
+*Figure 1. Curves in each panel average the same ten withheld minutes. The simulations start at the pre-cloud fill and continue under measured forcing. The persistence comparison holds the last observed spectrum before that window constant.*
 
-The mean late error was 0.934 decades with pooled fits, 0.970 with independent fits and 0.971 when only aerosol and initial conditions varied by run against common physics. Persistence gave 0.263 decades. The model and its fixed instrument assumptions had previously been studied with these six records. These tests measure transfer along each observed expansion under known forcing. An independently measured experiment would be needed to assess wider predictive skill.
+The most recent measured spectrum gave the smallest late error in every run. Holding that spectrum constant gave a six-run mean optical error of 0.263 decades. Simulating forward from the fill gave 0.934 decades with shared parameters, 0.970 with individual parameters and 0.971 when only aerosol and initial conditions varied by run. Persistence starts much closer in time to the withheld observations. These comparisons show how far a fit carries along a measured expansion. Testing transfer to another chamber experiment would require an independent record.
 
-A detection-floor check and a restriction to occupied measurements test how the apparent improvement depends on low counts. Removing empty bins also removes the penalty for producing particles where the counter measured none. Both views are informative about different parts of the distribution. [Sensitivity to low counts and neighboring minutes](spectra.md)
+A separate check varies how much weight very small concentrations carry in the optical score. Restricting the calculation to occupied bins tests agreement where Welas registered particles, while the all-bin calculation also counts simulated particles in measured-empty bins. [Sensitivity to low counts and neighboring minutes](spectra.md)
 
 [Six-run results and conclusions](index.md)
