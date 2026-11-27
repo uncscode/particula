@@ -42,9 +42,13 @@ def refresh(results):
         rtol=1e-12,
     )
 
+    min_diameter, max_diameter = 2, 40
+    visible = (display_edges[:-1] < max_diameter) & (display_edges[1:] > min_diameter)
+    visible_right = np.minimum(display_edges[1:][visible], max_diameter)
+
     def x(diameter):
-        return 51 + 231 * np.log10(diameter / edges[0]) / np.log10(
-            edges[-1] / edges[0]
+        return 42 + 238 * np.log10(diameter / min_diameter) / np.log10(
+            max_diameter / min_diameter
         )
 
     svg = TEMPLATE.read_text()
@@ -54,20 +58,20 @@ def refresh(results):
             and density.min() >= 0
             and density.max() <= 600
         )
-        y = 238 - density * 114 / 600
-        path = f"M51 {y[0]:.3f}" + "".join(
+        y = 241 - density[visible] * 123 / 600
+        path = f"M{x(min_diameter):.3f} {y[0]:.3f}" + "".join(
             f"V{height:.3f}H{x(right):.3f}"
-            for height, right in zip(y, display_edges[1:])
+            for height, right in zip(y, visible_right)
         )
         svg, n = re.subn(
             rf'(<path id="{key}"[^>]*? d=")[^"]*', rf"\g<1>{path}", svg
         )
         assert n == 1
     ticks = []
-    for d in (1, 3, 10, 30, 100):
+    for d in (2, 5, 10, 20, 40):
         pos = x(d)
         ticks.append(
-            f'<path d="M{pos:.3f} 238v4" stroke="#617679"/><text x="{pos:.3f}" y="256">{d}</text>'
+            f'<path d="M{pos:.3f} 241v4" stroke="#617679"/><text x="{pos:.3f}" y="260">{d}</text>'
         )
     svg, n = re.subn(
         r'(<g id="diameter-ticks"[^>]*>).*?(</g>)',
