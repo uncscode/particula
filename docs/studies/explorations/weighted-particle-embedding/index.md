@@ -4,23 +4,7 @@
 
 ![One simulated second with a million particles and 32 vapors took 35.5 minutes with full native physics and 7.11 minutes with the hybrid. The sampled-physics control took 7.07 minutes.](../../../images/studies/weighted-particle-embedding/forecast-toc.svg)
 
-A hybrid model forecast one second of aerosol evolution for one million particles exchanging mass with 32 vapors in 7.11 minutes. Full native physics took 35.5 minutes on the same GPU, a 4.99× difference in whole-forecast time. The hybrid sampled collision partners and used a neural network for the jump-distance term in their Brownian collision rate. Physics still governed vapor transfer and what happened when two particles merged. As a control, we used the same candidate pairs and evaluated the entire rate physically. That run took 7.07 minutes and produced the same 1,092 mergers on the shared seed. Pair sampling accounted for the observed speed gain. Separate tests asked what a network could learn about water uptake. A compact representation distinguished mixtures with identical dry size spectra and bulk composition for part of a vapor-pulse forecast. Retaining composition within each dry size sustained that distinction through the last observation. For vapor transfer, both a fixed and a learned time-step correction met the mass target in the tested boxes. A pulse outside the training conditions would test whether learning gives the better correction.
-
-## Which details of an aerosol are worth carrying into a forecast?
-
-In a particle-resolved simulation of an aging urban plume, Zaveri and colleagues found that particles with the same dry diameter could activate as cloud droplets at different supersaturations. Their particles carried different mixtures of material after condensation and coagulation. A diameter bin can retain the total mass of every species while losing the association between a material and the particle that carries it. That association matters when estimating which particles will grow in a humid parcel. [Zaveri et al., particle-resolved urban plume](https://doi.org/10.1029/2009JD013616)
-
-Published neural aerosol models suggest two scales at which to learn. Harder and colleagues trained a network on one-step changes from the seven-mode M7 aerosol model and tested ways to enforce species mass balance. Wang and colleagues used particle-resolved simulations to learn how a single-species aerosol size distribution evolves under Brownian coagulation, with a network that treats the two collision partners symmetrically. The first study asks whether a network can advance a population. The second asks whether it can learn the interactions that advance it. [Harder et al., physics-informed aerosol microphysics](https://doi.org/10.1017/eds.2022.22) · [Wang et al., learning coagulation](https://doi.org/10.1029/2022MS003252)
-
-There is also a physical route to lower cost. Shima and colleagues sampled pairs of weighted computational droplets to simulate coalescence in warm clouds. A representative droplet carries the number of physical droplets it stands for. Pair sampling and particle weighting are distinct choices. Our main coagulation comparison sampled partners while retaining one record per particle. Other experiments measured how far we could also reduce the number of records. [Shima et al., the super-droplet method](https://doi.org/10.1002/qj.441) · [Weighted versus explicit particle forecasts](scaling.md)
-
-## What does the network see, and what does physics still do?
-
-We first gave the model a paired test. One aerosol spread its water-attracting material evenly within each dry size. Its partner concentrated the same material on a subset of particles. Both received the same vapor pulse. A learned *embedding* mapped each particle’s properties to a short list of numbers and combined them using the particle counts as weights. The resulting record had the same length for any particle count, and reordering the particles gave the same summary. The question was how long a forecast initialized from that record could recover the difference in water uptake.
-
-The learned record distinguished the two mixtures after the pulse, although its forecast lost their water-uptake contrast sooner than the physical reconstruction did. With eight learned coordinates the forecast met the contrast criteria through 47.5 ms in the test families and 50 ms in the challenge families. Dry size alone gave no qualifying lead. Keeping composition within each dry size extended the lead to the last observation at 80 ms in both cohorts. This gives a compact model a test that matching total mass cannot provide. [Matched populations, forecast criteria and water errors](representation.md)
-
-We then gave individual processes narrower jobs. A water or organic-vapor network can estimate a transfer rate. A joint gas–particle calculation limits evaporation to the material on each particle and uptake to the vapor available. A collision network can estimate one term in a pair’s encounter probability. After a successful draw, the merger rule combines the partners’ masses and charges and updates their number. A birth-rate model can propose new particles, with the solver charging their mass to the precursor supply. In the two-vapor experiments we also tested recurrent memory and attention over other particles. Their value depended on how long the forcing history continued. [Network architectures and repeated-pulse tests](representation.md) · [Process clocks and physical correction intervals](process-clocks.md)
+A forecast coupling a neural collision term to physical vapor transfer took 7.11 minutes to advance one million particles and 32 vapors by one second. Full native physics took 35.5 minutes on the same GPU, a 4.99× speedup for the whole forecast. The hybrid changed both how the solver chose collision partners and how it evaluated their collision rate. Applying the physical rate to the same sampled pairs took 7.07 minutes. That control traced the speed gain to pair selection. We used the same kind of control to test neural rates for vapor transfer and new particle formation.
 
 ## How fast was the hybrid forecast at one million particles?
 
@@ -29,7 +13,7 @@ We then gave individual processes narrower jobs. A water or organic-vapor networ
 <span id="where-did-the-speedup-come-from"></span>
 <span id="full-native-baseline--1-simulated-second"></span>
 
-The hybrid forecast took 7.11 minutes compared with 35.5 minutes for full native physics, a 4.99× speedup for the whole calculation. One million initially neutral particles occupied 1 cm³ and exchanged material with 32 vapors for one simulated second. The hybrid sampled disjoint pairs and predicted the Brownian jump-distance term used to compute their collision probabilities. The native vapor solver advanced each particle between collision opportunities, and physical merger rules combined the mass and charge of each accepted pair.
+At each collision step the hybrid shuffled the particles and paired adjacent entries. For each candidate pair, a neural network estimated the jump-distance term in its Brownian collision rate. The solver used that rate and the pair’s probability of selection to draw mergers. Physical rules combined the partners’ masses and charges, and the native vapor solver advanced the particles between collision steps. All one million initially neutral particles remained individually represented in the 1 cm³ box until they merged.
 
 <figure class="scientific-figure">
 
@@ -40,13 +24,15 @@ The hybrid forecast took 7.11 minutes compared with 35.5 minutes for full native
 
 <span id="how-accurate-were-the-one-second-collision-runs"></span>
 
-The hybrid stayed within the accuracy targets on this run. Against the time-refined physical reference, its largest observed particle-count discrepancy was 0.00354% and its largest phase-mass discrepancy was 0.07501%.
+The hybrid met both accuracy targets on its single timed run. Against the time-refined physical reference, its largest particle-count discrepancy was 0.00354% (target 1% or less), and its largest phase-mass discrepancy was 0.07501% (target below 0.1%).
 
 ### What did the sampled-physics control show?
 
 With the same candidate pairs and random draws, evaluating the full physical Brownian rate took 7.07 minutes (5.02× faster than full native physics). The physical control and the hybrid each accepted 1,092 mergers and agreed on particle counts and phase masses at every observation. Sampling alone therefore reproduced the speed gain. Whether changing the rate gives the same merger outcomes on fresh draws remains open.
 
 Skipping collisions altogether saved little more time and pushed a gas species past the error limit. Turning mergers off saved another 12.2 seconds relative to sampled physics, but the largest phase-mass discrepancy rose from 0.0750% to 0.1103%, above the 0.1% target. Particle count stayed within its limit. A merger changes the surface available for subsequent vapor exchange, so the error can appear in the gas before it becomes apparent in the count. [Collision timers and the limiting gas species](coagulation.md)
+
+Shima and colleagues used random pairs of weighted computational droplets to simulate cloud coalescence. Here sampling reduced the number of pairs evaluated while preserving a separate record for each particle. Weighting the records to represent several particles is another way to reduce cost, with its own accuracy tests. [Shima et al., the super-droplet method](https://doi.org/10.1002/qj.441) · [Weighted and explicit particles at scale](scaling.md)
 
 ### How does the speedup vary by coagulation kernel?
 
@@ -61,13 +47,40 @@ Drawing disjoint pairs saved the most time for charged Brownian collisions. At 3
 
 At 32,768 particles both sampled methods stayed within the count and phase-mass targets across the eight seeds when compared with native physics on the same time step. In the smaller shear box, even two native runs could differ by more than the mass target when their random draws differed. [Absolute timings, forecast errors and the shear repeatability check](coagulation.md#how-do-the-alternatives-time-against-full-physics-for-each-kernel)
 
-## Why was the condensation speedup smaller?
+The same shuffling rule worked across the five kernels because the collision law enters after candidate selection. The fitted rate had a narrower range. Applying the neutral Brownian network unchanged to settling or shear gave large pair-rate errors. [Testing the rate network on another kernel](coagulation.md#what-happens-if-we-reuse-the-neutral-brownian-network-unchanged)
 
-Once the solver was already sampling collisions, vapor transfer took most of the time. In a separate ten-second forecast with one million particles, 16 vapors began condensing, eight evaporating and eight near equilibrium. Vapor transfer accounted for 87.4% of the 8.37-second forecast after warm-up. Calculating the transfer coefficient accounted for only 36% of a vapor half step. Even with that coefficient in hand, the solver still had to balance each gas reservoir and update every exchanging particle. [Process timings, mixture and scaling controls](process-comparisons.md)
+## What happened when we replaced other process rates?
+
+A separate ten-second experiment started from a physical solver that already sampled collision pairs. The million-particle box contained 32 vapors, with 16 initially favoring condensation, eight favoring evaporation and eight near equilibrium. We changed one rate at a time while keeping the other processes physical. The times below are whole-forecast means over three matched seeds after setup and warm-up. This experiment used a different vapor solver and time step from the one-second native benchmark above.
+
+| Rate changed in the ten-second forecast | Whole-forecast time |
+|---|---:|
+| Physical rates throughout, with sampled collisions | 8.370 s |
+| Neural jump distance for sampled collisions | 8.699 s |
+| Neural vapor-transfer factor | 276.1 s |
+| Neural birth rate | 8.375 s |
+
+Evaluating a neural transfer factor for each particle–vapor combination made the forecast take 33 times as long. The largest phase-mass difference from the physical run at the same step was about 0.00133%. Halving the physical vapor step changed phase mass by up to 0.636%, so agreement at the original step left a larger integration error unresolved. [Process timings, errors and box-size comparison](process-comparisons.md)
+
+Fitting one coefficient in the birth-rate law reproduced the physical birth count on all three seeds and left the total time effectively tied. Physical nucleation took only 0.141 seconds of the original forecast. Survival after birth poses a different question. For that test we followed newborn particles through growth and scavenging and counted how many reached 5 and 10 nm. [Newborn growth and survival](formation.md)
+
+### Why was the condensation speedup smaller?
+
+Vapor transfer accounted for 87.4% of the physical forecast time, but evaluating its coefficient occupied only 36% of a vapor half step. With the coefficient known, the solver still had to balance the gas reservoir and update every exchanging particle. We tested whether combining those physical operations on the GPU could save time and whether correcting the finite time step could improve accuracy.
 
 Combining the physical vapor calculations into two GPU passes cut the ten-second forecast to 5.17 seconds, a 1.62× speedup. The faster calculation reproduced the original coarse step, including its 1.23% phase-mass discrepancy from finer integration. Reaching the 0.1% target required improving the step itself.
 
 At about 15.2 seconds per forecast, both a fixed correction and a learned correction brought the phase discrepancy below the target. The two comparisons ranked the corrections differently. Against 16 physical substeps across three seeds, the worst discrepancy was smaller for the fixed correction (0.0551% versus 0.0705%). Against 64 substeps on one seed, it was smaller for the learned correction (0.0325% versus 0.0525%). A test on an unfamiliar mixture and pulse history would show whether the learned correction offers a repeatable advantage. [Condensation formulas and time-step checks](condensation-options.md)
+
+## Which details of an aerosol are worth carrying into a forecast?
+
+<span id="what-does-the-network-see-and-what-does-physics-still-do"></span>
+
+An inexpensive forecast must still distinguish particles that will respond differently to the next vapor pulse. Zaveri and colleagues illustrated the issue in an aging urban plume. Particles of the same dry diameter carried different mixtures and activated as cloud droplets at different supersaturations. A size bin can preserve the total mass of each species while losing which materials share a particle. [Zaveri et al., particle-resolved urban plume](https://doi.org/10.1029/2009JD013616)
+
+We tested this distinction with two synthetic aerosols that had identical dry size spectra and bulk composition. One distributed its water-attracting material evenly within each size class. The other concentrated that material on a subset of particles. A learned *embedding* summarized each particle and combined the summaries using particle counts as weights. With eight coordinates, it retained the difference in water uptake through 47.5 ms on the held-out test families and 50 ms on the challenge families. Dry size alone gave no qualifying lead. A physical reconstruction that retained composition within each size class recovered the difference through the final observation at 80 ms. [Matched mixtures and water-uptake forecasts](representation.md)
+
+These experiments connect two approaches to learning aerosol dynamics. Wang and colleagues learned how a size distribution evolves under Brownian coagulation using a model symmetric in the two collision partners. Harder and colleagues learned one-step changes to a seven-mode aerosol population and tested species mass balance. Our collision benchmark asks whether a learned interaction can accelerate a coupled forecast. The paired vapor pulse asks whether a compact population record still contains the information needed for that forecast. [Wang et al., learning coagulation](https://doi.org/10.1029/2022MS003252) · [Harder et al., physics-informed aerosol microphysics](https://doi.org/10.1017/eds.2022.22)
 
 ## Which neural experiment should come next?
 
@@ -75,8 +88,8 @@ A chamber-model ensemble needs many forecasts at different humidities, mixtures 
 
 | Candidate and intended use | Matched comparison | What would justify using the network? |
 |---|---|---|
-| Correct vapor transfer over one interval in repeated humidity or organic-vapor pulses | Freeze the trained correction. Hold out temperatures, vapor accommodation coefficients and pulse schedules. Compare with the fixed correction and a time-refined physical solve on the same initial particles. | Smaller worst gas- or particle-phase error at equal runtime, or a faster whole forecast at the same accuracy, across the held-out conditions. |
 | Estimate a charge-dependent encounter rate in a population gaining and losing ions | Keep the candidate pairs, ion clock and random draws paired. Change only the physical or learned rate. Repeat on fresh seeds and reserve charge distributions outside training. | Recover merger counts and the size and charge distributions of survivors. A faster rate must also lower total forecast time after sampling and vapor transfer. |
+| Correct vapor transfer over one interval in repeated humidity or organic-vapor pulses | Freeze the trained correction. Hold out temperatures, vapor accommodation coefficients and pulse schedules. Compare with the fixed correction and a time-refined physical solve on the same initial particles. | Smaller worst gas- or particle-phase error at equal runtime, or a faster whole forecast at the same accuracy, across the held-out conditions. |
 | Predict how many newly formed particles survive to 5 and 10 nm | Keep precursor debit and growth physics explicit. Compare a learned survival estimate with tracked newborn cohorts at unseen background concentrations and ion supplies. | At each diameter, bound the error in arrivals per 1,000 births across seeds and compare it with the uncertainty from refining the physical reference. This tests particles born during the forecast, including those lost before detection. |
 
 <span id="what-counts-as-an-accurate-forecast"></span>
@@ -93,11 +106,11 @@ An experimental test would ask a different question. Laboratory measurements on 
 <span id="what-does-each-process-cost"></span>
 
 - [Coagulation across kernels](coagulation.md#which-parts-transfer-to-another-collision-kernel) compares Brownian, charged Brownian, settling, shear and combined rates against each kernel’s full native timing and forecast.
-- [Particle representation](representation.md) compares matched mixtures after the same pulse.
+- [GPU scaling](scaling.md) varies particle count, number of vapors and number of weighted representatives.
 - [Process timings and errors](process-comparisons.md) compares one neural substitution at a time and calculates how much whole-forecast time each could save.
 - [Condensation](condensation-options.md) separates the transfer formula, gas balance and time-step error.
 - [Process clocks](process-clocks.md) tests when to update vapor, collisions and charge, and when to insert a full physical step.
-- [GPU scaling](scaling.md) varies particle count, number of vapors and number of weighted representatives.
 - [New particle formation](formation.md) follows each newborn cohort through growth and loss.
+- [Particle representation](representation.md) compares matched mixtures after the same pulse.
 
 [Recreate the simulations and figures](../../../../studies/weighted-particle-embedding/README.md) · [Download the quantitative figure data, plotting code and source checksums (ZIP)](../../../../website/public/study-data/weighted-particle-embedding/figure-data.zip)
