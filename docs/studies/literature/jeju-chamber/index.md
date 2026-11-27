@@ -1,4 +1,4 @@
-# Reconstructing particle growth in the Jeju cloud chamber
+# Reconstructing particle growth in the Jeju Island cloud chamber
 
 ![Jeju Island Chamber. A tube samples a cloud inside K-CPEC. The measured and simulated run-1 spectra share a peak, with fewer simulated particles on its smaller-diameter side.](../../../images/jeju-chamber/toc.svg)
 
