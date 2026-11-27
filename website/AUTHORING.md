@@ -146,10 +146,16 @@ result refresh when appropriate. The recorded library revision remains visible.
 
 ## Build without running simulations
 
+From the repository root, follow the [local setup](https://github.com/uncscode/particula/blob/main/website/README.md#run-locally)
+to install the Python and Node dependencies, then build and serve the site.
+
 ```bash
 npm --prefix website run build
-npm --prefix website run preview
+npm --prefix website run preview -- --port 4321
 ```
+
+Open the printed address under `/particula/` and keep the terminal open
+during review. Press Ctrl+C to stop the preview.
 
 Pages are generated from current prose/code and saved result bundles. Code is
 expandable; figures remain visible. Older results are labeled and grouped
