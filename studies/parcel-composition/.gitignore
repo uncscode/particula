@@ -1,0 +1,9 @@
+# Local simulation products. The portable examples and plot data are published.
+*.csv
+*.csv.gz
+*.npz
+!boreal/redraw-cloud-16.npz
+!boreal/redraw-burst-16.npz
+!boreal/redraw-failure-matrix.csv
+# Frozen calibration input for encoding the targeted coating rows.
+!boreal/coating-targets.csv

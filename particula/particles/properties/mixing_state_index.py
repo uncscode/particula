@@ -1,11 +1,9 @@
-"""Compute the aerosol mixing state index χ from an NxS matrix of per-particle
-species masses.
-"""
+"""Dry aerosol mixing-state index from particle-by-species masses."""
 
 import numpy as np
 from numpy.typing import NDArray
+from scipy.special import entr
 
-from particula.util.machine_limit import get_safe_exp, get_safe_log10
 from particula.util.validate_inputs import validate_inputs
 
 
@@ -13,96 +11,57 @@ from particula.util.validate_inputs import validate_inputs
 def get_mixing_state_index(
     species_masses: NDArray[np.float64],
 ) -> float:
-    """Calculate the aerosol mixing-state index (χ).
+    """Calculate the mass-weighted Riemer–West mixing-state index χ.
 
-    The index quantifies how internally or externally mixed an aerosol
-    population is. Fully internally mixed aerosols
-    have χ = 1, while fully externally mixed aerosols have χ = 0. The mixing
-    state index is a measure of the heterogeneity of the aerosol population,
-    and is defined as the ratio of the mass-weighted mean diversity of the
-    aerosol population to the bulk diversity of the aerosol population.
-    It is defined as:
-
-    - χ = (D̄ᵅ - 1) / (Dᵞ - 1)
-        - D̄ᵅ = Σₙ (Mₙ · Dₙ) / Σₙ Mₙ
-        - Dᵞ  = exp(−Σₛ Fₛ log Fₛ)
-        - Dₙ  = exp(−Σₛ fₙₛ log fₙₛ)
-        - fₙₛ = Mₙₛ / Mₙ
-        - Fₛ  = Mₛ  / Σₛ Mₛ
-        - D̄ᵅ is the mass-weighted mean diversity of the aerosol population
-        - Dᵞ is the bulk diversity of the aerosol population
-        - Dₙ is the diversity of particle n
-        - fₙₛ is the mass fraction of species s in particle n
-        - Fₛ is the mass fraction of species s in the aerosol population
-        - Mₙₛ is mass of species s in particle n
-        - Mₙ is total mass of particle n (Σₛ Mₙₛ)
-        - Mₛ is total mass of species s (Σₙ Mₙₛ)
+    For each particle, let H_i be the Shannon entropy of its species mass
+    fractions, using natural logarithms and the convention 0 ln 0 = 0.
+    H_alpha is the particle-mass-weighted mean of H_i. H_gamma is the
+    entropy of bulk species mass fractions. The index is
+    expm1(H_alpha) / expm1(H_gamma).
 
     Args:
-        species_masses: Per-particle species masses (NxS matrix).
-            [kg] where N is the number of particles and S the number of species.
+        species_masses: Nonnegative dry species masses [kg], shape
+            (particles, species). Rows represent individual particles.
+            For representative particles, multiply each row by its
+            represented count before calling. Zero-mass rows are ignored.
 
     Returns:
-        mixing_state_index: Mixing-state index χ (float, 0 ≤ χ ≤ 1).
-            Returns NaN when the aerosol has no mass.
+        Dimensionless χ in [0, 1]. Pure particles of different species
+        give zero. Identical multispecies compositions give one. Returns
+        NaN if fewer than two species carry mass, including an empty
+        population, because the bulk diversity then gives no contrast.
 
     Examples:
-        ``` py title="Mixing State Index Calculation"
+        Two equal-mass particles with opposite 90/10 compositions:
+
+        ```py
         import numpy as np
         import particula as par
 
-        # two particles, two species
-        masses = np.array([[1.0e-15, 0.0],
-                           [5.0e-16, 5.0e-16]])
-        chi = par.particles.get_mixing_state_index(masses)
-        print(chi)  # 0.5
+        masses = 1e-18 * np.array([[9., 1.], [1., 9.]])
+        chi = par.particles.get_mixing_state_index(masses)  # 0.38414549
         ```
 
     References:
-    - Riemer, N., West, M., Zaveri, R. A., & Easter, R. C. (2009).
-      Simulating the evolution of soot mixing state with a particle-resolved
-      aerosol model. Journal of Geophysical Research Atmospheres, 114(9).
-      [DOI](https://doi.org/10.1029/2008JD011073)
-    - Riemer, N., Ault, A. P., West, M., Craig, R. L., & Curtis, J. H.
-      (2019). Aerosol Mixing State: Measurements, Modeling, and Impacts.
-      Reviews of Geophysics, 57(2), 187–249.
-      [DOI](https://doi.org/10.1029/2018RG000615)
+        Riemer and West (2013), Quantifying aerosol mixing state with
+        entropy and diversity measures. https://doi.org/10.5194/acp-13-11423-2013
     """
-    species_masses_array = np.asarray(species_masses, dtype=float)
-
-    # only keep particles with non‑zero total mass
-    species_masses_array = species_masses_array[
-        species_masses_array.sum(axis=1) > 0
-    ]
-    if species_masses_array.size == 0:
+    masses = np.asarray(species_masses, dtype=np.float64)
+    if masses.ndim != 2:
+        raise ValueError("species_masses must be a particle-by-species matrix")
+    scale = masses.max(initial=0.0)
+    if scale == 0:
+        return np.nan
+    masses = masses / scale
+    species_totals = masses.sum(axis=0)
+    if np.count_nonzero(species_totals) < 2:
         return np.nan
 
-    # total mass of each particle
-    mass_per_particle = species_masses_array.sum(axis=1)
-
-    # per‑particle mass fractions
-    mass_fraction = species_masses_array / (mass_per_particle[:, None])
-
-    # per‑particle diversity
-    per_particle_diversity = get_safe_exp(
-        -(mass_fraction * get_safe_log10(mass_fraction)).sum(axis=1)
-    )
-
-    # total aerosol mass
-    total_mass = mass_per_particle.sum()
-    if total_mass <= 0:
-        return np.nan
-
-    # mass‑weighted mean diversity (D̄ᵅ)
-    mass_weighted_diversity = (
-        np.sum(mass_per_particle * per_particle_diversity) / total_mass
-    )
-
-    # bulk diversity (Dᵞ)
-    total_species_mass = species_masses_array.sum(axis=0)
-    bulk_mass_fraction = total_species_mass / (total_mass)
-    bulk_diversity = get_safe_exp(
-        -(bulk_mass_fraction * get_safe_log10(bulk_mass_fraction)).sum()
-    )
-
-    return (mass_weighted_diversity - 1.0) / (bulk_diversity - 1.0)
+    row_mass = masses.sum(axis=1)
+    active = row_mass > 0
+    particle_fractions = masses[active] / row_mass[active, None]
+    particle_entropy = entr(particle_fractions).sum(axis=1)
+    mean_entropy = np.average(particle_entropy, weights=row_mass[active])
+    bulk_entropy = entr(species_totals / species_totals.sum()).sum()
+    # Concavity bounds the ratio by one; sums can differ by roundoff.
+    return float(min(1.0, np.expm1(mean_entropy) / np.expm1(bulk_entropy)))

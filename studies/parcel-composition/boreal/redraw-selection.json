@@ -1,0 +1,21 @@
+{
+  "recipe": [
+    10,
+    32,
+    1
+  ],
+  "qualified_on_training": false,
+  "threshold": 0.9,
+  "training_seeds": [
+    7187,
+    7309,
+    7451,
+    7583
+  ],
+  "held_out_seeds": [
+    8329,
+    8467,
+    8599,
+    8719
+  ]
+}

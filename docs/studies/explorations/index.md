@@ -4,4 +4,5 @@ Exploratory studies test a modeling idea against a reference calculation. Each s
 
 <!-- STUDY_LIST_START -->
 - [A hybrid neural forecast for one million aerosol particles](weighted-particle-embedding/index.md)
+- [Regenerating a particle-resolved aerosol from a compact checkpoint](parcel-composition/index.md)
 <!-- STUDY_LIST_END -->
