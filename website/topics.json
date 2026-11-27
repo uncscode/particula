@@ -6520,6 +6520,82 @@
       "start_here": false
     },
     {
+      "source": "docs/studies/literature/reach-droplets/index.md",
+      "title": "The REACh hologram measured four times the predicted concentration of large droplets during a fan-off burst",
+      "topic": "chambers",
+      "also": [
+        "size",
+        "condensation",
+        "transport"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "reach-droplets",
+        "runs": [
+          "reach-droplet-burst"
+        ],
+        "companions": [
+          "docs/studies/literature/reach-droplets/mechanisms.md",
+          "docs/studies/literature/reach-droplets/camera.md",
+          "docs/studies/literature/reach-droplets/methods.md",
+          "docs/studies/literature/reach-droplets/data.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/processes/condensation.md",
+            "label": "Vapor-driven droplet growth"
+          },
+          {
+            "target": "docs/theory/dynamics/prescribed-transport.md",
+            "label": "Transport between chamber volumes"
+          }
+        ]
+      },
+      "tocFigure": "reach-droplets/toc.svg",
+      "tocSource": "studies/reach-droplets/toc.py"
+    },
+    {
+      "source": "docs/studies/literature/reach-droplets/mechanisms.md",
+      "title": "A burst of simulated mergers matches the fan-off peak but misses its rise",
+      "topic": "chambers",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/reach-droplets/camera.md",
+      "title": "Where a second camera could detect the arrival of large droplets",
+      "topic": "chambers",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/reach-droplets/methods.md",
+      "title": "What the camera observes and how the droplets evolve",
+      "topic": "chambers",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/reach-droplets/data.md",
+      "title": "Droplet measurements, figure values and replay",
+      "topic": "chambers",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/reach-droplets/burst.py",
+      "title": "Recover the half-second large-droplet shortfall",
+      "topic": "chambers",
+      "also": ["size"],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
       "source": "docs/studies/literature/jeju-chamber/index.md",
       "title": "Reconstructing particle growth in the Jeju Island cloud chamber",
       "topic": "chambers",
