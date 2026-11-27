@@ -250,18 +250,14 @@ def plot_snapshots(initial, warm, final):
     edges = np.geomspace(5e-9, 2e-6, 55)
 
     def histogram(state):
-        p = state.particles
-        radius = np.cbrt(
-            np.sum(p.masses / p.density, axis=-1) * 3 / (4 * np.pi)
+        from particula.particles import (
+            get_number_per_decade,
+            get_particle_number_spectrum,
         )
-        return np.array(
-            [
-                np.histogram(r, bins=edges, weights=c / v)[0]
-                for r, c, v in zip(
-                    radius, p.concentration, p.volume, strict=True
-                )
-            ]
-        ) / np.diff(np.log10(edges))
+
+        diameter_edges = 2 * edges
+        bins = get_particle_number_spectrum(state.particles, diameter_edges)
+        return get_number_per_decade(bins.bin_number_density, diameter_edges)
 
     with mplstyle.context("particula.default"):
         fig, axes = plotting.subplots(1, 2, size="wide")

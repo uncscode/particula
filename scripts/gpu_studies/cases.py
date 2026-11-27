@@ -30,7 +30,7 @@ from particula.gas.vapor_pressure_strategies import (
     ConstantVaporPressureStrategy,
     WaterBuckStrategy,
 )
-from particula.particles import ParticleData
+from particula.particles import ParticleData, get_particle_number_spectrum
 from particula.particles.activity_strategies import ActivityIdealMolar
 from particula.particles.surface_strategies import SurfaceStrategyVolume
 from particula.util.constants import AVOGADRO_NUMBER, GAS_CONSTANT
@@ -251,10 +251,7 @@ def particle_inventory(aerosol):
 def radius_histogram(aerosol, edges=None):
     """Number concentration in logarithmic radius bins, resolved by box."""
     edges = np.geomspace(0.2e-9, 2e-6, 65) if edges is None else edges
-    p = aerosol.particles
-    radius = np.cbrt(np.sum(p.masses / p.density, axis=-1) * 3 / (4 * np.pi))
-    rows = [
-        np.histogram(r, bins=edges, weights=c / v)[0]
-        for r, c, v in zip(radius, p.concentration, p.volume, strict=True)
-    ]
-    return edges, np.asarray(rows)
+    rows = get_particle_number_spectrum(
+        aerosol.particles, 2 * edges
+    ).bin_number_density
+    return edges, rows

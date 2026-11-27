@@ -4,6 +4,7 @@ import numpy as np
 from matplotlib import style as mplstyle
 from matplotlib.colors import LogNorm
 from particula import plotting
+from particula.particles import get_number_per_decade
 
 
 @mplstyle.context("particula.default")
@@ -16,8 +17,7 @@ def history_figures(report, title, *, forcing):
     mass = np.array([f["particle_mass_kg"] for f in frames])
     histograms = np.array([f["histogram_number_m3"] for f in frames])
     edges = np.array(frames[0]["radius_edges_m"])
-    widths = np.diff(np.log10(edges))
-    distribution = histograms / widths
+    distribution = get_number_per_decade(histograms, 2 * edges)
     boxes = temperature.shape[1]
     selected = sorted({0, boxes // 2, boxes - 1})
     fig, axes = plotting.subplots(2, 2, size="wide")
@@ -107,11 +107,10 @@ def stochastic_figures(report, initial_histogram, title):
     axes[0].set(xlabel="Time (s)", ylabel="Number concentration / initial")
     plotting.legend(axes[0])
     box = selected[1]
-    width = np.diff(np.log10(edges))
-    distribution = histogram[:, box] / width
+    distribution = get_number_per_decade(histogram[:, box], 2 * edges)
     low, high = np.percentile(distribution, [5, 95], axis=0)
     axes[1].stairs(
-        initial_histogram[box] / width,
+        get_number_per_decade(initial_histogram[box], 2 * edges),
         edges * 1e9,
         linestyle="--",
         label="Initial",
@@ -143,16 +142,17 @@ def stochastic_figures(report, initial_histogram, title):
 def lifecycle_figures(report, initial_histogram, title):
     """Show population changes and the independently checked process ledger."""
     edges = np.array(report["radius_edges_m"])
-    width = np.diff(np.log10(edges))
     fig, axes = plotting.subplots(1, 2, size="wide")
     axes[0].stairs(
-        initial_histogram.mean(axis=0) / width,
+        get_number_per_decade(initial_histogram.mean(axis=0), 2 * edges),
         edges * 1e9,
         linestyle="--",
         label="Initial",
     )
     axes[0].stairs(
-        np.array(report["mean_final_histogram_number_m3"]) / width,
+        get_number_per_decade(
+            np.array(report["mean_final_histogram_number_m3"]), 2 * edges
+        ),
         edges * 1e9,
         label="Final",
     )

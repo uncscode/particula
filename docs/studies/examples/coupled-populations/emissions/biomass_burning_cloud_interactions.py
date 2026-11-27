@@ -453,8 +453,8 @@ for name, collision in [
 # ## Convert counts into a comparable diameter spectrum
 #
 # Exclude empty slots, double radius to obtain wet diameter, and bin particles
-# between 0.01 and 100 µm. Divide counts by sample volume in cm³ and convert the
-# bin totals into dN/dlogDp. This coordinate differs from the initial count
+# between 0.01 and 100 µm. The spectrum uses the represented count per m³
+# and each bin’s measured log width. Convert the result to cm⁻³ per decade. This coordinate differs from the initial count
 # histogram and the radius-bin contour, so compare integrated number with the
 # appropriate measure rather than comparing raw vertical magnitudes.
 #
@@ -474,30 +474,21 @@ def get_wet_diameters(aero_obj):
     return diameters_um
 
 
-def compute_dndlogdp(diameters, volume_m3):
-    """Convert diameter samples into dN/dlogDp (#/cm³)."""
-    counts, _ = np.histogram(diameters, bins=BIN_EDGES)
-    m3_to_cm3 = par.util.get_unit_conversion("m^3", "cm^3")
-    dn_number = counts / (volume_m3 * m3_to_cm3)
-    centers = (BIN_EDGES[:-1] + BIN_EDGES[1:]) / 2
-    strategy = par.particles.get_distribution_conversion_strategy(
-        "dN/dlogDp", "pmf"
-    )
-    dndlogdp = strategy.convert(centers, dn_number, inverse=True)
-    return centers, dndlogdp
-
-
-# Compute distributions for all cases
+# Use the native represented counts and each scenario's sampling volume.
+diameter_edges = BIN_EDGES * 1e-6
+centers = (BIN_EDGES[:-1] + BIN_EDGES[1:]) / 2
 distributions = {}
 cases = [("Initial", aerosol), ("Start", aerosol_activated)] + list(
     results.items()
 )
-
 for label, aero_obj in cases:
-    diameters = get_wet_diameters(aero_obj)
-    volume = aero_obj.particles.volume[0]
-    centers, dnd = compute_dndlogdp(diameters, volume)
-    distributions[label] = (centers, dnd)
+    spectrum = par.particles.get_particle_number_spectrum(
+        aero_obj.particles, diameter_edges
+    )
+    density = par.particles.get_number_per_decade(
+        spectrum.bin_number_density[0], diameter_edges
+    )
+    distributions[label] = (centers, density * 1e-6)
 
 # %% [markdown]
 # ## Read the scenario overlay as a controlled model comparison
