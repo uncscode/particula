@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3in" height="3in" viewBox="0 0 300 300" role="img" aria-labelledby="title desc">
+  <title id="title">Jeju chamber measurements and the shared six-run fit</title>
+  <desc id="desc">In the unsalted ambient run, both record-mean spectra peak in the 14.9 micrometre bin. In the sulfate and dust run, the optical counter measures 388 particles per cubic centimetre in the 5–10 micrometre band and the shared fit gives 141. Bars start at zero. Each pair has its own unit and scale. The chamber sketch is schematic.</desc>
+  <rect width="300" height="300" fill="#FBF2E3"/>
+  <g fill="none" stroke="#243E43" stroke-linejoin="round" stroke-width="1.7">
+    <path d="M22 18 Q22 13 28 13 H55 Q61 13 61 18 V41 Q61 46 55 46 H28 Q22 46 22 41Z" fill="#CAD9D2"/>
+    <rect x="27" y="17" width="29" height="24" rx="4" fill="#FBF2E3"/>
+    <path d="M40 37V51H66" stroke="#135963"/>
+    <g fill="#617679" stroke="none"><circle cx="33" cy="24" r="1.8"/><circle cx="47" cy="22" r="2"/><circle cx="49" cy="33" r="2.4"/><circle cx="37" cy="30" r="2.3"/></g>
+  </g>
+  <g font-family="DejaVu Sans, sans-serif" fill="#243E43">
+    <text x="73" y="29" font-size="17" font-weight="bold">Jeju cloud chamber</text>
+    <text x="73" y="48" font-size="12.5">Record-mean spectra</text>
+    <g font-size="12.5">
+      <rect x="22" y="63" width="15" height="9" fill="#243E43"/><text x="43" y="72">Measured</text>
+      <rect x="143" y="63" width="15" height="9" fill="#FBF2E3" stroke="#135963" stroke-width="1.8"/><text x="164" y="72">Shared fit</text>
+    </g>
+    <path d="M21 83H279 M21 182H279" stroke="#BBC6BE" stroke-width="1.1"/>
+    <text x="22" y="106" font-size="17" font-weight="bold">Unsalted ambient air</text>
+    <text x="22" y="123" font-size="12.5">Diameter at the peak (µm)</text>
+    <rect x="23" y="134" width="180" height="10" fill="#243E43"/>
+    <rect x="23" y="154" width="180" height="10" fill="none" stroke="#135963" stroke-width="1.8"/>
+    <g font-size="14.5" font-weight="bold"><text x="213" y="145">14.9</text><text x="213" y="165" fill="#135963">14.9</text></g>
+    <text x="22" y="206" font-size="17" font-weight="bold">Sulfate and dust</text>
+    <text x="22" y="224" font-size="12.5">5–10 µm particles per cm³</text>
+    <rect x="23" y="235" width="180" height="10" fill="#243E43"/>
+    <rect x="23" y="255" width="65.41" height="10" fill="none" stroke="#135963" stroke-width="1.8"/>
+    <g font-size="14.5" font-weight="bold"><text x="213" y="246">388</text><text x="98" y="266" fill="#135963">141</text></g>
+  </g>
+  <g transform="translate(262,271)"><svg width="22.5" height="17.1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48.93 37.11" fill="#115f5a">
+  <circle cx="4.59" cy="4.59" r="4.59"/>
+  <circle cx="18.34" cy="4.59" r="4.59"/>
+  <circle cx="4.59" cy="18.34" r="4.59"/>
+  <circle cx="31.56" cy="32.53" r="4.59"/>
+  <circle cx="44.28" cy="18.78" r="4.59"/>
+  <circle cx="44.28" cy="5.02" r="4.59"/>
+  <circle cx="4.59" cy="32.09" r="4.59"/>
+</svg></g>
+</svg>

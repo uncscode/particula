@@ -6425,7 +6425,7 @@
     },
     {
       "source": "docs/studies/literature/jeju-chamber/index.md",
-      "title": "Reconstructing particle size distributions in six Jeju cloud chamber experiments",
+      "title": "The Jeju chamber model matches the unsalted droplet peak and undercounts 5–10 µm particles in the dust run",
       "topic": "chambers",
       "also": [
         "size",
@@ -6452,7 +6452,9 @@
             "label": "Transport between chamber cells"
           }
         ]
-      }
+      },
+      "tocFigure": "jeju-chamber/toc.svg",
+      "tocSource": "docs/studies/literature/jeju-chamber/toc.svg.in"
     },
     {
       "source": "docs/studies/literature/jeju-chamber/methods.md",

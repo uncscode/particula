@@ -90,8 +90,8 @@ A cloud activation fit predicts 49% more water than BAT at 95% humidity for one 
 
 <div class="study-figures">
 
-[![Mean measured and simulated size distributions in six Jeju expansions. The pooled fit recovers the peak size in the unsalted run and underestimates 5–10 µm particles in the sulfate and dust run.](../../images/jeju-chamber/mean-distributions.png)\
-Reconstructing particle size distributions in six Jeju cloud chamber experiments](jeju-chamber/index.md)
+[![Measured and shared-fit peaks both lie at 14.9 µm in unsalted air. The dusty run has 388 measured versus 141 modeled particles per cm³ at 5–10 µm.](../../images/jeju-chamber/toc.svg)\
+The Jeju chamber model matches the unsalted droplet peak and undercounts 5–10 µm particles in the dust run](jeju-chamber/index.md)
 
 [![Fresh dust inflow produces more primary freezing than a closed top in the reference eddy and less in two rapidly exchanging Arctic cloud profiles.](../../images/lund-freezing/cloud-toc.svg)\
 Fresh aerosol can form ice while entrainment reduces freezing across the cloud](lund-freezing/index.md)
@@ -172,7 +172,7 @@ Adding settling and diffusion lowers predicted one-hour survival of 1 µm partic
 
 **Cloud droplets and precipitation**
 
-- [Reconstructing particle size distributions in six Jeju cloud chamber experiments](jeju-chamber/index.md)
+- [The Jeju chamber model matches the unsalted droplet peak and undercounts 5–10 µm particles in the dust run](jeju-chamber/index.md)
 - [Fresh aerosol can form ice while entrainment reduces freezing across the cloud](lund-freezing/index.md)
 - [One droplet, two reported sizes: Simulating the Pallas cloud probes](pallas-cloud-probes/index.md)
 - [Π Chamber cloud counts rose over salt water, but separate haze fits predicted a decline](pi-chamber/haze-and-cloud/index.md)
