@@ -6612,6 +6612,104 @@
       ],
       "role": "Studies",
       "start_here": false
+    },
+    {
+      "source": "docs/studies/explorations/weighted-particle-embedding/index.md",
+      "title": "A hybrid neural forecast for one million aerosol particles",
+      "topic": "representations",
+      "also": [
+        "gpu",
+        "condensation-adaptive",
+        "brownian-resolved"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "weighted-particle-embedding",
+        "runs": [],
+        "companions": [
+          "docs/studies/explorations/weighted-particle-embedding/coagulation.md",
+          "docs/studies/explorations/weighted-particle-embedding/process-comparisons.md",
+          "docs/studies/explorations/weighted-particle-embedding/representation.md",
+          "docs/studies/explorations/weighted-particle-embedding/process-clocks.md",
+          "docs/studies/explorations/weighted-particle-embedding/condensation-options.md",
+          "docs/studies/explorations/weighted-particle-embedding/scaling.md",
+          "docs/studies/explorations/weighted-particle-embedding/formation.md"
+        ],
+        "relations": []
+      },
+      "tocFigure": "studies/weighted-particle-embedding/forecast-toc.svg",
+      "tocSource": "studies/weighted-particle-embedding/forecast_toc.py"
+    },
+    {
+      "source": "docs/studies/explorations/weighted-particle-embedding/coagulation.md",
+      "title": "Which coagulation kernels benefit from sampling particle pairs?",
+      "topic": "brownian-resolved",
+      "also": [
+        "gpu"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/explorations/weighted-particle-embedding/process-comparisons.md",
+      "title": "Process timings and errors in coupled forecasts",
+      "topic": "gpu",
+      "also": [
+        "representations"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/explorations/weighted-particle-embedding/representation.md",
+      "title": "What particle information survives compression?",
+      "topic": "representations",
+      "also": [
+        "condensation"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/explorations/weighted-particle-embedding/process-clocks.md",
+      "title": "When can aerosol processes use different time steps?",
+      "topic": "condensation-adaptive",
+      "also": [
+        "charged"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/explorations/weighted-particle-embedding/condensation-options.md",
+      "title": "Which part of condensation is worth approximating?",
+      "topic": "condensation-adaptive",
+      "also": [
+        "gpu"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/explorations/weighted-particle-embedding/scaling.md",
+      "title": "How many particles and vapors fit in a forecast?",
+      "topic": "gpu",
+      "also": [
+        "representations"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/explorations/weighted-particle-embedding/formation.md",
+      "title": "From vapor to particles at 5 and 10 nm",
+      "topic": "nucleation",
+      "also": [
+        "charged"
+      ],
+      "role": "Studies",
+      "start_here": false
     }
   ],
   "supporting": [
@@ -6894,12 +6992,17 @@
     {
       "source": "docs/studies/literature/jeju-chamber/replay.md",
       "reason": "Run the Jeju chamber model and reconstruct its six-run spectral comparisons."
+    },
+    {
+      "source": "docs/studies/explorations/index.md",
+      "reason": "Browsing directory for exploratory aerosol modeling studies."
     }
   ],
   "study_group_exceptions": {
     "docs/studies/validation/condensation": "The sparse-activity benchmark compares chemistry construction, lookup and fallback costs across both parcel and box workflows. Its reference and timing matrix are shared across integrators.",
     "docs/studies/validation": "The validation collections distinguish prescribed-flow replay against external CFD from local process tests, optics and release qualification.",
     "docs/studies/literature#organic-chemistry-and-evaporation": "The seven studies share a chamber or evaporation comparison. Keeping the three related Manchester reports together preserves navigation alongside the four independent experiments.",
-    "docs/studies/literature#cloud-droplets-and-precipitation": "Keep the seven cloud-droplet studies together so readers comparing measured spectra can move between the Jeju expansions, steady Π Chamber cases and field-probe comparisons."
+    "docs/studies/literature#cloud-droplets-and-precipitation": "Keep the seven cloud-droplet studies together so readers comparing measured spectra can move between the Jeju expansions, steady Π Chamber cases and field-probe comparisons.",
+    "docs/studies": "Six study categories and a cross-category index of runnable Python scripts."
   }
 }

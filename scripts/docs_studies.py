@@ -13,6 +13,7 @@ CATEGORIES = {
     "examples": "Worked examples",
     "tutorials": "Tutorials",
     "literature": "Literature analyses",
+    "explorations": "Explorations",
     "validation": "Validation studies",
     "benchmarks": "Benchmarks",
 }

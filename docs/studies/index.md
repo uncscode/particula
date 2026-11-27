@@ -15,6 +15,7 @@ If you are starting with a measured population, begin with [the first CPU simula
 - [Worked examples](examples/index.md)
 - [Tutorials](tutorials/index.md)
 - [Literature analyses](literature/index.md)
+- [Explorations](explorations/index.md)
 - [Validation studies](validation/index.md)
 - [Benchmarks](benchmarks/index.md)
 <!-- STUDY_LIST_END -->

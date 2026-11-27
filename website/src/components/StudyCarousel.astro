@@ -13,9 +13,12 @@ interface Props {
   resources?: Resource[];
   featured?: string[];
   literatureLink?: boolean;
+  collection?: string;
 }
-const { label, resources = graph.resources, featured, literatureLink } = Astro.props;
-const illustrated = resources.filter((r) => r.tocFigure);
+const { label, resources = graph.resources, featured, literatureLink, collection } = Astro.props;
+const illustrated = resources.filter((r) =>
+  r.tocFigure && (!collection || r.source.startsWith(`docs/studies/${collection}/`))
+);
 const slides = featured
   ? featured.map((id) => {
       const entry = illustrated.find((r) => r.study?.id === id);

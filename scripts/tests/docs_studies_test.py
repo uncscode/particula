@@ -42,6 +42,7 @@ def test_shared_companion_multiscript_and_prose_only_studies(tmp_path):
     module.parent.mkdir(parents=True)
     module.touch()
     graph = {
+        "study_group_exceptions": {base: "Six categories and a script index."},
         "topics": [],
         "resources": [
             record(
