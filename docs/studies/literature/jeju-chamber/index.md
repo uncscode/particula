@@ -1,4 +1,4 @@
-# The Jeju chamber model matches the unsalted droplet peak and undercounts 5–10 µm particles in the dust run
+# Reconstructing particle growth in the Jeju cloud chamber
 
 ![Jeju Island Chamber. A tube samples a cloud inside K-CPEC. The measured and simulated run-1 spectra share a peak, with fewer simulated particles on its smaller-diameter side.](../../../images/jeju-chamber/toc.svg)
 
