@@ -3,6 +3,7 @@
 from pathlib import Path
 import os
 import numpy as np
+from particula.particles import get_binned_number_spectrum
 import pandas as pd
 from summarize import SEASONS
 
@@ -18,17 +19,22 @@ def main():
         if "_ranked_" not in p.name and "_dark_" not in p.name:
             continue
         with np.load(p) as a:
-            d = a["wet_radius_m"][:, -1].astype(float) * 2e6
-            n = a["number_m3"][:, -1].astype(float) * 1e-6
+            d = a["wet_radius_m"][:, -1].astype(float) * 2
+            n = a["number_m3"][:, -1].astype(float)
+            counts = (
+                get_binned_number_spectrum(
+                    d, n, edges * 1e-6
+                ).bin_number_density
+                * 1e-6
+            )
             for j, h in enumerate(a["hour_in_week"]):
-                hist = np.histogram(d[j], edges, weights=n[j])[0]
                 records.append(
                     dict(
                         month=a["month"][j],
                         hour=h,
                         profile=a["profile"][j],
                         w=a["w"][j],
-                        **dict(zip(cols, hist)),
+                        **dict(zip(cols, counts[j])),
                     )
                 )
     df = pd.DataFrame(records)
@@ -44,7 +50,7 @@ def main():
                 season=SEASONS.get(m, "dark"),
                 profile=p,
                 w=w,
-                **dict(zip(cols, hist)),
+                **dict(zip(cols, counts[j])),
             )
         )
     x = pd.DataFrame(month)

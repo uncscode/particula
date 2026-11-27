@@ -5,15 +5,16 @@
   "package_source_sha256": "1d2bf0708c00d6e34107e200c143eb76cae07571fd4e691f1ce7cb88cd95a134",
   "scientific_source_sha256": "1d2bf0708c00d6e34107e200c143eb76cae07571fd4e691f1ce7cb88cd95a134",
   "input_sha256": {
-    "scripts/docs_gpu_figures.py": "3aeac1a9de599df908d6951e21c60b1d331bdd4f977125af5fcc6ed5d85925fb",
+    "scripts/docs_gpu_figures.py": "cd9a78452b81e74f31e2fa47d574fce1af75ccb8e777dc5f8a9b3a3966f8af68",
     "scripts/gpu_studies/__init__.py": "530c51f7c7f432a895623c9ba4548b7cf3e053a1a0f328a36ae8ae9e50cec9c4",
-    "scripts/gpu_studies/cases.py": "8728bdc1bb583d849d7228055c5bbc27606c021e1564f2d531b8c9a9e93787ec",
+    "scripts/gpu_studies/cases.py": "bb3a604a2964ce8fe7cde643517754ba7f340f262f90f270eadacfefb4e22cd9",
     "scripts/gpu_studies/validation.py": "816f83d10024feef14daa05112688ea7d26faa3ddde8e05ba12e8dc29f6a4a45",
-    "scripts/gpu_studies/trajectories.py": "41d64b0ef3351bb41c12cd3314b02b7ea7c87d8e225d7b9b6508663f6eca84af"
+    "scripts/gpu_studies/trajectories.py": "41d64b0ef3351bb41c12cd3314b02b7ea7c87d8e225d7b9b6508663f6eca84af",
+    "particula/particles/properties/number_spectrum.py": "9be9dd1fbc1eb354a44b71dbddcc3687bb179a2cb798ec7a73772394f315100b"
   },
   "example": "gpu-prepared-stochastic",
-  "fingerprint": "2118626d7ec0287503df4a4293ae391b760d8eb41c35a5f75ac131cfdafb7947",
-  "source": "docs/examples/gpu/prepared/gpu_prepared_stochastic.py",
+  "fingerprint": "931abf648b5299a1c4abc7f374a97fa12a81d0ad6c3357dd64bf4f35e6b07dcf",
+  "source": "docs/studies/examples/coupled-populations/charged-aerosols/gpu_prepared_stochastic.py",
   "revision": "da142e3dfcf190010d21f1ac07aca1a12e4c9fd0",
   "package_dirty": false,
   "executed_at": "2026-11-19T15:06:32.762439+00:00",
@@ -42,10 +43,10 @@
     ]
   ],
   "files": {
-    "figure-3-1.png": "a36ca4277472194344eb1ecd5155cc18d46e9d1873a28f223cd6434742f695b6",
-    "executed_source.py": "82a2d88a9b90bcc67e83113caf2cc0e099a496cf840fc8883da8e59481c2147b",
+    "source.py": "b46d154a4277d35b5a48fe17105e6e580c4d5803469242868127df8423dca814",
     "data.json": "54bfec9b176c86f848c7d490a50f7e2055b1c94ab56fb2a7a9aea4a716b2a0da",
-    "source.py": "64d61830827181140f6e4a3806de23839d9e24ad0e81c425de48fe1480cf5636"
+    "executed_source.py": "82a2d88a9b90bcc67e83113caf2cc0e099a496cf840fc8883da8e59481c2147b",
+    "figure-3-1.png": "a36ca4277472194344eb1ecd5155cc18d46e9d1873a28f223cd6434742f695b6"
   },
   "simulation_fingerprint": "5f01c42d6559eafa947fe26035c4f6683fcbae73f93761795a5f77631f4fc009",
   "historical_run": {
@@ -55,7 +56,7 @@
     "package_source_sha256": "1d2bf0708c00d6e34107e200c143eb76cae07571fd4e691f1ce7cb88cd95a134"
   },
   "render_versions": {
-    "particula": "0.3.2",
+    "particula": "0.3.6",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -72,7 +73,7 @@
     "scripts/gpu_studies/validation.py": "816f83d10024feef14daa05112688ea7d26faa3ddde8e05ba12e8dc29f6a4a45",
     "scripts/gpu_studies/trajectories.py": "41d64b0ef3351bb41c12cd3314b02b7ea7c87d8e225d7b9b6508663f6eca84af"
   },
-  "rendered_at": "2026-11-19T19:37:27.271227+00:00",
-  "render_revision": "f5be504b2ecb3d768eb5a41a2be1be19b0d2d96d",
-  "render_elapsed_seconds": 3.6000824630027637
+  "rendered_at": "2026-11-27T23:07:12.789264+00:00",
+  "render_revision": "ecc1d88a5c626ed7c761bdc3e296f99a00d14226",
+  "render_elapsed_seconds": 4.808248444925994
 }

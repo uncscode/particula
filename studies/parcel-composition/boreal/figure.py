@@ -5,6 +5,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from particula.particles import get_binned_number_spectrum
 import pandas as pd
 from campaign import read
 from checkpoint import decode, encode
@@ -34,10 +35,11 @@ def draw(base, out, figpath):
             active = (dry + b.water > 1000**3) & (
                 b.water > 1.05 * 49 * (b.dry @ KAPPA)
             )
-            counts.append(
-                np.histogram(np.cbrt(dry[active]), bins=edges)[0]
-                / h["forcing"]["volume"]
-            )
+            diameter = np.cbrt(dry[active]) * 1e-9
+            weight = np.full(diameter.shape, 1e6 / h["forcing"]["volume"])
+            counts.append(get_binned_number_spectrum(
+                diameter, weight, edges * 1e-9
+            ).bin_number_density * 1e-6)
         end = s + h["dt"]
         time.append(end / 3600)
         history.append(

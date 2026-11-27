@@ -2,12 +2,21 @@
 import sys
 from pathlib import Path
 import numpy as np
+from particula.particles import get_rebinned_number_spectrum
 import pandas as pd
 from scipy.special import ndtr
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT.parent))
-from study import ROOT as RUN_DIR, inputs, edges, channels, weights, window, COUNT
+from study import (
+    ROOT as RUN_DIR,
+    inputs,
+    edges,
+    channels,
+    interval_number,
+    window,
+    COUNT,
+)
 
 
 def measurements():
@@ -71,9 +80,13 @@ def measurements():
         ix = ix[c.loc[ix, COUNT] > 0]
         counts = {}
         for name, e, n in [
-            ("CDA", ec, channels(c.loc[ix]) * np.diff(np.log10(ec))),
-            ("FSSP", ef, channels(f.loc[ix]) * weights("F", ef)),
-            ("ICEMET", ei, channels(i.loc[ix]) * weights("I", ei)),
+            (
+                "CDA",
+                ec,
+                interval_number(channels(c.loc[ix]), ec, geometric=True),
+            ),
+            ("FSSP", ef, interval_number(channels(f.loc[ix]), ef, geometric=False)),
+            ("ICEMET", ei, interval_number(channels(i.loc[ix]), ei, geometric=True)),
         ]:
             counts[name] = (e, n.mean(axis=0))
         records.append((day, len(ix), counts))
@@ -81,10 +94,12 @@ def measurements():
 
 
 def map_to_grid(e, n, g):
-    # Constant dN/dlogD inside each measured source channel.
-    left = np.maximum(g[:-1, None], e[:-1])
-    right = np.maximum(left, np.minimum(g[1:, None], e[1:]))
-    return (np.log(right / left) / np.log(e[1:] / e[:-1])) @ n
+    return (
+        get_rebinned_number_spectrum(
+            n * 1e6, e * 1e-6, g * 1e-6
+        ).bin_number_density
+        * 1e-6
+    )
 
 
 def run(out):

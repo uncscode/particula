@@ -9,6 +9,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from particula.particles import get_number_per_decade
 from matplotlib.colors import LogNorm
 
 HERE = Path(__file__).resolve().parent
@@ -43,7 +44,12 @@ def contours(o, pooled, independent, dest):
         vals.append(np.log10((vals[-1] + 0.1 * dw) / (rr + 0.1 * dw)))
         for j, data in enumerate(vals):
             a = ax[r, j]
-            img = np.where(valid[:, None], data, np.nan).T
+            img = np.full(data.shape, np.nan)
+            img[valid] = (
+                data[valid]
+                if j == 3
+                else get_number_per_decade(data[valid] * 1e6, ds * 1e-6) * 1e-6
+            )
             opts = (
                 dict(cmap="RdBu_r", vmin=-2, vmax=2)
                 if j == 3
@@ -52,7 +58,7 @@ def contours(o, pooled, independent, dest):
             show = a.pcolormesh(
                 np.arange(len(valid) + 1),
                 ds,
-                img if j == 3 else np.maximum(0.1, img / dw[:, None]),
+                img.T if j == 3 else np.maximum(0.1, img.T),
                 **opts,
                 rasterized=True,
             )
@@ -170,7 +176,7 @@ def check_and_score(folder, obs):
 def draw(axis, edges, spectra):
     width = np.diff(np.log10(edges))
     for spec, (label, color, style, lw) in zip(spectra, SERIES, strict=True):
-        density = spec / width
+        density = get_number_per_decade(spec * 1e6, edges * 1e-6) * 1e-6
         np.testing.assert_allclose(width @ density, spec.sum(), rtol=1e-6)
         axis.stairs(
             np.where(density > 0, density, np.nan),
@@ -244,7 +250,11 @@ def render(obs, fits, dest):
                     total_cm3=float(spec.sum(dtype=float)),
                     modal_diameter_um=float(
                         obs["d"][
-                            np.argmax(spec / np.diff(np.log10(obs["edges"])))
+                            np.argmax(
+                                get_number_per_decade(
+                                    spec * 1e6, obs["edges"] * 1e-6
+                                )
+                            )
                         ]
                     ),
                 )

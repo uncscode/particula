@@ -2,6 +2,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+from scripts.mam4xx_coagulation.plots import number_per_decade
 
 
 def plot(report):
@@ -88,13 +89,16 @@ def spectra(report):
             if r["regime"] == reg
         )
         edges = np.array(record["interior_edges_nm"])
-        binwidth = np.diff(np.log10(edges))
-        mean = np.array(record["spectrum"]["mean"])[-1, 1:-1] / binwidth
+        mean = number_per_decade(
+            np.array(record["spectrum"]["mean"])[-1, 1:-1], edges
+        )
         n = len(record["seeds"])
         sd = (
-            np.array(record["spectrum"]["ci95"])[-1, 1:-1]
+            number_per_decade(
+                np.array(record["spectrum"]["ci95"])[-1, 1:-1], edges
+            )
             * np.sqrt(n)
-            / (student.ppf(0.975, n - 1) * binwidth)
+            / student.ppf(0.975, n - 1)
         )
         mid.stairs(
             mean + sd,
@@ -124,7 +128,7 @@ def spectra(report):
             ]
             ax = mid if law == "fine" else lower
             ax.stairs(
-                np.array(r["spectrum_cm3"])[-1] / spacing,
+                number_per_decade(np.array(r["spectrum_cm3"])[-1], grid_edges),
                 grid_edges,
                 label=label,
                 color=color,
@@ -139,15 +143,19 @@ def spectra(report):
                     np.array(mc[k])[-1, 1:-1] for k in ("mean", "p16", "p84")
                 )
                 lower.stairs(
-                    hi / binwidth,
+                    number_per_decade(hi, edges),
                     edges,
-                    baseline=lo / binwidth,
+                    baseline=number_per_decade(lo, edges),
                     fill=True,
                     color=color,
                     alpha=0.32,
                 )
                 lower.stairs(
-                    mean / binwidth, edges, color=color, ls="--", lw=0.75
+                    number_per_decade(mean, edges),
+                    edges,
+                    color=color,
+                    ls="--",
+                    lw=0.75,
                 )
                 mask = (mean * mc["box_cm3"] >= 10) & (reference > 0)
                 bottom, upper = [

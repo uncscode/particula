@@ -3,6 +3,10 @@
 import importlib.util
 
 import numpy as np
+from particula.particles import (
+    get_number_per_decade,
+    get_rebinned_number_spectrum,
+)
 import pandas as pd
 from scipy.ndimage import gaussian_filter1d
 from simulate import GRID, HERE, JOINT
@@ -47,20 +51,33 @@ def read_water():
 
 def spectra(hist, air, real):
     """Rebin count per dlog10D by overlap of the log-diameter intervals."""
-    edges = np.log10(2) + np.arange(61) * np.log10(1.12)
-    left = np.log10(real.low_nm.to_numpy())[:, None]
-    right = np.log10(real.high_nm.to_numpy())[:, None]
-    weights = (
-        np.maximum(
-            0,
-            np.minimum(right, edges[None, 1:])
-            - np.maximum(left, edges[None, :-1]),
+    if real.empty:
+        return np.empty(0, dtype=np.float64)
+    source = 2e-9 * 1.12 ** np.arange(61)
+    bounds = real[["low_nm", "high_nm"]].to_numpy() * 1e-9
+    target, indices = np.unique(bounds, return_inverse=True)
+    left, right = indices.reshape(bounds.shape).T
+    time = real.time_s.to_numpy().astype(int) // 300
+    # Rows may repeat a diameter interval at different times or omit a channel.
+    counts = get_rebinned_number_spectrum(hist[:, :60] / air, source, target)
+    if np.all(right == left + 1):
+        return (
+            get_number_per_decade(counts.bin_number_density, target)[time, left]
+            * 1e-6
         )
-        / np.diff(edges)
-        / (right - left)
+    # A requested interval may span a boundary from another row.
+    return (
+        np.array(
+            [
+                get_number_per_decade(
+                    [counts.bin_number_density[t, lo:hi].sum()],
+                    target[[lo, hi]],
+                )[0]
+                for t, lo, hi in zip(time, left, right, strict=True)
+            ]
+        )
+        * 1e-6
     )
-    density = hist[real.time_s.to_numpy().astype(int) // 300, :60] / (air * 1e6)
-    return (density * weights).sum(axis=1)
 
 
 class Targets:

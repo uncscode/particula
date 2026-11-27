@@ -8,6 +8,7 @@ from shutil import copyfile
 import numpy as np
 from scipy.special import ndtr
 from scipy.stats import t as student
+from scripts.mam4xx_coagulation.plots import number_per_decade
 
 ROOT = Path(__file__).resolve().parents[2]
 COLUMNS = ["uf_cm3", "above_cm3", "volume_above_100_um3_cm3"]
@@ -127,7 +128,6 @@ def export_spectra(root):
             reg = r["regime"]
             native = r["refinement"]
             edges = np.asarray(native["interior_edges_nm"])
-            width = np.diff(np.log10(edges))
             curves = [
                 number
                 * np.diff(
@@ -157,7 +157,7 @@ def export_spectra(root):
                     np.array(particle[k])[-1, 1:-1]
                     for k in ("mean", "p16", "p84")
                 )
-            densities = np.asarray(curves) / width
+            densities = number_per_decade(np.asarray(curves), edges)
             for low, high, values in zip(
                 edges[:-1], edges[1:], densities.T, strict=True
             ):

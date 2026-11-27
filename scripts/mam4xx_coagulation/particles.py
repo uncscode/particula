@@ -8,7 +8,7 @@ from particula.dynamics.coagulation.brownian_kernel import (
 )
 from particula.gas import EnvironmentData, GasData
 from particula.gpu.kernels.coagulation import CoagulationSubcyclingConfig
-from particula.particles import ParticleData
+from particula.particles import ParticleData, get_binned_number_spectrum
 from scipy.special import ndtri, roots_hermitenorm
 
 NUMBER = 2e11  # per cubic metre in the synthetic process box
@@ -70,9 +70,13 @@ def observe(particles):
     masses = particles.masses[0, keep, 0]
     concentration = particles.concentration[0, keep] / particles.volume[0]
     diameter = 1e9 * np.cbrt(6 * masses / (np.pi * DENSITY))
-    counts, _ = np.histogram(
-        diameter, bins=np.r_[0, EDGES_NM, np.inf], weights=concentration
+    bins, low, high = get_binned_number_spectrum(
+        diameter * 1e-9,
+        concentration,
+        EDGES_NM * 1e-9,
+        include_upper_edge=False,
     )
+    counts = np.r_[low, bins, high]
     np.testing.assert_allclose(counts.sum(), concentration.sum(), rtol=1e-12)
     return counts, np.sum(masses * concentration)
 

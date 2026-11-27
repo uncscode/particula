@@ -245,7 +245,7 @@ aerosol_activated = copy.deepcopy(aerosol)
 time_step = 600  # total simulation time in seconds
 time = np.arange(time_step + 1)  # include the full 600 s endpoint
 bins_lognormal = np.logspace(-8, -2, 200)  # radius bins from 10⁻⁸ to 10⁻² m
-distribution_counts = np.zeros((len(time), len(bins_lognormal) - 1))
+concentrations = np.zeros((len(time), len(bins_lognormal) - 1))
 
 # CUDA preparation retains its device-owned controller between observations.
 preparation = GPUResidentCondensation(
@@ -267,9 +267,9 @@ for i, _t in enumerate(tqdm(time, desc="Condensing")):
         preparation.step(bound)
     aerosol_activated = preparation.snapshot()
     # Record the size distribution at this time
-    distribution_counts[i, :], edges = np.histogram(
-        aerosol_activated.particles.radii[0].copy(), bins=bins_lognormal
-    )
+    concentrations[i, :] = par.particles.get_particle_number_spectrum(
+        aerosol_activated.particles, 2 * bins_lognormal
+    ).bin_number_density[0]
 
 # Print final state and water saturation
 print(
@@ -287,12 +287,10 @@ np.testing.assert_allclose(
     atol=1e-30,
 )
 
-# Convert counts → number concentration (#/m³)
-concentrations = distribution_counts / simulation_volume
 
 # Contour plot of log10(number concentration)
 fig, ax = plotting.subplots(size="wide")
-X, Y = np.meshgrid(time, edges[:-1])
+X, Y = np.meshgrid(time, bins_lognormal[:-1])
 log_conc = np.log10(
     concentrations,
     where=concentrations > 0,
