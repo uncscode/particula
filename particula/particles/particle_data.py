@@ -35,6 +35,8 @@ from dataclasses import dataclass
 import numpy as np
 from numpy.typing import NDArray
 
+from particula.particles._population import radius_node_widths, slot_density
+
 
 @dataclass
 class ParticleData:
@@ -272,9 +274,10 @@ class ParticleData:
             ValueError: If the kind, grid, volume, or raw data is invalid.
         """
         self.validate_representation()
-        if self.distribution_type == "particle_resolved":
-            return self.concentration / self.volume[:, None]
-        return self.concentration.copy()
+        density = slot_density(self)
+        if density is self.concentration:
+            return density.copy()
+        return density
 
     @property
     def number_density(self) -> NDArray[np.float64]:
@@ -318,11 +321,7 @@ class ParticleData:
             grid = self.radius_grid
             if grid is None:  # Defensive narrowing after validation.
                 raise ValueError("PDF radius grid is required")
-            intervals = np.diff(grid)
-            weights = np.empty_like(grid)
-            weights[0] = intervals[0] / 2
-            weights[-1] = intervals[-1] / 2
-            weights[1:-1] = (intervals[:-1] + intervals[1:]) / 2
+            weights = radius_node_widths(grid)
             return np.einsum("n,bn,bns->bs", weights, slots, self.masses)
         return np.einsum("bn,bns->bs", slots, self.masses)
 

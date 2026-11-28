@@ -18,6 +18,7 @@ from particula.dynamics.chemistry.resolved_binding import (
     ResolvedBinding,
 )
 from particula.execution.ode import ODEProblem
+from particula.particles._population import slot_density
 from particula.util.constants import GAS_CONSTANT
 
 
@@ -28,7 +29,7 @@ class _BoxKinetics:
         particles = aerosol.particles
         masses = particles.masses[0]
         self.active = particles.concentration[0] > 0
-        self.weights = particles.concentration[0] / particles.volume[0]
+        self.weights = slot_density(particles)[0]
         self.reference = (masses / particles.density).sum(axis=1)
         self.pm = np.asarray(bound.particle_masses)
         self.gm = np.asarray(bound.gas_masses)

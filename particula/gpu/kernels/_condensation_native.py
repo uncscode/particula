@@ -9,6 +9,8 @@ from typing import Any, no_type_check
 
 import warp as wp
 
+from particula.gpu.kernels._population_validation import native_slot_density
+
 
 @wp.kernel
 def _validate_primary(  # noqa: C901
@@ -82,20 +84,6 @@ def validate_primary_state(particles: Any, gas: Any, kind: int) -> None:
         raise ValueError("invalid native condensation physical state or volume")
 
 
-@wp.func
-def _density_weight(
-    concentration: Any,
-    volume: Any,
-    kind: wp.int32,
-    box: int,
-    slot: int,
-) -> wp.float64:
-    weight = concentration[box, slot]
-    if kind == wp.int32(3):
-        weight = weight / volume[box]
-    return weight
-
-
 @wp.kernel
 def gate_transfer(
     partitioning: Any,
@@ -138,8 +126,8 @@ def reduce_candidates(
             if transfer < wp.float64(0.0):
                 mass = masses[box, slot, p]
                 transfer = (mass + transfer) - mass
-            weighted = transfer * _density_weight(
-                concentration, volume, kind, box, slot
+            weighted = transfer * native_slot_density(
+                concentration[box, slot], volume[box], kind == wp.int32(3)
             )
             if transfer > wp.float64(0.0):
                 corrected = weighted - uptake_correction
@@ -204,8 +192,8 @@ def reduce_finalized(
             delta = wp.float64(0.0)
             correction = wp.float64(0.0)
             for slot in range(finalized.shape[1]):
-                weighted = finalized[box, slot, p] * _density_weight(
-                    concentration, volume, kind, box, slot
+                weighted = finalized[box, slot, p] * native_slot_density(
+                    concentration[box, slot], volume[box], kind == wp.int32(3)
                 )
                 corrected = weighted - correction
                 updated_delta = delta + corrected
@@ -232,8 +220,8 @@ def reduce_finalized(
         delta = wp.float64(0.0)
         correction = wp.float64(0.0)
         for slot in range(finalized.shape[1]):
-            weighted = finalized[box, slot, p] * _density_weight(
-                concentration, volume, kind, box, slot
+            weighted = finalized[box, slot, p] * native_slot_density(
+                concentration[box, slot], volume[box], kind == wp.int32(3)
             )
             corrected = weighted - correction
             updated_delta = delta + corrected

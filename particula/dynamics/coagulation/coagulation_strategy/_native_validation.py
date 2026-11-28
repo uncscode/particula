@@ -13,6 +13,7 @@ from typing import Any, Callable, TypeVar, cast
 import numpy as np
 from numpy.typing import NDArray
 
+from particula.particles._population import slot_density
 from particula.particles.particle_data import ParticleData
 
 _KernelMethod = TypeVar("_KernelMethod", bound=Callable[..., Any])
@@ -51,7 +52,7 @@ def validate_particle(particle: ParticleData, distribution_type: str) -> None:
     with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
         mass = np.sum(particle.masses, axis=2)
         material_volume = np.sum(particle.masses / particle.density, axis=2)
-        density = particle.concentration / particle.volume[:, None]
+        density = slot_density(particle)
     if not all(
         np.all(np.isfinite(values))
         for values in (mass, material_volume, density)

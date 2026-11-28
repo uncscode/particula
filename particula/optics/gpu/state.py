@@ -7,6 +7,7 @@ from math import pi
 import numpy as np
 import warp as wp
 
+from particula.gpu.kernels._population_validation import native_slot_density
 from particula.gpu.kernels.thermodynamics import _buck_vapor_pressure
 from particula.gpu.warp_types import WarpParticleData
 from particula.optics.gpu._complex import divide
@@ -35,13 +36,15 @@ def _fill_cases(
     group, slot = wp.tid()  # type: ignore[misc]
     wave = group % wavelengths.shape[0]
     box = group // wavelengths.shape[0]
-    count = particles.concentration[box, slot]
-    if particles.distribution_kind == 3:
-        count = count / particles.volume[box]
+    count = native_slot_density(
+        particles.concentration[box, slot],
+        particles.volume[box],
+        particles.distribution_kind == 3,
+    )
     weight[group, slot] = count
     r = wp.float64(0.0)
     absolute_index = configured_index[wave, 0]
-    if count > wp.float64(0.0):
+    if count > wp.float64(0.0):  # type: ignore[operator]
         total = wp.float64(0.0)
         polar = wp.vec2d(wp.float64(0.0), wp.float64(0.0))
         for material in range(particles.masses.shape[2]):

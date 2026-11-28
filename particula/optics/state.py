@@ -9,8 +9,8 @@ from particula.optics.mie import get_mie_efficiencies
 from particula.optics.population import (
     PopulationOptics,
     get_population_optics,
-    get_population_weights,
 )
+from particula.particles._population import number_density_weights
 
 
 def _index(values):
@@ -187,15 +187,10 @@ def particle_optics(particles, config):
 
 def population_optics(particles, config) -> PopulationOptics:
     """Evaluate live CPU particle state into (box, wavelength) results."""
-    measure = particles.distribution_type
-    weights = get_population_weights(
-        particles.concentration,
-        measure,
-        volume=particles.volume if measure == "particle_resolved" else None,
-        radius_grid=particles.radius_grid
-        if measure == "continuous_pdf"
-        else None,
-    )
+    with np.errstate(over="ignore", invalid="ignore"):
+        weights = number_density_weights(particles)
+    if not np.all(np.isfinite(weights)):
+        raise ValueError("Optical number-density weights must be finite")
     if not particles.n_particles:
         zero = np.zeros((particles.n_boxes, len(config.wavelength)))
         config.validate_materials(particles.n_species)

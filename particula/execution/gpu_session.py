@@ -107,9 +107,8 @@ def _require_native_population_kind(particles: "ParticleData") -> None:
 def _validate_native_cpu_population(particles: "ParticleData") -> None:
     """Check explicit population admission before upload."""
     _require_native_population_kind(particles)
-    particles.validate_representation()
     with np.errstate(over="ignore", invalid="ignore"):
-        density = particles.concentration / particles.volume[:, None]
+        density = particles.slot_concentration_density
     if not np.all(np.isfinite(density)):
         raise ValueError("resident population density must be finite")
 

@@ -11,7 +11,7 @@ from typing import Any, no_type_check
 
 import warp as wp
 
-from particula.gpu.kernels._condensation_native import _density_weight
+from particula.gpu.kernels._population_validation import native_slot_density
 
 CHUNK_SIZE = 256
 MIN_SLOTS = 4096
@@ -41,8 +41,8 @@ def _candidate_chunks(
             if transfer < wp.float64(0.0):
                 mass = masses[box, slot, material]
                 transfer = (mass + transfer) - mass
-            weighted = transfer * _density_weight(
-                concentration, volume, kind, box, slot
+            weighted = transfer * native_slot_density(
+                concentration[box, slot], volume[box], kind == wp.int32(3)
             )
             if transfer > wp.float64(0.0):
                 positive += weighted
@@ -82,8 +82,8 @@ def _transfer_chunks(
         start = chunk * 256
         stop = wp.min(start + 256, transfer.shape[1])
         for slot in range(start, stop):
-            total += transfer[box, slot, material] * _density_weight(
-                concentration, volume, kind, box, slot
+            total += transfer[box, slot, material] * native_slot_density(
+                concentration[box, slot], volume[box], kind == wp.int32(3)
             )
     partial[box, gas, chunk] = total
 
