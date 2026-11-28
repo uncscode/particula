@@ -39,6 +39,8 @@ capture for resolved chemistry. [PR #1687](https://github.com/uncscode/particula
 | 5 | [Inverse modeling and automatic differentiation](stage-05-inverse-modeling.md) | Recover supported initial-state quantities with tested inference and gradient methods. |
 | 6 | [Configurable chemistry model](stage-06-chemistry-model.md) | Bind reactions to user species with shared CPU/GPU configuration, then qualify gas, particle, and coupled chemistry. |
 
+The [chemical channel catalog](chemical-channel-catalog.md) imports seven atmospheric chemistry sources, pins study selections, and exports supported gas reactions to the Stage 6 native solver.
+
 ## Evidence available to the next stages
 
 - **Thermodynamics and observations.** Homogeneous binary BAT activity is

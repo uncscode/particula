@@ -34,6 +34,7 @@ homepage = "https://github.com/uncscode/particula"
 repository = "https://github.com/uncscode/particula"
 
 [project.scripts]
+particula = "particula.dynamics.chemistry.catalog.cli:main"
 particula-docs = "particula_docs:main"
 
 [project.optional-dependencies]
