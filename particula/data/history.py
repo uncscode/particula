@@ -23,24 +23,21 @@ def add_history(
         expressions.append(
             pl.concat_list(history).list.drop_nulls().alias(link + "s")
         )
-        for name in (f"refs_{role}", f"flags_{role}"):
-            labels = [
-                pl.col(name)
-                .shift(lag)
-                .over("_run")
-                .fill_null(pl.lit([], dtype=pl.List(pl.String)))
+    for name in ("quality_flags", "calibration_refs"):
+        labels = [
+            pl.col(name)
+            .shift(lag)
+            .over("_run")
+            .fill_null(pl.lit([], dtype=pl.List(pl.String)))
+            for lag in range(window)
+        ]
+        expressions.append(pl.concat_list(labels).alias(name))
+    expressions.append(
+        pl.any_horizontal(
+            [
+                pl.col("repaired").shift(lag).over("_run").fill_null(False)
                 for lag in range(window)
             ]
-            expressions.append(
-                pl.concat_list(labels).list.unique().list.sort().alias(name)
-            )
-        repaired = pl.col(f"repaired_{role}")
-        expressions.append(
-            pl.any_horizontal(
-                [
-                    repaired.shift(lag).over("_run").fill_null(False)
-                    for lag in range(window)
-                ]
-            ).alias(f"repaired_{role}")
-        )
+        ).alias("repaired")
+    )
     return frame.with_columns(*expressions)

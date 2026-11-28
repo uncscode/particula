@@ -291,6 +291,134 @@ def test_trusted_reader_and_correction_history():
         op.execute(signal=corrected)
 
 
+def test_rolling_quality_and_calibrations_follow_window(tmp_path):
+    """A missing scan and a certificate change affect overlapping windows."""
+    registry, process, first = _lab()
+    transition = "2024-01-01T00:00:02Z"
+    second = replace(first, start=transition, reference="F-2")
+    meter, _, _, _ = _inputs(
+        registry, (replace(first, stop=transition), second)
+    )
+    src = tmp_path / "volts.csv"
+    src.write_text(
+        "epoch,signal\n1704067200,1\n1704067201,.\n1704067202,3\n"
+        "1704067203,4\n1704067204,5\n1704067220,6\n"
+    )
+    rolling = registry.resolve("particula.signal.voltage_mean", "1")
+    calibrated = replace(
+        process,
+        mode="ordered",
+        implementation=lambda signal, gain, **params: rolling.implementation(
+            signal * gain, **params
+        ),
+        parameter_schema=rolling.parameter_schema,
+        history_parameters=rolling.history_parameters,
+    ).configure(window=3, max_gap_seconds=2, calibration="series")
+    result = calibrated.execute(signal=meter.read(src)).frame
+    assert result["flow"].to_list() == pytest.approx(
+        [None, None, None, None, 1.2, None]
+    )
+    assert result["quality_flags"].to_list() == [
+        ["incomplete_window"],
+        ["incomplete_window", "missing:signal"],
+        ["missing:signal"],
+        ["missing:signal"],
+        [],
+        ["incomplete_window"],
+    ]
+    assert result["calibration_refs"].to_list() == [
+        ["F-1"],
+        ["F-1"],
+        ["F-1", "F-2"],
+        ["F-1", "F-2"],
+        ["F-2"],
+        ["F-2"],
+    ]
+
+
+def test_whole_record_propagates_each_contributors_quality(tmp_path):
+    """A warning anywhere in the baseline affects every centered sample."""
+    registry, process, first = _lab()
+    transition = "2024-01-01T00:00:02Z"
+    second = replace(first, start=transition, reference="F-2")
+    profile = describe_profile(DATA / "flow-profile.yaml")
+    profile["input"]["record_width"] = 3
+    profile["vendor_flags"] = {"column": "status", "separator": ";"}
+    meter = Instrument(
+        profile,
+        registry=registry,
+        deployment=Deployment(
+            "meter", calibrations=(replace(first, stop=transition), second)
+        ),
+    )
+    src = tmp_path / "volts.csv"
+    src.write_text(
+        "epoch,signal,status\n1704067200,1,\n1704067201,2,drift\n1704067202,3,\n"
+    )
+    raw = meter.read(src)
+    centered = replace(
+        process,
+        mode="whole_record",
+        implementation=lambda signal, gain: signal * gain
+        - (signal * gain).mean(),
+    ).configure(calibration="series")
+    result = centered.execute(signal=raw)
+    assert result.frame["flow"].to_list() == pytest.approx([-0.3, 0, 0.3])
+    assert result.frame["quality_flags"].to_list() == [["drift"]] * 3
+    assert result.frame["calibration_refs"].to_list() == [["F-1", "F-2"]] * 3
+    assert (
+        result.quality_summary("flow", exclude_flags=["drift"])
+        .collect()["retained"]
+        .item()
+        == 0
+    )
+    assert centered.execute(signal=raw.filter(pl.lit(False))).frame.is_empty()
+
+
+def test_array_roles_compare_selected_fields_coordinates(tmp_path):
+    """Equal shapes require matching axis units and coordinate values."""
+    profile = describe_profile("cpc-3010")
+    profile["on_bad_record"] = "error"
+    field = profile.pop("fields")[1]
+    field.pop("column")
+    axis = {"name": "x", "unit": "m", "values": [0, 1]}
+    left = dict(field, name="left", columns=[1, 2], axes=[axis])
+    right = dict(field, name="right", columns=[3, 4], axes=[axis])
+    profile["arrays"] = [left, right]
+    src = tmp_path / "pair.csv"
+    src.write_text("1700000040,1,2,4,8\n")
+    operation = MeasurementProcess(
+        "lab.pair.difference",
+        "1",
+        inputs={
+            side: FieldContract("temperature", "K", field=side, axes=("x",))
+            for side in ("left", "right")
+        },
+        output=FieldContract("temperature", "K"),
+        output_field="difference",
+        implementation=lambda left, right: right.arr.get(1) - left.arr.get(1),
+    )
+    original = read_measurement(src, profile=profile)
+    assert (
+        operation.execute(left=original, right=original)
+        .frame["difference"]
+        .item()
+        == 6
+    )
+    for changed_axis in [dict(axis, values=[0, 2]), dict(axis, unit="cm")]:
+        right["axes"] = [changed_axis]
+        changed = read_measurement(src, profile=profile)
+        with pytest.raises(ValueError, match="common coordinate grid"):
+            operation.execute(left=changed, right=changed)
+        # An unrelated variable's axis does not change the selected left grid.
+        assert (
+            operation.execute(left=changed, right=original)
+            .frame["difference"]
+            .item()
+            == 6
+        )
+
+
 def test_signed_clock_correction_retains_reported_time(tmp_path):
     """Offsets apply once on reported time, without changing record identity."""
     from particula.data import correct_clock

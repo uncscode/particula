@@ -36,6 +36,24 @@ def _tag(condition: pl.Expr, reason: str) -> pl.Expr:
     return pl.when(condition).then(pl.lit(reason)).otherwise(None)
 
 
+def _field_axes(definition: dict) -> list[dict]:
+    """Return the selected field's ordered coordinates in their stored units."""
+    grid = next(iter(definition["grids"].values()))
+    if "axes" in definition:
+        return grid["variables"][definition["name"]]
+    axis = definition["axis"]
+    return [
+        {
+            "name": axis["name"],
+            "unit": axis["output_unit"],
+            "values": grid["coordinates"][axis["name"]],
+            "basis": axis["basis"],
+            "log10_bin_width": grid["log10_bin_width"],
+            "edge_convention": grid["edge_convention"],
+        }
+    ]
+
+
 def _unit_transform(source: str, target: str) -> tuple[float, float]:
     try:
         return _affine(source, target)
@@ -318,20 +336,11 @@ class MeasurementProcess:
             }
         primary = next(iter(self.inputs))
         deployment = products[primary].manifest.get("deployment") or {}
-        self._check_deployments(products)
+        self._check_compatibility(products, parents)
         frame = role_frames[0]
         for other in role_frames[1:]:
             frame = frame.join(other, on="time_utc", how="left", validate="1:1")
         frame = frame.sort("time_utc", f"parent_{primary}_scan_id")
-        if self.history_parameters:
-            window, gap = (arguments[name] for name in self.history_parameters)
-            frame = add_history(frame, tuple(self.inputs), window, gap)
-            reasons.append(
-                _tag(
-                    pl.col(f"parent_{primary}_scan_ids").list.len() < window,
-                    "incomplete_window",
-                )
-            )
         certificates: list[dict] = []
         if selector:
             coefficients, reference, certificates = self._calibrations(
@@ -341,6 +350,39 @@ class MeasurementProcess:
                 raise ValueError(f"Missing or expired calibration {selector!r}")
             bound.update(coefficients)
             refs.append(pl.concat_list(reference))
+        flags = [
+            pl.col(f"flags_{role}").fill_null(_empty_labels())
+            for role in self.inputs
+        ]
+        flags.append(pl.concat_list(reasons).list.drop_nulls())
+        frame = frame.with_columns(
+            pl.concat_list(flags).alias("quality_flags"),
+            pl.concat_list(refs).alias("calibration_refs"),
+            pl.any_horizontal(repairs).alias("repaired"),
+        )
+        output_flags = [pl.col("quality_flags")]
+        if self.history_parameters:
+            window, gap = (arguments[name] for name in self.history_parameters)
+            frame = add_history(frame, tuple(self.inputs), window, gap)
+            output_flags.append(
+                _tag(
+                    pl.col(f"parent_{primary}_scan_ids").list.len() < window,
+                    "incomplete_window",
+                )
+            )
+        if self.mode == "whole_record":
+            frame = frame.with_columns(
+                *[
+                    pl.col(name)
+                    .explode()
+                    .drop_nulls()
+                    .unique()
+                    .sort()
+                    .implode()
+                    for name in ("quality_flags", "calibration_refs")
+                ],
+                pl.col("repaired").any(),
+            )
         output = self.implementation(**bound, **arguments)
         if not isinstance(output, pl.Expr):
             raise TypeError(
@@ -354,24 +396,20 @@ class MeasurementProcess:
                 for role in self.inputs
             ]
         )
-        reasons.append(
+        output_flags.append(
             _tag(pl.col("_output").is_not_null() & ~finite, "nonfinite_output")
         )
-        flags = [
-            pl.col(f"flags_{role}").fill_null(_empty_labels())
-            for role in self.inputs
-        ]
-        flags.append(pl.concat_list(*reasons).list.drop_nulls())
         result = frame.select(
             "time_utc",
             pl.col(f"parent_{primary}_scan_id").alias("scan_id"),
             pl.selectors.starts_with("parent_"),
-            pl.any_horizontal(repairs).alias("repaired"),
-            pl.concat_list(flags)
+            "repaired",
+            pl.concat_list(output_flags)
+            .list.drop_nulls()
             .list.unique()
             .list.sort()
             .alias("quality_flags"),
-            pl.concat_list(refs)
+            pl.col("calibration_refs")
             .list.unique()
             .list.sort()
             .alias("calibration_refs"),
@@ -412,14 +450,16 @@ class MeasurementProcess:
             result, pl.LazyFrame(schema=ISSUE_SCHEMA), manifest
         )
 
-    def _check_deployments(self, products: dict[str, Measurement]) -> None:
-        """Check reference conditions and previously applied corrections."""
-        grids = {
-            tuple(product.grids)
-            for role, product in products.items()
-            if self.inputs[role].axes
-        }
-        if len(grids) > 1:
+    def _check_compatibility(
+        self, products: dict[str, Measurement], parents: dict
+    ) -> None:
+        """Check selected coordinates, conditions and previous corrections."""
+        grids = [
+            _field_axes(parents[role]["field"])
+            for role, contract in self.inputs.items()
+            if contract.axes
+        ]
+        if any(grid != grids[0] for grid in grids[1:]):
             raise ValueError("Array roles require a common coordinate grid")
         if self.same_volume_basis:
             for key in ("volume_basis", "inlet"):

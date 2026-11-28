@@ -161,7 +161,10 @@ Apply the filter to each deployment separately. For a custom filter choose
 `mode="ordered"` and implement the window, minimum sample count and reset
 rule in its expression. Choose `"elementwise"` for a calibration that uses
 only the current sample or `"whole_record"` for a calculation that needs the
-complete input.
+complete input. For example, subtracting the mean voltage makes every
+result depend on every sample used to compute the mean. Each output then
+carries the quality flags, repair status and calibration references from
+the complete aligned record.
 
 ## Prescribe, save and replay the calculation
 
@@ -234,7 +237,12 @@ can select `reader="lab.binary"`; for a disk import pass
 Both paths create a fresh decoder for each source.
 
 An array input contract can specify ordered `axes` and a diameter `basis`.
-Processing verifies the grid before passing the array expression to the
-lab's scalar reduction. The causal voltage mean also records the individual
-source IDs in `parent_signal_scan_ids` for every trailing window. After a
-clock gap that list starts again with the current observation.
+When an operation combines array fields, their selected axes must have the
+same names, order, units and coordinate values. Spectra must also share a
+diameter basis and bin geometry.
+
+The causal voltage mean records the individual source IDs in
+`parent_signal_scan_ids` for each trailing window. Quality flags, repair
+status and calibration references cover every contributing sample. A window
+that spans a calibration change lists both certificates. After a clock gap,
+the history starts again with the current observation.
