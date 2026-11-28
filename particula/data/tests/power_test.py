@@ -2,17 +2,14 @@
 
 import json
 from datetime import UTC, datetime, timedelta, timezone
-from pathlib import Path
 
 import numpy as np
 import pytest
 from particula.data.power import read_power_hour
 from particula.optics.solar import SolarInput
+from particula_docs import documentation_path
 
-_PACKET = (
-    Path(__file__).resolve().parents[3]
-    / "docs/data/shortwave/sodankyla-20220715"
-)
+_PACKET = documentation_path() / "data/shortwave/sodankyla-20220715"
 _START = datetime(2022, 7, 15, 10, tzinfo=UTC)
 
 

@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.9614105350337923,
-  "package_source_sha256": "369b5b6034c27333eef745bfc4b7373753c599cdd397cc98b2cabe12f8455028",
-  "scientific_source_sha256": "0a7055faa19d97b279f458b4d93eb29a47c0a12c5534b3b0684e5ae9883ffb9b",
+  "elapsed_seconds": 3.680075126932934,
+  "package_source_sha256": "e6cf31245b68fa3bebcd0daf47a5875b405f6f0d07702290aadeac1573d54e7d",
+  "scientific_source_sha256": "5d05996c4cce5010a4f6001b78d5393383a6b487c1c8be456ec4eef9049d5a02",
   "input_sha256": {
     "docs/data/shortwave/sodankyla-20220715/manifest.json": "bab819370d7bc20a9aa08a84c43072fa70c016cf95acb0b37f6fd3961ec3fb24",
     "docs/data/shortwave/sodankyla-20220715/power-hourly.json": "cdcbe9ea94f156c4f6004a3d2094f3ef2f9bbf921f643c142545f29af29d7c5f",
@@ -13,9 +13,9 @@
   "example": "shortwave-layer-altitude",
   "fingerprint": "ef954ae02129ec39169f12679461732282593254967854a2ddeeb5190340af84",
   "source": "docs/studies/examples/coupled-populations/radiation/layer_altitude.py",
-  "revision": "2320b8071ceff8222098a21fd9c4b9af49b06444",
+  "revision": "74aad2022981df7665f0cd745f68719f0b738342",
   "package_dirty": true,
-  "executed_at": "2026-11-28T16:28:56.344956+00:00",
+  "executed_at": "2026-11-28T16:43:15.095594+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
