@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 1.23383685387671,
+  "package_source_sha256": "d4849ffeb7f688f80c072e5440f387b64f4be422cea8c9437a2ca56952e019f3",
+  "scientific_source_sha256": "dabfdd2bd677c3fc02738b557c9f139a31fd177db9ff1f51b97566dfd290745d",
+  "input_sha256": {
+    "website/public/study-data/reach-droplets/figure-data.zip": "3ca640eef03bc0ce31d62e0cd391032799e56b3b7a8bf578080c3927d8d774e3"
+  },
+  "example": "reach-droplet-burst",
+  "fingerprint": "62f9757f72e65151f3a5f288fdef4d6ac372393e668c4f993539c315cf885c20",
+  "source": "docs/studies/literature/reach-droplets/burst.py",
+  "revision": "4c38aa9fe56382f45a99504cd3130367d92ffa67",
+  "package_dirty": false,
+  "executed_at": "2026-11-28T01:52:13.639236+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.3.6",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [
+      {
+        "text": "Hologram: 0.398 droplets/cm\u00b3\nForward physics: 0.093 droplets/cm\u00b3\nSpatial update: 0.172 droplets/cm\u00b3\nMeasured / forward: 4.27\n"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "a9fa718ad57e5508841035b78a2666fa2156d07699e57cd7501d9236d5620b89"
+  }
+}
