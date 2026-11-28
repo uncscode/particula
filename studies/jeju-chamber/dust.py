@@ -3,6 +3,7 @@
 import os
 
 import numpy as np
+from particula.particles import get_bin_number_density
 import pandas as pd
 from numpy.polynomial.legendre import leggauss
 from scipy.ndimage import gaussian_filter1d
@@ -55,7 +56,9 @@ def extract_observations():
                 logd[-1] + np.diff(logd)[-1] / 2,
             ]
         )
-        per_bin = raw.to_numpy() * np.diff(np.log10(edge))
+        per_bin = (
+            get_bin_number_density(raw.to_numpy() * 1e6, edge * 1e-6) * 1e-6
+        )
         assert np.all(per_bin[:, :FIRST] == 0)
         minute = [per_bin[(t >= 60 * j) & (t < 60 * (j + 1))] for j in range(5)]
         assert all(55 <= len(a) <= 65 for a in minute)

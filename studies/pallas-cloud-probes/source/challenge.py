@@ -13,6 +13,7 @@ from study import (
     FILES,
     inputs,
     channels,
+    interval_number,
     window,
     native,
     read_source,
@@ -59,7 +60,7 @@ def structural(f, i):
     reference = calibrate(f[f.index.day == 14])
     for conv in ["upper", "center"]:
         ef, n, _ = native(f, "F", conv)
-        reassigned = channels(f) * np.diff(np.log10(ef))
+        reassigned = interval_number(channels(f), ef, geometric=True)
         reassigned *= (
             f[COUNT].to_numpy()[:, None] / reassigned.sum(axis=1)[:, None]
         )

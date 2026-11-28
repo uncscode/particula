@@ -4,13 +4,13 @@ This directory contains the 18-cell chamber simulation, optical response, fit ob
 
 ## Environment and input files
 
-The study used Particula source revision `2db6a77323a7ac119f5acce0c180fe6b9e7b555e`, Python 3.12.12, Warp 1.11.1, NumPy, pandas, SciPy and Matplotlib. Use that revision in the Python import path. The original device was an NVIDIA GeForce RTX 5060. The same study kernels accept `--device cpu`. The raw file cache may initially be empty. On first use the reader downloads the optical, imager count, thermometry and vapor files from Figshare and verifies each file against the checksum for version 1. A completed cache can be used offline. [Versioned file URLs and MD5 values](source-files.json)
+The study used Particula source revision `2db6a77323a7ac119f5acce0c180fe6b9e7b555e`, Python 3.12.12, Warp 1.11.1, NumPy, pandas, SciPy and Matplotlib. The current replay imports the spectrum functions from the checkout containing these scripts. The original device was an NVIDIA GeForce RTX 5060. The same study kernels accept `--device cpu`. The raw file cache may initially be empty. On first use the reader downloads the optical, imager count, thermometry and vapor files from Figshare and verifies each file against the checksum for version 1. A completed cache can be used offline. [Versioned file URLs and MD5 values](source-files.json)
 
 Run 5 uses the supplier's lower and upper cumulative dry-volume limits at ten diameters. The table, source URL, treatment of the unresolved fine fraction and conversion to airborne number are in the dust model. An optional `--a2-table FILE` reads a three-column CSV with diameter in µm, lower volume percent and upper volume percent. It replaces the published powder specification for a new sensitivity experiment. [Powder Technology A2 limits](https://www.powdertechnologyinc.com/product/iso-12103-1-a2-fine-test-dust/) · [Airborne loading and dry-to-optical mapping](dust.py)
 
 ## Regenerate all main figures
 
-Start at the root of a checkout with the study code. Set `PYTHONPATH` to the pinned Particula checkout if it differs from the current checkout. Set the local root to a directory with scratch space for input files, transport tables, compiled kernels and calculated trajectories.
+Start at the root of a checkout with the study code. Set `PYTHONPATH` to that checkout. Set the local root to a directory with scratch space for input files, transport tables, compiled kernels and calculated trajectories.
 
 ```bash
 export PYTHONPATH="$PWD"

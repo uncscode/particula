@@ -1,21 +1,22 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 8.507034605019726,
-  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
+  "elapsed_seconds": 6.217267270898446,
+  "package_source_sha256": "fb62539e446aa9348489ec67f4eff6f98c534f6e668d75293727a4745fd40ef8",
+  "scientific_source_sha256": "de1b8e4f7828cd58d808601b3cb92b4ade18fbab99ba3c0a9792edc190f53c50",
   "input_sha256": {
     "docs/data/gpu/rtx5060.json": "253c5eb30214086edf5341178aa5e6e399a85da0db6e13ac66f25333d15ef6d7"
   },
   "example": "gpu-scaling-results",
-  "fingerprint": "b3bd352299b0f75dfef6e94fb5f887907f97ea82432e0b556d0281f4aee49ed2",
-  "source": "docs/examples/gpu/prepared/gpu_scaling_results.py",
-  "revision": "dd92d3c1ca71f36eacad56b49661b32c0da77ac7",
+  "fingerprint": "7fa1da19e6717c2c51993cab80da83795198af85dac79e568ed7492802c20827",
+  "source": "docs/studies/benchmarks/prepared-scaling/gpu_scaling_results.py",
+  "revision": "ecc1d88a5c626ed7c761bdc3e296f99a00d14226",
   "package_dirty": false,
-  "executed_at": "2026-11-19T14:42:56.954362+00:00",
+  "executed_at": "2026-11-27T22:55:47.377838+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.2",
+    "particula": "0.3.6",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -45,9 +46,9 @@
     ]
   ],
   "files": {
-    "figure-5-3.png": "4231f4d396953dc060c7713ea72ae76441fdb0d54c5a4a50fbffa53fe62539e4",
-    "figure-5-2.png": "34a49beaa66e7f99d876617d6efd7f32d4045b9d8faf889a9111db50f106f97c",
+    "source.py": "03864cebcdd4602053c39577f842da22402bfbd321bef12ce3ffa674c33ba630",
     "figure-5-1.png": "3a3fa2ae66874a32d9932f2177a8ffccd26e7919862e621c2744eeb512f3708e",
-    "source.py": "936a79caeb2c1c73381825f5d334cc0e2f17177a8b7f3819a5856354fa111c0e"
+    "figure-5-2.png": "34a49beaa66e7f99d876617d6efd7f32d4045b9d8faf889a9111db50f106f97c",
+    "figure-5-3.png": "4231f4d396953dc060c7713ea72ae76441fdb0d54c5a4a50fbffa53fe62539e4"
   }
 }

@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import LogNorm
 from particula import plotting
+from particula.particles import get_number_per_decade
 from scripts.pi_chamber.retrieval import fit_humidity
 from scripts.pi_chamber.temporal import simulate_history
 
@@ -56,7 +57,9 @@ def plot_results(report):
     main = report["main"]
     d = np.array(main["edges_um"])
     times = np.array(main["seconds"])
-    spectra = np.array(main["bin_cm3"]) / np.diff(np.log10(d))
+    spectra = (
+        get_number_per_decade(np.array(main["bin_cm3"]) * 1e6, d * 1e-6) * 1e-6
+    )
     fig, axes = plotting.subplots(2, 2, size="wide", sharex=True, sharey=True)
     ticks = [0, 1, 3, 5, 7, 9, 11, 13, 15]
     for i, ax in enumerate(axes.flat):

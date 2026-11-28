@@ -7,6 +7,7 @@ from pathlib import Path
 import sys
 import time
 import numpy as np
+from particula.particles import get_binned_number_spectrum
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parent
@@ -225,7 +226,10 @@ def distribution(pop, xs, b, wet, T, expansion, merge_physical=False):
     q = np.interp(
         np.array([0.10, 0.50, 0.90]) * total, np.cumsum(w) - w * 0.5, d
     )
-    hist = np.histogram(d, bins=SPECTRUM, weights=w)[0]
+    bins, low, high = get_binned_number_spectrum(
+        d * 1e-6, w * 1e6, SPECTRUM[1:-1] * 1e-6, include_upper_edge=False
+    )
+    hist = np.r_[low, bins, high] * 1e-6
     return total, *q, hist
 
 

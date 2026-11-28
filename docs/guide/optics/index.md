@@ -232,7 +232,9 @@ Start from a size spectrum and optical observations from a compatible sampling
 window. Normalize gas-volume conditions, align instrument RH and wavelengths,
 and choose an uncertainty model. An `OpticalGrid` takes number density
 integrated over each bin in m⁻³. Use `OpticalGrid.from_diameter_bins` to
-convert a spectrum reported as dN/dlog₁₀D using its diameter edges.
+convert a spectrum reported as dN/dlog₁₀D using its diameter edges. For
+weighted particles, use the [native spectrum functions](../data-model/index.md)
+to calculate integrated densities on those edges first.
 
 `EffectiveIndexModel(grid)` fits a common complex refractive index using
 sizes measured at the optical RH. To model dry material, supply the optical

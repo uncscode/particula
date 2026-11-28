@@ -5,6 +5,7 @@ from pathlib import Path
 
 import numpy as np
 import warp as wp
+from particula.particles import get_binned_number_spectrum
 from scipy.optimize import minimize_scalar
 from scripts.pi_chamber.growth import KELVIN, SMAX, F, build_steps, grow
 
@@ -232,9 +233,10 @@ def simulate_history(dt, seed, mean_pct):
             for g in range(groups):
                 present = entered[g] & (region[i, g] == 0)
                 w = weights[i, g, present] / (1 - FLOOR)
-                counts[i, g] = np.histogram(
-                    diam[i, g, present], EDGES, weights=w
-                )[0]
+                spectrum = get_binned_number_spectrum(
+                    diam[i, g, present] * 1e-6, w * 1e6, EDGES * 1e-6
+                )
+                counts[i, g] = spectrum.bin_number_density * 1e-6
                 np.testing.assert_allclose(
                     counts[i, g].sum(), w.sum(), rtol=1e-10
                 )

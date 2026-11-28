@@ -5,6 +5,7 @@ from pathlib import Path
 import re
 
 import numpy as np
+from particula.particles import get_number_per_decade
 
 TEMPLATE = (
     Path(__file__).resolve().parents[2]
@@ -19,23 +20,30 @@ def refresh(results):
     ):
         valid = obs["valid"][0]
         edges = obs["edges"]
-        widths = np.diff(np.log10(edges))
         assert fit["runs"][0] == 0
         mean_counts = [
-            a[0, valid].mean(axis=0, dtype=float)
-            for a in (obs["y"], fit["y"])
+            a[0, valid].mean(axis=0, dtype=float) for a in (obs["y"], fit["y"])
         ]
-        curves = mean_counts / widths
+        curves = (
+            get_number_per_decade(np.array(mean_counts) * 1e6, edges * 1e-6)
+            * 1e-6
+        )
         peak = obs["d"][np.argmax(curves[0])]
         assert round(peak, 1) == 14.9 and np.argmax(curves[0]) == np.argmax(
             curves[1]
         )
 
     # Sum number before converting to density, including the last partial group.
-    starts = np.arange(0, len(widths), 4)
+    starts = np.arange(0, len(edges) - 1, 4)
     display_edges = np.r_[edges[starts], edges[-1]]
     display_widths = np.diff(np.log10(display_edges))
-    display_curves = np.add.reduceat(mean_counts, starts, axis=1) / display_widths
+    display_curves = (
+        get_number_per_decade(
+            np.add.reduceat(mean_counts, starts, axis=1) * 1e6,
+            display_edges * 1e-6,
+        )
+        * 1e-6
+    )
     np.testing.assert_allclose(
         (display_curves * display_widths).sum(axis=1),
         np.sum(mean_counts, axis=1),
@@ -43,7 +51,9 @@ def refresh(results):
     )
 
     min_diameter, max_diameter = 2, 40
-    visible = (display_edges[:-1] < max_diameter) & (display_edges[1:] > min_diameter)
+    visible = (display_edges[:-1] < max_diameter) & (
+        display_edges[1:] > min_diameter
+    )
     visible_right = np.minimum(display_edges[1:][visible], max_diameter)
 
     def x(diameter):

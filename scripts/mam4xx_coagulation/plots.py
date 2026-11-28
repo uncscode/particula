@@ -2,6 +2,14 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+from particula.particles import get_number_per_decade
+
+
+def number_per_decade(counts, edges_nm):
+    """Convert the study's integrated cm⁻³ bins to cm⁻³ per decade."""
+    return (
+        get_number_per_decade(np.asarray(counts) * 1e6, edges_nm * 1e-9) * 1e-6
+    )
 
 
 def curves(report):
@@ -39,7 +47,6 @@ def spectra(report):
     )
     edges = np.asarray(report["edges_nm"])
     mid = np.sqrt(edges[1:] * edges[:-1])
-    width = np.diff(np.log10(edges))
     high = [
         c for c in report["cases"] if c["slots"] == 3840 and c["ratio"] == 1.0
     ]
@@ -49,7 +56,9 @@ def spectra(report):
             (gpu, "-", "#116a72", "Particula"),
             (modal, "--", "#a74e24", "MAM4xx"),
         ):
-            n = np.array(data["spectrum_cm3"][-1])[1:-1] / width
+            n = number_per_decade(
+                np.array(data["spectrum_cm3"][-1])[1:-1], edges
+            )
             ax.plot(mid, n, style, color=color, label=label)
         ax.set(xscale="log", xlim=(6, 1200), title=f"{gpu['diameter_nm']:g} nm")
     axes[0].legend(frameon=False)

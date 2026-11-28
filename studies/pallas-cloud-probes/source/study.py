@@ -103,12 +103,13 @@ def channels(df):
     return matrix
 
 
-def weights(probe, geometry):
-    return (
-        np.diff(np.log10(geometry))
-        if probe == "I"
-        else np.full(len(geometry) - 1, 0.05)
-    )
+def interval_number(reported, geometry, *, geometric):
+    """Convert reported cm⁻³ per decade using the selected channel convention."""
+    if geometric:
+        return par.particles.get_bin_number_density(
+            reported * 1e6, geometry * 1e-6
+        ) * 1e-6
+    return reported * 0.05
 
 
 def window(geometry, low, high, linear=False):
@@ -121,7 +122,7 @@ def window(geometry, low, high, linear=False):
 
 def native(frame, probe, convention):
     e = edges(probe, convention)
-    n = channels(frame) * weights(probe, e)
+    n = interval_number(channels(frame), e, geometric=probe == "I")
     representative = (e[1:] + e[:-1]) / 2
     # Build each instrument as a measured population of water drops per minute.
     # The public initializer accepts one distribution. Reuse the validated bin
@@ -159,11 +160,8 @@ def pilot():
             continue
         for convention in ["center"] if probe == "I" else ["upper", "center"]:
             e, n, mass = native(df, probe, convention)
-            for rule, w in [
-                ("constant_0.05", np.full(len(e) - 1, 0.05)),
-                ("geometric_log10", np.diff(np.log10(e))),
-            ]:
-                pop = channels(df) * w
+            for rule in ["constant_0.05", "geometric_log10"]:
+                pop = interval_number(channels(df), e, geometric=rule == "geometric_log10")
                 total = pop.sum(axis=1)
                 d = (e[:-1] + e[1:]) / 2
                 volume = pop @ mass * 1e9

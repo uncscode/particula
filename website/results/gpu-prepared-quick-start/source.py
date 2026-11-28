@@ -5,7 +5,7 @@
 # GPU? Follow construction, physical evolution, and detached analysis as separate
 # stages. You will learn which evidence comes from inventory checks, timestep
 # refinement, and checkpoint replay. Begin with
-# [native aerosol assembly](../../fundamentals/native_aerosol.py) if counts, volume,
+# [native aerosol assembly](../building-an-aerosol/native_aerosol.py) if counts, volume,
 # or species ordering are unfamiliar.
 #
 # A prepared simulation owns the complete aerosol state on one GPU. Construct
@@ -250,18 +250,14 @@ def plot_snapshots(initial, warm, final):
     edges = np.geomspace(5e-9, 2e-6, 55)
 
     def histogram(state):
-        p = state.particles
-        radius = np.cbrt(
-            np.sum(p.masses / p.density, axis=-1) * 3 / (4 * np.pi)
+        from particula.particles import (
+            get_number_per_decade,
+            get_particle_number_spectrum,
         )
-        return np.array(
-            [
-                np.histogram(r, bins=edges, weights=c / v)[0]
-                for r, c, v in zip(
-                    radius, p.concentration, p.volume, strict=True
-                )
-            ]
-        ) / np.diff(np.log10(edges))
+
+        diameter_edges = 2 * edges
+        bins = get_particle_number_spectrum(state.particles, diameter_edges)
+        return get_number_per_decade(bins.bin_number_density, diameter_edges)
 
     with mplstyle.context("particula.default"):
         fig, axes = plotting.subplots(1, 2, size="wide")
@@ -325,5 +321,5 @@ if __name__ == "__main__":
 # For a cooling-rate question, add an otherwise identical uncooled control and
 # compare size-resolved water uptake at the same physical times. Keep gas/material
 # mapping explicit and refine any rapid forcing transitions. Continue with the
-# [heterogeneous ensemble](gpu_prepared_multibox.py) for more boxes or
-# [custom process example](custom_process_backends.py) to supply a new forcing law.
+# [heterogeneous ensemble](../../examples/coupled-populations/forcing/gpu_prepared_multibox.py) for more boxes or
+# [custom process example](../../examples/custom-processes/custom_process_backends.py) to supply a new forcing law.

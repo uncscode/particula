@@ -15,13 +15,18 @@ import json
 import platform
 import subprocess
 import time
-from dataclasses import asdict, replace
+from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
 from particula._cpu_batch import detached
-from scripts.gpu_studies.cases import StudyCase, build_case, radius_histogram
+from scripts.gpu_studies.cases import (
+    StudyCase,
+    build_case,
+    prepare_study,
+    radius_histogram,
+)
 from scripts.gpu_studies.validation import (
     native_cpu_steps,
     require,
@@ -58,6 +63,65 @@ def summary(samples):
     }
 
 
+def _legacy_passes(owner, case):
+    """Bind the serial Brownian oracle to independently admitted durations."""
+    from particula.gpu.kernels.coagulation import (
+        _native_coagulation_kernel,
+        apply_coagulation_kernel,
+        initialize_admitted_rng,
+    )
+
+    initial, process, _ = build_case(case)
+    durations = []
+    with prepare_study(case, process, initial) as reference:
+        for _ in range(case.steps):
+            reference.step()
+            durations.append(
+                reference.coagulation_diagnostics()["substep_sizes"]
+            )
+
+    wp = owner._wp
+    call = owner._bindings["coagulation"]
+    args = call.selector_inputs
+    with owner._scope():
+        wp.launch(
+            initialize_admitted_rng,
+            dim=call.n_boxes,
+            inputs=[
+                args[27],
+                call.rng_pending,
+                call.rng_seed,
+                owner._device_failure,
+            ],
+            device=call.device,
+        )
+        owner._wait()
+    apply_args = [
+        call.masses,
+        call.concentration,
+        call.charge,
+        call.collision_pairs,
+        call.n_collisions,
+    ]
+
+    def run_step(step):
+        for duration in durations[step]:
+            wp.launch(
+                _native_coagulation_kernel,
+                dim=call.n_boxes,
+                inputs=(*args[:14], wp.float64(duration), *args[15:]),
+                device=call.device,
+            )
+            wp.launch(
+                apply_coagulation_kernel,
+                dim=(call.n_boxes, call.max_collisions),
+                inputs=apply_args,
+                device=call.device,
+            )
+
+    return run_step
+
+
 class Driver:
     """Use equivalent recorded kernel calls, owner steps, or CUDA replay."""
 
@@ -68,14 +132,7 @@ class Driver:
         if mode == "legacy":
             if case.family != "brownian":
                 raise ValueError("legacy comparison is Brownian-only")
-            from particula.gpu.kernels.coagulation import (
-                _enqueue_prepared_coagulation_call,
-            )
-
-            old = replace(
-                owner._bindings["coagulation"], brownian_parallel=None
-            )
-            self.operations = (lambda: _enqueue_prepared_coagulation_call(old),)
+            self.legacy_step = _legacy_passes(owner, case)
         if mode == "captured":
             owner.capture()
 
@@ -83,7 +140,10 @@ class Driver:
         """Run the workload, including the explicit source-off boundary."""
         owner = self.owner
         for step in range(self.case.steps):
-            if self.mode in ("direct", "legacy"):
+            if self.mode == "legacy":
+                with owner._scope():
+                    self.legacy_step(step)
+            elif self.mode == "direct":
                 with owner._scope():
                     for operation in self.operations:
                         operation()
@@ -224,9 +284,7 @@ def _gpu(case, initial, process, mode, report):
     )
     resident, download = [], []
     print(f"Preparing {case.name} on cuda:0", flush=True)
-    with process.prepare(
-        initial, device="cuda:0", time_step=case.time_step, root_seed=case.seed
-    ) as owner:
+    with prepare_study(case, process, initial) as owner:
         print("Preparation complete", flush=True)
         driver = Driver(owner, case, mode)
         restore = reset_buffers(owner)
@@ -272,12 +330,7 @@ def _fresh_runs(case, initial, process, mode, report):
     setup, capture, overall = [], [], []
     for sample in range(SAMPLES):
         start = time.perf_counter()
-        with process.prepare(
-            initial,
-            device="cuda:0",
-            time_step=case.time_step,
-            root_seed=case.seed,
-        ) as owner:
+        with prepare_study(case, process, initial) as owner:
             owner.synchronize()
             ready = time.perf_counter()
             driver = Driver(owner, case, mode)
@@ -327,8 +380,8 @@ def run(case, mode):
             "no repeated public-wrapper preflight"
         ),
         "legacy_scope": (
-            "previous Brownian selector, retained preparation; "
-            "resident timing only"
+            "serial Brownian selector on the same admitted durations; "
+            "reference schedule generated outside resident timing"
         ),
     }
     edges, histogram = radius_histogram(initial)

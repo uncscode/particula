@@ -1,26 +1,27 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 27.09017544600647,
-  "package_source_sha256": "1d2bf0708c00d6e34107e200c143eb76cae07571fd4e691f1ce7cb88cd95a134",
-  "scientific_source_sha256": "1d2bf0708c00d6e34107e200c143eb76cae07571fd4e691f1ce7cb88cd95a134",
+  "elapsed_seconds": 19.24593841889873,
+  "package_source_sha256": "fb62539e446aa9348489ec67f4eff6f98c534f6e668d75293727a4745fd40ef8",
+  "scientific_source_sha256": "de1b8e4f7828cd58d808601b3cb92b4ade18fbab99ba3c0a9792edc190f53c50",
   "input_sha256": {
-    "scripts/docs_gpu_figures.py": "3aeac1a9de599df908d6951e21c60b1d331bdd4f977125af5fcc6ed5d85925fb",
+    "scripts/docs_gpu_figures.py": "cd9a78452b81e74f31e2fa47d574fce1af75ccb8e777dc5f8a9b3a3966f8af68",
     "scripts/gpu_studies/__init__.py": "530c51f7c7f432a895623c9ba4548b7cf3e053a1a0f328a36ae8ae9e50cec9c4",
-    "scripts/gpu_studies/cases.py": "8728bdc1bb583d849d7228055c5bbc27606c021e1564f2d531b8c9a9e93787ec",
-    "scripts/gpu_studies/validation.py": "816f83d10024feef14daa05112688ea7d26faa3ddde8e05ba12e8dc29f6a4a45",
-    "scripts/gpu_studies/trajectories.py": "41d64b0ef3351bb41c12cd3314b02b7ea7c87d8e225d7b9b6508663f6eca84af"
+    "scripts/gpu_studies/cases.py": "740fc35b2df1dc913bde4e03c91859d3406e0da14b85e9f23804a02c3b0d133e",
+    "scripts/gpu_studies/validation.py": "e87d518878ce2f985209197e888d200d7d6e7dd67723b801f2a8905eccaee3c3",
+    "scripts/gpu_studies/trajectories.py": "28323bc6898d57d439b5e8f5cb38f1b4df6472d813b2c0f2632e07422cf75b17",
+    "particula/particles/properties/number_spectrum.py": "9be9dd1fbc1eb354a44b71dbddcc3687bb179a2cb798ec7a73772394f315100b"
   },
   "example": "gpu-prepared-stochastic",
-  "fingerprint": "2118626d7ec0287503df4a4293ae391b760d8eb41c35a5f75ac131cfdafb7947",
-  "source": "docs/examples/gpu/prepared/gpu_prepared_stochastic.py",
-  "revision": "da142e3dfcf190010d21f1ac07aca1a12e4c9fd0",
+  "fingerprint": "42072647d650639d4b47ffbb6c936f9bba763f3c6b097ee71f4d87d85cf1773e",
+  "source": "docs/studies/examples/coupled-populations/charged-aerosols/gpu_prepared_stochastic.py",
+  "revision": "383665bd1dfbad87632f809299e1b754b726960d",
   "package_dirty": false,
-  "executed_at": "2026-11-19T15:06:32.762439+00:00",
+  "executed_at": "2026-11-27T23:21:41.956862+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.0",
+    "particula": "0.3.6",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -34,6 +35,12 @@
     [],
     [
       {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 1.79 ms  (cached)\nModule particula.gpu.kernels.coagulation 84ae354 load on device 'cuda:0' took 1.24 ms  (cached)\nModule particula.gpu.kernels._coagulation_native f93a244 load on device 'cuda:0' took 1.52 ms  (cached)\nModule warp.utils f35afd3 load on device 'cuda:0' took 0.85 ms  (cached)\nModule warp.math edde159 load on device 'cuda:0' took 0.79 ms  (cached)\nModule warp.marching_cubes fb6e712 load on device 'cuda:0' took 1.47 ms  (cached)\nModule particula.gpu.properties.gas_properties edde159 load on device 'cuda:0' took 2.27 ms  (cached)\nModule particula.gpu.properties.particle_properties edde159 load on device 'cuda:0' took 2.81 ms  (cached)\nModule particula.gpu.dynamics.coagulation_funcs edde159 load on device 'cuda:0' took 2.48 ms  (cached)\nModule particula.gpu.dynamics.condensation_funcs edde159 load on device 'cuda:0' took 2.46 ms  (cached)\nModule particula.gpu.dynamics.ion_pair_data edde159 load on device 'cuda:0' took 2.47 ms  (cached)\nModule particula.gpu.dynamics.van_der_waals edde159 load on device 'cuda:0' took 2.46 ms  (cached)\nModule particula.gpu.kernels._coagulation_budget b4a3978 load on device 'cuda:0' took 1.87 ms  (cached)\nModule particula.gpu.kernels._coagulation_subcycling edde159 load on device 'cuda:0' took 2.45 ms  (cached)\nModule particula.execution.communication 2909959 load on device 'cuda:0' took 1.66 ms  (cached)\nModule particula.gpu.kernels._population_validation edde159 load on device 'cuda:0' took 2.45 ms  (cached)\nModule particula.gpu.kernels.communication ac9b2a2 load on device 'cuda:0' took 2.42 ms  (cached)\nModule particula.gpu.kernels._condensation_native edde159 load on device 'cuda:0' took 2.61 ms  (cached)\nModule particula.gpu.kernels._condensation_parallel edde159 load on device 'cuda:0' took 2.45 ms  (cached)\nModule particula.gpu.kernels.thermodynamics edde159 load on device 'cuda:0' took 2.45 ms  (cached)\nModule particula.gpu.kernels.condensation edde159 load on device 'cuda:0' took 1.82 ms  (cached)\nModule particula.gpu.kernels.exhaustion 616f81d load on device 'cuda:0' took 3.52 ms  (cached)\nModule particula.gpu.kernels.slot_management 0375e2c load on device 'cuda:0' took 1.13 ms  (cached)\nModule particula.gpu.kernels.nucleation 1124f09 load on device 'cuda:0' took 3.21 ms  (cached)\nModule particula.execution.gpu_resources 30f296c load on device 'cuda:0' took 2.28 ms  (cached)\nModule particula.gpu.warp_types edde159 load on device 'cuda:0' took 2.44 ms  (cached)\nModule particula.execution.prepared_diagnostics ca06582 load on device 'cuda:0' took 2.11 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel 5433dfc load on device 'cuda:0' took 2.30 ms  (cached)\nModule particula.execution.prepared_guards 5366864 load on device 'cuda:0' took 1.80 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel f84feee load on device 'cuda:0' took 2.74 ms  (cached)\nModule particula.gpu.kernels._coagulation_subcycling 93efbd4 load on device 'cuda:0' took 1.33 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel c0acfec load on device 'cuda:0' took 4.70 ms  (cached)\nModule particula.gpu.kernels.coagulation fd5b5c9 load on device 'cuda:0' took 3.05 ms  (cached)\nModule particula.gpu.kernels.coagulation 79e9aa8 load on device 'cuda:0' took 1.08 ms  (cached)\nModule particula.gpu.kernels._coagulation_subcycling ca6b3ba load on device 'cuda:0' took 2.95 ms  (cached)\nModule particula.gpu.kernels._coagulation_subcycling a49d377 load on device 'cuda:0' took 0.54 ms  (cached)\n"
+      },
+      {
         "text": "16 independent stream seeds; ensemble spread, not a confidence interval\nDistinct final trajectories: 16\n"
       },
       {
@@ -42,37 +49,9 @@
     ]
   ],
   "files": {
-    "figure-3-1.png": "a36ca4277472194344eb1ecd5155cc18d46e9d1873a28f223cd6434742f695b6",
-    "executed_source.py": "82a2d88a9b90bcc67e83113caf2cc0e099a496cf840fc8883da8e59481c2147b",
-    "data.json": "54bfec9b176c86f848c7d490a50f7e2055b1c94ab56fb2a7a9aea4a716b2a0da",
-    "source.py": "64d61830827181140f6e4a3806de23839d9e24ad0e81c425de48fe1480cf5636"
+    "source.py": "bd2f7d69ec9d128a34fe6c6b5fbb65945d48e4c1126edbdfbb0c3dd06dfc101e",
+    "data.json": "27c9354c4309c566efbde59e15afbf4b38904bdd48c99db95a99a04fc372b0e2",
+    "figure-3-1.png": "99028d9837283231af62353d35eb30e7050f96336dca9d408e61a7dc37421335"
   },
-  "simulation_fingerprint": "5f01c42d6559eafa947fe26035c4f6683fcbae73f93761795a5f77631f4fc009",
-  "historical_run": {
-    "revision": "da142e3dfcf190010d21f1ac07aca1a12e4c9fd0",
-    "study_revision": "535d02b7b06ba782aa2bd5d1c60890e06adbb654",
-    "data_sha256": "54bfec9b176c86f848c7d490a50f7e2055b1c94ab56fb2a7a9aea4a716b2a0da",
-    "package_source_sha256": "1d2bf0708c00d6e34107e200c143eb76cae07571fd4e691f1ce7cb88cd95a134"
-  },
-  "render_versions": {
-    "particula": "0.3.2",
-    "numpy": "2.3.4",
-    "scipy": "1.16.2",
-    "matplotlib": "3.10.7",
-    "nbclient": "0.10.2",
-    "jupytext": "1.17.3",
-    "warp-lang": "1.11.1",
-    "particula-distribution": "0.2.14"
-  },
-  "render_device": "CPU",
-  "execution_input_sha256": {
-    "scripts/docs_gpu_figures.py": "c6e4aca14a964fc2e3f091c92b3384212d40b3211ec34b2fa00df6a0f191a9ae",
-    "scripts/gpu_studies/__init__.py": "530c51f7c7f432a895623c9ba4548b7cf3e053a1a0f328a36ae8ae9e50cec9c4",
-    "scripts/gpu_studies/cases.py": "8728bdc1bb583d849d7228055c5bbc27606c021e1564f2d531b8c9a9e93787ec",
-    "scripts/gpu_studies/validation.py": "816f83d10024feef14daa05112688ea7d26faa3ddde8e05ba12e8dc29f6a4a45",
-    "scripts/gpu_studies/trajectories.py": "41d64b0ef3351bb41c12cd3314b02b7ea7c87d8e225d7b9b6508663f6eca84af"
-  },
-  "rendered_at": "2026-11-19T19:37:27.271227+00:00",
-  "render_revision": "f5be504b2ecb3d768eb5a41a2be1be19b0d2d96d",
-  "render_elapsed_seconds": 3.6000824630027637
+  "simulation_fingerprint": "eb99d612300ad3074352746a57d2274166eb40d1c4bc6ff41cd3cd4ff1134bd2"
 }

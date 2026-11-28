@@ -30,7 +30,7 @@ from particula.gas.vapor_pressure_strategies import (
     ConstantVaporPressureStrategy,
     WaterBuckStrategy,
 )
-from particula.particles import ParticleData
+from particula.particles import ParticleData, get_particle_number_spectrum
 from particula.particles.activity_strategies import ActivityIdealMolar
 from particula.particles.surface_strategies import SurfaceStrategyVolume
 from particula.util.constants import AVOGADRO_NUMBER, GAS_CONSTANT
@@ -52,6 +52,35 @@ class StudyCase:
     seed: int = 42
     heterogeneous: bool = False
     experiment: str = "steady"
+
+
+def prepare_study(case, process, aerosol, *, seed=None):
+    """Prepare a study interval with bounded Brownian collision passes."""
+    options = {}
+    if any(
+        isinstance(item, Coagulation)
+        for item in getattr(process, "processes", (process,))
+    ):
+        from particula.gpu.kernels import coagulation
+
+        # Archived engines use their original sampler. The current engine can
+        # split just the collisions while preserving the forcing/output clock.
+        policy = getattr(coagulation, "CoagulationSubcyclingConfig", None)
+        if policy is not None:
+            options["coagulation_subcycling"] = policy(
+                min_substep=case.time_step / 256,
+                max_subcycles=32,
+                # The 4096-box composed run reserves ~19.3 GiB on paper,
+                # including conservative bounds for source and rollback work.
+                max_device_bytes=24 * 1024**3,
+            )
+    return process.prepare(
+        aerosol,
+        device="cuda:0",
+        time_step=case.time_step,
+        root_seed=case.seed if seed is None else seed,
+        **options,
+    )
 
 
 def water_pressure(temperature):
@@ -251,10 +280,7 @@ def particle_inventory(aerosol):
 def radius_histogram(aerosol, edges=None):
     """Number concentration in logarithmic radius bins, resolved by box."""
     edges = np.geomspace(0.2e-9, 2e-6, 65) if edges is None else edges
-    p = aerosol.particles
-    radius = np.cbrt(np.sum(p.masses / p.density, axis=-1) * 3 / (4 * np.pi))
-    rows = [
-        np.histogram(r, bins=edges, weights=c / v)[0]
-        for r, c, v in zip(radius, p.concentration, p.volume, strict=True)
-    ]
-    return edges, np.asarray(rows)
+    rows = get_particle_number_spectrum(
+        aerosol.particles, 2 * edges
+    ).bin_number_density
+    return edges, rows

@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
+from particula.particles import get_bin_number_density
 from PIL import Image
 from scipy.ndimage import binary_erosion
 from scipy.spatial import cKDTree
@@ -90,7 +91,12 @@ def extract(fig3, fig5, supp):
         dist, idx = colors.query(pixels)
         if max(dist) > 95:
             continue
-        n = 10 ** (idx * 4 / (len(palette) - 1)) * np.diff(np.log10(edges))
+        n = (
+            get_bin_number_density(
+                10 ** (idx * 4 / (len(palette) - 1)) * 1e6, edges * 1e-9
+            )
+            * 1e-6
+        )
         rows.extend(zip(np.full_like(n, hour), diameter, n, strict=True))
     np.savetxt(
         ROOT / "background.csv",

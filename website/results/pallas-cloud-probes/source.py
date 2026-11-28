@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 from matplotlib.ticker import FixedFormatter, FixedLocator, NullLocator
 from particula import plotting
+from particula.particles import get_number_per_decade
 
 plt.style.use("particula.default")
 TEAL = plotting.COLORS["teal"]
@@ -68,13 +69,15 @@ def field_figure(field):
     for col, (day, group) in enumerate(field.groupby("day")):
         top, bottom = panels[:, col]
         edges = np.r_[group.low_um, group.high_um.iloc[-1]]
-        width = np.diff(np.log10(edges))
         for name, color, stroke in [
             ("FSSP", TEAL, "-"),
             ("ICEMET", RUST, "--"),
         ]:
             top.stairs(
-                group[name] / width,
+                get_number_per_decade(
+                    group[name].to_numpy() * 1e6, edges * 1e-6
+                )
+                * 1e-6,
                 edges,
                 baseline=None,
                 label=name,

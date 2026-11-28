@@ -6,6 +6,7 @@ import numpy as np
 from particula.util.constants import GAS_CONSTANT
 from scripts.gpu_studies.cases import (
     particle_inventory,
+    prepare_study,
     radius_histogram,
     water_pressure,
 )
@@ -43,9 +44,7 @@ def _evolution_once(case, initial, process):
     expected = mapped_inventory(initial)
     external = np.zeros_like(expected)
     max_error = 0.0
-    with process.prepare(
-        initial, device="cuda:0", time_step=case.time_step, root_seed=case.seed
-    ) as owner:
+    with prepare_study(case, process, initial) as owner:
         owner.capture()
         frame, _ = _frame(owner, 0)
         frames.append(frame)
@@ -154,9 +153,7 @@ def stochastic(case, initial, process):
     histories, histograms, hashes = [], [], []
     seeds = list(range(16))
     for seed in seeds:
-        with process.prepare(
-            initial, device="cuda:0", time_step=case.time_step, root_seed=seed
-        ) as owner:
+        with prepare_study(case, process, initial, seed=seed) as owner:
             owner.capture()
             history = [owner.diagnostics().number_concentration.tolist()]
             for _ in range(case.steps):
@@ -201,9 +198,7 @@ def _source_off(owner):
 def lifecycle(case, initial, process, processes):
     """Check all five processes, source/sink budgets and exact restart."""
     reference, ledger = validate_process_cycle(case, initial, processes)
-    with process.prepare(
-        initial, device="cuda:0", time_step=case.time_step, root_seed=case.seed
-    ) as original:
+    with prepare_study(case, process, initial) as original:
         original.capture()
         original.step()
         first = original.snapshot()
@@ -236,9 +231,7 @@ def lifecycle(case, initial, process, processes):
             resumed.checkpoint().resident.rng_continuation == continuation,
             "restart changed random continuation",
         )
-    with process.prepare(
-        initial, device="cuda:0", time_step=case.time_step, root_seed=case.seed
-    ) as ordinary:
+    with prepare_study(case, process, initial) as ordinary:
         ordinary.step()
         _source_off(ordinary)
         ordinary.run(case.steps - 1)
