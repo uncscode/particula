@@ -213,7 +213,7 @@ class ShortwaveWorkspace:
         """Download spectral results in case order.
 
         Returns:
-            tuple[ShortwaveFlux, ...]: Detached CPU results for each case.
+            (tuple[ShortwaveFlux, ...]): Detached CPU results for each case.
 
         Raises:
             RuntimeError: If no solve has run or a device result failed.
@@ -365,7 +365,7 @@ def prepare_shortwave(
             widths.
 
     Returns:
-        ShortwaveWorkspace: Retained layer and boundary data. Use enqueue()
+        (ShortwaveWorkspace): Retained layer and boundary data. Use enqueue()
             after updating inputs. Use download() for detached CPU results.
 
     Raises:
