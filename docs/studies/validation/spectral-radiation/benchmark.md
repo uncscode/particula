@@ -35,6 +35,10 @@ The Bai cloud study archived visible optical profiles from its clean, slowly asc
 
 A separate libRadtran control changed only solar ray geometry between plane-parallel and pseudo-spherical DISORT. For the aerosol-free US standard atmosphere above albedo 0.20, surface total spectral irradiance agreed to within 1% at the tested solar zenith angles through 70° at 350, 550, and 850 nm. The largest difference across wavelengths grew to 1.79% at 75°, 4.02% at 80°, and 15.31% at 85°. Use 70° as the tested one-percent limit for this surface quantity and atmosphere. Nearer the horizon, geometry dominates comparisons even with identical optical coefficients. [Low-Sun comparison](https://github.com/uncscode/particula/blob/main/studies/spectral-radiation/benchmark/low_sun.csv)
 
+![Relative differences in surface irradiance rise toward the horizon at 350, 550 and 850 nm. The dashed line marks one percent.](../../../images/spectral-radiation/low-sun.png)
+
+Each marker compares the plane-parallel and pseudo-spherical DISORT solutions at the same solar zenith angle. The vertical axis gives the absolute difference as a percentage of the pseudo-spherical total downwelling irradiance. At 75° the differences reach 1.79% at 350 nm and 1.01% at 550 nm, while the 850 nm difference is 0.12%.
+
 ## What changes for a directional surface?
 
 With solar and view zenith cosines both 0.8 and surface-relative azimuths of 60°, 170°, and 180°, the native Ross–Li land model agreed with libRadtran radiance to within 0.077% at the three wavelengths. Both codes used isotropic, volumetric and geometric coefficients of 0.22, 0.08 and 0.015. For this test the atmosphere contained a 550 nm aerosol depth of 0.1 with the same optical spectrum as the slab comparison, single-scattering albedo 0.92, and asymmetry 0.55.
@@ -50,6 +54,10 @@ For 64 two-layer columns, Warp computed interface fluxes in **69 ms** on a GeFor
 | 1 | 14.7 ms | 14.3 ms |
 | 16 | 17.1 ms | 219 ms |
 | 64 | 68.9 ms | 899 ms |
+
+![Measured NumPy and Warp solve times are close at one column and diverge at 16 and 64 columns on the RTX 5060.](../../../images/spectral-radiation/warp-scaling.png)
+
+The markers are measured batch sizes. At 64 columns the GPU solve was 13 times faster than the one-thread CPU loop. Both axes use logarithmic spacing. [Recorded benchmark values](https://github.com/uncscode/particula/blob/main/studies/spectral-radiation/benchmark/warp_scaling_rtx5060.csv)
 
 CUDA times are medians of three synchronized solves after workspace preparation, with inputs and results on device. The first preparation took 326 ms including Warp initialization with a populated kernel cache. The benchmark checks every column's upwelling spectrum against NumPy after timing. Directional radiance, live particle Mie calculations, changing surface geometry and host downloads have separate costs. [Timing script](https://github.com/uncscode/particula/blob/main/studies/spectral-radiation/benchmark/warp_scaling.py) · [Running on a simulation stream](../../../guide/optics/index.md)
 

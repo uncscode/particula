@@ -9,7 +9,7 @@
     "particula/optics/reference_data/tsis1.txt": "3fccfc7415b2cf4743905c9f7566ed632046c7badbe59dec350dc108bc5b7b3f"
   },
   "example": "shortwave-parcel-surfaces",
-  "fingerprint": "84686bcf0eca11bc781c479ce9abc21fd28896659ead66bec31da47514af23af",
+  "fingerprint": "e65b11d755c5be55274c8a1883b56badf1d24a8094e79e46fa6a8a2ecce1eece",
   "source": "docs/studies/examples/coupled-populations/radiation/parcel_surfaces.py",
   "revision": "277b9a3a975235e56e6ea5379add89a540be02f4",
   "package_dirty": true,
@@ -37,13 +37,36 @@
       },
       {
         "image": "figure-5-1.png"
+      },
+      {
+        "image": "figure-5-2.png"
       }
     ]
   ],
   "files": {
-    "source.py": "a573198433dc31bae9e2e2ad7186e5c733474682b6b7800b96f022da0a40f217",
+    "source.py": "2cacac9525cbcc21ca006c2c443252e583b6e3e52f6e10ade98d3b0374d28378",
     "data.json": "5cee7fd57d57d4cfcd253c4b01e4d5fe89234ccfda947d68db6cd545c7aa0e47",
-    "figure-5-1.png": "7ea081ba1507dcb4158a0d97ae203f69863910450ed9edaf99470ea3d86c859d"
+    "executed_source.py": "a573198433dc31bae9e2e2ad7186e5c733474682b6b7800b96f022da0a40f217",
+    "figure-5-1.png": "7ea081ba1507dcb4158a0d97ae203f69863910450ed9edaf99470ea3d86c859d",
+    "figure-5-2.png": "92c6ea8e5f274b23823e027a5a3d602d4b289ff0a1f4eb791dd0919c3b0d0922"
   },
-  "simulation_fingerprint": "1d70ade7dfbfda07678f8658e3fb72bc864f7cc15fa545d5ab6ed5149f56ce23"
+  "simulation_fingerprint": "1d70ade7dfbfda07678f8658e3fb72bc864f7cc15fa545d5ab6ed5149f56ce23",
+  "render_versions": {
+    "particula": "0.4.0",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "render_device": "CPU",
+  "execution_input_sha256": {
+    "particula/optics/reference_data/gas_reduced.npz": "92ddac24d33d8966ca1226f54a8c67ff84b83f68fc24e7512315a026eb648834",
+    "particula/optics/reference_data/tsis1.txt": "3fccfc7415b2cf4743905c9f7566ed632046c7badbe59dec350dc108bc5b7b3f"
+  },
+  "rendered_at": "2026-11-28T17:24:16.388013+00:00",
+  "render_revision": "9a14f2cb71e41ca83dd66c22f2e58ac1dc3ed99a",
+  "render_elapsed_seconds": 3.706848156871274
 }
