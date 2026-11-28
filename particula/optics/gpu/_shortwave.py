@@ -322,6 +322,16 @@ def begin_solve(status: wp.array2d(dtype=int)):
     status[c, w] = -1
 
 
+@wp.func
+def _finite_flux(value: wp.vec3d):
+    """Check all three directional flux components for NaN or infinity."""
+    return (
+        wp.isfinite(value[0])
+        and wp.isfinite(value[1])
+        and wp.isfinite(value[2])
+    )
+
+
 @wp.kernel(enable_backward=False)
 def integrate_flux(
     flux: wp.array3d(dtype=wp.vec3d),
@@ -335,7 +345,7 @@ def integrate_flux(
     for w in range(flux.shape[2]):
         value += weights[c, w] * flux[c, k, w]
     total[c, k] = value
-    if not wp.isfinite(value):
+    if not _finite_flux(value):
         wp.atomic_max(status, c, 0, 2)
 
 
@@ -367,5 +377,5 @@ def difference_flux(
     c, k = wp.tid()
     value = total[c, k] - total[refs[c], k]
     delta[c, k] = value
-    if not wp.isfinite(value):
+    if not _finite_flux(value):
         wp.atomic_max(status, c, 0, 2)
