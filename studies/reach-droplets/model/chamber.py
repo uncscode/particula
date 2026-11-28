@@ -1,5 +1,6 @@
 """Frozen-parameter mesh and observation-operator study for Sagan's two expansions."""
 
+from condensation import budget_error, remap
 import json, time, os
 from pathlib import Path
 import numpy as np
@@ -156,25 +157,9 @@ def run_case(
             path = (chord @ gas) / (chord @ factor[i])
             gas = gas + factor[i] * (chi[i] - path)
             new2 = m.diam**2 + dt * (growth[i] + response[i] * (gas / factor[i] - chi[i]))[:, None]
-            water = (
-                1000
-                * np.pi
-                / 6
-                * 1e-12
-                * ((new2.clamp(min=0) ** 1.5 - m.vol) * pop).sum(1)
-                / frac[:, 0]
-            )
-            wetgas = gas - water
-            pos = new2.clamp(min=1e-10).sqrt() / width - 0.5
-            j = pos.floor().long()
-            alpha = pos - j
-
-            def deposit(idx, weight):
-                return torch.zeros_like(pop).scatter_add(
-                    1, idx.clamp(0, nt - 1), pop * weight * ((idx >= 0) & (idx < nt) & (new2 > 0))
-                )
-
-            wet = deposit(j, 1 - alpha) + deposit(j + 1, alpha)
+            wet, uptake = remap(pop, new2, m.vol)
+            wetgas = gas - uptake / frac[:, 0]
+            residual = budget_error(pop, wet, m.vol, gas, wetgas, frac[:, 0])
             if pair_schedule is not None:
                 other, mid = pair_schedule(t)
                 k = other * (m.base - m.kernel["midpairs"]) + mid * m.kernel["midpairs"]
@@ -211,8 +196,9 @@ def run_case(
                         abs((after - settled).sum(0)).max(),
                         abs((gas - wetgas) @ frac[:, 0]),
                         merged.min(),
-                        gas.min(),
+                        torch.minimum(wetgas.min(), gas.min()),
                         abs(((merged - conc) @ m.vol).mul(frac[:, 0]).sum()),
+                        residual,
                     ]
                 )
                 .cpu()
@@ -225,6 +211,7 @@ def run_case(
         and ledger[:, 3].min() > -1e-12
         and ledger[:, 4].min() > 0
         and ledger[:, 5].max() < 1e-8
+        and ledger[:, 6].max() < 1e-15
     )
     name = (
         f"{run}-{mesh}-{flow}-{kernel}"

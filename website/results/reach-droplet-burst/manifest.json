@@ -1,18 +1,18 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 1.920631502987817,
+  "elapsed_seconds": 1.23383685387671,
   "package_source_sha256": "d4849ffeb7f688f80c072e5440f387b64f4be422cea8c9437a2ca56952e019f3",
   "scientific_source_sha256": "dabfdd2bd677c3fc02738b557c9f139a31fd177db9ff1f51b97566dfd290745d",
   "input_sha256": {
-    "website/public/study-data/reach-droplets/figure-data.zip": "ef4785135ed68f1e51e6a71fecf7a891820dd36c09a18811d15dbde4af66575c"
+    "website/public/study-data/reach-droplets/figure-data.zip": "3ca640eef03bc0ce31d62e0cd391032799e56b3b7a8bf578080c3927d8d774e3"
   },
   "example": "reach-droplet-burst",
-  "fingerprint": "aced32c8d5d0246f023efcd03feca36ed6bb27b8513840ceeb01eec7e94f4a53",
+  "fingerprint": "62f9757f72e65151f3a5f288fdef4d6ac372393e668c4f993539c315cf885c20",
   "source": "docs/studies/literature/reach-droplets/burst.py",
-  "revision": "d5560b4c9e48ae42e8ce59fcf71e19aade5733d5",
+  "revision": "4c38aa9fe56382f45a99504cd3130367d92ffa67",
   "package_dirty": false,
-  "executed_at": "2026-11-27T23:27:32.983821+00:00",
+  "executed_at": "2026-11-28T01:52:13.639236+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {

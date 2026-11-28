@@ -66,6 +66,7 @@ def run_case(run, gain, mesh):
             True,
             analysis_update=update if gain else None,
         )
+        assert bud[:, 6].max() < 1e-15 and bud[:, 4].min() > 0
         np.savez_compressed(
             folder / "prediction.npz",
             t=m.t,

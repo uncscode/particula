@@ -1,5 +1,6 @@
 """Differentiable size-resolved chamber model and instrument mapping for Figure 7."""
 
+from condensation import budget_error, remap
 import numpy as np
 from workspace import WORK, background
 
@@ -153,27 +154,10 @@ class Forward:
                 gas = gas - 1000 * np.pi / 6 * 1e-12 * (new_count @ m.vol)
             gain = 8e12 * ((gas / factor[i]) * self.p / es[i] - 1) / resistance[i]
             new2 = m.diam**2 + dt * gain[:, None]
-            water = (
-                1000
-                * np.pi
-                / 6
-                * 1e-12
-                * ((new2.clamp(min=0) ** 1.5 - m.vol) * pop).sum(1)
-                / self.f[:, 0]
-            )
-            vgas = gas - water
-            pos = new2.clamp(min=1e-10).sqrt() / self.width - 0.5
-            j = pos.floor().long()
-            w = pos - j
-
-            def deposit(idx, frac):
-                return torch.zeros_like(pop).scatter_add(
-                    1,
-                    idx.clamp(0, len(m.d) - 1),
-                    pop * frac * ((idx >= 0) & (idx < len(m.d)) & (new2 > 0)),
-                )
-
-            wet = deposit(j, 1 - w) + deposit(j + 1, w)
+            wet, uptake = remap(pop, new2, m.vol)
+            vgas = gas - uptake / self.f[:, 0]
+            if diagnostics:
+                residual = budget_error(pop, wet, m.vol, gas, vgas, self.f[:, 0])
             conc = wet / self.f
             if logs.shape[1] == 6:
                 kernel = m.base * 10 ** (logs[i] @ self.pair_weights)
@@ -200,8 +184,9 @@ class Forward:
                             (gas * self.f[:, 0] - vgas * self.f[:, 0]).sum().abs(),
                             ((merged - conc) @ m.vol * self.f[:, 0]).sum().abs(),
                             (merged - conc).sum(1).add(events).abs().max(),
-                            gas.min(),
+                            torch.minimum(vgas.min(), gas.min()),
                             after.min(),
+                            residual,
                         ]
                     )
                 )

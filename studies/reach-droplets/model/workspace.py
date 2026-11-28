@@ -8,7 +8,8 @@ from zipfile import ZipFile
 import pandas as pd
 
 STUDY = Path(__file__).resolve().parents[1]
-WORK = Path(os.environ.get("REACH_OUTPUT", "reach-output")).resolve()
+# A fitted history is a function of the sectional remap as well as its controls.
+WORK = Path(os.environ.get("REACH_OUTPUT", "reach-output")).resolve() / "volume-remap-v1"
 ARCHIVE = STUDY.parents[1] / "website/public/study-data/reach-droplets/digitizations.zip"
 
 

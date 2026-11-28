@@ -1,5 +1,6 @@
 """Fit the six early diameter bands jointly in the two expansions on the CPU."""
 
+from condensation import budget_error, remap
 import json
 import numpy as np
 import torch
@@ -28,7 +29,7 @@ def forward_setup(run, mode, step=0.05, width=2, offset=0, flow_case="standard")
     chi = T(chi[:, None])
     anomaly = T(anomaly)
     diameter = T(d)
-    bins = len(d)
+    volume = diameter**3
     survive = T(np.exp(-step * loss))
     fall = T(-np.expm1(-step * speed * nz / H))
     height = int(round(0.25 / step))
@@ -60,7 +61,6 @@ def forward_setup(run, mode, step=0.05, width=2, offset=0, flow_case="standard")
         transported = None
         coupled = flow_case == "vapor-transport"
         chord = T(vapor_chord(mode))
-        unit_mass = 1000 * np.pi / 6 * 1e-12
         vapor_to_mass = p * 0.01801528 / (8.314462618 * temp)
         # A single uniform correction constrains the measured chord after gas exchange.
         # Local anomalies persist. Liquid water transfer uses continuous droplet diameters.
@@ -75,24 +75,14 @@ def forward_setup(run, mode, step=0.05, width=2, offset=0, flow_case="standard")
                 g = g + wet_rate[i] * (gas / factor - chi[i])
 
             new2 = diameter**2 + step * g[:, None]
+            wet, uptake = remap(pop, new2, volume)
             if coupled:
-                water = (
-                    unit_mass
-                    * ((new2.clamp(min=0) ** 1.5 - diameter**3) * pop).sum(1)
-                    / fraction[:, 0]
-                )
-                transported = (trans @ ((gas - water) * fraction[:, 0])) / fraction[:, 0]
+                wetgas = gas - uptake / fraction[:, 0]
+                transported = (trans @ (wetgas * fraction[:, 0])) / fraction[:, 0]
                 if not train:
-                    assert transported.min() > 0
-            pos = torch.sqrt(new2.clamp(min=1.0e-10)) / width - 0.5
-            lower = pos.floor().long()
-            alpha = pos - lower
-
-            def deposit(j, weight):
-                source = pop * weight * ((j >= 0) & (j < bins) & (new2 > 0))
-                return torch.zeros_like(pop).scatter_add(1, j.clamp(0, bins - 1), source)
-
-            adv = (deposit(lower, 1 - alpha) + deposit(lower + 1, alpha)) * survive
+                    assert budget_error(pop, wet, volume, gas, wetgas, fraction[:, 0]) < 1e-15
+                    assert torch.minimum(wetgas.min(), transported.min()) > 0
+            adv = wet * survive
             settled = adv * (1 - fall)
             if nz > 1:
                 settled = torch.cat((settled[:-nr] + adv[nr:] * fall, settled[-nr:]), dim=0)
@@ -103,7 +93,7 @@ def forward_setup(run, mode, step=0.05, width=2, offset=0, flow_case="standard")
                 fields.append(mid)
             pop = end
         spectra = torch.stack(values)
-        byq = spectra.reshape(-1, height, bins).mean(1) @ T(bands.T)
+        byq = spectra.reshape(-1, height, len(d)).mean(1) @ T(bands.T)
         if retain:
             return byq.detach().numpy(), torch.stack(fields).detach().numpy()
         return byq
@@ -172,6 +162,9 @@ def calibrate():
         )
     best = min([r for r in records if r["case"] == case], key=lambda r: r["objective"])
     result = {run: np.array(best["x"])[keys[i]].tolist() for i, run in enumerate(RUNS)}
+    with torch.no_grad():
+        for run, (forward, _, _) in zip(RUNS, setup):
+            forward(T(result[run]))  # Verify the retained fit over the full record.
     WORK.mkdir(parents=True, exist_ok=True)
     (WORK / "early-background.json").write_text(json.dumps(result, indent=2) + "\n")
 

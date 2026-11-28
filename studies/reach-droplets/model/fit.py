@@ -220,6 +220,7 @@ def fit(
             and bud[:, 3].max() < 1e-8
             and bud[:, 4].min() > 0
             and bud[:, 5].min() > -1e-12
+            and bud[:, 6].max() < 1e-15
         )
         np.savez_compressed(
             folder / "prediction.npz",
