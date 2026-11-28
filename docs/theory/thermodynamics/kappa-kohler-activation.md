@@ -17,6 +17,10 @@ Here $\sigma$ is the solution–air surface tension (N m⁻¹), $M_w$ the water 
 
 For a seed of known dry size, the critical ratio is the highest $S_{\rm eq}$ over $D>D_d$. A seed below the critical dry size encounters a peak higher than the available vapor ratio as it takes up water. A larger seed of the same composition has a lower barrier. At a prescribed ratio $S>1$, define the critical dry diameter by equality between the peak and $S$. Equality counts as the threshold in an equilibrium population calculation.
 
+![Three Köhler curves plot equilibrium supersaturation against wet droplet diameter. The 80 nm dry seed peaks above the 0.20% setting, the 104.54 nm dry seed touches it at 702 nm wet, and the 130 nm dry seed peaks below it.](../../images/thermodynamics/kappa-kohler-barrier.png)
+
+With $\kappa=0.3$ and $A=2.1$ nm held fixed, the 80 nm dry seed needs about 0.30% supersaturation to pass its peak. The 130 nm seed needs only 0.14%, so the available 0.20% exceeds its entire barrier. The middle curve just touches the dashed line. Its 104.54 nm **dry** diameter is the population cutoff, while its 702 nm **wet** diameter locates the peak along the growth curve.
+
 ## Invert the peak for dry diameter
 
 At any crossing $S_{\rm eq}=S$ with $\kappa>0$, set $L=\ln S$ and $t=A/D-L$. Taking the logarithm of the activity term gives $e^t-1=\kappa D_d^3/(D^3-D_d^3)$. Substituting $D=A/(L+t)$ expresses the dry diameter of that crossing entirely in terms of $t>0$.
