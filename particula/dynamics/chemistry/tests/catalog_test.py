@@ -288,6 +288,75 @@ def test_kpp_fixed_reservoir(tmp_path, source, tag, location):
         catalog.export([snap], tmp_path / "gas.json")
 
 
+@pytest.mark.parametrize(
+    ("source", "tag"), [("mcm", "<R>"), ("wrf-chem", "{R}")]
+)
+def test_kpp_commented_equations(tmp_path, source, tag):
+    """Keep actual labels, source lines and implicit oxygen through comments."""
+    file = tmp_path / "case.eqn"
+    file.write_text(
+        "{ preamble\n#EQUATIONS\nignored; }\n#EQUATIONS\n"
+        "{ mechanism note;\n#SETFIX OH; }\n"
+        f"{tag} NO + O3 = NO2 {{ + O2}} : 1e-12; {{ trailing note; }}\n"
+    )
+    catalog = ChemistryCatalog(tmp_path / "db")
+    snap = catalog.import_file(source, file, release="1", mechanism="box")
+    row = catalog.show(snap + "/R")
+    assert row["line"] == 7
+    assert row["equation"] == "NO + O3 = NO2 { + O2}"
+    assert "OH" not in row["metadata"]["fixed_species"]
+    with pytest.raises(ValueError, match="closed-box O2"):
+        catalog.export([snap], tmp_path / "gas.json")
+    catalog.export([snap], tmp_path / "gas.json", close_oxygen=True)
+
+
+@pytest.mark.parametrize(
+    ("source", "tag"), [("mcm", "<R>"), ("wrf-chem", "{R}")]
+)
+@pytest.mark.parametrize("override_file", ["primary", "companion"])
+def test_kpp_reclassifies_reservoir(tmp_path, source, tag, override_file):
+    """The last explicit species setting controls closed-box export."""
+    catalog = ChemistryCatalog(tmp_path / "db")
+    file, companion = tmp_path / "case.eqn", tmp_path / "case.spc"
+    equation = f"#EQUATIONS\n{tag} NO + HO2 = NO2 + OH : 1e-12;\n"
+    declarations = "#DEFVAR\nOH = H + O;\n"
+    for variable in (False, True):
+        overrides = "#SETFIX OH;\n" + ("#SETVAR\n OH;\n" if variable else "")
+        primary = overrides if override_file == "primary" else declarations
+        companion.write_text(
+            declarations if override_file == "primary" else overrides
+        )
+        file.write_text(equation + primary)
+        snap = catalog.import_file(
+            source, file, release="1", mechanism="box", companions=[companion]
+        )
+        assert (
+            "OH" in catalog.show(snap + "/R")["metadata"]["fixed_species"]
+        ) != variable
+        if variable:
+            catalog.export([snap], tmp_path / "gas.json")
+        else:
+            with pytest.raises(ValueError, match="prescribed reservoir"):
+                catalog.export([snap], tmp_path / "gas.json")
+
+
+def test_mcm_inactive_element_declarations(tmp_path):
+    """Inactive atom declarations cannot make an unbalanced reaction exportable."""
+    file = tmp_path / "case.eqn"
+    file.write_text(
+        "#DEFVAR\nA = C + H;\nB = C;\n{ old composition\nA = C;\n}\n"
+        "#EQUATIONS\n<R> A = B : 2.0;\n"
+    )
+    catalog = ChemistryCatalog(tmp_path / "db")
+    snap = catalog.import_file("mcm", file, release="1", mechanism="box")
+    assert catalog.show(snap + "/R")["metadata"]["elements"]["A"] == {
+        "C": 1,
+        "H": 1,
+    }
+    with pytest.raises(ValueError, match="external material budget"):
+        catalog.export([snap], tmp_path / "gas.json")
+
+
 def test_mcm_repeated_atoms(tmp_path):
     """Keep all hydrogens when testing a local MCM equation's atom balance."""
     file = tmp_path / "source.eqn"
@@ -379,3 +448,23 @@ def test_camx_local_unit_evidence(tmp_path, description, concentration, time):
         ValueError, match="ppm/min rate conversion|units require verification"
     ):
         c.export([snap], tmp_path / "gas.json")
+
+
+@pytest.mark.parametrize(
+    ("primary", "companion", "issue"),
+    [
+        ("#SETVAR ALL_SPEC;", "", "unsupported KPP #SETVAR selector"),
+        ("#SETVAR OH;", "#SETFIX OH;", "ambiguous KPP reclassification"),
+    ],
+)
+def test_kpp_unknown_classification_order(tmp_path, primary, companion, issue):
+    """Unsupported selectors and conflicting file settings fail explicitly."""
+    file, species = tmp_path / "case.eqn", tmp_path / "case.spc"
+    file.write_text("#EQUATIONS\n<R> NO + HO2 = NO2 + OH : 1e-12;\n" + primary)
+    species.write_text(companion)
+    catalog = ChemistryCatalog(tmp_path / "db")
+    with pytest.raises(ValueError, match=issue):
+        catalog.import_file(
+            "mcm", file, release="1", mechanism="box", companions=[species]
+        )
+    assert catalog.search() == []
