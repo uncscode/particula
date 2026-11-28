@@ -32,7 +32,7 @@ I repeated the issue's count from the tracked Python production sources. Walking
 | [Warp population validation](../particula/gpu/kernels/_population_validation.py), [condensation](../particula/gpu/kernels/_condensation_native.py), [adaptive reservoirs](../particula/execution/_condensation_reservoirs.py), [native optics](../particula/optics/gpu/state.py), [array optics](../particula/optics/gpu/population.py), [resident diagnostics](../particula/execution/diagnostics.py) | Device-side weights and separate reductions for represented kg and m⁻³. Direct coagulation/nucleation/wall-loss kernels also bind raw writable buffers. | Mirror native formulas in Warp and reuse an existing device primitive where its metadata, precision and guards agree. Keep device data resident. Track both unit-discrete-volume guards and both directions of the diagnostic reduction for #1752. |
 | [Batch staging](../particula/_cpu_batch.py), [box process](../particula/box_process.py), [transfer](../particula/gpu/conversion.py), [recording](../particula/execution/recording.py), [checkpoint](../particula/execution/checkpoint.py), [prepared processes](../particula/execution/prepared_processes.py), [capture](../particula/execution/graph_capture.py) | Raw storage, tuple keys, schema names, dtype, alias and identity checks, RNG continuity. The recorder also selects density properties through strings. | Preserve native buffers for copies and binding. Keep the recorder's raw `particle_concentration` separate from its derived number/mass observations. Retain all checkpoint keys and versions here. Inventory these names for #1752, including upload/download, restart, prepared resources, forcing and extension adapters. |
 
-At PR closeout, extend this inventory with the actual changed symbols and the disposition of remaining raw sites. A second search for `"particles.concentration"`, `("particles", "concentration")`, `getattr`, `distribution_kind`, `concentration_units`, and kernel arguments named `count`, `counts` or `weight` finds boundaries the AST count omits. Trace references to their owning particle or gas field before changing them.
+A second search for `"particles.concentration"`, `("particles", "concentration")`, `getattr`, `distribution_kind`, `concentration_units`, and kernel arguments named `count`, `counts` or `weight` finds boundaries the AST count omits. Trace references to their owning particle or gas field before changing them.
 
 ### Implementation disposition for the storage migration
 
@@ -46,6 +46,21 @@ The shared CPU arithmetic lives in [the particle measure module](../particula/pa
 | Native device arithmetic | Direct and chunked condensation reductions, the adaptive gas/Jacobian reservoir reductions, and prepared optics share [`native_slot_density`](../particula/gpu/kernels/_population_validation.py). Its input is a scalar plus an explicit resolved flag; native tags and standalone optics measure codes stay at their respective boundaries. Revisit condensation event-count/latent-energy finalization, extensive diagnostic mass accumulation, resolved-only chemistry and communication kernels, and the unit-volume guards in both native device validators. Keep specialized resident diagnostic reductions and their launch signatures stable in this PR. |
 | Transport and device-buffer ownership | Grid and closed-map transport deal in physical inventories. Direct and prepared coagulation, condensation, wall loss, nucleation, communication and optical heating retain raw arrays for launches, shape checks and alias checks. Batch slicing, replacement, copies, GPU transfer, resource acquisition, graph capture, prepared fields, restart and state updates retain storage identity. Migrate keys and metadata at those boundaries as a coordinated schema change. |
 | Analysis and exact restart | The recorder field `"particles.concentration"`, the checkpoint key `("particles", "concentration")`, and extension/restart bindings still describe raw values. Density observations retain physical units. Give persisted raw values explicit versioned interpretation in #1752 and distinguish detached analysis files from exact device continuation. |
+
+### Owners of remaining direct references
+
+On implementation revision `f343041cf8`, the same AST query finds 146 references in 46 production files, including three inside the new conversion module. Use the owner list below together with the indirect schema and builder paths above when reviewing #1752. A raw buffer crossing a kernel launch can serve several quantities inside that kernel.
+
+| Source directory | Modules with direct references | What to verify in the storage migration |
+| --- | --- | --- |
+| `particula/` | `_cpu_batch`, `aerosol`, `aerosol_validation`, `box_process` | Batch slices, representation checks, writable destinations and per-box copy-back preserve the raw field's shape and identity. |
+| `particles/` | `_population`, `exhaustion` | Change the density conversion and its inverse. In exhaustion, the resolved count and represented volume scale together. |
+| `dynamics/` | `chemistry/resolved`, `coagulation/coagulation_strategy/{_native_step,_native_validation}`, `condensation/{_native_step,condensation_strategies}`, `dilution`, `ions/{cleanup,condensation}`, `nucleation/particle_source`, `optical_heating`, `optical_heating_gpu`, `particle_process`, `wall_loss/_native` | Separate counts used for selection, births, destruction, per-slot field retirement and alias checks from physical source/sink rates. Binned coagulation commits density through the writer. Dilution and wall loss still scale raw populations at fixed volume. |
+| `optics/` | `state`, `gpu/state` | CPU radius and activity selection needs an occupancy mask. Device input bindings carry the raw field and require the matching measure tag. |
+| `execution/` | `adapters/condensation`, `condensation_ode`, `gpu_condensation_ode`, `gpu_coupled`, `gpu_resident_condensation`, `gpu_resources`, `gpu_session` | Preserve occupancy checks, payloads, pointers and reservoir bindings. Apply the density conversion in physical budget reductions. |
+| `execution/` | `diagnostics`, `prepared_diagnostics`, `prepared_nucleation`, `prepared_particle_fields`, `prepared_processes`, `graph_capture`, `resident_communication` | Check each mass and number reduction against its extensive or intensive output label. Captured launches bind the raw buffer. Communication moves represented particles and their fields. |
+| `execution/` | `checkpoint`, `checkpoint_extensions`, `state_updates` | Snapshot, restore and replace the raw field and validate compatible metadata. Audit the indirect recording keys separately. |
+| `gpu/kernels/` | `_coagulation_native`, `_condensation_native`, `_wall_loss_native`, `coagulation`, `communication`, `condensation`, `nucleation`, `wall_loss` | Update bindings and unit-volume admission together. Hardware kernels performing rate, event-count, mass or energy reductions need distinct quantity checks. Resolved merges and transport keep their raw count semantics. |
 
 ## Implementation order
 
@@ -86,3 +101,39 @@ python -m pytest -q -Werror --no-cov -rs \
 ```
 
 For implementation closeout, also run the affected [mapped-species tests](../particula/dynamics/condensation/tests/species_mapping_test.py), [condensation reference suite](../particula/integration_tests/condensation_reference_test.py), [transfer tests](../particula/gpu/tests/conversion_test.py), [recording](../particula/execution/tests/recording_test.py) and [native checkpoint tests](../particula/execution/tests/native_checkpoint_test.py). If changing a wall-loss path, run both wall-loss test locations explicitly. If a prepared binding changes, run its direct and resident suites on supported backends and obtain actual CUDA evidence for capture. Use the [repository validation commands](../plugins/particula-helper/references/repository-validation.md) for source, examples, scripts, lint and typing. Record tested commit, exact commands, skips and numerical discrepancies in the PR.
+
+## Implementation verification
+
+Tested implementation `f343041cf80f2dda0448d2f90270284fbaf8c91e` with Python 3.12.12, NumPy 2.3.4 and Warp 1.11.1. Run from the worktree with the selected Python environment active, `PYTHONPATH=.` and `OPENBLAS_NUM_THREADS=1`. The host exposed both Warp CPU and an NVIDIA GeForce RTX 5060. The commands below use Bash brace expansion.
+
+The independent three-node PDF fixture gave weights [1, 6, 2] m⁻³ in native, condensation and measurement optics, total number density 9 m⁻³ and species densities [21, 16] × 10⁻¹⁸ kg/m³ at relative tolerance 10⁻¹⁴ and zero absolute tolerance. The new grid test compares each extensive lane exactly. The resolved optics test checks extinction and absorption for each box at each wavelength at relative tolerance 3 × 10⁻¹⁴ and zero absolute tolerance, and verifies the empty-box validity flags.
+
+The standard source suite passed 11,535 tests with 26 skipped, 65 deselected and one expected failure. The examples suite passed 274 tests with 6 skipped and 4 deselected. All 435 scripts tests passed. Ruff lint and formatting passed for the selected paths, and mypy reported no issues in 811 source files. Both focused runs below completed with zero skips. The focused counts overlap with the source suite.
+
+```bash
+# Physical rates, integrals, conservation, transfer and restart: 491 passed.
+python -m pytest -q --no-cov -Werror -rs \
+  particula/particles/tests/particle_population_test.py \
+  particula/optics/tests/{population,state}_test.py \
+  particula/dynamics/tests/{native_dilution,wall_loss_strategies,optical_heating}_test.py \
+  particula/coupling/tests/grid_flow_test.py \
+  particula/integration_tests/{native_scientific_processes,coagulation_reference,condensation_reference}_test.py \
+  particula/dynamics/condensation/tests/species_mapping_test.py \
+  particula/gpu/tests/conversion_test.py \
+  particula/execution/tests/{recording,native_checkpoint}_test.py \
+  particula/dynamics/chemistry/tests/resolved_test.py particula/dynamics/wall_loss/tests/
+
+# Direct, prepared, captured and restarted device paths: 1,142 passed.
+python -m pytest -q -Werror --no-cov -rs \
+  particula/gpu/kernels/tests/{condensation_native,wall_loss_native,coagulation_native}_test.py \
+  particula/optics/tests/gpu_population_test.py \
+  particula/execution/tests/{diagnostics,condensation_reservoirs,optical_recording,gpu_resident_condensation,native_checkpoint,prepared_restart_capture}_test.py \
+  particula/coupling/tests/grid_flow_test.py particula/dynamics/wall_loss/tests/
+
+python -m pytest -q -Werror -m 'not slow and not performance'
+python -m pytest -q examples_tests -Werror -m 'not slow and not performance'
+python -m pytest -q scripts/tests -Werror
+ruff check --no-fix particula/ examples_tests/ scripts/ _particula_build.py particula_docs.py
+ruff format --check particula/ examples_tests/ scripts/ _particula_build.py particula_docs.py
+mypy particula/ --ignore-missing-imports
+```
