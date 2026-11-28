@@ -7104,6 +7104,22 @@
       "start_here": false
     },
     {
+      "source": "docs/guide/data-model/measurement-collections.md",
+      "title": "Compare instruments on a common time grid",
+      "topic": "representations-measures",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/guide/data-model/measurement-processing.md",
+      "title": "Calibrate instrument signals and prescribe a measurement product",
+      "topic": "representations-measures",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
       "source": "docs/studies/validation/workflows-and-releases/measurement-import.md",
       "title": "Importing 108 million counter readings under a 1 GiB limit",
       "topic": "verification-qualification",
@@ -7138,6 +7154,33 @@
           }
         ],
         "order": 2
+      }
+    },
+    {
+      "source": "docs/studies/examples/calibrated_particle_count.py",
+      "title": "When 100 counts per second means 10 or 5 particles per cubic centimetre",
+      "topic": "representations-measures",
+      "also": [
+        "custom"
+      ],
+      "role": "Studies",
+      "study": {
+        "id": "calibrated-particle-count",
+        "runs": [
+          "calibrated-particle-count"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/studies/examples/measurement_import.py",
+            "label": "Source readings"
+          },
+          {
+            "target": "docs/guide/data-model/measurement-processing.md",
+            "label": "Usage guide"
+          }
+        ],
+        "order": 3
       }
     },
     {
@@ -7554,6 +7597,7 @@
     }
   ],
   "study_group_exceptions": {
+    "docs/studies/examples": "Keep the two instrument examples adjacent so a reader can proceed from raw counter records to calibrated concentrations. The five remaining choices are subject collections.",
     "docs/studies/literature": "The seven literature themes separate field constraints on stratospheric chemistry from chamber evaporation, aerosol growth, water uptake, cloud activation, precipitation and transport comparisons.",
     "docs/studies/validation/condensation": "The sparse-activity benchmark compares chemistry construction, lookup and fallback costs across both parcel and box workflows. Its reference and timing matrix are shared across integrators.",
     "docs/studies/validation": "The validation collections distinguish prescribed-flow replay against external CFD from local process tests, optics and release qualification.",

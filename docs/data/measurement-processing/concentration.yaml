@@ -1,0 +1,12 @@
+recipe_version: "1"
+steps:
+  - operation: lab.flow.linear
+    version: "1"
+    inputs: {signal: flow_voltage}
+    parameters: {calibration: flow-scale}
+    output: calibrated_flow
+  - operation: particula.particle_counter.number_concentration
+    version: "1"
+    inputs: {rate: inlet_rate, sample_flow: calibrated_flow}
+    output: inlet_number
+result: inlet_number

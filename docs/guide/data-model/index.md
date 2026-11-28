@@ -46,6 +46,9 @@ is implied. Native transfers and caller-owned scratch remain visible.
 
 Instrument exports have a separate profile-driven reader for time, units,
 coordinates and quality flags. [Read instrument measurements](measurements.md).
+For products from several deployments, [compare instruments on a common time
+grid](measurement-collections.md) or [apply a calibration and derive a
+measurement product](measurement-processing.md).
 
 ## Public imports
 

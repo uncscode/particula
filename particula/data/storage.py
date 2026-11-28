@@ -2,6 +2,7 @@
 
 import json
 import os
+from collections.abc import Callable
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import cast
@@ -15,17 +16,22 @@ from particula.data.profile import (
     digest,
     load_profile,
 )
-from particula.data.reader import MeasurementReader
+from particula.data.reader import BatchReader, MeasurementReader
 
 
 def read_measurement(
-    source: str | os.PathLike[str], *, profile: ProfileSource, **limits: int
+    source: str | os.PathLike[str],
+    *,
+    profile: ProfileSource,
+    reader_factory: Callable[..., BatchReader] = MeasurementReader,
+    **limits: int,
 ) -> Measurement:
     """Read a single instrument export into memory.
 
     Args:
         source: Path to the delimited export.
         profile: Built-in ID, mapping, or path to a JSON or YAML profile.
+        reader_factory: Trusted strategy constructing a new batch reader.
         **limits: Optional MeasurementReader chunk, record and batch limits.
 
     Returns:
@@ -37,7 +43,7 @@ def read_measurement(
         ValueError: A reader limit is invalid or the source changes during
             import.
     """
-    reader = MeasurementReader(source, profile, **limits)
+    reader = reader_factory(source, profile, **limits)
     scans, issues = zip(*reader.batches(), strict=True)
     return measurement(
         pl.concat(scans, how="vertical_relaxed").lazy(),
@@ -50,7 +56,8 @@ def open_measurement(destination: str | os.PathLike[str]) -> Measurement:
     """Open a completed Parquet measurement for lazy analysis.
 
     Args:
-        destination: Dataset directory created by import_to_parquet.
+        destination: Dataset directory created by import_to_parquet or
+            save_measurement.
 
     Returns:
         Measurement with lazy scans and diagnostics, validated profile units
@@ -63,6 +70,15 @@ def open_measurement(destination: str | os.PathLike[str]) -> Measurement:
     """
     root = Path(destination)
     manifest = json.loads((root / "manifest.json").read_bytes())
+    if "snapshot_version" in manifest:
+        from particula.data.snapshot import open_snapshot
+
+        return open_snapshot(root, manifest)
+    return _open_import(root, manifest)
+
+
+def _open_import(root: Path, manifest: dict) -> Measurement:
+    """Validate and reopen the complete raw import at the given path."""
     if manifest.get("format_version") != 1:
         raise ValueError("Unrecognized measurement manifest version")
     profile = load_profile(manifest["profile"])
@@ -109,6 +125,7 @@ def import_to_parquet(
     destination: str | os.PathLike[str],
     *,
     profile: ProfileSource,
+    reader_factory: Callable[..., BatchReader] = MeasurementReader,
     **limits: int,
 ) -> Measurement:
     """Write bounded Parquet parts and atomically publish a completed import.
@@ -117,21 +134,22 @@ def import_to_parquet(
         source: Path to a delimited instrument export.
         destination: Directory to publish after all parts have been written.
         profile: Built-in ID, mapping, or path to a JSON or YAML profile.
+        reader_factory: Trusted strategy constructing a new batch reader.
         **limits: Optional MeasurementReader chunk, record and batch limits.
 
     Returns:
         Disk-backed measurement with lazy scans and source diagnostics.
-        An existing dataset is reused when the source digest, profile digest
-        and parser version match.
+        An existing raw import is reused when the source digest, profile
+        digest and parser version match.
 
     Raises:
-        FileExistsError: The destination holds an incomplete or different
-            dataset.
+        FileExistsError: The destination holds a saved snapshot, an incomplete
+            import or a different dataset.
         ProfileError: The profile or source violates the input rules.
         ValueError: A reader limit is invalid or the source changes during
             import.
     """
-    reader = MeasurementReader(source, profile, **limits)
+    reader = reader_factory(source, profile, **limits)
     dest = Path(destination)
     dest.parent.mkdir(parents=True, exist_ok=True)
     with TemporaryDirectory(dir=dest.parent, prefix=".measurement-") as temp:
@@ -163,7 +181,9 @@ def import_to_parquet(
                 _sync(dest.parent)
                 return open_measurement(dest)
         try:
-            existing = open_measurement(dest)
+            existing = _open_import(
+                dest, json.loads((dest / "manifest.json").read_bytes())
+            )
         except (
             OSError,
             ValueError,

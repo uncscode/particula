@@ -118,6 +118,24 @@
           {
             "label": "Native container access and ownership",
             "slug": "guide/data-model/ownership"
+          },
+          {
+            "label": "Instrument measurements",
+            "collapsed": true,
+            "items": [
+              {
+                "label": "Read instrument measurements",
+                "slug": "guide/data-model/measurements"
+              },
+              {
+                "label": "Compare instruments on a common time grid",
+                "slug": "guide/data-model/measurement-collections"
+              },
+              {
+                "label": "Calibrate instrument signals and prescribe a measurement product",
+                "slug": "guide/data-model/measurement-processing"
+              }
+            ]
           }
         ]
       },

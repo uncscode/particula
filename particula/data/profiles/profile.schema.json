@@ -610,7 +610,11 @@
             "length",
             "pressure",
             "relative_humidity",
-            "ratio"
+            "ratio",
+            "voltage",
+            "volumetric_flow",
+            "duration",
+            "count"
           ]
         },
         "source_unit": {
@@ -804,6 +808,106 @@
               "output_unit": {
                 "enum": [
                   "1"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "quantity": {
+                "const": "voltage"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source_unit": {
+                "enum": [
+                  "V",
+                  "mV"
+                ]
+              },
+              "output_unit": {
+                "enum": [
+                  "V",
+                  "mV"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "quantity": {
+                "const": "volumetric_flow"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source_unit": {
+                "enum": [
+                  "L/min",
+                  "cm^3/s",
+                  "m^3/s"
+                ]
+              },
+              "output_unit": {
+                "enum": [
+                  "L/min",
+                  "cm^3/s",
+                  "m^3/s"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "quantity": {
+                "const": "duration"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source_unit": {
+                "enum": [
+                  "s",
+                  "ms"
+                ]
+              },
+              "output_unit": {
+                "enum": [
+                  "s",
+                  "ms"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "quantity": {
+                "const": "count"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source_unit": {
+                "enum": [
+                  "count"
+                ]
+              },
+              "output_unit": {
+                "enum": [
+                  "count"
                 ]
               }
             }

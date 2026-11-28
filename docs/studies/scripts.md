@@ -154,6 +154,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [What crosses a shared parcel face?](examples/thermodynamics/parcel-experiments/parcel_cluster.py)
 - [What does the second gust lift from a partly depleted dune?](examples/particle-processes/gust_dust_emission.py)
 - [What survives a data transfer?](tutorials/building-an-aerosol/containers/data_containers.py)
+- [When 100 counts per second means 10 or 5 particles per cubic centimetre](examples/calibrated_particle_count.py)
 - [When a size-distribution plot hides a composition error](examples/coupled-populations/emissions/organic_partitioning_and_coagulation.py)
 - [When does drying split an alcohol–salt droplet into two liquids?](examples/thermodynamics/equilibria/aiomfac_humidity_sweep.py)
 - [Where does a dust puff go when the wind turns?](examples/gas-transport/turning_sounding.py)

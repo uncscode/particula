@@ -41,7 +41,7 @@ def read_particle_counter(
     Raises:
         ValueError: The profile produces a different measurement type.
     """
-    result = ParticleCounter(profile).read(source, **limits)
+    result = ParticleCounter(profile).read(source, as_product=None, **limits)
     if not isinstance(result, ParticleCountRate):
         raise ValueError("The supplied profile did not produce a count rate")
     return result

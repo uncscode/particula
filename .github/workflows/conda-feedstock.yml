@@ -6,6 +6,7 @@ on:
     paths:
       - particula/__init__.py
       - particula/conftest.py
+      - particula/data/profiles/profile.schema.json
       - conftest.py
       - pyproject.toml
       - _particula_build.py

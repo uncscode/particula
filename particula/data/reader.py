@@ -11,6 +11,7 @@ from collections.abc import Iterator
 from itertools import chain, takewhile
 from pathlib import Path
 from threading import Lock
+from typing import Protocol
 
 import polars as pl
 
@@ -330,6 +331,17 @@ def _events(records, profile):
     if pending:
         _, first, total = pending
         yield None, first, first, total, "unresolved_fragment"
+
+
+class BatchReader(Protocol):
+    """Normalized batches, active source layout and final import manifest."""
+
+    segment: int
+    manifest: dict | None
+
+    def batches(self) -> Iterator[tuple[pl.DataFrame, pl.DataFrame]]:
+        """Yield scan and diagnostic frames and finalize metadata at EOF."""
+        ...
 
 
 class MeasurementReader:
