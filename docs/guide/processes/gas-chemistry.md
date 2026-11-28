@@ -80,9 +80,8 @@ other reaction types and unrecognized fields produce an error before export.
 
 Use the reaction catalog when you need a published equation and rate law in a
 Particula box. For example, a study of ozone loss by NO can use one WACCM
-reaction from a whole-atmosphere mechanism. Fetch the catalog from the matching
-Particula GitHub Release, retrieve a named source recipe, or import a local
-model case. Particula indexes released native reactions and local source imports
+reaction from a whole-atmosphere mechanism. Fetch a versioned Particula chemistry catalog release, retrieve a named source recipe, or import a local
+model case. Particula indexes released reaction records and local source imports
 in a SQLite catalog. Named source imports also retain the original files. The Python API and CLI use the same catalog.
 
 ### Choose the source files
@@ -109,23 +108,24 @@ time units are null in the record and the study lock.
 
 ### Export a selected gas reaction
 
-Run `particula chem fetch` to download the prebuilt catalog for the installed
-Particula version. Python users can call `ChemistryCatalog().fetch()`.
-The ZIP contains already converted Particula reactions, including 39 WACCM
-channels, 95 channels from the MCM α-pinene subset and 2,153 from the full
-MCM. Each configuration retains its own reaction IDs and provenance. The
-two MCM configurations overlap. The release also covers supported channels
-from E3SM, WRF-Chem, CMAQ, CAMx and PMCAMx. The manifest reports the full
-source inventory and how many channels have native mechanisms for each recipe.
+Run `particula chem fetch` for the latest stable catalog release. To reproduce
+a study, use `particula chem fetch --catalog-version 1.0.0` or
+`ChemistryCatalog().fetch(catalog_version="1.0.0")`. Catalog data versions
+are independent of the installed Particula version.
+
+Catalog 1.0.0 contains all 19,655 entries from the ten pinned configurations.
+Of these, 2,311 carry executable native conversions. Every entry retains its
+reported chemistry and source location. For example, you can inspect and lock
+both PMCAMx SOAP yield schemes. Entries that require host physics report the
+reason when you request a native export. The two MCM configurations overlap.
 [NCAR WACCM](https://www.cesm.ucar.edu/working-groups/whole-atmosphere/code) ·
 [University of York MCM citation guidance](https://www.mcm.york.ac.uk/MCM/about/cite)
 
 Fetch the ZIP once, then search and export offline. Particula verifies its
-SHA-256 checksum and indexes the native records alongside your local studies.
-Use `particula chem fetch --json` for snapshot IDs and citations. To inspect a
-full source inventory, including expressions that require host-model physics,
-use a named import such as `particula chem fetch waccm`. Named recipes also
-work with development builds before their release asset exists.
+SHA-256 checksum and indexes its records alongside your local studies.
+Use `particula chem fetch --json` for the release tag, snapshot IDs and citations.
+A named import such as `particula chem fetch waccm` retrieves or reuses the
+original upstream files when you need to audit or regenerate the conversion.
 Set `PARTICULA_CHEM_CATALOG` to choose a SQLite path. The default is
 `particula/chemistry.sqlite3` under the user's cache directory.
 

@@ -19,6 +19,7 @@ from particula.dynamics.chemistry.catalog import (
 from particula.dynamics.chemistry.catalog.cli import main
 from particula.dynamics.chemistry.mechanism import ReactionMechanism
 from scripts import build_chemistry_catalog as builder
+from scripts import publish_chemistry_catalog as publisher
 
 REACTION = b"Reactions\n[t] NO + O3 -> NO2 + O2 ; 3e-12,-1500\nEnd Reactions\n"
 
@@ -50,14 +51,19 @@ def assets(tmp_path, monkeypatch):
     monkeypatch.setattr(
         sources, "urlopen", lambda *a, **kw: pytest.fail("unexpected import")
     )
+    (native_data / "VERSION").write_text("1.0.0")
     builder.build(out, native_data)
     original = (out / bundle.ASSET).read_bytes()
     builder.build(out, native_data)
     assert original == (out / bundle.ASSET).read_bytes()
 
     def download(url, timeout):
+        if url.startswith(bundle.RELEASES_API):
+            return io.BytesIO(
+                b'[{"tag_name":"chemistry-catalog-v1.0.0","draft":false,"prerelease":false}]'
+            )
         assert url.startswith(
-            f"https://github.com/uncscode/particula/releases/download/{bundle.RELEASE}/"
+            f"{bundle.DOWNLOAD_URL}/chemistry-catalog-v1.0.0/"
         )
         return (out / url.rsplit("/", 1)[1]).open("rb")
 
@@ -152,32 +158,41 @@ def test_missing_release(tmp_path, monkeypatch, capsys):
     monkeypatch.setattr(bundle, "urlopen", missing)
     monkeypatch.setenv("PARTICULA_CHEM_CATALOG", str(tmp_path / "catalog.db"))
     with pytest.raises(SystemExit, match="2"):
-        main(["chem", "fetch", "--json"])
+        main(["chem", "fetch", "--catalog-version", "1.0.0", "--json"])
     assert "fetch RECIPE" in json.loads(capsys.readouterr().err)["error"]
 
 
 def test_release_job_publishes_both_catalog_assets():
-    """Require the builder and its checked output in the base release path."""
-    workflow = builder.NOTICES.parents[1] / ".github/workflows/pypi.yml"
-    jobs = yaml.safe_load(workflow.read_text())["jobs"]
-    steps = jobs["pyping"]["steps"]
-    build_step = next(
-        step
-        for step in steps
-        if "scripts.build_chemistry_catalog" in step.get("run", "")
+    """Catalog publication is gated on its own version and tested build."""
+    workflows = builder.NOTICES.parents[1] / ".github/workflows"
+    config = yaml.safe_load((workflows / "chemistry-catalog.yml").read_text())
+    triggers = config.get("on", config.get(True))
+    assert triggers["push"] == {
+        "branches": ["main"],
+        "paths": ["chemistry_catalog/VERSION"],
+    }
+    assert config["jobs"]["publish"]["needs"] == "build"
+    assert "build_chemistry_catalog" not in (workflows / "pypi.yml").read_text()
+
+
+def test_latest_catalog_version(monkeypatch):
+    """Ignore software, draft and prerelease tags and search all pages."""
+
+    def item(tag, draft=False, pre=False):
+        return dict(tag_name=tag, draft=draft, prerelease=pre)
+
+    first = [item("v9.0.0")] * 97 + [
+        item("chemistry-catalog-v1.9.0"),
+        item("chemistry-catalog-v4.0.0", draft=True),
+        item("chemistry-catalog-v3.0.0", pre=True),
+    ]
+    pages = iter([first, [item("chemistry-catalog-v1.10.0")]])
+    monkeypatch.setattr(
+        bundle,
+        "urlopen",
+        lambda url, timeout: io.BytesIO(json.dumps(next(pages)).encode()),
     )
-    assert build_step["if"] == "needs.release-plan.outputs.publish == 'true'"
-    assert (
-        f"sha256sum --strict --check {bundle.ASSET}.sha256" in build_step["run"]
-    )
-    assert "sha256sum catalog/* >> SHA256SUMS" in build_step["run"]
-    publish = "\n".join(
-        step.get("run", "") for step in jobs["publish"]["steps"]
-    )
-    assert (
-        f"cp candidates/catalog/{bundle.ASSET}{{,.sha256}} release-assets/"
-        in publish
-    )
+    assert bundle.latest_version() == "1.10.0"
 
 
 def test_committed_native_inventory(tmp_path, monkeypatch):
@@ -195,17 +210,43 @@ def test_committed_native_inventory(tmp_path, monkeypatch):
         lambda url, timeout: (tmp_path / url.rsplit("/", 1)[1]).open("rb"),
     )
     catalog = ChemistryCatalog(tmp_path / "catalog.db")
-    snapshots = catalog.fetch()["snapshots"]
-    assert sum(s["source_count"] for s in snapshots.values()) == 19655
-    assert sum(s["count"] for s in snapshots.values()) == 2311
-    assert sum(s["requires_closed_oxygen"] for s in snapshots.values()) == 7
+    snapshots = catalog.fetch(
+        catalog_version=(builder.DATA / "VERSION").read_text().strip()
+    )["snapshots"]
+    if (builder.DATA / "VERSION").read_text().strip() == "1.0.0":
+        assert sum(s["count"] for s in snapshots.values()) == 19655
+        assert sum(s["native_count"] for s in snapshots.values()) == 2311
+        assert sum(s["requires_closed_oxygen"] for s in snapshots.values()) == 7
+    assert all(s["count"] == s["source_count"] for s in snapshots.values())
     for key, snapshot in snapshots.items():
         rows = catalog.search(snapshot=snapshot["id"])
         assert len(rows) == snapshot["count"]
+        native_count = 0
         for line in (builder.DATA / f"{key}.jsonl").read_bytes().splitlines():
             item = json.loads(line)
+            if item["mechanism"] is None:
+                assert item["native_issue"]
+                continue
+            native_count += 1
             mechanism = ReactionMechanism.from_dict(item["mechanism"])
             assert len(mechanism.reactions) == 1
+        assert native_count == snapshot["native_count"]
+    soap_id = snapshots["pmcamx-soap"]["id"] + "/SOAP1"
+    assert soap_id in {
+        r["id"] for r in catalog.search(species="CAS3", role="product")
+    }
+    soap = catalog.show(soap_id)
+    assert soap["metadata"]["yield_unit"] == "ppm/ppm"
+    assert soap["expression"] and soap["native_reaction"] is None
+    assert snapshots["mcm"]["RO2"]
+    lock = tmp_path / "soap.lock.json"
+    catalog.export([soap_id], lock, target="lock")
+    assert (
+        json.loads(lock.read_bytes())["reactions"][0]["metadata"]
+        == soap["metadata"]
+    )
+    with pytest.raises(ValueError, match="NOx-dependent SOAP"):
+        catalog.export([], tmp_path / "soap.json", lock_path=lock)
     path = tmp_path / "ozone.json"
     for key, label in (("waccm", "NO_O3"), ("mcm", "7"), ("mcm-full", "7")):
         rid = snapshots[key]["id"] + "/" + label
@@ -234,3 +275,49 @@ def test_source_and_native_snapshot_coexist(assets, monkeypatch):
         catalog.show(native_row["id"])["native_reaction"]["id"]
         == source_id + "/t"
     )
+
+
+@pytest.mark.parametrize("exists", [False, True])
+def test_independent_publisher(assets, tmp_path, monkeypatch, exists):
+    """Use the catalog tag and preserve assets on retries."""
+    from shutil import copytree
+
+    release = publisher.release
+    monkeypatch.setattr(release, "ROOT", tmp_path)
+    monkeypatch.setenv("GITHUB_SHA", "a" * 40)
+    monkeypatch.setenv("GITHUB_REPOSITORY", release.REPOSITORY)
+    version = tmp_path / "chemistry_catalog/VERSION"
+    version.parent.mkdir()
+    version.write_text("1.0.0")
+    target = copytree(assets, tmp_path / "dist/catalog")
+    calls = []
+
+    def command(*args):
+        calls.append(args)
+        return "a" * 40
+
+    monkeypatch.setattr(release, "command", command)
+    monkeypatch.setattr(release, "ensure_tag", lambda *args: calls.append(args))
+    existing = dict(
+        draft=False,
+        prerelease=False,
+        assets=[
+            dict(name=p.name, digest="sha256:" + release.digest(p))
+            for p in target.iterdir()
+        ],
+    )
+    monkeypatch.setattr(
+        release, "fetch_json", lambda *a, **kw: existing if exists else None
+    )
+    publisher.publish()
+    assert ("1.0.0", "a" * 40, "chemistry-catalog") in calls
+    creates = [cmd for cmd in calls if cmd[:3] == ("gh", "release", "create")]
+    if exists:
+        assert not creates
+        assert not any(cmd[:3] == ("gh", "release", "upload") for cmd in calls)
+    else:
+        assert creates[0][3] == "chemistry-catalog-v1.0.0"
+        assert "--latest=false" in creates[0] and "--verify-tag" in creates[0]
+    version.write_text("1.0.1")
+    with pytest.raises(ValueError, match="version differs"):
+        publisher.publish()

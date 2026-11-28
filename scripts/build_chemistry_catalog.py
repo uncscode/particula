@@ -1,4 +1,4 @@
-"""Convert pinned channels and package the reviewed native records."""
+"""Package complete chemistry inventories and their native conversions."""
 
 import argparse
 import hashlib
@@ -8,7 +8,11 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from particula.dynamics.chemistry.catalog import ChemistryCatalog, sources
-from particula.dynamics.chemistry.catalog.bundle import ASSET, FORMAT, RELEASE
+from particula.dynamics.chemistry.catalog.bundle import (
+    ASSET,
+    FORMAT,
+    catalog_tag,
+)
 from particula.dynamics.chemistry.catalog.native import compile_channel
 from particula.dynamics.chemistry.catalog.store import IMPORT_VERSION
 from particula.dynamics.chemistry.mechanism import ReactionMechanism
@@ -27,47 +31,36 @@ CITATIONS = {
 
 
 def _convert(record):
-    """Return one validated executable channel, with any oxygen assumption."""
+    """Preserve each source entry and attach its validated native conversion."""
+    row = {
+        k: v for k, v in record.items() if k not in {"id", "snapshot", "source"}
+    }
+    row.update(source_id=record["id"], requires_closed_oxygen=False)
     try:
         reaction, species = compile_channel(record)
-        closure = False
     except ValueError:
         try:
             reaction, species = compile_channel(record, close_oxygen=True)
-        except ValueError:
-            return None
-        closure = True
+        except ValueError as exc:
+            return dict(row, mechanism=None, native_issue=str(exc))
+        row["requires_closed_oxygen"] = True
     mechanism = dict(
         version=1, basis="mol/m^3-air", species=species, reactions=[reaction]
     )
     ReactionMechanism.from_dict(mechanism)
-    aliases = {
-        role: sorted(
-            set(record[role + "s"])
-            - {name.removeprefix("gas:") for name in reaction[role + "s"]}
-        )
-        for role in ("reactant", "product")
-    }
-    return dict(
-        source_aliases={
-            role: names for role, names in aliases.items() if names
-        },
-        label=record["label"],
-        revision=record["revision"],
-        line=record["line"],
-        requires_closed_oxygen=closure,
-        mechanism=mechanism,
-    )
+    return dict(row, mechanism=mechanism, native_issue="")
 
 
 def refresh(catalog, directory):
-    """Regenerate reviewable native records using checksum-pinned inputs."""
+    """Regenerate the full catalog from checksum-pinned source inventories."""
     directory.mkdir(parents=True, exist_ok=True)
     snapshots = {}
     for key in sorted(sources.recipes()):
         snapshot = catalog.show(catalog.fetch(key))
         records = catalog.selection([snapshot["id"]])["reactions"]
-        converted = [item for r in records if (item := _convert(r))]
+        converted = [_convert(record) for record in records]
+        if len(converted) != snapshot["count"]:
+            raise ValueError(f"incomplete source snapshot for {key}")
         data = "".join(
             json.dumps(row, sort_keys=True, separators=(",", ":")) + "\n"
             for row in converted
@@ -76,14 +69,23 @@ def refresh(catalog, directory):
         digest = hashlib.sha256(data).hexdigest()
         snapshots[key] = {
             field: snapshot[field]
-            for field in ("release", "mechanism", "files", "source", "aerosol")
+            for field in (
+                "release",
+                "mechanism",
+                "files",
+                "source",
+                "aerosol",
+                "RO2",
+            )
+            if field in snapshot
         }
         snapshots[key].update(
-            id=f"{snapshot['id']}:native@{digest}",
+            id=f"{snapshot['id']}:catalog@{digest}",
             source_snapshot=snapshot["id"],
             importer_version=snapshot["importer_version"],
             source_count=snapshot["count"],
             count=len(converted),
+            native_count=sum(row["mechanism"] is not None for row in converted),
             requires_closed_oxygen=sum(
                 row["requires_closed_oxygen"] for row in converted
             ),
@@ -96,7 +98,7 @@ def refresh(catalog, directory):
 
 
 def build(output, directory=DATA):
-    """Package the reviewed native files offline with a release checksum."""
+    """Package the complete catalog offline with a release checksum."""
     output.mkdir(parents=True, exist_ok=True)
     snapshots = json.loads((directory / "snapshots.json").read_bytes())
     recipes = sources.recipes()
@@ -104,7 +106,7 @@ def build(output, directory=DATA):
         raise ValueError("native inventory differs from pinned recipe list")
     manifest = dict(
         format=FORMAT,
-        release=RELEASE,
+        release=catalog_tag((directory / "VERSION").read_text().strip()),
         importer_version=IMPORT_VERSION,
         snapshots=snapshots,
     )
@@ -118,6 +120,7 @@ def build(output, directory=DATA):
         if (
             hashlib.sha256(data).hexdigest() != snapshot["sha256"]
             or len(data.splitlines()) != snapshot["count"]
+            or snapshot["count"] != snapshot["source_count"]
             or snapshot["importer_version"] != IMPORT_VERSION
             or snapshot["files"] != files
             or any(
@@ -125,7 +128,7 @@ def build(output, directory=DATA):
                 for k in ("source", "release", "mechanism", "aerosol")
             )
         ):
-            raise ValueError(f"stale or damaged native catalog for {key}")
+            raise ValueError(f"stale or damaged catalog for {key}")
         entries[name] = data
     for notice in sorted(NOTICES.glob("*.txt")):
         entries[f"notices/{notice.name}"] = notice.read_bytes()
@@ -150,7 +153,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--refresh",
         action="store_true",
-        help="regenerate tracked native records from pinned recipes first",
+        help="regenerate all tracked records from pinned recipes first",
     )
     args = parser.parse_args()
     if args.refresh:

@@ -71,17 +71,19 @@ ambiguous. [WACCM channel](https://github.com/ESCOMP/CAM/blob/405a3f21446439d8f9
 - **Converted reactions.** The [native catalog](../chemistry_catalog/snapshots.json)
   records 19,655 input entries across ten recipes. It contains 2,311 individually
   validated native channels, including seven ozone titration channels requiring
-  explicit closed-box oxygen. The per-recipe JSON Lines files store native
-  mechanisms, source locations, revisions and assumptions. The manifest links
+  explicit closed-box oxygen. The per-recipe JSON Lines files retain every source entry, its rate
+  expression, stoichiometry, metadata, location and revision. Each entry
+  contains its native mechanism or a diagnostic explaining the conversion limit. The manifest links
   the upstream sources and records the pinned file hashes and conversion counts.
   Refresh these files intentionally with
   `python -m scripts.build_chemistry_catalog --refresh --output dist/catalog`
   and review the changed reactions and counts.
-- **GitHub Release.** The base library release job packages the committed native
-  records offline with `python -m scripts.build_chemistry_catalog --output dist/catalog`.
-  It attaches the ZIP and SHA-256 file to the matching library tag. Default fetch
-  indexes those native records. Named source imports retain the upstream inputs
-  for a full source inventory and subsequent conversions.
+- **GitHub Release.** The catalog has its own version in `chemistry_catalog/VERSION`.
+  A version change on upstream main builds and tests the committed inventory
+  and publishes the ZIP and checksum under `chemistry-catalog-vMAJOR.MINOR.PATCH`.
+  Default fetch selects the highest stable catalog version. For exact replay use
+  `particula chem fetch --catalog-version 1.0.0`. Format compatibility is checked
+  independently from the upstream importer version recorded in the artifact.
 - **Local cache.** SQLite holds the original source bytes, immutable records
   and species index in a single file. Import commits them together. Repeating
   a recipe uses cached source bytes, and searching requires neither upstream
