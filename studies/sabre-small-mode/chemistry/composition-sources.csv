@@ -1,0 +1,17 @@
+flight,product,revision,filename,bytes,sha256,archive
+20230308,SABRE-PALMSng,R1,SABRE-PALMSng_WB57_20230308_R1.ict,27989,dd36749238f3047eab0df5f6281a5f9a7d1cc09ffae40770c735d5ce9779fb89,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230308,SABRE-PALMSng-Chem-Mass,R0,SABRE-PALMSng-Chem-Mass_WB57_20230308_R0.ict,15262,57ac0af1937eb5ca50d0ca14cae669e5994bb824281aeb9cc9e740bdfd62dcdd,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230311,SABRE-PALMSng,R1,SABRE-PALMSng_WB57_20230311_R1.ict,26171,4a1270ff3ac61681126d608c9d827c9cf0a588d08b12315f5e090d6f7209abde,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230311,SABRE-PALMSng-Chem-Mass,R0,SABRE-PALMSng-Chem-Mass_WB57_20230311_R0.ict,14471,49a302844c12a5ad7ed34f8668cfb931836aef37444375d02caca568c45edadc,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230313,SABRE-PALMSng,R1,SABRE-PALMSng_WB57_20230313_R1.ict,20919,00f3117ceacef3342db2af530b87dd2394632d6ce5cdb9a329b2de732b2b244a,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230313,SABRE-PALMSng-Chem-Mass,R0,SABRE-PALMSng-Chem-Mass_WB57_20230313_R0.ict,11646,a3b504a462b6907d5ef28430e62a5a27668a40ed347125e3877bbf61daef4b89,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230315,SABRE-PALMSng,R1,SABRE-PALMSng_WB57_20230315_R1.ict,28393,f8457c6c6e62664f402ad2218d7a00d9f2d6853c1dc83d0f02295779b01e826b,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230315,SABRE-PALMSng-Chem-Mass,R0,SABRE-PALMSng-Chem-Mass_WB57_20230315_R0.ict,15601,aa85e689dce879c3882b11f06a6c103b1e48638e68a2b5e445cc6770e3be961a,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230317,SABRE-PALMSng,R1,SABRE-PALMSng_WB57_20230317_R1.ict,28595,af7dd7f07e5df2bd36a424ec80fdd11b480c95166df9f6525a7e6a6e00b5e49e,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230317,SABRE-PALMSng-Chem-Mass,R0,SABRE-PALMSng-Chem-Mass_WB57_20230317_R0.ict,15601,cf41112c24083c6ba8304595eaf9bb4e0d4ff0d92cf55d493bfb1f13fdef418d,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230320,SABRE-PALMSng,R1,SABRE-PALMSng_WB57_20230320_R1.ict,24959,b4d90a8902275cd9897ea1bbeab3e54b6656417a44866d7286e3fde4df4216f4,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230320,SABRE-PALMSng-Chem-Mass,R0,SABRE-PALMSng-Chem-Mass_WB57_20230320_R0.ict,13793,6d35a8f6bf7c00aa7691f96d69cbbdaca10b56eb20ff677746fdd9344165e1c7,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230323,SABRE-PALMSng,R1,SABRE-PALMSng_WB57_20230323_R1.ict,29201,e807697dfacf8e79cac5fd353aba8886b0defb76c2c23c187edba74839e0b33f,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230323,SABRE-PALMSng-Chem-Mass,R0,SABRE-PALMSng-Chem-Mass_WB57_20230323_R0.ict,15940,6c83074a2d5550625dd9d72d3c344d25fb671d317ab427354de5e59538b35ee5,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230326,SABRE-PALMSng,R1,SABRE-PALMSng_WB57_20230326_R1.ict,23949,b16c7ace94556449c93565e5a641bb1019117891e1b158309584d9b457a38a8f,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230326,SABRE-PALMSng-Chem-Mass,R0,SABRE-PALMSng-Chem-Mass_WB57_20230326_R0.ict,13002,426d1a9fe4436e2a633ccb77dc56456bd156a6bb11d526ed63fba3ebf658e3c4,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/

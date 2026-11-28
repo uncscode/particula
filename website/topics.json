@@ -6871,6 +6871,70 @@
       ],
       "role": "Studies",
       "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/sabre-small-mode/index.md",
+      "title": "SABRE’s inferred N₂O₅ uptake probabilities vary more than small-mode surface fractions can explain",
+      "topic": "atmosphere",
+      "also": [
+        "activity-nonideal",
+        "optics"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "sabre-small-mode",
+        "runs": [],
+        "companions": [
+          "docs/studies/literature/sabre-small-mode/optics.md",
+          "docs/studies/literature/sabre-small-mode/chemistry.md",
+          "docs/studies/literature/sabre-small-mode/reproduction.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/processes/resolved-chemistry.md",
+            "label": "Model gas uptake and particle reaction channels"
+          },
+          {
+            "target": "docs/guide/processes/activity.md",
+            "label": "Calculate activity in a mixed particle"
+          }
+        ]
+      },
+      "tocFigure": "sabre-small-mode/toc.svg",
+      "tocSource": "studies/sabre-small-mode/toc.py"
+    },
+    {
+      "source": "docs/studies/literature/sabre-small-mode/optics.md",
+      "title": "Which part of the small mode can extinction detect?",
+      "topic": "optics",
+      "also": [
+        "size",
+        "atmosphere"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/sabre-small-mode/chemistry.md",
+      "title": "What controls modeled N₂O₅ uptake on Arctic particles?",
+      "topic": "activity-nonideal",
+      "also": [
+        "composition",
+        "atmosphere"
+      ],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/literature/sabre-small-mode/reproduction.md",
+      "title": "Reproducing the SABRE surface-area and N₂O₅ uptake comparison",
+      "topic": "atmosphere",
+      "also": [
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false
     }
   ],
   "supporting": [
@@ -7160,6 +7224,7 @@
     }
   ],
   "study_group_exceptions": {
+    "docs/studies/literature": "The seven literature themes separate field constraints on stratospheric chemistry from chamber evaporation, aerosol growth, water uptake, cloud activation, precipitation and transport comparisons.",
     "docs/studies/validation/condensation": "The sparse-activity benchmark compares chemistry construction, lookup and fallback costs across both parcel and box workflows. Its reference and timing matrix are shared across integrators.",
     "docs/studies/validation": "The validation collections distinguish prescribed-flow replay against external CFD from local process tests, optics and release qualification.",
     "docs/studies/literature#organic-chemistry-and-evaporation": "The seven studies share a chamber or evaporation comparison. Keeping the three related Manchester reports together preserves navigation alongside the four independent experiments.",

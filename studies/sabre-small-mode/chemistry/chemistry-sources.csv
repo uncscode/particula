@@ -1,0 +1,17 @@
+flight,product,revision,filename,bytes,sha256,archive
+20230308,SABRE-DLH,R0,SABRE-DLH_WB57_20230308_R0.ict,433146,26b142662208eff1af0356d1917824ce3975f776fd8ff1e2a2cc3b597c40d852,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230308,SABRE-NOy-LIF,R0,SABRE-NOy-LIF_WB57_20230308_R0.ict,638403,7e13251d711d7fdaaef2b2b141d84de50ebc1515f2cd2441d7207c943c6b757d,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230311,SABRE-DLH,R0,SABRE-DLH_WB57_20230311_R0.ict,399121,ba78364a4aa35fe06be3bb0f592cdb0f2bdf598ae601302dbf3b574b1b726fa1,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230311,SABRE-NOy-LIF,R0,SABRE-NOy-LIF_WB57_20230311_R0.ict,701280,082a6b64124fcfa692faa2a27063c98b7d4424a5a7ef7035672d5581ebd35ddb,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230313,SABRE-DLH,R0,SABRE-DLH_WB57_20230313_R0.ict,310347,86d70bc949f7257a1c8183ced9270a358a7e4eb7e29413492e16b4fa9ed6ec8b,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230313,SABRE-NOy-LIF,R0,SABRE-NOy-LIF_WB57_20230313_R0.ict,539134,4e98d42634535f34bfc75542536ec43af6383047eeae9dc771f8662f9c79d93c,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230315,SABRE-DLH,R0,SABRE-DLH_WB57_20230315_R0.ict,439326,479e78d7cb106fb135a6fd334a91a185b72f6d251199750398800e62c50e69f4,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230315,SABRE-NOy-LIF,R0,SABRE-NOy-LIF_WB57_20230315_R0.ict,659504,473c181312838180e63b0adaa3963b7e61784d4885a9e89490bba48f8bb2fcd1,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230317,SABRE-DLH,R0,SABRE-DLH_WB57_20230317_R0.ict,445251,46b20ffe08ca14d2933a71386d681ad03ccb982ecba9dd424d6c44ad8f71e35a,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230317,SABRE-NOy-LIF,R0,SABRE-NOy-LIF_WB57_20230317_R0.ict,650530,803e1457b4403d0f45da59b3679177052a306fdd5d7e3633950b2b50944abc3c,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230320,SABRE-DLH,R0,SABRE-DLH_WB57_20230320_R0.ict,377306,b95e707f46ab3c0dc2d86c5c5a10913480301298298d30ac422ee815987557af,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230320,SABRE-NOy-LIF,R0,SABRE-NOy-LIF_WB57_20230320_R0.ict,564129,6d160288e629b1c071fe7335b178cb0646838be52b060234e5262c7de6e60bd8,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230323,SABRE-DLH,R0,SABRE-DLH_WB57_20230323_R0.ict,456445,3e60c8b8926c5ebf3a7af70aa71fb9d5174f5963e9576f6894a2cf46a0e791d1,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230323,SABRE-NOy-LIF,R0,SABRE-NOy-LIF_WB57_20230323_R0.ict,693797,389cc1aa9354fe00df265da530c0d11abde4046724bf492f6fe4cae706cdbee3,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230326,SABRE-DLH,R0,SABRE-DLH_WB57_20230326_R0.ict,354425,98802d8849e861b9ffbce25675a4317bf45a2942dbc0a16cd7d0500ad8c98b5c,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
+20230326,SABRE-NOy-LIF,R0,SABRE-NOy-LIF_WB57_20230326_R0.ict,531003,4d65f8edf93fac1af15e4c9a8b297a7662c396af8527b654f99ae796b4d8668e,https://csl.noaa.gov/groups/csl7/measurements/2023sabre/wb57/DataDownload/
