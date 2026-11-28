@@ -8,7 +8,7 @@
 # 7 July. Each file samples a different day and has its own time axis.
 #
 # From the Particula checkout, install the reader and figure dependencies with
-# `pip install ".[data,plot]"`. Both excerpts ship in the example download.
+# `pip install ".[data]"`. Both excerpts ship in the example download.
 # The counter excerpt contains the first 21 physical lines of the original file.
 # The mobility excerpt contains its 24-line preamble, column headings and first
 # scan. To reproduce the excerpts, take those same lines from the pinned

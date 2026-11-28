@@ -12,6 +12,7 @@ on:
       - particula_docs.py
       - conda/**
       - scripts/**
+      - license
       - website/examples.json
       - website/public/study-data/bai-limonene/monthly.csv
       - website/public/study-data/reach-droplets/figure-data.zip

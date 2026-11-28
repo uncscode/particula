@@ -5,14 +5,18 @@ import hashlib
 import io
 import os
 import re
+import sys
 from collections import Counter
 from itertools import chain, takewhile
 from pathlib import Path
+from threading import Lock
 
 import polars as pl
 
 from particula.data._binding import Binding
 from particula.data.profile import ProfileError, digest, load_profile
+
+_CSV_LIMIT_LOCK = Lock()
 
 ISSUE_SCHEMA = {
     "code": pl.String,
@@ -67,7 +71,9 @@ class _Lines:
                 source_line_end=self.line,
             )
         encoding = self.encoding
-        if encoding == "utf-8-sig" and self.line > 1:
+        # A concatenated export can start with a new signature. Preserve a
+        # literal U+FEFF on continuation lines of a quoted field.
+        if encoding == "utf-8-sig" and self.line != self.first:
             encoding = "utf-8"
         try:
             return raw.decode(encoding)
@@ -79,6 +85,20 @@ class _Lines:
             ) from exc
 
 
+def _next_record(rows, maximum):
+    # The stdlib shares its character limit across readers. Only raise it
+    # while decoding a record, restoring it before yielding to the caller.
+    with _CSV_LIMIT_LOCK:
+        original = csv.field_size_limit()
+        if original >= maximum:
+            return next(rows)
+        csv.field_size_limit(min(maximum, sys.maxsize))
+        try:
+            return next(rows)
+        finally:
+            csv.field_size_limit(original)
+
+
 def _records(lines, delimiter):
     rows = csv.reader(lines, delimiter=delimiter, strict=True)
     while True:
@@ -86,7 +106,7 @@ def _records(lines, delimiter):
         lines.used = 0
         lines.first = start
         try:
-            row = next(rows)
+            row = _next_record(rows, lines.maximum)
         except StopIteration:
             return
         except csv.Error as exc:

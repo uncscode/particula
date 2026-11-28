@@ -1,5 +1,7 @@
 """Behavioral checks for profiles, source spans, grids and Parquet publication."""
 
+import codecs
+import csv
 import hashlib
 import json
 from importlib.resources import files
@@ -30,9 +32,10 @@ from particula.instruments import (  # noqa: E402
     read_mobility_sizer,
     read_particle_counter,
 )
+from particula_docs import documentation_path  # noqa: E402
 from polars.testing import assert_frame_equal  # noqa: E402
 
-FIXTURES = Path(__file__).resolve().parents[3] / "docs/data/measurement-import"
+FIXTURES = documentation_path() / "data/measurement-import"
 
 
 def test_portable_profiles(tmp_path):
@@ -347,8 +350,6 @@ def test_repeated_aim_header_starts_a_new_grid_segment(tmp_path):
     """A new midpoint grid with the same width stays distinguishable on disk."""
     lines = (FIXTURES / "mobility.csv").read_bytes().splitlines(keepends=True)
     # Retain logarithmic spacing while changing every coordinate by a decade.
-    import csv
-
     h = next(csv.reader([lines[24].decode()]))
     a, b = h.index("Diameter Midpoint (nm)") + 1, h.index("Scan Time (s)")
     h[a:b] = [str(float(n) * 10) for n in h[a:b]]
@@ -458,3 +459,53 @@ def test_concurrent_publication_has_one_complete_product(tmp_path):
     assert_frame_equal(first.frame, second.frame)
     assert first.frame.height == first.frame["scan_id"].n_unique() == 20
     assert not list(tmp_path.glob(".measurement-*"))
+
+
+def test_concatenated_aim_signatures(tmp_path):
+    """Read two independently BOM-encoded exports, including a quoted key."""
+    raw = (FIXTURES / "mobility.csv").read_bytes().removeprefix(codecs.BOM_UTF8)
+    first = codecs.BOM_UTF8 + raw
+    second = codecs.BOM_UTF8 + raw.replace(
+        b"Sample Data,", b'"Sample Data",', 1
+    )
+    path = tmp_path / "combined.csv"
+    path.write_bytes(first + second)
+    out = import_to_parquet(
+        path, tmp_path / "dataset", profile="smps-aim", input_chunk_bytes=1
+    )
+    assert len(out.manifest["segments"]) == 2
+    assert (
+        out.manifest["segments"][0]["preamble"]
+        == out.manifest["segments"][1]["preamble"]
+    )
+    assert out.frame["scan_id"].to_list() == [26, 52]
+    assert out.frame["grid_id"].n_unique() == 1
+    assert (
+        out.manifest["source_sha256"]
+        == hashlib.sha256(first + second).hexdigest()
+    )
+
+
+def test_large_quoted_field_respects_record_budget(tmp_path):
+    """Import large multiline fields up to the byte cap and restore CSV state."""
+    profile = describe_profile("cpc-3010")
+    profile["input"]["encoding"] = "utf-8-sig"
+    profile["on_bad_record"] = "error"
+    profile["vendor_flags"] = {"column": 3, "separator": ";"}
+    token = "x" * 70000 + ",\n\ufeff" + "y" * 70000
+    raw = f'1700000040,120,17.0,"{token}",0.017\n'.encode()
+    path = tmp_path / "large.csv"
+    path.write_bytes(raw)
+    previous = csv.field_size_limit(131072)
+    try:
+        out = read_measurement(path, profile=profile, max_record_bytes=len(raw))
+        assert out.frame["vendor_status"][0] == token
+        assert out.frame["source_line_end"][0] == 2
+        assert csv.field_size_limit() == 131072
+        with pytest.raises(ProfileError, match="byte limit"):
+            read_measurement(
+                path, profile=profile, max_record_bytes=len(raw) - 1
+            )
+        assert csv.field_size_limit() == 131072
+    finally:
+        csv.field_size_limit(previous)

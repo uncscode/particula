@@ -8,6 +8,8 @@ import numpy as np
 import pytest
 
 pl = pytest.importorskip("polars")
+pytest.importorskip("pint")
+pytest.importorskip("jsonschema")
 from particula.data import import_to_parquet, read_measurement  # noqa: E402
 from polars.testing import assert_frame_equal  # noqa: E402
 

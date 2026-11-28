@@ -1,6 +1,6 @@
 # Read instrument measurements
 
-Install the optional reader with `pip install "particula[data]"`.
+Install the instrument readers and Matplotlib with `pip install "particula[data]"`.
 Use `particula.data` for a new delimited format and `particula.instruments`
 for a named instrument. A measurement carries a Polars scan table, its units,
 the source profile, any coordinate grids, and diagnostics.
