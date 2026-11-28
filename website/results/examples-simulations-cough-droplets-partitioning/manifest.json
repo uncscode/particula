@@ -1,20 +1,20 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 170.72046119812876,
-  "package_source_sha256": "fb62539e446aa9348489ec67f4eff6f98c534f6e668d75293727a4745fd40ef8",
-  "scientific_source_sha256": "de1b8e4f7828cd58d808601b3cb92b4ade18fbab99ba3c0a9792edc190f53c50",
+  "elapsed_seconds": 81.78317423700355,
+  "package_source_sha256": "142dc45c78857a370342e7331e40670f99125a47f20f328815752098c59941a3",
+  "scientific_source_sha256": "02156f28723d5f1efd3cdd1cc740489c33c6744dfd5d4e3cec8f8d5b9ddf17f3",
   "input_sha256": {},
   "example": "examples-simulations-cough-droplets-partitioning",
-  "fingerprint": "df2b5922398166af284cbaece99974cbf8157c8d6ab2d1dc98dd02ba28db8334",
+  "fingerprint": "2a9de66e7663f2fd48327e5ebc284f0f18d4f115cded46c414ec0700bd6c163b",
   "source": "docs/studies/examples/coupled-populations/emissions/cough_droplets_partitioning.py",
-  "revision": "ecc1d88a5c626ed7c761bdc3e296f99a00d14226",
+  "revision": "2fca78e8211bc7e6e55ad6e58dfd3c2ead52a979",
   "package_dirty": false,
-  "executed_at": "2026-11-27T23:06:18.067134+00:00",
+  "executed_at": "2026-11-28T14:22:55.945313+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.6",
+    "particula": "0.4.0",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -66,139 +66,100 @@
         "text": "Initial gas concentration (kg/m^3): [[6.9110312e-03 1.0000000e-30 1.0000000e-30 1.0000000e-30 1.0000000e-30\n  1.0000000e-30 1.0000000e-30 1.0000000e-30 1.0000000e-30 1.0000000e-30\n  1.0000000e-30 1.0000000e-30]]\n"
       },
       {
-        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\n"
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.execution._condensation_ode_kernels b6cefee load on device 'cuda:0' took 0.86 ms  (cached)\nModule particula.gpu.kernels.thermodynamics 10b2126 load on device 'cuda:0' took 0.36 ms  (cached)\nModule particula.gpu.kernels.condensation ad8087d load on device 'cuda:0' took 0.33 ms  (cached)\nModule particula.execution._adaptive_condensation_physics 09aa03a load on device 'cuda:0' took 0.46 ms  (cached)\nModule particula.execution._condensation_reservoirs 5b70dc2 load on device 'cuda:0' took 0.55 ms  (cached)\n"
       },
       {
-        "text": "Module particula.execution._condensation_ode_kernels b6cefee load on device 'cuda:0' took 2.01 ms  (cached)\nModule particula.gpu.kernels.thermodynamics 10b2126 load on device 'cuda:0' took 3.65 ms  (cached)\nModule particula.gpu.kernels.condensation ad8087d load on device 'cuda:0' took 2.04 ms  (cached)\nModule particula.execution._adaptive_condensation_physics 09aa03a load on device 'cuda:0' took 0.64 ms  (cached)\nModule particula.execution._condensation_reservoirs b231d81 load on device 'cuda:0' took 1.45 ms  (cached)\nModule particula.execution._condensation_device_control 053a506 load on device 'cuda:0' took 1.42 ms  (cached)\nModule particula.execution._condensation_ros3_kernels d88df3a load on device 'cuda:0' took 2.80 ms  (cached)\nModule particula.execution._condensation_block_kernels d2447a5 load on device 'cuda:0' took 2.69 ms  (cached)\n"
+        "text": "Module particula.execution._condensation_device_control 053a506 load on device 'cuda:0' took 0.75 ms  (cached)\nModule particula.execution._condensation_ros3_kernels ca76cae load on device 'cuda:0' took 0.64 ms  (cached)\nModule particula.execution._condensation_block_kernels d2447a5 load on device 'cuda:0' took 0.82 ms  (cached)\n"
       },
       {
         "text": "\rRunning Sim:   0%|          | 0/201 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rRunning Sim:   1%|          | 2/201 [01:51<3:04:51, 55.73s/it]"
+        "text": "\rRunning Sim:   1%|          | 2/201 [00:47<1:19:28, 23.96s/it]"
       },
       {
-        "text": "\rRunning Sim:   1%|\u258f         | 3/201 [01:58<1:57:25, 35.58s/it]"
+        "text": "\rRunning Sim:   1%|\u258f         | 3/201 [00:51<51:39, 15.65s/it]  "
       },
       {
-        "text": "\rRunning Sim:   2%|\u258f         | 4/201 [02:03<1:18:49, 24.01s/it]"
+        "text": "\rRunning Sim:   2%|\u258f         | 4/201 [00:54<35:14, 10.74s/it]"
       },
       {
-        "text": "\rRunning Sim:   2%|\u258f         | 5/201 [02:06<54:45, 16.76s/it]  "
+        "text": "\rRunning Sim:   2%|\u258f         | 5/201 [00:56<24:47,  7.59s/it]"
       },
       {
-        "text": "\rRunning Sim:   3%|\u258e         | 6/201 [02:08<38:03, 11.71s/it]"
+        "text": "\rRunning Sim:   3%|\u258e         | 6/201 [00:56<17:20,  5.34s/it]"
       },
       {
-        "text": "\rRunning Sim:   3%|\u258e         | 7/201 [02:09<27:38,  8.55s/it]"
+        "text": "\rRunning Sim:   3%|\u258e         | 7/201 [00:57<12:44,  3.94s/it]"
       },
       {
-        "text": "\rRunning Sim:   4%|\u258d         | 8/201 [02:11<20:05,  6.25s/it]"
+        "text": "\rRunning Sim:   4%|\u258d         | 8/201 [00:58<09:20,  2.90s/it]"
       },
       {
-        "text": "\rRunning Sim:   4%|\u258d         | 9/201 [02:11<14:22,  4.49s/it]"
+        "text": "\rRunning Sim:   5%|\u258d         | 10/201 [00:59<05:41,  1.79s/it]"
       },
       {
-        "text": "\rRunning Sim:   5%|\u258d         | 10/201 [02:13<11:20,  3.56s/it]"
+        "text": "\rRunning Sim:   5%|\u258c         | 11/201 [01:00<04:46,  1.51s/it]"
       },
       {
-        "text": "\rRunning Sim:   5%|\u258c         | 11/201 [02:14<09:07,  2.88s/it]"
+        "text": "\rRunning Sim:   6%|\u258c         | 12/201 [01:01<04:06,  1.30s/it]"
       },
       {
-        "text": "\rRunning Sim:   6%|\u258c         | 12/201 [02:15<07:37,  2.42s/it]"
+        "text": "\rRunning Sim:   6%|\u258b         | 13/201 [01:01<03:28,  1.11s/it]"
       },
       {
-        "text": "\rRunning Sim:   6%|\u258b         | 13/201 [02:17<06:21,  2.03s/it]"
+        "text": "\rRunning Sim:   8%|\u258a         | 16/201 [01:02<02:03,  1.50it/s]"
       },
       {
-        "text": "\rRunning Sim:   7%|\u258b         | 15/201 [02:18<04:02,  1.31s/it]"
+        "text": "\rRunning Sim:  10%|\u2588         | 21/201 [01:03<01:03,  2.85it/s]"
       },
       {
-        "text": "\rRunning Sim:   8%|\u258a         | 16/201 [02:19<03:47,  1.23s/it]"
+        "text": "\rRunning Sim:  12%|\u2588\u258f        | 24/201 [01:03<00:57,  3.06it/s]"
       },
       {
-        "text": "\rRunning Sim:   9%|\u2589         | 19/201 [02:19<02:05,  1.45it/s]"
+        "text": "\rRunning Sim:  14%|\u2588\u258d        | 28/201 [01:04<00:47,  3.61it/s]"
       },
       {
-        "text": "\rRunning Sim:  11%|\u2588         | 22/201 [02:20<01:37,  1.83it/s]"
+        "text": "\rRunning Sim:  18%|\u2588\u258a        | 36/201 [01:05<00:27,  5.93it/s]"
       },
       {
-        "text": "\rRunning Sim:  12%|\u2588\u258f        | 24/201 [02:21<01:33,  1.89it/s]"
+        "text": "\rRunning Sim:  20%|\u2588\u2589        | 40/201 [01:05<00:26,  6.02it/s]"
       },
       {
-        "text": "\rRunning Sim:  13%|\u2588\u258e        | 27/201 [02:22<01:15,  2.31it/s]"
+        "text": "\rRunning Sim:  22%|\u2588\u2588\u258f       | 44/201 [01:06<00:24,  6.33it/s]"
       },
       {
-        "text": "\rRunning Sim:  14%|\u2588\u258d        | 29/201 [02:23<01:15,  2.28it/s]"
+        "text": "\rRunning Sim:  24%|\u2588\u2588\u258d       | 49/201 [01:06<00:21,  7.03it/s]"
       },
       {
-        "text": "\rRunning Sim:  17%|\u2588\u258b        | 34/201 [02:23<00:46,  3.57it/s]"
+        "text": "\rRunning Sim:  26%|\u2588\u2588\u258b       | 53/201 [01:07<00:21,  6.96it/s]"
       },
       {
-        "text": "\rRunning Sim:  19%|\u2588\u2589        | 38/201 [02:24<00:39,  4.12it/s]"
+        "text": "\rRunning Sim:  32%|\u2588\u2588\u2588\u258f      | 65/201 [01:08<00:12, 10.95it/s]"
       },
       {
-        "text": "\rRunning Sim:  20%|\u2588\u2588        | 41/201 [02:25<00:43,  3.72it/s]"
+        "text": "\rRunning Sim:  35%|\u2588\u2588\u2588\u258c      | 71/201 [01:08<00:12, 10.31it/s]"
       },
       {
-        "text": "\rRunning Sim:  22%|\u2588\u2588\u258f       | 44/201 [02:26<00:41,  3.77it/s]"
+        "text": "\rRunning Sim:  38%|\u2588\u2588\u2588\u258a      | 77/201 [01:09<00:12, 10.31it/s]"
       },
       {
-        "text": "\rRunning Sim:  24%|\u2588\u2588\u258d       | 48/201 [02:27<00:36,  4.21it/s]"
+        "text": "\rRunning Sim:  47%|\u2588\u2588\u2588\u2588\u258b     | 95/201 [01:09<00:06, 16.83it/s]"
       },
       {
-        "text": "\rRunning Sim:  25%|\u2588\u2588\u258c       | 51/201 [02:28<00:38,  3.89it/s]"
+        "text": "\rRunning Sim:  56%|\u2588\u2588\u2588\u2588\u2588\u258c    | 112/201 [01:10<00:04, 21.16it/s]"
       },
       {
-        "text": "\rRunning Sim:  27%|\u2588\u2588\u258b       | 54/201 [02:28<00:35,  4.13it/s]"
+        "text": "\rRunning Sim:  62%|\u2588\u2588\u2588\u2588\u2588\u2588\u258f   | 124/201 [01:11<00:03, 20.02it/s]"
       },
       {
-        "text": "\rRunning Sim:  31%|\u2588\u2588\u2588       | 62/201 [02:29<00:21,  6.52it/s]"
+        "text": "\rRunning Sim:  77%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b  | 154/201 [01:11<00:01, 30.37it/s]"
       },
       {
-        "text": "\rRunning Sim:  33%|\u2588\u2588\u2588\u258e      | 66/201 [02:29<00:21,  6.32it/s]"
+        "text": "\rRunning Sim:  92%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258f| 184/201 [01:12<00:00, 38.25it/s]"
       },
       {
-        "text": "\rRunning Sim:  35%|\u2588\u2588\u2588\u258d      | 70/201 [02:30<00:23,  5.64it/s]"
-      },
-      {
-        "text": "\rRunning Sim:  37%|\u2588\u2588\u2588\u258b      | 74/201 [02:31<00:21,  5.93it/s]"
-      },
-      {
-        "text": "\rRunning Sim:  39%|\u2588\u2588\u2588\u2589      | 78/201 [02:32<00:21,  5.76it/s]"
-      },
-      {
-        "text": "\rRunning Sim:  44%|\u2588\u2588\u2588\u2588\u258d     | 88/201 [02:32<00:12,  8.87it/s]"
-      },
-      {
-        "text": "\rRunning Sim:  49%|\u2588\u2588\u2588\u2588\u2589     | 99/201 [02:33<00:08, 11.84it/s]"
-      },
-      {
-        "text": "\rRunning Sim:  54%|\u2588\u2588\u2588\u2588\u2588\u258d    | 109/201 [02:33<00:06, 13.66it/s]"
-      },
-      {
-        "text": "\rRunning Sim:  58%|\u2588\u2588\u2588\u2588\u2588\u258a    | 117/201 [02:34<00:07, 10.69it/s]"
-      },
-      {
-        "text": "\rRunning Sim:  63%|\u2588\u2588\u2588\u2588\u2588\u2588\u258e   | 126/201 [02:35<00:06, 12.24it/s]"
-      },
-      {
-        "text": "\rRunning Sim:  70%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588   | 141/201 [02:35<00:03, 16.25it/s]"
-      },
-      {
-        "text": "\rRunning Sim:  78%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258a  | 156/201 [02:36<00:02, 19.46it/s]"
-      },
-      {
-        "text": "\rRunning Sim:  85%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258c | 171/201 [02:37<00:01, 21.99it/s]"
-      },
-      {
-        "text": "\rRunning Sim:  93%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258e| 186/201 [02:37<00:00, 23.89it/s]"
-      },
-      {
-        "text": "\rRunning Sim: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 201/201 [02:38<00:00, 25.26it/s]"
-      },
-      {
-        "text": "\rRunning Sim: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 201/201 [02:38<00:00,  1.27it/s]"
+        "text": "\rRunning Sim: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 201/201 [01:12<00:00,  2.78it/s]"
       },
       {
         "text": "Final gas concentration (kg/m^3): [[6.91103209e-03 9.99999850e-31 9.99999848e-31 9.99999847e-31\n  9.99999848e-31 9.99999849e-31 4.18285543e-13 1.90984831e-14\n  1.55679389e-24 5.12376933e-28 6.26522875e-18 9.74225658e-20]]\nAdaptive condensation work: StepStatistics(accepted=8921, rejected=1, domain_rejected=0, rate_calls=446100, jacobian_calls=8922, time_derivative_calls=0, factorizations=8922, linear_solves=26766)\n"
@@ -229,7 +190,7 @@
     ]
   ],
   "files": {
-    "source.py": "2c999c3c69fc48c0ea0e7b9f4cdf95e876e359579fed6e3956f673eb10bbc258",
+    "source.py": "12eb46db713679f34a43907ed33804d2f2534776212b1134d5fa587ad3866c94",
     "figure-7-1.png": "4bb5a7b6c5e7721e6010041505f147471f7451502dbecf6efbb14cb00ac38dd7",
     "figure-11-1.png": "698882cd6d7f58d292e6b7d7b7c672c72f2041d554a0488a98305360245bad8c",
     "figure-12-1.png": "ccb961d81635675a90d2b9a4f5a4bb033e3459ea9ed2d77c2f07cd669d1d7a4e",
