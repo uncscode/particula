@@ -189,7 +189,7 @@ check = validate_profile(profile, source="CPC_3010_data_20220709_Jul.csv")
 check.raise_for_errors()
 counter = read_measurement("CPC_3010_data_20220709_Jul.csv", profile=profile)
 rates = counter.frame.select("scan_id", "time_utc", "count_rate", "temperature")
-repairs = counter.report.filter(code="split_record_repaired")
+repairs = counter.issues.filter(code="split_record_repaired")
 ```
 
 For July 9, expect 33,267 readings and 13 repair entries. The first entry references source lines 1–2. Its count rate is 32,660 counts/s and its reported 17.1 °C converts to 290.25 K. Running the JSON profile against the same file must reproduce the scan IDs, timestamps, units, values and repairs.
@@ -201,14 +201,14 @@ sizer = read_measurement("2022-07-07_095151_SMPS.csv", profile="smps-aim.json")
 grid_id = sizer.frame["grid_id"][0]
 scans = sizer.frame.filter(sizer.frame["grid_id"] == grid_id)
 spectrum = scans["number_spectrum"].to_numpy()  # (2854, 203)
-diameter_m = sizer.grids[grid_id].coordinates["diameter"]
+diameter_m = sizer.grids[grid_id]["coordinates"]["diameter"]
 ```
 
 The SMPS profile binds the actual export's midpoint headers, number weighting, vendor status and nominal scan timing. Inspect the [observed warnings](#campaign-features-and-acceptance-cases) before interpreting a comparison. Count concentration is returned in m⁻³ and the spectrum is m⁻³ per log10 diameter decade. Both raw units remain available in the manifest. UTC in this example comes from the donor settings; the export's date and time columns alone do not establish the site's timezone. The chamber export uses the same bounding header names with a different grid. Before the APS reader ships, add an example that retains its open channel, status flag and aerodynamic basis; a conversion to mobility diameter must name its physical assumptions.
 
 ## Streaming raw files and large analyses
 
-The [streaming import plan](measurement-import/streaming.md) specifies bounded reads from the first raw byte, independent input and output batch sizes, incremental Parquet and QC writes, and a 108-million-row campaign example under a 1 GiB memory limit. Provide one decoder behind a scan iterator, an on-disk sink and the convenience reader that collects a frame. Stable record ordinals may reference a staged source key until the incremental source digest is finalized at EOF. The fixture batch check is reference evidence; the full importer and large-file qualification are planned work.
+The [streaming import plan](measurement-import/streaming.md) specifies bounded reads from the first raw byte, independent input and output batch sizes, incremental Parquet and QC writes, and a 108-million-row campaign example under a 1 GiB memory limit. Provide one decoder behind a scan iterator, an on-disk sink and the convenience reader that collects a frame. Stable record ordinals may reference a staged source key until the incremental source digest is finalized at EOF. The [qualification record](../docs/studies/validation/workflows-and-releases/measurement-import.md) reports the implemented importer, full field-export comparisons and the capped disk-sized run.
 
 ## Campaign features and acceptance cases
 
@@ -237,7 +237,7 @@ Develop deliveries 4 and 5 independently once PR 1 supplies their inputs, then i
 
 **Start with an installable profile contract, then take one real particle-counter file all the way from raw bytes to a reopened Parquet dataset.** This is the first end-to-end milestone. It exercises units, source identity, repairs, streaming and persistence while the product still has a simple scalar shape. Publish each instrument's worked import example alongside its reader.
 
-The schema fixtures, donor-file checks and small Polars/Warp experiments above supply reference results. All deliveries below are planned. The prerequisite column identifies what each change actually needs; independent branches can proceed once their prerequisites pass.
+The schema fixtures, donor-file checks and small Polars/Warp experiments above supply reference results. Deliveries 1–3 are implemented on this branch. Deliveries 4–6 remain planned. The prerequisite column identifies what each change actually needs; independent branches can proceed once their prerequisites pass.
 
 | Order | Deliverable and prerequisite | Observable completion criterion |
 | --- | --- | --- |

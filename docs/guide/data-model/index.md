@@ -42,6 +42,9 @@ Slot examples continue the container construction shown here; follow the
 require Warp installed and select its CPU device explicitly; no CUDA evidence
 is implied. Native transfers and caller-owned scratch remain visible.
 
+Instrument exports have a separate profile-driven reader for time, units,
+coordinates and quality flags. [Read instrument measurements](measurements.md).
+
 ## Public imports
 
 ### Concrete CPU structural alignment (API validation)

@@ -2308,5 +2308,25 @@
     "input_destinations": {
       "website/public/study-data/reach-droplets/figure-data.zip": "figure-data.zip"
     }
+  },
+  "measurement-import": {
+    "title": "Read a particle counter log and a mobility size spectrum",
+    "source": "docs/studies/examples/measurement_import.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 120,
+    "inputs": [
+      "docs/data/measurement-import/counter.csv",
+      "docs/data/measurement-import/mobility.csv",
+      "license"
+    ],
+    "invoke": "report = run_example()\nfigure = plot_results(report)",
+    "data_expression": "report",
+    "replot_invoke": "figure = plot_results(saved_data)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
   }
 }

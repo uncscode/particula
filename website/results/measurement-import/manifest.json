@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 5.649981014896184,
+  "package_source_sha256": "30814cef5fe540a4c5e6566fc6dd5f4d96596c96c30005f7c47f5a9f30166b25",
+  "scientific_source_sha256": "b88af23db4d6d7bb083c151ec84d28588d3b86822be5af7af1bb7eac32e58440",
+  "input_sha256": {
+    "docs/data/measurement-import/counter.csv": "609eb132dccb456f38b86f189a46a3d3e90f774f8a0d9394314f25d9f9571781",
+    "docs/data/measurement-import/mobility.csv": "966f61116b52cdb5b43bf7e48064859cc4c0c3fd43c0a5d03be2609e1c8c0d28",
+    "license": "69cd6286e2d7f245821bd32f104183d5c03c1e49aaa161392e2d7912f0e6fb12"
+  },
+  "example": "measurement-import",
+  "fingerprint": "86e9697eb7d2e9cb7134e68b0e1768f3d94df7fca47c1726657ba17200665549",
+  "source": "docs/studies/examples/measurement_import.py",
+  "revision": "a9b173cdc045105d62cfe94aaaf1d8e691844907",
+  "package_dirty": true,
+  "executed_at": "2026-11-28T14:02:15.295174+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.4.0",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "20 counter readings. Repair spans (inclusive): [[1, 2]]. First rate: 32,660 counts/s.\n203 mobility channels. Integrated: 2168.99816 cm\u207b\u00b3. Vendor total: 2169.00 cm\u207b\u00b3.\nInstrument warnings: Detector aerosol flow rate error, Incomplete Scan\n"
+      },
+      {
+        "image": "figure-5-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "1f232cc6517e293dc6f0a11e68a0bd918c3d45c9eacd1ccee12930390e69f9a1",
+    "data.json": "976bc6b104cde14bdf6b8c0c3a270b5a7165c27ed62b8364db95c5e625609c42",
+    "figure-5-1.png": "ffb0f9d0e6beacdc2c7d3e37473df03e2442bb1cdd1e8c03783a98c981547ee3"
+  },
+  "simulation_fingerprint": "5f86f7a9cc1c2071bd2ee0d125b3c4a463fef36a7107d95bd44c053fe6230b53"
+}

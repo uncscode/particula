@@ -117,6 +117,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Qualify CUDA optics before interpreting a cloud spectrum](validation/material-properties/cuda-optics/cuda_optics.py)
 - [Radial distribution of droplet pairs](validation/cloud-droplet-collisions/dns-radial-distribution-comparison.py)
 - [Radial relative velocity of droplet pairs](validation/cloud-droplet-collisions/dns-radial-relative-velocity-comparison.py)
+- [Read a particle counter log and a mobility size spectrum](examples/measurement_import.py)
 - [Record aerosol extinction at 10 Hz during hygroscopic growth](validation/material-properties/optical-recording/dense_optical_history.py)
 - [Recorded GPU benchmark viewer](benchmarks/historical-coagulation/gpu_benchmarks.py)
 - [Recover the half-second large-droplet shortfall](literature/reach-droplets/burst.py)
