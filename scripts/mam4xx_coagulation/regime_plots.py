@@ -5,6 +5,17 @@ import numpy as np
 from scripts.mam4xx_coagulation.plots import number_per_decade
 
 
+def sectional_curve(counts, edges):
+    """Return log-plot heights, omitting unresolved nonpositive BDF tails."""
+    counts = np.asarray(counts)
+    # evolve() integrates sectional number in cm⁻³ with BDF atol=1e-10.
+    # Keep the signed solver output for budgets and reject larger excursions.
+    if np.any(counts < -1e-10):
+        raise ValueError("Negative sectional number exceeds BDF tolerance")
+    density = number_per_decade(np.maximum(counts, 0.0), edges)
+    return np.where(counts > 0, density, np.nan)
+
+
 def plot(report):
     """Show the range across paired environmental and resolution controls."""
     fig, axes = plt.subplots(
@@ -128,7 +139,7 @@ def spectra(report):
             ]
             ax = mid if law == "fine" else lower
             ax.stairs(
-                number_per_decade(np.array(r["spectrum_cm3"])[-1], grid_edges),
+                sectional_curve(np.array(r["spectrum_cm3"])[-1], grid_edges),
                 grid_edges,
                 label=label,
                 color=color,

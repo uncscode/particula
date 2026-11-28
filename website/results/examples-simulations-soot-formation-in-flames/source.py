@@ -15,6 +15,8 @@
 # %% [markdown]
 # # Follow organic uptake onto seeds during imposed cooling
 #
+# ![Cooling moves organic material from vapor onto pre-existing seeds. The schematic shows fewer vapor marks and a thicker organic coating around the same dark core.](../../../../images/coupled-populations/cooling-organic-uptake.svg)
+#
 # How can cooling alter gas–particle partitioning while collisions change particle
 # size? This example follows 24 organic species around a supplied seed population,
 # applying condensation and Brownian coagulation under a prescribed temperature
@@ -24,8 +26,8 @@
 # model**. There is no nucleation, reaction network, carbonization, oxidation,
 # or aggregate morphology. Fullerene-labeled seeds already exist at the start.
 # Material tables and cooling are illustrative, not a calibrated flame or plume.
-# Read [organic partitioning](../thermodynamics/equilibria/equilibria_part1.py)
-# and [resolved coagulation](../processes/coagulation/coagulation_3_particle_resolved_pattern.py)
+# Read [organic partitioning](../../thermodynamics/equilibria/equilibria_part1.py)
+# and [resolved coagulation](../../../tutorials/coagulation-populations/coagulation_3_particle_resolved_pattern.py)
 # for the separate mechanisms.
 
 # %%
@@ -596,7 +598,7 @@ plt.show()
 # %%
 # Set up histogram bins for radius distribution
 bins_lognormal = np.logspace(-10, -6, 200)  # 0.1 nm to 1 μm
-distribution_counts = np.zeros((time_len, len(bins_lognormal) - 1))
+concentrations = np.zeros((time_len, len(bins_lognormal) - 1))
 
 # Time series storage
 mass_concentration = np.zeros_like(time_array)  # kg/m³
@@ -626,11 +628,9 @@ for step, _t in enumerate(
         )
 
     # Record radius distribution
-    distribution_counts[step, :], edges = np.histogram(
-        aerosol_process.particles.radii[0].copy(),
-        bins=bins_lognormal,
-        density=False,
-    )
+    concentrations[step, :] = par.particles.get_particle_number_spectrum(
+        aerosol_process.particles, 2 * bins_lognormal
+    ).bin_number_density[0]
 
     # Total particle-phase mass [kg/m³]
     mass_concentration[step] = np.sum(
@@ -655,8 +655,7 @@ for step, _t in enumerate(
         atol=1e-30,
     )
 
-# Convert counts and masses to concentrations [#/m³] and [kg/m³]
-concentrations = distribution_counts / simulation_volume
+# Convert species masses to concentrations [kg/m³]
 species_mass = species_mass / simulation_volume
 
 # Final aerosol state
@@ -839,7 +838,7 @@ plt.show()
 fig, ax = plotting.subplots(size="wide")
 
 # Create mesh grid: time vs radius bins (left edges only)
-X, Y = np.meshgrid(time_array, edges[:-1])
+X, Y = np.meshgrid(time_array, bins_lognormal[:-1])
 
 # Plot number concentration on a log scale
 ax.grid(False)
