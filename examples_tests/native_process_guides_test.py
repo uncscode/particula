@@ -131,9 +131,7 @@ def test_condensation_recipe_inventories(index):
     initial_gas = gas.concentration.copy() * particle.volume[:, None]
     exec(compile(body, str(page), "exec"), namespace)  # noqa: S102
     final = namespace["particle"]
-    final_particle = np.sum(
-        final.masses * final.population[..., None], axis=1
-    )
+    final_particle = np.sum(final.masses * final.population[..., None], axis=1)
     np.testing.assert_allclose(
         final_particle + gas.concentration * final.volume[:, None],
         initial_particle + initial_gas,
