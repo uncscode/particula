@@ -13,7 +13,11 @@ from particula.dynamics.chemistry.catalog import (
     bundle,
     sources,
 )
+from particula.dynamics.chemistry.catalog import (
+    native as converter,
+)
 from particula.dynamics.chemistry.catalog.cli import main
+from particula.dynamics.chemistry.mechanism import ReactionMechanism
 from scripts import build_chemistry_catalog as builder
 
 REACTION = b"Reactions\n[t] NO + O3 -> NO2 + O2 ; 3e-12,-1500\nEnd Reactions\n"
@@ -41,13 +45,15 @@ def assets(tmp_path, monkeypatch):
         sources, "urlopen", lambda url, timeout: io.BytesIO(REACTION)
     )
     out = tmp_path / "release"
-    builder.build(out)
-    original = (out / bundle.ASSET).read_bytes()
-    builder.build(out)
-    assert original == (out / bundle.ASSET).read_bytes()
+    native_data = tmp_path / "native-data"
+    builder.refresh(ChemistryCatalog(tmp_path / "inputs.db"), native_data)
     monkeypatch.setattr(
         sources, "urlopen", lambda *a, **kw: pytest.fail("unexpected import")
     )
+    builder.build(out, native_data)
+    original = (out / bundle.ASSET).read_bytes()
+    builder.build(out, native_data)
+    assert original == (out / bundle.ASSET).read_bytes()
 
     def download(url, timeout):
         assert url.startswith(
@@ -66,13 +72,18 @@ def test_default_fetch_and_offline_export(
     """Install twice alongside a custom study, then search and export offline."""
     catalog = ChemistryCatalog()
     source = tmp_path / "case.in"
-    source.write_bytes(REACTION)
+    source.write_bytes(REACTION + b"\n")
     local = catalog.import_file("waccm", source, release="local", mechanism="x")
     main(["chem", "fetch", "--json"])
     manifest = json.loads(capsys.readouterr().out)
     assert catalog.fetch() == manifest
+    snap = manifest["snapshots"]["e3sm"]
+    assert catalog.show(snap["id"]) == snap
     assert catalog.show(local)["count"] == 1
-    assert catalog.source_bytes(sha256(REACTION).hexdigest()) == REACTION
+    assert catalog.source_bytes(sha256(REACTION).hexdigest()) is None
+    monkeypatch.setattr(
+        converter, "compile_channel", lambda *a, **kw: pytest.fail("recompiled")
+    )
     monkeypatch.setattr(
         bundle, "urlopen", lambda *a, **kw: pytest.fail("offline")
     )
@@ -81,8 +92,20 @@ def test_default_fetch_and_offline_export(
     assert row["id"] == manifest["snapshots"]["e3sm"]["id"] + "/t"
     native = tmp_path / "native.json"
     main(["chem", "export", row["id"], "--output", str(native)])
-    assert json.loads(native.read_bytes())
+    lock = tmp_path / "native.lock.json"
+    catalog.export([row["id"]], lock, target="lock")
+    replay = tmp_path / "replay.json"
+    ChemistryCatalog(tmp_path / "empty").export([], replay, lock_path=lock)
+    assert replay.read_bytes() == native.read_bytes()
+    expected = catalog.show(row["id"])["mechanism"]
+    assert ReactionMechanism.load(native).to_dict() == (
+        ReactionMechanism.from_dict(expected).to_dict()
+    )
     with zipfile.ZipFile(assets / bundle.ASSET) as archive:
+        assert not any(
+            n.endswith((".sqlite3", ".in")) for n in archive.namelist()
+        )
+        assert REACTION not in archive.read("e3sm.jsonl")
         assert (
             archive.read("notices/e3sm.txt")
             == (builder.NOTICES / "e3sm.txt").read_bytes()
@@ -154,4 +177,60 @@ def test_release_job_publishes_both_catalog_assets():
     assert (
         f"cp candidates/catalog/{bundle.ASSET}{{,.sha256}} release-assets/"
         in publish
+    )
+
+
+def test_committed_native_inventory(tmp_path, monkeypatch):
+    """Validate all tracked mechanisms and both reservoirs for MCM titration."""
+
+    def offline(*args, **kwargs):
+        pytest.fail("network or source converter called")
+
+    monkeypatch.setattr(sources, "urlopen", offline)
+    monkeypatch.setattr(converter, "compile_channel", offline)
+    builder.build(tmp_path)
+    monkeypatch.setattr(
+        bundle,
+        "urlopen",
+        lambda url, timeout: (tmp_path / url.rsplit("/", 1)[1]).open("rb"),
+    )
+    catalog = ChemistryCatalog(tmp_path / "catalog.db")
+    snapshots = catalog.fetch()["snapshots"]
+    assert sum(s["source_count"] for s in snapshots.values()) == 19655
+    assert sum(s["count"] for s in snapshots.values()) == 2311
+    assert sum(s["requires_closed_oxygen"] for s in snapshots.values()) == 7
+    for key, snapshot in snapshots.items():
+        rows = catalog.search(snapshot=snapshot["id"])
+        assert len(rows) == snapshot["count"]
+        for line in (builder.DATA / f"{key}.jsonl").read_bytes().splitlines():
+            item = json.loads(line)
+            mechanism = ReactionMechanism.from_dict(item["mechanism"])
+            assert len(mechanism.reactions) == 1
+    path = tmp_path / "ozone.json"
+    for key, label in (("waccm", "NO_O3"), ("mcm", "7"), ("mcm-full", "7")):
+        rid = snapshots[key]["id"] + "/" + label
+        if key.startswith("mcm"):
+            with pytest.raises(ValueError, match="close-oxygen"):
+                catalog.export([rid], path)
+        catalog.export([rid], path, close_oxygen=key.startswith("mcm"))
+        rxn = ReactionMechanism.load(path).to_dict()["reactions"][0]
+        assert rxn["reactants"] == {"gas:NO": 1, "gas:O3": 1}
+        assert rxn["products"] == {"gas:NO2": 1, "gas:O2": 1}
+
+
+def test_source_and_native_snapshot_coexist(assets, monkeypatch):
+    """Keep both pinned selections and return one match in ordinary searches."""
+    catalog = ChemistryCatalog()
+    snapshot = catalog.fetch()["snapshots"]["e3sm"]
+    monkeypatch.setattr(
+        sources, "urlopen", lambda *a, **kw: io.BytesIO(REACTION)
+    )
+    source_id = catalog.fetch("e3sm")
+    assert source_id == snapshot["source_snapshot"]
+    assert [r["id"] for r in catalog.search()] == [source_id + "/t"]
+    (native_row,) = catalog.search(snapshot=snapshot["id"])
+    assert native_row["id"] == snapshot["id"] + "/t"
+    assert (
+        catalog.show(native_row["id"])["native_reaction"]["id"]
+        == source_id + "/t"
     )

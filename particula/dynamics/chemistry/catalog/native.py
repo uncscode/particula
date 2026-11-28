@@ -140,6 +140,17 @@ def compile_channel(record, *, close_oxygen=False):
     ), species
 
 
+def selected_channel(record, *, close_oxygen=False):
+    """Read a released native reaction or convert a locally imported record."""
+    if "mechanism" not in record:
+        return compile_channel(record, close_oxygen=close_oxygen)
+    if record["requires_closed_oxygen"] and not close_oxygen:
+        raise ValueError("requires explicit closed-box O2 (--close-oxygen)")
+    mechanism = record["mechanism"]
+    (reaction,) = mechanism["reactions"]
+    return reaction, mechanism["species"]
+
+
 def native_mechanism(records, *, close_oxygen=False):
     """Build one validated closed mechanism from a pinned selection."""
     reactions = []
@@ -147,13 +158,13 @@ def native_mechanism(records, *, close_oxygen=False):
     seen: dict[tuple, str] = {}
     for record in records:
         try:
-            reaction, catalog = compile_channel(
+            reaction, catalog = selected_channel(
                 record, close_oxygen=close_oxygen
             )
         except ValueError as error:
             raise ValueError(f"{record['id']}: {error}") from error
         key = (
-            tuple(reaction["reactants"].items()),
+            tuple(sorted(reaction["reactants"].items())),
             tuple(sorted(reaction["products"].items())),
         )
         owner = record["snapshot"]
