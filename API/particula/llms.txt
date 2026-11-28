@@ -14485,6 +14485,7 @@ Return a detached, normalized representation for interchange.
 
 - `particula.dynamics.chemistry.adapter`
 - `particula.dynamics.chemistry.binding`
+- `particula.dynamics.chemistry.catalog`
 - `particula.dynamics.chemistry.device`
 - `particula.dynamics.chemistry.discovery`
 - `particula.dynamics.chemistry.inference`
@@ -14815,6 +14816,1247 @@ def _sparse_stoichiometry(rows)
 Compile reaction offsets, affected columns and signed coefficients.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/binding.py#L41-L46)
+
+---
+
+# particula.dynamics.chemistry.catalog
+
+*module*
+
+Local, versioned catalog of atmospheric model chemistry.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/__init__.py#L1-L1)
+
+## particula.dynamics.chemistry.catalog.ChemistryCatalog
+
+*class*
+
+```python
+class ChemistryCatalog
+```
+
+Re-exported from: `particula.dynamics.chemistry.catalog.store`
+
+Import local files once and query the resulting persistent records.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L115-L471)
+
+### particula.dynamics.chemistry.catalog.ChemistryCatalog.path
+
+*attribute* · *instance attribute*
+
+```python
+path = Path(path or os.environ.get('PARTICULA_CHEM_CATALOG', default))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L125-L127)
+
+### particula.dynamics.chemistry.catalog.ChemistryCatalog.__init__
+
+*method*
+
+```python
+def __init__(path=None)
+```
+
+Open or create the local SQLite catalog at path.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L118-L145)
+
+### particula.dynamics.chemistry.catalog.ChemistryCatalog._db
+
+*method*
+
+```python
+def _db()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L147-L150)
+
+### particula.dynamics.chemistry.catalog.ChemistryCatalog.export
+
+*method*
+
+```python
+def export(identifiers, output, *, target='native', lock_path=None, close_oxygen=False)
+```
+
+Write a study selection lock or an executable native mechanism.
+
+**Parameters**
+
+- `identifiers` — Reaction or snapshot IDs to select. Pass an empty sequence when replaying a lock.
+- `output` — Destination for the JSON lock or native JSON/YAML file. A successful export atomically replaces this file.
+- `target` (default: `'native'`) — Use ``"lock"`` to preserve the source records and oxygen assumption, or ``"native"`` to assemble the native channels.
+- `lock_path` (default: `None`) — Path to a saved selection lock. Replay uses the oxygen treatment recorded at lock creation.
+- `close_oxygen` (default: `False`) — For NO + O₃ → NO₂ + O₂, include O₂ as an evolving product when the source omits or prescribes it. Bind the resulting mechanism to a gas inventory with an O₂ column. Defaults to False. To change a saved assumption, create a new lock from the source IDs.
+
+**Raises**
+
+- `ValueError` — If the selection, lock, or target is invalid, or a
+selected channel cannot be represented by the native solver.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L394-L471)
+
+### particula.dynamics.chemistry.catalog.ChemistryCatalog.fetch
+
+*method*
+
+```python
+def fetch(recipe=None, *, catalog_version=None)
+```
+
+Fetch catalog records for offline search and export.
+
+**Parameters**
+
+- `recipe` (default: `None`) — Optional source key such as `waccm`. Omitting the key downloads the latest stable chemistry catalog release.
+- `catalog_version` (default: `None`) — Exact catalog data version, such as ``1.0.0``, when fetching the prebuilt artifact.
+
+**Returns**
+
+- The release manifest for a prebuilt catalog, or the immutable
+- snapshot ID for a named source import.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L160-L184)
+
+### particula.dynamics.chemistry.catalog.ChemistryCatalog.import_file
+
+*method*
+
+```python
+def import_file(source, path, *, release, mechanism, companions=(), aerosol=None, origins=())
+```
+
+Pin a source and optional companion files; return its snapshot ID.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L186-L268)
+
+### particula.dynamics.chemistry.catalog.ChemistryCatalog.search
+
+*method*
+
+```python
+def search(species=None, source=None, role=None, snapshot=None)
+```
+
+Search exact source species and roles across imported snapshots.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L270-L322)
+
+### particula.dynamics.chemistry.catalog.ChemistryCatalog.selection
+
+*method*
+
+```python
+def selection(identifiers, *, close_oxygen=False)
+```
+
+Pin individual channels or every channel in an imported source.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L358-L392)
+
+### particula.dynamics.chemistry.catalog.ChemistryCatalog.show
+
+*method*
+
+```python
+def show(identifier)
+```
+
+Inspect source parameters, provenance and export diagnostics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L324-L356)
+
+### particula.dynamics.chemistry.catalog.ChemistryCatalog.source_bytes
+
+*method*
+
+```python
+def source_bytes(digest)
+```
+
+Read a cached upstream file by its SHA-256 digest.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L152-L158)
+
+**Modules**
+
+- `particula.dynamics.chemistry.catalog.bundle`
+- `particula.dynamics.chemistry.catalog.camx`
+- `particula.dynamics.chemistry.catalog.cli`
+- `particula.dynamics.chemistry.catalog.cmc`
+- `particula.dynamics.chemistry.catalog.native`
+- `particula.dynamics.chemistry.catalog.readers`
+- `particula.dynamics.chemistry.catalog.sources`
+- `particula.dynamics.chemistry.catalog.store`
+
+---
+
+# particula.dynamics.chemistry.catalog.bundle
+
+*module*
+
+Install the prebuilt reaction catalog from a versioned catalog release.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/bundle.py#L1-L1)
+
+## particula.dynamics.chemistry.catalog.bundle.ASSET
+
+*attribute* · *module attribute*
+
+```python
+ASSET = 'particula-chemistry-catalog.zip'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/bundle.py#L15-L15)
+
+## particula.dynamics.chemistry.catalog.bundle.DOWNLOAD_URL
+
+*attribute* · *module attribute*
+
+```python
+DOWNLOAD_URL = 'https://github.com/uncscode/particula/releases/download'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/bundle.py#L20-L20)
+
+## particula.dynamics.chemistry.catalog.bundle.FORMAT
+
+*attribute* · *module attribute*
+
+```python
+FORMAT = 'particula.chemistry-catalog/2'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/bundle.py#L16-L16)
+
+## particula.dynamics.chemistry.catalog.bundle.RELEASES_API
+
+*attribute* · *module attribute*
+
+```python
+RELEASES_API = 'https://api.github.com/repos/uncscode/particula/releases'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/bundle.py#L19-L19)
+
+## particula.dynamics.chemistry.catalog.bundle.TAG_PREFIX
+
+*attribute* · *module attribute*
+
+```python
+TAG_PREFIX = 'chemistry-catalog-v'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/bundle.py#L17-L17)
+
+## particula.dynamics.chemistry.catalog.bundle.VERSION_PATTERN
+
+*attribute* · *module attribute*
+
+```python
+VERSION_PATTERN = '(?:0|[1-9][0-9]*)(?:\\.(?:0|[1-9][0-9]*)){2}'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/bundle.py#L18-L18)
+
+## particula.dynamics.chemistry.catalog.bundle._download
+
+*function*
+
+```python
+def _download(archive, tag)
+```
+
+Download both assets from the selected catalog tag and verify the ZIP.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/bundle.py#L60-L81)
+
+## particula.dynamics.chemistry.catalog.bundle._install_snapshot
+
+*function*
+
+```python
+def _install_snapshot(db, snapshot, data)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/bundle.py#L84-L126)
+
+## particula.dynamics.chemistry.catalog.bundle.catalog_tag
+
+*function*
+
+```python
+def catalog_tag(version)
+```
+
+Return the stable GitHub release tag for a catalog data version.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/bundle.py#L23-L27)
+
+## particula.dynamics.chemistry.catalog.bundle.install_release
+
+*function*
+
+```python
+def install_release(catalog, version=None)
+```
+
+Index every released source entry and native conversion atomically.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/bundle.py#L129-L156)
+
+## particula.dynamics.chemistry.catalog.bundle.latest_version
+
+*function*
+
+```python
+def latest_version()
+```
+
+Find the highest stable catalog version across release pages.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/bundle.py#L30-L57)
+
+---
+
+# particula.dynamics.chemistry.catalog.camx
+
+*module*
+
+Read CAMx numbered rate decks and PMCAMx-SR precursor yield tables.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/camx.py#L1-L1)
+
+## particula.dynamics.chemistry.catalog.camx.TITRATION_DECKS
+
+*attribute* · *module attribute*
+
+```python
+TITRATION_DECKS = {'camx': {'8d267b966a4cf3d9be236f4bbed5fdd52bd3cfe3e463f97c454aa7a9807bfe25'}, 'pmcamx': {'d0a18f9beff7538e20238220e7f57dbc3a49e7ceb134001db6d49b6b4cd1fec9'}}
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/camx.py#L17-L24)
+
+## particula.dynamics.chemistry.catalog.camx._deck_entry
+
+*function*
+
+```python
+def _deck_entry(raw, line_num, pinned, units, photo, listings, tables)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/camx.py#L117-L159)
+
+## particula.dynamics.chemistry.catalog.camx._deck_header
+
+*function*
+
+```python
+def _deck_header(lines)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/camx.py#L58-L89)
+
+## particula.dynamics.chemistry.catalog.camx._deck_rate
+
+*function*
+
+```python
+def _deck_rate(kind, values)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/camx.py#L92-L100)
+
+## particula.dynamics.chemistry.catalog.camx._deck_units
+
+*function*
+
+```python
+def _deck_units(pinned, header)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/camx.py#L103-L114)
+
+## particula.dynamics.chemistry.catalog.camx._soap_aging
+
+*function*
+
+```python
+def _soap_aging(text)
+```
+
+Read the literal bin gain terms in the published SOAP aging loops.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/camx.py#L285-L340)
+
+## particula.dynamics.chemistry.catalog.camx._soap_tables
+
+*function*
+
+```python
+def _soap_tables(text)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/camx.py#L185-L216)
+
+## particula.dynamics.chemistry.catalog.camx.equations
+
+*function*
+
+```python
+def equations(text)
+```
+
+Read a CAMx mech.* stoichiometry listing and continuation lines.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/camx.py#L27-L55)
+
+## particula.dynamics.chemistry.catalog.camx.rate_deck
+
+*function*
+
+```python
+def rate_deck(text, source, digest, listings, tables)
+```
+
+Join numbered rate rows to an optional matching mechanism listing.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/camx.py#L162-L182)
+
+## particula.dynamics.chemistry.catalog.camx.soap
+
+*function*
+
+```python
+def soap(text, digest=None)
+```
+
+Inventory PMCAMx-SR SOAP precursor rates and paired NOx yield tables.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/camx.py#L219-L282)
+
+---
+
+# particula.dynamics.chemistry.catalog.cli
+
+*module*
+
+Command-line access to the same chemistry catalog used by Python studies.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/cli.py#L1-L1)
+
+## particula.dynamics.chemistry.catalog.cli.main
+
+*function*
+
+```python
+def main(argv=None)
+```
+
+Run particula chem import, search, show or export.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/cli.py#L12-L105)
+
+---
+
+# particula.dynamics.chemistry.catalog.cmc
+
+*module*
+
+Recover CAMx/PMCAMx stoichiometry and kinetic orders from CMC tables.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/cmc.py#L1-L1)
+
+## particula.dynamics.chemistry.catalog.cmc._gain_loss
+
+*function*
+
+```python
+def _gain_loss(source)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/cmc.py#L9-L25)
+
+## particula.dynamics.chemistry.catalog.cmc._orders
+
+*function*
+
+```python
+def _orders(source)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/cmc.py#L28-L46)
+
+## particula.dynamics.chemistry.catalog.cmc.read_cmc
+
+*function*
+
+```python
+def read_cmc(companions, expected=None)
+```
+
+Read literal CMC assignments from a matched gain/loss and flux pair.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/cmc.py#L49-L75)
+
+---
+
+# particula.dynamics.chemistry.catalog.native
+
+*module*
+
+Compile selected closed gas channels to Particula's native schema.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/native.py#L1-L1)
+
+## particula.dynamics.chemistry.catalog.native.ALIASES
+
+*attribute* · *module attribute*
+
+```python
+ALIASES = {'HO': 'OH', 'O3P': 'O', 'O1D_CB4': 'O1D', 'HCHO': 'CH2O'}
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/native.py#L50-L50)
+
+## particula.dynamics.chemistry.catalog.native.FORMULAS
+
+*attribute* · *module attribute*
+
+```python
+FORMULAS = {name: name for name in ('O', 'O1D', 'O2', 'O3', 'H', 'H2', 'OH', 'HO2', 'H2O', 'H2O2', 'N', 'N2', 'NO', 'NO2', 'NO3', 'N2O', 'N2O5', 'HONO', 'HNO3', 'CO', 'CO2', 'CH4', 'SO', 'SO2', 'SO3', 'H2SO4', 'H2S', 'CH3O2', 'CH3OOH', 'CH2O', 'HCHO', 'C2H6', 'C2H4')}
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/native.py#L11-L48)
+
+## particula.dynamics.chemistry.catalog.native._elements
+
+*function*
+
+```python
+def _elements(name)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/native.py#L53-L57)
+
+## particula.dynamics.chemistry.catalog.native._normalize
+
+*function*
+
+```python
+def _normalize(side, declared)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/native.py#L60-L68)
+
+## particula.dynamics.chemistry.catalog.native._reservoirs
+
+*function*
+
+```python
+def _reservoirs(record, lhs, rhs, close_oxygen)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/native.py#L71-L91)
+
+## particula.dynamics.chemistry.catalog.native.compile_channel
+
+*function*
+
+```python
+def compile_channel(record, *, close_oxygen=False)
+```
+
+Return a native reaction and reviewed atomic compositions.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/native.py#L94-L140)
+
+## particula.dynamics.chemistry.catalog.native.native_mechanism
+
+*function*
+
+```python
+def native_mechanism(records, *, close_oxygen=False)
+```
+
+Build one validated closed mechanism from a pinned selection.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/native.py#L156-L187)
+
+## particula.dynamics.chemistry.catalog.native.selected_channel
+
+*function*
+
+```python
+def selected_channel(record, *, close_oxygen=False)
+```
+
+Read a released native reaction or convert a locally imported record.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/native.py#L143-L153)
+
+---
+
+# particula.dynamics.chemistry.catalog.readers
+
+*module*
+
+Read source mechanisms as data; preserve source expressions and locations.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L1-L1)
+
+## particula.dynamics.chemistry.catalog.readers.NUMBER
+
+*attribute* · *module attribute*
+
+```python
+NUMBER = '[+-]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eEdD][+-]?\\d+)?'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L8-L8)
+
+## particula.dynamics.chemistry.catalog.readers.SOURCES
+
+*attribute* · *module attribute*
+
+```python
+SOURCES = ('waccm', 'e3sm', 'mcm', 'wrf-chem', 'cmaq', 'camx', 'pmcamx')
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L9-L9)
+
+## particula.dynamics.chemistry.catalog.readers._KPP_COMMENTS
+
+*attribute* · *module attribute*
+
+```python
+_KPP_COMMENTS = re.compile('\\{[^}]*\\}|//[^\\n]*|![^\\n]*')
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L235-L235)
+
+## particula.dynamics.chemistry.catalog.readers._KPP_SECTION
+
+*attribute* · *module attribute*
+
+```python
+_KPP_SECTION = re.compile('^[ \\t]*#(\\w+)\\b', re.M)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L236-L236)
+
+## particula.dynamics.chemistry.catalog.readers.Entry
+
+*class* · *dataclass*
+
+```python
+class Entry
+```
+
+One source channel; kinetics are (A, C, b, Tref) for exp(C/T).
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L12-L46)
+
+### particula.dynamics.chemistry.catalog.readers.Entry.equation
+
+*attribute* · *instance attribute*
+
+```python
+equation: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L18-L18)
+
+### particula.dynamics.chemistry.catalog.readers.Entry.expression
+
+*attribute* · *instance attribute*
+
+```python
+expression: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L19-L19)
+
+### particula.dynamics.chemistry.catalog.readers.Entry.kinetics
+
+*attribute* · *instance attribute*
+
+```python
+kinetics: tuple | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L22-L22)
+
+### particula.dynamics.chemistry.catalog.readers.Entry.label
+
+*attribute* · *instance attribute*
+
+```python
+label: str
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L16-L16)
+
+### particula.dynamics.chemistry.catalog.readers.Entry.line
+
+*attribute* · *instance attribute*
+
+```python
+line: int
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L17-L17)
+
+### particula.dynamics.chemistry.catalog.readers.Entry.metadata
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+metadata: dict = field(default_factory=dict)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L24-L24)
+
+### particula.dynamics.chemistry.catalog.readers.Entry.products
+
+*attribute* · *instance attribute*
+
+```python
+products: dict
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L21-L21)
+
+### particula.dynamics.chemistry.catalog.readers.Entry.reactants
+
+*attribute* · *instance attribute*
+
+```python
+reactants: dict
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L20-L20)
+
+### particula.dynamics.chemistry.catalog.readers.Entry.reason
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+reason: str = ''
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L23-L23)
+
+### particula.dynamics.chemistry.catalog.readers.Entry.__init__
+
+*method*
+
+```python
+def __init__(label: str, line: int, equation: str, expression: str, reactants: dict, products: dict, kinetics: tuple | None, reason: str = '', metadata: dict = dict()) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L0-L0)
+
+### particula.dynamics.chemistry.catalog.readers.Entry.record
+
+*method*
+
+```python
+def record()
+```
+
+Return a JSON-compatible source record.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L26-L46)
+
+## particula.dynamics.chemistry.catalog.readers._cmaq_equations
+
+*function*
+
+```python
+def _cmaq_equations(text)
+```
+
+Yield labeled semicolon-terminated statements, and continuations.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L151-L181)
+
+## particula.dynamics.chemistry.catalog.readers._expression
+
+*function*
+
+```python
+def _expression(rate, source)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L184-L208)
+
+## particula.dynamics.chemistry.catalog.readers._fixed_species
+
+*function*
+
+```python
+def _fixed_species(source, clean, companions)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L358-L385)
+
+## particula.dynamics.chemistry.catalog.readers._kpp_equations
+
+*function*
+
+```python
+def _kpp_equations(text, clean, source)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L252-L304)
+
+## particula.dynamics.chemistry.catalog.readers._kpp_sections
+
+*function*
+
+```python
+def _kpp_sections(clean)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L245-L249)
+
+## particula.dynamics.chemistry.catalog.readers._kpp_settings
+
+*function*
+
+```python
+def _kpp_settings(content, fixed)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L334-L355)
+
+## particula.dynamics.chemistry.catalog.readers._kpp_text
+
+*function*
+
+```python
+def _kpp_text(text)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L239-L242)
+
+## particula.dynamics.chemistry.catalog.readers._mcm_elements
+
+*function*
+
+```python
+def _mcm_elements(text)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L315-L331)
+
+## particula.dynamics.chemistry.catalog.readers._mcm_rates
+
+*function*
+
+```python
+def _mcm_rates(companions)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L211-L220)
+
+## particula.dynamics.chemistry.catalog.readers._mozart_rate
+
+*function*
+
+```python
+def _mozart_rate(section, rate)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L96-L108)
+
+## particula.dynamics.chemistry.catalog.readers._resolve
+
+*function*
+
+```python
+def _resolve(rate, source, definitions)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L223-L232)
+
+## particula.dynamics.chemistry.catalog.readers._terms
+
+*function*
+
+```python
+def _terms(side)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L54-L69)
+
+## particula.dynamics.chemistry.catalog.readers.channel
+
+*function*
+
+```python
+def channel(label, line, equation, rate, kinetics=None, reason='', **metadata)
+```
+
+Keep the original equation even when its terms need a new dialect.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L72-L93)
+
+## particula.dynamics.chemistry.catalog.readers.labeled
+
+*function*
+
+```python
+def labeled(text, source, companions=())
+```
+
+Read York/WRF KPP equations or CMAQ MECHDEF in molecular units.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L388-L419)
+
+## particula.dynamics.chemistry.catalog.readers.mozart
+
+*function*
+
+```python
+def mozart(text)
+```
+
+Read MOZART preprocessor photolysis, kinetic and fixed-species blocks.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L111-L148)
+
+## particula.dynamics.chemistry.catalog.readers.number
+
+*function*
+
+```python
+def number(value)
+```
+
+Convert atmospheric-model Fortran numeric literals.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L49-L51)
+
+## particula.dynamics.chemistry.catalog.readers.ro2_members
+
+*function*
+
+```python
+def ro2_members(text)
+```
+
+Read the explicit KPP radical pool and its continuation lines.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/readers.py#L307-L312)
+
+---
+
+# particula.dynamics.chemistry.catalog.sources
+
+*module*
+
+Retrieve the repository's checksum-pinned atmospheric mechanism sources.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/sources.py#L1-L1)
+
+## particula.dynamics.chemistry.catalog.sources._member
+
+*function*
+
+```python
+def _member(archive, name)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/sources.py#L30-L42)
+
+## particula.dynamics.chemistry.catalog.sources._verify
+
+*function*
+
+```python
+def _verify(path, expected)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/sources.py#L20-L27)
+
+## particula.dynamics.chemistry.catalog.sources.fetch
+
+*function*
+
+```python
+def fetch(catalog, key)
+```
+
+Verify and import a published recipe using available cached files.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/sources.py#L45-L91)
+
+## particula.dynamics.chemistry.catalog.sources.recipes
+
+*function*
+
+```python
+def recipes()
+```
+
+Return available recipes, their origins, and reviewed byte digests.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/sources.py#L13-L17)
+
+---
+
+# particula.dynamics.chemistry.catalog.store
+
+*module*
+
+Cache source bytes, reviewed chemistry records, and immutable selections.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L1-L1)
+
+## particula.dynamics.chemistry.catalog.store.IMPORT_VERSION
+
+*attribute* · *module attribute*
+
+```python
+IMPORT_VERSION = 5
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L24-L24)
+
+## particula.dynamics.chemistry.catalog.store.LOCK_FORMAT
+
+*attribute* · *module attribute*
+
+```python
+LOCK_FORMAT = 'particula.chemical-selection/1'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L25-L25)
+
+## particula.dynamics.chemistry.catalog.store.NATIVE_LOCK_FORMAT
+
+*attribute* · *module attribute*
+
+```python
+NATIVE_LOCK_FORMAT = 'particula.chemical-selection/2'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L26-L26)
+
+## particula.dynamics.chemistry.catalog.store.ChemistryCatalog
+
+*class*
+
+```python
+class ChemistryCatalog
+```
+
+Import local files once and query the resulting persistent records.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L115-L471)
+
+### particula.dynamics.chemistry.catalog.store.ChemistryCatalog.path
+
+*attribute* · *instance attribute*
+
+```python
+path = Path(path or os.environ.get('PARTICULA_CHEM_CATALOG', default))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L125-L127)
+
+### particula.dynamics.chemistry.catalog.store.ChemistryCatalog.__init__
+
+*method*
+
+```python
+def __init__(path=None)
+```
+
+Open or create the local SQLite catalog at path.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L118-L145)
+
+### particula.dynamics.chemistry.catalog.store.ChemistryCatalog._db
+
+*method*
+
+```python
+def _db()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L147-L150)
+
+### particula.dynamics.chemistry.catalog.store.ChemistryCatalog.export
+
+*method*
+
+```python
+def export(identifiers, output, *, target='native', lock_path=None, close_oxygen=False)
+```
+
+Write a study selection lock or an executable native mechanism.
+
+**Parameters**
+
+- `identifiers` — Reaction or snapshot IDs to select. Pass an empty sequence when replaying a lock.
+- `output` — Destination for the JSON lock or native JSON/YAML file. A successful export atomically replaces this file.
+- `target` (default: `'native'`) — Use ``"lock"`` to preserve the source records and oxygen assumption, or ``"native"`` to assemble the native channels.
+- `lock_path` (default: `None`) — Path to a saved selection lock. Replay uses the oxygen treatment recorded at lock creation.
+- `close_oxygen` (default: `False`) — For NO + O₃ → NO₂ + O₂, include O₂ as an evolving product when the source omits or prescribes it. Bind the resulting mechanism to a gas inventory with an O₂ column. Defaults to False. To change a saved assumption, create a new lock from the source IDs.
+
+**Raises**
+
+- `ValueError` — If the selection, lock, or target is invalid, or a
+selected channel cannot be represented by the native solver.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L394-L471)
+
+### particula.dynamics.chemistry.catalog.store.ChemistryCatalog.fetch
+
+*method*
+
+```python
+def fetch(recipe=None, *, catalog_version=None)
+```
+
+Fetch catalog records for offline search and export.
+
+**Parameters**
+
+- `recipe` (default: `None`) — Optional source key such as `waccm`. Omitting the key downloads the latest stable chemistry catalog release.
+- `catalog_version` (default: `None`) — Exact catalog data version, such as ``1.0.0``, when fetching the prebuilt artifact.
+
+**Returns**
+
+- The release manifest for a prebuilt catalog, or the immutable
+- snapshot ID for a named source import.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L160-L184)
+
+### particula.dynamics.chemistry.catalog.store.ChemistryCatalog.import_file
+
+*method*
+
+```python
+def import_file(source, path, *, release, mechanism, companions=(), aerosol=None, origins=())
+```
+
+Pin a source and optional companion files; return its snapshot ID.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L186-L268)
+
+### particula.dynamics.chemistry.catalog.store.ChemistryCatalog.search
+
+*method*
+
+```python
+def search(species=None, source=None, role=None, snapshot=None)
+```
+
+Search exact source species and roles across imported snapshots.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L270-L322)
+
+### particula.dynamics.chemistry.catalog.store.ChemistryCatalog.selection
+
+*method*
+
+```python
+def selection(identifiers, *, close_oxygen=False)
+```
+
+Pin individual channels or every channel in an imported source.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L358-L392)
+
+### particula.dynamics.chemistry.catalog.store.ChemistryCatalog.show
+
+*method*
+
+```python
+def show(identifier)
+```
+
+Inspect source parameters, provenance and export diagnostics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L324-L356)
+
+### particula.dynamics.chemistry.catalog.store.ChemistryCatalog.source_bytes
+
+*method*
+
+```python
+def source_bytes(digest)
+```
+
+Read a cached upstream file by its SHA-256 digest.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L152-L158)
+
+## particula.dynamics.chemistry.catalog.store._digest
+
+*function*
+
+```python
+def _digest(data)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L35-L36)
+
+## particula.dynamics.chemistry.catalog.store._fingerprint
+
+*function*
+
+```python
+def _fingerprint(data)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L39-L40)
+
+## particula.dynamics.chemistry.catalog.store._inputs
+
+*function*
+
+```python
+def _inputs(path, companions, origins)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L92-L112)
+
+## particula.dynamics.chemistry.catalog.store._json
+
+*function*
+
+```python
+def _json(data)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L29-L32)
+
+## particula.dynamics.chemistry.catalog.store._read_entries
+
+*function*
+
+```python
+def _read_entries(source, text, digest, companions)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L43-L62)
+
+## particula.dynamics.chemistry.catalog.store._revision
+
+*function*
+
+```python
+def _revision(entry, record, files, manifest)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/catalog/store.py#L65-L89)
 
 ---
 

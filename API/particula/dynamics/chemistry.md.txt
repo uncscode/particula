@@ -151,6 +151,7 @@ Return a detached, normalized representation for interchange.
 
 - `particula.dynamics.chemistry.adapter`
 - `particula.dynamics.chemistry.binding`
+- `particula.dynamics.chemistry.catalog`
 - `particula.dynamics.chemistry.device`
 - `particula.dynamics.chemistry.discovery`
 - `particula.dynamics.chemistry.inference`
