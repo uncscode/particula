@@ -3887,6 +3887,41 @@
       "tocSource": "docs/studies/literature/dry-psl-mobility/toc.svg.in"
     },
     {
+      "source": "docs/theory/thermodynamics/kappa-kohler-activation.md",
+      "title": "Which dry particles can activate at a given water supersaturation?",
+      "topic": "activity-kappa",
+      "also": [],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/examples/thermodynamics/activity/equilibrium_ccn_spectrum.py",
+      "title": "How many particles remain eligible to activate as a chamber is diluted?",
+      "topic": "activity-kappa",
+      "also": [
+        "optics"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "equilibrium-ccn-spectrum",
+        "runs": [
+          "equilibrium-ccn-spectrum"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/thermodynamics/kappa-kohler-activation.md",
+            "label": "Equilibrium activation theory"
+          },
+          {
+            "target": "docs/guide/processes/ccn-retrieval.md",
+            "label": "CCN counter interpretation"
+          }
+        ]
+      }
+    },
+    {
       "source": "docs/guide/processes/ccn-retrieval.md",
       "title": "Design a size-resolved CCN experiment",
       "topic": "activity-kappa",

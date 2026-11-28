@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import isotonic_regression
 from scipy.special import ndtr
-from particula.particles import get_kelvin_radius
+from particula.particles import get_kappa_kohler_critical_dry_diameter, get_kelvin_radius
 
 HERE = Path(__file__).resolve().parent
 FIELD = HERE.parent
@@ -91,10 +91,19 @@ def score_response(dry, weight, data, scale, spread):
     return mid, width, rmse
 
 
-def koehler_threshold(kappa, supersaturation, kelvin, nq=1537):
-    """Maximize dry threshold at equal Köhler saturation over wet/dry water ratios."""
+def koehler_threshold(kappa, supersaturation, kelvin):
+    """Return dry threshold(s) in nm at the field setting in percent."""
+    return 1e9 * get_kappa_kohler_critical_dry_diameter(
+        kappa=np.atleast_1d(kappa),
+        saturation_ratio=1 + supersaturation / 100,
+        kelvin_diameter=kelvin * 1e-9,
+    )
+
+
+def _grid_reference_nm(kappa, supersaturation, kelvin):
+    """Check the core solver against the study's refined water-volume grid."""
     kappa = np.atleast_1d(kappa)
-    q = np.geomspace(1.0e-7, 1.0e5, nq)
+    q = np.geomspace(1.0e-7, 1.0e5, 3073)
     curve = kelvin / (
         np.cbrt(1 + q)
         * (np.log1p(supersaturation / 100) + np.log1p(kappa[:, None] / q))
@@ -155,7 +164,7 @@ def obs_transfer():
             k = gf_to_k(grid, a)
             physical = koehler_threshold(k, ss, a)
             if len(errors) < 8:
-                errors.append(np.max(abs(koehler_threshold(k, ss, a, 3073) - physical)))
+                errors.append(np.max(abs(_grid_reference_nm(k, ss, a) - physical)))
             mean_g = w @ grid
             for case, crit, weights, kap in [
                 (
@@ -214,7 +223,7 @@ def obs_transfer():
         compression={"method": "gzip", "mtime": 0},
     )
     (HERE / "kappa-check.json").write_text(
-        json.dumps(dict(max_refinement_nm=max(errors), rows=len(df)), indent=2) + "\n"
+        json.dumps(dict(max_core_to_3073_node_grid_nm=max(errors), rows=len(df)), indent=2) + "\n"
     )
 
 

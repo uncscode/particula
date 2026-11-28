@@ -14,5 +14,6 @@ Start with ideal activity to connect composition and partial pressure. Use κ fo
 - [Compare ideal and nonideal organic activity](bat_activity_example.py)
 - [Connect water content to hygroscopicity](kappa_activity_example.py)
 - [Equal mass does not mean equal activity](ideal_activity_example.py)
+- [How many particles remain eligible to activate as a chamber is diluted?](equilibrium_ccn_spectrum.py)
 - [Water and organic exchange in a closed box](aiomfac_closed_box.py)
 <!-- STUDY_LIST_END -->

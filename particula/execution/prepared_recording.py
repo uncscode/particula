@@ -14,8 +14,8 @@ from particula.execution.analysis_io import AnalysisWriter
 from particula.execution.prepared import PreparedSimulation
 from particula.execution.recording import (
     Recorder,
+    _analysis_schedules,
     _observation_times,
-    _optical_schedule,
 )
 
 _REDUCED = {
@@ -168,6 +168,9 @@ def run_prepared(  # noqa: C901
     optics=None,
     optical_output_times=None,
     optical_initial=False,
+    ccn=None,
+    ccn_output_times=None,
+    ccn_initial=False,
 ):
     """Run complete fixed steps and explicitly observe the requested grid.
 
@@ -179,6 +182,7 @@ def run_prepared(  # noqa: C901
     synchronize surfaces asynchronous failures even without an observer.
     An OpticalObserver uses its own schedule. By default it records every
     accepted step, plus the starting state if optical_initial is true.
+    CCNObserver supports the same independent scheduling via ccn_output_times.
     """
     if type(simulation) is not PreparedSimulation:
         raise TypeError("requires an exact PreparedSimulation owner")
@@ -196,19 +200,33 @@ def run_prepared(  # noqa: C901
         if end < start:
             raise ValueError("end_time precedes accepted simulation time")
         indices = {_index(simulation, float(time)) for time in times}
-        dense, optical_times = _optical_schedule(
-            simulation,
-            optics,
-            optical_output_times,
-            optical_initial,
-            _time(simulation),
-            end_time,
+        schedules = [
+            (
+                sampler,
+                dense,
+                {_index(simulation, float(time)) for time in times},
+            )
+            for sampler, dense, times in _analysis_schedules(
+                simulation,
+                _time(simulation),
+                end_time,
+                optics,
+                optical_output_times,
+                optical_initial,
+                ccn,
+                ccn_output_times,
+                ccn_initial,
+            )
+        ]
+        dense_steps = (
+            range(start + 1, end + 1)
+            if any(dense for _, dense, _ in schedules)
+            else range(0)
         )
-        optical_indices = {
-            _index(simulation, float(time)) for time in optical_times
-        }
-        dense_steps = range(start + 1, end + 1) if dense else range(0)
-        schedule = merge(sorted(indices | optical_indices), dense_steps)
+        schedule = merge(
+            sorted(indices.union(*(times for _, _, times in schedules))),
+            dense_steps,
+        )
         # Preflight the recorder's time too, so a mismatched history cannot
         # consume physics steps before its first failed observation.
         if observer is not None and observer.recorder.last_time is not None:
@@ -219,12 +237,13 @@ def run_prepared(  # noqa: C901
             if index < start or index == previous:
                 continue
             simulation.run(index - simulation.completed_steps)
-            if index in optical_indices or (dense and index > start):
-                optics.record()
+            for sampler, dense, sample_indices in schedules:
+                if index in sample_indices or (dense and index > start):
+                    sampler.record()
             if observer is not None and index in indices:
                 observer.record()
             previous = index
-        if optics is not None:
-            optics.flush()
+        for sampler, _, _ in schedules:
+            sampler.flush()
         simulation.synchronize()
     return simulation

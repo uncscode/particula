@@ -7,6 +7,7 @@ for runnable workflows.
 - [Turbulent dispersion and conservative flow replay](dynamics/prescribed-transport.md)
 - [Dust emission from a finite bed](dynamics/surface-emission.md)
 - [Water, aerosol, and motion in a parcel](thermodynamics/parcel-dynamics.md)
+- [Critical dry diameter and equilibrium CCN number](thermodynamics/kappa-kohler-activation.md)
 - [Activity and equilibria](thermodynamics/index.md)
 - [Condensation](dynamics/condensation-equations.md)
 - [Nucleation](dynamics/nucleation-equations.md)

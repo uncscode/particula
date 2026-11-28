@@ -108,7 +108,7 @@ def prepare(mode, output):
         anchor = d[d.recipe == d.base_recipe].copy()
         anchor["direct_k"] = [
             brentq(
-                lambda k: koehler_threshold(np.array([k]), s, kelvin_nm(t), 3073)[0]
+                lambda k: koehler_threshold(k, s, kelvin_nm(t))[0]
                 - diam,
                 0.001,
                 4,
