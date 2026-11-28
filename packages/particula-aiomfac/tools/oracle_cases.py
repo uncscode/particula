@@ -11,6 +11,15 @@ from tempfile import TemporaryDirectory
 from oracle_build import BUILD, CACHE, REFERENCE, SOURCE
 
 
+# Use the stock driver’s offline pure-component method in both input formats.
+CALCULATION_OPTIONS = (
+    "@@@@",
+    "calculation options:",
+    "smiles-based pure-component method? 0",
+    "----",
+)
+
+
 def read(path):
     return json.loads(path.read_text())
 
@@ -26,10 +35,7 @@ def input_text(points):
         lines.append("----")
     mole = int(case["basis"] == "mole")
     lines += [
-        "@@@@",
-        "calculation options:",
-        "smiles-based pure-component method? 0",
-        "----",
+        *CALCULATION_OPTIONS,
         "++++",
         "mixture composition and temperature:",
         f"mass fraction? {1 - mole}",
@@ -66,9 +72,10 @@ def execute(points, name="activity", original=False):
             data = (SOURCE / "Examples_Input/input_0008.txt").read_text()
             # Keep original component definitions and row 1 without later points.
             data = data[: re.search(r"(?m)^2\s+298", data).start()] + "====\n"
-            (root / "Auxiliary").mkdir()
-            table = "Auxiliary/Pure_component_smiles_table.csv"
-            (root / table).write_bytes((SOURCE / table).read_bytes())
+            # The legacy example omits the options block and enables the
+            # external Tg predictor by default. Preserve its composition rows.
+            options = "\n".join((*CALCULATION_OPTIONS, "++++", ""))
+            data = data.replace("++++\n", options, 1)
         file.write_text(data)
         result = subprocess.run(
             [BUILD / name, "./Inputfiles/input_0008.txt"],

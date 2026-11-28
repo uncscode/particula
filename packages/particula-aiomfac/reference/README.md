@@ -21,9 +21,10 @@ JSON are under `.artifacts/aiomfac-reference` in the calling directory.
 revision, cleanliness and SHA-256 of every build input. Build copies verified
 files into a temporary directory, builds the standard executable, instruments
 that copy and rebuilds the activity executable. Generation metadata binds the
-executables to the sources, generator, compiler and flags. The input CSV used
-by the standard driver is copied to its temporary run directory. Cases use
-explicit subgroups and require no external SMILES or viscosity service.
+executables to the sources, generator, compiler and flags. The mixed-case
+cross-check retains the upstream component definitions and first composition
+row. It inserts the same calculation option used in the generated cases to
+turn off the external SMILES-based viscosity predictor.
 
 `verify` writes fresh candidates, checks physical identities and compares
 against tracked JSON. Inspect numerical differences by case, species and field.
