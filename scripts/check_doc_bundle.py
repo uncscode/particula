@@ -101,7 +101,17 @@ def study_archives(wheel: Path, source: Path) -> dict:
             name = relative.with_suffix(".zip").as_posix()
             content = package.read(DOC_PREFIX + name)
             files = {"example.py": script}
-            for item in config["inputs"]:
+            inputs = list(config["inputs"])
+            if launcher := config.get("download_launcher"):
+                files = {"example.py": Path(launcher), "study.py": script}
+                inputs.extend(config["science_inputs"])
+                inputs.extend(
+                    (
+                        "particula/plotting/__init__.py",
+                        "particula/default.mplstyle",
+                    )
+                )
+            for item in inputs:
                 destination = config.get("input_destinations", {}).get(
                     item, item
                 )

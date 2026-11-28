@@ -651,6 +651,7 @@
     "policy": "cuda",
     "device": "cuda",
     "timeout": 7200,
+    "download_launcher": "scripts/historical_study.py",
     "science_inputs": [
       "particula/particles/properties/number_spectrum.py"
     ],
@@ -681,6 +682,7 @@
     "policy": "cuda",
     "device": "cuda",
     "timeout": 7200,
+    "download_launcher": "scripts/historical_study.py",
     "science_inputs": [
       "particula/particles/properties/number_spectrum.py"
     ],
@@ -714,6 +716,7 @@
     "policy": "cuda",
     "device": "cuda",
     "timeout": 7200,
+    "download_launcher": "scripts/historical_study.py",
     "science_inputs": [
       "particula/particles/properties/number_spectrum.py"
     ],
@@ -747,6 +750,7 @@
     "policy": "cuda",
     "device": "cuda",
     "timeout": 14400,
+    "download_launcher": "scripts/historical_study.py",
     "science_inputs": [
       "particula/particles/properties/number_spectrum.py"
     ],

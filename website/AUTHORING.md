@@ -207,6 +207,12 @@ separately installed optional model, declare its source and parameter files
 in `science_inputs`. These paths participate in the scientific fingerprint
 and saved hash inventory while the model ships in its own distribution.
 
+For a pinned GPU study that uses the later spectrum and plotting helpers,
+set `download_launcher` to `scripts/historical_study.py` and list the
+spectrum module in `science_inputs`. In the ZIP, `example.py` loads those
+helpers beside the installed historical engine and runs the original
+`study.py`. The ZIP README records the required engine revision.
+
 ## Maintain the LLM documentation index
 
 `website/public/llms.txt` is a small curated index published at

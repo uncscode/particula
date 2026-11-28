@@ -53,6 +53,10 @@ def study_inputs(source: Path) -> set[str]:
         name
         for config in registry.values()
         for name in config.get("inputs", [])
+    } | {
+        config["download_launcher"]
+        for config in registry.values()
+        if "download_launcher" in config
     }
 
 
