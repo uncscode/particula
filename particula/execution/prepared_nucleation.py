@@ -163,7 +163,7 @@ def compile_nucleation(plan: _ProcessPlan, context: BuiltinPreparationContext):
         _raise_nucleation_status(saved_status.numpy())
 
     context.observers.append(observe)
-    counts = context.particles.concentration
+    counts = context.particles.population
     budget = resources.exhaustion.resampling_releasable_counts
 
     def enqueue():

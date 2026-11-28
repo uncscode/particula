@@ -221,8 +221,8 @@ def test_translated_dilution_matches_independent_decay_and_freezes_config(
         result = simulation.snapshot()
     factor = np.exp(-0.4)
     np.testing.assert_allclose(
-        result.particles.concentration,
-        initial.particles.concentration * factor,
+        result.particles.population,
+        initial.particles.population * factor,
         rtol=1e-14,
     )
     np.testing.assert_allclose(
@@ -258,12 +258,12 @@ def test_translated_brownian_has_collisions_and_conserves_inventory(device):
     ) as simulation:
         simulation.step()
         result = simulation.snapshot()
-    assert np.count_nonzero(result.particles.concentration) == 1
+    assert np.count_nonzero(result.particles.population) == 1
     for name in ("masses", "charge"):
         before = getattr(initial.particles, name)
         after = getattr(result.particles, name)
-        weights = initial.particles.concentration
-        result_weights = result.particles.concentration
+        weights = initial.particles.population
+        result_weights = result.particles.population
         if before.ndim == 3:
             weights = weights[..., None]
             result_weights = result_weights[..., None]
@@ -300,7 +300,7 @@ def test_translated_wall_loss_clears_lost_slots(device, charged):
     ) as simulation:
         simulation.step()
         result = simulation.snapshot()
-    for name in ("masses", "charge", "concentration"):
+    for name in ("masses", "charge", "population"):
         np.testing.assert_array_equal(getattr(result.particles, name), 0)
     np.testing.assert_array_equal(
         result.gas.concentration, initial.gas.concentration
@@ -407,7 +407,7 @@ def test_translated_condensation_conserves_and_preserves_uncoupled_lanes(
     gain = (
         np.sum(
             (result.particles.masses[..., 0] - initial.particles.masses[..., 0])
-            * initial.particles.concentration,
+            * initial.particles.population,
             axis=1,
         )
         / initial.particles.volume
@@ -422,7 +422,7 @@ def test_translated_condensation_conserves_and_preserves_uncoupled_lanes(
         result.gas.concentration[:, :2], initial.gas.concentration[:, :2]
     )
     np.testing.assert_array_equal(
-        result.particles.concentration, initial.particles.concentration
+        result.particles.population, initial.particles.population
     )
 
 
@@ -460,7 +460,7 @@ def nucleation_case(*, resampling=False):
     initial, config = fixture(volume=1.0, capacity=4)
     initial.gas.concentration[0, 2] = 8 * 0.2 / AVOGADRO_NUMBER
     initial.gas.concentration[0, 1] = 32 * 0.1 / AVOGADRO_NUMBER
-    initial.particles.concentration[0, 0] = 1
+    initial.particles.population[0, 0] = 1
     process = runnable(initial, config)
     process.source_config = replace(
         process.source_config,
@@ -487,9 +487,7 @@ def test_translated_nucleation_injects_mapped_neutral_unit_events(device):
     ) as simulation:
         simulation.step()
         result = simulation.snapshot()
-    np.testing.assert_array_equal(
-        result.particles.concentration, [[1, 1, 1, 0]]
-    )
+    np.testing.assert_array_equal(result.particles.population, [[1, 1, 1, 0]])
     np.testing.assert_array_equal(result.particles.charge, 0)
     np.testing.assert_allclose(
         inventory(result), inventory(initial), rtol=1e-14
@@ -523,14 +521,14 @@ def test_nucleation_resampling_uses_live_capacity_and_retains_bounds(device):
 
     initial, process = nucleation_case(resampling=True)
     initial.particles.masses[0, 1:3] = initial.particles.masses[0, 0]
-    initial.particles.concentration[0, :3] = 1
+    initial.particles.population[0, :3] = 1
     with prepare_simulation(
         (process,), initial, device=device.native, time_step=1.0
     ) as simulation:
         simulation.step()
         result = simulation.snapshot()
     np.testing.assert_array_equal(
-        result.particles.concentration, [[1.5, 1.5, 1, 1]]
+        result.particles.population, [[1.5, 1.5, 1, 1]]
     )
     np.testing.assert_allclose(
         inventory(result), inventory(initial), rtol=1e-14
@@ -631,7 +629,7 @@ def test_new_unit_particles_guard_unequal_coagulation_before_rng_draw(device):
     from particula.execution.prepared import prepare_simulation
 
     initial, process = nucleation_case()
-    initial.particles.concentration[0, 0] = 2
+    initial.particles.population[0, 0] = 2
     with prepare_simulation(
         (
             process,
@@ -647,7 +645,7 @@ def test_new_unit_particles_guard_unequal_coagulation_before_rng_draw(device):
         simulation.run(3)
         simulation._wait()
         np.testing.assert_array_equal(
-            simulation._session.particles.concentration.numpy(), [[2, 1, 1, 0]]
+            simulation._session.particles.population.numpy(), [[2, 1, 1, 0]]
         )
         np.testing.assert_array_equal(resources.rng_states.numpy(), before_rng)
         with pytest.raises(ValueError, match="equal active counts"):
@@ -661,9 +659,7 @@ def test_public_prepare_forcing_and_reduced_diagnostics(device, kind):
     from particula.dynamics.tests.multibox_runnable_test import batch
     from particula.execution import PreparedSimulation, SimulationDiagnostics
 
-    initial = batch(state(volume=1.0, kind=kind))
-    if kind == "discrete":
-        initial.particles.volume[:] = 1.0
+    initial = batch(state(volume=0.25, kind=kind))
     process = Dilution(DilutionStrategy(0.2))
     with process.prepare(
         initial, device=device.native, time_step=0.5
@@ -671,18 +667,18 @@ def test_public_prepare_forcing_and_reduced_diagnostics(device, kind):
         assert isinstance(simulation, PreparedSimulation)
         before = simulation.diagnostics()
         assert isinstance(before, SimulationDiagnostics)
-        expected_count = initial.particles.concentration.sum(axis=1)
-        expected_mass = np.sum(
-            initial.particles.masses
-            * initial.particles.concentration[..., None],
-            axis=1,
+        # Each box contains 4 particles, -2 elementary charges and
+        # [12, 16] × 1e-18 kg of material in 0.25 or 4 m^3.
+        expected_count = np.array([16.0, 1.0])
+        np.testing.assert_array_equal(
+            before.number_concentration, expected_count
         )
-        if kind == "particle_resolved":
-            expected_count /= initial.particles.volume
-            expected_mass /= initial.particles.volume[:, None]
-        np.testing.assert_allclose(before.number_concentration, expected_count)
+        np.testing.assert_array_equal(before.charge_concentration, [-8.0, -0.5])
         np.testing.assert_allclose(
-            before.particle_mass_concentration, expected_mass
+            before.particle_mass_concentration,
+            np.array([[48, 64], [3, 4]]) * 1e-18,
+            rtol=1e-14,
+            atol=0,
         )
         np.testing.assert_array_equal(before.active_slots, [2, 2])
         gas = np.array([0.01, 0.02, 0.03])
@@ -830,7 +826,7 @@ def test_latched_failure_preserves_primary_arrays_and_random_streams(
             getattr(resident.particles, name)
             for name in (
                 "masses",
-                "concentration",
+                "population",
                 "charge",
                 "density",
                 "volume",
@@ -876,7 +872,7 @@ def test_nucleation_resampling_tolerance_failure_stops_later_process(device):
     initial, process = nucleation_case(resampling=True)
     initial.particles.masses[0, 1] = initial.particles.masses[0, 0] * 1000
     initial.particles.masses[0, 2] = initial.particles.masses[0, 0] * 1e6
-    initial.particles.concentration[0, :3] = 1
+    initial.particles.population[0, :3] = 1
     process.commit_config = replace(
         process.commit_config, mean_radius_relative_error=0.0
     )
@@ -910,7 +906,7 @@ def test_prepared_stochastic_streams_follow_logical_boxes_and_run_segments(
     old = initial.particles
     initial.particles = ParticleData(
         masses=np.tile(old.masses, (1, 32, 1)),
-        concentration=np.ones((2, 64)),
+        population=np.ones((2, 64)),
         charge=np.tile(old.charge, (1, 32)),
         density=old.density.copy(),
         volume=np.array([1e-13, 2e-13]),
@@ -918,7 +914,7 @@ def test_prepared_stochastic_streams_follow_logical_boxes_and_run_segments(
     )
     swapped = detached(initial)
     for carrier, names in (
-        (swapped.particles, ("masses", "concentration", "charge", "volume")),
+        (swapped.particles, ("masses", "population", "charge", "volume")),
         (swapped.gas, ("concentration",)),
         (swapped.environment, ("temperature", "pressure", "saturation_ratio")),
     ):
@@ -942,8 +938,8 @@ def test_prepared_stochastic_streams_follow_logical_boxes_and_run_segments(
             for steps in segments:
                 simulation.run(steps)
             results.append(simulation.snapshot())
-    assert np.count_nonzero(results[0].particles.concentration) < 128
-    for name in ("masses", "concentration", "charge", "volume"):
+    assert np.count_nonzero(results[0].particles.population) < 128
+    for name in ("masses", "population", "charge", "volume"):
         first = getattr(results[0].particles, name)
         np.testing.assert_array_equal(
             first, getattr(results[1].particles, name)
@@ -1096,9 +1092,7 @@ def test_binary_bat_fixed_step_both_vapors(device, latent, weighted):
         assert np.all(np.abs(expected) > 0)
         np.testing.assert_allclose(change, expected, rtol=1e-3, atol=0)
         np.testing.assert_allclose(
-            change
-            @ initial.particles.concentration[0]
-            / initial.particles.volume,
+            change @ initial.particles.population[0] / initial.particles.volume,
             initial.gas.concentration[:, gas]
             - result.gas.concentration[:, gas],
             rtol=1e-8,

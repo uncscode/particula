@@ -15,7 +15,7 @@ def test_pulse_recovers_both_closed_reservoir_endpoints():
     _, radius, vapor, particle_water = endpoints.T
     dry_mass = aerosol.particles.masses[0, 0, 1]
     number_density = (
-        aerosol.particles.concentration[0, 0] / aerosol.particles.volume[0]
+        aerosol.particles.population[0, 0] / aerosol.particles.volume[0]
     )
     masses = np.column_stack(
         (particle_water / number_density, np.full(2, dry_mass))

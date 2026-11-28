@@ -100,7 +100,7 @@ def test_restart_restores_closed_transport_and_published_stream_words(
     checkpoint = session.checkpoint(registry, guard)
     source_gas = cast(Any, session.gas).concentration.numpy().copy()
     source_particle_concentration = (
-        cast(Any, session.particles).concentration.numpy().copy()
+        cast(Any, session.particles).population.numpy().copy()
     )
     source_final_volumes = cast(Any, resources.final_volumes).numpy().copy()
 
@@ -149,7 +149,7 @@ def test_restart_restores_closed_transport_and_published_stream_words(
         atol=1e-30,
     )
     npt.assert_allclose(
-        cast(Any, restored.particles).concentration.numpy(),
+        cast(Any, restored.particles).population.numpy(),
         source_particle_concentration,
         rtol=1e-12,
         atol=1e-30,
@@ -178,8 +178,8 @@ def test_restart_restores_closed_transport_and_published_stream_words(
         atol=1e-30,
     )
     npt.assert_allclose(
-        cast(Any, restored.particles).concentration.numpy(),
-        cast(Any, session.particles).concentration.numpy(),
+        cast(Any, restored.particles).population.numpy(),
+        cast(Any, session.particles).population.numpy(),
         rtol=1e-12,
         atol=1e-30,
     )

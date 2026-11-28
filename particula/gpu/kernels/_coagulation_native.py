@@ -21,7 +21,7 @@ def validate_schema(particles: Any) -> None:
     boxes, slots, species = shape
     for name, expected in (
         ("masses", shape),
-        ("concentration", (boxes, slots)),
+        ("population", (boxes, slots)),
         ("charge", (boxes, slots)),
         ("density", (species,)),
         ("volume", (boxes,)),
@@ -80,7 +80,7 @@ def validate_physics(particles: Any, requested_volume: Any) -> None:
         dim=boxes,
         inputs=[
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.density,
             particles.charge,
             invalid,
@@ -100,7 +100,7 @@ def validate_physics(particles: Any, requested_volume: Any) -> None:
         dim=boxes,
         inputs=[
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.density,
             particles.volume,
             requested_volume,
@@ -148,7 +148,7 @@ def validate_ownership(
     """Reject every native writer overlapping another writer or read source."""
     writers = [
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         pairs,
         counts,

@@ -70,7 +70,7 @@ def test_split_disk_restart_preserves_exact_future(tmp_path, method):
         left, right = owner.snapshot(), restored.snapshot()
         npt.assert_array_equal(left.particles.masses, right.particles.masses)
         npt.assert_array_equal(
-            left.particles.concentration, right.particles.concentration
+            left.particles.population, right.particles.population
         )
         npt.assert_array_equal(left.gas.concentration, right.gas.concentration)
         npt.assert_array_equal(right.fields["lab.marker"], [3, 4])

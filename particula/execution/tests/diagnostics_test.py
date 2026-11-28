@@ -48,7 +48,7 @@ def _session() -> ResidentSession:
         dtype=wp.float64,
         device="cpu",
     )
-    particles.concentration = wp.array(
+    particles.population = wp.array(
         np.array([[4.0, 0.0], [2.0, 3.0]]), dtype=wp.float64, device="cpu"
     )
     particles.charge = wp.zeros((2, 2), dtype=wp.float64, device="cpu")
@@ -70,8 +70,8 @@ def _session() -> ResidentSession:
         np.array([[2.0, 3.0], [4.0, 5.0]]), dtype=wp.float64, device="cpu"
     )
     # Convert the original density fixture to counts at its physical volume.
-    particles.concentration.assign(
-        particles.concentration.numpy() * particles.volume.numpy()[:, None]
+    particles.population.assign(
+        particles.population.numpy() * particles.volume.numpy()[:, None]
     )
     return ResidentSession(
         particles,
@@ -305,7 +305,7 @@ def test_parallel_reductions_match_large_non_power_of_two_oracle() -> None:
     particles = WarpParticleData()
     particles.distribution_kind = wp.int32(3)
     particles.masses = wp.array(masses, dtype=wp.float64, device="cpu")
-    particles.concentration = wp.array(
+    particles.population = wp.array(
         concentration, dtype=wp.float64, device="cpu"
     )
     particles.charge = wp.zeros(
@@ -330,7 +330,7 @@ def test_parallel_reductions_match_large_non_power_of_two_oracle() -> None:
     environment.saturation_ratio = wp.ones(
         (n_boxes, n_species), dtype=wp.float64, device="cpu"
     )
-    particles.concentration.assign(concentration * volume[:, None])
+    particles.population.assign(concentration * volume[:, None])
     session = ResidentSession(
         particles,
         gas,
@@ -564,7 +564,7 @@ def test_diagnostics_launches_parallel_stages(
         "_accumulate_mapped_particle_mass",
         "_accumulate_mapped_particle_mass",
         "_clear_particle_number",
-        "_accumulate_resolved_number",
+        "_accumulate_number_density",
         "_copy_snapshot",
         "_conservation_residual",
     ]

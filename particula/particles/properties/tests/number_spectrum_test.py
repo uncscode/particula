@@ -111,11 +111,11 @@ def test_population_measures():
         mass = 4 * np.pi / 3 * radius[:, None] ** 3 * material_density / 2
         counts = np.array([2.0, 8.0, 0.0]) * np.asarray(volumes)[:, None]
         return ParticleData(
-            np.tile(mass, (len(volumes), 1, 1)),
-            counts,
-            np.zeros_like(counts),
-            material_density,
-            np.array(volumes),
+            masses=np.tile(mass, (len(volumes), 1, 1)),
+            population=counts,
+            charge=np.zeros_like(counts),
+            density=material_density,
+            volume=np.array(volumes),
             distribution_type=kind,
         )
 

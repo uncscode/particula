@@ -42,22 +42,22 @@ def test_cpu_fixture_has_documented_active_and_inactive_slots(
 
     assert particle_data.masses.shape == (1, 8, 1)
     assert particle_data.distribution_type == "particle_resolved"
-    assert particle_data.concentration.shape == (1, 8)
+    assert particle_data.population.shape == (1, 8)
     assert all(
         array.dtype == np.float64
         for array in (
             particle_data.masses,
-            particle_data.concentration,
+            particle_data.population,
             particle_data.charge,
             particle_data.density,
             particle_data.volume,
         )
     )
     np.testing.assert_array_equal(
-        np.flatnonzero(particle_data.concentration[0] > 0.0), np.arange(6)
+        np.flatnonzero(particle_data.population[0] > 0.0), np.arange(6)
     )
     np.testing.assert_array_equal(
-        np.flatnonzero(particle_data.concentration[0] == 0.0), [6, 7]
+        np.flatnonzero(particle_data.population[0] == 0.0), [6, 7]
     )
 
 
@@ -384,7 +384,7 @@ def test_real_warp_selected_adapter_reuses_rng_and_preserves_identity(
     np.testing.assert_allclose(
         np.sum(
             result.particle_data.masses
-            * result.particle_data.concentration[:, :, None]
+            * result.particle_data.population[:, :, None]
         ),
         12.5e-21,
         rtol=1e-12,

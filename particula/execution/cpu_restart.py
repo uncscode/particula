@@ -50,7 +50,7 @@ def checkpoint_condensation(owner):
     solver = owner.solver
     plan = condensation_identity(owner._strategy)
     return CondensationCheckpoint(
-        2,
+        3,
         pack_native(owner._base),
         plan,
         solver.state,
@@ -75,7 +75,7 @@ def resume_condensation(saved, strategy):
     if (
         type(saved) is not CondensationCheckpoint
         or type(saved.schema_version) is not int
-        or saved.schema_version != 2
+        or saved.schema_version != 3
     ):
         raise ValueError("unsupported adaptive condensation checkpoint")
     base = unpack_native(saved.base)

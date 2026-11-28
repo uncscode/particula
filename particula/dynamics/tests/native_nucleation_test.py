@@ -41,7 +41,7 @@ def fixture(volume=0.25, capacity=4):
     counts[0, 0] = 2
     particles = ParticleData(
         masses=masses,
-        concentration=counts,
+        population=counts,
         charge=np.zeros_like(counts),
         density=np.array([1000.0, 1200.0, 1400.0]),
         volume=np.array([volume]),
@@ -85,7 +85,7 @@ def records(aerosol, rate=1e9):
 def inventory(aerosol):
     """Compute mapped mass density including the particle-only lane."""
     p = aerosol.particles
-    result = np.sum(p.masses * p.concentration[..., None], axis=1)
+    result = np.sum(p.masses * p.population[..., None], axis=1)
     result /= p.volume[:, None]
     result[:, 0] += aerosol.gas.concentration[:, 2]
     result[:, 1] += aerosol.gas.concentration[:, 1]
@@ -99,12 +99,12 @@ def test_commit_converts_density_to_counts_and_maps_species(volume):
     p, gas = aerosol.particles, aerosol.gas
     before = inventory(aerosol)
     gas_before = gas.concentration.copy()
-    arrays = [p.masses, p.concentration, p.charge, p.volume, gas.concentration]
+    arrays = [p.masses, p.population, p.charge, p.volume, gas.concentration]
     result = source.commit_particle_source(*records(aerosol), p, gas, config)
     per_event = np.array([0, 2, 1, 0]) * gas.molar_mass / AVOGADRO_NUMBER
     assert result.event_count_units == "count"
     np.testing.assert_allclose(result.represented_event_count, [1e9 * volume])
-    np.testing.assert_allclose(p.concentration[0, 1], 1e9 * volume)
+    np.testing.assert_allclose(p.population[0, 1], 1e9 * volume)
     np.testing.assert_allclose(p.masses[0, 1], per_event[[2, 1, 0]])
     np.testing.assert_array_equal(p.charge[0], [0, 2, 0, 0])
     np.testing.assert_allclose(gas.concentration, gas_before - 1e9 * per_event)
@@ -118,7 +118,7 @@ def test_commit_converts_density_to_counts_and_maps_species(volume):
         left is right
         for left, right in zip(
             arrays,
-            [p.masses, p.concentration, p.charge, p.volume, gas.concentration],
+            [p.masses, p.population, p.charge, p.volume, gas.concentration],
             strict=True,
         )
     )
@@ -142,7 +142,7 @@ def test_representative_scaling_preserves_density_and_inert_gas():
         config,
     )
     np.testing.assert_array_equal(aerosol.particles.volume, [0.125])
-    np.testing.assert_array_equal(aerosol.particles.concentration[0, :1], [1.0])
+    np.testing.assert_array_equal(aerosol.particles.population[0, :1], [1.0])
     np.testing.assert_allclose(result.represented_event_count, [1.25e8])
     np.testing.assert_allclose(
         result.representation_reduction_event_count, [1.25e8]
@@ -178,7 +178,7 @@ def test_rejection_is_write_free(failure):
     elif failure == "pmf":
         p.distribution_type = "discrete"
         p.volume[:] = 1
-    arrays = [p.masses, p.concentration, p.charge, p.volume, gas.concentration]
+    arrays = [p.masses, p.population, p.charge, p.volume, gas.concentration]
     snapshots = [array.copy() for array in arrays]
     with pytest.raises((TypeError, ValueError)):
         source.commit_particle_source(demand, diagnostics, p, gas, config)
@@ -190,7 +190,7 @@ def test_partial_commit_failure_restores_all_arrays(monkeypatch):
     """A failing writer restores every attempted particle and gas write."""
     aerosol, config = fixture()
     p, gas = aerosol.particles, aerosol.gas
-    arrays = [p.masses, p.concentration, p.charge, p.volume, gas.concentration]
+    arrays = [p.masses, p.population, p.charge, p.volume, gas.concentration]
     before = [array.copy() for array in arrays]
     copyto = np.copyto
 
@@ -263,7 +263,7 @@ def test_native_resampling_retains_existing_species_inventory():
     aerosol, config = fixture(capacity=2)
     p = aerosol.particles
     p.masses[0, 1] = p.masses[0, 0]
-    p.concentration[0, 1] = 3.0
+    p.population[0, 1] = 3.0
     before = inventory(aerosol)
     config = replace(
         config, exhaustion_controls=ExhaustionControls(True, False)
@@ -275,7 +275,7 @@ def test_native_resampling_retains_existing_species_inventory():
     np.testing.assert_allclose(
         inventory(aerosol), before, rtol=1e-12, atol=1e-30
     )
-    np.testing.assert_allclose(p.concentration[0, 0], 5.0)
+    np.testing.assert_allclose(p.population[0, 0], 5.0)
 
 
 def test_later_substep_failure_keeps_earlier_commit(monkeypatch):
@@ -299,7 +299,7 @@ def test_later_substep_failure_keeps_earlier_commit(monkeypatch):
     monkeypatch.setattr(process_module, "_commit_particle_source", fail_second)
     with pytest.raises(RuntimeError, match="second source attempt"):
         process.execute(aerosol, 1.0, 2)
-    for name in ("masses", "concentration", "charge", "volume"):
+    for name in ("masses", "population", "charge", "volume"):
         np.testing.assert_array_equal(
             getattr(aerosol.particles, name), getattr(expected.particles, name)
         )

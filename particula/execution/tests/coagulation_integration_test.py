@@ -93,7 +93,7 @@ def _make_cpu_aerosol() -> tuple[Any, Any]:
     mass = np.array([1.0e-18, 2.0e-18, 3.0e-18], dtype=np.float64)
     particles = par.particles.ParticleData(
         masses=mass.reshape(1, 3, 1),
-        concentration=np.ones((1, 3)),
+        population=np.ones((1, 3)),
         charge=np.array([[0.0, 1.0, -1.0]]),
         density=np.array([1000.0]),
         volume=np.array([1.0e-6]),
@@ -169,11 +169,11 @@ def _warp_bundle(fixture: _Fixture, device: str = "cpu") -> Any:
     from particula.gpu import to_warp_environment_data, to_warp_particle_data
 
     particle_data = ParticleData(
-        fixture.masses.copy(),
-        fixture.concentration.copy(),
-        fixture.charge.copy(),
-        fixture.density.copy(),
-        fixture.volume.copy(),
+        masses=fixture.masses.copy(),
+        population=fixture.concentration.copy(),
+        charge=fixture.charge.copy(),
+        density=fixture.density.copy(),
+        volume=fixture.volume.copy(),
         distribution_type="particle_resolved",
     )
     environment_data = EnvironmentData(
@@ -240,7 +240,7 @@ def _dispatch(
 def _assert_warp_invariants(bundle: Any, before: _Fixture) -> None:
     """Assert conservation, valid pairs, and inactive-sentinel protection."""
     masses = bundle.particles.masses.numpy()
-    concentration = bundle.particles.concentration.numpy()
+    concentration = bundle.particles.population.numpy()
     charge = bundle.particles.charge.numpy()
     pairs = bundle.pairs.numpy()
     counts = bundle.counts.numpy()
@@ -317,7 +317,7 @@ def test_cpu_adapter_nonzero_step_mutates_and_conserves_particle_mass() -> None:
     # binning need not consume identical random trajectories.
     runnable.coagulation_strategy.random_generator = np.random.default_rng(0)
     before_mass = aerosol.particles.total_mass[0].copy()
-    before_concentration = aerosol.particles.concentration[0].copy()
+    before_concentration = aerosol.particles.population[0].copy()
     before_charge = aerosol.particles.charge[0].copy()
     request = CPUCoagulationExecutionState(
         CPUCoagulationState(BrownianCoagulationConfig(), aerosol),
@@ -329,7 +329,7 @@ def test_cpu_adapter_nonzero_step_mutates_and_conserves_particle_mass() -> None:
     result = CPUCoagulationExecutionAdapter().execute(request)
 
     after_mass = aerosol.particles.total_mass[0]
-    after_concentration = aerosol.particles.concentration[0]
+    after_concentration = aerosol.particles.population[0]
     after_charge = aerosol.particles.charge[0]
     assert result.backend_result is not None
     cpu_result = cast(CPUCoagulationResult, result.backend_result.value)
@@ -437,7 +437,7 @@ def test_warp_adapter_keeps_boxes_isolated() -> None:
     for baseline, changed in zip(
         (
             baseline_bundle.particles.masses.numpy()[1],
-            baseline_bundle.particles.concentration.numpy()[1],
+            baseline_bundle.particles.population.numpy()[1],
             baseline_bundle.particles.charge.numpy()[1],
             baseline_bundle.pairs.numpy()[1],
             baseline_bundle.counts.numpy()[1],
@@ -445,7 +445,7 @@ def test_warp_adapter_keeps_boxes_isolated() -> None:
         ),
         (
             altered_bundle.particles.masses.numpy()[1],
-            altered_bundle.particles.concentration.numpy()[1],
+            altered_bundle.particles.population.numpy()[1],
             altered_bundle.particles.charge.numpy()[1],
             altered_bundle.pairs.numpy()[1],
             altered_bundle.counts.numpy()[1],
@@ -525,12 +525,12 @@ def test_warp_persistent_rng_advances_across_nonterminal_dispatches() -> None:
     wp.synchronize()
     _assert_warp_result_identities(first_result, bundle)
     first = bundle.rng.numpy().copy()
-    assert np.count_nonzero(bundle.particles.concentration.numpy()[0]) >= 2
+    assert np.count_nonzero(bundle.particles.population.numpy()[0]) >= 2
     second_result = _dispatch(bundle, time_step=1.0, initialize_rng=False)
     wp.synchronize()
     _assert_warp_result_identities(second_result, bundle)
     second = bundle.rng.numpy().copy()
-    assert np.count_nonzero(bundle.particles.concentration.numpy()[0]) >= 2
+    assert np.count_nonzero(bundle.particles.population.numpy()[0]) >= 2
     assert not np.array_equal(first, np.zeros_like(first))
     assert not np.array_equal(second, first)
 
@@ -547,7 +547,7 @@ def test_warp_explicit_rng_reset_replays_first_dispatch_exactly() -> None:
         value.numpy().copy()
         for value in (
             first.particles.masses,
-            first.particles.concentration,
+            first.particles.population,
             first.particles.charge,
             first.pairs,
             first.counts,
@@ -562,7 +562,7 @@ def test_warp_explicit_rng_reset_replays_first_dispatch_exactly() -> None:
         value.numpy()
         for value in (
             second.particles.masses,
-            second.particles.concentration,
+            second.particles.population,
             second.particles.charge,
             second.pairs,
             second.counts,

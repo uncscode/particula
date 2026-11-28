@@ -74,12 +74,12 @@ def test_cpu_nucleation_example_uses_public_api_and_conserves_mass() -> None:
     assert particles.masses.dtype == np.float64
     assert gas.concentration.shape == (1, 2)
     assert gas.concentration.dtype == np.float64
-    assert np.any(particles.concentration > 0.0)
+    assert np.any(particles.population > 0.0)
     assert gas.concentration[0, 0] < 1.0e-12
     npt.assert_allclose(
         gas.concentration[:, 1:], [[2.0e-6]], rtol=0.0, atol=0.0
     )
-    total = np.sum(particles.masses * particles.concentration[..., None])
+    total = np.sum(particles.masses * particles.population[..., None])
     total /= particles.volume[0]
     npt.assert_allclose(
         total + gas.concentration[0, 0], 1.0e-12, rtol=1e-12, atol=1e-30

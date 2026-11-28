@@ -59,6 +59,8 @@ class ParticleDataBuilder:
         """Initialize empty builder state."""
         self._masses: Optional[NDArray[np.float64]] = None
         self._concentration: Optional[NDArray[np.float64]] = None
+        self._measured_density = False
+        self._population: NDArray[np.float64] | None = None
         self._charge: Optional[NDArray[np.float64]] = None
         self._density: Optional[NDArray[np.float64]] = None
         self._volume: Optional[NDArray[np.float64]] = None
@@ -141,7 +143,7 @@ class ParticleDataBuilder:
         Args:
             concentration: Concentration array shaped (n_boxes, n_particles)
                 or (n_particles,).
-            units: Storage units. PMF: 1/m^3 or 1/cm^3;
+            units: Storage units. PMF density: 1/m^3 or 1/cm^3;
                 PDF: 1/m^4; resolved: count.
 
         Returns:
@@ -150,6 +152,8 @@ class ParticleDataBuilder:
         Raises:
             ValueError: When concentration is not 1D or 2D.
         """
+        if units == "count" and self._measured_density:
+            raise ValueError("counts conflict with the supplied number density")
         concentration_array = np.asarray(concentration, dtype=np.float64)
         if concentration_array.ndim == 1:
             concentration_array = np.expand_dims(concentration_array, axis=0)
@@ -161,8 +165,36 @@ class ParticleDataBuilder:
                 units, "1/m^3"
             )
 
+        self._measured_density = False
         self._concentration = concentration_array
         self._concentration_units = units
+        return self
+
+    def set_number_density(
+        self, values: NDArray[np.float64], units: str = "1/m^3"
+    ) -> "ParticleDataBuilder":
+        """Import bin/slot number density or radius PDF density in 1/m^4."""
+        if units not in ("1/m^3", "1/cm^3", "1/m^4"):
+            raise ValueError("density units must be 1/m^3, 1/cm^3 or 1/m^4")
+        if (
+            self._concentration is not None
+            and self._concentration_units == "count"
+        ):
+            raise ValueError(
+                "number density conflicts with the supplied counts"
+            )
+        self.set_concentration(values, units)
+        self._measured_density = True
+        return self
+
+    def set_population(
+        self, population: NDArray[np.float64]
+    ) -> "ParticleDataBuilder":
+        """Set extensive slot counts, or radius PDF ordinates in m^-1."""
+        values = np.asarray(population, dtype=np.float64)
+        if values.ndim not in (1, 2):
+            raise ValueError("population must be 1D or 2D")
+        self._population = np.atleast_2d(values)
         return self
 
     def set_charge(self, charge: NDArray[np.float64]) -> "ParticleDataBuilder":
@@ -357,7 +389,13 @@ class ParticleDataBuilder:
         density = self._density
 
         conc = self._concentration
-        if conc is None:
+        if self._population is not None:
+            if conc is not None:
+                raise ValueError("supply either population or concentration")
+            conc = self._broadcast_if_needed(
+                self._population, (n_boxes, n_particles), label="population"
+            )
+        elif conc is None:
             conc = (
                 np.zeros((n_boxes, n_particles))
                 if self._distribution_type == "continuous_pdf"
@@ -372,7 +410,11 @@ class ParticleDataBuilder:
             accepted_units = {
                 "discrete": ("1/m^3", "1/cm^3"),
                 "continuous_pdf": ("1/m^4",),
-                "particle_resolved": ("count",),
+                "particle_resolved": (
+                    ("1/m^3", "1/cm^3")
+                    if self._measured_density
+                    else ("count",)
+                ),
             }
             if (
                 self._concentration_units
@@ -398,9 +440,20 @@ class ParticleDataBuilder:
                 volume, (n_boxes,), label="volume"
             )
 
+        if (
+            self._population is None
+            and np.any(volume != 1)
+            and (
+                self._measured_density
+                or self._distribution_type in ("discrete", "continuous_pdf")
+            )
+        ):
+            with np.errstate(over="ignore", invalid="ignore"):
+                conc = conc * volume[:, None]
+
         result = ParticleData(
             masses=masses,
-            concentration=conc,
+            population=conc,
             charge=charge,
             density=density,
             volume=volume,

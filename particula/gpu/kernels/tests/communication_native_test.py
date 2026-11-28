@@ -41,7 +41,7 @@ def population(device):
     particles = to_warp_particle_data(
         ParticleData(
             masses=masses,
-            concentration=particles.concentration.numpy(),
+            population=particles.population.numpy(),
             charge=charge,
             density=np.array([1000.0, 1500.0]),
             volume=np.array([0.25, 4.0]),
@@ -87,7 +87,7 @@ def test_physical_volume_keeps_counts_and_extensive_inventories(
     from particula.gpu.kernels import communication as module
 
     particles, gas = population(device)
-    protected = (particles.masses, particles.concentration, particles.charge)
+    protected = (particles.masses, particles.population, particles.charge)
     before = [array.numpy().copy() for array in protected]
     gas_amount = gas.concentration.numpy() * particles.volume.numpy()[:, None]
     final = wp.array([0.5, 2.0], dtype=wp.float64, device=device)
@@ -104,7 +104,7 @@ def test_physical_volume_keeps_counts_and_extensive_inventories(
             for _ in range(2):
                 module._enqueue_prepared_resident_volume_evolution(
                     particles.volume,
-                    particles.concentration,
+                    particles.population,
                     gas.concentration,
                     2,
                     final,
@@ -151,7 +151,7 @@ def test_transport_moves_counts_without_volume_ratio(
             wp.empty_like(a)
             for a in (
                 particles.masses,
-                particles.concentration,
+                particles.population,
                 particles.charge,
             )
         ]
@@ -166,7 +166,7 @@ def test_transport_moves_counts_without_volume_ratio(
             for _ in range(2):
                 module._enqueue_prepared_resident_particle_communication(
                     particles.masses,
-                    particles.concentration,
+                    particles.population,
                     particles.charge,
                     particles.density,
                     particles.volume,
@@ -196,7 +196,7 @@ def test_transport_moves_counts_without_volume_ratio(
         )
         expected = [[4.0, 0.0], [4.0, 0.0]]
     wp.synchronize()
-    counts = particles.concentration.numpy()
+    counts = particles.population.numpy()
     np.testing.assert_array_equal(counts, expected)
     np.testing.assert_allclose(
         np.sum(particles.masses.numpy() * counts[..., None], axis=(0, 1)),
@@ -213,7 +213,7 @@ def test_invalid_physical_volume_gates_all_writers(device, final):
     from particula.gpu.kernels.communication import volume_evolution_step_gpu
 
     particles, gas = population(device)
-    fields = (particles.volume, particles.concentration, gas.concentration)
+    fields = (particles.volume, particles.population, gas.concentration)
     before = [array.numpy().copy() for array in fields]
     volume_evolution_step_gpu(
         particles, gas, wp.array(final, dtype=wp.float64, device=device)
@@ -258,7 +258,7 @@ def test_native_transport_rejects_invalid_state_without_primary_writes(
         values[0, 0, 0] = np.nan
         particles.masses.assign(values)
     else:
-        particles.charge = particles.concentration
+        particles.charge = particles.population
     buffers = module.ParticleCommunicationBuffers(
         wp.empty((2, 2), dtype=wp.float64, device=device),
         wp.empty((2, 2), dtype=wp.float64, device=device),
@@ -267,7 +267,7 @@ def test_native_transport_rejects_invalid_state_without_primary_writes(
     )
     fields = (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.volume,
     )

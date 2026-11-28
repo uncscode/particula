@@ -41,7 +41,7 @@ def _inventory(aerosol):
     """Extensive material inventory, independently of example diagnostics."""
     particles = aerosol.particles
     weighted = np.sum(
-        particles.masses * particles.concentration[..., None], axis=1
+        particles.masses * particles.population[..., None], axis=1
     )
     if particles.distribution_type == "particle_resolved":
         return (
@@ -142,7 +142,7 @@ def test_particle_injection_counts_inventory_and_exhaustion(monkeypatch):
     aerosol = values["aerosol"]
     particles = aerosol.particles
     assert particles.masses.shape == (1, 120_000, 1)
-    assert particles.concentration.sum() == 120_000
+    assert particles.population.sum() == 120_000
     np.testing.assert_allclose(
         particles.species_mass_density[0, 0],
         (
@@ -163,7 +163,7 @@ def test_particle_injection_counts_inventory_and_exhaustion(monkeypatch):
             values["requested_counts"],
         )
     np.testing.assert_array_equal(particles.masses, before)
-    np.testing.assert_array_equal(particles.concentration, 1.0)
+    np.testing.assert_array_equal(particles.population, 1.0)
     plt.close("all")
 
 
@@ -224,7 +224,7 @@ def test_cooled_soot_condensation_then_coagulation_inventory(monkeypatch):
         environment=copy.deepcopy(source.environment),
     )
     initial = _inventory(aerosol)
-    count = aerosol.particles.concentration.sum()
+    count = aerosol.particles.population.sum()
     for temperature in (700.0, 400.0, 300.0):
         aerosol.environment.temperature[0] = temperature
         values["condensation_process"].execute(
@@ -234,8 +234,8 @@ def test_cooled_soot_condensation_then_coagulation_inventory(monkeypatch):
         np.testing.assert_allclose(
             _inventory(aerosol), initial, rtol=1e-12, atol=1e-30
         )
-        assert 0 < aerosol.particles.concentration.sum() <= count
-        count = aerosol.particles.concentration.sum()
+        assert 0 < aerosol.particles.population.sum() <= count
+        count = aerosol.particles.population.sum()
     assert np.any(aerosol.particles.masses[0, :, :-1] > 0)
     assert aerosol.environment.temperature[0] == 300.0
     plt.close("all")

@@ -38,7 +38,7 @@ class IonCondensationExclusion(RunnableABC):
             raise ValueError("ion species index is invalid")
         if indices[0] == indices[1]:
             raise ValueError("ion polarities require distinct material lanes")
-        counts = particles.concentration
+        counts = particles.population
         if np.any((counts != 0) & (counts != 1)):
             raise ValueError("ion exclusion requires unit active counts")
 

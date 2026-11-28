@@ -318,7 +318,7 @@ def _plan_coagulation(process: Any, aerosol: Aerosol) -> _ProcessPlan:  # noqa: 
             raise ValueError(
                 "CPU kernel interpolation controls have no GPU equivalent"
             )
-    for row in aerosol.particles.concentration:
+    for row in aerosol.particles.population:
         active = row[row > 0]
         if active.size and not np.all(active == active[0]):
             raise ValueError(
@@ -567,7 +567,7 @@ def _compile_coagulation(plan, context: BuiltinPreparationContext):
         )
         prepared = replace(prepared, adaptive=controller)
     context.bindings[plan.family] = prepared
-    counts, failure = context.particles.concentration, context.failure
+    counts, failure = context.particles.population, context.failure
     wp = context.wp
 
     def enqueue():

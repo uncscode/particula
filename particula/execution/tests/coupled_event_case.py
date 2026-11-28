@@ -58,11 +58,11 @@ def coupled_event_case():
     )
     aerosol = Aerosol(
         particles=ParticleData(
-            masses,
-            counts,
-            charge,
-            np.full(2, 1000.0),
-            volume,
+            masses=masses,
+            population=counts,
+            charge=charge,
+            density=np.full(2, 1000.0),
+            volume=volume,
             distribution_type="particle_resolved",
         ),
         gas=GasData(

@@ -45,7 +45,7 @@ def test_setup_pins_native_kind_and_independent_species_widths(
     assert session.metadata.distribution_type == kind
     assert session.metadata.gas_names == tuple(aerosol.gas.name)
     np.testing.assert_array_equal(
-        session.particles.concentration.numpy(), aerosol.particles.concentration
+        session.particles.population.numpy(), aerosol.particles.population
     )
     registry = GPUResourceRegistry(session)
     scratch = registry.acquire_condensation().scratch_buffers
@@ -81,7 +81,7 @@ def diagnostics_plan(session):
     device = session.particles.masses.device
     p, g = session.particles, session.gas
     expected = g.concentration.numpy() * p.volume.numpy()[:, None]
-    weight = p.concentration.numpy()
+    weight = p.population.numpy()
     if session.metadata.distribution_type == "discrete":
         weight = weight * p.volume.numpy()[:, None]
     mass = np.sum(p.masses.numpy() * weight[..., None], axis=1)
@@ -209,7 +209,7 @@ def test_native_condensation_adapter_preserves_material_and_gas_widths(
     )
     before = source.g.concentration.numpy().copy()
     original_mass = np.sum(
-        source.p.masses.numpy() * source.p.concentration.numpy()[..., None],
+        source.p.masses.numpy() * source.p.population.numpy()[..., None],
         axis=1,
     )
     binding = WarpCondensationExecutionAdapter().prepare(request)
@@ -220,7 +220,7 @@ def test_native_condensation_adapter_preserves_material_and_gas_widths(
     assert np.any(after[:, [1, 2]] < before[:, [1, 2]])
     np.testing.assert_array_equal(after[:, [0, 3]], before[:, [0, 3]])
     final_mass = np.sum(
-        source.p.masses.numpy() * source.p.concentration.numpy()[..., None],
+        source.p.masses.numpy() * source.p.population.numpy()[..., None],
         axis=1,
     )
     for gas_lane, particle_lane in source.pairs:
@@ -296,7 +296,7 @@ def test_native_resident_nucleation_pins_mapping_and_separate_sidecars(device):
     binding = ResidentNucleationAdapter().prepare(request)
     binding.execute()
     wp.synchronize()
-    assert np.count_nonzero(p.concentration.numpy()) == 2
+    assert np.count_nonzero(p.population.numpy()) == 2
     np.testing.assert_allclose(
         density_inventory(p, g), before, rtol=1e-12, atol=1e-30
     )
@@ -309,7 +309,7 @@ def test_setup_rejects_overflowing_count_density_before_upload(monkeypatch):
 
     aerosol = state(0.25)
     aerosol.particles.volume[:] = 1e-300
-    aerosol.particles.concentration[:] = 1e300
+    aerosol.particles.population[:] = 1e300
     monkeypatch.setattr(
         conversion,
         "to_warp_particle_data",

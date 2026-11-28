@@ -62,7 +62,7 @@ def validate_particle(particle: ParticleData, distribution_type: str) -> None:
         raise ValueError(
             "positive mass must have representable particle volume"
         )
-    if np.any((particle.concentration > 0) & (mass == 0)):
+    if np.any((particle.population > 0) & (mass == 0)):
         raise ValueError("occupied coagulation particles require positive mass")
 
 
@@ -175,7 +175,7 @@ def native_kernel(method: _KernelMethod) -> _KernelMethod:
         # inferred from this temporary untagged, non-authoritative carrier.
         material = ParticleData(
             masses=particle.masses[:, indices, :],
-            concentration=particle.concentration[:, indices],
+            population=particle.population[:, indices],
             charge=particle.charge[:, indices],
             density=particle.density,
             volume=particle.volume,

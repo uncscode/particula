@@ -37,9 +37,8 @@ def _fill_cases(
     wave = group % wavelengths.shape[0]
     box = group // wavelengths.shape[0]
     count = native_slot_density(
-        particles.concentration[box, slot],
+        particles.population[box, slot],
         particles.volume[box],
-        particles.distribution_kind == 3,
     )
     weight[group, slot] = count
     r = wp.float64(0.0)

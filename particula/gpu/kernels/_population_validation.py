@@ -13,12 +13,10 @@ from particula.gpu.population_metadata import (
 
 @wp.func
 def native_slot_density(
-    value: wp.float64, box_volume: wp.float64, resolved: bool
+    value: wp.float64, box_volume: wp.float64
 ) -> wp.float64:
-    """Read an admitted discrete density or resolved count as m⁻³."""
-    if resolved:
-        return value / box_volume
-    return value
+    """Read an extensive bin or slot population as m⁻³."""
+    return value / box_volume
 
 
 def array_field(
@@ -90,8 +88,6 @@ def _scan_population(
     if not wp.isfinite(box_volume) or box_volume <= wp.float64(0):
         wp.atomic_max(invalid, 0, 1)
         return
-    if code == 1 and box_volume != wp.float64(1):
-        wp.atomic_max(invalid, 0, 1)
     for species in range(masses.shape[2]):
         if not wp.isfinite(density[species]) or density[species] <= wp.float64(
             0
@@ -130,7 +126,7 @@ def validate_population(particles: Any) -> tuple[Any, ...]:
             particles, "masses", (boxes, slots, species), wp.float64, device
         ),
         array_field(
-            particles, "concentration", (boxes, slots), wp.float64, device
+            particles, "population", (boxes, slots), wp.float64, device
         ),
         array_field(particles, "charge", (boxes, slots), wp.float64, device),
         array_field(particles, "density", (species,), wp.float64, device),

@@ -34,12 +34,12 @@ def test_native_checkpoint_restores_canonical_bytes_and_semantics(device, kind):
     token = guard.begin_step(0.25)
     guard.complete_step(token)
     checkpoint = session.checkpoint(registry, guard)
-    assert checkpoint.schema_version == 5
+    assert checkpoint.schema_version == 6
     assert checkpoint.distribution_type == kind
     assert checkpoint.particles.distribution_type == kind
     assert checkpoint.dimensions.n_species == 2
     assert checkpoint.dimensions.n_gas_species == 3
-    checkpoint.particles.concentration[:] = 999
+    checkpoint.particles.population[:] = 999
     checkpoint.particles.distribution_type = None
     checkpoint.gas.concentration[:] = 999
     restored, restored_registry, restored_guard = restart_resident_session(
@@ -53,7 +53,7 @@ def test_native_checkpoint_restores_canonical_bytes_and_semantics(device, kind):
     for family, roles in (
         (
             "particles",
-            ("masses", "concentration", "charge", "density", "volume"),
+            ("masses", "population", "charge", "density", "volume"),
         ),
         (
             "gas",
@@ -125,7 +125,7 @@ def test_native_stochastic_restart_continues_actual_adapters(
     )
 
     _, session = session_for(device)
-    session.particles.concentration.assign(np.ones((1, 2)))
+    session.particles.population.assign(np.ones((1, 2)))
     registry = GPUResourceRegistry(session)
     guard = ResidentStepGuard(session, registry)
     coagulation, wall = _dispatch_real_processes(session, registry)
@@ -150,7 +150,7 @@ def test_native_stochastic_restart_continues_actual_adapters(
         restored_coagulation, restored_wall = _dispatch_real_processes(
             restored, restored_registry
         )
-    for role in ("masses", "concentration", "charge", "volume"):
+    for role in ("masses", "population", "charge", "volume"):
         np.testing.assert_array_equal(
             getattr(restored.particles, role).numpy(),
             getattr(session.particles, role).numpy(),

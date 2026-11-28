@@ -31,7 +31,7 @@ def test_resampling_prepared_enqueue_is_setup_free_and_pinned(
     )
     pinned_concentration = prepared.concentration
     replacement = _warp().zeros((1, 4), dtype=_warp().float64, device="cpu")
-    particles.concentration = replacement
+    particles.population = replacement
 
     def forbidden(*_args: object, **_kwargs: object) -> None:
         pytest.fail("prepared enqueue performed forbidden host setup")
@@ -131,7 +131,7 @@ def test_scaling_prepared_enqueue_is_setup_free_and_pinned(
     )
     pinned_concentration = prepared.concentration
     replacement = wp.zeros((1, 4), dtype=wp.float64, device="cpu")
-    particles.concentration = replacement
+    particles.population = replacement
 
     def forbidden(*_args: object, **_kwargs: object) -> None:
         pytest.fail("prepared enqueue performed forbidden host setup")
@@ -244,7 +244,7 @@ def _state(device: str = "cpu"):
             dtype=wp.float64,
             device=device,
         ),
-        concentration=wp.array(
+        population=wp.array(
             [[2.0, 3.0, 5.0, 0.0]], dtype=wp.float64, device=device
         ),
         charge=wp.array(
@@ -292,7 +292,7 @@ def _custom_state(
     box_count, particle_count, species_count = masses.shape
     particles = _ResolvedParticleState(
         masses=wp.array(masses, dtype=wp.float64, device=device),
-        concentration=wp.array(concentration, dtype=wp.float64, device=device),
+        population=wp.array(concentration, dtype=wp.float64, device=device),
         charge=wp.array(charge, dtype=wp.float64, device=device),
         density=wp.array(density, dtype=wp.float64, device=device),
         volume=wp.array(np.ones(box_count), dtype=wp.float64, device=device),
@@ -349,7 +349,7 @@ def _single_active_state():
         dtype=wp.float64,
         device="cpu",
     )
-    particles.concentration = wp.array(
+    particles.population = wp.array(
         [[2.0, 0.0, 0.0, 0.0]], dtype=wp.float64, device="cpu"
     )
     particles.charge = wp.zeros((1, 4), dtype=wp.float64, device="cpu")
@@ -521,24 +521,24 @@ def test_resampling_remaps_retained_original_slots_and_conserves_inventory() -> 
 
     particles, counts, buffers = _state()
     before_mass = np.sum(
-        particles.masses.numpy() * particles.concentration.numpy()[..., None],
+        particles.masses.numpy() * particles.population.numpy()[..., None],
         axis=1,
     )
     before_charge = np.sum(
-        particles.charge.numpy() * particles.concentration.numpy(), axis=1
+        particles.charge.numpy() * particles.population.numpy(), axis=1
     )
     assert resampling_step_gpu(particles, counts, buffers) is particles
     assert buffers.retained_indices.numpy()[0, :2].tolist() == [0, 1]
     assert buffers.released_indices.numpy()[0, :1].tolist() == [2]
     assert buffers.retained_indices.numpy()[0, 2:].tolist() == [-1, -1]
-    assert particles.concentration.numpy()[0, 2] == 0.0
+    assert particles.population.numpy()[0, 2] == 0.0
     assert np.all(particles.masses.numpy()[0, 2] == 0.0)
     after_mass = np.sum(
-        particles.masses.numpy() * particles.concentration.numpy()[..., None],
+        particles.masses.numpy() * particles.population.numpy()[..., None],
         axis=1,
     )
     after_charge = np.sum(
-        particles.charge.numpy() * particles.concentration.numpy(), axis=1
+        particles.charge.numpy() * particles.population.numpy(), axis=1
     )
     npt.assert_allclose(after_mass, before_mass, rtol=1e-12, atol=1e-30)
     npt.assert_allclose(after_charge, before_charge, rtol=1e-12, atol=1e-30)
@@ -563,7 +563,7 @@ def test_resampling_empty_box_with_zero_demand_is_write_free() -> None:
     particles, buffers = _single_active_state()
     wp = _warp()
     particles.masses = wp.zeros((1, 4, 2), dtype=wp.float64, device="cpu")
-    particles.concentration = wp.zeros((1, 4), dtype=wp.float64, device="cpu")
+    particles.population = wp.zeros((1, 4), dtype=wp.float64, device="cpu")
     counts = wp.zeros(1, dtype=wp.int32, device="cpu")
     count_container = SimpleNamespace(counts=counts)
     snapshots = _snapshot(particles, count_container, buffers)
@@ -621,7 +621,7 @@ def test_resampling_accepts_maximum_valid_release_count() -> None:
     assert resampling_step_gpu(particles, counts, buffers) is particles
     assert buffers.retained_counts.numpy().tolist() == [1]
     assert buffers.released_counts.numpy().tolist() == [2]
-    assert np.count_nonzero(particles.concentration.numpy()) == 1
+    assert np.count_nonzero(particles.population.numpy()) == 1
 
 
 def test_resampling_rejects_release_from_single_active_slot_without_mutation() -> (
@@ -747,11 +747,11 @@ def test_resampling_pure_species_zero_diversity_bound_preserves_inventory() -> (
         counts=np.array([1], dtype=np.int32),
     )
     before_mass = np.sum(
-        particles.masses.numpy() * particles.concentration.numpy()[..., None],
+        particles.masses.numpy() * particles.population.numpy()[..., None],
         axis=1,
     )
     before_charge = np.sum(
-        particles.charge.numpy() * particles.concentration.numpy(), axis=1
+        particles.charge.numpy() * particles.population.numpy(), axis=1
     )
 
     assert (
@@ -765,8 +765,7 @@ def test_resampling_pure_species_zero_diversity_bound_preserves_inventory() -> (
     assert buffers.diversity_absolute_error.numpy().tolist() == [0.0]
     npt.assert_allclose(
         np.sum(
-            particles.masses.numpy()
-            * particles.concentration.numpy()[..., None],
+            particles.masses.numpy() * particles.population.numpy()[..., None],
             axis=1,
         ),
         before_mass,
@@ -774,9 +773,7 @@ def test_resampling_pure_species_zero_diversity_bound_preserves_inventory() -> (
         atol=1e-30,
     )
     npt.assert_allclose(
-        np.sum(
-            particles.charge.numpy() * particles.concentration.numpy(), axis=1
-        ),
+        np.sum(particles.charge.numpy() * particles.population.numpy(), axis=1),
         before_charge,
         rtol=1e-12,
         atol=1e-30,
@@ -940,7 +937,7 @@ def _assert_multi_box_oracle_parity(device: str) -> None:
         particles.masses.numpy(), expected["masses"], rtol=1e-12, atol=0.0
     )
     npt.assert_allclose(
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         expected["concentration"],
         rtol=1e-12,
         atol=0.0,
@@ -980,8 +977,7 @@ def _assert_multi_box_oracle_parity(device: str) -> None:
     # Conservation is intentionally separate from deterministic CPU-oracle parity.
     npt.assert_allclose(
         np.sum(
-            particles.masses.numpy()
-            * particles.concentration.numpy()[..., None],
+            particles.masses.numpy() * particles.population.numpy()[..., None],
             axis=1,
         ),
         before_inventory,
@@ -1035,7 +1031,7 @@ def test_gpu_representative_volume_scaling_matches_numpy_oracle() -> None:
     concentration = np.array([[2.0, 3.0], [5.0, 7.0]], dtype=np.float64)
     particles = _ResolvedParticleState(
         masses=wp.array(masses, dtype=wp.float64, device="cpu"),
-        concentration=wp.array(concentration, dtype=wp.float64, device="cpu"),
+        population=wp.array(concentration, dtype=wp.float64, device="cpu"),
         charge=wp.array(
             [[1.0, 2.0], [3.0, 4.0]], dtype=wp.float64, device="cpu"
         ),
@@ -1060,9 +1056,7 @@ def test_gpu_representative_volume_scaling_matches_numpy_oracle() -> None:
     assert returned[2] is resolved
     wp.synchronize_device("cpu")
     npt.assert_allclose(particles.volume.numpy(), [2.0, 6.0])
-    npt.assert_allclose(
-        particles.concentration.numpy(), [[1.0, 1.5], [5.0, 7.0]]
-    )
+    npt.assert_allclose(particles.population.numpy(), [[1.0, 1.5], [5.0, 7.0]])
     npt.assert_allclose(demand.numpy(), [1.5, 2.0])
     npt.assert_allclose(resolved.numpy(), [0.5, 1.0])
     npt.assert_array_equal(particles.masses.numpy(), original_mass)
@@ -1331,7 +1325,7 @@ def _assert_p4_subnormal_demand_scaling(device: str) -> None:
         particles, demand, flags, requested, minimum, minimum_volume, resolved
     )
     wp.synchronize_device(device)
-    npt.assert_array_equal(particles.concentration.numpy(), [[1.0, 2.0, 4.0]])
+    npt.assert_array_equal(particles.population.numpy(), [[1.0, 2.0, 4.0]])
     npt.assert_array_equal(particles.volume.numpy(), [0.5])
     npt.assert_array_equal(demand.numpy(), [0.0])
     npt.assert_array_equal(resolved.numpy(), [0.5])
@@ -1370,7 +1364,7 @@ def test_gpu_representative_volume_scaling_empty_invalid_density_rejects() -> (
 
     particles = _ResolvedParticleState(
         masses=wp.zeros((0, 1, 1), dtype=wp.float64, device="cpu"),
-        concentration=wp.zeros((0, 1), dtype=wp.float64, device="cpu"),
+        population=wp.zeros((0, 1), dtype=wp.float64, device="cpu"),
         charge=wp.zeros((0, 1), dtype=wp.float64, device="cpu"),
         density=wp.array([-1.0], dtype=wp.float64, device="cpu"),
         volume=wp.zeros(0, dtype=wp.float64, device="cpu"),
@@ -1446,7 +1440,7 @@ def _commit_fixed_source(
     wp = _warp()
     wp.synchronize_device(device)
     masses = particles.masses.numpy()
-    concentration = particles.concentration.numpy()
+    concentration = particles.population.numpy()
     charge = particles.charge.numpy()
     boxes, _, species = masses.shape
     if (
@@ -1470,7 +1464,7 @@ def _commit_fixed_source(
         charge[box, index] = source_charge[box]
     wp.copy(particles.masses, wp.array(masses, dtype=wp.float64, device=device))
     wp.copy(
-        particles.concentration,
+        particles.population,
         wp.array(concentration, dtype=wp.float64, device=device),
     )
     wp.copy(particles.charge, wp.array(charge, dtype=wp.float64, device=device))
@@ -1526,7 +1520,7 @@ def _assert_source_and_resampling_matrix(device: str) -> None:
     _assert_direct_ledger(
         _direct_particle_ledger(
             particles.masses.numpy(),
-            particles.concentration.numpy(),
+            particles.population.numpy(),
             particles.charge.numpy(),
             particles.volume.numpy(),
             include_volume=False,
@@ -1535,7 +1529,7 @@ def _assert_source_and_resampling_matrix(device: str) -> None:
     )
     after_source = _direct_particle_ledger(
         particles.masses.numpy(),
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         particles.charge.numpy(),
         particles.volume.numpy(),
         include_volume=False,
@@ -1545,7 +1539,7 @@ def _assert_source_and_resampling_matrix(device: str) -> None:
     _assert_direct_ledger(
         _direct_particle_ledger(
             particles.masses.numpy(),
-            particles.concentration.numpy(),
+            particles.population.numpy(),
             particles.charge.numpy(),
             particles.volume.numpy(),
             include_volume=False,
@@ -1627,7 +1621,7 @@ def test_resampling_full_capacity_fixture_conserves_particle_ledger() -> None:
     _assert_direct_ledger(
         _direct_particle_ledger(
             particles.masses.numpy(),
-            particles.concentration.numpy(),
+            particles.population.numpy(),
             particles.charge.numpy(),
             particles.volume.numpy(),
             include_volume=False,
@@ -1705,7 +1699,7 @@ def _assert_p4_source_ledger(device: str) -> None:
     _assert_direct_ledger(
         _direct_particle_ledger(
             particles.masses.numpy(),
-            particles.concentration.numpy(),
+            particles.population.numpy(),
             particles.charge.numpy(),
             particles.volume.numpy(),
             include_volume=True,

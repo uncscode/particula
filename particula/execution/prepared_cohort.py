@@ -79,7 +79,7 @@ def wrap_cohort_operations(
 
     wp = context.wp
     p, device = context.particles, context.device.native
-    shape = p.concentration.shape
+    shape = p.population.shape
     pending = wp.zeros(shape, dtype=wp.int64, device=device)
     background = wp.zeros(shape, dtype=wp.int32, device=device)
     statistics = wp.zeros((shape[0], 4), dtype=wp.int64, device=device)
@@ -94,7 +94,7 @@ def wrap_cohort_operations(
         device=device,
         inputs=[
             p.masses,
-            p.concentration,
+            p.population,
             cohort.values["seed_species"],
             cohort.values["background_species"],
             pending,
@@ -104,7 +104,7 @@ def wrap_cohort_operations(
     )
     observe_args = [
         p.masses,
-        p.concentration,
+        p.population,
         p.density,
         wp.float64(np.pi / 6 * cohort.values["target_diameter"] ** 3),
         pending,

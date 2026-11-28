@@ -61,7 +61,7 @@ def _state(
     materials = masses.shape[2]
     particle = ParticleData(
         masses=masses,
-        concentration=np.array([[2e9, 5e8, 0], [3e8, 4e9, 0]]),
+        population=np.array([[2e9, 5e8, 0], [3e8, 4e9, 0]]),
         charge=np.array([[1.0, -1.0, 0.0], [2.0, 0.0, 0.0]]),
         density=np.array([1000.0, 1200.0, 1500.0])[:materials],
         volume=np.full(2, volume),
@@ -174,9 +174,7 @@ def _oracle(state):  # noqa: C901
     """Evaluate scalar equations and four conservative steps without helpers."""
     p, gas = state.cpu_p, state.cpu_g
     masses, gases = p.masses.copy(), gas.concentration.copy()
-    weights = p.concentration.copy()
-    if p.distribution_type == "particle_resolved":
-        weights /= p.volume[:, None]
+    weights = p.population / p.volume[:, None]
     total = np.zeros_like(masses)
     energy = np.zeros_like(gases)
     temp, pressure, dt = (
@@ -289,6 +287,8 @@ def _oracle(state):  # noqa: C901
         ("particle_resolved", 1.0),
         ("particle_resolved", 4.0),
         ("discrete", 1.0),
+        ("discrete", 0.25),
+        ("discrete", 4.0),
     ],
 )
 @pytest.mark.parametrize(
@@ -306,7 +306,7 @@ def test_native_four_substeps_match_independent_science(
     expected_m, expected_g, expected_total, expected_energy = _oracle(state)
     identities = [
         state.p.masses,
-        state.p.concentration,
+        state.p.population,
         state.p.charge,
         state.p.density,
         state.p.volume,
@@ -327,7 +327,7 @@ def test_native_four_substeps_match_independent_science(
     for current, old in zip(
         [
             state.p.masses,
-            state.p.concentration,
+            state.p.population,
             state.p.charge,
             state.p.density,
             state.p.volume,
@@ -350,7 +350,7 @@ def test_native_four_substeps_match_independent_science(
     npt.assert_allclose(
         state.total.numpy(), expected_total, rtol=2e-9, atol=1e-32
     )
-    weights = before[1] if kind == "particle_resolved" else before[1] * volume
+    weights = before[1]
     for source, target in state.pairs:
         initial = (
             np.sum(before[0][:, :, target] * weights, axis=1)
@@ -439,7 +439,7 @@ def test_native_preflight_rejections_preserve_all_caller_storage(  # noqa: C901
         "volume": state.p.volume,
         "pmf_volume": state.p.volume,
         "mass": state.p.masses,
-        "count": state.p.concentration,
+        "count": state.p.population,
         "density": state.p.density,
         "charge": state.p.charge,
         "gas": state.g.concentration,
@@ -447,7 +447,7 @@ def test_native_preflight_rejections_preserve_all_caller_storage(  # noqa: C901
     }
     if fault in fields:
         values = fields[fault].numpy().copy()
-        value = 4.0 if fault == "pmf_volume" else -1.0
+        value = -1.0
         if fault in ("volume", "charge", "gas"):
             value = np.nan
         if fault == "flags":
@@ -456,7 +456,7 @@ def test_native_preflight_rejections_preserve_all_caller_storage(  # noqa: C901
         fields[fault].assign(values)
     elif fault == "number_density_overflow":
         state.p.volume.fill_(0.25)
-        state.p.concentration.fill_(1e308)
+        state.p.population.fill_(1e308)
     elif fault == "mapping":
         state.kwargs["species_binding"] = None
     elif fault == "storage":
@@ -494,7 +494,7 @@ def test_native_preflight_rejections_preserve_all_caller_storage(  # noqa: C901
         state.kwargs["time_step"] = True
     arrays = [
         state.p.masses,
-        state.p.concentration,
+        state.p.population,
         state.p.density,
         state.p.volume,
         state.p.charge,
@@ -530,7 +530,7 @@ def test_native_prepared_enqueue_uses_only_frozen_device_references(
     frozen_masses, frozen_gas = state.p.masses, state.g.concentration
     replacements = []
     for carrier, names in (
-        (state.p, ("masses", "concentration", "density", "charge", "volume")),
+        (state.p, ("masses", "population", "density", "charge", "volume")),
         (
             state.g,
             ("concentration", "molar_mass", "partitioning", "vapor_pressure"),
@@ -579,7 +579,7 @@ def test_native_no_work_preserves_primary_inventory(device, no_work):
     if no_work == "time":
         state.kwargs["time_step"] = 0.0
     elif no_work == "counts":
-        state.p.concentration.zero_()
+        state.p.population.zero_()
     elif no_work == "flags":
         state.g.partitioning.zero_()
     else:
@@ -730,7 +730,7 @@ def test_native_empty_particle_axis_preserves_gas(device):
     empty = replace(
         state.cpu_p,
         masses=state.cpu_p.masses[:, :0, :].copy(),
-        concentration=state.cpu_p.concentration[:, :0].copy(),
+        population=state.cpu_p.population[:, :0].copy(),
         charge=state.cpu_p.charge[:, :0].copy(),
     )
     state.p = to_warp_particle_data(empty, device=device)
@@ -794,7 +794,7 @@ def test_empty_gas_clears_outputs_without_gas_indexed_launches(
         a.numpy().copy()
         for a in (
             state.p.masses,
-            state.p.concentration,
+            state.p.population,
             state.p.charge,
         )
     ]
@@ -816,7 +816,7 @@ def test_empty_gas_clears_outputs_without_gas_indexed_launches(
     assert module._refresh_vapor_pressure_kernel not in launches
     assert module.native_kernels.reduce_candidates not in launches
     for array, saved in zip(
-        (state.p.masses, state.p.concentration, state.p.charge),
+        (state.p.masses, state.p.population, state.p.charge),
         before,
         strict=True,
     ):
@@ -825,7 +825,9 @@ def test_empty_gas_clears_outputs_without_gas_indexed_launches(
     npt.assert_array_equal(state.work.numpy(), 0)
 
 
-@pytest.mark.parametrize("kind,volume", [(1, 1.0), (3, 0.25), (3, 4.0)])
+@pytest.mark.parametrize(
+    "kind,volume", [(1, 0.25), (1, 1.0), (1, 4.0), (3, 0.25), (3, 4.0)]
+)
 @pytest.mark.parametrize(
     "case", ["rounded_uptake", "unrepresentable_release", "rounded_release"]
 )
@@ -849,7 +851,7 @@ def test_representable_transfer_never_overdraws_gas(device, kind, volume, case):
         ]
         available = 0.0
     masses, candidate = array(old), array(proposed)
-    counts = array([[1e12 * (volume if kind == 3 else 1.0)] * 2])
+    counts = array([[1e12 * volume] * 2])
     volumes, gas = array([volume]), array([[available]])
     mapping = array([0], wp.int32)
     demand, release, scale, delta = [array([[0.0]]) for _ in range(4)]
@@ -955,9 +957,9 @@ def test_evaporated_resolved_slots_allow_next_gpu_process(
     old_masses[:, 0, 2] = 0  # Fully volatile first representative.
     old_masses[:, 2] = 0  # Free spare slot.
     state.p.masses.assign(old_masses)
-    counts = state.p.concentration.numpy().copy()
+    counts = state.p.population.numpy().copy()
     counts[:, :2] = 2e9
-    state.p.concentration.assign(counts)
+    state.p.population.assign(counts)
     before_gas = state.g.concentration.numpy().copy()
     before_charge = state.p.charge.numpy().copy()
     state.kwargs["time_step"] = 1e6
@@ -971,9 +973,9 @@ def test_evaporated_resolved_slots_allow_next_gpu_process(
     new_masses = state.p.masses.numpy().copy()
     npt.assert_array_equal(new_masses[:, 0], 0)
     npt.assert_array_equal(new_masses[:, 1, 2], old_masses[:, 1, 2])
-    npt.assert_array_equal(state.p.concentration.numpy()[:, 0], 0)
+    npt.assert_array_equal(state.p.population.numpy()[:, 0], 0)
     npt.assert_array_equal(state.p.charge.numpy()[:, 0], 0)
-    npt.assert_array_equal(state.p.concentration.numpy()[:, 1], counts[:, 1])
+    npt.assert_array_equal(state.p.population.numpy()[:, 1], counts[:, 1])
     npt.assert_array_equal(state.p.charge.numpy()[:, 1], before_charge[:, 1])
     for source, target in state.pairs:
         transferred = np.sum(
@@ -1008,7 +1010,7 @@ def test_four_substeps_cannot_spend_sub_ulp_gas_budget(device, prepared_call):
 
     state = _state(device, volume=1.0, scenario="uptake", single=True)
     state.p.masses.fill_(1e-18)
-    state.p.concentration.fill_(1e12)
+    state.p.population.fill_(1e12)
     state.g.concentration.fill_(1e-22)
     state.kwargs["time_step"] = 1e6
     old_mass = state.p.masses.numpy().copy()

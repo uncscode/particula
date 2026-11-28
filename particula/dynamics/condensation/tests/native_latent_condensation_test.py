@@ -488,8 +488,8 @@ class TestCondensationLatentHeat(unittest.TestCase):
         )
 
         particle_data_double = copy.deepcopy(particle_data)
-        particle_data_double.concentration[0] = (
-            particle_data_double.concentration[0] * 2.0
+        particle_data_double.population[0] = (
+            particle_data_double.population[0] * 2.0
         )
         double_rate = self.data_strategy.rate(
             particle=particle_data_double,
@@ -802,7 +802,7 @@ class TestCondensationLatentHeat(unittest.TestCase):
 
         initial_mass = np.sum(
             particle_data.masses[0]
-            * particle_data.concentration[0][:, np.newaxis]
+            * particle_data.population[0][:, np.newaxis]
             / particle_data.volume[0]
         ) + np.sum(gas_data.concentration[0])
         particle_new, gas_new = cond.step(
@@ -826,9 +826,7 @@ class TestCondensationLatentHeat(unittest.TestCase):
         particle_data, gas_data = self._make_data_inputs()
         particle_data.volume[0] = 0.0
 
-        with self.assertRaisesRegex(
-            ValueError, "particle-resolved volume must be positive"
-        ):
+        with self.assertRaisesRegex(ValueError, "volume must be positive"):
             self.data_strategy.step(
                 particle=particle_data,
                 gas_species=gas_data,
@@ -885,7 +883,7 @@ class TestCondensationLatentHeat(unittest.TestCase):
         else:
             mass_rate_array = mass_rate
         # Native mass rates already exclude skipped full-gas map lanes.
-        norm_conc = particle_data.concentration[0] / particle_data.volume[0]
+        norm_conc = particle_data.population[0] / particle_data.volume[0]
         mass_transfer = get_mass_transfer(
             mass_rate=mass_rate_array,
             time_step=1.0,
@@ -937,7 +935,7 @@ class TestCondensationLatentHeat(unittest.TestCase):
         else:
             mass_rate_array = mass_rate
         # Native mass rates already exclude skipped full-gas map lanes.
-        norm_conc = particle_data.concentration[0] / particle_data.volume[0]
+        norm_conc = particle_data.population[0] / particle_data.volume[0]
         mass_transfer = get_mass_transfer(
             mass_rate=mass_rate_array,
             time_step=1.0,
@@ -1000,7 +998,7 @@ class TestCondensationLatentHeat(unittest.TestCase):
         else:
             mass_rate_array = mass_rate
         # Native mass rates already exclude skipped full-gas map lanes.
-        norm_conc = particle_data.concentration[0] / particle_data.volume[0]
+        norm_conc = particle_data.population[0] / particle_data.volume[0]
         mass_transfer = get_mass_transfer(
             mass_rate=mass_rate_array,
             time_step=1.0,
@@ -1063,7 +1061,7 @@ class TestCondensationLatentHeat(unittest.TestCase):
         else:
             mass_rate_array = mass_rate
         # Native mass rates already exclude skipped full-gas map lanes.
-        norm_conc = particle_data.concentration[0] / particle_data.volume[0]
+        norm_conc = particle_data.population[0] / particle_data.volume[0]
         mass_transfer = get_mass_transfer(
             mass_rate=mass_rate_array,
             time_step=1.0,
@@ -1269,7 +1267,7 @@ class TestCondensationLatentHeat(unittest.TestCase):
             else mass_rate
         )
         # Native mass rates already exclude skipped full-gas map lanes.
-        norm_conc = particle_data.concentration[0] / particle_data.volume[0]
+        norm_conc = particle_data.population[0] / particle_data.volume[0]
         expected_mass_transfer = get_mass_transfer(
             mass_rate=mass_rate_array,
             time_step=1.0,
@@ -1334,7 +1332,7 @@ class TestCondensationLatentHeat(unittest.TestCase):
     def test_small_negative_concentration_rejects_without_mutation(self):
         """Native execution rejects even tiny negative population counts."""
         particle, gas = self._make_data_inputs()
-        particle.concentration[0, 0] = -1.0e-13
+        particle.population[0, 0] = -1.0e-13
         masses_before = particle.masses.copy()
         gas_before = gas.concentration.copy()
         with self.assertRaisesRegex(ValueError, "finite physical values"):
@@ -1343,7 +1341,7 @@ class TestCondensationLatentHeat(unittest.TestCase):
             )
         np.testing.assert_array_equal(particle.masses, masses_before)
         np.testing.assert_array_equal(gas.concentration, gas_before)
-        self.assertEqual(particle.concentration[0, 0], -1.0e-13)
+        self.assertEqual(particle.population[0, 0], -1.0e-13)
 
     def test_step_rejects_invalid_time_step(self):
         """step() rejects non-finite or negative timesteps."""

@@ -61,7 +61,7 @@ def _inventory(particles: ParticleData) -> np.ndarray:
     """Calculate concentration-weighted particle inventory."""
     return np.einsum(
         "bn,bns->bs",
-        particles.concentration,
+        particles.population,
         particles.masses,
         dtype=np.float64,
         optimize=True,
@@ -107,7 +107,7 @@ def _mutable_arrays(
     """
     return (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         particles.volume,
@@ -121,7 +121,7 @@ def _fixture() -> tuple[ParticleData, GasData, ParticleSourceCommitConfig]:
     """
     particles = ParticleData(
         masses=np.zeros((2, 4, 2), dtype=np.float64),
-        concentration=np.zeros((2, 4), dtype=np.float64),
+        population=np.zeros((2, 4), dtype=np.float64),
         charge=np.zeros((2, 4), dtype=np.float64),
         density=np.array([1000.0, 1200.0]),
         volume=np.ones(2),
@@ -198,7 +198,7 @@ def test_direct_p3_policy_failure_is_write_free() -> None:
     """
     particles, gas, config = _fixture()
     particles.masses[:] = 0.25
-    particles.concentration[:] = 1.0
+    particles.population[:] = 1.0
     gas.concentration[:] = 1.0
     demand, diagnostics = finalize_particle_source(
         PotentialEventData(np.array([1.0, 1.0]), 1.0),
@@ -220,7 +220,7 @@ def test_direct_scaling_fallback_preserves_per_lane_scaled_balance() -> None:
     """
     particles, gas, _ = _fixture()
     particles.masses[0, :3] = [0.25, 0.5]
-    particles.concentration[0, :3] = 2.0
+    particles.population[0, :3] = 2.0
     counts = (1, 2)
     per_event = np.asarray(counts, dtype=np.float64) * gas.molar_mass
     per_event /= AVOGADRO_NUMBER

@@ -31,7 +31,7 @@ def test_binned_boxes_match_direct_single_box_physics(kind, family):
     single = state(1.0, kind)
     p = single.particles
     p.masses = np.concatenate([p.masses, p.masses * 4], axis=1)
-    p.concentration = np.ones((1, 4))
+    p.population = np.ones((1, 4))
     p.charge = np.zeros((1, 4))
     if kind == "continuous_pdf":
         p.radius_grid = np.array([1e-8, 2e-8, 4e-8, 8e-8])
@@ -111,7 +111,7 @@ def test_condensation_variants_conserve_each_box(strategy_type):
             np.einsum(
                 "bns,bn->b",
                 aerosol.particles.masses - masses_before,
-                aerosol.particles.concentration,
+                aerosol.particles.population,
             )
             * 2e6,
             rtol=1e-10,
@@ -123,7 +123,7 @@ def batch(single):
     """Expand independent state, with distinct environment and gas per box."""
     result = _cpu_batch.detached(single)
     for container, names in (
-        (result.particles, ("masses", "concentration", "charge", "volume")),
+        (result.particles, ("masses", "population", "charge", "volume")),
         (result.gas, ("concentration",)),
         (result.environment, ("temperature", "pressure", "saturation_ratio")),
     ):
@@ -297,7 +297,7 @@ def test_all_coagulation_mechanisms_match_independent_boxes(kind, mechanism):
     single = state(1.0, kind)
     single.particles = _particle(kind)
     if kind == "particle_resolved":
-        single.particles.concentration[:] = 2.0
+        single.particles.population[:] = 2.0
     aerosol = batch(single)
     if kind != "particle_resolved":
         aerosol.particles.volume[:] = 1
@@ -392,7 +392,7 @@ def test_zero_work_preserves_random_continuation(family, zero_duration):
     reference = CPUExecutionContext(17, ("a", "b"))
     if not zero_duration:
         aerosol.particles.masses[:] = 0
-        aerosol.particles.concentration[:] = 0
+        aerosol.particles.population[:] = 0
         aerosol.particles.charge[:] = 0
     process.execute(aerosol, 0 if zero_duration else 1, context=context)
     namespace = "coagulation" if family == "coagulation" else "wall_loss"
@@ -419,7 +419,7 @@ def test_late_nucleation_capacity_failure_preserves_every_box():
     )
     aerosol = batch(single)
     aerosol.particles.masses[1, :] = aerosol.particles.masses[1, 0]
-    aerosol.particles.concentration[1, :] = 2
+    aerosol.particles.population[1, :] = 2
     before = {
         name: value.copy() for name, value in _cpu_batch.arrays(aerosol).items()
     }
@@ -492,7 +492,7 @@ def test_binned_condensation_accepts_readonly_protected_inputs(
     process = MassCondensation(strategy)
     reference = _cpu_batch.detached(aerosol)
     process.execute(reference, 0.01)
-    protected = [aerosol.particles.concentration, aerosol.particles.charge]
+    protected = [aerosol.particles.population, aerosol.particles.charge]
     if not update_gases:
         protected.append(aerosol.gas.concentration)
     for value in protected:

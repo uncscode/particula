@@ -32,7 +32,7 @@ def validate_native_step_storage(
     """Reject read-only destinations and aliases with any protected field."""
     fields = [
         particle.masses,
-        particle.concentration,
+        particle.population,
         particle.charge,
         particle.density,
         particle.volume,
@@ -69,10 +69,8 @@ def retire_evaporated_slots(particle: ParticleData) -> None:
     implied. Density-grid populations retain their prescribed bin semantics.
     """
     if particle.distribution_type == "particle_resolved":
-        empty = np.all(particle.masses == 0, axis=2) & (
-            particle.concentration > 0
-        )
-        particle.concentration[empty] = 0
+        empty = np.all(particle.masses == 0, axis=2) & (particle.population > 0)
+        particle.population[empty] = 0
         particle.charge[empty] = 0
 
 

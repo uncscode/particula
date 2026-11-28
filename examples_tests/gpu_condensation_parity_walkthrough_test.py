@@ -64,7 +64,7 @@ def test_fixture_and_builders_are_fp64_readonly_and_non_aliasing(
     for particles in (oracle.particles, source.particles):
         assert particles.distribution_type == "particle_resolved"
         npt.assert_allclose(
-            particles.concentration / particles.volume[:, None],
+            particles.population / particles.volume[:, None],
             fixture.concentration,
             rtol=1e-15,
             atol=0,

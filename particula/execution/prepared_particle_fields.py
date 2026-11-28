@@ -66,7 +66,7 @@ def wrap_particle_fields(context: BuiltinPreparationContext, plans, operations):
     specs = tuple(s for s in context.fields.specs if "particle" in s.axes)
     if not specs:
         return operations
-    wp, counts = context.wp, context.particles.concentration
+    wp, counts = context.wp, context.particles.population
     before = wp.empty_like(counts)
     fields = []
     for spec in specs:
@@ -124,7 +124,7 @@ def _wrap(context: BuiltinPreparationContext, plan, operation, before, fields): 
     """Prepare a single family's event launches against fixed buffers."""
     from particula.execution import particle_field_kernels as kernels
 
-    wp, counts = context.wp, context.particles.concentration
+    wp, counts = context.wp, context.particles.population
     failure = context.failure
     after_launches: list[tuple[Any, tuple[int, ...], tuple[Any, ...]]] = []
     copies = []

@@ -31,7 +31,7 @@ def make_state(kind="particle_resolved", volume=0.25):
     """Construct native two-particle/three-gas-species state, without facades."""
     particle = ParticleData(
         masses=np.array([[[2e-18, 3e-18], [5e-18, 7e-18], [11e-18, 13e-18]]]),
-        concentration=np.array([[2.0, 0.5, 4.0]]),
+        population=np.array([[2.0, 0.5, 4.0]]),
         charge=np.zeros((1, 3)),
         density=np.array([1000.0, 1200.0]),
         volume=np.array([volume]),
@@ -54,7 +54,7 @@ def snapshot(particle, gas):
     """Retain identities and bytes, including directly malformed arrays."""
     arrays = [
         particle.masses,
-        particle.concentration,
+        particle.population,
         particle.charge,
         particle.density,
         particle.volume,
@@ -257,26 +257,27 @@ def test_resolved_inventory_weights_have_one_volume_division(volume):
         atol=1e-30,
     )
     weights[:] = 0
-    np.testing.assert_array_equal(particle.concentration, [[2, 0.5, 4]])
+    np.testing.assert_array_equal(particle.population, [[2, 0.5, 4]])
 
 
 @pytest.mark.parametrize("kind", ["discrete", "continuous_pdf"])
 @pytest.mark.parametrize("volume", [0.25, 4.0])
-def test_nonunit_binned_volume_rejects(kind, volume):
-    """Nonunit binned volume rejects."""
-    particle, gas, mapping = make_state(kind, volume)
-    before = snapshot(particle, gas)
-    with pytest.raises(ValueError, match="exactly 1"):
-        validate_condensation_state(particle, gas, mapping, 298, 101325)
-    with pytest.raises(ValueError, match="exactly 1"):
-        condensation_population_weights(particle)
-    assert snapshot(particle, gas) == before
+def test_nonunit_binned_weights_scale_inversely_with_volume(kind, volume):
+    """Equal extensive populations supply different intensive weights."""
+    unit, _, _ = make_state(kind, 1.0)
+    particle, gas, mapping = make_state(kind, 1.0)
+    particle.volume[:] = volume
+    validate_condensation_state(particle, gas, mapping, 298, 101325)
+    np.testing.assert_allclose(
+        condensation_population_weights(particle),
+        condensation_population_weights(unit) / volume,
+    )
 
 
 def test_pdf_integrates_mass_times_density_on_nonuniform_radius_grid():
     """Pdf integrates mass times density on nonuniform radius grid."""
     particle, _, _ = make_state("continuous_pdf", 1.0)
-    particle.concentration[:] = [[1e9, 2e9, 1e9]]
+    particle.population[:] = [[1e9, 2e9, 1e9]]
     weights = condensation_population_weights(particle)
     # Independent two-interval trapezoids of mass*PDF (not a bare PDF sum).
     expected = (
@@ -583,7 +584,7 @@ def test_native_activity_retains_unmapped_particle_material():
 def test_inactive_nodes_have_no_native_mass_rate():
     """No number inventory means no transfer, even when slot masses remain."""
     particle, gas, mapping = make_state()
-    particle.concentration[0, 1] = 0
+    particle.population[0, 1] = 0
     strategy = native_strategy(CondensationIsothermal, gas, mapping)
     np.testing.assert_array_equal(
         strategy.mass_transfer_rate(particle, gas, 298, 101325)[1], 0

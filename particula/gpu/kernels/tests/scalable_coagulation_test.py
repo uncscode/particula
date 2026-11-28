@@ -60,13 +60,13 @@ def test_all_additive_masks_conserve_inventory(device, mask):
     charge = prepared.charge.numpy()
     np.testing.assert_allclose(
         np.sum(mass * count[..., None], axis=1),
-        np.sum(cpu.masses * cpu.concentration[..., None], axis=1),
+        np.sum(cpu.masses * cpu.population[..., None], axis=1),
         rtol=1e-14,
         atol=1e-30,
     )
     np.testing.assert_allclose(
         np.sum(charge * count, axis=1),
-        np.sum(cpu.charge * cpu.concentration, axis=1),
+        np.sum(cpu.charge * cpu.population, axis=1),
         rtol=1e-13,
         atol=1e-12,
     )
@@ -392,7 +392,7 @@ def test_executed_work_counters_preserve_rng_and_results(device):
     np.testing.assert_array_equal(observed[:, 0], observed[:, 1])
     assert observed[:, 1].sum() > 0
     assert np.all(accepted.numpy() <= observed[:, 1])
-    for field in ("masses", "concentration", "charge"):
+    for field in ("masses", "population", "charge"):
         np.testing.assert_array_equal(
             getattr(left, field).numpy(), getattr(right, field).numpy()
         )

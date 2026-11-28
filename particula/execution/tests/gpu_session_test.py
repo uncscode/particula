@@ -114,7 +114,7 @@ def _warp_resources(
     particles.masses = wp.ones(
         (boxes, particles_count, species), dtype=wp.float64, device="cpu"
     )
-    particles.concentration = wp.ones(
+    particles.population = wp.ones(
         (boxes, particles_count), dtype=wp.float64, device="cpu"
     )
     particles.charge = wp.zeros(
@@ -173,7 +173,7 @@ def _primary_fields() -> tuple[tuple[str, str, tuple[int, ...], str], ...]:
     """Return the primary array schema for the canonical one-box fixture."""
     return (
         ("particles", "masses", (1, 2, 1), "float64"),
-        ("particles", "concentration", (1, 2), "float64"),
+        ("particles", "population", (1, 2), "float64"),
         ("particles", "charge", (1, 2), "float64"),
         ("particles", "density", (1,), "float64"),
         ("particles", "volume", (1,), "float64"),
@@ -461,7 +461,7 @@ def test_session_rejects_schema_and_metadata_mismatches() -> None:
 @pytest.mark.parametrize(
     ("carrier", "field", "aliased_carrier", "aliased_field"),
     [
-        ("particles", "charge", "particles", "concentration"),
+        ("particles", "charge", "particles", "population"),
         ("environment", "saturation_ratio", "gas", "concentration"),
     ],
 )
@@ -1228,11 +1228,11 @@ def test_session_schema_validation_never_performs_runtime_work(
 
     object.__setattr__(
         particles,
-        "concentration",
+        "population",
         _MetadataArray(wp.float64, (1, 1), particles.masses.device),
     )
     with pytest.raises(
-        ValueError, match="particles.concentration must have shape"
+        ValueError, match="particles.population must have shape"
     ):
         ResidentSession(
             particles,
@@ -1252,7 +1252,7 @@ def _cpu_resources(
     """Create matching float64 CPU carriers for resident-session setup."""
     particles = ParticleData(
         masses=np.ones((boxes, particle_count, species), dtype=np.float64),
-        concentration=np.ones((boxes, particle_count), dtype=np.float64),
+        population=np.ones((boxes, particle_count), dtype=np.float64),
         charge=np.zeros((boxes, particle_count), dtype=np.float64),
         density=np.ones(species, dtype=np.float64),
         volume=np.ones(boxes, dtype=np.float64),
@@ -1404,7 +1404,7 @@ def test_setup_resident_session_rejects_local_types_before_conversion(
 @pytest.mark.parametrize(
     "field",
     [
-        "concentration",
+        "population",
         "charge",
         "density",
         "volume",
@@ -1415,7 +1415,7 @@ def test_setup_resident_session_rejects_particle_shape_before_conversion(
 ) -> None:
     """Test each cross-container particle schema field is checked locally."""
     particles, gas, environment = _cpu_resources()
-    wrong_shape = (1,) if field in {"concentration", "charge"} else (2,)
+    wrong_shape = (1,) if field in {"population", "charge"} else (2,)
     setattr(particles, field, np.zeros(wrong_shape, dtype=np.float64))
     before = _snapshot_cpu_resources(particles, gas, environment)
 
@@ -1438,7 +1438,7 @@ def _snapshot_cpu_resources(
     """Capture CPU carrier arrays and ordered gas names without mutation."""
     values = (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         particles.volume,
@@ -1557,9 +1557,9 @@ def test_setup_resident_session_rejects_device_subclass_before_upload() -> None:
         ("environment = object()", "TypeError", "EnvironmentData"),
         ("particles.masses = np.ones((1, 2))", "ValueError", "rank 3"),
         (
-            "particles.concentration = np.ones((1,))",
+            "particles.population = np.ones((1,))",
             "ValueError",
-            "concentration",
+            "population",
         ),
         ("particles.charge = np.ones((1,))", "ValueError", "charge"),
         ("particles.density = np.ones((2,))", "ValueError", "density"),
@@ -1625,7 +1625,7 @@ empty = np.array([])
 before = (
     tuple((id(value), value.shape, tuple(value.flat)) for value in (
         getattr(particles, 'masses', empty),
-        getattr(particles, 'concentration', empty),
+        getattr(particles, 'population', empty),
         getattr(particles, 'charge', empty),
         getattr(particles, 'density', empty),
         getattr(particles, 'volume', empty),
@@ -1650,7 +1650,7 @@ assert not any(name == 'warp' or name.startswith('particula.gpu') for name in sy
 after = (
     tuple((id(value), value.shape, tuple(value.flat)) for value in (
         getattr(particles, 'masses', empty),
-        getattr(particles, 'concentration', empty),
+        getattr(particles, 'population', empty),
         getattr(particles, 'charge', empty),
         getattr(particles, 'density', empty),
         getattr(particles, 'volume', empty),
@@ -2365,7 +2365,7 @@ def test_untagged_cpu_session_rejects_before_optional_import(monkeypatch):
 
     particles, gas, environment = _cpu_resources()
     particles.distribution_type = None
-    before = particles.concentration.copy()
+    before = particles.population.copy()
     original_import = builtins.__import__
 
     def guarded_import(name, *args, **kwargs):
@@ -2378,4 +2378,4 @@ def test_untagged_cpu_session_rejects_before_optional_import(monkeypatch):
         setup_resident_session(
             particles, gas, environment, Device(Backend.WARP, "cpu")
         )
-    np.testing.assert_array_equal(particles.concentration, before)
+    np.testing.assert_array_equal(particles.population, before)

@@ -111,7 +111,7 @@ def prepare_validation(configuration, arrays, state, owner):  # noqa: C901
             upper = spec.maximum if spec.maximum is not None else upper
         elif name in (
             "particles.masses",
-            "particles.concentration",
+            "particles.population",
             "gas.concentration",
         ):
             lower = 0.0

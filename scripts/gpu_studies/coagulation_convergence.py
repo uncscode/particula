@@ -43,11 +43,11 @@ def population(slots, boxes=1):
     )
     mass = 4 * np.pi / 3 * DENSITY * radii**3
     return ParticleData(
-        np.broadcast_to(mass[None, :, None], (boxes, slots, 1)).copy(),
-        np.ones((boxes, slots)),
-        np.zeros((boxes, slots)),
-        np.array([DENSITY]),
-        np.full(boxes, slots / NUMBER_DENSITY),
+        masses=np.broadcast_to(mass[None, :, None], (boxes, slots, 1)).copy(),
+        population=np.ones((boxes, slots)),
+        charge=np.zeros((boxes, slots)),
+        density=np.array([DENSITY]),
+        volume=np.full(boxes, slots / NUMBER_DENSITY),
         distribution_type="particle_resolved",
     )
 
@@ -97,11 +97,11 @@ def cpu_reference(slots, ensembles, duration):
         count = 0
         while masses.size > 1:
             local = ParticleData(
-                masses[None, :, None],
-                np.ones((1, masses.size)),
-                np.zeros((1, masses.size)),
-                np.array([DENSITY]),
-                initial.volume.copy(),
+                masses=masses[None, :, None],
+                population=np.ones((1, masses.size)),
+                charge=np.zeros((1, masses.size)),
+                density=np.array([DENSITY]),
+                volume=initial.volume.copy(),
                 distribution_type="particle_resolved",
             )
             matrix = strategy.kernel(local, TEMPERATURE, PRESSURE)
@@ -173,7 +173,7 @@ def device_ensemble(slots, ensembles, duration, nominal_step, device):
             **inputs(slots),
         )
         mass = particles.masses.numpy()[..., 0]
-        counts = particles.concentration.numpy()
+        counts = particles.population.numpy()
         np.testing.assert_allclose(
             (mass * counts).sum(axis=1),
             initial.masses[..., 0].sum(axis=1),

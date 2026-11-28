@@ -68,7 +68,7 @@ def _request(
             dtype=wp.float64,
             device="cpu",
         )
-        particles.concentration = wp.array(
+        particles.population = wp.array(
             [[4.0, 0.0, 2.0, 0.0], [0.0, 0.0, 3.0, 0.0], [5.0, 0.0, 0.0, 0.0]],
             dtype=wp.float64,
             device="cpu",
@@ -283,7 +283,7 @@ def test_resident_gas_barriers_match_repeated_numpy_oracle(
     gas = cast(Any, request.session.gas)
     particles = cast(Any, request.session.particles)
     initial = gas.concentration.numpy().copy()
-    initial_particle_concentration = particles.concentration.numpy().copy()
+    initial_particle_concentration = particles.population.numpy().copy()
     old_volume = particles.volume.numpy().copy()
     expected = initial.copy()
 
@@ -303,13 +303,13 @@ def test_resident_gas_barriers_match_repeated_numpy_oracle(
         particles.volume.numpy(), final_volumes, rtol=0.0, atol=0.0
     )
     npt.assert_allclose(
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         initial_particle_concentration,
         rtol=RTOL,
         atol=0.0,
     )
     npt.assert_allclose(
-        particles.concentration.numpy().sum(),
+        particles.population.numpy().sum(),
         initial_particle_concentration.sum(),
         rtol=RTOL,
         atol=INVENTORY_ATOL,
@@ -341,7 +341,7 @@ def test_resident_particle_barrier_conserves_multibox_weighted_state() -> None:
     particles = cast(Any, request.session.particles)
     volume = particles.volume.numpy().copy()
     mass = particles.masses.numpy().copy()
-    concentration = particles.concentration.numpy().copy()
+    concentration = particles.population.numpy().copy()
     charge = particles.charge.numpy().copy()
 
     ResidentCommunicationExecutor(request).execute_communication()
@@ -357,7 +357,7 @@ def test_resident_particle_barrier_conserves_multibox_weighted_state() -> None:
         np.array([0.25, 0.5], dtype=np.float64),
     )
     npt.assert_allclose(
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         expected_concentration,
         rtol=RTOL,
         atol=0.0,
@@ -370,22 +370,21 @@ def test_resident_particle_barrier_conserves_multibox_weighted_state() -> None:
     )
 
     npt.assert_allclose(
-        particles.concentration.numpy().sum(),
+        particles.population.numpy().sum(),
         concentration.sum(),
         rtol=RTOL,
         atol=INVENTORY_ATOL,
     )
     npt.assert_allclose(
         (
-            particles.masses.numpy()
-            * particles.concentration.numpy()[..., None]
+            particles.masses.numpy() * particles.population.numpy()[..., None]
         ).sum(axis=(0, 1)),
         (mass * concentration[..., None]).sum(axis=(0, 1)),
         rtol=RTOL,
         atol=INVENTORY_ATOL,
     )
     npt.assert_allclose(
-        (particles.charge.numpy() * particles.concentration.numpy()).sum(),
+        (particles.charge.numpy() * particles.population.numpy()).sum(),
         (charge * concentration).sum(),
         rtol=RTOL,
         atol=INVENTORY_ATOL,
@@ -420,7 +419,7 @@ def test_resident_one_dimensional_padded_map_matches_particle_oracle(
     particles = cast(Any, request.session.particles)
     initial = (
         particles.masses.numpy().copy(),
-        particles.concentration.numpy().copy(),
+        particles.population.numpy().copy(),
         particles.charge.numpy().copy(),
         particles.volume.numpy().copy(),
     )
@@ -439,11 +438,11 @@ def test_resident_one_dimensional_padded_map_matches_particle_oracle(
         particles.masses.numpy(), expected[0], rtol=RTOL, atol=0.0
     )
     npt.assert_allclose(
-        particles.concentration.numpy(), expected[1], rtol=RTOL, atol=0.0
+        particles.population.numpy(), expected[1], rtol=RTOL, atol=0.0
     )
     npt.assert_allclose(
         particles.charge.numpy(), expected[2], rtol=RTOL, atol=0.0
     )
     npt.assert_allclose(
-        particles.concentration.numpy()[2], initial[1][2], rtol=0.0, atol=0.0
+        particles.population.numpy()[2], initial[1][2], rtol=0.0, atol=0.0
     )

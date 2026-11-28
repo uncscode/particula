@@ -33,7 +33,7 @@ def test_object_oriented_native_builder_units():
     assert particles.distribution_type == "discrete"
     np.testing.assert_allclose(particles.radii, [radii], rtol=1e-12)
     np.testing.assert_allclose(particles.masses[0, :, 0], masses, rtol=1e-12)
-    np.testing.assert_allclose(particles.concentration, [concentration])
+    np.testing.assert_allclose(particles.population, [concentration])
     np.testing.assert_allclose(
         particles.species_mass_density, [[masses @ concentration]], rtol=1e-12
     )

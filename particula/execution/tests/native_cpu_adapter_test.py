@@ -71,10 +71,9 @@ def test_native_selected_adapter_dispatches_once_and_conserves(
     """The adapter passes original controls once and preserves native carriers."""
     aerosol = state()
     p, g = aerosol.particles, aerosol.gas
-    original_arrays = (p.masses, p.concentration, p.charge, g.concentration)
+    original_arrays = (p.masses, p.population, p.charge, g.concentration)
     before_particle = (
-        np.sum(p.masses * p.concentration[..., None], axis=1)
-        / p.volume[:, None]
+        np.sum(p.masses * p.population[..., None], axis=1) / p.volume[:, None]
     )
     before_gas = g.concentration.copy()
     adapter, request = selected(family, aerosol)
@@ -101,8 +100,7 @@ def test_native_selected_adapter_dispatches_once_and_conserves(
         assert value is aerosol
         assert np.any(g.concentration[:, 1:] < before_gas[:, 1:])
     after_particle = (
-        np.sum(p.masses * p.concentration[..., None], axis=1)
-        / p.volume[:, None]
+        np.sum(p.masses * p.population[..., None], axis=1) / p.volume[:, None]
     )
     np.testing.assert_allclose(
         after_particle + g.concentration[:, [2, 1]],
@@ -114,7 +112,7 @@ def test_native_selected_adapter_dispatches_once_and_conserves(
         left is right
         for left, right in zip(
             original_arrays,
-            (p.masses, p.concentration, p.charge, g.concentration),
+            (p.masses, p.population, p.charge, g.concentration),
             strict=True,
         )
     )

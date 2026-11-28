@@ -117,7 +117,7 @@ class TestCondensationParticleResolved(unittest.TestCase):
         """Particle mass should increase while gas-phase water decreases."""
         initial_species_mass = self.aerosol.particles.masses[0].copy()
         particle_concentration = (
-            self.aerosol.particles.concentration[0]
+            self.aerosol.particles.population[0]
             / self.aerosol.particles.volume[0]
         ).copy()
         initial_particle_inventory = np.sum(

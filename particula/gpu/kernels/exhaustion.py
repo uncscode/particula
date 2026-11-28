@@ -1224,7 +1224,7 @@ def _prepare_resampling_step_gpu(
     if s == 0:
         raise ValueError("species capacity must be positive")
     device = masses.device
-    concentration = _field(particles, "concentration")
+    concentration = _field(particles, "population")
     charge = _field(particles, "charge")
     density = _field(particles, "density")
     volume = _field(particles, "volume")
@@ -1432,7 +1432,7 @@ def _prepare_representative_volume_scaling_step_gpu(  # noqa: C901
     if s == 0:
         raise ValueError("species capacity must be positive")
     device = masses.device
-    concentration = _field(particles, "concentration")
+    concentration = _field(particles, "population")
     charge = _field(particles, "charge")
     density = _field(particles, "density")
     volume = _field(particles, "volume")

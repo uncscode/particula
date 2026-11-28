@@ -240,7 +240,7 @@ class _NativeBatchRunnable(RunnableABC):
         if self._namespace == "condensation":
             writers = ["particles.masses"]
             if aerosol.particles.distribution_type == "particle_resolved":
-                writers.extend(["particles.concentration", "particles.charge"])
+                writers.extend(["particles.population", "particles.charge"])
             if getattr(self.condensation_strategy, "update_gases", True):
                 writers.append("gas.concentration")
             return (
@@ -248,7 +248,7 @@ class _NativeBatchRunnable(RunnableABC):
                 + aerosol.fields.particle_names()
                 + tuple(name for name, _ in aerosol.fields.transaction_arrays())
             )
-        writers = ["particles.concentration"]
+        writers = ["particles.population"]
         resolved = aerosol.particles.distribution_type == "particle_resolved"
         if self._namespace == "nucleation" or (
             resolved and self._namespace in ("coagulation", "wall_loss")
@@ -267,7 +267,7 @@ class _NativeBatchRunnable(RunnableABC):
     def _advance_box(self, aerosol, time_step):
         """Update field sinks using the exact native count change."""
         names = aerosol.fields.particle_names()
-        counts = aerosol.particles.concentration.copy() if names else None
+        counts = aerosol.particles.population.copy() if names else None
         result = self._execute_box(aerosol, time_step, sub_steps=1)
         if names and self._namespace in (
             "wall_loss",
@@ -275,7 +275,7 @@ class _NativeBatchRunnable(RunnableABC):
             "condensation",
         ):
             aerosol.fields.retire_particles(
-                counts, aerosol.particles.concentration
+                counts, aerosol.particles.population
             )
         if names:
             from particula.extension_fields import field_dimensions
@@ -283,7 +283,7 @@ class _NativeBatchRunnable(RunnableABC):
             aerosol.fields.validate_layout(
                 field_dimensions(aerosol.particles, aerosol.gas),
                 aerosol.particles.distribution_type,
-                aerosol.particles.concentration > 0,
+                aerosol.particles.population > 0,
             )
         return result
 
@@ -472,7 +472,7 @@ class Nucleation(_NativeBatchRunnable):
             raise ValueError("precursor_index is out of range for gas species")
         writers = (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.volume,
             gas.concentration,
@@ -847,7 +847,7 @@ class WallLoss(_NativeBatchRunnable):
         Args:
             particle: Particle object whose concentration is clipped in place.
         """
-        np.maximum(particle.concentration, 0.0, out=particle.concentration)
+        np.maximum(particle.population, 0.0, out=particle.population)
 
     def _execute_box(
         self,

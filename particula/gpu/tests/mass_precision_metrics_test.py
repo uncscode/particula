@@ -833,7 +833,7 @@ def test_study_helpers_leave_cpu_defaults_at_float64() -> None:
     )
 
     assert data.masses.dtype == np.float64
-    assert data.concentration.dtype == np.float64
+    assert data.population.dtype == np.float64
     assert data.charge.dtype == np.float64
     assert data.density.dtype == np.float64
     assert data.volume.dtype == np.float64
@@ -848,7 +848,7 @@ def test_study_helpers_leave_warp_defaults_at_float64() -> None:
     data = ParticleData(
         masses=case.masses,
         density=case.density_kg_m3,
-        concentration=case.concentration,
+        population=case.concentration,
         charge=case.charge,
         volume=case.volume,
         distribution_type="particle_resolved",
@@ -857,7 +857,7 @@ def test_study_helpers_leave_warp_defaults_at_float64() -> None:
     gpu_data = to_warp_particle_data(data, device="cpu")
 
     assert gpu_data.masses.dtype == wp.float64
-    assert gpu_data.concentration.dtype == wp.float64
+    assert gpu_data.population.dtype == wp.float64
     assert gpu_data.charge.dtype == wp.float64
     assert gpu_data.density.dtype == wp.float64
     assert gpu_data.volume.dtype == wp.float64

@@ -36,7 +36,7 @@ def _inventory(particles: ParticleData) -> np.ndarray:
     """Return concentration-weighted particle inventory by box and species."""
     return np.einsum(
         "bn,bns->bs",
-        particles.concentration,
+        particles.population,
         particles.masses,
         dtype=np.float64,
         optimize=True,
@@ -135,7 +135,7 @@ def _all_mutable_arrays(
     """
     return (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         particles.volume,
@@ -716,7 +716,7 @@ def _source_particles(boxes: int = 1, capacity: int = 3) -> ParticleData:
     """Build valid fixed-slot particle storage with all slots free."""
     return ParticleData(
         masses=np.zeros((boxes, capacity, 1)),
-        concentration=np.zeros((boxes, capacity)),
+        population=np.zeros((boxes, capacity)),
         charge=np.zeros((boxes, capacity)),
         density=np.array([1000.0]),
         volume=np.ones(boxes),
@@ -772,7 +772,7 @@ def test_commit_particle_source_activates_ascending_slots_and_conserves() -> (
     """
     particles = _source_particles(capacity=4)
     particles.masses[0, 1] = 0.5
-    particles.concentration[0, 1] = 3.0
+    particles.population[0, 1] = 3.0
     gas = GasData(
         name=["a"],
         molar_mass=np.array([0.1]),
@@ -780,7 +780,7 @@ def test_commit_particle_source_activates_ascending_slots_and_conserves() -> (
         partitioning=np.array([True]),
     )
     demand, diagnostics = _p2_records(np.array([3.0]))
-    initial = np.einsum("bn,bns->bs", particles.concentration, particles.masses)
+    initial = np.einsum("bn,bns->bs", particles.population, particles.masses)
     initial_gas = gas.concentration.copy()
 
     result = commit_particle_source(
@@ -790,10 +790,10 @@ def test_commit_particle_source_activates_ascending_slots_and_conserves() -> (
     npt.assert_array_equal(result.requested_slot_count, [2])
     npt.assert_array_equal(result.activated_slot_count, [2])
     npt.assert_allclose(particles.masses[0, [0, 2], 0], [0.25, 0.25])
-    npt.assert_allclose(particles.concentration[0, [0, 2]], [1.5, 1.5])
+    npt.assert_allclose(particles.population[0, [0, 2]], [1.5, 1.5])
     npt.assert_allclose(particles.charge[0, [0, 2]], [1.0, 1.0])
     particle_mass = np.einsum(
-        "bn,bns->bs", particles.concentration, particles.masses
+        "bn,bns->bs", particles.population, particles.masses
     )
     npt.assert_allclose(
         particle_mass + gas.concentration, initial + initial_gas
@@ -814,7 +814,7 @@ def test_commit_particle_source_zero_row_is_exact_noop() -> None:
     demand, diagnostics = _p2_records(np.array([0.0]))
     before = (
         particles.masses.copy(),
-        particles.concentration.copy(),
+        particles.population.copy(),
         gas.concentration.copy(),
     )
 
@@ -825,7 +825,7 @@ def test_commit_particle_source_zero_row_is_exact_noop() -> None:
     npt.assert_array_equal(result.requested_slot_count, [0])
     npt.assert_array_equal(result.activated_slot_count, [0])
     npt.assert_array_equal(particles.masses, before[0])
-    npt.assert_array_equal(particles.concentration, before[1])
+    npt.assert_array_equal(particles.population, before[1])
     npt.assert_array_equal(gas.concentration, before[2])
 
 
@@ -862,7 +862,7 @@ def test_commit_particle_source_uses_ceiling_slot_counts(
     npt.assert_array_equal(result.activated_slot_count, [expected_slots])
     if expected_slots:
         npt.assert_allclose(
-            particles.concentration[0, :expected_slots],
+            particles.population[0, :expected_slots],
             event_count / expected_slots,
         )
         npt.assert_allclose(
@@ -871,7 +871,7 @@ def test_commit_particle_source_uses_ceiling_slot_counts(
         )
         npt.assert_allclose(particles.charge[0, :expected_slots], 1.0)
     npt.assert_array_equal(
-        particles.concentration[0, expected_slots:],
+        particles.population[0, expected_slots:],
         np.zeros(3 - expected_slots),
     )
 
@@ -890,7 +890,7 @@ def test_commit_particle_source_rejects_late_gas_underflow_atomically() -> None:
         field.copy()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -906,7 +906,7 @@ def test_commit_particle_source_rejects_late_gas_underflow_atomically() -> None:
     for field, snapshot in zip(
         (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -922,7 +922,7 @@ def test_commit_particle_source_scales_gas_and_particle_inventory() -> None:
     """Scaling fallback preserves the scaled-domain particle-plus-gas balance."""
     particles = _source_particles(capacity=2)
     particles.masses[0, 0, 0] = 0.5
-    particles.concentration[0, 0] = 4.0
+    particles.population[0, 0] = 4.0
     gas = GasData(
         name=["a"],
         molar_mass=np.array([0.1]),
@@ -953,10 +953,10 @@ def test_commit_particle_source_scales_gas_and_particle_inventory() -> None:
     npt.assert_array_equal(result.requested_slot_count, [1])
     npt.assert_array_equal(result.activated_slot_count, [1])
     npt.assert_allclose(particles.volume, [0.5])
-    npt.assert_allclose(particles.concentration, [[2.0, 1.5]])
+    npt.assert_allclose(particles.population, [[2.0, 1.5]])
     npt.assert_allclose(gas.concentration, [[2.125]])
     particle_mass = np.einsum(
-        "bn,bns->bs", particles.concentration, particles.masses
+        "bn,bns->bs", particles.population, particles.masses
     )
     npt.assert_allclose(
         particle_mass + gas.concentration,
@@ -1059,9 +1059,7 @@ def test_commit_particle_source_rejects_forged_p2_records_atomically(
         )
 
     npt.assert_array_equal(particles.masses, particle_snapshot.masses)
-    npt.assert_array_equal(
-        particles.concentration, particle_snapshot.concentration
-    )
+    npt.assert_array_equal(particles.population, particle_snapshot.population)
     npt.assert_array_equal(particles.charge, particle_snapshot.charge)
     npt.assert_array_equal(particles.volume, particle_snapshot.volume)
     npt.assert_array_equal(gas.concentration, gas_snapshot)
@@ -1113,7 +1111,7 @@ def test_private_commit_helpers_validate_counts_schema_and_inventory() -> None:
     """
     particles = _source_particles(capacity=2)
     particles.masses[0, 0, 0] = 2.0
-    particles.concentration[0, 0] = 3.0
+    particles.population[0, 0] = 3.0
 
     npt.assert_array_equal(
         particle_source._request_counts(np.array([0.0, 2.1]), 2.0, 2),
@@ -1137,7 +1135,7 @@ def test_private_commit_helpers_validate_counts_schema_and_inventory() -> None:
             gas.concentration.flags, "writeable", False
         ),
         lambda particles, gas: setattr(
-            particles.concentration.flags, "writeable", False
+            particles.population.flags, "writeable", False
         ),
     ],
 )
@@ -1157,7 +1155,7 @@ def test_commit_rejects_nonwritable_or_noncontiguous_storage_without_writes(
     demand, diagnostics = _p2_records(np.array([1.0]))
     snapshot = (
         particles.masses.copy(),
-        particles.concentration.copy(),
+        particles.population.copy(),
         gas.concentration.copy(),
     )
     mutation(particles, gas)  # type: ignore[operator]
@@ -1168,7 +1166,7 @@ def test_commit_rejects_nonwritable_or_noncontiguous_storage_without_writes(
         )
 
     npt.assert_array_equal(particles.masses, snapshot[0])
-    npt.assert_array_equal(particles.concentration, snapshot[1])
+    npt.assert_array_equal(particles.population, snapshot[1])
     npt.assert_array_equal(gas.concentration, snapshot[2])
 
 
@@ -1207,7 +1205,7 @@ def test_commit_resampling_precedes_scaling_for_full_capacity() -> None:
     """A releasable full row chooses resampling before scaling fallback."""
     particles = _source_particles(capacity=3)
     particles.masses[0, :, 0] = [0.2, 0.3, 0.4]
-    particles.concentration[0] = [1.0, 1.0, 1.0]
+    particles.population[0] = [1.0, 1.0, 1.0]
     gas = GasData(
         name=["a"],
         molar_mass=np.array([0.1]),
@@ -1292,7 +1290,7 @@ def test_commit_scaling_cannot_activate_a_full_store_atomically() -> None:
     """Scaling source demand does not create a free slot in a full store."""
     particles = _source_particles(capacity=3)
     particles.masses[:, :, 0] = 0.25
-    particles.concentration[:] = 1.0
+    particles.population[:] = 1.0
     gas = GasData(
         name=["a"],
         molar_mass=np.array([0.1]),
@@ -1314,7 +1312,7 @@ def test_commit_scaling_cannot_activate_a_full_store_atomically() -> None:
     with pytest.raises(ValueError, match="free slot capacity"):
         commit_particle_source(demand, diagnostics, particles, gas, config)
 
-    for name in ("masses", "concentration", "charge", "density", "volume"):
+    for name in ("masses", "population", "charge", "density", "volume"):
         npt.assert_array_equal(
             getattr(particles, name), getattr(particle_snapshot, name)
         )
@@ -1325,7 +1323,7 @@ def test_commit_full_capacity_with_policies_off_preserves_all_storage() -> None:
     """Policies-disabled capacity rejection preserves every mutable field."""
     particles = _source_particles(capacity=2)
     particles.masses[:, :, 0] = 0.25
-    particles.concentration[:] = 1.0
+    particles.population[:] = 1.0
     gas = GasData(
         name=["a"],
         molar_mass=np.array([0.1]),
@@ -1343,7 +1341,7 @@ def test_commit_full_capacity_with_policies_off_preserves_all_storage() -> None:
     )
     fields = (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         particles.volume,
@@ -1383,7 +1381,7 @@ def test_commit_multibox_multispecies_conserves_each_box_and_species() -> None:
     """
     particles = ParticleData(
         masses=np.zeros((2, 3, 2)),
-        concentration=np.zeros((2, 3)),
+        population=np.zeros((2, 3)),
         charge=np.zeros((2, 3)),
         density=np.array([1000.0, 1200.0]),
         volume=np.ones(2),
@@ -1411,7 +1409,7 @@ def test_commit_multibox_multispecies_conserves_each_box_and_species() -> None:
         gas.concentration, initial_gas - events[:, None] * per_event
     )
     npt.assert_allclose(
-        np.einsum("bn,bns->bs", particles.concentration, particles.masses)
+        np.einsum("bn,bns->bs", particles.population, particles.masses)
         + gas.concentration,
         initial_gas,
     )
@@ -1441,9 +1439,7 @@ def test_commit_rejects_tiny_forged_gas_demand_atomically() -> None:
         )
 
     npt.assert_array_equal(particles.masses, particle_snapshot.masses)
-    npt.assert_array_equal(
-        particles.concentration, particle_snapshot.concentration
-    )
+    npt.assert_array_equal(particles.population, particle_snapshot.population)
     npt.assert_array_equal(gas.concentration, gas_snapshot)
 
 
@@ -1460,7 +1456,7 @@ def test_commit_rejects_overlapping_mutable_storage_atomically(
         partitioning=np.array([True]),
     )
     if target == "particle":
-        particles.concentration = np.lib.stride_tricks.as_strided(
+        particles.population = np.lib.stride_tricks.as_strided(
             np.zeros(1), shape=(2, 3), strides=(0, 0)
         )
     else:
@@ -1477,9 +1473,7 @@ def test_commit_rejects_overlapping_mutable_storage_atomically(
         )
 
     npt.assert_array_equal(particles.masses, particle_snapshot.masses)
-    npt.assert_array_equal(
-        particles.concentration, particle_snapshot.concentration
-    )
+    npt.assert_array_equal(particles.population, particle_snapshot.population)
     npt.assert_array_equal(gas.concentration, gas_snapshot)
 
 
@@ -1591,7 +1585,7 @@ def test_commit_multibox_oracle_proves_per_species_source_transfer() -> None:
     """
     particles = ParticleData(
         masses=np.zeros((2, 4, 2), dtype=np.float64),
-        concentration=np.zeros((2, 4), dtype=np.float64),
+        population=np.zeros((2, 4), dtype=np.float64),
         charge=np.zeros((2, 4), dtype=np.float64),
         density=np.array([1000.0, 1200.0]),
         volume=np.ones(2),

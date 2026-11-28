@@ -41,9 +41,7 @@ def _make_gpu_data() -> tuple[Any, Any]:
             dtype=np.float64,
         ),
         # Preserve the former unit number density at the declared volume.
-        concentration=np.full(
-            (_N_BOXES, n_particles), 1.0e-6, dtype=np.float64
-        ),
+        population=np.full((_N_BOXES, n_particles), 1.0e-6, dtype=np.float64),
         charge=np.zeros((_N_BOXES, n_particles), dtype=np.float64),
         density=np.array([1000.0, 1200.0], dtype=np.float64),
         volume=np.full(_N_BOXES, 1.0e-6, dtype=np.float64),

@@ -71,8 +71,14 @@ def measure(
     on_result=None,
     collisions=True,
     sampled_factory=None,
+    first_seeds=None,
 ):
-    """Time native coupled simulations and verify their inventories."""
+    """Verify repeated forecasts, optionally resuming explicit box-group seeds.
+
+    By default each repetition advances `boxes` consecutive streams starting
+    from `seed`. A supplied `first_seeds` sequence selects exactly those
+    repetitions while reusing the prepared solver.
+    """
     from particula.gpu.kernels._coagulation_config import (
         CoagulationMechanismConfig,
     )
@@ -101,12 +107,12 @@ def measure(
     wp.synchronize_device("cuda:0")
     setup = perf_counter() - t
     out = []
-    for rep in range(repeats):
+    if first_seeds is None:
+        first_seeds = range(seed, seed + boxes * repeats, boxes)
+    for first_seed in first_seeds:
         start_utc = datetime.now(timezone.utc).isoformat()
         t = perf_counter()
-        obs = solver.run(
-            inputs, range(seed + rep * boxes, seed + (rep + 1) * boxes)
-        )
+        obs = solver.run(inputs, range(first_seed, first_seed + boxes))
         wp.synchronize_device("cuda:0")
         elapsed = perf_counter() - t
         end_utc = datetime.now(timezone.utc).isoformat()
@@ -115,7 +121,13 @@ def measure(
             count = obs[i, :, 0] * b.volume
             pm = obs[i, :, 1 : ns + 2]
             gas = obs[i, :, ns + 2 : 2 * ns + 2]
-            total = pm[:, :ns] + gas
+            if not np.isfinite(obs[i]).all():
+                raise ArithmeticError("Nonfinite native observation")
+            total = pm.copy()
+            with np.errstate(over="ignore"):
+                total[:, :ns] += gas
+            if not np.isfinite(total).all():
+                raise ArithmeticError("Nonfinite native material inventory")
             drift = float(
                 np.max(np.abs((total - total[0]) / np.maximum(total[0], 1e-30)))
             )
@@ -143,7 +155,7 @@ def measure(
                 charge=charge,
                 kernel="native-warp" if collisions else "native-warp-off",
                 family=family,
-                first_seed=seed + rep * boxes,
+                first_seed=first_seed,
                 boxes=boxes,
                 horizon=h,
                 steps=steps,

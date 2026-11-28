@@ -10,13 +10,8 @@ if TYPE_CHECKING:
 
 
 def slot_density(particles: "ParticleData") -> NDArray[np.float64]:
-    """Read admitted storage as m⁻³ (bins/slots) or m⁻⁴ (radius PDF).
-
-    Binned storage is already a density. Treat the result as read-only.
-    """
-    if particles.distribution_type == "particle_resolved":
-        return particles.concentration / particles.volume[:, None]
-    return particles.concentration
+    """Convert admitted extensive bins, slots or radius ordinates to density."""
+    return particles.population / particles.volume[:, None]
 
 
 def write_binned_density(
@@ -25,7 +20,11 @@ def write_binned_density(
     """Commit admitted bin densities or PDF ordinates to existing storage."""
     if particles.distribution_type not in ("discrete", "continuous_pdf"):
         raise ValueError("writing bin densities requires a binned population")
-    particles.concentration[:] = density
+    with np.errstate(over="ignore", invalid="ignore"):
+        candidate = density * particles.volume[:, None]
+    if not np.all(np.isfinite(candidate)) or np.any(candidate < 0):
+        raise ValueError("binned population must remain finite and nonnegative")
+    particles.population[:] = candidate
 
 
 def radius_node_widths(radius: NDArray[np.float64]) -> NDArray[np.float64]:

@@ -24,7 +24,7 @@ def test_constant_kernel_exponential_solution(monkeypatch, record_property):
         pdf = initial_number * np.exp(-scaled_mass) * jacobian
         particle = ParticleData(
             masses=mass[None, :, None],
-            concentration=pdf[None].copy(),
+            population=pdf[None].copy(),
             charge=np.zeros((1, size)),
             density=np.array([1000.0]),
             volume=np.ones(1),
@@ -55,15 +55,13 @@ def test_constant_kernel_exponential_solution(monkeypatch, record_property):
             return np.sum((values[1:] + values[:-1]) * width / 2)
 
         number_error = abs(
-            integrate(particle.concentration[0]) / (initial_number / (1 + tau))
-            - 1
+            integrate(particle.population[0]) / (initial_number / (1 + tau)) - 1
         )
         mass_error = abs(
-            integrate(particle.concentration[0] * mass) / integrate(pdf * mass)
-            - 1
+            integrate(particle.population[0] * mass) / integrate(pdf * mass) - 1
         )
         spectrum_error = (
-            integrate(abs(particle.concentration[0] - exact)) / initial_number
+            integrate(abs(particle.population[0] - exact)) / initial_number
         )
         errors.append([number_error, mass_error, spectrum_error])
     record_property("number_mass_spectrum_errors_128_256_512", repr(errors))

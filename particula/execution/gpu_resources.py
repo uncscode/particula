@@ -1050,7 +1050,7 @@ def _primary_arrays(session: ResidentSession) -> tuple[Any, ...]:
     environment = cast(Any, session.environment)
     return (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         particles.volume,

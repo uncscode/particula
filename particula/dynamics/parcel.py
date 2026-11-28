@@ -159,9 +159,8 @@ class ParcelTrajectory:
 
         The discrete particle lanes are dry material and water, respectively.
         Supply dry material density (kg/m³) to convert the fixed dry volumes
-        to mass. Gas holds water vapor in kg/m³. The native discrete volume
-        is 1 m³. Multiply its density inventories by the physical parcel
-        volume at this sample to recover extensive quantities.
+        to mass. Gas holds water vapor in kg/m³. The native box retains its
+        physical parcel volume and bin counts.
         """
         if not np.isfinite(dry_density) or dry_density <= 0:
             raise ValueError("dry_density must be finite and positive")
@@ -172,10 +171,10 @@ class ParcelTrajectory:
         water_mass = WATER_FACTOR * (wet - dry) * (wet**2 + wet * dry + dry**2)
         particles = ParticleData(
             masses=np.column_stack((dry_mass, water_mass))[None, :, :],
-            concentration=self.initial.number[None, :] / volume,
+            population=self.initial.number[None, :].copy(),
             charge=np.zeros((1, len(dry))),
             density=np.array([dry_density, RHO_W]),
-            volume=np.ones(1),
+            volume=np.array([volume]),
             distribution_type="discrete",
         )
         gas = GasData(

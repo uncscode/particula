@@ -517,7 +517,7 @@ class _NucleationPreflight:
                 "particle_arrays",
                 (
                     self.particles.masses,
-                    self.particles.concentration,
+                    self.particles.population,
                     self.particles.charge,
                     self.particles.density,
                     self.particles.volume,
@@ -1156,7 +1156,7 @@ def _preflight_nucleation(  # noqa: C901
         masses,
         _array(
             particles,
-            "concentration",
+            "population",
             wp.float64,
             (n_boxes, n_particles),
             device,
@@ -1298,7 +1298,7 @@ def _preflight_nucleation(  # noqa: C901
         (particle_arrays[0], particle_arrays[1], *particle_arrays[3:]),
         (
             "particles.masses",
-            "particles.concentration",
+            "particles.population",
             "particles.density",
             "particles.volume",
         ),
@@ -2273,7 +2273,7 @@ def _stage_nucleation_slots(
             dim=(preflight.n_boxes, preflight.n_particles),
             inputs=[
                 preflight.particles.masses,
-                preflight.particles.concentration,
+                preflight.particles.population,
                 preflight.particles.charge,
                 categories,
                 invalid,
@@ -2629,7 +2629,7 @@ def _revalidate_p4_particle_state(preflight: _NucleationPreflight) -> None:
         _array(preflight.particles, "masses", wp.float64, (b, n, s), device),
         _array(
             preflight.particles,
-            "concentration",
+            "population",
             wp.float64,
             (b, n),
             device,
@@ -2646,7 +2646,7 @@ def _revalidate_p4_particle_state(preflight: _NucleationPreflight) -> None:
     ):
         raise ValueError("P4 particle fields must be the P1-validated storage.")
     _scan(current[0], "particles.masses")
-    _scan(current[1], "particles.concentration")
+    _scan(current[1], "particles.population")
     _scan_finite_2d(current[2], "particles.charge")
     _scan(current[3], "particles.density", positive=True)
     _scan(current[4], "particles.volume", positive=True)
@@ -2726,7 +2726,7 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
             dim=(preflight.n_boxes, preflight.n_particles),
             inputs=[
                 preflight.particles.masses,
-                preflight.particles.concentration,
+                preflight.particles.population,
                 preflight.particles.charge,
                 categories,
                 invalid,
@@ -2850,7 +2850,7 @@ def _orchestrate_nucleation_exhaustion(  # noqa: C901
                 dim=(preflight.n_boxes, preflight.n_particles),
                 inputs=[
                     preflight.particles.masses,
-                    preflight.particles.concentration,
+                    preflight.particles.population,
                     preflight.particles.charge,
                     final_categories,
                     final_invalid,
@@ -3045,7 +3045,7 @@ def _revalidate_p5_storage(preflight: _NucleationPreflight) -> None:
         _array(preflight.particles, "masses", wp.float64, (b, n, s), device),
         _array(
             preflight.particles,
-            "concentration",
+            "population",
             wp.float64,
             (b, n),
             device,
@@ -3112,7 +3112,7 @@ def _commit_nucleation_p5(
         dim=preflight.n_boxes,
         inputs=[
             preflight.particles.masses,
-            preflight.particles.concentration,
+            preflight.particles.population,
             preflight.particles.charge,
             preflight.particles.volume,
             preflight.gas.concentration,
@@ -3137,7 +3137,7 @@ def _commit_nucleation_p5(
         dim=preflight.n_boxes,
         inputs=[
             preflight.particles.masses,
-            preflight.particles.concentration,
+            preflight.particles.population,
             preflight.particles.charge,
             preflight.gas.concentration,
             preflight.gas.molar_mass,
@@ -4174,7 +4174,7 @@ def _raise_nucleation_status(status: np.ndarray) -> None:  # noqa: C901
     p1 = status[:14]
     p1_errors = (
         "particles.masses must be finite and nonnegative.",
-        "particles.concentration must be finite and nonnegative.",
+        "particles.population must be finite and nonnegative.",
         "particles.density must be positive and finite.",
         "particles.volume must be positive and finite.",
         "particles.charge must be finite.",

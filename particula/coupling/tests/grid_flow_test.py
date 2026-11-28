@@ -150,11 +150,11 @@ def test_native_and_host_contract(device):
         np.array([True, False]),
     )
     particles = ParticleData(
-        np.array([[[2.0, 0.0]], [[1.0, 2.0]]]),
-        np.array([[5.0], [7.0]]),
-        np.zeros((2, 1)),
-        np.ones(2),
-        np.ones(2),
+        masses=np.array([[[2.0, 0.0]], [[1.0, 2.0]]]),
+        population=np.array([[5.0], [7.0]]),
+        charge=np.zeros((2, 1)),
+        density=np.ones(2),
+        volume=np.ones(2),
         distribution_type="discrete",
     )
     a = layout.pack(grid, gas, particles)
@@ -514,7 +514,8 @@ def test_live_step_replay_and_resume(tmp_path, device):
     np.testing.assert_array_equal(external.snapshot()["state"], transported)
 
 
-def test_native_inventory_round_trip_in_unequal_cells():
+@pytest.mark.parametrize("sample_volume", [[1.0, 1.0], [4.0, 3.0], [0.25, 4.0]])
+def test_native_inventory_round_trip_in_unequal_cells(sample_volume):
     """Each cell's physical volume independently converts densities to amounts."""
     grid = FlowGrid((2, 1, 1), ((0, 2), (0, 1), (0, 4)), bed=(0, 0, 2))
     layout = InventoryLayout(("A",), ("bin",), ("dry",))
@@ -523,10 +524,10 @@ def test_native_inventory_round_trip_in_unequal_cells():
     )
     particles = ParticleData(
         masses=np.array([[[2.0]], [[3.0]]]),
-        concentration=np.array([[5.0], [7.0]]),
+        population=np.array([[5.0], [7.0]]) * np.array(sample_volume)[:, None],
         charge=np.zeros((2, 1)),
         density=np.ones(1),
-        volume=np.ones(2),
+        volume=np.array(sample_volume),
         distribution_type="discrete",
     )
 
@@ -538,6 +539,34 @@ def test_native_inventory_round_trip_in_unequal_cells():
     )
     np.testing.assert_array_equal(restored_gas.concentration, gas.concentration)
     np.testing.assert_array_equal(
-        restored_particles.concentration, particles.concentration
+        restored_particles.population, particles.population
     )
     np.testing.assert_array_equal(restored_particles.masses, particles.masses)
+
+    np.testing.assert_array_equal(restored_particles.volume, sample_volume)
+    particles.population[1, 0] = 0
+    empty = layout.pack(grid, gas, particles)
+    np.testing.assert_array_equal(empty[1], [9, 0, 0])
+    _, restored = layout.unpack(grid, empty, gas, particles)
+    np.testing.assert_array_equal(restored.masses, particles.masses)
+
+
+def test_gas_only_native_inventory_preserves_empty_particle_axes():
+    """Transport the gas mass in cells without particle or material lanes."""
+    grid = FlowGrid((1, 1, 1), ((0, 2), (0, 1), (0, 4)))
+    layout = InventoryLayout(("A",))
+    gas = GasData(["A"], np.array([0.1]), np.array([[3.0]]), np.array([True]))
+    particles = ParticleData(
+        masses=np.empty((1, 0, 0)),
+        population=np.empty((1, 0)),
+        charge=np.empty((1, 0)),
+        density=np.empty(0),
+        volume=np.array([0.25]),
+        distribution_type="discrete",
+    )
+    lanes = layout.pack(grid, gas, particles)
+    np.testing.assert_array_equal(lanes, [[24.0]])
+    restored_gas, restored = layout.unpack(grid, lanes, gas, particles)
+    np.testing.assert_array_equal(restored_gas.concentration, [[3.0]])
+    assert restored.masses.shape == (1, 0, 0)
+    assert restored.population.shape == (1, 0)

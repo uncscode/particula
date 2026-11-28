@@ -222,7 +222,7 @@ def _layout_signature(fixture: _LoopFixture) -> dict[str, object]:
         "particles": (
             id(session.particles),
             _array_signature(session.particles.masses),
-            _array_signature(session.particles.concentration),
+            _array_signature(session.particles.population),
             _array_signature(session.particles.charge),
             _array_signature(session.particles.density),
             _array_signature(session.particles.volume),
@@ -288,7 +288,7 @@ def _expected_inventory(session: Any) -> np.ndarray:
     gas = cast(Any, session.gas)
     volume = particles.volume.numpy()
     particle_mass = particles.masses.numpy()
-    particle_concentration = particles.concentration.numpy()
+    particle_concentration = particles.population.numpy()
     gas_concentration = gas.concentration.numpy()
     return (
         np.sum(particle_mass * particle_concentration[:, :, None], axis=1)
@@ -501,7 +501,7 @@ def _build_loop_fixture(  # noqa: C901
     particles.masses = np.array(
         [[[1.0], [2.0]], [[3.0], [4.0]], [[5.0], [6.0]]], dtype=np.float64
     )
-    particles.concentration = np.array(
+    particles.population = np.array(
         [[1.0, 0.5], [2.0, 1.0], [3.0, 1.5]], dtype=np.float64
     )
     particles.charge = np.zeros((3, 2), dtype=np.float64)
@@ -509,7 +509,7 @@ def _build_loop_fixture(  # noqa: C901
     particles.volume = np.array([1.0, 2.0, 3.0], dtype=np.float64)
     # Original fixture weights are number densities. Native resolved storage
     # holds counts, preserving their original extensive particle inventory.
-    particles.concentration *= particles.volume[:, None]
+    particles.population *= particles.volume[:, None]
     particles.distribution_type = "particle_resolved"
     gas.molar_mass = np.array([0.018], dtype=np.float64)
     gas.concentration = np.array([[0.25], [0.5], [0.75]], dtype=np.float64)

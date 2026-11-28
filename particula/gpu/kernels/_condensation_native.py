@@ -30,17 +30,13 @@ def _validate_primary(  # noqa: C901
         v = volume[box]
         if not wp.isfinite(v) or v <= wp.float64(0.0):
             wp.atomic_add(invalid, 0, 1)
-        if kind == wp.int32(1) and v != wp.float64(1.0):
-            wp.atomic_add(invalid, 0, 1)
     if lane < masses.shape[1]:
         count = concentration[box, lane]
         if not wp.isfinite(count) or count < wp.float64(0.0):
             wp.atomic_add(invalid, 0, 1)
-        if kind == wp.int32(3):
-            v = volume[box]
-            if v > wp.float64(0.0) and wp.isfinite(v):
-                if not wp.isfinite(count / v):
-                    wp.atomic_add(invalid, 0, 1)
+        v = volume[box]
+        if v > wp.float64(0.0) and not wp.isfinite(count / v):
+            wp.atomic_add(invalid, 0, 1)
         if not wp.isfinite(charge[box, lane]):
             wp.atomic_add(invalid, 0, 1)
         for species in range(masses.shape[2]):
@@ -69,7 +65,7 @@ def validate_primary_state(particles: Any, gas: Any, kind: int) -> None:
         dim=(boxes, max(1, slots, materials, gas.concentration.shape[1])),
         inputs=[
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -127,7 +123,7 @@ def reduce_candidates(
                 mass = masses[box, slot, p]
                 transfer = (mass + transfer) - mass
             weighted = transfer * native_slot_density(
-                concentration[box, slot], volume[box], kind == wp.int32(3)
+                concentration[box, slot], volume[box]
             )
             if transfer > wp.float64(0.0):
                 corrected = weighted - uptake_correction
@@ -193,7 +189,7 @@ def reduce_finalized(
             correction = wp.float64(0.0)
             for slot in range(finalized.shape[1]):
                 weighted = finalized[box, slot, p] * native_slot_density(
-                    concentration[box, slot], volume[box], kind == wp.int32(3)
+                    concentration[box, slot], volume[box]
                 )
                 corrected = weighted - correction
                 updated_delta = delta + corrected
@@ -221,7 +217,7 @@ def reduce_finalized(
         correction = wp.float64(0.0)
         for slot in range(finalized.shape[1]):
             weighted = finalized[box, slot, p] * native_slot_density(
-                concentration[box, slot], volume[box], kind == wp.int32(3)
+                concentration[box, slot], volume[box]
             )
             corrected = weighted - correction
             updated_delta = delta + corrected
@@ -247,8 +243,6 @@ def energy_transfer(
     if p >= 0:
         for slot in range(total.shape[1]):
             count = concentration[box, slot]
-            if kind == wp.int32(1):
-                count *= volume[box]
             delta += total[box, slot, p] * count
     energy[box, g] = delta * latent_heat[g]
 

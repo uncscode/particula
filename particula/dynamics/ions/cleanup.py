@@ -47,7 +47,7 @@ class IonNeutralCleanup(RunnableABC):
                 raise ValueError("ion species index is invalid")
         if self.positive_species == self.negative_species:
             raise ValueError("ion polarities require distinct material lanes")
-        counts = particles.concentration
+        counts = particles.population
         if np.any((counts != 0) & (counts != 1)):
             raise ValueError("ion cleanup requires unit active counts")
 

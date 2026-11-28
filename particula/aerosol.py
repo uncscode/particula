@@ -128,7 +128,7 @@ class Aerosol:
         fields.validate_layout(
             dimensions,
             particles.distribution_type,
-            particles.concentration > 0,
+            particles.population > 0,
         )
         self._fields = fields
         self._particles, self._gas, self._environment = (

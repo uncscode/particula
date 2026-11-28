@@ -97,7 +97,7 @@ class TestNativeBinnedCondensation(unittest.TestCase):
         particle = ParticleData(
             masses=masses[None, ...],
             density=densities,
-            concentration=concentration[None, ...],
+            population=concentration[None, ...],
             charge=np.zeros((1, n_bins)),
             volume=np.array([1.0]),
             distribution_type=(
@@ -120,7 +120,7 @@ class TestNativeBinnedCondensation(unittest.TestCase):
     ) -> np.ndarray:
         """Independently integrate each species using the declared measure."""
         masses = particle_data.masses[0]
-        concentration = particle_data.concentration[0]
+        concentration = particle_data.population[0]
         weighted = masses * concentration[:, np.newaxis]
         if particle_data.distribution_type == "continuous_pdf":
             particle_mass = np.trapezoid(
@@ -343,7 +343,7 @@ class TestNativeBinnedCondensation(unittest.TestCase):
         )
         volume = particle_data.volume[0]
         # Discrete concentration is already number density.
-        norm_conc = particle_data.concentration[0]
+        norm_conc = particle_data.population[0]
         mass_transfer = get_mass_transfer(
             mass_rate=mass_rate,
             time_step=1.0,
@@ -454,7 +454,7 @@ class TestNativeBinnedCondensation(unittest.TestCase):
         )
 
         masses_before = particle_data.masses.copy()
-        particle_concentration_before = particle_data.concentration.copy()
+        particle_concentration_before = particle_data.population.copy()
         gas_before = gas_data.concentration.copy()
         with self.assertRaisesRegex(ValueError, "latent heat must be finite"):
             cond.mass_transfer_rate(
@@ -466,14 +466,14 @@ class TestNativeBinnedCondensation(unittest.TestCase):
 
         np.testing.assert_array_equal(particle_data.masses, masses_before)
         np.testing.assert_array_equal(
-            particle_data.concentration, particle_concentration_before
+            particle_data.population, particle_concentration_before
         )
         np.testing.assert_array_equal(gas_data.concentration, gas_before)
 
     def test_step_rejects_negative_concentration(self):
         """Binned step rejects negative concentrations."""
         particle_data, gas_data, physics = self._build_binned_data("pmf", 10)
-        particle_data.concentration[0][0] = -1.0
+        particle_data.population[0][0] = -1.0
         cond = CondensationLatentHeat(
             molar_mass=gas_data.molar_mass,
             diffusion_coefficient=self.diffusion_coefficient,
@@ -482,7 +482,7 @@ class TestNativeBinnedCondensation(unittest.TestCase):
         )
 
         masses_before = particle_data.masses.copy()
-        particle_concentration_before = particle_data.concentration.copy()
+        particle_concentration_before = particle_data.population.copy()
         gas_before = gas_data.concentration.copy()
         with self.assertRaisesRegex(
             ValueError, "particle data must have finite physical values"
@@ -497,6 +497,6 @@ class TestNativeBinnedCondensation(unittest.TestCase):
 
         np.testing.assert_array_equal(particle_data.masses, masses_before)
         np.testing.assert_array_equal(
-            particle_data.concentration, particle_concentration_before
+            particle_data.population, particle_concentration_before
         )
         np.testing.assert_array_equal(gas_data.concentration, gas_before)

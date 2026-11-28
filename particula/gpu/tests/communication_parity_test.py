@@ -59,7 +59,7 @@ def _containers(device: str) -> tuple[SimpleNamespace, SimpleNamespace]:
             dtype=wp.float64,
             device=device,
         ),
-        concentration=wp.array(
+        population=wp.array(
             [[4.0, 0.0, 2.0, 0.0], [0.0, 0.0, 3.0, 0.0], [5.0, 0.0, 0.0, 0.0]],
             dtype=wp.float64,
             device=device,
@@ -391,13 +391,13 @@ def test_gas_and_volume_match_independent_multibox_oracle(
         atol=INVENTORY_ATOL,
     )
     npt.assert_allclose(
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         initial_particle_concentration,
         rtol=RTOL,
         atol=0.0,
     )
     npt.assert_allclose(
-        particles.concentration.numpy().sum(),
+        particles.population.numpy().sum(),
         initial_particle_concentration.sum(),
         rtol=RTOL,
         atol=INVENTORY_ATOL,
@@ -535,7 +535,7 @@ def test_repeated_one_dimensional_calls_match_sequential_oracles(
     particles, _ = _containers(device)
     initial = (
         particles.masses.numpy().copy(),
-        particles.concentration.numpy().copy(),
+        particles.population.numpy().copy(),
         particles.charge.numpy().copy(),
     )
     particle_configuration = _configuration(
@@ -573,13 +573,13 @@ def test_repeated_one_dimensional_calls_match_sequential_oracles(
         particles.masses.numpy(), expected[0], rtol=RTOL, atol=0.0
     )
     npt.assert_allclose(
-        particles.concentration.numpy(), expected[1], rtol=RTOL, atol=0.0
+        particles.population.numpy(), expected[1], rtol=RTOL, atol=0.0
     )
     npt.assert_allclose(
         particles.charge.numpy(), expected[2], rtol=RTOL, atol=0.0
     )
     npt.assert_allclose(
-        particles.concentration.numpy()[2], initial[1][2], rtol=0.0, atol=0.0
+        particles.population.numpy()[2], initial[1][2], rtol=0.0, atol=0.0
     )
 
 
@@ -597,7 +597,7 @@ def test_particle_transport_conserves_sparse_multibox_inventories(
 
     particles, _ = _containers(device)
     initial_mass = particles.masses.numpy().copy()
-    initial_concentration = particles.concentration.numpy().copy()
+    initial_concentration = particles.population.numpy().copy()
     initial_charge = particles.charge.numpy().copy()
     volumes = particles.volume.numpy().copy()
     source = np.array([0, 1], dtype=np.int32)
@@ -634,7 +634,7 @@ def test_particle_transport_conserves_sparse_multibox_inventories(
     wp.synchronize()
 
     final_mass = particles.masses.numpy()
-    final_concentration = particles.concentration.numpy()
+    final_concentration = particles.population.numpy()
     final_charge = particles.charge.numpy()
     npt.assert_allclose(final_mass, expected[0], rtol=RTOL, atol=0.0)
     npt.assert_allclose(final_concentration, expected[1], rtol=RTOL, atol=0.0)

@@ -64,17 +64,12 @@ to process bindings, not to this structural helper.
 
 For new builder-created `ParticleData`, explicitly call
 `set_distribution_type("discrete" | "continuous_pdf" | "particle_resolved")`
-before `build()`. Discrete/PMF bin concentrations are already in m⁻³ and
-continuous radius PDF values are `dn/dr` in m⁻⁴; both require a fixed 1 m³
-volume. A PDF additionally needs `set_radius_grid(...)`: positive, finite,
-strictly increasing radius nodes in metres, at least two, matching its slot
-width. `number_density` and `species_mass_density` integrate PDFs with
-trapezoids (mass times PDF is integrated together) and sum PMF bins.
-Particle-resolved slots instead hold represented counts and are normalized
-once by their positive physical volume. `slot_concentration_density` returns
-fresh per-slot density; `species_mass_inventory` returns kg per box and
-`total_mass` remains kg per particle. An empty PDF retains a valid grid with
-zero PDF and zero population mass.
+before `build()`. Each box has a finite positive represented air volume in m³.
+The writable `population` array stores represented counts for bins and resolved
+slots, and represented number per metre of radius for continuous PDFs.
+`slot_concentration_density` returns a detached per-slot density. PDF
+integration uses the supplied increasing radius grid, with at least two nodes.
+An empty PDF has zero ordinates on its original grid.
 
 Call `validate_representation()` after directly constructing or mutating
 writable particle arrays; new population helpers call it on each read and
@@ -115,15 +110,14 @@ but it is not an executable or transferable population.
 
 ### Stored units and physical inventories
 
-Let `c[b,n]` be stored concentration, `m[b,n,s]` per-particle species mass
-in kg, and `V[b]` physical volume in m³. The declared kind is authoritative;
-array shape, a legacy strategy, or fractional weights do not infer it.
+Let P be the stored population, m the species mass of one particle in kg,
+and V the represented air volume in m³. Each sum or integral is per box.
 
-| Declared `distribution_type` | Raw `c` units | Volume rule | Number density (m⁻³) | Species mass density (kg/m³) |
-| --- | --- | --- | --- | --- |
-| `discrete` (PMF) | Number per bin per m³ | Exactly 1 m³ | Sum `c` over bins | Sum `c*m` over bins |
-| `continuous_pdf` | Radius PDF `dn/dr`, m⁻⁴ | Exactly 1 m³ | Trapezoidal integral of `c` over radius | Trapezoidal integral of `c*m` over radius |
-| `particle_resolved` | Represented particle counts | Finite, strictly positive V | Sum `c` / V | Sum `c*m` / V |
+| Kind | Stored P | Number density (m⁻³) | Species mass density (kg/m³) |
+| --- | --- | --- | --- |
+| Discrete | Count per bin | Σ P/V | Σ P m/V |
+| Continuous PDF | dN/dr, m⁻¹ | ∫ (P/V) dr | ∫ (P m/V) dr |
+| Resolved | Multiplicity per slot | Σ P/V | Σ P m/V |
 
 PDF quadrature uses the explicitly supplied positive, finite, strictly
 increasing float64 radius grid in metres, with at least two nodes and one
@@ -147,6 +141,7 @@ These are existing signatures/properties, not additional aggregate APIs:
 | --- | --- |
 | `ParticleData.validate_representation()` | Returns `None`; read-only kind, float64 schema, physical-value, volume and grid admission; rejects without repair. |
 | `ParticleData.slot_concentration_density` | Fresh `(B,N)` array; m⁻³ for PMF/resolved, m⁻⁴ for PDF. |
+| `ParticleData.set_slot_concentration_density(density_by_slot, *, volume=None)` | Replaces population in place from per-slot density and the current or supplied volume. |
 | `ParticleData.number_density` | Fresh `(B,)` array, m⁻³. |
 | `ParticleData.species_mass_density` | Fresh `(B,Sp)` array, kg/m³. |
 | `ParticleData.species_mass_inventory` | Fresh `(B,Sp)` array, kg. |
@@ -256,7 +251,7 @@ leading `n_boxes` axis.
 | Field | Shape | Meaning |
 | --- | --- | --- |
 | `masses` | `(n_boxes, n_particles, n_species)` | Authoritative per-particle, per-species masses. |
-| `concentration` | `(n_boxes, n_particles)` | Per-box particle concentration or count, depending on workflow. |
+| `population` | `(n_boxes, n_particles)` | Extensive counts or radius PDF ordinates in m⁻¹. |
 | `charge` | `(n_boxes, n_particles)` | Per-box particle charge state as dimensionless elementary-charge counts. |
 | `density` | `(n_species,)` | Shared-across-box species density. |
 | `volume` | `(n_boxes,)` | Authoritative per-box simulation volume in m³. |
@@ -321,11 +316,11 @@ from particula.particles import ParticleData
 
 particle_data = ParticleData(
     masses=np.array([[[1e-18, 2e-18]]]),
-    concentration=np.array([[1.0]]),
+    population=np.array([[1.0]]),
     charge=np.array([[0.0]]),
     density=np.array([1000.0, 1200.0]),
     volume=np.array([1e-6]),
-    distribution_type="particle_resolved",  # raw concentration stores counts
+    distribution_type="particle_resolved",  # raw population stores counts
 )
 
 gas_data = GasData(
@@ -486,3 +481,64 @@ for merger/removal budgets and a hand-checked resampling/source case. The
 uses a per-box field for custom source accounting, and the
 [CPU/CUDA extension example](../../studies/examples/custom-processes/custom_process_backends.py)
 shows field continuation through explicit transfer, capture and restart.
+
+### Migrating particle inputs and writers from 0.3.6
+
+In 0.4 all particle representations store an extensive population. Pass
+`population=` to the constructor or use `set_population()` for counts or
+radius-PDF ordinates. The former second positional argument and
+`concentration=` retain their 0.3 interpretation. The deprecated writable
+`.concentration` alias returns the actual buffer for resolved particles and
+unit-volume bins/PDFs throughout 0.4.x. Type checkers can flag this alias. A non-unit binned box rejects the legacy spelling,
+including when just one box in a batch has non-unit volume. A retained raw
+array reference always refers to the stored amounts. Use the density accessor
+after changing volume.
+
+```python
+import numpy as np
+from particula.particles import create_particle_data_from_radii
+
+sample = create_particle_data_from_radii(
+    radii=[50e-9], distribution_type="discrete", concentration=[2e6],
+    concentration_units="1/m^3", volume=0.25,
+)
+np.testing.assert_allclose(sample.population, [[500_000]])
+np.testing.assert_allclose(sample.number_density, [2e6])
+sample.population[:] *= 0.5
+np.testing.assert_allclose(sample.number_density, [1e6])
+```
+
+The example uses SI units and works with the base installation. With the
+optional Pint unit converter installed, the same measurement can be supplied
+as `concentration=[2.0], concentration_units="1/cm^3"`.
+
+To replace the sample with a new measurement, supply a density for each
+slot. At 400 particles/m³, the current 0.25 m³ represents 100 particles.
+If the new sample represents 0.5 m³, pass its volume in the same call.
+
+```python
+sample.set_slot_concentration_density([400.0])
+np.testing.assert_allclose(sample.population, [[100.0]])
+sample.set_slot_concentration_density([400.0], volume=0.5)
+np.testing.assert_allclose(sample.population, [[200.0]])
+np.testing.assert_allclose(sample.number_density, [400.0])
+```
+
+For multiple boxes, pass a density row per box and optionally a volume per
+box. For a radius PDF, pass the measured ordinates in m⁻⁴. The setter
+multiplies each ordinate by volume and preserves the radius grid. This
+operation replaces the particle sample. Gas concentrations remain independent.
+
+For a density tendency in m⁻³ s⁻¹ (m⁻⁴ s⁻¹ for a PDF), multiply the
+increment by the row's volume before adding it to population. For a measured
+`dn/dr`, multiply by volume once on import. Integrate over radius only when
+forming an inventory or density summed across nodes. Gas stays in kg/m³.
+At fixed volume a clean-air flush removes particle and gas inventory. Under
+the resolved prescribed-volume operation, count and gas kg are conserved
+while concentration changes inversely with volume.
+
+Record `particle_population` and `volume` for new raw observations.
+`load_analysis` maps valid 0.3 analysis files to the new schema and records
+their source schema version. Start a new simulation from an explicitly
+converted physical state when crossing versions. Exact restart uses a
+matching checkpoint schema, package and runtime.

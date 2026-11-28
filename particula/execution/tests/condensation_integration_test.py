@@ -120,7 +120,7 @@ def _build_native_cpu_state(
     )
     particles = ParticleData(
         masses=np.array([[[0.0 if case == "inactive" else 1.0e-18]]]),
-        concentration=np.array([[particle_concentration]]),
+        population=np.array([[particle_concentration]]),
         density=np.array([1000.0]),
         charge=np.zeros((1, 1)),
         volume=np.ones(1),
@@ -295,7 +295,7 @@ def _build_warp_state(
 
     particle_data = ParticleData(
         masses=case.masses.copy(),
-        concentration=case.concentration.copy(),
+        population=case.concentration.copy(),
         charge=np.zeros_like(case.concentration),
         density=np.array([1000.0]),
         volume=np.ones(case.masses.shape[0]),
@@ -691,7 +691,7 @@ def test_cpu_adapter_executes_native_cases_and_conserves_inventory(
     aerosol = state.state.aerosol
     assert isinstance(aerosol, Aerosol)
     initial_mass = aerosol.particles.masses[0].copy()
-    concentration = aerosol.particles.concentration[0].copy()
+    concentration = aerosol.particles.population[0].copy()
     initial_gas = np.array(aerosol.gas.concentration[0, :1], copy=True)
     result = CPUCondensationExecutionAdapter().execute(state)
     assert aerosol.gas.concentration[0, 1] == 0.0
@@ -714,7 +714,7 @@ def test_cpu_adapter_executes_native_cases_and_conserves_inventory(
     if case == "inactive":
         # Inactive native slots preserve count and gas inventory.
         npt.assert_array_equal(
-            aerosol.particles.concentration[0].copy(),
+            aerosol.particles.population[0].copy(),
             concentration,
         )
         npt.assert_array_equal(final_gas, initial_gas)
@@ -778,7 +778,7 @@ def test_warp_adapter_zero_time_is_an_exact_noop() -> None:
     state = WarpCondensationExecutionState(resources["state"].state, 0.0)
     before = {
         "masses": resources["particles"].masses.numpy().copy(),
-        "concentration": resources["particles"].concentration.numpy().copy(),
+        "concentration": resources["particles"].population.numpy().copy(),
         "gas": resources["gas"].concentration.numpy().copy(),
         "transfer": resources["transfer"].numpy().copy(),
     }
@@ -793,7 +793,7 @@ def test_warp_adapter_zero_time_is_an_exact_noop() -> None:
         resources["particles"].masses.numpy(), before["masses"]
     )
     npt.assert_array_equal(
-        resources["particles"].concentration.numpy(), before["concentration"]
+        resources["particles"].population.numpy(), before["concentration"]
     )
     npt.assert_array_equal(
         resources["gas"].concentration.numpy(), before["gas"]

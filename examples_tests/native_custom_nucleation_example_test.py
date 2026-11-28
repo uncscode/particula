@@ -21,15 +21,15 @@ def test_custom_source_preserves_extensive_mass_and_capacity(monkeypatch):
     volume = aerosol.particles.volume[0]
     nucleus_mass = example["mass_nucleated_particle"]
     gas_before = aerosol.gas.concentration.copy()
-    counts_before = aerosol.particles.concentration.sum()
+    counts_before = aerosol.particles.population.sum()
     particle_before = np.sum(
-        aerosol.particles.masses * aerosol.particles.concentration[..., None]
+        aerosol.particles.masses * aerosol.particles.population[..., None]
     )
     count = example["inject_custom_nuclei"](
         aerosol, 2.5 * nucleus_mass / volume, 1.0, nucleus_mass
     )
     assert count == 2
-    assert aerosol.particles.concentration.sum() == counts_before + 2
+    assert aerosol.particles.population.sum() == counts_before + 2
     np.testing.assert_allclose(
         aerosol.gas.concentration,
         gas_before - 2 * nucleus_mass / volume,
@@ -37,7 +37,7 @@ def test_custom_source_preserves_extensive_mass_and_capacity(monkeypatch):
         atol=1e-30,
     )
     particle_after = np.sum(
-        aerosol.particles.masses * aerosol.particles.concentration[..., None]
+        aerosol.particles.masses * aerosol.particles.population[..., None]
     )
     np.testing.assert_allclose(
         particle_after + aerosol.gas.concentration[0, 0] * volume,
@@ -47,7 +47,7 @@ def test_custom_source_preserves_extensive_mass_and_capacity(monkeypatch):
     )
     # Capacity rejection preserves both gas and particle records.
     aerosol.particles.masses[:] = nucleus_mass
-    aerosol.particles.concentration[:] = 1.0
+    aerosol.particles.population[:] = 1.0
     gas_before = aerosol.gas.concentration.copy()
     masses_before = aerosol.particles.masses.copy()
     with pytest.raises(ValueError, match="free slot capacity"):

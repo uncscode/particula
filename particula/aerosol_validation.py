@@ -103,9 +103,7 @@ def validate_aerosol_structure(
     boxes, slots, particle_species = masses.shape
     if boxes == 0:
         raise ValueError("particles.masses box count must be positive")
-    _require_shape(
-        particles.concentration, "particles.concentration", (boxes, slots)
-    )
+    _require_shape(particles.population, "particles.population", (boxes, slots))
     _require_shape(particles.charge, "particles.charge", (boxes, slots))
     _require_shape(particles.density, "particles.density", (particle_species,))
     _require_shape(particles.volume, "particles.volume", (boxes,))

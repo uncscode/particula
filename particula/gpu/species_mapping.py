@@ -22,7 +22,7 @@ from particula.gpu.population_metadata import (
     particle_distribution_code,
 )
 
-_PARTICLE_FIELDS = ("masses", "concentration", "charge", "density", "volume")
+_PARTICLE_FIELDS = ("masses", "population", "charge", "density", "volume")
 _GAS_FIELDS = ("concentration", "molar_mass", "partitioning", "vapor_pressure")
 
 

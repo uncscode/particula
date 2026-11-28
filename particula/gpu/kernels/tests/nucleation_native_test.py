@@ -43,7 +43,7 @@ def setup(device, volume=0.25, capacity=20):
     counts[0, 0] = 2.0
     cpu = ParticleData(
         masses=masses,
-        concentration=counts,
+        population=counts,
         charge=np.zeros_like(counts),
         density=np.ones(3),
         volume=np.array([volume]),
@@ -82,9 +82,7 @@ def setup(device, volume=0.25, capacity=20):
 
 def density_inventory(p, g):
     """Compute independent mapped density, including particle-only mass."""
-    result = np.sum(
-        p.masses.numpy() * p.concentration.numpy()[..., None], axis=1
-    )
+    result = np.sum(p.masses.numpy() * p.population.numpy()[..., None], axis=1)
     result /= p.volume.numpy()[:, None]
     result[:, 0] += g.concentration.numpy()[:, 2]
     result[:, 1] += g.concentration.numpy()[:, 1]
@@ -100,9 +98,7 @@ def test_native_gpu_unit_count_and_independent_species_widths(device, volume):
     before = density_inventory(p, g)
     assert nucleation_step_gpu(p, g, config, 1.0, **kwargs) == (p, g)
     number = int(4 * volume)
-    np.testing.assert_array_equal(
-        p.concentration.numpy()[0, 1 : number + 1], 1.0
-    )
+    np.testing.assert_array_equal(p.population.numpy()[0, 1 : number + 1], 1.0)
     np.testing.assert_array_equal(
         p.masses.numpy()[0, 1 : number + 1],
         np.tile([1.0, 2.0, 0.0], (number, 1)),
@@ -141,7 +137,7 @@ def test_native_gpu_scaling_preserves_gas_and_existing_density(device):
     kwargs["exhaustion_controls"] = NucleationExhaustionControls(False, True)
     nucleation_step_gpu(p, g, config, 1.0, **kwargs)
     np.testing.assert_array_equal(p.volume.numpy(), [0.5])
-    np.testing.assert_array_equal(p.concentration.numpy(), [[1.0, 1.0, 1.0]])
+    np.testing.assert_array_equal(p.population.numpy(), [[1.0, 1.0, 1.0]])
     np.testing.assert_array_equal(
         g.concentration.numpy(), [[7.0, 92.0, 96.0, 9.0]]
     )
@@ -184,9 +180,7 @@ def test_native_prepared_repeats_without_setup_and_reads_live_gas(
             patch.setattr(getattr(prepared, name), "numpy", forbidden)
         module._enqueue_prepared_nucleation_call(prepared)
     module._observe_prepared_nucleation_call(prepared)
-    np.testing.assert_array_equal(
-        p.concentration.numpy()[0, :3], [2.0, 1.0, 1.0]
-    )
+    np.testing.assert_array_equal(p.population.numpy()[0, :3], [2.0, 1.0, 1.0])
     np.testing.assert_array_equal(
         g.concentration.numpy(), [[7.0, 84.0, 96.0, 9.0]]
     )
@@ -223,7 +217,7 @@ def test_native_gpu_resampling_then_source_preserves_density(device):
         ),
     )
     wp.copy(
-        p.concentration,
+        p.population,
         wp.array([[2.0, 3.0, 5.0, 0.0]], dtype=wp.float64, device=device),
     )
     buffers = kwargs["exhaustion_buffers"]
@@ -235,9 +229,7 @@ def test_native_gpu_resampling_then_source_preserves_density(device):
     before = density_inventory(p, g)
     nucleation_step_gpu(p, g, config, 1.0, **kwargs)
     np.testing.assert_array_equal(buffers.required_release_counts.numpy(), [1])
-    np.testing.assert_array_equal(
-        p.concentration.numpy(), [[5.0, 5.0, 1.0, 1.0]]
-    )
+    np.testing.assert_array_equal(p.population.numpy(), [[5.0, 5.0, 1.0, 1.0]])
     np.testing.assert_allclose(
         density_inventory(p, g), before, rtol=1e-12, atol=1e-30
     )
@@ -277,7 +269,7 @@ def test_native_prepared_invalid_live_payload_preserves_particles_and_gas(
                 [[7.0, 100.0, 50.0, 9.0]], dtype=wp.float64, device=device
             ),
         )
-    arrays = [p.masses, p.concentration, p.charge, p.volume, g.concentration]
+    arrays = [p.masses, p.population, p.charge, p.volume, g.concentration]
     before = [array.numpy().copy() for array in arrays]
     module._enqueue_prepared_nucleation_call(prepared)
     with pytest.raises(ValueError):
@@ -423,9 +415,7 @@ def test_standalone_native_phases_preserve_independent_species_inventory(
     np.testing.assert_array_equal(
         kwargs["exhaustion_buffers"].final_counts.numpy(), [counts]
     )
-    np.testing.assert_array_equal(
-        p.concentration.numpy()[0, 1 : counts + 1], 1.0
-    )
+    np.testing.assert_array_equal(p.population.numpy()[0, 1 : counts + 1], 1.0)
     np.testing.assert_array_equal(
         p.masses.numpy()[0, 1 : counts + 1],
         np.tile([1.0, 2.0, 0.0], (counts, 1)),
@@ -444,7 +434,7 @@ def test_standalone_p5_rejects_rebound_binding_storage(device):
     preflight, storage = _stage_native_source(p, g, config, kwargs)
     wp = pytest.importorskip("warp")
     g.vapor_pressure = wp.zeros_like(g.vapor_pressure)
-    arrays = (p.masses, p.concentration, p.charge, g.concentration)
+    arrays = (p.masses, p.population, p.charge, g.concentration)
     before = [array.numpy().copy() for array in arrays]
     with pytest.raises(ValueError, match="species binding storage changed"):
         module._commit_nucleation_p5(
@@ -460,7 +450,7 @@ def test_standalone_preflight_rejects_nonfinite_count_density(device):
 
     p, g, config, kwargs = setup(device)
     p.volume.assign(np.array([1e-320]))
-    arrays = (p.masses, p.concentration, p.charge, g.concentration)
+    arrays = (p.masses, p.population, p.charge, g.concentration)
     before = [array.numpy().copy() for array in arrays]
     with pytest.raises(ValueError, match="invalid native population"):
         module._preflight_nucleation(
@@ -501,7 +491,7 @@ def test_standalone_gated_preflight_protects_full_gas_storage(
     )
     arrays = (
         p.masses,
-        p.concentration,
+        p.population,
         p.charge,
         g.concentration,
         g.vapor_pressure,

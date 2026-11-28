@@ -63,7 +63,7 @@ def calculate_total_mass(
         Total mass in kilograms for conservation checks.
     """
     particle_mass = float(
-        np.sum(particle.masses * particle.concentration[..., None])
+        np.sum(particle.masses * particle.population[..., None])
     )
     gas_mass = float(
         np.sum(gas_species.concentration * particle.volume[:, None])

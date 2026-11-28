@@ -38,10 +38,10 @@ def test_survival_ensemble_separates_slots_and_sample_count(
         )
         strategy.random_generator = np.random.default_rng(81700 + seed)
         strategy.step(particle, 298.15, 101325.0, 1.0)
-        survivors = particle.concentration[0].sum()
+        survivors = particle.population[0].sum()
         fractions.append(survivors / 1e6)
         remaining = np.sum(
-            particle.masses[0] * particle.concentration[0, :, None], axis=0
+            particle.masses[0] * particle.population[0, :, None], axis=0
         )
         removed = (1e6 - survivors) * material_mass
         npt.assert_allclose(

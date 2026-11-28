@@ -417,3 +417,40 @@ def test_llms_index_rejects_empty_and_escaping_targets(tmp_path, monkeypatch):
         (public / "llms.txt").write_text(text)
         (dist / "llms.txt").write_text(text)
         assert any(expected in e for e in site.check_llms_index(dist))
+
+
+@pytest.mark.parametrize(
+    "name", ["gpu-prepared-forcing", "gpu-prepared-cyclic-chamber"]
+)
+def test_download_launches_with_bundled_spectrum_and_style(name, tmp_path):
+    """The standalone launcher loads the reporting assets from its own ZIP."""
+    import json
+    import subprocess
+    import zipfile
+
+    config = json.loads((site.ROOT / "website/examples.json").read_text())[name]
+    archive = tmp_path / "download.zip"
+    probe = """from pathlib import Path
+import inspect
+import sys
+import particula
+from particula import plotting
+from particula.particles import get_number_per_decade
+from matplotlib import pyplot as plt
+import numpy as np
+
+assert __name__ == "__main__"
+assert "--cuda" in sys.argv
+for helper in (plotting.subplots, get_number_per_decade):
+    assert Path(inspect.getfile(helper)).is_relative_to(Path.cwd())
+np.testing.assert_allclose(get_number_per_decade([42], [1, 10]), [42])
+with plt.style.context("particula.default"):
+    fig, ax = plotting.subplots()
+    fig.canvas.draw()
+"""
+    site.write_study_zip(archive, site.ROOT, config, probe)
+    with zipfile.ZipFile(archive) as bundle:
+        bundle.extractall(tmp_path)  # noqa: S202 -- locally generated ZIP
+    subprocess.run(  # noqa: S603 -- locally generated study
+        [sys.executable, "example.py", "--cuda"], cwd=tmp_path, check=True
+    )

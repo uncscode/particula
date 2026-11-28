@@ -224,7 +224,7 @@ def _make_p2_state(
     particles = dataclasses.replace(
         support._make_particle_data(1, 1, 1),
         masses=np.array([[[mass]]], dtype=np.float64),
-        concentration=np.array([[concentration]], dtype=np.float64),
+        population=np.array([[concentration]], dtype=np.float64),
     )
     gas = dataclasses.replace(
         support._make_gas_data(1, 1),

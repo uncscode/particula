@@ -104,7 +104,7 @@ class CondensationODE:
             self._weights.append(
                 condensation_population_weights(state.particles)
             )
-            active = np.flatnonzero(state.particles.concentration[0] > 0)
+            active = np.flatnonzero(state.particles.population[0] > 0)
             for slot in active:
                 for target in targets:
                     mass_indices.append((box, slot, int(target)))
@@ -229,7 +229,7 @@ class CondensationODE:
             strict=True,
         ):
             masses[index] = value
-        active = self._base.particles.concentration > 0
+        active = self._base.particles.population > 0
         return bool(np.all(masses.sum(axis=2)[active] > 0))
 
     def _rate(self, time, values):

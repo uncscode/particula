@@ -89,7 +89,7 @@ def test_native_density_rate_and_step(kind):
         number = number / r
     particles = ParticleData(
         masses=(4 * np.pi / 3 * r**3 * 1700)[None, :, None],
-        concentration=number[None, :].copy(),
+        population=number[None, :].copy(),
         density=np.array([1700.0]),
         charge=np.zeros((1, 8)),
         volume=np.ones(1),
@@ -116,7 +116,7 @@ def test_native_density_rate_and_step(kind):
     net = s.net_rate(particles, 298, 101325)
     assert s.step(particles, 298, 101325, 0.1) is particles
     np.testing.assert_allclose(
-        particles.concentration[0], number + 0.1 * net, rtol=1e-13, atol=0
+        particles.population[0], number + 0.1 * net, rtol=1e-13, atol=0
     )
 
 
@@ -137,7 +137,7 @@ def test_native_rejection_and_composition():
     assert s.random_generator.bit_generator.state == rng
     np.testing.assert_array_equal(p.masses, initial.masses)
     p.masses[0, 1] = 0
-    p.concentration[0, 1] = 0
+    p.population[0, 1] = 0
     k = s.kernel(p, 298.0, 101325.0)
     assert k[0, 0] > 0
     np.testing.assert_array_equal(k[1, :], 0)
@@ -153,7 +153,7 @@ def test_resolved_domain_only_checks_distinct_slots(combine):
         masses=masses[None, :, None],
         density=np.array([density]),
         charge=np.array([[4.0, 0.0]]),
-        concentration=np.ones((1, 2)),
+        population=np.ones((1, 2)),
         volume=np.ones(1),
         distribution_type="particle_resolved",
     )
@@ -172,7 +172,7 @@ def test_resolved_domain_only_checks_distinct_slots(combine):
         )
     strategy.random_generator = np.random.default_rng(42)
     strategy.step(particles, 298.0, 101325.0, 0.999999 / expected)
-    assert np.count_nonzero(particles.concentration) == 1
+    assert np.count_nonzero(particles.population) == 1
     assert particles.masses.sum() == pytest.approx(masses.sum(), abs=0)
     assert particles.charge.sum() == 4
 
@@ -184,7 +184,7 @@ def test_real_pairs_between_repeated_charged_states_keep_domain_checks():
         masses=np.full((1, 2, 1), mass),
         density=np.array([2000.0]),
         charge=np.full((1, 2), 4.0),
-        concentration=np.ones((1, 2)),
+        population=np.ones((1, 2)),
         volume=np.ones(1),
         distribution_type="particle_resolved",
     )
@@ -193,7 +193,7 @@ def test_real_pairs_between_repeated_charged_states_keep_domain_checks():
     with pytest.raises(ValueError, match="capture table domain"):
         capture.step(particles, 298.0, 101325.0, 1.0)
     assert capture.random_generator.bit_generator.state == rng
-    np.testing.assert_array_equal(particles.concentration, [[1.0, 1.0]])
+    np.testing.assert_array_equal(particles.population, [[1.0, 1.0]])
 
 
 def test_resolved_identical_material_retains_cross_slot_rates():

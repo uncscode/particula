@@ -64,7 +64,7 @@ def test_p1_raw_particle_transfer_characterization(
     weights = [1e9, 2e9, 1e9] if kind == "pdf_transfer_only" else [8, 0.5, 0]
     source = ParticleData(
         masses=np.array([[[0.5e-18, 1.5e-18], [2e-18, 3e-18], [0.0, 0.0]]]),
-        concentration=np.array([weights], dtype=np.float64),
+        population=np.array([weights], dtype=np.float64),
         charge=np.array([[1.0, -1.0, 0.0]]),
         density=np.array([1000.0, 1200.0]),
         volume=np.array([volume]),
@@ -77,13 +77,9 @@ def test_p1_raw_particle_transfer_characterization(
         with pytest.raises(ValueError, match="continuous_pdf"):
             to_warp_particle_data(source, device=device, copy=True)
         return
-    if kind == "discrete" and volume != 1.0:
-        with pytest.raises(ValueError, match="PMF/PDF volume"):
-            to_warp_particle_data(source, device=device, copy=True)
-        return
     mirror = to_warp_particle_data(source, device=device, copy=True)
     restored = from_warp_particle_data(mirror)
-    for field in ("masses", "concentration", "charge", "density", "volume"):
+    for field in ("masses", "population", "charge", "density", "volume"):
         np.testing.assert_array_equal(
             getattr(mirror, field).numpy(), getattr(source, field)
         )
@@ -93,8 +89,8 @@ def test_p1_raw_particle_transfer_characterization(
         assert not np.shares_memory(
             getattr(restored, field), getattr(source, field)
         )
-    source.concentration[0, 0] = 0
-    assert mirror.concentration.numpy()[0, 0] == weights[0]
+    source.population[0, 0] = 0
+    assert mirror.population.numpy()[0, 0] == weights[0]
 
 
 @pytest.mark.parametrize("device", _available_warp_devices())
@@ -279,7 +275,7 @@ def sample_particle_data():
     n_boxes, n_particles, n_species = 2, 100, 3
     return ParticleData(
         masses=np.random.rand(n_boxes, n_particles, n_species) * 1e-18,
-        concentration=np.ones((n_boxes, n_particles)),
+        population=np.ones((n_boxes, n_particles)),
         charge=np.zeros((n_boxes, n_particles)),
         density=np.array([1000.0, 1200.0, 1500.0]),
         volume=np.array([1e-3, 1e-3]),
@@ -337,7 +333,7 @@ class TestToWarpParticleData:
 
         # Verify all fields are accessible
         assert gpu_data.masses is not None
-        assert gpu_data.concentration is not None
+        assert gpu_data.population is not None
         assert gpu_data.charge is not None
         assert gpu_data.density is not None
         assert gpu_data.volume is not None
@@ -348,8 +344,7 @@ class TestToWarpParticleData:
 
         assert gpu_data.masses.shape == sample_particle_data.masses.shape
         assert (
-            gpu_data.concentration.shape
-            == sample_particle_data.concentration.shape
+            gpu_data.population.shape == sample_particle_data.population.shape
         )
         assert gpu_data.charge.shape == sample_particle_data.charge.shape
         assert gpu_data.density.shape == sample_particle_data.density.shape
@@ -365,8 +360,8 @@ class TestToWarpParticleData:
             sample_particle_data.masses,
         )
         np.testing.assert_array_almost_equal(
-            gpu_data.concentration.numpy(),
-            sample_particle_data.concentration,
+            gpu_data.population.numpy(),
+            sample_particle_data.population,
         )
         np.testing.assert_array_almost_equal(
             gpu_data.charge.numpy(),
@@ -383,7 +378,7 @@ class TestToWarpParticleData:
 
         # Verify dtypes
         assert gpu_data.masses.dtype == wp.float64
-        assert gpu_data.concentration.dtype == wp.float64
+        assert gpu_data.population.dtype == wp.float64
         assert gpu_data.charge.dtype == wp.float64
         assert gpu_data.density.dtype == wp.float64
         assert gpu_data.volume.dtype == wp.float64
@@ -893,7 +888,7 @@ class TestMultiBoxScenarios:
 
         data = ParticleData(
             masses=np.random.rand(n_boxes, n_particles, n_species) * 1e-18,
-            concentration=np.ones((n_boxes, n_particles)),
+            population=np.ones((n_boxes, n_particles)),
             charge=np.zeros((n_boxes, n_particles)),
             density=np.array([1000.0, 1200.0]),
             volume=np.array([1e-3] * n_boxes),
@@ -904,7 +899,7 @@ class TestMultiBoxScenarios:
 
         # Verify multi-box shapes
         assert gpu_data.masses.shape == (5, 50, 2)
-        assert gpu_data.concentration.shape == (5, 50)
+        assert gpu_data.population.shape == (5, 50)
         assert gpu_data.charge.shape == (5, 50)
         assert gpu_data.density.shape == (2,)
         assert gpu_data.volume.shape == (5,)
@@ -938,7 +933,7 @@ class TestMultiBoxScenarios:
 
         data = ParticleData(
             masses=np.random.rand(n_boxes, n_particles, n_species) * 1e-18,
-            concentration=np.ones((n_boxes, n_particles)),
+            population=np.ones((n_boxes, n_particles)),
             charge=np.zeros((n_boxes, n_particles)),
             density=np.array([1000.0, 1200.0, 800.0]),
             volume=np.array([1e-6]),
@@ -949,7 +944,7 @@ class TestMultiBoxScenarios:
 
         # Verify single-box shapes
         assert gpu_data.masses.shape == (1, 200, 3)
-        assert gpu_data.concentration.shape == (1, 200)
+        assert gpu_data.population.shape == (1, 200)
         assert gpu_data.charge.shape == (1, 200)
         assert gpu_data.density.shape == (3,)
         assert gpu_data.volume.shape == (1,)
@@ -981,7 +976,7 @@ class TestMultiBoxScenarios:
 
         data = ParticleData(
             masses=np.random.rand(n_boxes, n_particles, n_species) * 1e-18,
-            concentration=np.ones((n_boxes, n_particles)),
+            population=np.ones((n_boxes, n_particles)),
             charge=np.zeros((n_boxes, n_particles)),
             density=np.array([1000.0, 1200.0]),
             volume=np.array([1e-3] * n_boxes),
@@ -993,7 +988,7 @@ class TestMultiBoxScenarios:
 
         # Verify all shapes preserved
         assert result.masses.shape == (5, 50, 2)
-        assert result.concentration.shape == (5, 50)
+        assert result.population.shape == (5, 50)
         assert result.volume.shape == (5,)
 
         # Verify values match
@@ -1032,7 +1027,7 @@ class TestMultiBoxScenarios:
 
         data = ParticleData(
             masses=np.random.rand(1, 10, 2) * 1e-18,
-            concentration=np.ones((1, 10)),
+            population=np.ones((1, 10)),
             charge=np.zeros((1, 10)),
             density=np.array([1000.0, 1200.0]),
             volume=np.array([1e-3]),
@@ -1051,7 +1046,7 @@ class TestMultiBoxScenarios:
 
         data = ParticleData(
             masses=np.array([[[1e-18]]]),  # (1, 1, 1)
-            concentration=np.array([[1.0]]),  # (1, 1)
+            population=np.array([[1.0]]),  # (1, 1)
             charge=np.array([[0.0]]),  # (1, 1)
             density=np.array([1000.0]),  # (1,)
             volume=np.array([1e-3]),  # (1,)
@@ -1335,8 +1330,8 @@ class TestFromWarpParticleData:
             sample_particle_data.masses,
         )
         np.testing.assert_array_almost_equal(
-            result.concentration,
-            sample_particle_data.concentration,
+            result.population,
+            sample_particle_data.population,
         )
         np.testing.assert_array_almost_equal(
             result.charge,
@@ -1360,10 +1355,7 @@ class TestFromWarpParticleData:
         result = from_warp_particle_data(gpu_data)
 
         assert result.masses.shape == sample_particle_data.masses.shape
-        assert (
-            result.concentration.shape
-            == sample_particle_data.concentration.shape
-        )
+        assert result.population.shape == sample_particle_data.population.shape
         assert result.charge.shape == sample_particle_data.charge.shape
         assert result.density.shape == sample_particle_data.density.shape
         assert result.volume.shape == sample_particle_data.volume.shape
@@ -1933,7 +1925,7 @@ class TestGpuContext:
         with gpu_context(sample_particle_data, device="cpu") as gpu_data:
             # Verify gpu_data has expected WarpParticleData attributes
             assert hasattr(gpu_data, "masses")
-            assert hasattr(gpu_data, "concentration")
+            assert hasattr(gpu_data, "population")
             assert hasattr(gpu_data, "charge")
             assert hasattr(gpu_data, "density")
             assert hasattr(gpu_data, "volume")

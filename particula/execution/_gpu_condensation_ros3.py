@@ -115,10 +115,6 @@ class ROS3Stages:
                 owner._gas_shape[1],
                 self.target,
                 self.source,
-                int(
-                    owner._base.particles.distribution_type
-                    == "particle_resolved"
-                ),
                 wp.float64(inverse),
                 result,
                 owner._invalid,

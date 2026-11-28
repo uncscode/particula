@@ -584,9 +584,7 @@ def test_wall_loss_selected_lanes_preserve_disabled_and_no_work_rng() -> None:
     registry = _registry(session)
     resources = registry.acquire_wall_loss()
     particles = cast(Any, session.particles)
-    particles.concentration.assign(
-        np.array([[1.0, 1.0], [0.0, 0.0], [0.0, 0.0]])
-    )
+    particles.population.assign(np.array([[1.0, 1.0], [0.0, 0.0], [0.0, 0.0]]))
     particles.masses.assign(
         np.array([[[1.0], [1.0]], [[1.0], [1.0]], [[0.0], [0.0]]])
     )

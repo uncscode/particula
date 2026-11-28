@@ -365,7 +365,7 @@ def _make_aerosol(n_species=1, n_boxes=1) -> Aerosol:
             masses=np.tile(
                 np.array([1e-18, 2e-18])[None, :, None], (n_boxes, 1, n_species)
             ),
-            concentration=np.tile([[4.0, 8.0]], (n_boxes, 1)),
+            population=np.tile([[4.0, 8.0]], (n_boxes, 1)),
             charge=np.tile([[1.0, -1.0]], (n_boxes, 1)),
             density=np.full(n_species, 1000.0),
             volume=np.full(n_boxes, 2.0),
@@ -388,9 +388,7 @@ def _make_aerosol(n_species=1, n_boxes=1) -> Aerosol:
 def _concentrations(aerosol):
     """Copy normalized particle concentration and the two gas categories."""
     return (
-        (
-            aerosol.particles.concentration[0] / aerosol.particles.volume[0]
-        ).copy(),
+        (aerosol.particles.population[0] / aerosol.particles.volume[0]).copy(),
         aerosol.gas.concentration[0, :1].copy(),
         aerosol.gas.concentration[0, 1:].copy(),
     )
@@ -398,7 +396,7 @@ def _concentrations(aerosol):
 
 def _storage(aerosol):
     """Return the authoritative concentration arrays."""
-    return (aerosol.particles.concentration, aerosol.gas.concentration)
+    return (aerosol.particles.population, aerosol.gas.concentration)
 
 
 def _assert_unchanged(aerosol, snapshots):
@@ -433,13 +431,13 @@ def test_dilute_aerosol_supports_speciated_particle_representation():
     """Dilution updates a supported speciated representation in physical units."""
     aerosol = _make_aerosol(n_species=2)
     source = (
-        aerosol.particles.concentration[0] / aerosol.particles.volume[0]
+        aerosol.particles.population[0] / aerosol.particles.volume[0]
     ).copy()
 
     dilute_aerosol(aerosol, 0.5, 2.0)
 
     npt.assert_allclose(
-        (aerosol.particles.concentration[0] / aerosol.particles.volume[0]),
+        (aerosol.particles.population[0] / aerosol.particles.volume[0]),
         source / np.e,
     )
 
@@ -481,9 +479,7 @@ def test_dilute_aerosol_zero_coefficient_or_duration_is_exact_no_op(
     """Zero coefficient or duration retains all concentration values exactly."""
     aerosol = _make_aerosol()
     sources = (
-        (
-            aerosol.particles.concentration[0] / aerosol.particles.volume[0]
-        ).copy(),
+        (aerosol.particles.population[0] / aerosol.particles.volume[0]).copy(),
         np.asarray(aerosol.gas.concentration[0, :1]).copy(),
         aerosol.gas.concentration[0, 1:].copy(),
     )
@@ -491,7 +487,7 @@ def test_dilute_aerosol_zero_coefficient_or_duration_is_exact_no_op(
     assert dilute_aerosol(aerosol, coefficient, time_step) is aerosol
 
     npt.assert_array_equal(
-        (aerosol.particles.concentration[0] / aerosol.particles.volume[0]),
+        (aerosol.particles.population[0] / aerosol.particles.volume[0]),
         sources[0],
     )
     npt.assert_array_equal(aerosol.gas.concentration[0, :1], sources[1])
@@ -515,7 +511,7 @@ def test_dilute_aerosol_no_op_does_not_call_concentration_setters(
 def test_dilute_aerosol_zero_source_is_an_exact_no_op():
     """A canonical free population and zero gas remain exactly zero."""
     aerosol = _make_aerosol()
-    aerosol.particles.concentration[:] = 0
+    aerosol.particles.population[:] = 0
     aerosol.particles.masses[:] = 0
     aerosol.particles.charge[:] = 0
     aerosol.gas.concentration[:] = 0
@@ -555,9 +551,7 @@ def test_dilute_aerosol_rejects_invalid_scalars_without_mutation(
     """Scalar validation precedes every container access or assignment."""
     aerosol = _make_aerosol()
     snapshots = (
-        (
-            aerosol.particles.concentration[0] / aerosol.particles.volume[0]
-        ).copy(),
+        (aerosol.particles.population[0] / aerosol.particles.volume[0]).copy(),
         np.asarray(aerosol.gas.concentration[0, :1]).copy(),
         np.asarray(aerosol.gas.concentration[0, 1:]).copy(),
     )
@@ -566,7 +560,7 @@ def test_dilute_aerosol_rejects_invalid_scalars_without_mutation(
         dilute_aerosol(aerosol, coefficient, time_step)
 
     npt.assert_array_equal(
-        (aerosol.particles.concentration[0] / aerosol.particles.volume[0]),
+        (aerosol.particles.population[0] / aerosol.particles.volume[0]),
         snapshots[0],
     )
     npt.assert_array_equal(
@@ -585,7 +579,7 @@ def test_dilute_aerosol_rejects_complex_coefficient_warning_cleanly(
     """Complex coefficients fail before conversion or concentration mutation."""
     aerosol = _make_aerosol()
     snapshots = (
-        aerosol.particles.concentration.copy(),
+        aerosol.particles.population.copy(),
         aerosol.gas.concentration[:, :1].copy(),
         aerosol.gas.concentration[:, 1:].copy(),
     )
@@ -593,7 +587,7 @@ def test_dilute_aerosol_rejects_complex_coefficient_warning_cleanly(
     with pytest.raises(TypeError, match="coefficient.*real-valued"):
         dilute_aerosol(aerosol, coefficient, 1.0)
 
-    npt.assert_array_equal(aerosol.particles.concentration, snapshots[0])
+    npt.assert_array_equal(aerosol.particles.population, snapshots[0])
     npt.assert_array_equal(aerosol.gas.concentration[:, :1], snapshots[1])
     npt.assert_array_equal(aerosol.gas.concentration[:, 1:], snapshots[2])
 
@@ -619,7 +613,7 @@ def test_dilute_aerosol_accepts_zero_dimensional_scalars_and_underflows():
 
     assert result is aerosol
     npt.assert_array_equal(
-        (aerosol.particles.concentration[0] / aerosol.particles.volume[0]),
+        (aerosol.particles.population[0] / aerosol.particles.volume[0]),
         np.zeros(2),
     )
     assert aerosol.gas.concentration[0, :1] == 0.0
@@ -629,12 +623,12 @@ def test_dilute_aerosol_accepts_zero_dimensional_scalars_and_underflows():
 def test_dilute_aerosol_preserves_subnormal_particle_storage():
     """Storage decay avoids erasing a representable count through volume scaling."""
     aerosol = _make_aerosol()
-    aerosol.particles.concentration[0, 0] = np.nextafter(0.0, 1.0)
+    aerosol.particles.population[0, 0] = np.nextafter(0.0, 1.0)
     aerosol.particles.volume[0] = 1e308
 
     dilute_aerosol(aerosol, 0.5, 1.0)
 
-    assert aerosol.particles.concentration[0, 0] > 0.0
+    assert aerosol.particles.population[0, 0] > 0.0
 
 
 def test_dilute_aerosol_zero_dimensional_scalars_apply_normal_decay():
@@ -645,7 +639,7 @@ def test_dilute_aerosol_zero_dimensional_scalars_apply_normal_decay():
     assert dilute_aerosol(aerosol, np.array(0.5), np.array(2.0)) is aerosol
 
     npt.assert_allclose(
-        (aerosol.particles.concentration[0] / aerosol.particles.volume[0]),
+        (aerosol.particles.population[0] / aerosol.particles.volume[0]),
         np.array([2.0, 4.0]) * decay,
     )
     npt.assert_allclose(aerosol.gas.concentration[0, :1], 3.0 * decay)
@@ -762,11 +756,11 @@ def test_dilute_aerosol_invalid_volume_preflight_is_atomic(volume):
 def test_dilute_aerosol_rejects_invalid_particle_storage_before_writes(storage):
     """Native concentration shape and dtype failures preserve all storage."""
     aerosol = _make_aerosol()
-    aerosol.particles.concentration = storage
+    aerosol.particles.population = storage
     snapshots = [x.copy() for x in _storage(aerosol)]
     with pytest.raises(
         ValueError,
-        match="concentration|particle data arrays must have float64 schema",
+        match="population|particle data arrays must have float64 schema",
     ):
         dilute_aerosol(aerosol, 0.5, 1.0)
     _assert_unchanged(aerosol, snapshots)
@@ -780,7 +774,7 @@ def test_dilute_aerosol_invalid_backing_storage_has_no_setter_writes(
 ):
     """Malformed backing arrays reject before the native writer is called."""
     aerosol = _make_aerosol()
-    aerosol.particles.concentration[0] = storage
+    aerosol.particles.population[0] = storage
     snapshots = [x.copy() for x in _storage(aerosol)]
     calls = []
     monkeypatch.setattr(

@@ -73,11 +73,11 @@ def _host_state(resident, primary) -> Aerosol:
         raise ValueError("prepared restart requires shared gas partitioning")
     return Aerosol(
         particles=ParticleData(
-            unpack("particles", "masses"),
-            unpack("particles", "concentration"),
-            unpack("particles", "charge"),
-            unpack("particles", "density"),
-            unpack("particles", "volume"),
+            masses=unpack("particles", "masses"),
+            population=unpack("particles", "population"),
+            charge=unpack("particles", "charge"),
+            density=unpack("particles", "density"),
+            volume=unpack("particles", "volume"),
             distribution_type=resident.distribution_type,
         ),
         gas=GasData(

@@ -41,14 +41,14 @@ class TestWarpParticleDataCreation:
         data.masses = wp.zeros(
             (n_boxes, n_particles, n_species), dtype=wp.float64
         )
-        data.concentration = wp.ones((n_boxes, n_particles), dtype=wp.float64)
+        data.population = wp.ones((n_boxes, n_particles), dtype=wp.float64)
         data.charge = wp.zeros((n_boxes, n_particles), dtype=wp.float64)
         data.density = wp.array([1000.0, 1200.0, 1500.0], dtype=wp.float64)
         data.volume = wp.array([1e-3, 1e-3], dtype=wp.float64)
 
         # Verify struct is accessible
         assert data.masses is not None
-        assert data.concentration is not None
+        assert data.population is not None
         assert data.charge is not None
         assert data.density is not None
         assert data.volume is not None
@@ -61,7 +61,7 @@ class TestWarpParticleDataCreation:
         data.masses = wp.zeros(
             (n_boxes, n_particles, n_species), dtype=wp.float64
         )
-        data.concentration = wp.ones((n_boxes, n_particles), dtype=wp.float64)
+        data.population = wp.ones((n_boxes, n_particles), dtype=wp.float64)
         data.charge = wp.zeros((n_boxes, n_particles), dtype=wp.float64)
         data.density = wp.array(
             [1000.0, 1100.0, 1200.0, 1300.0], dtype=wp.float64
@@ -70,7 +70,7 @@ class TestWarpParticleDataCreation:
 
         # Verify shapes
         assert data.masses.shape == (n_boxes, n_particles, n_species)
-        assert data.concentration.shape == (n_boxes, n_particles)
+        assert data.population.shape == (n_boxes, n_particles)
         assert data.charge.shape == (n_boxes, n_particles)
         assert data.density.shape == (n_species,)
         assert data.volume.shape == (n_boxes,)
@@ -83,14 +83,14 @@ class TestWarpParticleDataCreation:
         data.masses = wp.zeros(
             (n_boxes, n_particles, n_species), dtype=wp.float64
         )
-        data.concentration = wp.ones((n_boxes, n_particles), dtype=wp.float64)
+        data.population = wp.ones((n_boxes, n_particles), dtype=wp.float64)
         data.charge = wp.zeros((n_boxes, n_particles), dtype=wp.float64)
         data.density = wp.array([1000.0, 1200.0], dtype=wp.float64)
         data.volume = wp.array([1e-6], dtype=wp.float64)
 
         # Verify single-box shapes
         assert data.masses.shape == (1, 200, 2)
-        assert data.concentration.shape == (1, 200)
+        assert data.population.shape == (1, 200)
         assert data.charge.shape == (1, 200)
         assert data.density.shape == (2,)
         assert data.volume.shape == (1,)
@@ -103,14 +103,14 @@ class TestWarpParticleDataCreation:
         data.masses = wp.zeros(
             (n_boxes, n_particles, n_species), dtype=wp.float64
         )
-        data.concentration = wp.ones((n_boxes, n_particles), dtype=wp.float64)
+        data.population = wp.ones((n_boxes, n_particles), dtype=wp.float64)
         data.charge = wp.zeros((n_boxes, n_particles), dtype=wp.float64)
         data.density = wp.array([1000.0, 1200.0, 800.0], dtype=wp.float64)
         data.volume = wp.array([1e-6] * n_boxes, dtype=wp.float64)
 
         # Verify multi-box shapes
         assert data.masses.shape == (5, 100, 3)
-        assert data.concentration.shape == (5, 100)
+        assert data.population.shape == (5, 100)
         assert data.charge.shape == (5, 100)
         assert data.density.shape == (3,)
         assert data.volume.shape == (5,)
@@ -123,14 +123,14 @@ class TestWarpParticleDataCreation:
         data.masses = wp.zeros(
             (n_boxes, n_particles, n_species), dtype=wp.float64
         )
-        data.concentration = wp.ones((n_boxes, n_particles), dtype=wp.float64)
+        data.population = wp.ones((n_boxes, n_particles), dtype=wp.float64)
         data.charge = wp.zeros((n_boxes, n_particles), dtype=wp.float64)
         data.density = wp.array([1000.0, 1200.0], dtype=wp.float64)
         data.volume = wp.array([1e-6, 2e-6], dtype=wp.float64)
 
         # Verify dtypes
         assert data.masses.dtype == wp.float64
-        assert data.concentration.dtype == wp.float64
+        assert data.population.dtype == wp.float64
         assert data.charge.dtype == wp.float64
         assert data.density.dtype == wp.float64
         assert data.volume.dtype == wp.float64
@@ -149,14 +149,14 @@ class TestWarpParticleDataCreation:
         # Create Warp struct with NumPy data
         data = WarpParticleData()
         data.masses = wp.array(np_masses, dtype=wp.float64)
-        data.concentration = wp.array(np_concentration, dtype=wp.float64)
+        data.population = wp.array(np_concentration, dtype=wp.float64)
         data.charge = wp.array(np_charge, dtype=wp.float64)
         data.density = wp.array(np_density, dtype=wp.float64)
         data.volume = wp.array(np_volume, dtype=wp.float64)
 
         # Verify shapes match
         assert data.masses.shape == (n_boxes, n_particles, n_species)
-        assert data.concentration.shape == (n_boxes, n_particles)
+        assert data.population.shape == (n_boxes, n_particles)
         assert data.charge.shape == (n_boxes, n_particles)
         assert data.density.shape == (n_species,)
         assert data.volume.shape == (n_boxes,)
@@ -426,13 +426,13 @@ class TestWarpDataFieldAccess:
         )
 
         data = WarpParticleData()
-        data.concentration = wp.array(np_concentration, dtype=wp.float64)
+        data.population = wp.array(np_concentration, dtype=wp.float64)
 
         # Verify shape
-        assert data.concentration.shape == (3, 4)
+        assert data.population.shape == (3, 4)
 
         # Convert back and verify
-        conc_np = data.concentration.numpy()
+        conc_np = data.population.numpy()
         np.testing.assert_array_equal(conc_np, np_concentration)
 
     def test_particle_data_1d_array_access(self) -> None:

@@ -316,7 +316,7 @@ def setup_prepared_thermodynamic_binding(
     environment = cast(Any, session.environment)
     primaries = (
         cast(Any, session.particles).masses,
-        cast(Any, session.particles).concentration,
+        cast(Any, session.particles).population,
         cast(Any, session.particles).density,
         cast(Any, session.particles).volume,
         cast(Any, session.particles).charge,

@@ -142,7 +142,7 @@ class TestWallLossStrategies(unittest.TestCase):
     def test_zero_concentration_edge_case(self):
         """Zero concentration should remain zero after step."""
         zero_particle = _particle()
-        zero_particle.concentration[...] = 0.0
+        zero_particle.population[...] = 0.0
 
         rate = self.strategy_discrete.rate(
             particle=zero_particle,
@@ -360,7 +360,7 @@ class TestRectangularWallLossStrategy(unittest.TestCase):
     def test_zero_concentration_edge_case(self):
         """Zero concentration should remain zero after step."""
         zero_particle = _particle()
-        zero_particle.concentration[...] = 0.0
+        zero_particle.population[...] = 0.0
 
         rate = self.strategy_discrete.rate(
             particle=zero_particle,

@@ -52,9 +52,7 @@ def test_nucleation_prepared_enqueue_is_setup_free_and_pinned(
 ) -> None:
     """Prepared nucleation uses pinned arrays without host setup work."""
     warm_particles, warm_gas = _state(particles=2)
-    warm_particles.concentration = wp.zeros(
-        (1, 2), dtype=wp.float64, device="cpu"
-    )
+    warm_particles.population = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     warm_scratch, warm_finalized, warm_diagnostics = _sidecars(1, 2, 1)
     warm_buffers = _exhaustion_buffers(1, 2, 1)
     warm_prepared = nucleation_module._prepare_nucleation_step_gpu(
@@ -73,7 +71,7 @@ def test_nucleation_prepared_enqueue_is_setup_free_and_pinned(
     nucleation_module._enqueue_prepared_nucleation_call(warm_prepared)
 
     particles, gas = _state(particles=2)
-    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    particles.population = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     buffers = _exhaustion_buffers(1, 2, 1)
     prepared = nucleation_module._prepare_nucleation_step_gpu(
@@ -139,7 +137,7 @@ def test_nucleation_prepared_enqueue_is_setup_free_and_pinned(
 def test_nucleation_prepared_enqueue_gates_live_invalid_payload() -> None:
     """A post-prepare invalid gas value prevents every dependent writer."""
     particles, gas = _state(particles=2)
-    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    particles.population = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     buffers = _exhaustion_buffers(1, 2, 1)
     prepared = nucleation_module._prepare_nucleation_step_gpu(
@@ -201,7 +199,7 @@ def test_public_zero_rate_preserves_late_validation_short_circuit(
 ) -> None:
     """Zero rate retains the established no-admission temperature precedence."""
     particles, gas = _state(particles=2)
-    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    particles.population = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     buffers = _exhaustion_buffers(1, 2, 1)
     before = _snapshot_arrays(particles, gas)
@@ -264,9 +262,7 @@ def _state(
         masses=wp.zeros(
             (boxes, particles, species), dtype=wp.float64, device=device
         ),
-        concentration=wp.ones(
-            (boxes, particles), dtype=wp.float64, device=device
-        ),
+        population=wp.ones((boxes, particles), dtype=wp.float64, device=device),
         charge=wp.zeros((boxes, particles), dtype=wp.float64, device=device),
         density=wp.ones(species, dtype=wp.float64, device=device)
         * wp.float64(1000.0),
@@ -384,7 +380,7 @@ def _stage_slots(counts, particle_slots, device="cpu"):
     """
     boxes, particles = particle_slots.shape
     particle_data, gas_data = _state(boxes, particles, 1, device)
-    particle_data.concentration = wp.array(
+    particle_data.population = wp.array(
         np.where(particle_slots, 1.0, 0.0), dtype=wp.float64, device=device
     )
     particle_data.masses = wp.array(
@@ -480,7 +476,7 @@ def test_public_nucleation_step_commits_selected_slots_and_gas() -> None:
     matching gas inventory.
     """
     particles, gas = _state(particles=2)
-    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    particles.population = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     buffers = _exhaustion_buffers(1, 2, 1)
     config = _config(coefficient=0.1 / AVOGADRO_NUMBER)
@@ -511,7 +507,7 @@ def test_public_nucleation_step_commits_selected_slots_and_gas() -> None:
         particles.masses.numpy(), [[[event_mass], [0.0]]], rtol=1e-12, atol=0.0
     )
     np.testing.assert_allclose(
-        particles.concentration.numpy(), [[1.0, 0.0]], rtol=0.0, atol=0.0
+        particles.population.numpy(), [[1.0, 0.0]], rtol=0.0, atol=0.0
     )
     np.testing.assert_allclose(
         gas.concentration.numpy(),
@@ -524,7 +520,7 @@ def test_public_nucleation_step_commits_selected_slots_and_gas() -> None:
 def test_public_nucleation_step_zero_time_is_particle_gas_write_free() -> None:
     """A valid all-box zero-time gate preserves particle and gas fields."""
     particles, gas = _state(particles=2)
-    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    particles.population = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     buffers = _exhaustion_buffers(1, 2, 1)
     before = _snapshot_arrays(particles, gas)
@@ -771,7 +767,7 @@ def test_public_nucleation_step_commits_multi_box_multispecies_state(
     inputs.
     """
     particles, gas = _state(boxes=2, particles=2, species=2)
-    particles.concentration = wp.zeros((2, 2), dtype=wp.float64, device="cpu")
+    particles.population = wp.zeros((2, 2), dtype=wp.float64, device="cpu")
     gas.molar_mass = wp.array([0.1, 0.2], dtype=wp.float64, device="cpu")
     scratch, finalized, diagnostics = _sidecars(2, 2, 2)
     buffers = _exhaustion_buffers(2, 2, 2)
@@ -822,7 +818,7 @@ def test_public_nucleation_step_commits_multi_box_multispecies_state(
         atol=0.0,
     )
     np.testing.assert_allclose(
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         [[1.0, 0.0], [1.0, 1.0]],
         rtol=0.0,
         atol=0.0,
@@ -842,7 +838,7 @@ def test_public_nucleation_step_rejects_corrupt_p5_handoff_without_commit(
     commit.
     """
     particles, gas = _state(particles=2)
-    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    particles.population = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     buffers = _exhaustion_buffers(1, 2, 1)
     before = _snapshot_arrays(particles, gas)
@@ -953,7 +949,7 @@ def test_public_nucleation_step_rejects_invalid_p5_handoffs_without_commit(
 ) -> None:
     """Every malformed commit handoff preserves particle and gas state."""
     particles, gas = _state(particles=2)
-    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    particles.population = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     buffers = _exhaustion_buffers(1, 2, 1)
     handoff_snapshot = []
@@ -990,7 +986,7 @@ def test_prepared_nucleation_p4_rebinding_cannot_redirect_dispatch() -> None:
     originally pinned arrays.
     """
     particles, gas = _state(particles=2)
-    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    particles.population = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     buffers = _exhaustion_buffers(1, 2, 1)
     replacement = wp.ones(1, dtype=wp.float64, device="cpu")
@@ -1544,7 +1540,7 @@ def test_stage_nucleation_slots_excludes_scratch_from_identity_validation():
     scratch.
     """
     particles, gas = _state()
-    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    particles.population = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     finalized = NucleationFinalizedDemandBuffers(
         finalized.accepted_counts,
@@ -1692,9 +1688,7 @@ def test_stage_nucleation_slots_rejects_invalid_event_conversion_without_writes(
     staging output.
     """
     particle_data, gas_data = _state(1, 2, 1)
-    particle_data.concentration = wp.zeros(
-        (1, 2), dtype=wp.float64, device="cpu"
-    )
+    particle_data.population = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     finalized = NucleationFinalizedDemandBuffers(
         finalized.accepted_counts,
@@ -1796,7 +1790,7 @@ def test_p2_to_p3_zero_demand_seam_preserves_p2_outputs():
     demand planning-owned sidecars or state.
     """
     particles, gas = _state()
-    particles.concentration = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
+    particles.population = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     scratch, finalized, diagnostics = _sidecars(1, 2, 1)
     source_before = _snapshot_arrays(particles, gas)
 
@@ -2287,7 +2281,7 @@ def test_preflight_rejects_conflicting_or_unconfigured_environment_inputs():
 def test_preflight_rejects_sidecar_overlap_without_mutating_state():
     """Sidecars cannot alias mutable particle fields during a read-only call."""
     particles, gas = _state()
-    before = particles.concentration.numpy().copy()
+    before = particles.population.numpy().copy()
     scratch = NucleationScratchBuffers(
         particles.volume,
         wp.zeros(1, dtype=wp.float64, device="cpu"),
@@ -2303,7 +2297,7 @@ def test_preflight_rejects_sidecar_overlap_without_mutating_state():
             scratch=scratch,
             _native_binding=_binding(particles, gas),
         )
-    np.testing.assert_array_equal(particles.concentration.numpy(), before)
+    np.testing.assert_array_equal(particles.population.numpy(), before)
 
 
 def test_real_rejects_oversized_scalars_as_value_errors():

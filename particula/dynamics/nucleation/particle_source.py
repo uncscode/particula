@@ -627,7 +627,7 @@ def _validate_commit_particle_schema(  # noqa: C901
         raise TypeError("particles must be a ParticleData")
     fields = (
         ("masses", particles.masses, 3),
-        ("concentration", particles.concentration, 2),
+        ("concentration", particles.population, 2),
         ("charge", particles.charge, 2),
         ("density", particles.density, 1),
         ("volume", particles.volume, 1),
@@ -649,7 +649,7 @@ def _validate_commit_particle_schema(  # noqa: C901
             "particle capacity and species capacity must be positive"
         )
     if (
-        particles.concentration.shape != (boxes, capacity)
+        particles.population.shape != (boxes, capacity)
         or particles.charge.shape != (boxes, capacity)
         or particles.density.shape != (species,)
         or particles.volume.shape != (boxes,)
@@ -665,8 +665,8 @@ def _validate_commit_particle_schema(  # noqa: C901
     if (
         not np.all(np.isfinite(particles.masses))
         or np.any(particles.masses < 0.0)
-        or not np.all(np.isfinite(particles.concentration))
-        or np.any(particles.concentration < 0.0)
+        or not np.all(np.isfinite(particles.population))
+        or np.any(particles.population < 0.0)
         or not np.all(np.isfinite(particles.charge))
         or not np.all(np.isfinite(particles.density))
         or np.any(particles.density <= 0.0)
@@ -735,7 +735,7 @@ def _validate_commit_inputs(  # noqa: C901
             np.shares_memory(writer, metadata)
             for writer in (
                 particles.masses,
-                particles.concentration,
+                particles.population,
                 particles.charge,
                 particles.volume,
             )
@@ -757,7 +757,7 @@ def _validate_commit_inputs(  # noqa: C901
         np.shares_memory(gas.concentration, field)
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -914,7 +914,7 @@ def _weighted_particle_mass(particles: ParticleData) -> NDArray[np.float64]:
     """
     return np.einsum(
         "bn,bns->bs",
-        particles.concentration,
+        particles.population,
         particles.masses,
         dtype=np.float64,
         optimize=True,
@@ -975,7 +975,7 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
         extension_fields.validate_layout(
             field_dimensions(particles, gas),
             particles.distribution_type,
-            particles.concentration > 0,
+            particles.population > 0,
         )
         if config.exhaustion_controls.representative_volume_scaling:
             raise ValueError(
@@ -1107,7 +1107,7 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
             )
             request_charge[box_index, :prefix] = config.source_charge
     counts_before_birth = (
-        staged_particles.concentration.copy()
+        staged_particles.population.copy()
         if staged_fields is not None
         else None
     )
@@ -1120,12 +1120,12 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
     )
     if staged_fields is not None and counts_before_birth is not None:
         staged_fields._activate_particles(
-            counts_before_birth, staged_particles.concentration
+            counts_before_birth, staged_particles.population
         )
         staged_fields.validate_layout(
             field_dimensions(staged_particles, gas),
             staged_particles.distribution_type,
-            staged_particles.concentration > 0,
+            staged_particles.population > 0,
         )
     density_events = represented_events
     if native:
@@ -1186,14 +1186,14 @@ def commit_particle_source(  # noqa: C901, PLR0914, PLR0915
     )
     targets = (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.volume,
         gas.concentration,
     )
     candidates = (
         staged_particles.masses,
-        staged_particles.concentration,
+        staged_particles.population,
         staged_particles.charge,
         staged_particles.volume,
         staged_gas,

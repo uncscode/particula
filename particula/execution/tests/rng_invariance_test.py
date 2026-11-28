@@ -69,7 +69,7 @@ def _make_session(
             concentration[lane] = 1.0
     particles = ParticleData(
         masses=masses,
-        concentration=concentration,
+        population=concentration,
         charge=charge,
         density=np.array([1000.0], dtype=np.float64),
         volume=np.ones(boxes, dtype=np.float64),
@@ -149,7 +149,7 @@ def _particle_snapshot(session: Any, lane: int) -> tuple[np.ndarray, ...]:
     _synchronize_owning_device(session.particles.masses)
     return (
         session.particles.masses.numpy()[lane].copy(),
-        session.particles.concentration.numpy()[lane].copy(),
+        session.particles.population.numpy()[lane].copy(),
         session.particles.charge.numpy()[lane].copy(),
     )
 
@@ -159,7 +159,7 @@ def _all_particle_snapshot(session: Any) -> tuple[np.ndarray, ...]:
     _synchronize_owning_device(session.particles.masses)
     return (
         session.particles.masses.numpy().copy(),
-        session.particles.concentration.numpy().copy(),
+        session.particles.population.numpy().copy(),
         session.particles.charge.numpy().copy(),
     )
 

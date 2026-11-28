@@ -1751,7 +1751,7 @@ def _validate_particle_arrays(
         raise ValueError("particle masses shape does not match expected")
     if particles.density.shape[0] != n_species:
         raise ValueError("particle density length does not match n_species")
-    if particles.concentration.shape != (n_boxes, n_particles):
+    if particles.population.shape != (n_boxes, n_particles):
         raise ValueError(
             "particle concentration shape does not match (n_boxes, n_particles)"
         )
@@ -1793,7 +1793,7 @@ def _validate_device_arrays(particles: Any, device: Any) -> None:
     """
     _validate_device_match("particle masses", particles.masses, device)
     _validate_device_match(
-        "particle concentration", particles.concentration, device
+        "particle concentration", particles.population, device
     )
     _validate_device_match("particle charge", particles.charge, device)
     _validate_device_match("particle density", particles.density, device)
@@ -1866,7 +1866,7 @@ def _validate_charged_particle_physics(
         dim=(n_boxes, n_particles),
         inputs=[
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.density,
             invalid,
             active_counts,
@@ -1899,7 +1899,7 @@ def _validate_sedimentation_particle_physics(
         dim=(n_boxes,),
         inputs=[
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.density,
             particles.charge,
             invalid,
@@ -1955,7 +1955,7 @@ def _validate_turbulent_particle_physics(
         dim=(n_boxes,),
         inputs=[
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.density,
             particles.charge,
             invalid,
@@ -2662,7 +2662,7 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
     prepared = _PreparedCoagulationCall(
         particles,
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         collision_pairs,
         n_collisions,
@@ -2671,7 +2671,7 @@ def _prepare_coagulation_step_gpu(  # noqa: C901
         device,
         (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.density,
             volume_array,
             temperature_array,
@@ -2928,7 +2928,7 @@ def coagulation_preflight_gpu(
     ]
     particle_pointers = {
         getattr(particles, name).ptr
-        for name in ("masses", "concentration", "density", "volume", "charge")
+        for name in ("masses", "population", "density", "volume", "charge")
     }
     if work.capture.x:
         arrays.append(work.capture.x)
@@ -3017,7 +3017,7 @@ def adaptive_coagulation_step_gpu(
     )
     particle_bytes = sum(
         getattr(particles, name).capacity
-        for name in ("masses", "charge", "concentration")
+        for name in ("masses", "charge", "population")
     )
     outputs = sum(
         getattr(kwargs.get(key), "capacity", 0)

@@ -48,10 +48,10 @@ def test_build_cpu_state_has_documented_sparse_float64_schema(
 
     assert particles.masses.shape == (1, 4, 2)
     assert particles.masses.dtype == np.float64
-    assert particles.concentration.shape == (1, 4)
+    assert particles.population.shape == (1, 4)
     assert particles.charge.shape == (1, 4)
     assert particles.distribution_type == "particle_resolved"
-    assert np.array_equal(particles.concentration, [[2.0, 0.0, 2.0, 0.0]])
+    assert np.array_equal(particles.population, [[2.0, 0.0, 2.0, 0.0]])
     assert np.array_equal(particles.masses[0, [1, 3]], [[0.0, 0.0], [0.0, 0.0]])
     assert gas.concentration.shape == (1, 2)
     assert gas.partitioning.dtype == np.bool_
@@ -809,7 +809,7 @@ def test_real_warp_cpu_path_restores_named_cpu_containers(
         # Test-only observation; the published sequence has no intermediate
         # host restore or instrumentation.
         masses = particles.masses.numpy().copy()
-        counts = particles.concentration.numpy().copy()
+        counts = particles.population.numpy().copy()
         volume = particles.volume.numpy().copy()
         gas_density = gas.concentration.numpy().copy()
         return {

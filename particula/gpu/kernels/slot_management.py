@@ -299,8 +299,8 @@ def _validate_particles(particles: Any) -> tuple[Any, Any, Any, int, int, Any]:
             "particles.masses has invalid Warp array metadata."
         ) from exc
     concentration = _validate_array_schema(
-        _get_required_field(particles, "concentration"),
-        "particles.concentration",
+        _get_required_field(particles, "population"),
+        "particles.population",
         wp.float64,
         2,
         (n_boxes, n_particles),

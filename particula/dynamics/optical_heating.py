@@ -191,7 +191,7 @@ class OpticalHeating(BoxProcess):
             reads=(
                 "particles.masses",
                 "particles.density",
-                "particles.concentration",
+                "particles.population",
                 "particles.volume",
                 "gas.concentration",
                 "gas.molar_mass",
@@ -269,7 +269,7 @@ class OpticalHeating(BoxProcess):
         if np.any((ambient < _MIN_K) | (ambient > _MAX_K)):
             raise ValueError("Gas temperature outside the liquid domain")
         temperature = aerosol.fields[self.temperature_field]
-        active = aerosol.particles.concentration > 0
+        active = aerosol.particles.population > 0
         outside = (temperature != 0) & (
             (temperature < _MIN_K) | (temperature > _MAX_K)
         )
@@ -277,7 +277,7 @@ class OpticalHeating(BoxProcess):
             raise ValueError("Particle temperature outside the liquid domain")
         i = self.water_material
         if np.any(
-            (aerosol.particles.concentration > 0)
+            (aerosol.particles.population > 0)
             & (aerosol.particles.masses[..., 1 - i] <= 0)
         ):
             raise ValueError(
@@ -287,7 +287,7 @@ class OpticalHeating(BoxProcess):
     def advance(self, aerosol, *, time, time_step, context):
         """Advance one box and add represented water and energy inventories."""
         particles = aerosol.particles
-        active = particles.concentration[0] > 0
+        active = particles.population[0] > 0
         if not np.any(active):
             return
         _, cross = particle_optics(particles, self.optics)

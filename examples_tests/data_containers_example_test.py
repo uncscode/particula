@@ -67,22 +67,22 @@ def test_build_particle_data_returns_documented_shapes(
     particle_data = example_module._build_particle_data()
 
     assert particle_data.masses.shape == (1, 2, 2)
-    assert particle_data.concentration.shape == (1, 2)
+    assert particle_data.population.shape == (1, 2)
     assert particle_data.charge.shape == (1, 2)
     assert particle_data.density.shape == (2,)
     assert particle_data.volume.shape == (1,)
     np.testing.assert_allclose(particle_data.volume, np.array([1.0e-6]))
     assert particle_data.distribution_type == "particle_resolved"
     particle_data.validate_representation()
-    np.testing.assert_array_equal(particle_data.concentration, [[1.0, 0.25]])
+    np.testing.assert_array_equal(particle_data.population, [[1.0, 0.25]])
     np.testing.assert_allclose(
-        particle_data.concentration / particle_data.volume[:, None],
+        particle_data.population / particle_data.volume[:, None],
         [[1e6, 2.5e5]],
         rtol=1e-14,
     )
     np.testing.assert_allclose(
         np.sum(
-            particle_data.masses * particle_data.concentration[:, :, None],
+            particle_data.masses * particle_data.population[:, :, None],
             axis=1,
         )
         / particle_data.volume[:, None],

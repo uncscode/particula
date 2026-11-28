@@ -619,8 +619,8 @@ def volume_evolution_step_gpu(
     n_boxes, n_particles, n_species = masses.shape
     device = masses.device
     particle_concentration, particle_range = _validate_array(
-        _get_field(particles, "concentration", "particles.concentration"),
-        "particles.concentration",
+        _get_field(particles, "population", "particles.population"),
+        "particles.population",
         wp.float64,
         2,
         (n_boxes, n_particles),
@@ -1299,8 +1299,8 @@ def gas_communication_step_gpu(
     boxes, slots, particle_species = masses.shape
     device = masses.device
     particle_concentration, particle_range = _validate_array(
-        _get_field(particles, "concentration", "particles.concentration"),
-        "particles.concentration",
+        _get_field(particles, "population", "particles.population"),
+        "particles.population",
         wp.float64,
         2,
         (boxes, slots),
@@ -1633,8 +1633,8 @@ def particle_communication_step_gpu(
     boxes, slots, species = masses.shape
     device = masses.device
     concentration, concentration_range = _validate_array(
-        _get_field(particles, "concentration", "particles.concentration"),
-        "particles.concentration",
+        _get_field(particles, "population", "particles.population"),
+        "particles.population",
         wp.float64,
         2,
         (boxes, slots),
@@ -2306,7 +2306,7 @@ def resident_particle_communication_step_gpu(
     map_data = configuration.communication_map
     _enqueue_prepared_resident_particle_communication(
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         particles.volume,
@@ -2353,7 +2353,7 @@ def resident_volume_evolution_step_gpu(
     _resolved_communication(particles)
     _enqueue_prepared_resident_volume_evolution(
         particles.volume,
-        particles.concentration,
+        particles.population,
         gas.concentration,
         particles.volume.shape[0],
         final_volumes,

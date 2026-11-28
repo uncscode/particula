@@ -40,9 +40,7 @@ def test_coupled_coagulation_splits_interval_and_resumes(device):
         if resident:
             owner.capture_events()
         owner.step()
-        before = np.count_nonzero(
-            owner.snapshot().particles.concentration, axis=1
-        )
+        before = np.count_nonzero(owner.snapshot().particles.population, axis=1)
         checkpoint = owner.checkpoint()
         owner.step()
         work = owner.coagulation_diagnostics()
@@ -53,7 +51,7 @@ def test_coupled_coagulation_splits_interval_and_resumes(device):
         assert owner.completed_steps == 2 and owner.time == pytest.approx(0.2)
         final = owner.snapshot()
         np.testing.assert_array_equal(
-            before - np.count_nonzero(final.particles.concentration, axis=1),
+            before - np.count_nonzero(final.particles.population, axis=1),
             work["accepted_collisions"].sum(axis=0),
         )
     with resume_coupled(checkpoint, events, strategy, device=device) as resumed:

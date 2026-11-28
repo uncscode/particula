@@ -10,7 +10,7 @@ def test_equal_material_volumes_have_volume_weighted_density():
     # Each material occupies 1e-21 m3; the total mass is 3e-18 kg.
     data = ParticleData(
         masses=np.array([[[1e-18, 2e-18], [0.0, 0.0]]]),
-        concentration=np.array([[1.0, 0.0]]),
+        population=np.array([[1.0, 0.0]]),
         charge=np.zeros((1, 2)),
         density=np.array([1000.0, 2000.0]),
         volume=np.array([1e-6]),

@@ -16,7 +16,17 @@ def write_study_zip(archive, root, config, source):
         "studies require an available NVIDIA GPU and Warp.\n"
     )
     entries = {"example.py": source, "README.txt": readme}
-    for name in config["inputs"]:
+    inputs = list(config["inputs"])
+    if launcher := config.get("download_launcher"):
+        revision = config["historical_run"]["revision"]
+        entries["README.txt"] += f"Scientific package revision: {revision}\n"
+        entries["study.py"] = source
+        entries["example.py"] = (root / launcher).read_bytes()
+        inputs.extend(config["science_inputs"])
+        inputs.extend(
+            ("particula/plotting/__init__.py", "particula/default.mplstyle")
+        )
+    for name in inputs:
         destination = Path(config.get("input_destinations", {}).get(name, name))
         if destination.is_absolute() or ".." in destination.parts:
             raise ValueError(

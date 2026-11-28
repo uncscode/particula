@@ -40,7 +40,7 @@ def get_slot_diagnostics(
             message is ``"Invalid particle slot state."``.
     """
     masses = data.masses
-    concentration = data.concentration
+    concentration = data.population
     charge = data.charge
 
     expected_shape = masses.shape[:2] if masses.ndim == 3 else None
@@ -104,7 +104,7 @@ def _validate_destinations(
             or the destination shapes are incompatible.
     """
     masses = getattr(data, "masses", None)
-    concentration = getattr(data, "concentration", None)
+    concentration = getattr(data, "population", None)
     charge = getattr(data, "charge", None)
     fields = (masses, concentration, charge)
     if any(

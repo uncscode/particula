@@ -17,7 +17,7 @@ def _containers(
             [[[0.5, 1.5], [2, 3]], [[1, 2], [4, 1]]], dtype=np.float64
         )
         * 1e-18,
-        concentration=np.array([[8, 0.5], [3, 2]], dtype=np.float64),
+        population=np.array([[8, 0.5], [3, 2]], dtype=np.float64),
         charge=np.zeros((2, 2), dtype=np.float64),
         density=np.array([1000, 1500], dtype=np.float64),
         volume=np.array([0.25, 4], dtype=np.float64),
@@ -112,7 +112,7 @@ def test_current_reads_and_detached_container_copies(
         (
             particles,
             particle_copy,
-            ("masses", "concentration", "charge", "density", "volume"),
+            ("masses", "population", "charge", "density", "volume"),
         ),
         (gas, gas_copy, ("concentration", "molar_mass", "partitioning")),
         (
@@ -128,7 +128,7 @@ def test_current_reads_and_detached_container_copies(
     assert gas_copy.name is not gas.name
     assert particle_copy.distribution_type == "particle_resolved"
 
-    particles.concentration[0, 0] = 4
+    particles.population[0, 0] = 4
     gas.concentration[0, 2] = 9e-18
     environment.saturation_ratio[0, 2] = 0.9
     validate_aerosol_structure(particles, gas, environment)

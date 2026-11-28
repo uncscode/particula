@@ -78,7 +78,7 @@ def kernel_edges(
     validate_bin_controls(edges, total_bins, bins_per_decade)
     if edges is not None:
         return validate_edges(edges).copy()
-    radii = particle.radii[0][particle.concentration[0] > 0]
+    radii = particle.radii[0][particle.population[0] > 0]
     if not radii.size:
         raise ValueError("kernel binning requires an active particle")
     lower, upper = float(np.min(radii)) * 0.5, float(np.max(radii)) * 2
@@ -104,12 +104,12 @@ def binned_kernel_data(
     """
     validate_particle(particle, "particle_resolved")
     edges = validate_edges(edges)
-    active = particle.concentration[0] > 0
+    active = particle.population[0] > 0
     radii = particle.radii[0][active]
     indices = np.digitize(radii, edges)
     if np.any(indices >= edges.size):
         raise ValueError("kernel radius edges must cover every active particle")
-    weights = particle.concentration[0][active]
+    weights = particle.population[0][active]
     mass = particle.masses[0][active]
     charge = particle.charge[0][active]
     groups = np.unique(indices)
@@ -132,7 +132,7 @@ def binned_kernel_data(
             new_charge[0, lane] = np.median(charge[selected])
     result = ParticleData(
         masses=new_mass,
-        concentration=new_count,
+        population=new_count,
         charge=new_charge,
         density=particle.density.copy(),
         volume=particle.volume.copy(),
@@ -146,7 +146,7 @@ def _validate_storage(particle: ParticleData, resolved: bool) -> None:
     """Reject unwritable or overlapping destinations before draws."""
     fields = [
         particle.masses,
-        particle.concentration,
+        particle.population,
         particle.charge,
         particle.density,
         particle.volume,
@@ -236,7 +236,7 @@ def _merge(
         )
     masses, counts, charge = (
         particle.masses.copy(),
-        particle.concentration.copy(),
+        particle.population.copy(),
         particle.charge.copy(),
     )
     with np.errstate(over="ignore", invalid="ignore"):
@@ -247,7 +247,7 @@ def _merge(
     charge[0, donor] = 0
     candidate = ParticleData(
         masses=masses,
-        concentration=counts,
+        population=counts,
         charge=charge,
         density=particle.density,
         volume=particle.volume,
@@ -257,7 +257,7 @@ def _merge(
     if extension_fields is not None:
         extension_fields.merge_particles(donor, recipient)
     np.copyto(particle.masses, masses)
-    np.copyto(particle.concentration, counts)
+    np.copyto(particle.population, counts)
     np.copyto(particle.charge, charge)
 
 
@@ -325,8 +325,8 @@ def step_native(  # noqa: C901
         raise ValueError("use_direct_kernel must be Boolean")
     if not isinstance(strategy.random_generator, np.random.Generator):
         raise ValueError("random_generator must be a NumPy Generator")
-    active = np.flatnonzero(particle.concentration[0] > 0)
-    weights = particle.concentration[0, active]
+    active = np.flatnonzero(particle.population[0] > 0)
+    weights = particle.population[0, active]
     if weights.size and np.any(weights != weights[0]):
         raise ValueError(
             "resolved coagulation requires equal positive active weights"
@@ -337,7 +337,7 @@ def step_native(  # noqa: C901
     positive_scalar(scaled_time, "weighted time_step", zero_allowed=True)
     material = ParticleData(
         masses=particle.masses[:, active].copy(),
-        concentration=particle.concentration[:, active].copy(),
+        population=particle.population[:, active].copy(),
         charge=particle.charge[:, active].copy(),
         density=particle.density.copy(),
         volume=particle.volume.copy(),

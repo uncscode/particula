@@ -122,9 +122,9 @@ def test_direct_example_runs_with_explicit_transfer_and_conservation(
     assert gas.concentration.shape == (1, 1)
     assert environment.temperature.shape == (1,)
     assert particles.distribution_type == "particle_resolved"
-    assert np.count_nonzero(particles.concentration) == int(volume)
+    assert np.count_nonzero(particles.population) == int(volume)
     npt.assert_array_equal(particles.volume, [volume])
-    inventory = np.sum(particles.masses * particles.concentration[:, :, None])
+    inventory = np.sum(particles.masses * particles.population[:, :, None])
     npt.assert_allclose(
         inventory + gas.concentration.sum() * volume,
         volume,

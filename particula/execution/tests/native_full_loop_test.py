@@ -111,11 +111,11 @@ def build_loop(device, source=False, restored=None):
         counts = np.zeros((1, 8))
         counts[0, :2] = 1
         cpu_p = ParticleData(
-            masses,
-            counts,
-            np.zeros_like(counts),
-            np.array([1000.0, 1200.0]),
-            np.array([0.25]),
+            masses=masses,
+            population=counts,
+            charge=np.zeros_like(counts),
+            density=np.array([1000.0, 1200.0]),
+            volume=np.array([0.25]),
             distribution_type="particle_resolved",
         )
         cpu_g = GasData(
@@ -384,7 +384,7 @@ def inventory(loop):
     """Independent extensive inventory in full gas order."""
     p, g = loop.session.particles, loop.session.gas
     result = g.concentration.numpy().copy() * p.volume.numpy()[:, None]
-    mass = np.sum(p.masses.numpy() * p.concentration.numpy()[..., None], axis=1)
+    mass = np.sum(p.masses.numpy() * p.population.numpy()[..., None], axis=1)
     result[:, 2] += mass[:, 0]
     result[:, 1] += mass[:, 1]
     return result
@@ -438,8 +438,7 @@ def test_native_complete_prepared_loop_and_restart(device, source, monkeypatch):
             advance(loop, monkeypatch)
         if source:
             assert (
-                np.count_nonzero(loop.session.particles.concentration.numpy())
-                == 4
+                np.count_nonzero(loop.session.particles.population.numpy()) == 4
             )
         else:
             assert np.any(loop.session.particles.masses.numpy() > initial_mass)
@@ -456,7 +455,7 @@ def test_native_complete_prepared_loop_and_restart(device, source, monkeypatch):
         restored_loop = build_loop(device, source, restored)
         advance(loop, monkeypatch)
         advance(restored_loop, monkeypatch)
-        for field in ("masses", "concentration", "charge", "volume"):
+        for field in ("masses", "population", "charge", "volume"):
             np.testing.assert_array_equal(
                 getattr(loop.session.particles, field).numpy(),
                 getattr(restored_loop.session.particles, field).numpy(),
@@ -511,7 +510,7 @@ def test_low_level_synchronize_reports_budget_failure_and_faults(device):
         binding = loop.prepared.coagulation
         watched = (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             binding.prepared.selector_inputs[27],
             binding.prepared.collision_pairs,

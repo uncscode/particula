@@ -46,7 +46,7 @@ def native_interval(box, dt, seed, family, micro):
     driver = NativeSplit([state], 1, micro, mechanism_config=mech)
     driver.run([state], [seed])
     p = driver.owner.particles
-    w = p.concentration.numpy()[0]
+    w = p.population.numpy()[0]
     if not np.isin(w, [0.0, 1.0]).all():
         raise ArithmeticError("Native refresh changed unit multiplicity")
     live = w == 1

@@ -234,14 +234,12 @@ def test_public_materializer_retains_p3_overrides_and_inactive_sentinels() -> (
     np.testing.assert_array_equal(particles.volume, case.volume)
     for box, active in enumerate(case.fixture.active):
         np.testing.assert_array_equal(
-            particles.concentration[box, list(active)],
+            particles.population[box, list(active)],
             case.concentration[box, list(active)],
         )
         inactive = sorted(set(range(case.fixture.radii.shape[1])) - set(active))
         np.testing.assert_array_equal(particles.masses[box, inactive], 7.0e-31)
-        np.testing.assert_array_equal(
-            particles.concentration[box, inactive], 0.0
-        )
+        np.testing.assert_array_equal(particles.population[box, inactive], 0.0)
         np.testing.assert_array_equal(particles.charge[box, inactive], 29.0)
 
 
@@ -252,12 +250,12 @@ def test_initial_particle_snapshot_retains_host_invariant_state() -> None:
     )
     initial = _initial_particle_snapshot(particles)
     particles.masses[0, 0, 0] = 0.0
-    particles.concentration[0, 0] = 0.0
+    particles.population[0, 0] = 0.0
     particles.charge[0, 0] = 0.0
 
-    assert initial.keys() == {"masses", "concentration", "charge"}
+    assert initial.keys() == {"masses", "population", "charge"}
     assert initial["masses"][0, 0, 0] != 0.0
-    assert initial["concentration"][0, 0] != 0.0
+    assert initial["population"][0, 0] != 0.0
     assert initial["charge"][0, 0] != 0.0
 
 

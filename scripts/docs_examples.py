@@ -132,10 +132,7 @@ def result_state(config, manifest, root=ROOT):
 
 def use_historical_package(science_root, renderer_root, *, spectrum=False):
     """Load the pinned science package and its separately versioned renderer."""
-    from importlib.util import module_from_spec, spec_from_file_location
-
-    import matplotlib as mpl
-    from matplotlib import style
+    from scripts.historical_study import load_reporting
 
     sys.path.insert(0, science_root)
     try:
@@ -152,29 +149,7 @@ def use_historical_package(science_root, renderer_root, *, spectrum=False):
         raise RuntimeError(
             "The kernel imported a different scientific checkout"
         )
-    root = Path(renderer_root)
-    if spectrum:
-        # These archived engines predate the host-side reporting functions.
-        # The study declares the current diagnostic as a hashed science input.
-        spec = spec_from_file_location(
-            "study_number_spectrum", root / SPECTRUM_INPUT
-        )
-        diagnostic = module_from_spec(spec)
-        spec.loader.exec_module(diagnostic)
-        particula.particles.get_particle_number_spectrum = (
-            diagnostic.get_particle_number_spectrum
-        )
-        particula.particles.get_number_per_decade = (
-            diagnostic.get_number_per_decade
-        )
-    spec = spec_from_file_location("particula.plotting", root / STYLE_INPUTS[1])
-    module = module_from_spec(spec)
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
-    particula.plotting = module
-    style.library["particula.default"] = mpl.rc_params_from_file(
-        root / STYLE_INPUTS[0], use_default_template=False
-    )
+    load_reporting(particula, Path(renderer_root), spectrum=spectrum)
 
 
 def execute(config, root=ROOT, *, saved_data=None, science_root=None):

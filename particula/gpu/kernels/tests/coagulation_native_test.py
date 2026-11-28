@@ -53,7 +53,7 @@ def _state(device, row, weight=1.0, slots=5):
     charge = np.tile(np.array([1.0, 11.0, -1.0, 2.0, 3.0])[:slots], (3, 1))
     cpu = ParticleData(
         masses=masses,
-        concentration=counts,
+        population=counts,
         charge=charge,
         density=np.array([1000.0, 1500.0, 1800.0]),
         volume=np.array([0.25, 1.0, 4.0]),
@@ -106,7 +106,7 @@ def _snapshot(state):
             name: getattr(state.p, name).numpy().copy()
             for name in (
                 "masses",
-                "concentration",
+                "population",
                 "charge",
                 "density",
                 "volume",
@@ -120,7 +120,7 @@ def _snapshot(state):
 
 def _inventory(snapshot):
     """Compute per-box species/charge inventories without container helpers."""
-    weights = snapshot["concentration"]
+    weights = snapshot["population"]
     return (
         np.sum(snapshot["masses"] * weights[:, :, None], axis=1),
         np.sum(snapshot["charge"] * weights, axis=1),
@@ -146,7 +146,7 @@ def test_native_merges_conserve_all_species_and_charge(  # noqa: C901
     inventory = _inventory(initial)
     identities = {
         name: getattr(state.p, name)
-        for name in ("masses", "concentration", "charge", "density", "volume")
+        for name in ("masses", "population", "charge", "density", "volume")
     }
     # The old fixture requested 1e30 s and depended on silent clipping.
     # Reject that demand, then explicitly take admitted steps until every
@@ -189,7 +189,7 @@ def test_native_merges_conserve_all_species_and_charge(  # noqa: C901
             assert getattr(state.p, name) is original
         for name in ("density", "volume"):
             npt.assert_array_equal(after[name], initial[name])
-        for name in ("masses", "concentration", "charge"):
+        for name in ("masses", "population", "charge"):
             npt.assert_array_equal(after[name][:, 1], initial[name][:, 1])
         for box, count in enumerate(after["counts"]):
             pairs = after["pairs"][box, :count]
@@ -203,8 +203,8 @@ def test_native_merges_conserve_all_species_and_charge(  # noqa: C901
                     atol=1e-30,
                 )
                 npt.assert_array_equal(after["masses"][box, donor], 0)
-                assert after["concentration"][box, donor] == 0
-                assert after["concentration"][box, recipient] == weight
+                assert after["population"][box, donor] == 0
+                assert after["population"][box, recipient] == weight
         if positive.size == 0:
             npt.assert_array_equal(after["rng"], before["rng"])
             break
@@ -249,7 +249,7 @@ def test_native_scheduling_matches_independent_pair_hazard(device, row, mode):
     material = fixture.masses[0, :, None] * np.array([0.4, 0.6])
     cpu = ParticleData(
         masses=np.tile(material, (boxes, 1, 1)),
-        concentration=np.repeat(weights[:, None], 2, axis=1),
+        population=np.repeat(weights[:, None], 2, axis=1),
         charge=np.tile(fixture.charges, (boxes, 1)),
         density=np.full(2, 1000.0),
         volume=volumes,
@@ -271,7 +271,7 @@ def test_native_scheduling_matches_independent_pair_hazard(device, row, mode):
         )
     else:
         # Current counts are dynamic device state, not host-cached weights.
-        particles.concentration.assign(np.ones_like(cpu.concentration))
+        particles.population.assign(np.ones_like(cpu.population))
         prepared = _prepare_coagulation_step_gpu(
             particles,
             298.15,
@@ -281,7 +281,7 @@ def test_native_scheduling_matches_independent_pair_hazard(device, row, mode):
             rng_seed=873,
             **kwargs,
         )
-        particles.concentration.assign(cpu.concentration)
+        particles.population.assign(cpu.population)
         _, _, counts = _enqueue_prepared_coagulation_call(prepared)
     observed = counts.numpy().reshape(9, repetitions)
     assert np.all((observed == 0) | (observed == 1))
@@ -295,10 +295,8 @@ def test_native_scheduling_matches_independent_pair_hazard(device, row, mode):
         < 6 * standard_error + 1 / repetitions
     )
     # Species conservation is separately checked even for zero-event boxes.
-    final = (
-        particles.masses.numpy() * particles.concentration.numpy()[:, :, None]
-    )
-    original = cpu.masses * cpu.concentration[:, :, None]
+    final = particles.masses.numpy() * particles.population.numpy()[:, :, None]
+    original = cpu.masses * cpu.population[:, :, None]
     npt.assert_allclose(
         final.sum(axis=1), original.sum(axis=1), rtol=1e-12, atol=1e-30
     )
@@ -311,9 +309,9 @@ def test_unequal_counts_reject_without_mutation(device, row):
     from particula.gpu.kernels.coagulation import coagulation_step_gpu
 
     state = _state(device, row)
-    counts = state.p.concentration.numpy()
+    counts = state.p.population.numpy()
     counts[0, 0] = 2
-    state.p.concentration.assign(counts)
+    state.p.population.assign(counts)
     before = _snapshot(state)
     with pytest.raises(ValueError, match="equal|concentrations"):
         coagulation_step_gpu(state.p, **state.kwargs)
@@ -328,8 +326,8 @@ def test_unequal_counts_reject_without_mutation(device, row):
         ("masses", -1.0),
         ("masses", np.nan),
         ("masses", np.inf),
-        ("concentration", -1.0),
-        ("concentration", np.nan),
+        ("population", -1.0),
+        ("population", np.nan),
         ("charge", np.inf),
         ("density", 0.0),
         ("density", np.nan),
@@ -365,7 +363,7 @@ def test_writers_cannot_alias_primary_or_protected_arrays(device, target):
 
     state = _state(device, EXECUTABLE_ROWS[0])
     if target == "charge":
-        state.p.charge = state.p.concentration
+        state.p.charge = state.p.population
     elif target == "temperature":
         # Positive charge values can simultaneously look like temperatures.
         state.p.charge = wp.full(
@@ -437,7 +435,7 @@ def test_empty_and_one_active_preserve_native_rng_and_particles(device, slots):
     after = _snapshot(state)
     for name in (
         "masses",
-        "concentration",
+        "population",
         "charge",
         "density",
         "volume",
@@ -507,7 +505,7 @@ def test_zero_time_preserves_primary_state_and_rng(device, row):
     after = _snapshot(state)
     for name in (
         "masses",
-        "concentration",
+        "population",
         "charge",
         "density",
         "volume",
@@ -518,7 +516,7 @@ def test_zero_time_preserves_primary_state_and_rng(device, row):
 
 
 @pytest.mark.parametrize(
-    "field", ["masses", "concentration", "charge", "density", "volume"]
+    "field", ["masses", "population", "charge", "density", "volume"]
 )
 @pytest.mark.parametrize("fault", ["dtype", "shape"])
 def test_native_primary_schema_rejects_before_any_payload_launch(
@@ -532,7 +530,7 @@ def test_native_primary_schema_rejects_before_any_payload_launch(
     state = _state(device, EXECUTABLE_ROWS[0])
     fields = {
         name: getattr(state.p, name)
-        for name in ("masses", "concentration", "charge", "density", "volume")
+        for name in ("masses", "population", "charge", "density", "volume")
     }
     original = fields[field]
     fields[field] = wp.zeros(
@@ -589,9 +587,9 @@ def test_occupied_zero_material_rejects_and_inactive_zero_material_is_valid(
         coagulation_step_gpu(state.p, **state.kwargs)
     for name, values in _snapshot(state).items():
         npt.assert_array_equal(values, before[name])
-    counts = state.p.concentration.numpy()
+    counts = state.p.population.numpy()
     counts[:, 0] = 0
-    state.p.concentration.assign(counts)
+    state.p.population.assign(counts)
     _admit_state_step(state)
     coagulation_step_gpu(state.p, **state.kwargs)
     assert state.counts.numpy().sum() > 0
@@ -648,7 +646,7 @@ def test_native_environment_sources_preserve_physical_state(device, form):
     assert restored.distribution_type == "particle_resolved"
     npt.assert_array_equal(restored.volume, [0.25, 1.0, 4.0])
     after = _snapshot(state)
-    npt.assert_array_equal(restored.concentration, after["concentration"])
+    npt.assert_array_equal(restored.concentration, after["population"])
     for expected, actual in zip(
         _inventory(before), _inventory(after), strict=True
     ):
@@ -671,7 +669,7 @@ def test_native_admission_exceeds_former_charged_active_limit(device, mask):
     count = 257
     cpu = ParticleData(
         masses=np.full((1, count, 2), 1e-18),
-        concentration=np.ones((1, count)),
+        population=np.ones((1, count)),
         charge=np.zeros((1, count)),
         density=np.full(2, 1000.0),
         volume=np.ones(1),
@@ -687,7 +685,7 @@ def test_native_admission_exceeds_former_charged_active_limit(device, mask):
     )
     npt.assert_array_equal(collisions.numpy(), 0)
     npt.assert_array_equal(particles.masses.numpy(), cpu.masses)
-    npt.assert_array_equal(particles.concentration.numpy(), cpu.concentration)
+    npt.assert_array_equal(particles.population.numpy(), cpu.population)
 
 
 @pytest.mark.parametrize("metadata", [None, 0, 1, 2])

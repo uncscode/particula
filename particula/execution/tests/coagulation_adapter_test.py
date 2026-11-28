@@ -515,7 +515,7 @@ def _warp_particles() -> Any:
     particles = WarpParticleData()
     particles.distribution_kind = wp.int32(3)
     particles.masses = wp.ones((1, 2, 1), dtype=wp.float64, device="cpu")
-    particles.concentration = wp.ones((1, 2), dtype=wp.float64, device="cpu")
+    particles.population = wp.ones((1, 2), dtype=wp.float64, device="cpu")
     particles.charge = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     particles.density = wp.ones(1, dtype=wp.float64, device="cpu")
     particles.volume = wp.ones(1, dtype=wp.float64, device="cpu")
@@ -556,7 +556,7 @@ def test_warp_state_construction_is_write_free_and_never_dispatches(
     rng_states = wp.array([19], dtype=wp.uint32, device="cpu")
     resources = (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         particles.volume,
@@ -605,7 +605,7 @@ def test_warp_state_preserves_p2_validation_order() -> None:
     rng_states = wp.zeros(1, dtype=wp.uint32, device="cpu")
     resources = (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         particles.volume,
@@ -653,7 +653,7 @@ def test_warp_state_preserves_p2_validation_order() -> None:
                 None,
                 None,
                 invalid_time,
-                rng_states=particles.concentration,
+                rng_states=particles.population,
                 environment=environment,
             )
     with pytest.raises(ValueError, match="^rng_states must be supplied.$"):
@@ -674,7 +674,7 @@ def test_warp_state_preserves_p2_validation_order() -> None:
             None,
             None,
             1.0,
-            rng_states=particles.concentration,
+            rng_states=particles.population,
             environment=environment,
         )
     for expected, resource in zip(before, resources, strict=True):
@@ -906,7 +906,7 @@ def test_warp_state_accepts_direct_form_and_rejects_aliases() -> None:
             temperature,
             pressure,
             1.0,
-            rng_states=particles.concentration,
+            rng_states=particles.population,
         )
 
 

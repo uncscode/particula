@@ -104,7 +104,7 @@ def _particles(device: str, n_boxes: int = 2, *, native: bool = False):
     particles.masses = runtime_wp.array(
         masses, dtype=runtime_wp.float64, device=device
     )
-    particles.concentration = runtime_wp.array(
+    particles.population = runtime_wp.array(
         np.tile(
             np.array([1.0, 1.0, 0.0, 0.0 if native else 1.0]), (n_boxes, 1)
         ),
@@ -140,7 +140,7 @@ def _one_species_particles(device: str, n_boxes: int = 2):
     particles.masses = runtime_wp.array(
         masses, dtype=runtime_wp.float64, device=device
     )
-    particles.concentration = runtime_wp.array(
+    particles.population = runtime_wp.array(
         np.tile(np.array([1.0, 1.0, 0.0, 1.0]), (n_boxes, 1)),
         dtype=runtime_wp.float64,
         device=device,
@@ -192,7 +192,7 @@ def _cpu_oracle(
     )
 
     masses = particles.masses.numpy()
-    concentration = particles.concentration.numpy()
+    concentration = particles.population.numpy()
     density = particles.density.numpy()
     eligible = np.zeros(concentration.shape, dtype=bool)
     coefficients = np.zeros(concentration.shape, dtype=np.float64)
@@ -245,7 +245,7 @@ def _charged_cpu_oracle(
     from particula.dynamics.wall_loss import ChargedWallLossStrategy
 
     masses = particles.masses.numpy()
-    concentration = particles.concentration.numpy()
+    concentration = particles.population.numpy()
     charge = particles.charge.numpy()
     density = particles.density.numpy()
     field = config.wall_electric_field
@@ -533,7 +533,7 @@ def test_complete_slot_rates_match_independent_cpu_oracle(
     )
     before = (
         particles.masses.numpy().copy(),
-        particles.concentration.numpy().copy(),
+        particles.population.numpy().copy(),
         particles.charge.numpy().copy(),
     )
     rates = runtime_wp.zeros(
@@ -548,7 +548,7 @@ def test_complete_slot_rates_match_independent_cpu_oracle(
         dim=expected_mask.shape,
         inputs=[
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.density,
             temperature,
             pressure,
@@ -576,7 +576,7 @@ def test_complete_slot_rates_match_independent_cpu_oracle(
     )
     assert not np.any(expected_mask[:, 2:])
     npt.assert_array_equal(particles.masses.numpy(), before[0])
-    npt.assert_array_equal(particles.concentration.numpy(), before[1])
+    npt.assert_array_equal(particles.population.numpy(), before[1])
     npt.assert_array_equal(particles.charge.numpy(), before[2])
 
 
@@ -598,7 +598,7 @@ def _charged_matrix_particles(
     particles.masses = runtime_wp.array(
         masses, dtype=runtime_wp.float64, device=device
     )
-    particles.concentration = runtime_wp.array(
+    particles.population = runtime_wp.array(
         np.tile(
             [
                 1.0,
@@ -633,7 +633,7 @@ def _charged_diagnostic(
 ) -> tuple[np.ndarray, np.ndarray]:
     """Run the non-mutating charged Warp diagnostic and return bulk results."""
     runtime_wp = _warp()
-    shape = particles.concentration.shape
+    shape = particles.population.shape
     rates = runtime_wp.zeros(shape, dtype=runtime_wp.float64, device=device)
     eligible = runtime_wp.zeros(shape, dtype=runtime_wp.int32, device=device)
     dimensions = config.chamber_dimensions or (0.0, 0.0, 0.0)
@@ -650,7 +650,7 @@ def _charged_diagnostic(
         dim=shape,
         inputs=[
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             temperature,
@@ -676,7 +676,7 @@ def _neutral_diagnostic(
 ) -> tuple[np.ndarray, np.ndarray]:
     """Run the non-mutating neutral Warp diagnostic and return bulk results."""
     runtime_wp = _warp()
-    shape = particles.concentration.shape
+    shape = particles.population.shape
     rates = runtime_wp.zeros(shape, dtype=runtime_wp.float64, device=device)
     eligible = runtime_wp.zeros(shape, dtype=runtime_wp.int32, device=device)
     dimensions = config.chamber_dimensions or (0.0, 0.0, 0.0)
@@ -685,7 +685,7 @@ def _neutral_diagnostic(
         dim=shape,
         inputs=[
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.density,
             temperature,
             pressure,
@@ -725,7 +725,7 @@ def test_charged_coefficients_match_independent_cpu_oracle(
     )
     particle_before = {
         name: getattr(particles, name).numpy().copy()
-        for name in ("masses", "concentration", "charge", "density", "volume")
+        for name in ("masses", "population", "charge", "density", "volume")
     }
     field_before = (
         config.wall_electric_field.numpy().copy()
@@ -805,7 +805,7 @@ def test_zero_charge_charged_mode_exactly_matches_neutral_diagnostics_and_state(
         config=charged_config,
         rng_states=charged_rng,
     )
-    for name in ("masses", "concentration", "charge", "density", "volume"):
+    for name in ("masses", "population", "charge", "density", "volume"):
         npt.assert_array_equal(
             getattr(charged_particles, name).numpy(),
             getattr(neutral_particles, name).numpy(),
@@ -826,7 +826,7 @@ def _homogeneous_particles(device: str, active: int = 32):
     particles.masses = runtime_wp.array(
         masses, dtype=runtime_wp.float64, device=device
     )
-    particles.concentration = runtime_wp.array(
+    particles.population = runtime_wp.array(
         np.array([[*np.ones(active), 0.0, 0.0]]),
         dtype=runtime_wp.float64,
         device=device,
@@ -888,7 +888,7 @@ def _charged_homogeneous_particles(
     particles.masses = runtime_wp.array(
         masses, dtype=runtime_wp.float64, device=device
     )
-    particles.concentration = runtime_wp.array(
+    particles.population = runtime_wp.array(
         [[*np.ones(active), 0.0, 0.0]], dtype=runtime_wp.float64, device=device
     )
     particles.charge = runtime_wp.array(
@@ -971,16 +971,16 @@ def test_charged_survival_matches_frozen_exact_binomial_interval(
         particles = _charged_homogeneous_particles(device, radius, 2.0, active)
         sentinels = tuple(
             getattr(particles, name).numpy()[0, active:].copy()
-            for name in ("masses", "concentration", "charge")
+            for name in ("masses", "population", "charge")
         )
         wall_loss_step_gpu(
             particles, 298.15, 101325.0, time_step, config=config, rng_seed=seed
         )
         observed += int(
-            np.count_nonzero(particles.concentration.numpy()[0, :active])
+            np.count_nonzero(particles.population.numpy()[0, :active])
         )
         for name, expected in zip(
-            ("masses", "concentration", "charge"), sentinels, strict=True
+            ("masses", "population", "charge"), sentinels, strict=True
         ):
             npt.assert_array_equal(
                 getattr(particles, name).numpy()[0, active:], expected
@@ -1051,9 +1051,7 @@ def test_charged_persistent_sidecar_survival_and_noop_lifecycle(
         initialize_rng=True,
     )
     npt.assert_array_equal(reset_states.numpy(), initialized_state)
-    observed = int(
-        np.count_nonzero(particles.concentration.numpy()[0, :active])
-    )
+    observed = int(np.count_nonzero(particles.population.numpy()[0, :active]))
     assert _is_within_inclusive_binomial_interval(
         observed, active, 0.5**steps, 1.25e-7
     )
@@ -1090,7 +1088,7 @@ def test_charged_opposing_field_does_not_reset_supplied_sidecar(
     states = runtime_wp.array([31], dtype=runtime_wp.uint32, device=device)
     particle_before = {
         name: getattr(particles, name).numpy().copy()
-        for name in ("masses", "concentration", "charge")
+        for name in ("masses", "population", "charge")
     }
     state_before = states.numpy().copy()
 
@@ -1127,20 +1125,20 @@ def test_fresh_seed_survival_matches_binomial_expectation(
         particles = _homogeneous_particles(device, active)
         inactive = (
             particles.masses.numpy()[0, active:].copy(),
-            particles.concentration.numpy()[0, active:].copy(),
+            particles.population.numpy()[0, active:].copy(),
             particles.charge.numpy()[0, active:].copy(),
         )
         wall_loss_step_gpu(
             particles, 298.15, 101325.0, time_step, config=config, rng_seed=seed
         )
         observed += int(
-            np.count_nonzero(particles.concentration.numpy()[0, :active])
+            np.count_nonzero(particles.population.numpy()[0, :active])
         )
         npt.assert_array_equal(
             particles.masses.numpy()[0, active:], inactive[0]
         )
         npt.assert_array_equal(
-            particles.concentration.numpy()[0, active:], inactive[1]
+            particles.population.numpy()[0, active:], inactive[1]
         )
         npt.assert_array_equal(
             particles.charge.numpy()[0, active:], inactive[2]
@@ -1171,7 +1169,7 @@ def test_persistent_sidecar_survival_and_lifecycle(
         owner = states
         for step in range(n_steps):
             before = states.numpy().copy()
-            eligible = np.any(particles.concentration.numpy()[0, :active] > 0)
+            eligible = np.any(particles.population.numpy()[0, :active] > 0)
             returned = wall_loss_step_gpu(
                 particles,
                 298.15,
@@ -1188,7 +1186,7 @@ def test_persistent_sidecar_survival_and_lifecycle(
             else:
                 npt.assert_array_equal(states.numpy(), before)
         observed += int(
-            np.count_nonzero(particles.concentration.numpy()[0, :active])
+            np.count_nonzero(particles.population.numpy()[0, :active])
         )
     total_trials = active * 100
     probability = 0.5**n_steps
@@ -1207,12 +1205,12 @@ def test_zero_time_and_all_inactive_are_exact_noops(device: str) -> None:
     for time_step, inactive in ((0.0, False), (1.0, True)):
         particles = _particles(device, 1, native=True)
         if inactive:
-            particles.concentration = runtime_wp.zeros(
+            particles.population = runtime_wp.zeros(
                 (1, 4), dtype=runtime_wp.float64, device=device
             )
         states = runtime_wp.array([17], dtype=runtime_wp.uint32, device=device)
         particle_owner = particles
-        field_names = ("masses", "concentration", "charge", "density", "volume")
+        field_names = ("masses", "population", "charge", "density", "volume")
         snapshot = {
             name: (
                 getattr(particles, name),

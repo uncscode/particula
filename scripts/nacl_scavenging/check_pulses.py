@@ -21,7 +21,7 @@ def state(ds, charges):
     m[:, 1, 1] = masses[:, 1]
     return SimpleNamespace(
         masses=wp.array(m, dtype=wp.float64, device=DEVICE),
-        concentration=wp.ones((n, 2), dtype=wp.float64, device=DEVICE),
+        population=wp.ones((n, 2), dtype=wp.float64, device=DEVICE),
         charge=wp.array(charges, dtype=wp.float64, device=DEVICE),
     )
 

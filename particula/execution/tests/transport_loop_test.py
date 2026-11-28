@@ -79,7 +79,7 @@ def _binding(
     particles = cast(Any, session.particles)
     gas = cast(Any, session.gas)
     particles.volume.assign(np.array([1.0, 2.0, 4.0], dtype=np.float64))
-    particles.concentration.assign(np.array([[3.0], [2.0], [1.0]]))
+    particles.population.assign(np.array([[3.0], [2.0], [1.0]]))
     gas.concentration.assign(np.array([[4.0], [3.0], [2.0]]))
     registry = GPUResourceRegistry(session)
     source_boxes = (
@@ -180,7 +180,7 @@ def test_closed_transport_loop_matches_extensive_amount_oracle(
     particles = cast(Any, session.particles)
     gas = cast(Any, session.gas)
     expected_gas = gas.concentration.numpy().copy()
-    expected_particles = particles.concentration.numpy().copy()
+    expected_particles = particles.population.numpy().copy()
     expected_volume = particles.volume.numpy().copy()
     identities = (session, registry, resources, resources.buffers)
     executor = ResidentCommunicationExecutor(request)
@@ -207,7 +207,7 @@ def test_closed_transport_loop_matches_extensive_amount_oracle(
         gas.concentration.numpy(), expected_gas, rtol=1e-12, atol=1e-30
     )
     npt.assert_allclose(
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         expected_particles,
         rtol=1e-12,
         atol=1e-30,
@@ -240,7 +240,7 @@ def test_sparse_closed_map_matches_oracle_and_conserves_amount() -> None:
     before_volume = particles.volume.numpy().copy()
     expected, _, _ = _transport_oracle(
         before_concentration,
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         before_volume,
         source,
         destination,

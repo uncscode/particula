@@ -11,7 +11,7 @@ Example:
 
         data = ParticleData(
             masses=np.random.rand(1, 1000, 3) * 1e-18,  # 1000 particles
-            concentration=np.ones((1, 1000)),
+            population=np.ones((1, 1000)),
             charge=np.zeros((1, 1000)),
             density=np.array([1000.0, 1200.0, 800.0]),
             volume=np.array([1e-6]),  # 1 cm^3
@@ -22,7 +22,7 @@ Example:
 
         cfd_data = ParticleData(
             masses=np.zeros((100, 10000, 3)),
-            concentration=np.ones((100, 10000)),
+            population=np.ones((100, 10000)),
             charge=np.zeros((100, 10000)),
             density=np.array([1000.0, 1200.0, 800.0]),
             volume=np.ones(100) * 1e-6,
@@ -33,12 +33,30 @@ Example:
 from dataclasses import dataclass
 
 import numpy as np
-from numpy.typing import NDArray
+from numpy.typing import ArrayLike, NDArray
+from typing_extensions import deprecated
 
+from particula._array_validation import validate_writable_arrays
 from particula.particles._population import radius_node_widths, slot_density
 
 
-@dataclass
+def _replacement_volumes(
+    volume: ArrayLike, shape: tuple[int, ...]
+) -> NDArray[np.float64]:
+    """Stage an independent volume value for each box before updating state."""
+    supplied = np.asarray(volume)
+    if supplied.dtype.kind not in "iuf":
+        raise TypeError("volume must contain real numbers")
+    if supplied.shape not in ((), shape):
+        raise ValueError("volume must be scalar or one value per box")
+    with np.errstate(over="ignore", under="ignore"):
+        volumes = np.array(supplied, dtype=np.float64, copy=True)
+    if not np.all(np.isfinite(volumes)) or np.any(volumes <= 0):
+        raise ValueError("volume must be finite and positive")
+    return np.broadcast_to(volumes, shape)
+
+
+@dataclass(init=False)
 class ParticleData:
     """Batched particle data container for multi-box simulations.
 
@@ -52,16 +70,15 @@ class ParticleData:
     Attributes:
         masses: Per-species masses in kg.
             Shape: (n_boxes, n_particles, n_species)
-        concentration: Raw slot weights of shape (n_boxes, n_particles).
-            Discrete bins store number per m^3, PDF nodes store dN/dr
-            in m^-4, and resolved slots store counts.
+        population: Extensive weights of shape (n_boxes, n_particles).
+            Bins and resolved slots store counts. Radius PDFs store dN/dr
+            in m^-1.
         charge: Particle charges (dimensionless integer counts).
             Shape: (n_boxes, n_particles)
         density: Material densities in kg/m^3.
             Shape: (n_species,) - shared across all boxes
         volume: Simulation volume per box in m^3, shape (n_boxes,).
-            Tagged discrete/PDF storage uses 1 m^3; tagged resolved
-            storage uses positive physical volume.
+            All tagged populations use finite positive air volumes.
         distribution_type: Explicit storage interpretation, or ``None`` for
             untagged legacy carriers. New bulk helpers reject untagged data.
         radius_grid: Explicit PDF radius nodes in metres, shape
@@ -72,12 +89,73 @@ class ParticleData:
     """
 
     masses: NDArray[np.float64]
-    concentration: NDArray[np.float64]
+    population: NDArray[np.float64]
     charge: NDArray[np.float64]
     density: NDArray[np.float64]
     volume: NDArray[np.float64]
     distribution_type: str | None = None
     radius_grid: NDArray[np.float64] | None = None
+
+    def __init__(
+        self,
+        masses: NDArray[np.float64],
+        concentration: NDArray[np.float64] | None = None,
+        charge: NDArray[np.float64] | None = None,
+        density: NDArray[np.float64] | None = None,
+        volume: NDArray[np.float64] | None = None,
+        distribution_type: str | None = None,
+        radius_grid: NDArray[np.float64] | None = None,
+        *,
+        population: NDArray[np.float64] | None = None,
+    ) -> None:
+        """Bind extensive storage or the compatible 0.3 concentration array."""
+        if charge is None or density is None or volume is None:
+            raise TypeError("charge, density and volume are required")
+        self.masses = masses
+        self.charge = charge
+        self.density = density
+        self.volume = volume
+        self.distribution_type = distribution_type
+        self.radius_grid = radius_grid
+        if population is None:
+            if concentration is None:
+                raise TypeError("population is required")
+            self._check_legacy_population()
+            population = concentration
+        elif concentration is not None:
+            raise ValueError("supply either population or concentration")
+        self.population = population
+        self.__post_init__()
+        if distribution_type is not None and (
+            np.any(volume <= 0) or not np.all(np.isfinite(volume))
+        ):
+            raise ValueError(
+                "represented air volume must be positive and finite"
+            )
+
+    def _check_legacy_population(self) -> None:
+        if self.distribution_type in ("discrete", "continuous_pdf") and np.any(
+            self.volume != 1
+        ):
+            raise ValueError(
+                "legacy concentration requires binned volume exactly 1 m^3; "
+                "use population=density * volume[:, None] for storage or "
+                "slot_concentration_density to read density"
+            )
+
+    @property
+    @deprecated("Use population or slot_concentration_density", category=None)
+    def concentration(self) -> NDArray[np.float64]:
+        """Deprecated writable 0.3 alias for legacy-compatible volumes."""
+        self._check_legacy_population()
+        return self.population
+
+    @concentration.setter
+    @deprecated("Use population or slot_concentration_density", category=None)
+    def concentration(self, value: NDArray[np.float64]) -> None:
+        """Replace the legacy-compatible writable population buffer."""
+        self._check_legacy_population()
+        self.population = value
 
     def __post_init__(self) -> None:
         """Validate raw array shapes without interpreting distribution kind.
@@ -99,9 +177,9 @@ class ParticleData:
 
         # Validate concentration shape (n_boxes, n_particles)
         expected_2d = (n_boxes, n_particles)
-        if self.concentration.shape != expected_2d:
+        if self.population.shape != expected_2d:
             raise ValueError(
-                f"concentration shape {self.concentration.shape} doesn't match "
+                f"concentration shape {self.population.shape} doesn't match "
                 f"expected {expected_2d}"
             )
 
@@ -193,9 +271,8 @@ class ParticleData:
 
         Call after directly changing writable arrays. This read-only check
         never repairs state; derived population helpers call it on every read.
-        Discrete and PDF storage requires exactly 1 m^3 per box; resolved
-        storage requires positive volume. PDF nodes must form an increasing,
-        positive radius grid with at least two nodes.
+        Each box requires positive represented volume. PDF nodes must form an
+        increasing, positive radius grid with at least two nodes.
 
         Raises:
             ValueError: If kind, grid, volume, shape, or values are invalid.
@@ -214,7 +291,7 @@ class ParticleData:
             raise ValueError("masses must be a rank-3 float64 array")
         boxes, slots, species = self.masses.shape
         fields = (
-            (self.concentration, (boxes, slots)),
+            (self.population, (boxes, slots)),
             (self.charge, (boxes, slots)),
             (self.density, (species,)),
             (self.volume, (boxes,)),
@@ -229,19 +306,16 @@ class ParticleData:
         if (
             not np.all(np.isfinite(self.masses))
             or np.any(self.masses < 0)
-            or not np.all(np.isfinite(self.concentration))
-            or np.any(self.concentration < 0)
+            or not np.all(np.isfinite(self.population))
+            or np.any(self.population < 0)
             or not np.all(np.isfinite(self.charge))
             or not np.all(np.isfinite(self.density))
             or np.any(self.density <= 0)
             or not np.all(np.isfinite(self.volume))
         ):
             raise ValueError("particle data must have finite physical values")
-        if self.distribution_type == "particle_resolved":
-            if np.any(self.volume <= 0):
-                raise ValueError("particle-resolved volume must be positive")
-        elif np.any(self.volume != 1.0):
-            raise ValueError("PMF/PDF volume must be exactly 1 m^3")
+        if np.any(self.volume <= 0):
+            raise ValueError("represented air volume must be positive")
         if self.distribution_type == "continuous_pdf":
             grid = self.radius_grid
             if (
@@ -265,7 +339,7 @@ class ParticleData:
 
         Discrete and resolved slots have units m^-3; PDF nodes have units
         m^-4. The result has shape (n_boxes, n_particles) and is detached
-        from the raw concentration array.
+        from the raw population array.
 
         Returns:
             Per-slot density on the declared representation's grid.
@@ -274,10 +348,67 @@ class ParticleData:
             ValueError: If the kind, grid, volume, or raw data is invalid.
         """
         self.validate_representation()
-        density = slot_density(self)
-        if density is self.concentration:
-            return density.copy()
-        return density
+        return slot_density(self)
+
+    def set_slot_concentration_density(
+        self, density_by_slot: ArrayLike, *, volume: ArrayLike | None = None
+    ) -> None:
+        """Replace particle population from per-slot density and air volume.
+
+        Args:
+            density_by_slot: Nonnegative number densities (m^-3) for bins
+                or resolved slots, or radius-PDF ordinates (m^-4). Supply
+                shape (n_boxes, n_particles), or (n_particles,) for one box.
+            volume: Represented air volume (m^3), as one positive scalar
+                for all boxes or an array of shape (n_boxes,). Omit to use
+                each box's current volume.
+
+        Writes density times the selected volume into the existing population
+        array. A supplied volume is committed in the same update.
+
+        Raises:
+            TypeError: If an input does not contain real numbers.
+            ValueError: If the representation, shape, values or storage
+                prevent an in-place update. Both arrays retain their values.
+        """
+        self.validate_representation()
+        slots = np.asarray(density_by_slot)
+        if slots.dtype.kind not in "iuf":
+            raise TypeError("density_by_slot must contain real numbers")
+        if self.n_boxes == 1 and slots.ndim == 1:
+            slots = slots[None, :]
+        if slots.shape != self.population.shape:
+            raise ValueError("density_by_slot must match the population shape")
+        if not np.all(np.isfinite(slots)) or np.any(slots < 0):
+            raise ValueError("density_by_slot must be finite and nonnegative")
+
+        volumes = self.volume
+        if volume is not None:
+            volumes = _replacement_volumes(volume, self.volume.shape)
+
+        with np.errstate(over="ignore", under="ignore", invalid="ignore"):
+            population = np.asarray(slots * volumes[:, None], dtype=np.float64)
+        if not np.all(np.isfinite(population)) or np.any(
+            (slots > 0) & (population == 0)
+        ):
+            raise ValueError("population is outside the float64 range")
+
+        fields = {
+            "population": self.population,
+            "volume": self.volume,
+            "masses": self.masses,
+            "density": self.density,
+            "charge": self.charge,
+        }
+        if self.radius_grid is not None:
+            fields["radius_grid"] = self.radius_grid
+        writers = (
+            ("population",) if volume is None else ("population", "volume")
+        )
+        validate_writable_arrays(fields, writers)
+        self.population[:] = population
+        if volume is not None:
+            self.volume[:] = volumes
 
     @property
     def number_density(self) -> NDArray[np.float64]:
@@ -335,7 +466,13 @@ class ParticleData:
         Raises:
             ValueError: If the representation fails read-only validation.
         """
-        return self.species_mass_density * self.volume[:, None]
+        self.validate_representation()
+        if self.radius_grid is not None:
+            widths = radius_node_widths(self.radius_grid)
+            return np.einsum(
+                "n,bn,bns->bs", widths, self.population, self.masses
+            )
+        return np.einsum("bn,bns->bs", self.population, self.masses)
 
     @property
     def effective_density(self) -> NDArray[np.float64]:
@@ -377,7 +514,7 @@ class ParticleData:
         """
         return ParticleData(
             masses=np.copy(self.masses),
-            concentration=np.copy(self.concentration),
+            population=np.copy(self.population),
             charge=np.copy(self.charge),
             density=np.copy(self.density),
             volume=np.copy(self.volume),

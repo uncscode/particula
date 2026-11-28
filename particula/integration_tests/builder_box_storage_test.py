@@ -39,11 +39,11 @@ def test_particle_broadcast_supports_independent_slot_activation():
         np.array([1, 0], dtype=np.int32),
     )
     np.testing.assert_array_equal(activated, [1, 0])
-    np.testing.assert_array_equal(particles.concentration[1], 0)
+    np.testing.assert_array_equal(particles.population[1], 0)
     particles.volume[0] = 0.5
     assert particles.volume[1] == 0.25
     for field, source in (
-        (particles.concentration, concentration),
+        (particles.population, concentration),
         (particles.charge, charge),
         (particles.volume, volume),
     ):
@@ -62,7 +62,7 @@ def test_particle_matching_fields_retain_storage():
         .set_concentration(concentration)
         .build()
     )
-    assert particles.concentration is concentration
+    assert particles.population is concentration
 
 
 @pytest.mark.parametrize("source_boxes, target_boxes", [(1, 3), (2, 2)])

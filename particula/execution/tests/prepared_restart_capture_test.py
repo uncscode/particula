@@ -52,13 +52,13 @@ def scenario(name):
         initial, process = nucleation_case(resampling=True)
         if name == "nucleation_resampling":
             initial.particles.masses[0, 1:3] = initial.particles.masses[0, 0]
-            initial.particles.concentration[0, :3] = 1
+            initial.particles.population[0, :3] = 1
         return initial, process, 1.0
     initial = state(volume=1e-13)
     old = initial.particles
     initial.particles = ParticleData(
         masses=np.tile(old.masses, (1, 32, 1)),
-        concentration=np.ones((1, 64)),
+        population=np.ones((1, 64)),
         charge=np.tile(old.charge, (1, 32)),
         density=old.density.copy(),
         volume=old.volume.copy(),
@@ -221,7 +221,7 @@ def test_checkpoint_does_not_delay_owned_storage_release(device):
 def test_restart_rechecks_evolved_equal_count_capability(device, monkeypatch):
     """A late source can create a state that the next Brownian step rejects."""
     initial, source = nucleation_case()
-    initial.particles.concentration *= 2
+    initial.particles.population *= 2
     process = (
         Coagulation(BrownianCoagulationStrategy("particle_resolved")) | source
     )
@@ -383,7 +383,7 @@ def test_captured_device_failure_stops_later_queued_writers():
             simulation.synchronize()
         assert not simulation.captured
         for family, names in (
-            ("particles", ("masses", "concentration", "charge", "volume")),
+            ("particles", ("masses", "population", "charge", "volume")),
             ("gas", ("concentration",)),
         ):
             for name in names:

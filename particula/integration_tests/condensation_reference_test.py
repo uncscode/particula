@@ -91,8 +91,8 @@ def test_condensation_converges_to_independent_radius_quadrature(
         )
 
         def dilute(particle=particle, gas=gas, steps=steps):
-            particle.concentration[:] = get_dilution_step(
-                hazard, particle.concentration, duration / steps
+            particle.population[:] = get_dilution_step(
+                hazard, particle.population, duration / steps
             )
             gas.concentration[:] = get_dilution_step(
                 hazard, gas.concentration, duration / steps
@@ -115,7 +115,7 @@ def test_condensation_converges_to_independent_radius_quadrature(
         if closed:
             npt.assert_allclose(
                 gas.concentration[0, 0]
-                + particle.concentration[0, 0] * particle.masses[0, 0, 0],
+                + particle.population[0, 0] * particle.masses[0, 0, 0],
                 (gas_initial + number_density * mass)
                 * np.exp(-hazard * duration),
                 rtol=2e-14,

@@ -16,7 +16,7 @@ def _containers(boxes=2, slots=2, species=1, mask=None):
         mask = [True, False, True]
     particles = ParticleData(
         masses=np.ones((boxes, slots, species)),
-        concentration=np.ones((boxes, slots)),
+        population=np.ones((boxes, slots)),
         charge=np.zeros((boxes, slots)),
         density=np.ones(species),
         volume=np.ones(boxes),
@@ -38,7 +38,7 @@ def _containers(boxes=2, slots=2, species=1, mask=None):
 def _snapshot(containers):
     """Capture all raw field identities and contents for rejection checks."""
     fields = (
-        ("masses", "concentration", "charge", "density", "volume"),
+        ("masses", "population", "charge", "density", "volume"),
         ("name", "molar_mass", "concentration", "partitioning"),
         ("temperature", "pressure", "saturation_ratio"),
     )
@@ -105,9 +105,9 @@ def test_top_level_type_precedes_stored_fields(index):
         (0, "masses", np.ones((0, 2, 1)), "box count"),
         (0, "masses", "not an array", "particles.masses"),
         (0, "masses", None, "particles.masses"),
-        (0, "concentration", None, "particles.concentration"),
+        (0, "concentration", None, "particles.population"),
         (0, "charge", [1, 2], "particles.charge"),
-        (0, "concentration", np.ones((2, 3)), "particles.concentration"),
+        (0, "concentration", np.ones((2, 3)), "particles.population"),
         (0, "charge", np.ones(2), "particles.charge"),
         (0, "density", np.ones(2), "particles.density"),
         (0, "volume", np.ones(1), "particles.volume"),

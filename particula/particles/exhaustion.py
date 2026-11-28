@@ -546,7 +546,7 @@ def _validate_particle_schema(  # noqa: C901
             )
     arrays = (
         ("masses", particles.masses, 3),
-        ("concentration", particles.concentration, 2),
+        ("concentration", particles.population, 2),
         ("charge", particles.charge, 2),
         ("density", particles.density, 1),
         ("volume", particles.volume, 1),
@@ -565,7 +565,7 @@ def _validate_particle_schema(  # noqa: C901
         raise ValueError("particle capacity must be positive")
     if species_count == 0:
         raise ValueError("species capacity must be positive")
-    if particles.concentration.shape != (box_count, particle_count):
+    if particles.population.shape != (box_count, particle_count):
         raise ValueError("concentration must have shape (B, N)")
     if particles.charge.shape != (box_count, particle_count):
         raise ValueError("charge must have shape (B, N)")
@@ -590,8 +590,8 @@ def _cache_particle_state(  # noqa: C901
         particles.masses < 0
     ):
         raise ValueError("masses must be finite and nonnegative")
-    if not np.all(np.isfinite(particles.concentration)) or np.any(
-        particles.concentration < 0
+    if not np.all(np.isfinite(particles.population)) or np.any(
+        particles.population < 0
     ):
         raise ValueError("concentration must be finite and nonnegative")
     if not np.all(np.isfinite(particles.charge)):
@@ -607,7 +607,7 @@ def _cache_particle_state(  # noqa: C901
 
     cached: list[_CachedBoxState] = []
     for box_index in range(particles.n_boxes):
-        active = particles.concentration[box_index] > 0.0
+        active = particles.population[box_index] > 0.0
         inactive = ~active
         if np.any(particles.masses[box_index, inactive] != 0.0) or np.any(
             particles.charge[box_index, inactive] != 0.0
@@ -628,7 +628,7 @@ def _cache_particle_state(  # noqa: C901
         cached.append(
             _CachedBoxState(
                 active_indices=indices.astype(np.intp, copy=False),
-                concentrations=particles.concentration[box_index, indices],
+                concentrations=particles.population[box_index, indices],
                 masses=masses,
                 charges=particles.charge[box_index, indices],
                 radii=radii,
@@ -1208,7 +1208,7 @@ def apply_resampling(
             particle_data.masses[box_index, retained] = np.asarray(
                 box_plan.replacement_masses, dtype=np.float64
             )
-            particle_data.concentration[box_index, retained] = np.asarray(
+            particle_data.population[box_index, retained] = np.asarray(
                 box_plan.replacement_concentrations, dtype=np.float64
             )
             particle_data.charge[box_index, retained] = np.asarray(
@@ -1217,7 +1217,7 @@ def apply_resampling(
         if box_plan.released_indices:
             released = np.asarray(box_plan.released_indices, dtype=np.intp)
             particle_data.masses[box_index, released] = np.float64(0.0)
-            particle_data.concentration[box_index, released] = np.float64(0.0)
+            particle_data.population[box_index, released] = np.float64(0.0)
             particle_data.charge[box_index, released] = np.float64(0.0)
     return particle_data
 
@@ -1253,7 +1253,7 @@ def _validate_p4_non_aliasing(
     """
     arrays = (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         particles.volume,
@@ -1386,8 +1386,8 @@ def apply_representative_volume_scaling(  # noqa: C901, PLR0913
     ):
         raise ValueError("selected scaled volume must meet minimum_volume")
     factors = np.where(selected, requested, 1.0)
-    scaled_concentration = particle_data.concentration * factors[:, None]
-    active = particle_data.concentration > 0.0
+    scaled_concentration = particle_data.population * factors[:, None]
+    active = particle_data.population > 0.0
     if np.any(active & (~np.isfinite(scaled_concentration))) or np.any(
         active & (scaled_concentration <= 0.0)
     ):
@@ -1395,6 +1395,6 @@ def apply_representative_volume_scaling(  # noqa: C901, PLR0913
     resolved[:] = factors
     if np.any(selected):
         particle_data.volume[selected] *= factors[selected]
-        particle_data.concentration[selected, :] *= factors[selected, None]
+        particle_data.population[selected, :] *= factors[selected, None]
         demand[selected] *= factors[selected]
     return particle_data, demand, resolved

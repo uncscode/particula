@@ -96,7 +96,7 @@ def test_independent_species_widths(particle_width, gas_width, partitioning):
     """Construction owns storage; processes own material-to-gas mapping."""
     particles = ParticleData(
         masses=np.full((1, 2, particle_width), 1e-18),
-        concentration=np.array([[4.0, 8.0]]),
+        population=np.array([[4.0, 8.0]]),
         charge=np.zeros((1, 2)),
         density=np.full(particle_width, 1000.0),
         volume=np.array([2.0]),

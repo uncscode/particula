@@ -94,7 +94,7 @@ def validate(
         raise ValueError("native wall-loss derived quantities must be finite")
     if np.any((mass > 0) & (material_volume <= 0)):
         raise ValueError("positive mass requires representable particle volume")
-    if np.any((particle.concentration > 0) & (mass <= 0)):
+    if np.any((particle.population > 0) & (mass <= 0)):
         raise ValueError("occupied wall-loss particles require positive mass")
     return radius, density
 
@@ -114,7 +114,7 @@ def coefficient(
         particle.distribution_type == "particle_resolved"
         and not include_inactive
     ):
-        selected &= particle.concentration[0] > 0
+        selected &= particle.population[0] > 0
     result = np.zeros(particle.n_particles, dtype=np.float64)
     if not np.any(selected):
         return result
@@ -159,7 +159,7 @@ def rate(
 
 def _storage(strategy: Any, particle: ParticleData, resolved: bool) -> None:
     fields = [
-        particle.concentration,
+        particle.population,
         particle.masses,
         particle.charge,
         particle.density,
@@ -220,23 +220,23 @@ def step(
         raise ValueError(
             "wall-loss random_generator must support binomial draws"
         )
-    if time_step == 0 or not np.any(particle.concentration):
+    if time_step == 0 or not np.any(particle.population):
         return particle
     if not resolved:
         with np.errstate(over="ignore", invalid="ignore"):
             updated = (
-                particle.concentration
-                - values[None] * particle.concentration * time_step
+                particle.population
+                - values[None] * particle.population * time_step
             )
         if not np.all(np.isfinite(updated)) or np.any(updated < 0):
             raise ValueError(
                 "wall-loss step requires a smaller finite time_step"
             )
-        np.copyto(particle.concentration, updated)
+        np.copyto(particle.population, updated)
         return particle
     active = radius > 0
     if charged:
-        active &= particle.concentration[0] > 0
+        active &= particle.population[0] > 0
         with np.errstate(over="ignore"):
             probability = np.exp(-values[active] * time_step)
         survived = np.zeros(particle.n_particles)
@@ -260,13 +260,13 @@ def step(
         (survived == 0) | (survived == 1)
     ):
         raise ValueError("wall-loss draws must return binary slot values")
-    updated = particle.concentration * survived[None]
+    updated = particle.population * survived[None]
     masses = particle.masses.copy()
-    lost = (particle.concentration[0] > 0) & (survived == 0)
+    lost = (particle.population[0] > 0) & (survived == 0)
     masses[0, lost] = 0
     charge = particle.charge.copy()
     charge[0, lost] = 0
     np.copyto(particle.masses, masses)
-    np.copyto(particle.concentration, updated)
+    np.copyto(particle.population, updated)
     np.copyto(particle.charge, charge)
     return particle

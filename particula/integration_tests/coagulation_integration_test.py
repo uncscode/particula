@@ -21,7 +21,7 @@ def forbid_facades(forbid_legacy_facades):
 
 def _mass_density(particle):
     """Independent population-aware mass concentration in kg/m^3."""
-    product = particle.masses[0].sum(axis=1) * particle.concentration[0]
+    product = particle.masses[0].sum(axis=1) * particle.population[0]
     if particle.distribution_type == "continuous_pdf":
         return np.sum(
             (product[1:] + product[:-1]) * np.diff(particle.radius_grid) / 2
@@ -84,7 +84,7 @@ class TestCoagulationIntegration(unittest.TestCase):
         )
         self.assertIsNotNone(aerosol_pmf)
         self.assertEqual(
-            aerosol_pmf.particles.concentration[0].shape,
+            aerosol_pmf.particles.population[0].shape,
             self.radius_bins.shape,
         )
 
@@ -112,7 +112,7 @@ class TestCoagulationIntegration(unittest.TestCase):
         )
         self.assertIsNotNone(aerosol_pdf)
         self.assertEqual(
-            aerosol_pdf.particles.concentration[0].shape,
+            aerosol_pdf.particles.population[0].shape,
             self.radius_bins.shape,
         )
 

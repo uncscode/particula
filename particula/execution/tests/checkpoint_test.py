@@ -55,7 +55,7 @@ def _resident_binding(
     particles.masses = wp.array(
         np.ones((n_boxes, 1, 1)), dtype=wp.float64, device="cpu"
     )
-    particles.concentration = wp.array(
+    particles.population = wp.array(
         np.full((n_boxes, 1), 2.0), dtype=wp.float64, device="cpu"
     )
     particles.charge = wp.zeros((n_boxes, 1), dtype=wp.float64, device="cpu")
@@ -107,7 +107,7 @@ def _real_dispatch_binding() -> tuple[Any, "GPUResourceRegistry", Any]:
 
     particles = ParticleData(
         masses=np.array([[[1.0e-18], [1.5e-18]]]),
-        concentration=np.ones((1, 2)),
+        population=np.ones((1, 2)),
         charge=np.zeros((1, 2)),
         density=np.array([1000.0]),
         volume=np.ones(1),
@@ -319,7 +319,7 @@ def test_checkpoint_is_detached_and_preserves_active_session() -> None:
     assert checkpoint.environment is not session.environment
     assert [item.role for item in checkpoint.payloads] == [
         "masses",
-        "concentration",
+        "population",
         "charge",
         "density",
         "volume",
@@ -416,7 +416,7 @@ def test_checkpoint_captures_wall_loss_stream_continuation(
     registry.acquire_wall_loss()
     checkpoint = session.checkpoint(registry, guard)
 
-    assert checkpoint.schema_version == 5
+    assert checkpoint.schema_version == 6
     assert checkpoint.rng_continuation is not None
     assert [
         item.process_id for item in checkpoint.rng_continuation.payloads
@@ -538,7 +538,7 @@ def test_schema_v5_restart_continues_real_process_streams(
         source_wall_loss = wall_loss.rng_states.numpy().copy()
         checkpoint = session.checkpoint(registry, guard)
 
-        assert checkpoint.schema_version == 5
+        assert checkpoint.schema_version == 6
         assert checkpoint.rng_continuation is not None
         assert [
             item.process_id for item in checkpoint.rng_continuation.payloads
@@ -586,7 +586,7 @@ def test_schema_v5_restart_continues_real_process_streams(
         restored_gas = cast(Any, restored.gas)
         states: tuple[tuple[Any, Any], ...] = (
             (source_particles.masses, restored_particles.masses),
-            (source_particles.concentration, restored_particles.concentration),
+            (source_particles.population, restored_particles.population),
             (source_particles.charge, restored_particles.charge),
             (source_gas.concentration, restored_gas.concentration),
             (coagulation.rng_states, restored_coagulation.rng_states),
@@ -1092,7 +1092,7 @@ def test_restart_rejects_non_checkpoint_and_terminal_checkpoint() -> None:
         )
 
     terminal = ResidentCheckpoint(
-        5,
+        6,
         "ResidentSession",
         cast(ResidentDimensions, object()),
         Device(Backend.WARP, "cpu"),
@@ -1268,7 +1268,7 @@ def test_v5_untagged_restart_rejects_before_setup(kind, monkeypatch):
 
     session, registry, guard = _resident_binding()
     snapshot = session.checkpoint(registry, guard)
-    assert snapshot.schema_version == 5
+    assert snapshot.schema_version == 6
     assert snapshot.distribution_type == "particle_resolved"
 
     def forbidden(*args, **kwargs):

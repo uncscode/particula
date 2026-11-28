@@ -232,7 +232,7 @@ its snapshot; a later exact matching finalization returns that same object.
 The implemented compatibility boundary is exact and fail-closed: restart accepts
 a `ResidentCheckpoint` with carrier type `"ResidentSession"`, lifecycle
 `ACTIVE`, complete valid payload descriptors and payloads, and an exactly equal
-target `Device`. Only schema-v5 is accepted. It retains explicit population
+target `Device`. Only schema-v6 is accepted. It retains explicit population
 semantics and independent gas and particle widths, optional complete closed-map
 communication, and required RNG continuation metadata/current published words.
 Schemas v1–v4 reject before setup or upload; no migration or inferred population
@@ -505,7 +505,7 @@ smoke—not exact per-seed or cross-backend replay.
 
 The supported boundary remains concrete-only and caller-owned: setup uploads
 each CPU container once; registry resources are identity-pinned; diagnostics
-copy only to caller-owned outputs; schema-v5 current words, not lossy inspection
+copy only to caller-owned outputs; schema-v6 current words, not lossy inspection
 carriers, are continuation authority; manual in-memory restart requires the
 exact device and creates fresh identities; and source finalization caches its
 first snapshot. Export expansion, automatic restart, device selection or

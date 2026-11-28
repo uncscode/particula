@@ -204,7 +204,7 @@ def _resident_state(fixture: ProcessFixture, device: str) -> SimpleNamespace:
     particles = WarpParticleData()
     particles.distribution_kind = wp.int32(3)
     particles.masses = wp.array(fixture.masses, dtype=wp.float64, device=device)
-    particles.concentration = wp.array(
+    particles.population = wp.array(
         fixture.particle_concentration * fixture.volume[:, None],
         dtype=wp.float64,
         device=device,
@@ -793,7 +793,7 @@ def _assert_restored_cpu_conversion_matches(
     """Compare restored CPU containers with explicit raw Warp snapshots."""
     assert restored_particles.masses.shape == fixture.masses.shape
     assert (
-        restored_particles.concentration.shape
+        restored_particles.population.shape
         == fixture.particle_concentration.shape
     )
     assert restored_particles.charge.shape == fixture.charge.shape
@@ -814,8 +814,8 @@ def _assert_restored_cpu_conversion_matches(
         restored_particles.masses, state.particles.masses.numpy()
     )
     npt.assert_array_equal(
-        restored_particles.concentration,
-        state.particles.concentration.numpy(),
+        restored_particles.population,
+        state.particles.population.numpy(),
     )
     npt.assert_array_equal(
         restored_particles.charge, state.particles.charge.numpy()
@@ -1342,7 +1342,7 @@ def test_warp_mirrors_fresh_fixture_and_preserves_stale_sidecars() -> None:
         particles.masses = wp.array(
             fixture.masses, dtype=wp.float64, device=device
         )
-        particles.concentration = wp.array(
+        particles.population = wp.array(
             fixture.particle_concentration, dtype=wp.float64, device=device
         )
         particles.charge = wp.array(
@@ -1407,7 +1407,7 @@ def _run_resident_sequence_on_device(
     wp.synchronize()
     initial_inventory = _particle_plus_gas_inventory(
         state.particles.masses.numpy(),
-        state.particles.concentration.numpy()
+        state.particles.population.numpy()
         / state.particles.volume.numpy()[:, None],
         state.gas.concentration.numpy(),
     )
@@ -1429,7 +1429,7 @@ def _run_resident_sequence_on_device(
     wp.synchronize()
     condensed_inventory = _particle_plus_gas_inventory(
         state.particles.masses.numpy(),
-        state.particles.concentration.numpy()
+        state.particles.population.numpy()
         / state.particles.volume.numpy()[:, None],
         state.gas.concentration.numpy(),
     )
@@ -1443,7 +1443,7 @@ def _run_resident_sequence_on_device(
 
     mass_charge_before = _active_slot_mass_and_charge(
         state.particles.masses.numpy(),
-        state.particles.concentration.numpy(),
+        state.particles.population.numpy(),
         state.particles.charge.numpy(),
     )
     assert np.all(np.isfinite(mass_charge_before[0]))
@@ -1479,7 +1479,7 @@ def _run_resident_sequence_on_device(
         )
         collision_totals += state.collision_counts.numpy()
         if np.all(
-            np.count_nonzero(state.particles.concentration.numpy(), axis=1) < 2
+            np.count_nonzero(state.particles.population.numpy(), axis=1) < 2
         ):
             break
     else:
@@ -1492,7 +1492,7 @@ def _run_resident_sequence_on_device(
     wp.synchronize()
     mass_charge_after = _active_slot_mass_and_charge(
         state.particles.masses.numpy(),
-        state.particles.concentration.numpy(),
+        state.particles.population.numpy(),
         state.particles.charge.numpy(),
     )
     npt.assert_allclose(
@@ -1507,7 +1507,7 @@ def _run_resident_sequence_on_device(
     for box, count in enumerate(collision_counts):
         pairs = collision_pairs[box, :count]
         assert np.all((pairs >= 0) & (pairs < fixture.masses.shape[1]))
-        assert np.all(state.particles.concentration.numpy()[box, pairs] >= 0.0)
+        assert np.all(state.particles.population.numpy()[box, pairs] >= 0.0)
 
     rng_after_first_call = state.coagulation_rng.numpy().copy()
     repeat = coagulation_step_gpu(
@@ -1530,7 +1530,7 @@ def _run_resident_sequence_on_device(
     npt.assert_array_equal(state.coagulation_rng.numpy(), rng_after_first_call)
     npt.assert_array_equal(state.collision_counts.numpy(), 0)
 
-    concentration_before = state.particles.concentration.numpy().copy()
+    concentration_before = state.particles.population.numpy().copy()
     gas_before = state.gas.concentration.numpy().copy()
     expected_particle, _ = _dilution_expectation(
         concentration_before, np.float64(0.2), 0.1
@@ -1542,13 +1542,11 @@ def _run_resident_sequence_on_device(
     assert diluted_particles is state.particles
     assert diluted_gas is state.gas
     wp.synchronize()
-    npt.assert_allclose(
-        state.particles.concentration.numpy(), expected_particle
-    )
+    npt.assert_allclose(state.particles.population.numpy(), expected_particle)
     npt.assert_allclose(state.gas.concentration.numpy(), expected_gas)
 
     wall_masses_before = state.particles.masses.numpy().copy()
-    wall_concentration_before = state.particles.concentration.numpy().copy()
+    wall_concentration_before = state.particles.population.numpy().copy()
     wall_rng_before = state.wall_rng.numpy().copy()
     wall_config = NeutralWallLossConfig(
         "spherical",
@@ -1574,7 +1572,7 @@ def _run_resident_sequence_on_device(
     wp.synchronize()
     assert state.wall_rng.shape == wall_rng_before.shape
     removed_mask = (wall_concentration_before > 0.0) & (
-        state.particles.concentration.numpy() == 0.0
+        state.particles.population.numpy() == 0.0
     )
     retained, removed = _wall_loss_budget(
         wall_masses_before,
@@ -1593,7 +1591,7 @@ def _run_resident_sequence_on_device(
     npt.assert_allclose(
         _particle_inventory(
             state.particles.masses.numpy(),
-            state.particles.concentration.numpy(),
+            state.particles.population.numpy(),
         ),
         retained,
         rtol=1e-12,
@@ -1603,7 +1601,7 @@ def _run_resident_sequence_on_device(
     assert np.all(state.gas.concentration.numpy() >= 0.0)
     _slot_expectation(
         state.particles.masses.numpy(),
-        state.particles.concentration.numpy(),
+        state.particles.population.numpy(),
         state.particles.charge.numpy(),
     )
 
@@ -1622,7 +1620,7 @@ def _run_resident_sequence_on_device(
     wp.synchronize()
     inventory_before_nucleation = _particle_plus_gas_inventory(
         state.particles.masses.numpy(),
-        state.particles.concentration.numpy()
+        state.particles.population.numpy()
         / state.particles.volume.numpy()[:, None],
         state.gas.concentration.numpy(),
     )
@@ -1657,7 +1655,7 @@ def _run_resident_sequence_on_device(
     npt.assert_allclose(
         _particle_plus_gas_inventory(
             state.particles.masses.numpy(),
-            state.particles.concentration.numpy()
+            state.particles.population.numpy()
             / state.particles.volume.numpy()[:, None],
             state.gas.concentration.numpy(),
         ),
@@ -1672,7 +1670,7 @@ def _run_resident_sequence_on_device(
 
     wp.synchronize()
     raw_particle = state.particles.masses.numpy().copy()
-    raw_concentration = state.particles.concentration.numpy().copy()
+    raw_concentration = state.particles.population.numpy().copy()
     raw_charge = state.particles.charge.numpy().copy()
     raw_density = state.particles.density.numpy().copy()
     raw_volume = state.particles.volume.numpy().copy()
@@ -1701,7 +1699,7 @@ def _run_resident_sequence_on_device(
         restored_environment,
     )
     npt.assert_array_equal(restored_particles.masses, raw_particle)
-    npt.assert_array_equal(restored_particles.concentration, raw_concentration)
+    npt.assert_array_equal(restored_particles.population, raw_concentration)
     npt.assert_array_equal(restored_particles.charge, raw_charge)
     npt.assert_array_equal(restored_particles.density, raw_density)
     npt.assert_array_equal(restored_particles.volume, raw_volume)
@@ -1826,7 +1824,7 @@ def test_zero_time_direct_calls_are_byte_exact_no_op(
     state = _resident_state(_resident_sequence_fixture(fixture), "cpu")
     particle_before = {
         "masses": state.particles.masses.numpy().copy(),
-        "concentration": state.particles.concentration.numpy().copy(),
+        "concentration": state.particles.population.numpy().copy(),
         "charge": state.particles.charge.numpy().copy(),
         "density": state.particles.density.numpy().copy(),
         "volume": state.particles.volume.numpy().copy(),
@@ -1919,7 +1917,7 @@ def test_zero_time_direct_calls_are_byte_exact_no_op(
         state.particles.masses.numpy(), particle_before["masses"]
     )
     npt.assert_array_equal(
-        state.particles.concentration.numpy(), particle_before["concentration"]
+        state.particles.population.numpy(), particle_before["concentration"]
     )
     npt.assert_array_equal(
         state.particles.charge.numpy(), particle_before["charge"]
@@ -1980,15 +1978,15 @@ def test_positive_time_nucleation_admits_slots_removes_gas_and_conserves() -> (
     state.particles.masses = wp.zeros(
         state.particles.masses.shape, dtype=wp.float64, device="cpu"
     )
-    state.particles.concentration = wp.zeros(
-        state.particles.concentration.shape, dtype=wp.float64, device="cpu"
+    state.particles.population = wp.zeros(
+        state.particles.population.shape, dtype=wp.float64, device="cpu"
     )
     state.particles.charge = wp.zeros(
         state.particles.charge.shape, dtype=wp.float64, device="cpu"
     )
     inventory_before = _particle_plus_gas_inventory(
         state.particles.masses.numpy(),
-        state.particles.concentration.numpy()
+        state.particles.population.numpy()
         / state.particles.volume.numpy()[:, None],
         state.gas.concentration.numpy(),
     )
@@ -2028,14 +2026,14 @@ def test_positive_time_nucleation_admits_slots_removes_gas_and_conserves() -> (
     wp.synchronize()
     npt.assert_array_equal(state.finalized.accepted_counts.numpy(), [1])
     npt.assert_array_equal(
-        state.particles.concentration.numpy() > 0.0,
+        state.particles.population.numpy() > 0.0,
         [[True, False, False, False]],
     )
     assert state.gas.concentration.numpy()[0, 0] < gas_before[0, 0]
     npt.assert_allclose(
         _particle_plus_gas_inventory(
             state.particles.masses.numpy(),
-            state.particles.concentration.numpy()
+            state.particles.population.numpy()
             / state.particles.volume.numpy()[:, None],
             state.gas.concentration.numpy(),
         ),
@@ -2468,7 +2466,7 @@ def test_neutral_wall_loss_aggregate_removal_stays_within_binomial_band() -> (
             dtype=wp.float64,
             device="cpu",
         ),
-        concentration=wp.ones((trials, 1), dtype=wp.float64, device="cpu"),
+        population=wp.ones((trials, 1), dtype=wp.float64, device="cpu"),
         charge=wp.ones((trials, 1), dtype=wp.float64, device="cpu"),
         density=wp.array([particle_density], dtype=wp.float64, device="cpu"),
         volume=wp.ones(trials, dtype=wp.float64, device="cpu"),
@@ -2485,7 +2483,7 @@ def test_neutral_wall_loss_aggregate_removal_stays_within_binomial_band() -> (
             device="cpu",
         ),
     )
-    removed = int(np.sum(particles.concentration.numpy() == 0.0))
+    removed = int(np.sum(particles.population.numpy() == 0.0))
 
     assert abs(removed - expected_mean) <= bound
 

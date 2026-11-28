@@ -20,7 +20,7 @@ def device(request):
 
 def add_fields(initial):
     """Give two independent tracers nonuniform values and birth defaults."""
-    counts = initial.particles.concentration
+    counts = initial.particles.population
     for name, axes, scale in (
         ("lab.scalar", ("box", "particle"), 1),
         ("lab.vector", ("box", "particle", "particle_species"), 3),
@@ -45,7 +45,7 @@ def add_fields(initial):
 
 def inventory(state, name):
     """Represented per-box inventory, independent of slot layout."""
-    counts = state.particles.concentration
+    counts = state.particles.population
     values = state.fields[name]
     return np.sum(
         values * (counts if values.ndim == 2 else counts[..., None]), axis=1
@@ -81,7 +81,7 @@ def test_native_particle_inventory(device, family):
                 rtol=2e-14,
             )
             assert np.all(
-                result.fields[name][result.particles.concentration == 0] == 0
+                result.fields[name][result.particles.population == 0] == 0
             )
         if family == "nucleation_resampling":
             # Three unit-weight donors become two weight-1.5 survivors;
@@ -90,7 +90,7 @@ def test_native_particle_inventory(device, family):
                 result.fields["lab.scalar"], [[4 / 3, 8 / 3, 2, 2]]
             )
         if family == "coagulation":
-            assert np.count_nonzero(result.particles.concentration) < 64
+            assert np.count_nonzero(result.particles.population) < 64
         saved = sim.checkpoint()
         with process.resume(saved) as resumed:
             assert resumed.checkpoint().field_payloads == saved.field_payloads
@@ -103,7 +103,7 @@ def test_passive_birth(device, dtype):
 
     initial, process = nucleation_case(resampling=False)
     dt = 1.0
-    values = np.where(initial.particles.concentration > 0, 9, 0).astype(dtype)
+    values = np.where(initial.particles.population > 0, 9, 0).astype(dtype)
     initial.fields.add(
         FieldSpec(
             "lab.label", ("box", "particle"), "1", dtype=dtype, initial_value=4
@@ -113,8 +113,8 @@ def test_passive_birth(device, dtype):
     with process.prepare(initial, device=device, time_step=dt) as sim:
         sim.step()
         result = sim.snapshot()
-    born = (initial.particles.concentration == 0) & (
-        result.particles.concentration > 0
+    born = (initial.particles.population == 0) & (
+        result.particles.population > 0
     )
     assert np.any(born)
     np.testing.assert_array_equal(result.fields["lab.label"][born], 4)
@@ -235,7 +235,7 @@ def test_custom_particle_contract_faults_before_later_work(device, change):
             maximum=2,
         )
     )
-    name = "particles.concentration" if change == "activity" else "lab.value"
+    name = "particles.population" if change == "activity" else "lab.value"
     process = FunctionProcess(
         lambda *_a, **_k: None, name="writer", writes=(name,)
     )
@@ -258,7 +258,7 @@ def test_positive_particle_bounds_ignore_inactive_slots(device):
     from particula import FunctionProcess, ProcessRegistry
 
     initial, _, dt = scenario("nucleation")
-    values = np.where(initial.particles.concentration > 0, 1.0, 0.0)
+    values = np.where(initial.particles.population > 0, 1.0, 0.0)
     initial.fields.add(
         FieldSpec(
             "lab.value", ("box", "particle"), "1", initial_value=1, minimum=1

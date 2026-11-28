@@ -35,7 +35,7 @@ def _native_aerosol(kind):
     volume = 1e-6 if kind == "particle_resolved" else 1.0
     particle = ParticleData(
         masses=(4 / 3 * np.pi * radius**3 * 1000)[None, :, None],
-        concentration=np.full(
+        population=np.full(
             (1, radius.size), 1.0 if kind == "particle_resolved" else 1e6
         ),
         charge=np.zeros((1, radius.size)),
@@ -119,7 +119,7 @@ class DummyCondensationStrategy(CondensationStrategy):
         return 0.0
 
     def rate(self, particle, *_, **__):
-        return np.zeros_like(particle.concentration[0])
+        return np.zeros_like(particle.population[0])
 
     def step(self, particle, gas_species, *_, **__):
         return particle, gas_species
@@ -136,7 +136,7 @@ class SpyWallLossStrategy(WallLossStrategy):
         self.time_steps: list[float] = []
 
     def loss_coefficient(self, particle, temperature, pressure):
-        return np.zeros_like(particle.concentration[0])
+        return np.zeros_like(particle.population[0])
 
     def loss_coefficient_for_particles(
         self,
@@ -164,30 +164,30 @@ def test_init_with_rectangular_strategy(rectangular_strategy):
 
 def test_execute_reduces_concentration(aerosol, spherical_strategy):
     wall_loss = WallLoss(wall_loss_strategy=spherical_strategy)
-    initial = aerosol.particles.concentration[0].copy()
+    initial = aerosol.particles.population[0].copy()
     updated = wall_loss.execute(aerosol, time_step=1.0)
-    assert np.all(updated.particles.concentration[0] <= initial)
+    assert np.all(updated.particles.population[0] <= initial)
 
 
 def test_execute_zero_time_step_no_change(aerosol, spherical_strategy):
     wall_loss = WallLoss(wall_loss_strategy=spherical_strategy)
-    initial = aerosol.particles.concentration[0].copy()
+    initial = aerosol.particles.population[0].copy()
     updated = wall_loss.execute(aerosol, time_step=0.0)
-    np.testing.assert_array_equal(updated.particles.concentration[0], initial)
+    np.testing.assert_array_equal(updated.particles.population[0], initial)
 
 
 def test_execute_clamps_non_negative(aerosol, spherical_strategy, monkeypatch):
     """The runnable clamps successful custom strategy output in place."""
-    array = aerosol.particles.concentration
+    array = aerosol.particles.population
 
     def negative_output(particle, **_):
-        particle.concentration[0, 0] = -1.0
+        particle.population[0, 0] = -1.0
         return particle
 
     monkeypatch.setattr(spherical_strategy, "step", negative_output)
     wall_loss = WallLoss(wall_loss_strategy=spherical_strategy)
     assert wall_loss.execute(aerosol, time_step=1.0) is aerosol
-    assert aerosol.particles.concentration is array
+    assert aerosol.particles.population is array
     assert np.all(array >= 0.0)
     assert array[0, 0] == 0.0
 
@@ -196,10 +196,10 @@ def test_oversized_native_step_rejects_before_mutation(
     aerosol, spherical_strategy
 ):
     """Native finite-step admission rejects a negative concentration proposal."""
-    original = aerosol.particles.concentration.copy()
+    original = aerosol.particles.population.copy()
     with pytest.raises(ValueError, match="smaller finite time_step"):
         WallLoss(spherical_strategy).execute(aerosol, time_step=1e8)
-    np.testing.assert_array_equal(aerosol.particles.concentration, original)
+    np.testing.assert_array_equal(aerosol.particles.population, original)
 
 
 def test_execute_honors_sub_steps(aerosol):
@@ -212,7 +212,7 @@ def test_execute_honors_sub_steps(aerosol):
 def test_rate_negative_and_shape(aerosol, spherical_strategy):
     wall_loss = WallLoss(wall_loss_strategy=spherical_strategy)
     rates = wall_loss.rate(aerosol)
-    assert rates.shape == aerosol.particles.concentration.shape
+    assert rates.shape == aerosol.particles.population.shape
     assert np.all(rates <= 0.0)
 
 
@@ -221,7 +221,7 @@ def test_rectangular_strategy_smoke(aerosol, rectangular_strategy):
     updated = wall_loss.execute(aerosol, time_step=1.0)
     rates = wall_loss.rate(updated)
     assert np.all(rates <= 0.0)
-    assert updated.particles.concentration.sum() >= 0.0
+    assert updated.particles.population.sum() >= 0.0
 
 
 def test_particle_resolved_distribution_smoke(aerosol_resolved):
@@ -234,7 +234,7 @@ def test_particle_resolved_distribution_smoke(aerosol_resolved):
     updated = wall_loss.execute(aerosol_resolved, time_step=0.5)
     rates = wall_loss.rate(updated)
     assert np.all(rates <= 0.0)
-    assert updated.particles.concentration.sum() >= 0.0
+    assert updated.particles.population.sum() >= 0.0
 
 
 def test_process_chaining_with_coagulation(aerosol, spherical_strategy):
@@ -243,7 +243,7 @@ def test_process_chaining_with_coagulation(aerosol, spherical_strategy):
     combined = coagulation | wall_loss
     updated = combined.execute(aerosol, time_step=1.0)
     assert isinstance(updated, Aerosol)
-    assert np.all(updated.particles.concentration[0] >= 0.0)
+    assert np.all(updated.particles.population[0] >= 0.0)
 
 
 def test_process_chaining_with_condensation(aerosol, spherical_strategy):
@@ -254,7 +254,7 @@ def test_process_chaining_with_condensation(aerosol, spherical_strategy):
     combined = condensation | wall_loss
     updated = combined.execute(aerosol, time_step=1.0)
     assert isinstance(updated, Aerosol)
-    assert np.all(updated.particles.concentration[0] >= 0.0)
+    assert np.all(updated.particles.population[0] >= 0.0)
 
 
 @pytest.mark.parametrize("operation", ["rate", "execute"])

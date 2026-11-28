@@ -151,8 +151,8 @@ class DirectDualCondensation:
                 "Native dual-vapor provider reported a failure"
             )
         self.host.particles.masses[:] = self.particles.masses.numpy()
-        self.host.particles.concentration[:] = (
-            self.particles.concentration.numpy()
+        self.host.particles.population[:] = (
+            self.particles.population.numpy()
         )
         self.host.gas.concentration[:] = self.gas.concentration.numpy()
         return self.host

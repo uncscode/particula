@@ -238,7 +238,7 @@ def test_mass_precision_cases_construct_particle_data(
     """Each case can initialize ParticleData without shape changes."""
     particle_data = ParticleData(
         masses=case.masses,
-        concentration=case.concentration,
+        population=case.concentration,
         charge=case.charge,
         density=case.density_kg_m3,
         volume=case.volume,
@@ -246,7 +246,7 @@ def test_mass_precision_cases_construct_particle_data(
     )
 
     assert particle_data.masses.shape == case.masses.shape
-    assert particle_data.concentration.shape == case.concentration.shape
+    assert particle_data.population.shape == case.concentration.shape
     assert particle_data.charge.shape == case.charge.shape
     assert particle_data.density.shape == case.density_kg_m3.shape
     assert particle_data.volume.shape == case.volume.shape
@@ -261,7 +261,7 @@ def test_mass_precision_case_radii_match_expected_scale_order(
     for case in mass_precision_cases:
         particle_data = ParticleData(
             masses=case.masses,
-            concentration=case.concentration,
+            population=case.concentration,
             charge=case.charge,
             density=case.density_kg_m3,
             volume=case.volume,
@@ -289,7 +289,7 @@ def test_mass_precision_case_rejects_malformed_particle_data_shape() -> None:
     ):
         ParticleData(
             masses=case.masses[0],
-            concentration=case.concentration,
+            population=case.concentration,
             charge=case.charge,
             density=case.density_kg_m3,
             volume=case.volume,
@@ -302,7 +302,7 @@ def test_mass_precision_case_rejects_malformed_particle_data_shape() -> None:
     ):
         ParticleData(
             masses=case.masses,
-            concentration=case.concentration[:, :-1],
+            population=case.concentration[:, :-1],
             charge=case.charge,
             density=case.density_kg_m3,
             volume=case.volume,
@@ -365,7 +365,7 @@ def test_mass_precision_baseline_policy_preserves_fp64_on_cpu_and_warp(
 
     particle_data = ParticleData(
         masses=case.masses,
-        concentration=case.concentration,
+        population=case.concentration,
         charge=case.charge,
         density=case.density_kg_m3,
         volume=case.volume,
@@ -373,14 +373,14 @@ def test_mass_precision_baseline_policy_preserves_fp64_on_cpu_and_warp(
     )
     assert case.masses.dtype == np.float64
     assert particle_data.masses.dtype == np.float64
-    assert particle_data.concentration.dtype == np.float64
+    assert particle_data.population.dtype == np.float64
     assert particle_data.charge.dtype == np.float64
     assert particle_data.density.dtype == np.float64
     assert particle_data.volume.dtype == np.float64
 
     gpu_data = to_warp_particle_data(particle_data, device="cpu")
     assert gpu_data.masses.dtype == wp.float64
-    assert gpu_data.concentration.dtype == wp.float64
+    assert gpu_data.population.dtype == wp.float64
     assert gpu_data.charge.dtype == wp.float64
     assert gpu_data.density.dtype == wp.float64
     assert gpu_data.volume.dtype == wp.float64
@@ -402,7 +402,7 @@ def test_mass_precision_case_warp_round_trip_preserves_values_exactly(
     pytest.importorskip("warp")
     particle_data = ParticleData(
         masses=case.masses,
-        concentration=case.concentration,
+        population=case.concentration,
         charge=case.charge,
         density=case.density_kg_m3,
         volume=case.volume,
@@ -415,14 +415,14 @@ def test_mass_precision_case_warp_round_trip_preserves_values_exactly(
 
     npt.assert_array_equal(restored.masses, particle_data.masses)
     npt.assert_array_equal(
-        restored.concentration,
-        particle_data.concentration,
+        restored.population,
+        particle_data.population,
     )
     npt.assert_array_equal(restored.charge, particle_data.charge)
     npt.assert_array_equal(restored.density, particle_data.density)
     npt.assert_array_equal(restored.volume, particle_data.volume)
     assert restored.masses.dtype == np.float64
-    assert restored.concentration.dtype == np.float64
+    assert restored.population.dtype == np.float64
     assert restored.charge.dtype == np.float64
     assert restored.density.dtype == np.float64
     assert restored.volume.dtype == np.float64

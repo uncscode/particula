@@ -25,11 +25,11 @@ def cohort_case(background=False, seed_diameter=3e-9):
         masses[0, 1, 0] = masses[0, 0, 0]
     return Aerosol(
         particles=ParticleData(
-            masses,
-            np.ones((1, 2)),
-            np.zeros((1, 2)),
-            np.full(3, 1000.0),
-            np.array([1e-25]),
+            masses=masses,
+            population=np.ones((1, 2)),
+            charge=np.zeros((1, 2)),
+            density=np.full(3, 1000.0),
+            volume=np.array([1e-25]),
             distribution_type="particle_resolved",
         ),
         gas=base.gas,
@@ -77,7 +77,7 @@ def test_original_lineage_partition_and_restart(
         result = simulation.snapshot()
         observed = simulation.cohort_diagnostics()
         after = simulation.checkpoint()
-        assert np.count_nonzero(result.particles.concentration) == 1
+        assert np.count_nonzero(result.particles.population) == 1
         for key, value in zip(
             ("initial", "reached", "captured", "unresolved"),
             expected,
@@ -126,7 +126,7 @@ def test_condensation_updates_first_passage_after_process(device):
     if device != "cpu" and not wp.is_cuda_available():
         pytest.skip("CUDA unavailable")
     initial, condensation = condensation_case()
-    initial.particles.concentration[:] = 1
+    initial.particles.population[:] = 1
     initial.particles.masses[..., 0] = 0
     volume = (initial.particles.masses / initial.particles.density).sum(axis=2)
     target = float(np.max((6 * volume / np.pi) ** (1 / 3)) * 1.05)
@@ -174,14 +174,14 @@ def test_evaporated_background_does_not_capture_after_slot_reuse(device):
     initial.particles.masses[:] = 0
     initial.particles.masses[0, 0, 0] = 1e-24  # Volatile background.
     initial.particles.masses[0, 1, 1] = 1e-21  # Nonvolatile seed.
-    initial.particles.concentration[:] = [[1, 1, 0, 0]]
+    initial.particles.population[:] = [[1, 1, 0, 0]]
     initial.particles.charge[:] = 0
     initial.gas.concentration[:, 2] = 0
     process = condensation | SeedCohort(1, 0, target_diameter=1e-6)
     with process.prepare(initial, device=device, time_step=1e-3) as owner:
         owner.step()
         after = owner.snapshot()
-        assert after.particles.concentration[0, 0] == 0
+        assert after.particles.population[0, 0] == 0
         p = owner._session.particles
         pending = owner._auxiliary["cohort_pending"]
         background = owner._auxiliary["cohort_background"]
@@ -211,7 +211,7 @@ def test_evaporated_background_does_not_capture_after_slot_reuse(device):
             device=device,
             inputs=[
                 p.masses,
-                p.concentration,
+                p.population,
                 p.density,
                 wp.float64(np.pi / 6 * 1e-18),
                 pending,
@@ -237,7 +237,7 @@ def test_evaporated_unresolved_seed_still_faults(device):
     initial, condensation = condensation_case()
     initial.particles.masses[:] = 0
     initial.particles.masses[..., 0] = 1e-24
-    initial.particles.concentration[:] = 1
+    initial.particles.population[:] = 1
     initial.gas.concentration[:, 2] = 0
     process = condensation | SeedCohort(0, 1, target_diameter=1e-6)
     with process.prepare(initial, device=device, time_step=1e-3) as owner:

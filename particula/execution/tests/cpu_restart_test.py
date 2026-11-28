@@ -129,7 +129,7 @@ def test_auxiliary_fields_and_inventory_ledgers_survive_disk(tmp_path):
     from particula import FieldSpec
 
     initial, process, dt = scenario("dilution")
-    values = np.where(initial.particles.concentration > 0, 2e-20, 0.0)
+    values = np.where(initial.particles.population > 0, 2e-20, 0.0)
     initial.fields.add(
         FieldSpec(
             "lab.tracer", ("box", "particle"), "kg", particle_policy="additive"

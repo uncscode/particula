@@ -99,8 +99,8 @@ def test_native_staggered_scalar_oracle(
     particles, gas, mapping = make_state(kind, volume)
     gas.concentration[0, 1:] = 1e-18
     if kind == "continuous_pdf":
-        particles.concentration *= 1e9
-    weights = particles.concentration[0].copy()
+        particles.population *= 1e9
+    weights = particles.population[0].copy()
     if kind == "particle_resolved":
         weights /= volume
     elif kind == "continuous_pdf":
@@ -130,7 +130,7 @@ def test_native_staggered_scalar_oracle(
     expected_mass, expected_gas = _oracle(
         old_mass[0],
         particles.density,
-        particles.concentration[0],
+        particles.population[0],
         weights,
         old_gas[0],
         gas.molar_mass,
@@ -226,7 +226,7 @@ def test_repeated_evaporation_cannot_spend_original_mass_twice(volume):
     particles, gas, mapping = make_state(volume=volume)
     gas.concentration[0, 1:] = 0
     original = particles.masses.copy()
-    weights = particles.concentration[0] / volume
+    weights = particles.population[0] / volume
     strategy = native_strategy(
         CondensationIsothermalStaggered,
         gas,
@@ -257,12 +257,12 @@ def test_staggered_uptake_reads_gas_updated_by_preceding_batches():
     )
     strategy.vapor_pressure_strategy.vapor_pressure = np.zeros(3)
     old_masses, old_gas = particles.masses.copy(), gas.concentration.copy()
-    weights = particles.concentration[0] / 0.25
+    weights = particles.population[0] / 0.25
     batches = [np.array([0]), np.array([1]), np.array([2])]
     expected_mass, expected_gas = _oracle(
         old_masses[0],
         particles.density,
-        particles.concentration[0],
+        particles.population[0],
         weights,
         old_gas[0],
         gas.molar_mass,
@@ -275,7 +275,7 @@ def test_staggered_uptake_reads_gas_updated_by_preceding_batches():
     frozen_mass, _ = _oracle(
         old_masses[0],
         particles.density,
-        particles.concentration[0],
+        particles.population[0],
         weights,
         old_gas[0],
         gas.molar_mass,

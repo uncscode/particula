@@ -33,7 +33,7 @@ def test_native_all_gas_decay_and_measure_correct_rate(kind, volume, mask):
     aerosol = state(volume, kind)
     aerosol.gas.partitioning[:] = mask
     before = snapshots(aerosol)
-    old_counts = aerosol.particles.concentration.copy()
+    old_counts = aerosol.particles.population.copy()
     old_gas = aerosol.gas.concentration.copy()
     process = Dilution(DilutionStrategy(0.25))
     np.testing.assert_allclose(
@@ -41,7 +41,7 @@ def test_native_all_gas_decay_and_measure_correct_rate(kind, volume, mask):
     )
     assert process.execute(aerosol, 4.0, 4) is aerosol
     np.testing.assert_allclose(
-        aerosol.particles.concentration,
+        aerosol.particles.population,
         old_counts * np.exp(-1),
         rtol=1e-12,
         atol=0,
@@ -51,7 +51,7 @@ def test_native_all_gas_decay_and_measure_correct_rate(kind, volume, mask):
     )
     for array, values in before:
         if (
-            array is not aerosol.particles.concentration
+            array is not aerosol.particles.population
             and array is not aerosol.gas.concentration
         ):
             np.testing.assert_array_equal(array, values)
@@ -67,13 +67,13 @@ def test_native_rejections_leave_every_array_unchanged(failure, time):
     if failure == "nan_gas":
         aerosol.gas.concentration[0, 0] = np.nan
     elif failure == "nan_counts":
-        aerosol.particles.concentration[0, 0] = np.nan
+        aerosol.particles.population[0, 0] = np.nan
     elif failure == "volume":
         aerosol.particles.volume[0] = 0
     elif failure == "readonly":
         aerosol.gas.concentration.flags.writeable = False
     else:
-        aerosol.particles.charge = aerosol.particles.concentration.view()
+        aerosol.particles.charge = aerosol.particles.population.view()
     before = snapshots(aerosol)
     with pytest.raises(ValueError):
         Dilution(DilutionStrategy(0.25)).execute(aerosol, time, 2)
@@ -89,12 +89,12 @@ def test_failed_later_substep_restores_its_entry_and_keeps_prior_commit(
     original = module.np.copyto
     calls = []
     error = RuntimeError("second substep gas write")
-    before_counts = aerosol.particles.concentration.copy()
+    before_counts = aerosol.particles.population.copy()
     before_gas = aerosol.gas.concentration.copy()
 
     def write(target, values):
         if (
-            target is aerosol.particles.concentration
+            target is aerosol.particles.population
             or target is aerosol.gas.concentration
         ):
             calls.append(target)
@@ -108,7 +108,7 @@ def test_failed_later_substep_restores_its_entry_and_keeps_prior_commit(
     assert caught.value is error
     assert len(calls) == 4
     np.testing.assert_allclose(
-        aerosol.particles.concentration,
+        aerosol.particles.population,
         before_counts * np.exp(-0.25),
         rtol=1e-15,
     )

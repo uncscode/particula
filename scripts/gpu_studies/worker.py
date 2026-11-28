@@ -163,7 +163,7 @@ def reset_buffers(owner):
     for carrier, names in (
         (
             owner._session.particles,
-            ("masses", "concentration", "charge", "density", "volume"),
+            ("masses", "population", "charge", "density", "volume"),
         ),
         (
             owner._session.gas,

@@ -93,7 +93,7 @@ def _state(device, boxes=1, particles=3, species=2, *, active=False):
     particle_data = SimpleNamespace(
         distribution_kind=3,
         masses=wp.array(masses, dtype=wp.float64, device=device),
-        concentration=wp.array(concentration, dtype=wp.float64, device=device),
+        population=wp.array(concentration, dtype=wp.float64, device=device),
         charge=wp.zeros((boxes, particles), dtype=wp.float64, device=device),
         density=wp.array(
             1000.0 + 200.0 * np.arange(species),
@@ -330,7 +330,7 @@ def test_public_nucleation_step_matches_independent_p2_p3_p5_oracle(
         particles.masses.numpy(), expected_masses, rtol=1e-12, atol=1e-30
     )
     np.testing.assert_allclose(
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         expected_concentration,
         rtol=1e-12,
         atol=1e-30,
@@ -407,7 +407,7 @@ def test_public_nucleation_step_conserves_tiny_matrix_transfer(device) -> None:
     )
     initial = _particle_inventory(
         particles.masses.numpy(),
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         particles.volume.numpy(),
     )
     initial += gas.concentration.numpy()
@@ -427,7 +427,7 @@ def test_public_nucleation_step_conserves_tiny_matrix_transfer(device) -> None:
     wp.synchronize_device(device)
     final = _particle_inventory(
         particles.masses.numpy(),
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         particles.volume.numpy(),
     )
     final += gas.concentration.numpy()
@@ -463,7 +463,7 @@ def test_public_nucleation_step_scaling_fallback_has_separate_inventory(
     )
     initial_particle = _particle_inventory(
         particles.masses.numpy(),
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         particles.volume.numpy(),
     )
     initial_gas = gas.concentration.numpy().copy()
@@ -491,7 +491,7 @@ def test_public_nucleation_step_scaling_fallback_has_separate_inventory(
     source_removal = 4.0 * event_mass
     final_particle = _particle_inventory(
         particles.masses.numpy(),
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         particles.volume.numpy(),
     )
     np.testing.assert_array_equal(exhaustion.scaling_required.numpy(), [1])
@@ -535,7 +535,7 @@ def test_public_nucleation_step_resampling_precedes_scaling(device) -> None:
         dtype=wp.float64,
         device=device,
     )
-    particles.concentration = wp.array(
+    particles.population = wp.array(
         [[2.0, 3.0, 0.0]], dtype=wp.float64, device=device
     )
     scratch, finalized, diagnostics, exhaustion = _sidecars(
@@ -548,7 +548,7 @@ def test_public_nucleation_step_resampling_precedes_scaling(device) -> None:
     )
     initial_particle = _particle_inventory(
         particles.masses.numpy(),
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         particles.volume.numpy(),
     )
     initial_gas = gas.concentration.numpy().copy()
@@ -570,7 +570,7 @@ def test_public_nucleation_step_resampling_precedes_scaling(device) -> None:
     wp.synchronize_device(device)
     final_particle = _particle_inventory(
         particles.masses.numpy(),
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         particles.volume.numpy(),
     )
     np.testing.assert_array_equal(exhaustion.scaling_required.numpy(), [0])
@@ -611,7 +611,7 @@ def test_public_nucleation_step_repeated_calls_use_current_gas(device) -> None:
     )
     wp.synchronize_device(device)
     before_particles = particles.masses.numpy().copy()
-    before_concentration = particles.concentration.numpy().copy()
+    before_concentration = particles.population.numpy().copy()
     before_gas = gas.concentration.numpy().copy()
     demand, removal, event_mass = _numpy_p2(
         before_gas, gas.molar_mass.numpy(), config, 1.0
@@ -639,7 +639,7 @@ def test_public_nucleation_step_repeated_calls_use_current_gas(device) -> None:
         particles.masses.numpy(), expected_masses, rtol=1e-12, atol=1e-30
     )
     np.testing.assert_allclose(
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         expected_concentration,
         rtol=1e-12,
         atol=1e-30,

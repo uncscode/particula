@@ -20,7 +20,7 @@ array widths alone never establishes chemical correspondence.
 |---|---|---|
 | `aerosol.particles` / `.gas` / `.environment` | Container | Actual held object, not a copy |
 | `particles.masses` | `(B,N,P)` | Writable kg per represented particle/material |
-| `particles.concentration` | `(B,N)` | Writable counts, PMF density or radius-PDF density according to the explicit kind |
+| `particles.population` | `(B,N)` | Writable represented number per bin or slot, or dN/dr in m⁻¹ for a radius PDF |
 | `particles.charge` | `(B,N)` | Writable elementary-charge units |
 | `particles.density` | `(P,)` | Material density, kg/m³ |
 | `particles.volume` | `(B,)` | Authoritative represented volume, m³ |
@@ -44,10 +44,10 @@ masses or counts. `copy()` explicitly detaches a container. Population-derived
 properties validate the current representation on each read; raw mutation
 itself does not enforce process-specific physics.
 
-For resolved data, `concentration` is **counts**, and per-slot number density is
-`concentration / volume[:, None]`. For PMFs, sum densities. For radius PDFs,
-integrate `dN/dr` and mass times `dN/dr` over the explicit radius grid; do not
-sum PDF nodes. Discrete/PDF volume is exactly 1 m³. See
+For every kind, `population / volume[:, None]` gives the per-slot density.
+Sum bin and resolved densities across slots. For a radius PDF, integrate the
+density over the explicit radius grid. For species mass density, integrate
+the product of per-particle mass and PDF density over that same grid. See
 [distribution rules](construction.md#distribution-and-volume-rules).
 
 ## Executable access and replacement walkthrough
@@ -71,8 +71,8 @@ replacement_layout = example["replacement_layout"]
 aerosol = build_aerosol()
 held = aerosol.particles
 assert held is aerosol.particles
-counts = held.concentration
-assert counts is held.concentration
+counts = held.population
+assert counts is held.population
 
 # Compatible individual replacement retains the supplied identity.
 candidate = held.copy()
@@ -102,7 +102,7 @@ carriers and require explicit new preparation after replacement or restart.
 ## Explicit Warp boundary
 
 Native discrete and resolved particle transfers retain population metadata and
-raw concentration values. Radius-PDF upload is unsupported. Preserve the full
+extensive particle population. Radius-PDF upload is unsupported. Preserve the full
 ordered gas names externally; `WarpGasData` has no names. A gas restore without
 names produces placeholders, and always drops GPU-only vapor-pressure storage.
 Native condensation/nucleation require explicit process species bindings for the

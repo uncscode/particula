@@ -23,11 +23,13 @@ def ion_condensation_case(*, latent=False):
     ion_volume = np.pi / 6 * (0.5e-9) ** 3
     initial = Aerosol(
         particles=ParticleData(
-            masses,
-            np.ones((1, 4)),
-            np.array([[1.0, -1.0, 0.0, 0.0]]),
-            np.array([1000.0, 1000.0, 2e-25 / ion_volume, 1e-25 / ion_volume]),
-            np.array([1e-12]),
+            masses=masses,
+            population=np.ones((1, 4)),
+            charge=np.array([[1.0, -1.0, 0.0, 0.0]]),
+            density=np.array(
+                [1000.0, 1000.0, 2e-25 / ion_volume, 1e-25 / ion_volume]
+            ),
+            volume=np.array([1e-12]),
             distribution_type="particle_resolved",
         ),
         gas=base.gas,
@@ -73,7 +75,7 @@ def test_ion_exclusion_conservation_capture_restart(device, latent):
         result.particles.charge, initial.particles.charge
     )
     np.testing.assert_array_equal(
-        result.particles.concentration, initial.particles.concentration
+        result.particles.population, initial.particles.population
     )
     uptake = (
         result.particles.masses[0, 3, 0] - initial.particles.masses[0, 3, 0]

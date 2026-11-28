@@ -27,6 +27,7 @@ from particula.execution._ros3_coefficients import (
     M2,
     M3,
 )
+from particula.gpu.kernels._population_validation import native_slot_density
 
 
 @wp.kernel
@@ -118,7 +119,6 @@ def solve_gas(
     gases: wp.int32,
     target: wp.int32,
     source: wp.int32,
-    resolved: wp.int32,
     inverse_step_gamma: wp.float64,
     solution: FloatVector,
     invalid: IntVector,
@@ -131,9 +131,7 @@ def solve_gas(
     correction = wp.float64(0.0)
     for slot in range(counts.shape[1]):
         i = (box * counts.shape[1] + slot) * materials + target
-        weight = counts[box, slot]
-        if resolved == 1:
-            weight /= volume[box]
+        weight = native_slot_density(counts[box, slot], volume[box])
         weight *= scale[i] / scale[gas_index]
         diagonal = inverse_step_gamma - local[box, slot]
         if diagonal == wp.float64(0.0) or not wp.isfinite(diagonal):

@@ -30,7 +30,7 @@ def state(volume=0.25, kind="particle_resolved"):
     return Aerosol(
         particles=ParticleData(
             masses=np.array([[[2e-18, 3e-18], [4e-18, 5e-18]]]),
-            concentration=np.array([[2.0, 2.0]]),
+            population=np.array([[2.0, 2.0]]),
             charge=np.array([[1.0, -2.0]]),
             density=np.array([1000.0, 1200.0]),
             volume=np.array([volume]),
@@ -78,7 +78,7 @@ def test_real_condensation_substeps_close_each_species_and_retain_objects(
         aerosol.gas,
         aerosol.environment,
     )
-    arrays = (particles.masses, particles.concentration, gas.concentration)
+    arrays = (particles.masses, particles.population, gas.concentration)
     before_mass, before_gas = particles.masses.copy(), gas.concentration.copy()
     process = MassCondensation(condensation(gas))
     rates = process.rate(aerosol)
@@ -89,13 +89,13 @@ def test_real_condensation_substeps_close_each_species_and_retain_objects(
     assert aerosol.particles is particles and aerosol.gas is gas
     assert aerosol.environment is environment
     for actual, expected in zip(
-        (particles.masses, particles.concentration, gas.concentration),
+        (particles.masses, particles.population, gas.concentration),
         arrays,
         strict=True,
     ):
         assert actual is expected
     gain = np.sum(
-        (particles.masses - before_mass) * particles.concentration[..., None],
+        (particles.masses - before_mass) * particles.population[..., None],
         axis=1,
     )
     loss = (before_gas[:, [2, 1]] - gas.concentration[:, [2, 1]]) * volume
@@ -140,7 +140,7 @@ def test_density_coagulation_rate_keeps_measure_and_does_not_mutate(kind):
     aerosol.particles = ParticleData(
         masses=np.array([[[2, 3], [4, 5], [8, 9], [16, 17]]], dtype=float)
         * 1e-18,
-        concentration=np.array([[2.0, 3.0, 4.0, 5.0]]),
+        population=np.array([[2.0, 3.0, 4.0, 5.0]]),
         charge=np.zeros((1, 4)),
         density=np.array([1000.0, 1200.0]),
         volume=np.ones(1),
@@ -150,12 +150,12 @@ def test_density_coagulation_rate_keeps_measure_and_does_not_mutate(kind):
         else None,
     )
     strategy = BrownianCoagulationStrategy(kind)
-    before = aerosol.particles.concentration.copy()
+    before = aerosol.particles.population.copy()
     expected = strategy.net_rate(aerosol.particles, 298.15, 101325.0)
     np.testing.assert_array_equal(
         Coagulation(strategy).rate(aerosol), expected[None, :]
     )
-    np.testing.assert_array_equal(aerosol.particles.concentration, before)
+    np.testing.assert_array_equal(aerosol.particles.population, before)
 
 
 def test_wall_loss_retirement_makes_slots_reusable():

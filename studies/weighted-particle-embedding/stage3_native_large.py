@@ -64,6 +64,7 @@ def run(folder, until, million=False):
             1,
             len(seeds),
             on_result=save,
+            first_seeds=seeds,
         )
 
 

@@ -320,7 +320,7 @@ class PulsePairs:
         """Advance until the remaining interval expires in every box."""
         self.left.fill_(dt)
         # Every accepted collision removes a slot. One final draw exhausts dt.
-        for draw in range(aerosol.concentration.shape[1]):
+        for draw in range(aerosol.population.shape[1]):
             self.again.zero_()
             wp.launch(
                 refresh_pairs,
@@ -342,7 +342,7 @@ class PulsePairs:
                 self.left.shape,
                 inputs=[
                     aerosol.masses,
-                    aerosol.concentration,
+                    aerosol.population,
                     aerosol.charge,
                     self.pairs,
                     self.rates,

@@ -38,7 +38,7 @@ def test_cpu_process_guide_snippets(name):
     assert isinstance(aerosol, par.Aerosol)
     assert aerosol.particles.distribution_type == "discrete"
     assert np.all(np.isfinite(aerosol.particles.masses))
-    assert np.all(aerosol.particles.concentration >= 0)
+    assert np.all(aerosol.particles.population >= 0)
     assert 0 < aerosol.particles.number_density.item() < 1e8
     assert 0 <= aerosol.gas.concentration.item() < 1e-6
     assert aerosol.gas is namespace["gas"]
@@ -126,7 +126,7 @@ def test_condensation_recipe_inventories(index):
     particle, gas = aerosol.particles, aerosol.gas
     namespace.update(particle=particle, gas=gas)
     initial_particle = np.sum(
-        particle.masses * particle.concentration[..., None], axis=1
+        particle.masses * particle.population[..., None], axis=1
     )
     initial_gas = gas.concentration.copy() * particle.volume[:, None]
     exec(compile(body, str(page), "exec"), namespace)  # noqa: S102
@@ -168,7 +168,7 @@ def test_dilution_guide_decay_and_held_state():
     assert aerosol.gas is namespace["gas"]
     assert aerosol.environment is namespace["environment"]
     np.testing.assert_allclose(
-        aerosol.particles.concentration, [[4 / np.e, 8 / np.e]], rtol=1e-12
+        aerosol.particles.population, [[4 / np.e, 8 / np.e]], rtol=1e-12
     )
     np.testing.assert_allclose(
         aerosol.particles.number_density, [6 / np.e], rtol=1e-12
@@ -200,11 +200,11 @@ def test_nucleation_guide_mapped_inventory():
     assert aerosol.environment is namespace["environment"]
     particles = aerosol.particles
     assert particles.masses.shape == (1, 3, 1)
-    assert np.any(particles.concentration > 0)
+    assert np.any(particles.population > 0)
     np.testing.assert_array_equal(particles.volume, [0.25])
     assert 0 <= aerosol.gas.concentration[0, 0] < 1e-12
     assert aerosol.gas.concentration[0, 1] == 2e-6
-    total = np.sum(particles.masses * particles.concentration[..., None])
+    total = np.sum(particles.masses * particles.population[..., None])
     total += aerosol.gas.concentration[0, 0] * 0.25
     np.testing.assert_allclose(total, 2.5e-13, rtol=1e-12, atol=1e-30)
 
@@ -232,13 +232,13 @@ def test_native_scientific_direct_calls(monkeypatch):
         namespace["initial_gas"][:, [2, 1]] * 0.25
     )
     final = (
-        np.sum(particles.masses * particles.concentration[..., None], axis=1)
+        np.sum(particles.masses * particles.population[..., None], axis=1)
         + aerosol.gas.concentration[:, [2, 1]] * 0.25
     )
     assert np.all(final <= initial * (1 + 1e-12))
     assert np.all(final >= 0)
     assert 0 <= particles.number_density.item() <= 16.0
-    lost = particles.concentration == 0
+    lost = particles.population == 0
     assert np.all(particles.masses[lost] == 0)
     assert np.all(particles.charge[lost] == 0)
 
@@ -292,7 +292,7 @@ def _foundations_namespace():
                 rtol=1e-12,
             )
             np.testing.assert_array_equal(
-                particles.concentration.numpy(), [[1.0, 1.0]]
+                particles.population.numpy(), [[1.0, 1.0]]
             )
             # Explicit upload/activation does not mutate the CPU source.
             np.testing.assert_array_equal(

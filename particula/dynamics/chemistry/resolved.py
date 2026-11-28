@@ -28,7 +28,7 @@ class _BoxKinetics:
     def __init__(self, bound, aerosol):
         particles = aerosol.particles
         masses = particles.masses[0]
-        self.active = particles.concentration[0] > 0
+        self.active = particles.population[0] > 0
         self.weights = slot_density(particles)[0]
         self.reference = (masses / particles.density).sum(axis=1)
         self.pm = np.asarray(bound.particle_masses)
@@ -154,7 +154,7 @@ class ResolvedChemistry(BoxProcess):
             extension_id="particula.resolved_chemistry",
             reads=(
                 "particles.masses",
-                "particles.concentration",
+                "particles.population",
                 "particles.volume",
                 "gas.concentration",
                 "environment.temperature",

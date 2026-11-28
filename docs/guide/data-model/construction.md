@@ -14,7 +14,7 @@ import particula as par
 particles = par.particles.create_resolved_particle_data(
     masses=[[0.5e-18, 1.5e-18], [2e-18, 3e-18]],
     density=[1000.0, 1200.0],
-    concentration=[8.0, 0.5],  # represented counts, including fractional weights
+    population=[8.0, 0.5],  # represented counts, including fractional weights
     volume=0.25,  # physical m^3
 )
 gas = (
@@ -88,7 +88,8 @@ reprepare them through their existing APIs.
 
 All four functions are exported from `particula.particles` and return owned,
 writable float64 arrays. They use the existing `ParticleDataBuilder` for final
-admission. Existing native builder ownership and storage units are unchanged.
+admission. Pass a measured density or explicit extensive population according
+to the factory signature.
 
 | Function | Inputs and storage |
 |---|---|
@@ -102,16 +103,16 @@ Direct mass/species construction also remains available through
 
 ### Distribution and volume rules
 
-| Kind | Stored concentration | Volume | Bulk calculation |
+| Kind | Writable population | Represented air volume V | Number density |
 |---|---|---|---|
-| `discrete` | Number per bin per m³ | Exactly 1 m³ | Sum weights or mass × weights |
-| `continuous_pdf` | Radius `dn/dr`, m⁻⁴ | Exactly 1 m³ | Trapezoids over explicit radius; integrate mass × PDF together |
-| `particle_resolved` | Represented counts | Positive finite physical volume | Sum counts or mass × counts, divided by volume for density |
+| `discrete` | Number per bin | Positive finite m³ | Sum bin counts and divide by V |
+| `continuous_pdf` | dN/dr, m⁻¹ | Positive finite m³ | Integrate dN/dr over the radius nodes and divide by V |
+| `particle_resolved` | Represented number per slot | Positive finite m³ | Sum multiplicities and divide by V |
 
 PDF nodes are positive, finite, strictly increasing metres with at least two
 nodes. Integration uses the supplied interval without extrapolation. Zero PDFs
 retain their grid. Empty discrete/resolved populations are supported; sampled
-presets require a positive integer sample count. Non-unit binned volumes reject.
+presets require a positive integer sample count.
 At initialization only, non-SI reference-volume conversion roundoff within four
 float64 ulps of one is canonicalized to exactly one; direct SI admission stays
 exact. Canonical SI units work without Pint. Other unit spellings and
@@ -156,14 +157,14 @@ use explicit species masses for mixtures. Inputs are never modified.
 
 ## Explicit execution boundaries
 
-Native discrete and resolved particle uploads preserve their tag and raw
-concentration values. Radius-PDF upload is unsupported; never strip metadata to
+Native discrete and resolved particle uploads preserve their tag, volume and
+extensive population. Radius-PDF upload is unsupported; never strip metadata to
 bypass validation. Gas names remain externally owned, and native condensation
 and nucleation require explicit exact-carrier species bindings. Direct and
 resident examples show their concrete preparation APIs and synchronization.
 
 A CPU aggregate replacement cannot rebind existing device arrays or a prepared
-resident request. Explicit restart uses a fresh same-device binding and schema-v5
+resident request. Explicit restart uses a fresh same-device binding and schema-v6
 canonical checkpoint bytes; CPU inspection is not continuation authority.
 There is no implicit transfer, fallback, migration or recovery. CPU dynamics runnables iterate batched storage; direct strategies retain
 their single-box contracts and existing numerical restrictions.

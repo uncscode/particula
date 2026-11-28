@@ -701,7 +701,7 @@ def test_signature_tracks_every_primary_array_identity(
     request = cast("ResidentSimulationRequest", resident_request)
     paths = (
         "session.particles.masses",
-        "session.particles.concentration",
+        "session.particles.population",
         "session.particles.density",
         "session.particles.volume",
         "session.particles.charge",

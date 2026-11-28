@@ -5,6 +5,7 @@ from numbers import Integral, Real
 
 import numpy as np
 
+from particula._array_validation import validate_writable_arrays
 from particula.aerosol import Aerosol
 from particula.aerosol_validation import validate_aerosol_structure
 from particula.gas import GasData
@@ -36,7 +37,7 @@ def arrays(aerosol):
     p, g, e = aerosol.particles, aerosol.gas, aerosol.environment
     result = {
         "particles.masses": p.masses,
-        "particles.concentration": p.concentration,
+        "particles.population": p.population,
         "particles.charge": p.charge,
         "particles.volume": p.volume,
         "particles.density": p.density,
@@ -68,44 +69,9 @@ def validate(aerosol, writers=()):
     aerosol.fields.validate_layout(
         field_dimensions(aerosol.particles, aerosol.gas),
         aerosol.particles.distribution_type,
-        aerosol.particles.concentration > 0,
+        aerosol.particles.population > 0,
     )
-    fields = arrays(aerosol)
-    for name in writers:
-        target = fields[name]
-        if not target.flags.writeable:
-            raise ValueError(f"{name} must be writable")
-        if any(
-            np.shares_memory(target, other)
-            for key, other in fields.items()
-            if key != name
-        ):
-            raise ValueError("CPU writer fields must not alias state")
-        if target.size == 0:
-            continue
-        # A stride-span proof handles contiguous, transposed, reversed and
-        # ordinary sliced arrays without a quadratic scan over box pairs.
-        span = target.itemsize
-        for stride, length in sorted(
-            (abs(stride), length)
-            for stride, length in zip(target.strides, target.shape, strict=True)
-            if length > 1
-        ):
-            if stride < span:
-                # Interleaved views can fail the simple span proof without
-                # overlapping. Resolve only these unusual layouts exactly.
-                offsets = np.array([0], dtype=np.int64)
-                for size, step in zip(
-                    target.shape, target.strides, strict=True
-                ):
-                    offsets = (
-                        offsets[:, None] + np.arange(size) * step
-                    ).ravel()
-                offsets.sort()
-                if np.any(np.diff(offsets) < target.itemsize):
-                    raise ValueError("CPU writer elements must not overlap")
-                break
-            span += stride * (length - 1)
+    validate_writable_arrays(arrays(aerosol), writers)
 
 
 def detached(aerosol):
@@ -131,7 +97,7 @@ def box_view(aerosol, box):
     return Aerosol(
         particles=ParticleData(
             masses=p.masses[row],
-            concentration=p.concentration[row],
+            population=p.population[row],
             charge=p.charge[row],
             density=p.density,
             volume=p.volume[row],

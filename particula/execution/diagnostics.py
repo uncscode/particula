@@ -192,7 +192,7 @@ class PreparedResidentDiagnostics:
     Attributes:
         plan: Exact diagnostics plan validated during setup.
         particle_masses: Bound resident particle mass array.
-        particle_concentration: Bound resident particle concentration array.
+        particle_population: Bound resident extensive particle population.
         particle_volume: Bound resident particle volume array.
         gas_concentration: Bound resident gas concentration array.
         saturation_ratio: Bound resident saturation-ratio array.
@@ -205,13 +205,12 @@ class PreparedResidentDiagnostics:
         source_ledgers: Residual source ledgers aligned with registrations.
         sink_ledgers: Residual sink ledgers aligned with registrations.
         total_mass_output: Bound total-mass output used by the residual writer.
-        resolved_counts: Whether particle population stores raw counts.
         particle_mass_pairs: Validated gas-to-particle inventory lane pairs.
     """
 
     plan: ResidentDiagnosticsPlan
     particle_masses: object
-    particle_concentration: object
+    particle_population: object
     particle_volume: object
     gas_concentration: object
     saturation_ratio: object
@@ -224,7 +223,6 @@ class PreparedResidentDiagnostics:
     source_ledgers: tuple[object | None, ...]
     sink_ledgers: tuple[object | None, ...]
     total_mass_output: object | None
-    resolved_counts: bool = False
     particle_mass_pairs: tuple[tuple[int, int], ...] = ()
 
 
@@ -252,13 +250,6 @@ def _clear_particle_number(output: Any) -> None:
 
 
 @wp.kernel
-def _accumulate_particle_number(concentration: Any, output: Any) -> None:
-    """Accumulate one particle concentration lane in parallel."""
-    box, particle = wp.tid()  # type: ignore[misc]
-    wp.atomic_add(output, box, concentration[box, particle])
-
-
-@wp.kernel
 def _conservation_residual(
     total_mass: Any,
     baseline: Any,
@@ -277,7 +268,7 @@ def _conservation_residual(
 
 
 @wp.kernel
-def _accumulate_resolved_number(
+def _accumulate_number_density(
     concentration: Any, volume: Any, output: Any
 ) -> None:
     """Reduce represented counts to per-volume number concentration."""
@@ -288,18 +279,14 @@ def _accumulate_resolved_number(
 @wp.kernel
 def _accumulate_mapped_particle_mass(
     masses: Any,
-    concentration: Any,
-    volume: Any,
+    population: Any,
     output: Any,
     particle_species: int,
     gas_species: int,
-    resolved: int,
 ) -> None:
     """Accumulate one explicit material-to-gas extensive inventory lane."""
     box, particle = wp.tid()  # type: ignore[misc]
-    weight = concentration[box, particle]
-    if resolved == 0:
-        weight *= volume[box]
+    weight = population[box, particle]
     wp.atomic_add(
         output,
         box,
@@ -497,26 +484,18 @@ class ResidentDiagnosticsExecutor:
                     _clear_particle_number,
                     dim=dimensions.n_boxes,
                     inputs=[registration.output],
-                    device=particles.concentration.device,
+                    device=particles.population.device,
                 )
                 if dimensions.n_particles:
                     wp.launch(
-                        _accumulate_resolved_number
-                        if plan.session.metadata.distribution_type
-                        == "particle_resolved"
-                        else _accumulate_particle_number,
+                        _accumulate_number_density,
                         dim=(dimensions.n_boxes, dimensions.n_particles),
-                        inputs=(
-                            [
-                                particles.concentration,
-                                particles.volume,
-                                registration.output,
-                            ]
-                            if plan.session.metadata.distribution_type
-                            == "particle_resolved"
-                            else [particles.concentration, registration.output]
-                        ),
-                        device=particles.concentration.device,
+                        inputs=[
+                            particles.population,
+                            particles.volume,
+                            registration.output,
+                        ],
+                        device=particles.population.device,
                     )
             elif dimensions.gas_species:
                 matrix_dim = (dimensions.n_boxes, dimensions.gas_species)
@@ -566,15 +545,10 @@ class ResidentDiagnosticsExecutor:
                                 ),
                                 inputs=[
                                     particles.masses,
-                                    particles.concentration,
-                                    particles.volume,
+                                    particles.population,
                                     registration.output,
                                     particle_lane,
                                     gas_lane,
-                                    int(
-                                        plan.session.metadata.distribution_type
-                                        == "particle_resolved"
-                                    ),
                                 ],
                                 device=particles.masses.device,
                             )
@@ -654,7 +628,7 @@ def setup_prepared_resident_diagnostics(
     environment = cast(Any, typed.session.environment)
     primaries = (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.density,
         particles.volume,
         particles.charge,
@@ -685,7 +659,7 @@ def setup_prepared_resident_diagnostics(
     return PreparedResidentDiagnostics(
         typed,
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.volume,
         gas.concentration,
         environment.saturation_ratio,
@@ -698,7 +672,6 @@ def setup_prepared_resident_diagnostics(
         tuple(item.source_ledger for item in typed.registrations),
         tuple(item.sink_ledger for item in typed.registrations),
         total_mass_output,
-        typed.session.metadata.distribution_type == "particle_resolved",
         _mass_pairs(typed),
     )
 
@@ -737,19 +710,13 @@ def _enqueue_prepared_resident_diagnostics(  # noqa: C901
             )
             if dimensions.n_particles:
                 wp.launch(
-                    _accumulate_resolved_number
-                    if prepared.resolved_counts
-                    else _accumulate_particle_number,
+                    _accumulate_number_density,
                     dim=(dimensions.n_boxes, dimensions.n_particles),
-                    inputs=(
-                        [
-                            prepared.particle_concentration,
-                            prepared.particle_volume,
-                            output,
-                        ]
-                        if prepared.resolved_counts
-                        else [prepared.particle_concentration, output]
-                    ),
+                    inputs=[
+                        prepared.particle_population,
+                        prepared.particle_volume,
+                        output,
+                    ],
                     device=device,
                 )
         elif dimensions.gas_species:
@@ -792,12 +759,10 @@ def _enqueue_prepared_resident_diagnostics(  # noqa: C901
                             dim=(dimensions.n_boxes, dimensions.n_particles),
                             inputs=[
                                 prepared.particle_masses,
-                                prepared.particle_concentration,
-                                prepared.particle_volume,
+                                prepared.particle_population,
                                 output,
                                 particle_lane,
                                 gas_lane,
-                                int(prepared.resolved_counts),
                             ],
                             device=device,
                         )

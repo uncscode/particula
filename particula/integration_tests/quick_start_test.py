@@ -53,8 +53,7 @@ def test_quick_start_runs():
     assert 0 <= aerosol.gas.concentration[0, 0] < 1e-6
     inventory = (
         np.sum(
-            aerosol.particles.masses
-            * aerosol.particles.concentration[..., None]
+            aerosol.particles.masses * aerosol.particles.population[..., None]
         )
         + aerosol.gas.concentration[0, 0] * 1e-6
     )
@@ -107,7 +106,7 @@ def test_documentation_quick_start_runs():
     np.testing.assert_array_equal(particles.volume, [1.0])
     assert 0 <= aerosol.gas.concentration[0, 0] < 100.0
     final_particle_mass = np.sum(
-        particles.masses * particles.concentration[..., None]
+        particles.masses * particles.population[..., None]
     )
     initial_particle_mass = initial_particle_mass.item()
     assert final_particle_mass > initial_particle_mass

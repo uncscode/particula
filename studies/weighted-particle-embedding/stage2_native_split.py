@@ -124,7 +124,7 @@ class NativeSplit:
         levels = np.stack([b.levels for b in boxes])
         masks = np.stack([b.masks for b in boxes])
         owner.particles.masses.assign(m)
-        owner.particles.concentration.assign(np.ones_like(z))
+        owner.particles.population.assign(np.ones_like(z))
         owner.particles.charge.assign(z)
         g = levels[:, 0].copy()
         owner.update_gas(g)
@@ -158,7 +158,7 @@ class NativeSplit:
                 a.numpy()
                 for a in (
                     owner.particles.masses,
-                    owner.particles.concentration,
+                    owner.particles.population,
                     owner.particles.charge,
                     owner.gas.concentration,
                 )

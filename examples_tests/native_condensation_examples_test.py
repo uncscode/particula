@@ -28,7 +28,7 @@ def test_radius_bin_example_evaporation_and_species_inventory():
     masses = particles.masses.copy()
     gas_before = gas.concentration.copy()
     inventory = (
-        np.sum(masses * particles.concentration[..., None], axis=1) + gas_before
+        np.sum(masses * particles.population[..., None], axis=1) + gas_before
     )
     assert values["rate"].shape == (1, 500, 1)
     assert np.all(values["rate"] < 0)
@@ -37,7 +37,7 @@ def test_radius_bin_example_evaporation_and_species_inventory():
     assert np.any(particles.masses < masses)
     assert np.all(gas.concentration >= gas_before)
     after = (
-        np.sum(particles.masses * particles.concentration[..., None], axis=1)
+        np.sum(particles.masses * particles.population[..., None], axis=1)
         + gas.concentration
     )
     np.testing.assert_allclose(after, inventory, rtol=1e-12, atol=1e-30)
