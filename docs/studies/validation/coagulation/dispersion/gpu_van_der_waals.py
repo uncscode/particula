@@ -31,7 +31,7 @@ def initial_state(boxes):
     mass = 4 * np.pi / 3 * (np.array([150.0, 220.0]) * 0.5e-9) ** 3 * density
     particles = ParticleData(
         masses=np.tile(np.diag(mass), (boxes, 1, 1)),
-        concentration=np.ones((boxes, 2)),
+        population=np.ones((boxes, 2)),
         charge=np.tile([1.0, -1.0], (boxes, 1)),
         density=np.array([density, density]),
         volume=np.full(boxes, 1e-13),
@@ -49,9 +49,9 @@ def initial_state(boxes):
 def inventory(state):
     """Count mergers and verify both material channels and signed charge."""
     p = state.particles
-    mass = (p.masses * p.concentration[:, :, None]).sum(axis=1)
-    charge = (p.charge * p.concentration).sum(axis=1)
-    return np.count_nonzero(p.concentration, axis=1) == 1, mass, charge
+    mass = (p.masses * p.population[:, :, None]).sum(axis=1)
+    charge = (p.charge * p.population).sum(axis=1)
+    return np.count_nonzero(p.population, axis=1) == 1, mass, charge
 
 
 # %% [markdown]

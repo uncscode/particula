@@ -66,7 +66,7 @@ def build_aerosol():
     return Aerosol(
         particles=ParticleData(
             masses=masses,
-            concentration=np.ones((boxes, slots)),  # counts, not m^-3
+            population=np.ones((boxes, slots)),  # counts, not m^-3
             charge=np.zeros((boxes, slots)),
             density=np.array([1000.0, 1000.0]),
             volume=np.full(boxes, slots / 5e13),
@@ -127,7 +127,7 @@ def build_process(aerosol):
 def water_inventory(aerosol):
     """Compute extensive water inventory independently from CPU snapshot arrays."""
     p = aerosol.particles
-    return np.sum(p.masses[..., 0] * p.concentration, axis=1) + (
+    return np.sum(p.masses[..., 0] * p.population, axis=1) + (
         aerosol.gas.concentration[:, 2] * p.volume
     )
 

@@ -40,7 +40,7 @@ def build_aerosol() -> par.Aerosol:
     particles = par.particles.create_resolved_particle_data(
         masses=[[2e-18, 3e-18], [4e-18, 5e-18]],
         density=[1000.0, 1200.0],
-        concentration=[2.0, 2.0],
+        population=[2.0, 2.0],
         volume=0.25,
     )
     gas = par.gas.GasData(
@@ -105,8 +105,8 @@ def run_example() -> par.Aerosol:
     """Exercise identity, detached properties, replacement and mapped physics."""
     aerosol = build_aerosol()
     held = aerosol.particles
-    counts = held.concentration  # Writable raw array, not number density.
-    assert counts is aerosol.particles.concentration
+    counts = held.population  # Writable raw array, not number density.
+    assert counts is aerosol.particles.population
     np.testing.assert_array_equal(held.number_density, [16.0])
     detached_density = held.slot_concentration_density
     detached_density[:] = 0.0

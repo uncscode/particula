@@ -49,7 +49,7 @@ def simulate(device="cpu", sizes=(257, 2000, 5000)):
         masses = (4 * np.pi / 3 * 1000 * radius**3)[None, :, None]
         cpu = ParticleData(
             masses=masses,
-            concentration=np.ones((1, count)),
+            population=np.ones((1, count)),
             charge=np.zeros((1, count)),
             density=np.array([1000.0]),
             volume=np.array([count / 2e9]),
@@ -86,12 +86,12 @@ def simulate(device="cpu", sizes=(257, 2000, 5000)):
         )
         wp.synchronize_device(device)
         after = from_warp_particle_data(particles)
-        initial_mass = np.sum(cpu.masses * cpu.concentration[..., None])
-        final_mass = np.sum(after.masses * after.concentration[..., None])
+        initial_mass = np.sum(cpu.masses * cpu.population[..., None])
+        final_mass = np.sum(after.masses * after.population[..., None])
         np.testing.assert_allclose(final_mass, initial_mass, rtol=2e-14)
         np.testing.assert_array_equal(after.charge, 0.0)
         accepted = int(collisions.numpy()[0])
-        assert np.sum(after.concentration) == count - accepted
+        assert np.sum(after.population) == count - accepted
         rows.append(
             dict(
                 particles=count,
