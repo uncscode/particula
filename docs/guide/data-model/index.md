@@ -498,14 +498,18 @@ import numpy as np
 from particula.particles import create_particle_data_from_radii
 
 sample = create_particle_data_from_radii(
-    radii=[50e-9], distribution_type="discrete", concentration=[2.0],
-    concentration_units="1/cm^3", volume=0.25,
+    radii=[50e-9], distribution_type="discrete", concentration=[2e6],
+    concentration_units="1/m^3", volume=0.25,
 )
 np.testing.assert_allclose(sample.population, [[500_000]])
 np.testing.assert_allclose(sample.number_density, [2e6])
 sample.population[:] *= 0.5
 np.testing.assert_allclose(sample.number_density, [1e6])
 ```
+
+The example uses SI units and works with the base installation. With the
+optional Pint unit converter installed, the same measurement can be supplied
+as `concentration=[2.0], concentration_units="1/cm^3"`.
 
 For a density tendency in m⁻³ s⁻¹ (m⁻⁴ s⁻¹ for a PDF), multiply the
 increment by the row's volume before adding it to population. For a measured
