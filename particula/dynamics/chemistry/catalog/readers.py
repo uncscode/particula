@@ -148,7 +148,7 @@ def mozart(text):
         raise ValueError(f"unterminated MOZART {section} block")
 
 
-def _statements(text, start, stop=None):
+def _cmaq_equations(text):
     """Yield labeled semicolon-terminated statements, and continuations."""
     active = False
     found = False
@@ -156,30 +156,28 @@ def _statements(text, start, stop=None):
     first = 0
     for line, raw in enumerate(text.splitlines(), 1):
         row = raw.split("//")[0].split("!")[0].strip()
-        if row == start:
+        if row == "REACTIONS[CM] =":
             active = True
             found = True
             continue
         if not active or not row:
             continue
-        if row == stop:
+        if row == "END MECH":
             break
-        if start == "#EQUATIONS" and row.startswith("#"):
-            if pending:
-                raise ValueError(f"unfinished reaction near line {first}")
-            active = False
-            continue
         if not pending:
             first = line
         pending = (pending + " " + row).strip()
         while ";" in pending:
             statement, pending = pending.split(";", 1)
-            yield first, statement.strip()
+            m = re.fullmatch(r"<([^>]+)>\s*(.+?)\s*#\s*(.*)", statement.strip())
+            if not m:
+                raise ValueError(f"line {first}: invalid cmaq reaction")
+            yield first, *m.groups()
             pending = pending.strip()
             first = line
     if not found or pending:
         raise ValueError(
-            f"missing {start!r} or unfinished reaction near line {first}"
+            f"missing CMAQ reactions or unfinished reaction near line {first}"
         )
 
 
@@ -234,9 +232,81 @@ def _resolve(rate, source, definitions):
     return _expression(rate, source), {}
 
 
+_KPP_COMMENTS = re.compile(r"\{[^}]*\}|//[^\n]*|![^\n]*")
+_KPP_SECTION = re.compile(r"^[ \t]*#(\w+)\b", re.M)
+
+
+def _kpp_text(text):
+    # Preserve offsets and source lines so WRF tags and equation annotations
+    # can be recovered from the original text after finding active syntax.
+    return _KPP_COMMENTS.sub(lambda m: re.sub(r"[^\n]", " ", m[0]), text)
+
+
+def _kpp_sections(clean):
+    headings = list(_KPP_SECTION.finditer(clean))
+    for i, match in enumerate(headings):
+        end = headings[i + 1].start() if i + 1 < len(headings) else len(clean)
+        yield match[1].upper(), match.end(), end
+
+
+def _kpp_equations(text, clean, source):
+    found = False
+    for section, start, end in _kpp_sections(clean):
+        if section != "EQUATIONS":
+            continue
+        found = True
+        line = 1 + clean.count("\n", 0, start)
+        offset = start
+        for terminator in re.compile(";").finditer(clean, start, end):
+            stop = terminator.start()
+            row = clean[offset:stop]
+            body = len(row) - len(row.lstrip())
+            if source == "wrf-chem":
+                # WRF writes its tag as the last identifier in braces before
+                # the first equation token. Earlier brace blocks are comments.
+                tags = [
+                    m
+                    for m in _KPP_COMMENTS.finditer(text, offset, offset + body)
+                    if re.fullmatch(r"\{[\w.-]+\}", m[0])
+                ]
+                tag = tags[-1] if tags else None
+                label = tag[0][1:-1] if tag else ""
+                tag_line = (
+                    line + row.count("\n", 0, tag.start() - offset)
+                    if tag
+                    else line
+                )
+            else:
+                m = re.match(r"<([^>]+)>", row[body:])
+                tag_line = line + row.count("\n", 0, body)
+                label = m[1] if m else ""
+                if m:
+                    body += m.end()
+            colon = row.find(":", body)
+            if not label or colon < 0:
+                raise ValueError(f"line {tag_line}: invalid {source} reaction")
+            original = text[offset + body : offset + colon]
+            equation = _KPP_COMMENTS.sub(
+                lambda m: m[0] if m[0].startswith("{") else "", original
+            )
+            equation = " ".join(
+                s.strip() for s in equation.splitlines() if s.strip()
+            )
+            rate = " ".join(
+                s.strip() for s in row[colon + 1 :].splitlines() if s.strip()
+            )
+            yield tag_line, label, equation, rate
+            offset = terminator.end()
+            line += row.count("\n")
+        if clean[offset:end].strip():
+            raise ValueError(f"unfinished reaction near line {line}")
+    if not found:
+        raise ValueError("missing '#EQUATIONS'")
+
+
 def ro2_members(text):
     """Read the explicit KPP radical pool and its continuation lines."""
-    preamble = text.partition("#EQUATIONS")[0]
+    preamble = _kpp_text(text).partition("#EQUATIONS")[0]
     logical_lines = re.sub(r"&\s*\n\s*&?", "", preamble)
     pool = re.search(r"^\s*RO2\s*=([^\n]*)", logical_lines, re.M | re.I)
     return sorted(set(re.findall(r"C\(ind_(\w+)\)", pool[1]))) if pool else []
@@ -244,11 +314,11 @@ def ro2_members(text):
 
 def _mcm_elements(text):
     catalog = {}
-    for section in re.finditer(
-        r"^#DEFVAR\s*$(.*?)(?=^#|\Z)", text, re.M | re.S
-    ):
+    for section, start, end in _kpp_sections(text):
+        if section != "DEFVAR":
+            continue
         for name, formula in re.findall(
-            r"^(\w+)\s*=\s*(.*?)\s*;", section[1], re.M
+            r"\b(\w+)\s*=\s*([^;]+);", text[start:end]
         ):
             counts: Counter[str] = Counter()
             for term in formula.split("+"):
@@ -261,50 +331,79 @@ def _mcm_elements(text):
     return catalog
 
 
-def _kpp_fixed(text):
-    # Drop comments before recognizing directives and species assignments.
-    text = re.sub(r"\{[^}]*\}|//[^\n]*|![^\n]*", "", text)
-    for block in re.finditer(
-        r"^[ \t]*#DEFFIX\b(.*?)(?=^[ \t]*#|\Z)", text, re.I | re.M | re.S
-    ):
-        yield from re.findall(r"\b([A-Za-z]\w*)\s*=", block[1])
+def _kpp_settings(content, fixed):
+    local = {}
+    for section, start, end in _kpp_sections(content):
+        block = content[start:end]
+        if section == "DEFFIX":
+            fixed.update(re.findall(r"\b([A-Za-z]\w*)\s*=", block))
+        if section not in {"SETVAR", "SETFIX"}:
+            continue
+        for item in block.split(";"):
+            name = item.strip()
+            if not name:
+                continue
+            if not re.fullmatch(r"[A-Za-z]\w*", name) or name.upper() in {
+                "ALL_SPEC",
+                "VAR_SPEC",
+                "FIX_SPEC",
+            }:
+                raise ValueError(
+                    f"unsupported KPP #{section} selector {name!r}"
+                )
+            local[name] = section == "SETFIX"
+    return local
 
 
-def _fixed_species(source, text, companions):
+def _fixed_species(source, clean, companions):
     fixed = {"M", "N2", "O2"}
+    if source == "cmaq":
+        return fixed | {"H2", "CH4", "H2O"}
     if source == "wrf-chem":
         fixed.add("H2O")
-    if source in {"mcm", "wrf-chem"}:
-        fixed.update(_kpp_fixed(text))
-        for data in companions:
-            if b"#DEFFIX" in data.upper():
-                fixed.update(_kpp_fixed(data.decode("utf-8-sig")))
-    if source == "cmaq":
-        fixed.update(("H2", "CH4", "H2O"))
-    return fixed
+    # Companion basenames are sorted for snapshot identity, so they do not
+    # establish KPP include order. Reject order-dependent cross-file settings.
+    settings: dict[str, bool] = {}
+    for content in [
+        clean,
+        *(
+            _kpp_text(data.decode("utf-8-sig"))
+            for data in companions
+            if re.search(rb"#(?:DEF|SET)(?:VAR|FIX)\b", data, re.I)
+        ),
+    ]:
+        local = _kpp_settings(content, fixed)
+        for name, prescribed in local.items():
+            if name in settings and settings[name] != prescribed:
+                raise ValueError(
+                    f"ambiguous KPP reclassification across files: {name}"
+                )
+            settings[name] = prescribed
+    fixed.update(name for name, prescribed in settings.items() if prescribed)
+    return fixed.difference(
+        name for name, prescribed in settings.items() if not prescribed
+    )
 
 
 def labeled(text, source, companions=()):
     """Read York/WRF KPP equations or CMAQ MECHDEF in molecular units."""
-    is_cmaq = source == "cmaq"
-    start = "REACTIONS[CM] =" if is_cmaq else "#EQUATIONS"
-    labels = r"<([^>]+)>" if source != "wrf-chem" else r"\{([^}]+)\}"
-    sep = "#" if is_cmaq else ":"
-    elements = _mcm_elements(text) if source == "mcm" else {}
+    clean = "" if source == "cmaq" else _kpp_text(text)
+    elements = _mcm_elements(clean) if source == "mcm" else {}
     definitions = _mcm_rates(companions) if source == "mcm" else {}
-    fixed = _fixed_species(source, text, companions)
-    for line, stmt in _statements(text, start, "END MECH" if is_cmaq else None):
-        m = re.fullmatch(labels + r"\s*(.+)", stmt)
-        if not m or sep not in m[2]:
-            raise ValueError(f"line {line}: invalid {source} reaction")
-        equation, rate = m[2].split(sep, 1)
+    fixed = _fixed_species(source, clean, companions)
+    equations = (
+        _cmaq_equations(text)
+        if source == "cmaq"
+        else _kpp_equations(text, clean, source)
+    )
+    for line, label, equation, rate in equations:
         rate = rate.strip()
         kinetics, references = _resolve(rate, source, definitions)
         issue = "" if kinetics else "requires source rate expression or forcing"
         if "hv" in equation.lower() or "J(" in rate.upper() or "/<" in rate:
             issue = "requires a source photolysis frequency"
         clean_eq = equation.split("%")[0]
-        entry = channel(m[1], line, clean_eq.strip(), rate, kinetics, issue)
+        entry = channel(label, line, clean_eq.strip(), rate, kinetics, issue)
         entry.equation = equation.strip()
         if references:
             entry.metadata["rate_definitions"] = references

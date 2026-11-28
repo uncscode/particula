@@ -145,6 +145,13 @@ study. A snapshot ID pins the host, release, mechanism, optional aerosol
 scheme, input digests and importer version. Use `--snapshot ID` to search just
 that import. Pass a snapshot ID to export to lock its complete inventory.
 
+For local MCM and WRF-Chem mechanisms, include the companion species file
+with `--companion` when it defines the reservoirs. The importer applies
+individual `#SETFIX` and `#SETVAR` overrides in file order. If different files
+set the same species to conflicting types, consolidate those overrides into
+one file. Expand KPP group selectors such as `ALL_SPEC` into individual names
+before import.
+
 Choose the result for `NO_O3`, the reaction NO + O₃ → NO₂ + O₂. Copy its
 exact ID from the search results into `REACTION_ID` below. Inspect the
 record before exporting, particularly when another source has a different

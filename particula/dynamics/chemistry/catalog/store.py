@@ -21,7 +21,7 @@ from particula.dynamics.chemistry.catalog.readers import (
     ro2_members,
 )
 
-IMPORT_VERSION = 4
+IMPORT_VERSION = 5
 LOCK_FORMAT = "particula.chemical-selection/1"
 NATIVE_LOCK_FORMAT = "particula.chemical-selection/2"
 
