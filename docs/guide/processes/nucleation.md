@@ -55,7 +55,7 @@ factory, then select its precursor lane in `NucleationSourceConfig`:
 
 ```python
 particles = ParticleData(
-    masses=np.zeros((1, 3, 1)), concentration=np.zeros((1, 3)),
+    masses=np.zeros((1, 3, 1)), population=np.zeros((1, 3)),
     charge=np.zeros((1, 3)), density=np.array([1000.0]),
     volume=np.array([0.25]), distribution_type="particle_resolved",
 )

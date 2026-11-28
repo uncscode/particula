@@ -56,7 +56,7 @@ def _preflight_native_dilution(
     if particles.n_boxes != 1:
         raise ValueError("CPU dilution requires exactly one box.")
     coefficient = _validate_nonnegative_scalar(coefficient, "coefficient")
-    targets = (particles.concentration, gas.concentration)
+    targets = (particles.population, gas.concentration)
     protected: tuple[np.ndarray, ...] = (
         particles.masses,
         particles.charge,

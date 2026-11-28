@@ -32,14 +32,14 @@ def mixture(slots=3):
     original, _ = case(2)
     particles = ParticleData(
         masses=np.tile([[[2e-15, 1e-15]]], (2, slots, 1)),
-        concentration=np.full((2, slots), 1e7),
+        population=np.full((2, slots), 1e7),
         density=np.array([1000.0, 1500.0]),
         charge=np.zeros((2, slots)),
         volume=np.array([0.3, 0.8]),
         distribution_type="particle_resolved",
     )
     particles.masses[:, -1] = 0
-    particles.concentration[:, -1] = 0
+    particles.population[:, -1] = 0
     gas = GasData(
         name=["b", "inert", "a"],
         molar_mass=np.array([0.018, 0.028, 0.18]),
@@ -245,7 +245,7 @@ def test_dry_relaxation_derivative_does_not_depend_on_initial_wet_scale():
         .set_water_index(1)
         .build()
     )
-    active = initial.particles.concentration > 0
+    active = initial.particles.population > 0
     initial.particles.masses[..., 0][active] = 2e-22
     initial.particles.masses[..., 1][active] = 1e-12
     wet = CondensationODE(initial, strategy, method="ros2")

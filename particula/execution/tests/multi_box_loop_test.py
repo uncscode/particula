@@ -201,7 +201,7 @@ def _cpu_carriers(
         volume[lane] = 1.0e-8 * value
     particles = ParticleData(
         masses=masses,
-        concentration=concentration * volume[:, None],
+        population=concentration * volume[:, None],
         charge=charge,
         density=np.linspace(1000.0, 1200.0, n_species, dtype=np.float64),
         volume=volume,
@@ -219,7 +219,7 @@ def _cpu_carriers(
         saturation_ratio=np.ones((n_boxes, n_species), dtype=np.float64),
     )
     assert particles.masses.shape == (n_boxes, n_particles, n_species)
-    assert particles.concentration.shape == (n_boxes, n_particles)
+    assert particles.population.shape == (n_boxes, n_particles)
     assert gas.concentration.shape == (n_boxes, n_species)
     return particles, gas, environment
 
@@ -265,7 +265,7 @@ def test_full_activity_carriers_fill_slots_and_enable_partitioning() -> None:
         full_activity=True,
     )
 
-    assert np.count_nonzero(particles.concentration > 0.0) == 8
+    assert np.count_nonzero(particles.population > 0.0) == 8
     assert np.all(np.sum(particles.masses, axis=2) > 0.0)
     assert np.array_equal(gas.partitioning, np.ones(3, dtype=bool))
 
@@ -364,7 +364,7 @@ def _snapshot(session: Any) -> tuple[np.ndarray, ...]:
     wp.synchronize_device(session.particles.masses.device)
     return (
         session.particles.masses.numpy().copy(),
-        session.particles.concentration.numpy().copy(),
+        session.particles.population.numpy().copy(),
         session.particles.charge.numpy().copy(),
         session.gas.concentration.numpy().copy(),
         session.gas.vapor_pressure.numpy().copy(),

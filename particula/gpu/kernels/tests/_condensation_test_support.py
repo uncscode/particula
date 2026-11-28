@@ -391,7 +391,7 @@ def test_finalize_inventory_limited_transfer_matches_numpy_oracle(
     particles = dataclasses.replace(
         particles,
         masses=masses.copy(),
-        concentration=concentration.copy(),
+        population=concentration.copy(),
     )
     gas = _make_gas_data(n_boxes, n_species)
     gas = dataclasses.replace(gas, concentration=gas_concentration.copy())
@@ -547,7 +547,7 @@ def test_finalize_inventory_limited_transfer_preflight_is_atomic(
     ("invalid_kind", "invalid_value", "message"),
     (
         ("masses", -1.0, "particles.masses.*finite"),
-        ("concentration", np.nan, "particles.concentration.*finite"),
+        ("concentration", np.nan, "particles.population.*finite"),
         ("gas", -1.0, "gas.concentration.*finite"),
         ("proposal", np.inf, "gated_mass_transfer must be finite"),
     ),
@@ -590,7 +590,7 @@ def test_finalize_inventory_rejects_invalid_physical_inputs_atomically(
         )
     elif invalid_kind == "concentration":
         wp.copy(
-            gpu_particles.concentration,
+            gpu_particles.population,
             wp.array(
                 [[invalid_value]], dtype=wp.float64, device=warp_cpu_device
             ),
@@ -785,7 +785,7 @@ def test_finalize_inventory_limited_transfer_is_exactly_repeatable(
         particles = dataclasses.replace(
             _make_particle_data(1, 2, 1),
             masses=masses.copy(),
-            concentration=concentration.copy(),
+            population=concentration.copy(),
         )
         gas = dataclasses.replace(
             _make_gas_data(1, 1), concentration=gas_concentration.copy()
@@ -841,7 +841,7 @@ def test_finalize_inventory_limited_transfer_allocates_omitted_sidecars(
     particles = dataclasses.replace(
         _make_particle_data(1, 2, 1),
         masses=masses.copy(),
-        concentration=concentration.copy(),
+        population=concentration.copy(),
     )
     gas = dataclasses.replace(
         _make_gas_data(1, 1), concentration=gas_concentration.copy()
@@ -909,7 +909,7 @@ def test_condensation_step_gpu_invalid_primary_p2_state_is_atomic(
         )
     elif state_name == "concentration":
         wp.copy(
-            gpu_particles.concentration,
+            gpu_particles.population,
             wp.array([[invalid_value]], dtype=wp.float64, device=device),
         )
     else:
@@ -919,7 +919,7 @@ def test_condensation_step_gpu_invalid_primary_p2_state_is_atomic(
         )
     state_arrays = (
         gpu_particles.masses,
-        gpu_particles.concentration,
+        gpu_particles.population,
         gpu_gas.concentration,
         gpu_gas.vapor_pressure,
         scratch.work_mass_transfer,
@@ -1049,7 +1049,7 @@ def test_condensation_step_gpu_couples_four_substeps_to_numpy_oracle(
     )
     _assert_conservation_balance(
         gas.concentration - final_gas.concentration,
-        np.sum(returned.numpy() * particles.concentration[:, :, None], axis=1),
+        np.sum(returned.numpy() * particles.population[:, :, None], axis=1),
     )
     assert np.all(np.isfinite(final_gas.concentration))
     assert np.all(final_gas.concentration >= 0.0)
@@ -1207,7 +1207,7 @@ def test_condensation_scratch_ownership_aliases_are_atomic(
         )
     state_arrays = (
         gpu_particles.masses,
-        gpu_particles.concentration,
+        gpu_particles.population,
         gpu_gas.concentration,
         gpu_gas.vapor_pressure,
         thermodynamics.parameters,
@@ -1437,7 +1437,7 @@ def test_condensation_rejects_nonfinite_extreme_gas_delta_before_coupling(
     particles = dataclasses.replace(
         _make_particle_data(1, 1, 1),
         masses=np.array([[[1.0e100]]]),
-        concentration=np.array([[1.0e308]]),
+        population=np.array([[1.0e308]]),
     )
     gas = dataclasses.replace(
         _make_gas_data(1, 1), concentration=np.array([[1.0]])
@@ -1502,7 +1502,7 @@ def test_prepared_condensation_enqueue_uses_frozen_device_references_only(
     replacement_masses = wp.zeros_like(frozen_masses)
     replacement_gas_concentration = wp.zeros_like(frozen_gas_concentration)
     gpu_particles.masses = replacement_masses
-    gpu_particles.concentration = wp.zeros_like(gpu_particles.concentration)
+    gpu_particles.population = wp.zeros_like(gpu_particles.population)
     gpu_particles.density = wp.zeros_like(gpu_particles.density)
     gpu_gas.concentration = replacement_gas_concentration
     gpu_gas.vapor_pressure = wp.zeros_like(gpu_gas.vapor_pressure)
@@ -1566,13 +1566,13 @@ def test_condensation_public_insufficient_inventory_scales_uptake_and_conserves(
     particles = dataclasses.replace(
         _make_particle_data(1, 1, 1),
         masses=np.array([[[1.0e-18]]]),
-        concentration=np.array([[1.0e9]]),
+        population=np.array([[1.0e9]]),
     )
     gas = dataclasses.replace(
         _make_gas_data(1, 1), concentration=np.array([[1.0e-12]])
     )
     initial_weighted_total = (
-        particles.masses * particles.concentration[:, :, None]
+        particles.masses * particles.population[:, :, None]
     ).sum(axis=1) + gas.concentration
     gpu_particles = to_warp_particle_data(particles, device=device)
     gpu_gas = to_warp_gas_data(
@@ -1609,7 +1609,7 @@ def test_condensation_public_insufficient_inventory_scales_uptake_and_conserves(
     assert np.all(scratch.positive_mass_transfer_scale.numpy() < 1.0)
     final_gas = gpu_gas.concentration.numpy()
     final_weighted_total = (
-        gpu_particles.masses.numpy() * particles.concentration[:, :, None]
+        gpu_particles.masses.numpy() * particles.population[:, :, None]
     ).sum(axis=1) + final_gas
     assert np.all(final_gas >= 0.0)
     npt.assert_allclose(
@@ -1732,7 +1732,7 @@ def _make_particle_data(
     volume = np.full((n_boxes,), 1.0e-6, dtype=np.float64)
     return ParticleData(
         masses=masses,
-        concentration=concentration,
+        population=concentration,
         charge=charge,
         density=density,
         volume=np.ones_like(volume),
@@ -1799,7 +1799,7 @@ class CondensationParityCase:
         return (
             ParticleData(
                 masses=self.particles.masses.copy(),
-                concentration=self.particles.concentration.copy(),
+                population=self.particles.population.copy(),
                 charge=self.particles.charge.copy(),
                 density=self.particles.density.copy(),
                 volume=np.ones_like(self.particles.volume.copy()),
@@ -1831,7 +1831,7 @@ def _make_condensation_parity_cases() -> tuple[CondensationParityCase, ...]:
             ],
             dtype=np.float64,
         ),
-        concentration=np.array([[1.0, 2.0], [1.5, 0.0]], dtype=np.float64),
+        population=np.array([[1.0, 2.0], [1.5, 0.0]], dtype=np.float64),
         charge=np.zeros((2, 2), dtype=np.float64),
         density=np.array([1000.0, 1100.0, 1200.0], dtype=np.float64),
         volume=np.ones_like(np.array([1.0e-6, 1.1e-6], dtype=np.float64)),
@@ -1955,7 +1955,7 @@ class CondensationStiffnessCase:
         for box_idx, particle_idx in self.zero_mass_particles:
             particles.masses[box_idx, particle_idx, :] = 0.0
         for box_idx, particle_idx in self.zero_concentration_particles:
-            particles.concentration[box_idx, particle_idx] = 0.0
+            particles.population[box_idx, particle_idx] = 0.0
         return particles
 
     def build_gas_data(self) -> GasData:
@@ -2213,7 +2213,7 @@ def _validate_stiffness_case_metadata(
         raise ValueError(
             "particle masses shape does not match declared case metadata"
         )
-    if particles.concentration.shape != expected_concentration_shape:
+    if particles.population.shape != expected_concentration_shape:
         raise ValueError(
             "particle concentration shape does not match declared case metadata"
         )
@@ -2228,7 +2228,7 @@ def _validate_stiffness_case_metadata(
 
     dtype_expectations = (
         ("particle masses", particles.masses),
-        ("particle concentration", particles.concentration),
+        ("particle concentration", particles.population),
         ("particle density", particles.density),
         ("particle volume", particles.volume),
         ("gas concentration", gas.concentration),
@@ -2381,7 +2381,7 @@ def _cpu_mass_transfer(  # noqa: C901
             dynamic_viscosity=dynamic_viscosity,
         )
         for particle_idx in range(n_particles):
-            if particles.concentration[box_idx, particle_idx] == 0.0:
+            if particles.population[box_idx, particle_idx] == 0.0:
                 continue
             total_volume = np.sum(
                 particles.masses[box_idx, particle_idx, :] / particles.density
@@ -2574,13 +2574,13 @@ def _cpu_four_substep_oracle(
             proposal[:, :, ~np.asarray(partitioning, dtype=bool)] = 0.0
         _, _, _, _, applied = _inventory_reference(
             working_particles.masses,
-            working_particles.concentration,
+            working_particles.population,
             working_gas.concentration,
             proposal,
         )
         working_particles.masses += applied
         working_gas.concentration -= np.sum(
-            applied * working_particles.concentration[:, :, None], axis=1
+            applied * working_particles.population[:, :, None], axis=1
         )
         # The public step clamps each finalized gas update before the next
         # proposal; retain that substep contract in the independent oracle.
@@ -2672,7 +2672,7 @@ class P4CondensationCase:
         n_boxes, n_particles, n_species = self.masses.shape
         return ParticleData(
             masses=self.masses.copy(),
-            concentration=np.ones((n_boxes, n_particles), dtype=np.float64),
+            population=np.ones((n_boxes, n_particles), dtype=np.float64),
             charge=np.zeros((n_boxes, n_particles), dtype=np.float64),
             density=np.array([1000.0, 1450.0], dtype=np.float64),
             volume=np.ones_like(np.full(n_boxes, 1.0e-6, dtype=np.float64)),
@@ -3371,14 +3371,14 @@ def _assert_condensation_parity_case(
         )
         _, demand, _, scale, finalized = _inventory_reference(
             particles.masses,
-            particles.concentration,
+            particles.population,
             gas.concentration,
             raw_proposal,
         )
         assert demand[0, 0] > gas.concentration[0, 0]
         assert 0.0 < scale[0, 0] < 1.0
         npt.assert_allclose(
-            np.sum(finalized[:, :, 0] * particles.concentration),
+            np.sum(finalized[:, :, 0] * particles.population),
             gas.concentration[0, 0],
             rtol=1.0e-12,
             atol=1.0e-30,
@@ -3386,7 +3386,7 @@ def _assert_condensation_parity_case(
         assert np.any(expected_transfer[:, :, 0] > 0.0)
         assert expected_gas[0, 0] < gas.concentration[0, 0]
     elif case.name == "multi_box_evaporation_phase_gated":
-        active_slots = particles.concentration > 0.0
+        active_slots = particles.population > 0.0
         npt.assert_array_equal(expected_transfer[:, :, 0], 0.0)
         assert np.any(expected_transfer[:, :, 1][active_slots] < 0.0)
         npt.assert_array_equal(expected_transfer[:, :, 2], 0.0)
@@ -3461,7 +3461,7 @@ def _assert_condensation_parity_case(
     _assert_parity_allclose(gpu_gas.concentration, expected_gas)
     _assert_particle_gas_inventory_conserved(
         particles.masses,
-        particles.concentration,
+        particles.population,
         gas.concentration,
         gpu_result.masses,
         gpu_gas.concentration,
@@ -3694,7 +3694,7 @@ def _run_p2_contract_case(device: str) -> dict[str, Any]:
         (n_boxes, n_species), 17.0, dtype=runtime.wp.float64, device=device
     )
     immutable_arrays = {
-        "concentration": gpu_particles.concentration,
+        "concentration": gpu_particles.population,
         "temperature": temperature,
         "pressure": pressure,
         "partitioning": gpu_gas.partitioning,
@@ -3731,7 +3731,7 @@ def _run_p2_contract_case(device: str) -> dict[str, Any]:
         "gpu_gas": gpu_gas,
         "initial_masses": initial_masses,
         "initial_gas": initial_gas,
-        "concentration": particles.concentration.copy(),
+        "concentration": particles.population.copy(),
         "temperature": temperature,
         "pressure": pressure,
         "surface_tension": surface_tension,
@@ -3833,7 +3833,7 @@ def test_condensation_p2_contract_inventory_limited_uptake_is_consistent(
     particles = dataclasses.replace(
         _make_particle_data(1, 1, 1),
         masses=np.array([[[1.0e-18]]]),
-        concentration=np.array([[1.0e9]]),
+        population=np.array([[1.0e9]]),
     )
     gas = dataclasses.replace(
         _make_gas_data(1, 1), concentration=np.array([[1.0e-12]])
@@ -3853,7 +3853,7 @@ def test_condensation_p2_contract_inventory_limited_uptake_is_consistent(
     scratch = _make_condensation_scratch_buffers((1, 1, 1), warp_cpu_device)
     thermodynamics = _make_thermodynamics_config(gpu_gas)
     immutable = {
-        "concentration": gpu_particles.concentration,
+        "concentration": gpu_particles.population,
         "partitioning": gpu_gas.partitioning,
         "latent_heat": latent_heat,
         "thermodynamics_modes": thermodynamics.modes,
@@ -3906,7 +3906,7 @@ def test_condensation_p2_contract_inventory_limited_uptake_is_consistent(
     assert np.all(final_gas >= 0.0)
     _assert_contract_allclose(transfer, final_masses - initial_masses)
     particle_delta = np.sum(
-        (final_masses - initial_masses) * particles.concentration[:, :, None],
+        (final_masses - initial_masses) * particles.population[:, :, None],
         axis=1,
     )
     _assert_inventory_residual_within_contract(
@@ -3914,7 +3914,7 @@ def test_condensation_p2_contract_inventory_limited_uptake_is_consistent(
     )
     _assert_contract_allclose(
         energy.numpy(),
-        np.sum(transfer * particles.concentration[:, :, None], axis=1)
+        np.sum(transfer * particles.population[:, :, None], axis=1)
         * particles.volume[:, None]
         * latent_heat.numpy()[None, :],
     )
@@ -4034,7 +4034,7 @@ def test_condensation_p2_contract_invalid_buffers_are_atomic(
         "gas_concentration": gpu_gas.concentration,
         "gas_molar_mass": gpu_gas.molar_mass,
         "vapor_pressure": gpu_gas.vapor_pressure,
-        "particle_concentration": gpu_particles.concentration,
+        "particle_concentration": gpu_particles.population,
         "partitioning": gpu_gas.partitioning,
         "temperature": temperature,
         "pressure": pressure,
@@ -4102,7 +4102,7 @@ def _make_production_inventory_case() -> tuple[
             ],
             dtype=np.float64,
         ),
-        concentration=np.array(
+        population=np.array(
             [[1.0, 0.0, 2.0], [1.5, 0.0, 0.5]], dtype=np.float64
         ),
         charge=np.zeros((2, 3), dtype=np.float64),
@@ -4155,7 +4155,7 @@ def _run_production_inventory_case(device: str) -> None:
     ) = _make_production_inventory_case()
     initial_masses = particles.masses.copy()
     initial_gas = gas.concentration.copy()
-    particle_concentration = particles.concentration.copy()
+    particle_concentration = particles.population.copy()
     npt.assert_array_equal(initial_gas[:, 2], 0.0)
     expected_masses, _, _, expected_gas = _cpu_four_substep_oracle(
         particles,
@@ -4288,7 +4288,7 @@ def test_condensation_scratch_buffers_complete_sidecar_preserves_identity(
     npt.assert_array_equal(scratch.positive_mass_transfer_scale.numpy(), 1.0)
     _assert_conservation_balance(
         initial_gas - final_gas.concentration,
-        np.sum(returned.numpy() * particles.concentration[:, :, None], axis=1),
+        np.sum(returned.numpy() * particles.population[:, :, None], axis=1),
     )
 
 
@@ -4774,7 +4774,7 @@ def test_condensation_partitioning_gates_disabled_species_and_inactive_slots(
 ) -> None:
     """The raw and accumulated transfers are zeroed before application gates."""
     particles = _make_particle_data(2, 2, 2)
-    particles.concentration[1, 1] = 0.0
+    particles.population[1, 1] = 0.0
     gas = _make_gas_data(2, 2)
     gpu_particles = to_warp_particle_data(particles, device=warp_cpu_device)
     gpu_gas = to_warp_gas_data(
@@ -4815,7 +4815,7 @@ def test_condensation_partitioning_gates_disabled_species_and_inactive_slots(
     npt.assert_array_equal(final_mass[1, 1, :], initial_mass[1, 1, :])
     _assert_conservation_balance(
         initial_gas - gpu_gas.concentration.numpy(),
-        np.sum(total_values * particles.concentration[:, :, None], axis=1),
+        np.sum(total_values * particles.population[:, :, None], axis=1),
     )
     npt.assert_array_equal(
         gpu_gas.concentration.numpy()[0, 1], initial_gas[0, 1]
@@ -5575,7 +5575,7 @@ def _assert_composed_condensation_route(
     npt.assert_array_equal(energy_transfer.numpy()[:, 1], 0.0)
     npt.assert_allclose(
         initial_gas_concentration - gpu_gas.concentration.numpy(),
-        np.sum(expected_total * particles.concentration[:, :, None], axis=1),
+        np.sum(expected_total * particles.population[:, :, None], axis=1),
         rtol=1e-12,
         # Subtracting a femtogram-scale delta from the 1e-6 gas fixture has
         # one fp64 rounding unit beyond the transfer accumulator.
@@ -5774,7 +5774,7 @@ def test_condensation_step_gpu_nonzero_execution_launches_four_p2_sequences(
         assert launched_kernels.count(kernel) == 4
     _assert_conservation_balance(
         initial_gas - gpu_gas.concentration.numpy(),
-        np.sum(total.numpy() * particles.concentration[:, :, None], axis=1),
+        np.sum(total.numpy() * particles.population[:, :, None], axis=1),
     )
     assert all(np.all(np.isfinite(sidecar.numpy())) for sidecar in p2_sidecars)
 
@@ -6166,7 +6166,7 @@ def test_condensation_energy_transfer_device_mismatch_is_atomic(
     )
     state_arrays = {
         "masses": gpu_particles.masses,
-        "particle_concentration": gpu_particles.concentration,
+        "particle_concentration": gpu_particles.population,
         "gas_concentration": gpu_gas.concentration,
         "vapor_pressure": gpu_gas.vapor_pressure,
         "partitioning": gpu_gas.partitioning,
@@ -7483,7 +7483,7 @@ def test_run_gpu_step_can_round_trip_executed_gas_state(device: str) -> None:
     npt.assert_allclose(
         gas.concentration - executed_gas.concentration,
         np.sum(
-            mass_transfer.numpy() * particles.concentration[:, :, None], axis=1
+            mass_transfer.numpy() * particles.population[:, :, None], axis=1
         ),
         rtol=1e-12,
         atol=1e-22,
@@ -8927,7 +8927,7 @@ def test_condensation_forced_evaporation_accumulates_applied_transfer(
     assert np.all(gpu_particles.masses.numpy() >= 0.0)
     npt.assert_allclose(
         gas.concentration - gpu_gas.concentration.numpy(),
-        np.sum(expected_total * particles.concentration[:, :, None], axis=1),
+        np.sum(expected_total * particles.population[:, :, None], axis=1),
         rtol=1e-12,
         atol=1e-23,
     )
@@ -8944,7 +8944,7 @@ def test_condensation_skips_inactive_particles(device: str) -> None:
     pressure = 101325.0
     time_step = 1.0
     particles = _make_particle_data(n_boxes=1, n_particles=2, n_species=1)
-    particles.concentration[0, 1] = 0.0
+    particles.population[0, 1] = 0.0
     gas = _make_gas_data(n_boxes=1, n_species=1)
     vapor_pressure = _make_vapor_pressure(n_boxes=1, n_species=1)
 
@@ -9985,7 +9985,7 @@ def test_condensation_step_gpu_rejects_particle_concentration_shape(
         vapor_pressure=vapor_pressure,
     )
 
-    gpu_particles.concentration = wp.zeros(
+    gpu_particles.population = wp.zeros(
         (1, 3),
         dtype=wp.float64,
         device=device,
@@ -10157,7 +10157,7 @@ def test_condensation_step_gpu_rejects_particle_concentration_device_mismatch(
     if wrong_device == "cuda" and not cuda_available(wp):
         pytest.skip("CUDA not available for mismatch test")
 
-    gpu_particles.concentration = wp.zeros(
+    gpu_particles.population = wp.zeros(
         (1, 2),
         dtype=wp.float64,
         device=wrong_device,

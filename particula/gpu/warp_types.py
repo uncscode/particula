@@ -37,10 +37,10 @@ class WarpParticleData:
         masses: Per-species masses in kg.
             Shape: (n_boxes, n_particles, n_species)
             3D array where each particle has mass per species.
-        concentration: Number concentration per particle.
+        population: Number concentration per particle.
             Shape: (n_boxes, n_particles)
             For particle-resolved: actual count (typically 1).
-            For binned: number per m^3.
+            For binned: represented number in the bin.
         charge: Particle charges (dimensionless integer counts).
             Shape: (n_boxes, n_particles)
             Stored as float64 for GPU compatibility.
@@ -50,7 +50,7 @@ class WarpParticleData:
         volume: Simulation volume per box in m^3.
             Shape: (n_boxes,)
         distribution_kind: Stable host-visible population tag: 0 invalid/unset,
-            1 discrete density, 2 unsupported PDF, 3 resolved counts.
+            1 discrete counts, 2 unsupported PDF, 3 resolved counts.
             Numerical arrays are never normalized by assigning this tag.
 
     Example:
@@ -62,7 +62,7 @@ class WarpParticleData:
         >>> data.masses = wp.zeros(
         ...     (n_boxes, n_particles, n_species), dtype=wp.float64
         ... )
-        >>> data.concentration = wp.ones(
+        >>> data.population = wp.ones(
         ...     (n_boxes, n_particles), dtype=wp.float64
         ... )
         >>> data.charge = wp.zeros(
@@ -75,7 +75,7 @@ class WarpParticleData:
     """
 
     masses: wp.array3d(dtype=wp.float64)  # type: ignore[valid-type]
-    concentration: wp.array2d(dtype=wp.float64)  # type: ignore[valid-type]
+    population: wp.array2d(dtype=wp.float64)  # type: ignore[valid-type]
     charge: wp.array2d(dtype=wp.float64)  # type: ignore[valid-type]
     density: wp.array(dtype=wp.float64)  # type: ignore[valid-type]
     volume: wp.array(dtype=wp.float64)  # type: ignore[valid-type]

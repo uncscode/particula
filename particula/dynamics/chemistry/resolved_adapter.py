@@ -101,7 +101,7 @@ class ResolvedChemistryAdapter:
             w,
             gas,
             mass,
-            context.arrays["particles.concentration"],
+            context.arrays["particles.population"],
             context.arrays["particles.volume"],
             context.arrays["environment.temperature"],
             wp.float64(context.time_step),

@@ -47,7 +47,7 @@ def test_native_decay_preserves_raw_basis_and_every_protected_field(
     from particula.gpu.kernels import dilution as module
 
     particles, gas = containers(kind, volume, device)
-    targets = (particles.concentration, gas.concentration)
+    targets = (particles.population, gas.concentration)
     before = [a.numpy().copy() for a in targets]
     protected = (
         particles.masses,
@@ -108,21 +108,21 @@ def test_native_preflight_rejects_without_primary_writes(device, failure, time):
     )
     options = {}
     if failure.startswith("volume") or failure == "pmf_volume":
-        value = {"volume_zero": 0.0, "volume_nan": np.nan, "pmf_volume": 4.0}[
+        value = {"volume_zero": 0.0, "volume_nan": np.nan, "pmf_volume": -1.0}[
             failure
         ]
         particles.volume.assign(np.array([value]))
     elif failure == "counts_overflow":
         particles.volume.assign(np.array([0.25]))
-        particles.concentration.assign(np.array([[1e308, 2.0]]))
+        particles.population.assign(np.array([[1e308, 2.0]]))
     elif failure == "mass_nan":
         particles.masses.assign(np.full((1, 2, 2), np.nan))
     elif failure == "scratch_alias":
         options["factors"] = particles.volume
     else:
-        particles.charge = particles.concentration
+        particles.charge = particles.population
     arrays = (
-        particles.concentration,
+        particles.population,
         gas.concentration,
         particles.masses,
         particles.charge,

@@ -44,7 +44,7 @@ def _build_multi_box_particle_data() -> ParticleData:
     return ParticleData(
         distribution_type="discrete",
         masses=np.array([[[1e-18], [2e-18]], [[9e-18], [8e-18]]]),
-        concentration=np.array([[1.0, 2.0], [10.0, 20.0]]),
+        population=np.array([[1.0, 2.0], [10.0, 20.0]]),
         charge=np.array([[0.0, 1.0], [4.0, 5.0]]),
         density=np.array([1000.0]),
         volume=np.array([1.0, 1.0]),
@@ -126,7 +126,7 @@ def test_get_mean_effective_density_particle_data_filters_zeros() -> None:
     """Mean effective density should ignore zero-mass particles."""
     data = ParticleData(
         masses=np.array([[[0.0], [1e-18], [2e-18]]]),
-        concentration=np.array([[0.0, 1.0, 1.0]]),
+        population=np.array([[0.0, 1.0, 1.0]]),
         charge=np.zeros((1, 3)),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
@@ -142,7 +142,7 @@ def test_get_mean_effective_density_particle_data_all_zero_returns_zero() -> (
     """Mean effective density should be zero when no positive mass exists."""
     data = ParticleData(
         masses=np.array([[[0.0], [0.0]]]),
-        concentration=np.array([[0.0, 0.0]]),
+        population=np.array([[0.0, 0.0]]),
         charge=np.zeros((1, 2)),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
@@ -161,7 +161,7 @@ def test_material_admission_retains_same_instance() -> None:
     """Native material admission retains the original particle instance."""
     data = ParticleData(
         masses=np.array([[[1e-18]]]),
-        concentration=np.array([[1.0]]),
+        population=np.array([[1.0]]),
         charge=np.array([[0.0]]),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
@@ -175,7 +175,7 @@ def test_require_single_box_particle_data_accepts_single_box() -> None:
     """Single-box ParticleData should pass the shared validation helper."""
     data = ParticleData(
         masses=np.array([[[1e-18]]]),
-        concentration=np.array([[1.0]]),
+        population=np.array([[1.0]]),
         charge=np.array([[0.0]]),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
@@ -190,7 +190,7 @@ def test_require_single_box_particle_data_rejects_multi_box() -> None:
     """Multi-box ParticleData should raise a clear validation error."""
     data = ParticleData(
         masses=np.array([[[1e-18]], [[2e-18]]]),
-        concentration=np.array([[1.0], [2.0]]),
+        population=np.array([[1.0], [2.0]]),
         charge=np.array([[0.0], [1.0]]),
         density=np.array([1000.0]),
         volume=np.array([1.0, 2.0]),
@@ -205,7 +205,7 @@ def test_getters_particle_data_match_arrays() -> None:
     data = ParticleData(
         distribution_type="discrete",
         masses=np.array([[[1e-18, 2e-18], [2e-18, 3e-18]]]),
-        concentration=np.array([[1.0, 2.0]]),
+        population=np.array([[1.0, 2.0]]),
         charge=np.array([[0.0, 1.0]]),
         density=np.array([1000.0, 1200.0]),
         volume=np.array([1.0]),
@@ -245,7 +245,7 @@ def test_getters_particle_data_reject_multi_box_inputs() -> None:
                 [[9e-18, 8e-18], [7e-18, 6e-18]],
             ]
         ),
-        concentration=np.array([[1.0, 2.0], [10.0, 20.0]]),
+        population=np.array([[1.0, 2.0], [10.0, 20.0]]),
         charge=np.array([[0.0, 1.0], [4.0, 5.0]]),
         density=np.array([1000.0, 1200.0]),
         volume=np.array([1.0, 9.0]),
@@ -306,7 +306,7 @@ def test_get_particle_resolved_kernel_radius_data_uses_bin_radius() -> None:
     data = ParticleData(
         distribution_type="particle_resolved",
         masses=np.array([[[1e-18], [2e-18]]]),
-        concentration=np.array([[1.0, 1.0]]),
+        population=np.array([[1.0, 1.0]]),
         charge=np.zeros((1, 2)),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
@@ -324,7 +324,7 @@ def test_get_particle_resolved_kernel_radius_data_raises_on_all_zero() -> None:
     data = ParticleData(
         distribution_type="particle_resolved",
         masses=np.zeros((1, 2, 1)),
-        concentration=np.zeros((1, 2)),
+        population=np.zeros((1, 2)),
         charge=np.zeros((1, 2)),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
@@ -340,7 +340,7 @@ def test_get_particle_resolved_kernel_radius_data_raises_on_nonfinite() -> None:
     data = ParticleData(
         distribution_type="particle_resolved",
         masses=np.array([[[np.inf]]]),
-        concentration=np.array([[1.0]]),
+        population=np.array([[1.0]]),
         charge=np.array([[0.0]]),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
@@ -358,7 +358,7 @@ def test_get_particle_resolved_kernel_radius_data_generates_requested_bins() -> 
     data = ParticleData(
         distribution_type="particle_resolved",
         masses=np.array([[[1e-18], [8e-18], [27e-18]]]),
-        concentration=np.array([[1.0, 1.0, 1.0]]),
+        population=np.array([[1.0, 1.0, 1.0]]),
         charge=np.array([[0.0, 0.0, 0.0]]),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
@@ -391,7 +391,7 @@ def test_get_particle_resolved_kernel_radius_data_rejects_multi_box_inputs() -> 
     data = ParticleData(
         distribution_type="particle_resolved",
         masses=np.array([[[1e-18]], [[2e-18]]]),
-        concentration=np.array([[1.0], [2.0]]),
+        population=np.array([[1.0], [2.0]]),
         charge=np.array([[0.0], [1.0]]),
         density=np.array([1000.0]),
         volume=np.array([1.0, 2.0]),
@@ -408,7 +408,7 @@ def test_get_binned_kernel_data_from_particle_data_aggregates_bins() -> None:
     data = ParticleData(
         distribution_type="particle_resolved",
         masses=np.array([[[1e-18], [2e-18], [3e-18]]]),
-        concentration=np.array([[1.0, 2.0, 3.0]]),
+        population=np.array([[1.0, 2.0, 3.0]]),
         charge=np.array([[0.0, 1.0, 2.0]]),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
@@ -470,7 +470,7 @@ def test_get_binned_kernel_data_from_particle_data_rejects_multi_box_inputs() ->
     data = ParticleData(
         distribution_type="particle_resolved",
         masses=np.array([[[1e-18]], [[2e-18]]]),
-        concentration=np.array([[1.0], [2.0]]),
+        population=np.array([[1.0], [2.0]]),
         charge=np.array([[0.0], [1.0]]),
         density=np.array([1000.0]),
         volume=np.array([1.0, 2.0]),
@@ -488,7 +488,7 @@ def test_get_binned_kernel_data_rejects_uncovered_active_radii() -> None:
     data = ParticleData(
         distribution_type="particle_resolved",
         masses=np.array([[[1e-18], [2e-18]]]),
-        concentration=np.array([[1.0, 2.0]]),
+        population=np.array([[1.0, 2.0]]),
         charge=np.array([[0.0, 1.0]]),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
@@ -519,7 +519,7 @@ def test_loss_gain_and_net_rate_particle_data_paths(
     data = ParticleData(
         distribution_type="discrete",
         masses=np.array([[[1e-18], [2e-18], [3e-18], [4e-18]]]),
-        concentration=np.array([[3.0, 4.0, 5.0, 6.0]]),
+        population=np.array([[3.0, 4.0, 5.0, 6.0]]),
         charge=np.array([[0.0, 1.0, 0.0, 1.0]]),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
@@ -630,7 +630,7 @@ def test_loss_gain_rate_reject_invalid_distribution_type() -> None:
     data = ParticleData(
         distribution_type="discrete",
         masses=np.array([[[1e-18]]]),
-        concentration=np.array([[1.0]]),
+        population=np.array([[1.0]]),
         charge=np.array([[0.0]]),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
@@ -652,7 +652,7 @@ def test_step_discrete_particle_data_updates_concentration_in_place(
     data = ParticleData(
         distribution_type="discrete",
         masses=np.array([[[1e-18], [2e-18]]]),
-        concentration=np.array([[3.0, 4.0]]),
+        population=np.array([[3.0, 4.0]]),
         charge=np.array([[0.0, 0.0]]),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
@@ -689,12 +689,12 @@ def test_step_discrete_representation_updates_concentration_in_place(
         strategy,
         "net_rate",
         lambda particle, temperature, pressure: np.full_like(
-            particle.concentration[0],
+            particle.population[0],
             2.0,
             dtype=np.float64,
         ),
     )
-    concentration_before = particle.concentration.copy()
+    concentration_before = particle.population.copy()
 
     result = strategy.step(
         particle=particle,
@@ -705,7 +705,7 @@ def test_step_discrete_representation_updates_concentration_in_place(
 
     assert result is particle
     np.testing.assert_allclose(
-        particle.concentration,
+        particle.population,
         concentration_before + np.full_like(concentration_before, 6.0),
     )
 
@@ -717,7 +717,7 @@ def test_step_particle_resolved_empty_loss_gain_indices_noop(
     data = ParticleData(
         distribution_type="particle_resolved",
         masses=np.array([[[1e-18, 1e-18], [2e-18, 2e-18]]]),
-        concentration=np.array([[1.0, 1.0]]),
+        population=np.array([[1.0, 1.0]]),
         charge=np.array([[0.0, 1.0]]),
         density=np.array([1000.0, 1200.0]),
         volume=np.array([1.0]),
@@ -760,7 +760,7 @@ def test_step_particle_resolved_zero_kernel_radius_raises(
     data = ParticleData(
         distribution_type="particle_resolved",
         masses=np.array([[[1e-18, 1e-18], [2e-18, 2e-18]]]),
-        concentration=np.array([[1.0, 1.0]]),
+        population=np.array([[1.0, 1.0]]),
         charge=np.array([[0.0, 1.0]]),
         density=np.array([1000.0, 1200.0]),
         volume=np.array([1.0]),
@@ -784,7 +784,7 @@ def test_step_rejects_invalid_distribution_type() -> None:
     data = ParticleData(
         distribution_type="discrete",
         masses=np.array([[[1e-18]]]),
-        concentration=np.array([[1.0]]),
+        population=np.array([[1.0]]),
         charge=np.array([[0.0]]),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
@@ -804,7 +804,7 @@ def test_diffusive_knudsen_and_friction_factor_particle_data(
     """Diffusive Knudsen path should compose friction-factor helpers."""
     data = ParticleData(
         masses=np.array([[[1e-18], [2e-18]]]),
-        concentration=np.array([[1.0, 2.0]]),
+        population=np.array([[1.0, 2.0]]),
         charge=np.array([[0.0, 1.0]]),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
@@ -904,7 +904,7 @@ def test_step_particle_data_particle_resolved_updates_arrays(
     data = ParticleData(
         distribution_type="particle_resolved",
         masses=np.array([[[1e-18, 1e-18], [2e-18, 2e-18], [3e-18, 3e-18]]]),
-        concentration=np.array([[1.0, 1.0, 1.0]]),
+        population=np.array([[1.0, 1.0, 1.0]]),
         charge=np.array([[0.0, 1.0, -1.0]]),
         density=np.array([1000.0, 1200.0]),
         volume=np.array([1.0]),
@@ -951,7 +951,7 @@ def test_step_particle_data_multi_box_raises_before_mutation(
                 [[9e-18, 8e-18], [7e-18, 6e-18], [5e-18, 4e-18]],
             ]
         ),
-        concentration=np.array([[1.0, 1.0, 1.0], [2.0, 3.0, 4.0]]),
+        population=np.array([[1.0, 1.0, 1.0], [2.0, 3.0, 4.0]]),
         charge=np.array([[0.0, 1.0, -1.0], [4.0, 5.0, 6.0]]),
         density=np.array([1000.0, 1200.0]),
         volume=np.array([1.0, 5.0]),
@@ -994,7 +994,7 @@ def test_step_particle_data_zero_concentration_noop(
     data = ParticleData(
         distribution_type="particle_resolved",
         masses=np.array([[[1e-18, 1e-18], [2e-18, 2e-18]]]),
-        concentration=np.array([[0.0, 0.0]]),
+        population=np.array([[0.0, 0.0]]),
         charge=np.array([[0.0, 0.0]]),
         density=np.array([1000.0, 1200.0]),
         volume=np.array([1.0]),
@@ -1034,7 +1034,7 @@ def test_step_particle_data_empty_particle_resolved_noop(
     data = ParticleData(
         distribution_type="particle_resolved",
         masses=np.zeros((1, 0, 2), dtype=np.float64),
-        concentration=np.zeros((1, 0), dtype=np.float64),
+        population=np.zeros((1, 0), dtype=np.float64),
         charge=np.zeros((1, 0), dtype=np.float64),
         density=np.array([1000.0, 1200.0]),
         volume=np.array([1.0]),
@@ -1074,7 +1074,7 @@ def test_step_rejects_untagged_population_before_kernel(duration, monkeypatch):
     """Raw material storage cannot silently become an executable population."""
     data = ParticleData(
         masses=np.array([[[1e-18], [2e-18]]]),
-        concentration=np.array([[1.0, 1.0]]),
+        population=np.array([[1.0, 1.0]]),
         charge=np.zeros((1, 2)),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
@@ -1105,7 +1105,7 @@ def test_step_discrete_negative_proposal_preserves_state(monkeypatch):
     """Retain the old two-second fixture as native rejection evidence."""
     data = ParticleData(
         masses=np.array([[[1e-18], [2e-18]]]),
-        concentration=np.array([[3.0, 4.0]]),
+        population=np.array([[3.0, 4.0]]),
         charge=np.zeros((1, 2)),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
@@ -1128,7 +1128,7 @@ def test_binned_empty_native_population_retains_layout_and_volume():
     """An empty population is distinct from discarding uncovered active slots."""
     data = ParticleData(
         masses=np.zeros((1, 0, 2)),
-        concentration=np.zeros((1, 0)),
+        population=np.zeros((1, 0)),
         charge=np.zeros((1, 0)),
         density=np.array([1000.0, 1200.0]),
         volume=np.array([0.25]),

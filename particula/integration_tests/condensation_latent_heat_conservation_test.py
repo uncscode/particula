@@ -60,7 +60,7 @@ def _particle_water_inventory(aerosol: par.Aerosol) -> float:
     """
     species_mass = np.asarray(aerosol.particles.masses[0], dtype=np.float64)
     concentration = (
-        aerosol.particles.concentration[0] / aerosol.particles.volume[0]
+        aerosol.particles.population[0] / aerosol.particles.volume[0]
     )
 
     if species_mass.ndim == 1:
@@ -195,9 +195,7 @@ def test_particle_water_inventory_accepts_valid_single_species_shapes(
     expected = float(
         np.sum(
             species_mass.reshape(-1)
-            * (
-                aerosol.particles.concentration[0] / aerosol.particles.volume[0]
-            ),
+            * (aerosol.particles.population[0] / aerosol.particles.volume[0]),
             dtype=np.float64,
         )
     )

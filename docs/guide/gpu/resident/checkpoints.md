@@ -8,12 +8,12 @@ owner restores the last committed outer state before this checkpoint. [Adaptive 
 
 For public runnable continuation, use [prepared checkpoints and resume](../prepared.md#state-forcing-and-observations). The detailed concrete resident schema below remains the underlying continuation authority.
 
-Current controllers create schema-v5 checkpoints with explicit population type
-and independent particle-material and gas widths. Schemas v1–v4 reject before
+Current controllers create schema-v6 checkpoints with explicit population type
+and independent particle-material and gas widths. Schemas v1–v5 reject before
 setup or upload; there is no inferred migration. Supported population semantics
-are explicit PMF and resolved counts, with independently declared gas width.
-Schema-v5 `legacy_untagged` records and missing population meaning reject before
-setup or upload without inferred migration or a schema-version change. PDF
+are extensive bin counts and resolved multiplicities, with independently declared gas width.
+Schema-v6 `legacy_untagged` records and missing population meaning reject before
+setup or upload without inferred migration. PDF
 remains unsupported on Warp. Native inspection carriers retain their population
 tag; canonical bytes remain restart authority.
 
@@ -52,7 +52,7 @@ resident-array identities.
 Restart compatibility is intentionally exact and fail-closed. It accepts
 `ResidentCheckpoint` records with carrier type `"ResidentSession"`, lifecycle
 `ACTIVE`, complete valid canonical payload descriptors, and an exactly equal
-target `Device`. Schema-v5 checkpoints may contain no communication family or
+target `Device`. Schema-v6 checkpoints may contain no communication family or
 exactly one complete closed-map GAS or PARTICLES family with matching metadata
 and payloads. They always require RNG continuation
 metadata, though their published-stream payload collection may be empty when
@@ -69,8 +69,8 @@ schemas, malformed, incomplete, partial, mixed, or mismatched communication
 payloads, non-`ACTIVE` checkpoint records, and device mismatches; it does not
 promise forward or backward compatibility.
 
-Schema-v5 continuation covers the canonical published `coagulation`
-and `wall_loss` streams; schema-v5 is the current format. Each retained record
+Schema-v6 continuation covers the canonical published `coagulation`
+and `wall_loss` streams; schema-v6 is the current format. Each retained record
 includes schema-versioned stable logical-ID, root-seed, and namespace metadata
 plus immutable current `uint32` words. Those words are the sole continuation
 authority, rather than lossy CPU inspection carriers or ordinary resource

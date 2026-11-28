@@ -1,7 +1,8 @@
 """Native particle initialization without strategy-bearing facades.
 
 Initialization allocates owned float64 arrays. Aggregate wrapping is a separate,
-identity-preserving operation. Binned densities use fixed volume 1 m^3.
+identity-preserving operation. Binned density inputs produce extensive
+populations.
 Canonical SI inputs do not require Pint; other unit spellings/conversions do.
 """
 
@@ -104,7 +105,8 @@ def _reference_volume(value: float, units: str) -> float:
 def create_particle_data_from_radii(
     *,
     radii: ArrayLike,
-    concentration: ArrayLike,
+    concentration: ArrayLike | None = None,
+    population: ArrayLike | None = None,
     distribution_type: str,
     density: ArrayLike = 1000.0,
     charge: ArrayLike = 0.0,
@@ -119,10 +121,11 @@ def create_particle_data_from_radii(
     Args:
         radii: Scalar, vector or singleton row/column of positive radii.
         concentration: Scalar or matching per-radius densities.
+        population: Alternative extensive counts or dN/dr in m^-1.
         distribution_type: Required ``discrete`` or ``continuous_pdf`` kind.
         density: One positive material density; redundant equal values allowed.
         charge: Scalar or per-radius elementary-charge counts, default zero.
-        volume: Reference volume, which must convert to exactly 1 m^3.
+        volume: Finite positive represented air volume.
         radius_units: Radius units, default metres.
         concentration_units: Defaults to 1/m^3 for bins, 1/m^4 for PDFs.
             Discrete inputs also accept 1/cm^3, as in ParticleDataBuilder.
@@ -152,17 +155,23 @@ def create_particle_data_from_radii(
         .set_distribution_type(distribution_type)
         .set_masses(masses)
         .set_density(np.array([material]))
-        .set_concentration(
-            _bin_values(concentration, radius.size, "concentration"),
-            units=concentration_units
-            if concentration_units is not None
-            else (
-                "1/m^4" if distribution_type == "continuous_pdf" else "1/m^3"
-            ),
-        )
         .set_charge(_bin_values(charge, radius.size, "charge"))
         .set_volume(np.asarray(_reference_volume(volume, volume_units)))
     )
+    if (population is None) == (concentration is None):
+        raise ValueError("supply exactly one of concentration or population")
+    if population is not None:
+        if concentration_units is not None:
+            raise ValueError("concentration_units require density input")
+        builder.set_population(
+            _bin_values(population, radius.size, "population")
+        )
+    elif concentration is not None:
+        builder.set_concentration(
+            _bin_values(concentration, radius.size, "concentration"),
+            units=concentration_units
+            or ("1/m^4" if distribution_type == "continuous_pdf" else "1/m^3"),
+        )
     if distribution_type == "continuous_pdf":
         builder.set_radius_grid(radius)
     return builder.build().copy()
@@ -193,7 +202,7 @@ def create_lognormal_binned_particle_data(
         number_concentration: Modal number densities, default [1e10, 1e9] m^-3.
         density: Single material density, default 1000 kg/m^3.
         charge: Scalar or per-node charge, default zero.
-        volume: Reference volume; must convert to exactly 1 m^3.
+        volume: Positive represented air volume.
         radius_units: Units of supplied nodes/modes; defaults remain SI.
         number_concentration_units: Units of supplied modal densities.
         density_units: Material-density units.
@@ -247,7 +256,7 @@ def create_lognormal_binned_particle_data(
         if distribution_type == "continuous_pdf"
         else get_lognormal_pmf_distribution
     )
-    result.concentration[0] = generator(
+    result.population[0] = result.volume[0] * generator(
         x_values=radius,
         mode=modes,
         geometric_standard_deviation=deviations,
@@ -304,11 +313,38 @@ def _slot_values(
     raise ValueError(f"{name} must retain one value per particle without loss")
 
 
+def _resolved_counts(
+    population, concentration, concentration_units, shape, volumes
+):
+    """Convert measured slot densities to multiplicities once."""
+    if population is not None:
+        if concentration is not None or concentration_units != "count":
+            raise ValueError(
+                "population conflicts with concentration or density units"
+            )
+        concentration = population
+    if concentration_units not in ("count", "1/m^3", "1/cm^3"):
+        raise ValueError(
+            "resolved concentration units must be count or density"
+        )
+    if concentration is None and concentration_units != "count":
+        raise ValueError("density units require explicit concentration")
+    counts = _slot_values(
+        1.0 if concentration is None else concentration, shape, "concentration"
+    )
+    if concentration_units != "count":
+        with np.errstate(over="ignore", invalid="ignore"):
+            counts *= _unit_factor(concentration_units, "1/m^3")
+            counts *= volumes[:, None]
+    return counts
+
+
 def create_resolved_particle_data(
     *,
     masses: ArrayLike,
     density: ArrayLike,
     concentration: ArrayLike | None = None,
+    population: ArrayLike | None = None,
     charge: ArrayLike | None = 0.0,
     volume: ArrayLike = 1.0,
     mass_units: str = "kg",
@@ -322,6 +358,7 @@ def create_resolved_particle_data(
         masses: Scalar, (N,) single-species, (N,S), or (B,N,S) masses.
         density: Scalar or (S,) densities; singleton forms and identical
             population rows are accepted. Differing population rows reject.
+        population: Optional explicit extensive multiplicities.
         concentration: Scalar, (N,), or (B,N) weights; default one count/slot.
             Singleton row/column forms broadcast without dropping values.
         charge: Scalar, (N,), or (B,N) charge counts; None means zero.
@@ -367,25 +404,15 @@ def create_resolved_particle_data(
         raise ValueError(
             "volume must be positive finite with one value per box"
         )
-    if concentration_units not in ("count", "1/m^3", "1/cm^3"):
-        raise ValueError(
-            "resolved concentration units must be count or density"
-        )
-    if concentration is None and concentration_units != "count":
-        raise ValueError("density units require explicit concentration")
-    counts = _slot_values(
-        1.0 if concentration is None else concentration, shape, "concentration"
+    counts = _resolved_counts(
+        population, concentration, concentration_units, shape, volumes
     )
-    if concentration_units != "count":
-        with np.errstate(over="ignore", invalid="ignore"):
-            counts *= _unit_factor(concentration_units, "1/m^3")
-            counts *= volumes[:, None]
     builder = (
         ParticleDataBuilder()
         .set_distribution_type("particle_resolved")
         .set_masses(mass.copy(), units=mass_units)
         .set_density(_species_density(density, shape), units=density_units)
-        .set_concentration(counts, units="count")
+        .set_population(counts)
         .set_charge(
             _slot_values(
                 0.0 if charge is None else charge,

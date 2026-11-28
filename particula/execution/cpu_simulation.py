@@ -169,7 +169,7 @@ class CPUSimulation:
     def checkpoint(self):
         """Detach native state and RNG bytes between accepted cycles."""
         return CPUCheckpoint(
-            1,
+            2,
             pack_native(self._state),
             self._plans,
             self.time,
@@ -235,7 +235,7 @@ class CPUSimulation:
         if (
             type(checkpoint) is not CPUCheckpoint
             or type(checkpoint.schema_version) is not int
-            or checkpoint.schema_version != 1
+            or checkpoint.schema_version != 2
         ):
             raise ValueError("unsupported native CPU checkpoint")
         if (

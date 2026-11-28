@@ -66,7 +66,7 @@ def _particle(kind="discrete", volume=1.0):
     return ParticleData(
         masses=np.array([[[1.0, 2.0], [4.0, 3.0], [10.0, 9.0], [25.0, 30.0]]])
         * 1e-18,
-        concentration=np.array([[0.5, 2.0, 4.0, 10.0]])
+        population=np.array([[0.5, 2.0, 4.0, 10.0]])
         * (1e13 if kind == "continuous_pdf" else 1.0),
         charge=np.array([[1.0, -1.0, 2.0, 0.0]]),
         density=np.array([1000.0, 1600.0]),
@@ -213,7 +213,7 @@ def test_native_kernels_preserve_physical_laws_and_population_independence(
         a.copy()
         for a in (
             particle.masses,
-            particle.concentration,
+            particle.population,
             particle.density,
             particle.charge,
             particle.volume,
@@ -227,15 +227,15 @@ def test_native_kernels_preserve_physical_laws_and_population_independence(
         and np.all(np.isfinite(result))
         and np.all(result >= 0)
     )
-    particle.concentration *= 7
+    particle.population *= 7
     npt.assert_allclose(
         strategy.kernel(particle, 298.15, 101325.0), result, rtol=0, atol=0
     )
-    particle.concentration /= 7
+    particle.population /= 7
     for actual, saved in zip(
         (
             particle.masses,
-            particle.concentration,
+            particle.population,
             particle.density,
             particle.charge,
             particle.volume,
@@ -257,13 +257,13 @@ def test_native_helpers_separate_particle_mass_from_density(kind, volume):
         _get_effective_density(particle), density, rtol=1e-15, atol=0
     )
     expected = (
-        particle.concentration[0] / volume
+        particle.population[0] / volume
         if kind == "particle_resolved"
-        else particle.concentration[0]
+        else particle.population[0]
     )
     npt.assert_array_equal(_get_concentration(particle), expected)
     assert not np.shares_memory(
-        _get_concentration(particle), particle.concentration
+        _get_concentration(particle), particle.population
     )
 
 
@@ -281,21 +281,17 @@ def test_rate_measures_and_gain_quadrature_have_independent_expected_values(
     )
     widths = np.diff(radius, append=2 * radius[-1] - radius[-2])
     pdf = 3e12
-    particle.concentration[0] = (
-        pdf if kind == "continuous_pdf" else pdf * widths
-    )
+    particle.population[0] = pdf if kind == "continuous_pdf" else pdf * widths
     kernel_value = 2e-15
     kernel = np.full((4, 4), kernel_value)
-    before = particle.concentration.copy()
+    before = particle.population.copy()
     if kind == "continuous_pdf":
         expected_loss = np.full(
             4, kernel_value * pdf**2 * (radius[-1] - radius[0])
         )
     else:
         expected_loss = (
-            kernel_value
-            * particle.concentration[0]
-            * sum(particle.concentration[0])
+            kernel_value * particle.population[0] * sum(particle.population[0])
         )
     expected_gain = []
     for target in radius:
@@ -322,7 +318,7 @@ def test_rate_measures_and_gain_quadrature_have_independent_expected_values(
         rtol=1e-13,
         atol=0,
     )
-    npt.assert_array_equal(particle.concentration, before)
+    npt.assert_array_equal(particle.population, before)
 
 
 @pytest.mark.parametrize("name", MECHANISMS)
@@ -357,7 +353,7 @@ def test_native_kernel_rejection_is_read_only(name, fault):
         particle = replace(
             particle,
             masses=np.repeat(particle.masses, 2, axis=0),
-            concentration=np.repeat(particle.concentration, 2, axis=0),
+            population=np.repeat(particle.population, 2, axis=0),
             charge=np.repeat(particle.charge, 2, axis=0),
             volume=np.ones(2),
         )
@@ -368,12 +364,12 @@ def test_native_kernel_rejection_is_read_only(name, fault):
     else:
         array = getattr(
             particle,
-            {"mass": "masses", "count": "concentration"}.get(fault, fault),
+            {"mass": "masses", "count": "population"}.get(fault, fault),
         )
-        array.flat[0] = 4 if fault == "volume" else np.nan
+        array.flat[0] = 0 if fault == "volume" else np.nan
     arrays = [
         particle.masses,
-        particle.concentration,
+        particle.population,
         particle.density,
         particle.charge,
         particle.volume,
@@ -394,12 +390,12 @@ def test_native_kernels_keep_zero_mass_slots_and_empty_layout(name, empty):
         particle = replace(
             particle,
             masses=particle.masses[:, :0, :].copy(),
-            concentration=particle.concentration[:, :0].copy(),
+            population=particle.population[:, :0].copy(),
             charge=particle.charge[:, :0].copy(),
         )
     else:
         particle.masses[0, 1] = 0
-        particle.concentration[0, 1] = 0
+        particle.population[0, 1] = 0
         particle.charge[0, 1] = 0
     kernel = _strategy(name, "particle_resolved").kernel(
         particle, 298.15, 101325.0
@@ -411,7 +407,7 @@ def test_native_kernels_keep_zero_mass_slots_and_empty_layout(name, empty):
         selected = replace(
             particle,
             masses=particle.masses[:, [0, 2, 3], :],
-            concentration=particle.concentration[:, [0, 2, 3]],
+            population=particle.population[:, [0, 2, 3]],
             charge=particle.charge[:, [0, 2, 3]],
         )
         npt.assert_allclose(
@@ -457,12 +453,12 @@ def test_native_rates_validate_kernel_and_current_population(method, fault):
     elif fault == "kind":
         strategy.distribution_type = "discrete"
     else:
-        particle.volume[0] = 4.0
-    before = particle.masses.copy(), particle.concentration.copy()
+        particle.volume[0] = 0.0
+    before = particle.masses.copy(), particle.population.copy()
     with pytest.raises(ValueError):
         getattr(strategy, method)(particle, kernel)
     npt.assert_array_equal(particle.masses, before[0])
-    npt.assert_array_equal(particle.concentration, before[1])
+    npt.assert_array_equal(particle.population, before[1])
 
 
 @pytest.mark.parametrize("kind", ["discrete", "continuous_pdf"])
@@ -473,7 +469,7 @@ def test_native_gain_preserves_existing_cubic_grid_requirement(kind, nodes):
     particle = replace(
         particle,
         masses=particle.masses[:, :nodes].copy(),
-        concentration=particle.concentration[:, :nodes].copy(),
+        population=particle.population[:, :nodes].copy(),
         charge=particle.charge[:, :nodes].copy(),
         radius_grid=particle.radius_grid[:nodes].copy()
         if kind == "continuous_pdf"
@@ -484,7 +480,7 @@ def test_native_gain_preserves_existing_cubic_grid_requirement(kind, nodes):
     with pytest.raises(ValueError, match="at least four"):
         strategy.gain_rate(particle, kernel)
     assert np.all(strategy.loss_rate(particle, kernel) > 0)
-    particle.concentration.fill(0.0)
+    particle.population.fill(0.0)
     npt.assert_array_equal(
         strategy.gain_rate(particle, kernel), np.zeros(nodes)
     )
@@ -522,11 +518,11 @@ def test_native_mutated_mechanism_controls_reject(name, field, value):
     particle = _particle()
     strategy = _strategy(name, "discrete")
     setattr(strategy, field, value)
-    before = particle.masses.copy(), particle.concentration.copy()
+    before = particle.masses.copy(), particle.population.copy()
     with pytest.raises(ValueError):
         strategy.kernel(particle, 298.15, 101325.0)
     npt.assert_array_equal(particle.masses, before[0])
-    npt.assert_array_equal(particle.concentration, before[1])
+    npt.assert_array_equal(particle.population, before[1])
 
 
 @pytest.mark.parametrize(

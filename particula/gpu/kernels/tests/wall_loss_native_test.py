@@ -49,7 +49,7 @@ def _state(device, family, *, slots=8, boxes=3):
         masses[6] = 0
     cpu = ParticleData(
         masses=np.tile(masses, (boxes, 1, 1)),
-        concentration=np.tile(counts, (boxes, 1)),
+        population=np.tile(counts, (boxes, 1)),
         charge=np.tile(charge, (boxes, 1)),
         density=np.array([1000.0, 1500.0]),
         volume=np.resize(np.array([0.25, 1.0, 4.0]), boxes),
@@ -95,7 +95,7 @@ def _state(device, family, *, slots=8, boxes=3):
 def _snapshot(state):
     result = {
         name: getattr(state.p, name).numpy().copy()
-        for name in ("masses", "concentration", "charge", "density", "volume")
+        for name in ("masses", "population", "charge", "density", "volume")
     }
     result["rng"] = state.rng.numpy().copy()
     if hasattr(state.config.wall_electric_field, "numpy"):
@@ -118,16 +118,16 @@ def _call(state, mode):
 
 def _assert_sink(before, after):
     """Inventory accounting uses raw counts and independently integrated sums."""
-    lost = (before["concentration"] > 0) & (after["concentration"] == 0)
+    lost = (before["population"] > 0) & (after["population"] == 0)
     npt.assert_array_equal(
-        after["concentration"], np.where(lost, 0, before["concentration"])
+        after["population"], np.where(lost, 0, before["population"])
     )
     npt.assert_array_equal(
         after["masses"], np.where(lost[:, :, None], 0, before["masses"])
     )
     npt.assert_array_equal(after["charge"], np.where(lost, 0, before["charge"]))
-    old_weights = before["concentration"]
-    new_weights = after["concentration"]
+    old_weights = before["population"]
+    new_weights = after["population"]
 
     # Sum the independent oracle accurately: NumPy's strided species axis
     # otherwise accumulates O(n) roundoff over thousands of repeated masses.
@@ -181,7 +181,7 @@ def test_complete_removal_accounts_for_unequal_count_species_and_charge(
     }
     assert _call(state, mode) is state.p
     lost = _assert_sink(before, _snapshot(state))
-    npt.assert_array_equal(lost, before["concentration"] > 0)
+    npt.assert_array_equal(lost, before["population"] > 0)
     assert all(
         getattr(state.p, name) is identity
         for name, identity in identities.items()
@@ -211,7 +211,7 @@ def test_weighted_survival_matches_independent_rate_and_binomial_variance(
     # Homogeneous material and signed charge; unequal weight strata are not
     # treated as independent physical particles within a representative.
     state.p.masses = wp.array(sample, dtype=wp.float64, device=device)
-    state.p.concentration = wp.ones((3, 1), dtype=wp.float64, device=device)
+    state.p.population = wp.ones((3, 1), dtype=wp.float64, device=device)
     state.p.charge = wp.full((3, 1), 2.0, dtype=wp.float64, device=device)
     _, coefficients = oracle(
         state.p, np.full(3, 298.15), np.full(3, 101325.0), state.config
@@ -223,7 +223,7 @@ def test_weighted_survival_matches_independent_rate_and_binomial_variance(
     state.p.masses = wp.array(
         np.repeat(sample, slots, axis=1), dtype=wp.float64, device=device
     )
-    state.p.concentration = wp.array(
+    state.p.population = wp.array(
         np.tile(weights, (3, 1)), dtype=wp.float64, device=device
     )
     state.p.charge = wp.full((3, slots), 2.0, dtype=wp.float64, device=device)
@@ -245,7 +245,7 @@ def test_weighted_survival_matches_independent_rate_and_binomial_variance(
                 * (1 - survival)
                 * np.dot(selected_weights, selected_weights)
             )
-            observed = after["concentration"][box, selected].sum()
+            observed = after["population"][box, selected].sum()
             # Existing coefficient parity has up to 1.002e-3 relative error
             # for spherical charged transport. Bound that approximation as
             # well as sampling variance; neither is a conservation tolerance.
@@ -271,7 +271,7 @@ def _launch_retained_wall_loss_kernel(state, device):
     pressure = wp.full(boxes, 101325.0, dtype=wp.float64, device=device)
     inputs = [
         p.masses,
-        p.concentration,
+        p.population,
         p.charge,
         p.density,
         temperature,
@@ -363,7 +363,7 @@ def test_noop_preserves_primary_state_and_rng(device, family, mode, case):
     if case == "zero_time":
         state.kwargs["time_step"] = 0.0
     if case == "inactive":
-        wp.copy(state.p.concentration, wp.zeros_like(state.p.concentration))
+        wp.copy(state.p.population, wp.zeros_like(state.p.population))
     before = _snapshot(state)
     assert _call(state, mode) is state.p
     after = _snapshot(state)
@@ -395,7 +395,7 @@ def test_invalid_current_population_rejects_without_caller_writes(
     state = _state(device, "spherical")
     name = {
         "mass": "masses",
-        "count": "concentration",
+        "count": "population",
         "zero_mass": "masses",
         "underflow_volume": "masses",
         "density_overflow": "volume",
@@ -438,20 +438,20 @@ def test_native_writers_cannot_overlap_primary_or_protected_inputs(
         device, "charged_rectangular" if alias == "field" else "spherical"
     )
     protected = wp.array(
-        ptr=state.p.concentration.ptr,
+        ptr=state.p.population.ptr,
         dtype=wp.float64,
         shape=(3,),
         device=device,
     )
     if alias == "charge":
-        state.p.charge = state.p.concentration
+        state.p.charge = state.p.population
     elif alias == "volume":
         state.p.volume = protected
     elif alias == "temperature":
         state.kwargs["temperature"] = protected
     elif alias == "rng":
         state.rng = wp.array(
-            ptr=state.p.concentration.ptr,
+            ptr=state.p.population.ptr,
             dtype=wp.uint32,
             shape=(3,),
             device=device,
@@ -569,7 +569,7 @@ def test_noncontiguous_native_storage_rejects_before_writer(device):
 
 
 @pytest.mark.parametrize(
-    "field", ["masses", "concentration", "charge", "density", "volume"]
+    "field", ["masses", "population", "charge", "density", "volume"]
 )
 def test_native_primary_schema_rejects_float32_storage(device, field):
     """The population tag does not expand the direct fp64 storage contract."""
@@ -585,7 +585,7 @@ def test_native_primary_schema_rejects_float32_storage(device, field):
             name: getattr(state.p, name)
             for name in (
                 "masses",
-                "concentration",
+                "population",
                 "charge",
                 "density",
                 "volume",
@@ -620,7 +620,7 @@ def test_prepared_references_are_frozen_and_enqueue_has_no_setup(
     prepared = wall_loss._prepare_wall_loss_step_gpu(state.p, **state.kwargs)
     arrays = {
         name: getattr(state.p, name)
-        for name in ("masses", "concentration", "charge")
+        for name in ("masses", "population", "charge")
     }
     calls = []
 
@@ -678,7 +678,7 @@ def test_explicit_reset_flag_remains_frozen_in_prepared_call(device, family):
     original = _snapshot(state)
     _enqueue_prepared_wall_loss_call(prepared)
     first = _snapshot(state)
-    for name in ("masses", "concentration", "charge"):
+    for name in ("masses", "population", "charge"):
         wp.copy(
             getattr(state.p, name),
             wp.array(original[name], dtype=wp.float64, device=device),
@@ -726,7 +726,7 @@ def test_native_selected_wall_loss_preserves_unselected_state_and_rng(
     lost = _assert_sink(before, after)
     np.testing.assert_array_equal(lost[1], False)
     np.testing.assert_array_equal(
-        lost[[0, 2]], before["concentration"][[0, 2]] > 0
+        lost[[0, 2]], before["population"][[0, 2]] > 0
     )
     assert after["rng"][1] == before["rng"][1]
 

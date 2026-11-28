@@ -36,7 +36,7 @@ def arrays(aerosol):
     p, g, e = aerosol.particles, aerosol.gas, aerosol.environment
     result = {
         "particles.masses": p.masses,
-        "particles.concentration": p.concentration,
+        "particles.population": p.population,
         "particles.charge": p.charge,
         "particles.volume": p.volume,
         "particles.density": p.density,
@@ -68,7 +68,7 @@ def validate(aerosol, writers=()):
     aerosol.fields.validate_layout(
         field_dimensions(aerosol.particles, aerosol.gas),
         aerosol.particles.distribution_type,
-        aerosol.particles.concentration > 0,
+        aerosol.particles.population > 0,
     )
     fields = arrays(aerosol)
     for name in writers:
@@ -131,7 +131,7 @@ def box_view(aerosol, box):
     return Aerosol(
         particles=ParticleData(
             masses=p.masses[row],
-            concentration=p.concentration[row],
+            population=p.population[row],
             charge=p.charge[row],
             density=p.density,
             volume=p.volume[row],

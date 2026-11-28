@@ -16,11 +16,11 @@ def source_case(capacity=128):
     base = state(volume=1e-6)
     aerosol = Aerosol(
         particles=ParticleData(
-            np.zeros((1, capacity, 2)),
-            np.zeros((1, capacity)),
-            np.zeros((1, capacity)),
-            np.array([1000.0, 1000.0]),
-            np.array([1e-6]),
+            masses=np.zeros((1, capacity, 2)),
+            population=np.zeros((1, capacity)),
+            charge=np.zeros((1, capacity)),
+            density=np.array([1000.0, 1000.0]),
+            volume=np.array([1e-6]),
             distribution_type="particle_resolved",
         ),
         gas=base.gas,
@@ -64,7 +64,7 @@ def test_prepared_source_restart_and_ledger(device):
     )
     np.testing.assert_array_equal(final.particles.charge.sum(axis=1), 0)
     np.testing.assert_array_equal(
-        final.particles.concentration.sum(axis=1), 2 * ledger["injected_pairs"]
+        final.particles.population.sum(axis=1), 2 * ledger["injected_pairs"]
     )
     assert ledger["injected_pairs"].sum() > 0
 
@@ -117,4 +117,4 @@ def test_source_zero_rate_preserves_random_state():
         simulation.run(3)
         after = simulation.checkpoint().auxiliary
         assert before == after
-        assert not simulation.snapshot().particles.concentration.any()
+        assert not simulation.snapshot().particles.population.any()

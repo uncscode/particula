@@ -69,7 +69,7 @@ def test_prepared_cloud_kernel_matches_native_material_law(device, kind):
         work = binding.brownian_parallel
         for box in range(2):
             radii = initial.particles.radii[box]
-            active = initial.particles.concentration[box] > 0
+            active = initial.particles.population[box] > 0
             mean_density = initial.particles.effective_density[
                 box, active
             ].mean()
@@ -113,11 +113,11 @@ def test_material_coupling_restarts_persistent_collision_rng(kind):
     for box in range(initial.particles.n_boxes):
         particles = initial.particles
         local = ParticleData(
-            particles.masses[box : box + 1].copy(),
-            particles.concentration[box : box + 1].copy(),
-            particles.charge[box : box + 1].copy(),
-            particles.density.copy(),
-            particles.volume[box : box + 1].copy(),
+            masses=particles.masses[box : box + 1].copy(),
+            population=particles.population[box : box + 1].copy(),
+            charge=particles.charge[box : box + 1].copy(),
+            density=particles.density.copy(),
+            volume=particles.volume[box : box + 1].copy(),
             distribution_type="particle_resolved",
         )
         active = local.concentration[0] > 0

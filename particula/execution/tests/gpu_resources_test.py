@@ -75,7 +75,7 @@ def _session(
     particles.masses = wp.ones(
         (boxes, particle_count, species), dtype=wp.float64, device="cpu"
     )
-    particles.concentration = wp.ones(
+    particles.population = wp.ones(
         (boxes, particle_count), dtype=wp.float64, device="cpu"
     )
     particles.charge = wp.zeros(
@@ -1009,7 +1009,7 @@ def test_registry_rejects_replaced_container_before_allocation() -> None:
     replacement_particles.distribution_kind = (
         original_particles.distribution_kind
     )
-    for name in ("masses", "concentration", "charge", "density", "volume"):
+    for name in ("masses", "population", "charge", "density", "volume"):
         setattr(replacement_particles, name, getattr(original_particles, name))
     object.__setattr__(session, "particles", replacement_particles)
 
@@ -1784,7 +1784,7 @@ def test_dilution_resource_validation_rejects_invalid_views_without_mutation(
         array.numpy().copy()
         for array in (
             cast(Any, session.particles).masses,
-            cast(Any, session.particles).concentration,
+            cast(Any, session.particles).population,
             cast(Any, session.gas).concentration,
         )
     )
@@ -1800,7 +1800,7 @@ def test_dilution_resource_validation_rejects_invalid_views_without_mutation(
     for current, before in zip(
         (
             cast(Any, session.particles).masses,
-            cast(Any, session.particles).concentration,
+            cast(Any, session.particles).population,
             cast(Any, session.gas).concentration,
         ),
         primaries_before,
@@ -2178,7 +2178,7 @@ def test_validate_pinned_session_rejects_primary_and_container_drift() -> None:
 
     replacement = WarpParticleData()
     replacement.distribution_kind = wp.int32(3)
-    for name in ("masses", "concentration", "charge", "density", "volume"):
+    for name in ("masses", "population", "charge", "density", "volume"):
         setattr(replacement, name, getattr(particles, name))
     object.__setattr__(session, "particles", replacement)
     with pytest.raises(ValueError, match="signature changed"):

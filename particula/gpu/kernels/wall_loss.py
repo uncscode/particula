@@ -368,8 +368,8 @@ def _validate_particle_schema(particles: Any) -> tuple[int, Any]:
     n_boxes, n_particles, n_species = masses.shape
     device = masses.device
     _validate_array_schema(
-        _get_required_field(particles, "concentration"),
-        "particles.concentration",
+        _get_required_field(particles, "population"),
+        "particles.population",
         2,
         (n_boxes, n_particles),
         device,
@@ -418,7 +418,7 @@ def _validate_particle_values(particles: Any) -> None:
     """Validate particle values after configuration-dependent schema checks."""
     for values, name, positive, finite_only in (
         (particles.masses, "particles.masses", False, False),
-        (particles.concentration, "particles.concentration", False, False),
+        (particles.population, "particles.population", False, False),
         (particles.charge, "particles.charge", False, True),
         (particles.density, "particles.density", True, False),
         (particles.volume, "particles.volume", True, False),
@@ -1479,7 +1479,7 @@ def _prepare_wall_loss_step_gpu(
         launch_kernel = _wall_loss_remove
         launch_inputs = (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             temperature_array,
@@ -1501,7 +1501,7 @@ def _prepare_wall_loss_step_gpu(
         launch_kernel = _charged_spherical_wall_loss_remove
         launch_inputs = (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             temperature_array,
@@ -1521,7 +1521,7 @@ def _prepare_wall_loss_step_gpu(
         launch_kernel = _charged_rectangular_wall_loss_remove
         launch_inputs = (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             temperature_array,
@@ -1723,7 +1723,7 @@ def _prepare_selected_wall_loss_call(
     dimensions = validated_config.chamber_dimensions or (0.0, 0.0, 0.0)
     common = (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         temperature_array,
@@ -1893,7 +1893,7 @@ def wall_loss_selected_boxes_step_gpu(
             dim=selected_boxes.shape[0],
             inputs=[
                 particles.masses,
-                particles.concentration,
+                particles.population,
                 particles.charge,
                 particles.density,
                 temperature_array,
@@ -1920,7 +1920,7 @@ def wall_loss_selected_boxes_step_gpu(
             dim=selected_boxes.shape[0],
             inputs=[
                 particles.masses,
-                particles.concentration,
+                particles.population,
                 particles.charge,
                 particles.density,
                 temperature_array,
@@ -1945,7 +1945,7 @@ def wall_loss_selected_boxes_step_gpu(
             dim=selected_boxes.shape[0],
             inputs=[
                 particles.masses,
-                particles.concentration,
+                particles.population,
                 particles.charge,
                 particles.density,
                 temperature_array,

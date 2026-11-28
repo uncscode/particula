@@ -28,11 +28,11 @@ def cleanup_case():
     )
     return Aerosol(
         particles=ParticleData(
-            masses,
-            np.array([[1.0, 1.0, 1.0, 1.0, 1.0, 0.0]]),
-            np.array([[0.0, 0.0, 1.0, -1.0, 1.0, 0.0]]),
-            np.full(3, 1000.0),
-            np.array([1e-6]),
+            masses=masses,
+            population=np.array([[1.0, 1.0, 1.0, 1.0, 1.0, 0.0]]),
+            charge=np.array([[0.0, 0.0, 1.0, -1.0, 1.0, 0.0]]),
+            density=np.full(3, 1000.0),
+            volume=np.array([1e-6]),
             distribution_type="particle_resolved",
         ),
         gas=base.gas,
@@ -67,7 +67,7 @@ def test_cleanup_inventory_capture_and_restart(device):
         result.particles.charge, initial.particles.charge
     )
     assert not result.particles.masses[:, 0].any()
-    assert result.particles.concentration[0, 0] == 0
+    assert result.particles.population[0, 0] == 0
     np.testing.assert_array_equal(ledger["exported_particles"], [1])
     np.testing.assert_array_equal(ledger["exported_mass"], [[2e-25, 1e-25, 0]])
     np.testing.assert_allclose(
@@ -101,7 +101,7 @@ def test_cleanup_rejects_evolving_fractional_counts():
     from particula.gpu.kernels.ion_cleanup import remove_neutral_ion_products
 
     initial = cleanup_case().particles
-    counts = initial.concentration.copy()
+    counts = initial.population.copy()
     counts[0, 2] = 0.5
     masses_gpu = wp.array(initial.masses, dtype=wp.float64, device="cpu")
     counts_gpu = wp.array(counts, dtype=wp.float64, device="cpu")

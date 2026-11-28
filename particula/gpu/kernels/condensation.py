@@ -1305,7 +1305,8 @@ def _bound_evaporation_candidate_kernel(
 # type: ignore[misc]
 def _reduce_inventory_candidates_kernel(
     candidate: Any,
-    concentration: Any,
+    population: Any,
+    volume: Any,
     demand: Any,
     release: Any,
 ) -> None:
@@ -1328,7 +1329,9 @@ def _reduce_inventory_candidates_kernel(
     negative_release = wp.float64(0.0)
     for particle_idx in range(candidate.shape[1]):
         transfer = candidate[box_idx, particle_idx, species_idx]
-        weighted_transfer = transfer * concentration[box_idx, particle_idx]
+        weighted_transfer = transfer * (
+            population[box_idx, particle_idx] / volume[box_idx]
+        )
         if transfer > wp.float64(0.0):
             positive_demand += weighted_transfer
         elif transfer < wp.float64(0.0):
@@ -1742,7 +1745,7 @@ def _validate_p2_primary_state(
     if not getattr(device, "is_cuda", False):
         values = (
             ("particles.masses", particles.masses, True),
-            ("particles.concentration", particles.concentration, True),
+            ("particles.population", particles.population, True),
             ("gas.concentration", gas.concentration, True),
         )
         for name, array, nonnegative in values:
@@ -1762,7 +1765,7 @@ def _validate_p2_primary_state(
         dim=(n_boxes, n_species),
         inputs=[
             particles.masses,
-            particles.concentration,
+            particles.population,
             gas.concentration,
             invalid,
         ],
@@ -1946,7 +1949,7 @@ def _validate_particle_arrays(
     """
     if particles.density.shape[0] != n_species:
         raise ValueError("particle density length does not match n_species")
-    if particles.concentration.shape != (n_boxes, n_particles):
+    if particles.population.shape != (n_boxes, n_particles):
         raise ValueError(
             "particle concentration shape does not match (n_boxes, n_particles)"
         )
@@ -2063,7 +2066,7 @@ def _validate_device_arrays(particles: Any, gas: Any, device: Any) -> None:
         ValueError: If any particle or gas array is on a different device.
     """
     _validate_device_match(
-        "particle concentration", particles.concentration, device
+        "particle concentration", particles.population, device
     )
     _validate_device_match("particle density", particles.density, device)
     _validate_device_match("gas molar mass", gas.molar_mass, device)
@@ -2089,9 +2092,9 @@ def _finalize_inventory_limited_mass_transfer(
     release. It mutates particle masses and any supplied inventory finalization
     sidecars, but
     deliberately does not mutate ``gas.concentration``. This primitive accepts
-    explicitly discrete number-density weights and equal particle/gas lanes.
+    explicitly discrete counts and equal particle/gas lanes.
     The public mapped step owns its separate gas coupling and supports resolved
-    counts with volume normalization; this primitive does not interpret counts.
+    counts with volume normalization.
 
     Args:
         particles: GPU particle data with float64 masses and concentrations.
@@ -2164,7 +2167,7 @@ def _finalize_inventory_limited_mass_transfer(
         validated_scratch.positive_mass_transfer_scale,
         (
             ("particles.masses", particles.masses),
-            ("particles.concentration", particles.concentration),
+            ("particles.population", particles.population),
             ("gas.concentration", gas.concentration),
             ("gated_mass_transfer", gated_mass_transfer),
             ("energy_transfer", energy_transfer),
@@ -2194,7 +2197,13 @@ def _finalize_inventory_limited_mass_transfer(
     wp.launch(
         _reduce_inventory_candidates_kernel,
         dim=reduction_shape,
-        inputs=[candidate, particles.concentration, demand, release],
+        inputs=[
+            candidate,
+            particles.population,
+            particles.volume,
+            demand,
+            release,
+        ],
         device=device,
     )
     wp.launch(
@@ -2262,7 +2271,7 @@ def _validate_native_ownership(
             )
         )
     protected = [
-        particles.concentration,
+        particles.population,
         particles.density,
         particles.charge,
         particles.volume,
@@ -2622,7 +2631,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
             mass_transfer,
             (
                 particles.masses,
-                particles.concentration,
+                particles.population,
                 particles.density,
                 particles.charge,
                 particles.volume,
@@ -2725,7 +2734,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
             scratch_buffers,
             (
                 ("particles.masses", particles.masses),
-                ("particles.concentration", particles.concentration),
+                ("particles.population", particles.population),
                 ("particles.density", particles.density),
                 ("particles.charge", particles.charge),
                 ("particles.volume", particles.volume),
@@ -2795,7 +2804,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
             energy_transfer,
             (
                 particles.masses,
-                particles.concentration,
+                particles.population,
                 particles.density,
                 particles.charge,
                 particles.volume,
@@ -3014,7 +3023,7 @@ def _prepare_condensation_step_gpu(  # noqa: C901
         device,
         wp.float64(time_step / 4.0),
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.density,
         gas.concentration,
         gas.vapor_pressure,

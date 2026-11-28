@@ -151,7 +151,7 @@ def particle_optics(particles, config):
     """
     particles.validate_representation()
     config.validate_materials(particles.n_species)
-    active = particles.concentration > 0
+    active = particles.population > 0
     native_radius = (
         particles.radius_grid
         if particles.distribution_type == "continuous_pdf"
@@ -162,7 +162,7 @@ def particle_optics(particles, config):
         index = np.asarray(config.particle_index)[None, :, None]
     else:
         volumes = particles.masses / particles.density
-        volumes = np.where(particles.concentration[..., None] > 0, volumes, 0)
+        volumes = np.where(particles.population[..., None] > 0, volumes, 0)
         total = volumes.sum(axis=-1, keepdims=True)
         if np.any(active & (total[..., 0] <= 0)):
             raise ValueError(

@@ -28,7 +28,7 @@ def case(boxes=1):
     volume = np.linspace(0.3, 0.8, boxes)
     p = ParticleData(
         masses=np.tile(np.array([[[mass], [0.0]]]), (boxes, 1, 1)),
-        concentration=np.column_stack([1e9 * volume, np.zeros(boxes)]),
+        population=np.column_stack([1e9 * volume, np.zeros(boxes)]),
         charge=np.zeros((boxes, 2)),
         density=np.array([1000.0]),
         volume=volume,
@@ -123,7 +123,7 @@ def test_batched_nonunit_volumes_match_individual_box():
         output.gas.concentration[0], output.gas.concentration[1], rtol=1e-14
     )
     npt.assert_array_equal(
-        output.particles.concentration, aerosol.particles.concentration
+        output.particles.population, aerosol.particles.population
     )
 
 

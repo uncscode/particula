@@ -170,8 +170,8 @@ def to_warp_particle_data(
 
     if copy:
         gpu_data.masses = wp.array(data.masses, dtype=wp.float64, device=device)
-        gpu_data.concentration = wp.array(
-            data.concentration, dtype=wp.float64, device=device
+        gpu_data.population = wp.array(
+            data.population, dtype=wp.float64, device=device
         )
         gpu_data.charge = wp.array(data.charge, dtype=wp.float64, device=device)
         gpu_data.density = wp.array(
@@ -183,8 +183,8 @@ def to_warp_particle_data(
         gpu_data.masses = _from_numpy_zero_copy(
             wp, data.masses, dtype=wp.float64, device=device
         )
-        gpu_data.concentration = _from_numpy_zero_copy(
-            wp, data.concentration, dtype=wp.float64, device=device
+        gpu_data.population = _from_numpy_zero_copy(
+            wp, data.population, dtype=wp.float64, device=device
         )
         gpu_data.charge = _from_numpy_zero_copy(
             wp, data.charge, dtype=wp.float64, device=device
@@ -478,7 +478,7 @@ def from_warp_particle_data(
 
     return ParticleData(
         masses=gpu_data.masses.numpy(),
-        concentration=gpu_data.concentration.numpy(),
+        population=gpu_data.population.numpy(),
         charge=gpu_data.charge.numpy(),
         density=gpu_data.density.numpy(),
         volume=gpu_data.volume.numpy(),

@@ -27,13 +27,13 @@ class Process(RunnableABC):
     fail = False
 
     def _writer_fields(self, aerosol):
-        return ("particles.concentration",)
+        return ("particles.population",)
 
     def _rate_box(self, aerosol):
-        return aerosol.particles.concentration[0]
+        return aerosol.particles.population[0]
 
     def _execute_box(self, aerosol, time_step, sub_steps=1):
-        aerosol.particles.concentration *= np.exp(-time_step)
+        aerosol.particles.population *= np.exp(-time_step)
         if self.fail and aerosol.environment.temperature[0] > 290:
             raise ValueError("late box failure")
         return aerosol
@@ -42,11 +42,11 @@ class Process(RunnableABC):
 def test_shared_driver_identity_shapes_and_box_independence():
     """Rates keep B and execution publishes into original arrays."""
     aerosol = state()
-    target = aerosol.particles.concentration
+    target = aerosol.particles.population
     process = Process()
     assert process.rate(aerosol).shape == (2, 3)
     assert process.execute(aerosol, 1, sub_steps=2) is aerosol
-    assert aerosol.particles.concentration is target
+    assert aerosol.particles.population is target
     np.testing.assert_allclose(target, np.exp(-1))
 
 
@@ -57,13 +57,13 @@ def test_later_box_failure_preserves_whole_batch():
     process.fail = True
     with pytest.raises(ValueError, match="late box"):
         process.execute(aerosol, 1)
-    np.testing.assert_array_equal(aerosol.particles.concentration, 1)
+    np.testing.assert_array_equal(aerosol.particles.population, 1)
 
 
 def test_original_readonly_storage_rejects_before_staging():
     """Copies cannot conceal unwritable original destinations."""
     aerosol = state()
-    aerosol.particles.concentration.flags.writeable = False
+    aerosol.particles.population.flags.writeable = False
     with pytest.raises(ValueError, match="writable"):
         Process().execute(aerosol, 1)
 
@@ -72,21 +72,21 @@ def test_zero_step_never_publishes_hook_writes():
     """A successful zero-duration call retains the original values."""
     aerosol = state()
     Process().execute(aerosol, 0)
-    np.testing.assert_array_equal(aerosol.particles.concentration, 1)
+    np.testing.assert_array_equal(aerosol.particles.population, 1)
 
 
 @pytest.mark.parametrize("axis", [0, 1])
 def test_overlapping_destinations_reject_before_hooks(axis):
     """Both inter-box and within-box overlaps reject before calculation."""
     aerosol = state()
-    strides = list(aerosol.particles.concentration.strides)
+    strides = list(aerosol.particles.population.strides)
     strides[axis] = 0
-    aerosol.particles.concentration = np.lib.stride_tricks.as_strided(
-        aerosol.particles.concentration, shape=(2, 3), strides=strides
+    aerosol.particles.population = np.lib.stride_tricks.as_strided(
+        aerosol.particles.population, shape=(2, 3), strides=strides
     )
     with pytest.raises(ValueError, match="overlap"):
         Process().execute(aerosol, 1)
-    np.testing.assert_array_equal(aerosol.particles.concentration, 1)
+    np.testing.assert_array_equal(aerosol.particles.population, 1)
 
 
 def test_publication_failure_restores_all_written_fields(monkeypatch):
@@ -95,7 +95,7 @@ def test_publication_failure_restores_all_written_fields(monkeypatch):
 
     aerosol = state()
     staged = _cpu_batch.detached(aerosol)
-    staged.particles.concentration *= 2
+    staged.particles.population *= 2
     staged.gas.concentration *= 3
     original_copy = np.copyto
     calls = 0
@@ -110,9 +110,9 @@ def test_publication_failure_restores_all_written_fields(monkeypatch):
     monkeypatch.setattr(np, "copyto", fail_second)
     with pytest.raises(RuntimeError, match="write failure"):
         _cpu_batch.publish(
-            aerosol, staged, ("particles.concentration", "gas.concentration")
+            aerosol, staged, ("particles.population", "gas.concentration")
         )
-    np.testing.assert_array_equal(aerosol.particles.concentration, 1)
+    np.testing.assert_array_equal(aerosol.particles.population, 1)
     np.testing.assert_array_equal(aerosol.gas.concentration, 1)
 
 
@@ -145,7 +145,7 @@ def test_sequence_order_and_adapter_context_delegation():
     )
     CPUExecutionAdapter(sequence).execute(carrier)
     assert events == [("a", 280), ("a", 300), ("b", 280), ("b", 300)] * 2
-    np.testing.assert_allclose(aerosol.particles.concentration, np.exp(-2))
+    np.testing.assert_allclose(aerosol.particles.population, np.exp(-2))
 
 
 def test_interleaved_nonoverlapping_storage_is_supported():
@@ -155,9 +155,9 @@ def test_interleaved_nonoverlapping_storage_is_supported():
     target = np.lib.stride_tricks.as_strided(
         backing, shape=(2, 3), strides=(24, 16)
     )
-    aerosol.particles.concentration = target
+    aerosol.particles.population = target
     Process().execute(aerosol, 1)
-    assert aerosol.particles.concentration is target
+    assert aerosol.particles.population is target
     np.testing.assert_allclose(target, np.exp(-1))
 
 

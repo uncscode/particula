@@ -64,7 +64,7 @@ def compile_ion_source(plan, context: BuiltinPreparationContext):
     v = plan.values
     args = [
         p.masses,
-        p.concentration,
+        p.population,
         p.charge,
         p.volume,
         wp.float64(v["production_rate"]),
@@ -127,7 +127,7 @@ def compile_ion_cleanup(plan, context: BuiltinPreparationContext):
     p = context.particles
     args = [
         p.masses,
-        p.concentration,
+        p.population,
         p.charge,
         plan.values["positive_species"],
         plan.values["negative_species"],

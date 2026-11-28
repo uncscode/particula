@@ -27,7 +27,7 @@ def illuminated_state(*, irradiance=9e4, gas_offset=0):
     mass = wet[:, None] * np.array([0.72 * 997, 0.28 * 1600])
     particles = ParticleData(
         masses=mass[None, :, :],
-        concentration=np.array([[24.0, 40.0, 0.0]]),
+        population=np.array([[24.0, 40.0, 0.0]]),
         charge=np.zeros((1, 3)),
         density=np.array([997.0, 1600.0]),
         volume=np.array([0.04]),
@@ -70,7 +70,7 @@ def test_discrete_heating_rejects_before_registering_fields():
     resolved, process = illuminated_state()
     particles = ParticleData(
         masses=resolved.particles.masses,
-        concentration=resolved.particles.slot_concentration_density,
+        population=resolved.particles.slot_concentration_density,
         charge=resolved.particles.charge,
         density=resolved.particles.density,
         volume=np.ones(1),
@@ -91,7 +91,7 @@ def test_energy_water_and_temperature_match_independent_roots():
     aerosol, process = illuminated_state()
     start = aerosol.particles.masses.copy()
     initial_water = aerosol.gas.concentration[0, 1]
-    weights = aerosol.particles.concentration[0, :2] / 0.04
+    weights = aerosol.particles.population[0, :2] / 0.04
     radius = aerosol.particles.radii[0, :2]
     q = get_mie_efficiencies(radius, 550e-9, 1.5 + 0.08j)
     power = 9e4 * q.absorption * np.pi * radius**2

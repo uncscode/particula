@@ -27,7 +27,7 @@ def _particles(masses, concentration, charge, device="cpu"):
     wp = _warp()
     return SimpleNamespace(
         masses=wp.array(masses, dtype=wp.float64, device=device),
-        concentration=wp.array(concentration, dtype=wp.float64, device=device),
+        population=wp.array(concentration, dtype=wp.float64, device=device),
         charge=wp.array(charge, dtype=wp.float64, device=device),
         density="not a Warp array",
         volume="not a Warp array",
@@ -89,7 +89,7 @@ def _cpu_particles(masses, concentration, charge):
     """Build equivalent CPU particle data for diagnostic-reference checks."""
     return ParticleData(
         masses=masses,
-        concentration=concentration,
+        population=concentration,
         charge=charge,
         density=np.ones(masses.shape[2], dtype=np.float64),
         volume=np.ones(masses.shape[0], dtype=np.float64),
@@ -113,7 +113,7 @@ def test_slot_diagnostics_matches_cpu_oracle_and_preserves_particles():
         field.numpy().copy()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
         )
     )
@@ -129,7 +129,7 @@ def test_slot_diagnostics_matches_cpu_oracle_and_preserves_particles():
     for sidecar, reference in zip(sidecars, expected, strict=True):
         npt.assert_array_equal(sidecar.numpy(), reference)
     for field, expected in zip(
-        (particles.masses, particles.concentration, particles.charge),
+        (particles.masses, particles.population, particles.charge),
         particle_values,
         strict=True,
     ):
@@ -374,7 +374,7 @@ def test_slot_diagnostics_converts_masses_metadata_errors_to_value_error(
         npt.assert_array_equal(sidecar.numpy(), expected)
 
 
-@pytest.mark.parametrize("missing_field", ["masses", "concentration", "charge"])
+@pytest.mark.parametrize("missing_field", ["masses", "population", "charge"])
 def test_slot_diagnostics_rejects_missing_particle_field_without_writes(
     missing_field,
 ):
@@ -397,7 +397,7 @@ def test_slot_diagnostics_rejects_missing_particle_field_without_writes(
     "field, replacement",
     [
         ("masses", np.zeros((1, 1, 1))),
-        ("concentration", np.zeros((1, 1))),
+        ("population", np.zeros((1, 1))),
         ("charge", np.zeros((1, 1))),
     ],
 )
@@ -424,9 +424,9 @@ def test_slot_diagnostics_rejects_non_warp_particle_field_without_writes(
     [
         ("masses", lambda wp: wp.zeros((1, 1, 1), dtype=wp.float32)),
         ("masses", lambda wp: wp.zeros((1, 1), dtype=wp.float64)),
-        ("concentration", lambda wp: wp.zeros((1, 1), dtype=wp.float32)),
-        ("concentration", lambda wp: wp.zeros(1, dtype=wp.float64)),
-        ("concentration", lambda wp: wp.zeros((1, 2), dtype=wp.float64)),
+        ("population", lambda wp: wp.zeros((1, 1), dtype=wp.float32)),
+        ("population", lambda wp: wp.zeros(1, dtype=wp.float64)),
+        ("population", lambda wp: wp.zeros((1, 2), dtype=wp.float64)),
         ("charge", lambda wp: wp.zeros((1, 1), dtype=wp.float32)),
         ("charge", lambda wp: wp.zeros(1, dtype=wp.float64)),
         ("charge", lambda wp: wp.zeros((1, 2), dtype=wp.float64)),
@@ -592,7 +592,7 @@ def test_slot_diagnostics_rejects_cross_device_sidecars_without_writes(
         field.numpy().copy()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
         )
     )
@@ -604,7 +604,7 @@ def test_slot_diagnostics_rejects_cross_device_sidecars_without_writes(
     for sidecar, expected in zip(sidecars, original, strict=True):
         npt.assert_array_equal(sidecar.numpy(), expected)
     for field, expected in zip(
-        (particles.masses, particles.concentration, particles.charge),
+        (particles.masses, particles.population, particles.charge),
         particle_values,
         strict=True,
     ):
@@ -653,9 +653,7 @@ def test_activation_matches_cpu_oracle_and_post_activation_diagnostics():
     for actual, expected in zip(returned, sidecars, strict=True):
         assert actual is expected
     npt.assert_array_equal(particles.masses.numpy(), cpu_data.masses)
-    npt.assert_array_equal(
-        particles.concentration.numpy(), cpu_data.concentration
-    )
+    npt.assert_array_equal(particles.population.numpy(), cpu_data.population)
     npt.assert_array_equal(particles.charge.numpy(), cpu_data.charge)
     npt.assert_array_equal(sidecars[0].numpy(), expected_activated)
     for actual, expected in zip(
@@ -688,7 +686,7 @@ def test_activation_rejects_invalid_selected_request_without_mutation():
         array.numpy().copy()
         for array in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             *sidecars,
         )
@@ -709,7 +707,7 @@ def test_activation_rejects_invalid_selected_request_without_mutation():
     for array, expected in zip(
         (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             *sidecars,
         ),
@@ -738,7 +736,7 @@ def test_activation_zero_prefix_overwrites_diagnostics_without_particle_writes()
         field.numpy().copy()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
         )
     )
@@ -746,7 +744,7 @@ def test_activation_zero_prefix_overwrites_diagnostics_without_particle_writes()
     _activate(particles, *requests, *sidecars)
 
     for field, expected in zip(
-        (particles.masses, particles.concentration, particles.charge),
+        (particles.masses, particles.population, particles.charge),
         initial,
         strict=True,
     ):
@@ -786,7 +784,7 @@ def test_activation_rejects_invalid_count_or_capacity_without_mutation(
         array.numpy().copy()
         for array in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             *sidecars,
         )
@@ -798,7 +796,7 @@ def test_activation_rejects_invalid_count_or_capacity_without_mutation(
     for array, expected in zip(
         (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             *sidecars,
         ),
@@ -853,7 +851,7 @@ def test_activation_rejects_aliased_mutable_outputs_without_mutation():
         array.numpy().copy()
         for array in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             activated_counts,
             free_indices,
@@ -876,7 +874,7 @@ def test_activation_rejects_aliased_mutable_outputs_without_mutation():
     for array, expected in zip(
         (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             activated_counts,
             free_indices,
@@ -1007,7 +1005,7 @@ def test_activation_rejects_request_arrays_aliasing_particle_storage():
         array.numpy().copy()
         for array in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             *sidecars,
         )
@@ -1019,7 +1017,7 @@ def test_activation_rejects_request_arrays_aliasing_particle_storage():
         _activate(
             particles,
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             requested_counts,
             *sidecars,
@@ -1028,7 +1026,7 @@ def test_activation_rejects_request_arrays_aliasing_particle_storage():
     for array, expected in zip(
         (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             *sidecars,
         ),
@@ -1085,9 +1083,7 @@ def test_activation_matches_cpu_oracle_for_multibox_multispecies_and_reuse():
     _activate(particles, *requests, *sidecars)
 
     npt.assert_array_equal(particles.masses.numpy(), cpu_data.masses)
-    npt.assert_array_equal(
-        particles.concentration.numpy(), cpu_data.concentration
-    )
+    npt.assert_array_equal(particles.population.numpy(), cpu_data.population)
     npt.assert_array_equal(particles.charge.numpy(), cpu_data.charge)
     npt.assert_array_equal(sidecars[0].numpy(), expected_counts)
     for actual, expected in zip(
@@ -1167,9 +1163,7 @@ def test_activation_sparse_capacity_matches_cpu_oracle():
     _activate(particles, *requests, *sidecars)
 
     npt.assert_array_equal(particles.masses.numpy(), cpu_data.masses)
-    npt.assert_array_equal(
-        particles.concentration.numpy(), cpu_data.concentration
-    )
+    npt.assert_array_equal(particles.population.numpy(), cpu_data.population)
     npt.assert_array_equal(particles.charge.numpy(), cpu_data.charge)
     npt.assert_array_equal(sidecars[0].numpy(), expected_counts)
     for actual, expected in zip(
@@ -1218,9 +1212,7 @@ def test_activation_cuda_matches_cpu_oracle_when_available():
     _activate(particles, *requests, *sidecars)
 
     npt.assert_array_equal(particles.masses.numpy(), cpu_data.masses)
-    npt.assert_array_equal(
-        particles.concentration.numpy(), cpu_data.concentration
-    )
+    npt.assert_array_equal(particles.population.numpy(), cpu_data.population)
     npt.assert_array_equal(particles.charge.numpy(), cpu_data.charge)
     npt.assert_array_equal(sidecars[0].numpy(), expected_counts)
     for actual, expected in zip(

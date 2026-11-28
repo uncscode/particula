@@ -63,7 +63,7 @@ def _materialize_public_particles(
             charge[box, slot] = fixture.charges[box, slot]
     return ParticleData(
         masses=masses,
-        concentration=particle_concentration,
+        population=particle_concentration,
         charge=charge,
         density=np.full(n_species, 1000.0),
         volume=(
@@ -81,7 +81,7 @@ def _public_snapshot(
     """Synchronize mutable public state used by one public-step call."""
     return {
         "masses": particles.masses.numpy().copy(),
-        "concentration": particles.concentration.numpy().copy(),
+        "population": particles.population.numpy().copy(),
         "charge": particles.charge.numpy().copy(),
         "pairs": pairs.numpy().copy(),
         "counts": counts.numpy().copy(),
@@ -93,7 +93,7 @@ def _initial_particle_snapshot(particles: Any) -> dict[str, np.ndarray]:
     """Copy host particle state for post-step public invariant checks."""
     return {
         "masses": particles.masses.copy(),
-        "concentration": particles.concentration.copy(),
+        "population": particles.population.copy(),
         "charge": particles.charge.copy(),
     }
 
@@ -114,10 +114,10 @@ def _assert_public_invariants(
 ) -> None:
     """Assert collision ownership, inventory, charge, and inactive state."""
     initial_inventory = np.sum(
-        initial["masses"] * initial["concentration"][..., None], axis=1
+        initial["masses"] * initial["population"][..., None], axis=1
     )
     final_inventory = np.sum(
-        final["masses"] * final["concentration"][..., None], axis=1
+        final["masses"] * final["population"][..., None], axis=1
     )
     npt.assert_allclose(
         final_inventory, initial_inventory, rtol=1e-12, atol=1e-30
@@ -137,13 +137,13 @@ def _assert_public_invariants(
         assert len(used) == len(set(used))
         assert set(used) <= set(active)
         inactive = sorted(set(range(final["charge"].shape[1])) - set(active))
-        for key in ("masses", "concentration", "charge"):
+        for key in ("masses", "population", "charge"):
             npt.assert_array_equal(
                 final[key][box, inactive], initial[key][box, inactive]
             )
         for recipient, donor in pairs:
             npt.assert_array_equal(final["masses"][box, donor], 0.0)
-            assert final["concentration"][box, donor] == 0.0
+            assert final["population"][box, donor] == 0.0
             assert final["charge"][box, donor] == 0.0
             npt.assert_allclose(
                 final["masses"][box, recipient],

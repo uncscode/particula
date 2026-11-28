@@ -79,15 +79,16 @@ def test_lognormal_defaults_number_and_mass(kind):
 
 @pytest.mark.parametrize("kind", ["discrete", "continuous_pdf"])
 @pytest.mark.parametrize("volume", [0.25, 4.0])
-def test_nonunit_binned_volume_rejects(kind, volume):
-    """Non-unit-volume binned examples are invalid under delivered v0.3.0."""
-    with pytest.raises(ValueError, match="exactly 1"):
-        create_particle_data_from_radii(
-            radii=[1e-9, 2e-9],
-            concentration=0,
-            distribution_type=kind,
-            volume=volume,
-        )
+def test_nonunit_binned_density_input(kind, volume):
+    """Density input is converted to an extensive amount in its own box."""
+    data = create_particle_data_from_radii(
+        radii=[1e-9, 2e-9],
+        concentration=[2.0, 4.0],
+        distribution_type=kind,
+        volume=volume,
+    )
+    np.testing.assert_array_equal(data.population, [[2 * volume, 4 * volume]])
+    np.testing.assert_array_equal(data.slot_concentration_density, [[2, 4]])
 
 
 @pytest.mark.parametrize(
@@ -210,15 +211,16 @@ def test_zero_pdf_retains_valid_grid():
     np.testing.assert_array_equal(data.radius_grid, [1e-9, 2e-9, 4e-9])
 
 
-def test_si_volume_rule_stays_exact():
-    """Unit-conversion roundoff handling does not relax direct SI admission."""
-    with pytest.raises(ValueError, match="exactly 1"):
-        create_particle_data_from_radii(
-            radii=[1e-9],
-            concentration=1,
-            distribution_type="discrete",
-            volume=np.nextafter(1.0, 2.0),
-        )
+def test_si_volume_keeps_supplied_precision():
+    """Adjacent representable SI volumes retain their identity."""
+    volume = np.nextafter(1.0, 2.0)
+    data = create_particle_data_from_radii(
+        radii=[1e-9],
+        concentration=1,
+        distribution_type="discrete",
+        volume=volume,
+    )
+    assert data.volume[0] == data.population[0, 0] == volume
 
 
 @pytest.mark.parametrize("kind", ["discrete", "continuous_pdf"])

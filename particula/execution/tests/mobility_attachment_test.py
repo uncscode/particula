@@ -182,7 +182,7 @@ def test_variable_environment_capture_restart(device):  # noqa: F811
             "coagulation"
         ].brownian_parallel.majorants.numpy()[0]
         np.testing.assert_allclose(majorant, rate, rtol=2e-12)
-    assert result.particles.concentration.sum() == 1
+    assert result.particles.population.sum() == 1
     assert result.particles.charge.sum() == 1
     np.testing.assert_array_equal(
         result.particles.masses.sum(axis=1),

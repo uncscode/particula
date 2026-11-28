@@ -63,7 +63,7 @@ def test_reservoir_sum_matches_compensated_scalar_oracle(
             if material < 0:
                 continue
             terms = [
-                -float(count[box, slot] / (volume[box] if resolved else 1))
+                -float(count[box, slot] / volume[box])
                 * float(rate[box, slot, material])
                 for slot in range(slots)
             ]

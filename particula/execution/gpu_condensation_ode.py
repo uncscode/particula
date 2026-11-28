@@ -202,7 +202,7 @@ class GPUCondensationODE:
         base = self._base
         self._masses = self._array(base.particles.masses)
         self._gas = self._array(base.gas.concentration)
-        self._counts = self._array(base.particles.concentration)
+        self._counts = self._array(base.particles.population)
         self._volume = self._array(base.particles.volume)
         self._density = self._array(base.particles.density)
         self._molar = self._array(base.gas.molar_mass)

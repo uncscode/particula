@@ -22,7 +22,7 @@ def test_aerosol_tutorial_population_and_held_state():
     assert aerosol.gas is values["glycerol_gas"]
     assert aerosol.environment is values["environment"]
     assert particles.distribution_type == "discrete"
-    np.testing.assert_allclose(particles.concentration.sum(), 1e10, rtol=1e-12)
+    np.testing.assert_allclose(particles.population.sum(), 1e10, rtol=1e-12)
     # Independent third moment of the prescribed lognormal radius population.
     expected_mass = (
         1e10
@@ -33,7 +33,7 @@ def test_aerosol_tutorial_population_and_held_state():
         * (100e-9) ** 3
         * np.exp(4.5 * np.log(1.5) ** 2)
     )
-    actual_mass = np.sum(particles.masses[:, :, 0] * particles.concentration)
+    actual_mass = np.sum(particles.masses[:, :, 0] * particles.population)
     # The published 250-point grid approximates the continuous third moment.
     np.testing.assert_allclose(actual_mass, expected_mass, rtol=0.01)
     np.testing.assert_array_equal(particles.volume, [1.0])
@@ -148,7 +148,7 @@ def test_particle_construction_units_and_material_inventory():
     np.testing.assert_allclose(
         particles.total_mass[0], expected_mass, rtol=1e-14
     )
-    np.testing.assert_allclose(particles.concentration[0], [1e8, 1e9, 1e10])
+    np.testing.assert_allclose(particles.population[0], [1e8, 1e9, 1e10])
     expected = np.sum(expected_mass * [1e8, 1e9, 1e10])
     np.testing.assert_allclose(
         particles.species_mass_density, [[expected]], rtol=1e-14

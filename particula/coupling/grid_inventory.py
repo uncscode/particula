@@ -4,8 +4,6 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from particula.particles._population import slot_density, write_binned_density
-
 
 @dataclass(frozen=True)
 class InventoryLayout:
@@ -13,7 +11,7 @@ class InventoryLayout:
 
     Lanes contain extensive gas kg, then represented counts by bin, then
     particulate kg in bin-major/material-minor order. Native discrete boxes
-    store gas kg/m³, number/m³ and kg per individual particle.
+    store gas kg/m³, represented counts and kg per individual particle.
     """
 
     gases: tuple
@@ -65,7 +63,9 @@ class InventoryLayout:
             or particles.distribution_type != "discrete"
             or particles.masses.shape
             != (n, len(self.bins), len(self.materials))
-            or np.any(particles.volume != 1)
+            or particles.volume.shape != (n,)
+            or not np.all(np.isfinite(particles.volume))
+            or np.any(particles.volume <= 0)
             or np.any(particles.charge)
         ):
             raise ValueError(
@@ -76,7 +76,7 @@ class InventoryLayout:
         """Convert native neutral discrete boxes to extensive quantities."""
         self._check_native(grid, gas, particles)
         vol = grid.volume[:, None]
-        counts = slot_density(particles) * vol
+        counts = particles.population * (vol / particles.volume[:, None])
         mass = particles.masses * counts[:, :, None]
         return self.validate(
             np.column_stack(
@@ -94,12 +94,18 @@ class InventoryLayout:
         counts = a[:, g : g + b]
         gas, particles = gas.copy(), particles.copy()
         gas.concentration[:] = a[:, :g] / grid.volume[:, None]
-        write_binned_density(particles, counts / grid.volume[:, None])
-        mass = a[:, g + b :].reshape(n, b, -1)
-        particles.masses[:] = np.divide(
+        particles.population[:] = (
+            counts * (particles.volume / grid.volume)[:, None]
+        )
+        if not np.all(np.isfinite(particles.population)):
+            raise ValueError(
+                "grid counts overflow the target sample population"
+            )
+        mass = a[:, g + b :].reshape(n, b, len(self.materials))
+        np.divide(
             mass,
             counts[:, :, None],
-            out=np.zeros_like(mass),
+            out=particles.masses,
             where=counts[:, :, None] > 0,
         )
         return gas, particles

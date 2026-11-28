@@ -40,7 +40,7 @@ def equal_native(left, right):
     for family, names in (
         (
             "particles",
-            ("masses", "concentration", "charge", "density", "volume"),
+            ("masses", "population", "charge", "density", "volume"),
         ),
         ("gas", ("concentration", "molar_mass", "partitioning")),
         ("environment", ("temperature", "pressure")),
@@ -64,7 +64,7 @@ def test_order_matches_explicit_flows_and_independent_budget(device, order):
     dt = 0.01
     reference = _cpu_batch.detached(initial)
     if order == "events-first":
-        reference.particles.concentration *= np.exp(-0.2 * dt)
+        reference.particles.population *= np.exp(-0.2 * dt)
         reference.gas.concentration *= np.exp(-0.2 * dt)
     flow = GPUCondensationODE(
         reference, strategy, device=device, **asdict(controls)
@@ -73,7 +73,7 @@ def test_order_matches_explicit_flows_and_independent_budget(device, order):
         flow.step(dt)
     reference = flow.snapshot()
     if order == "condensation-first":
-        reference.particles.concentration *= np.exp(-0.2 * dt)
+        reference.particles.population *= np.exp(-0.2 * dt)
         reference.gas.concentration *= np.exp(-0.2 * dt)
     with GPUCoupledSimulation(
         initial,
@@ -94,8 +94,7 @@ def test_order_matches_explicit_flows_and_independent_budget(device, order):
         before = (
             initial.gas.concentration[:, 1]
             + np.sum(
-                initial.particles.masses[..., 0]
-                * initial.particles.concentration,
+                initial.particles.masses[..., 0] * initial.particles.population,
                 axis=1,
             )
             / initial.particles.volume
@@ -103,7 +102,7 @@ def test_order_matches_explicit_flows_and_independent_budget(device, order):
         after = (
             final.gas.concentration[:, 1]
             + np.sum(
-                final.particles.masses[..., 0] * final.particles.concentration,
+                final.particles.masses[..., 0] * final.particles.population,
                 axis=1,
             )
             / final.particles.volume
@@ -152,8 +151,8 @@ def test_rejection_cannot_repeat_stochastic_events(device, monkeypatch):
         )
         final = owner.snapshot()
         np.testing.assert_array_equal(
-            final.particles.concentration,
-            event_checkpoint.resident.particles.concentration,
+            final.particles.population,
+            event_checkpoint.resident.particles.population,
         )
         np.testing.assert_array_equal(
             final.particles.charge, event_checkpoint.resident.particles.charge
@@ -187,9 +186,9 @@ def test_disk_restart_preserves_events_physics_and_random_words(
         owner.step()
         collision_binding = owner._events._bindings["coagulation"]
         np.testing.assert_array_equal(
-            owner._events._session.particles.concentration.numpy().sum(axis=1)
+            owner._events._session.particles.population.numpy().sum(axis=1)
             + collision_binding.n_collisions.numpy(),
-            initial.particles.concentration.sum(axis=1) + 2,
+            initial.particles.population.sum(axis=1) + 2,
         )
         gas = owner.diagnostics().gas_concentration.copy()
         gas[:, 1] = 0
@@ -279,7 +278,7 @@ def test_empty_population_can_continue_and_restart(device, tmp_path):
     """Complete evaporation/removal is not a reason to lose event continuation."""
     initial, strategy = case()
     initial.particles.masses[:] = 0
-    initial.particles.concentration[:] = 0
+    initial.particles.population[:] = 0
     initial.particles.charge[:] = 0
     events = (Dilution(DilutionStrategy(0.2)),)
     with GPUCoupledSimulation(
@@ -427,7 +426,7 @@ def test_decimal_bounds_preserve_cycles_and_restart(device, resident, origin):
         )
     initial, strategy = case()
     initial.particles.masses[:] = 0
-    initial.particles.concentration[:] = 0
+    initial.particles.population[:] = 0
     initial.particles.charge[:] = 0
     events = (Dilution(DilutionStrategy(0.2)),)
     options = dict(device=device, time_step=0.1, time=origin, resident=resident)
@@ -468,7 +467,7 @@ def test_decimal_bounds_do_not_accumulate_admission_drift():
     """A thousand fixed decimal cycles are admitted on their integer grid."""
     initial, strategy = case()
     initial.particles.masses[:] = 0
-    initial.particles.concentration[:] = 0
+    initial.particles.population[:] = 0
     initial.particles.charge[:] = 0
     events = (Dilution(DilutionStrategy(0.0)),)
     with GPUCoupledSimulation(
@@ -487,7 +486,7 @@ def test_bound_roundoff_is_scaled_and_smaller_than_a_cycle(origin, dt, admit):
     """Small times admit roundoff; coarse clocks cannot waive a partial cycle."""
     initial, strategy = case()
     initial.particles.masses[:] = 0
-    initial.particles.concentration[:] = 0
+    initial.particles.population[:] = 0
     initial.particles.charge[:] = 0
     events = (Dilution(DilutionStrategy(0.0)),)
     with GPUCoupledSimulation(

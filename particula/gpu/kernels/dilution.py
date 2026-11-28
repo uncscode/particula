@@ -518,12 +518,12 @@ def _prepare_dilution_step_gpu(
 
     particle_concentration = _get_required_field(
         particles,
-        "concentration",
-        "particles.concentration",
+        "population",
+        "particles.population",
     )
     _validate_concentration_schema(
         particle_concentration,
-        "particles.concentration",
+        "particles.population",
         n_boxes,
         device,
         n_particles,

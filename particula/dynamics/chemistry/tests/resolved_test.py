@@ -88,11 +88,11 @@ def experiment(case, equal=False, solver=None):
     )
     state = Aerosol(
         particles=ParticleData(
-            masses,
-            counts,
-            np.zeros_like(n),
-            density,
-            np.array([1.0, 2.0]),
+            masses=masses,
+            population=counts,
+            charge=np.zeros_like(n),
+            density=density,
+            volume=np.array([1.0, 2.0]),
             distribution_type="particle_resolved",
         ),
         gas=GasData(
@@ -176,7 +176,7 @@ def reference(state, case, duration):
     out = p.masses.copy()
     gas = state.gas.concentration.copy()
     for b, temp in enumerate(state.environment.temperature):
-        active = p.concentration[b] > 0
+        active = p.population[b] > 0
         mass = p.masses[b, active]
         v = (mass / p.density).sum(axis=1)
         if case == "bulk":
@@ -189,7 +189,7 @@ def reference(state, case, duration):
                 v,
                 duration,
                 gas[b, 1],
-                p.concentration[b, active] / p.volume[b],
+                p.population[b, active] / p.volume[b],
             )
     return gas, out
 
@@ -218,7 +218,7 @@ def test_resolved_reference_and_restart(case, equal, device):
     state, process, _ = experiment(case, equal)
     duration = 1.5
     expected_gas, expected_particle = reference(state, case, duration)
-    counts = state.particles.concentration.copy()
+    counts = state.particles.population.copy()
     initial_mass = state.particles.masses.copy()
     volume = state.particles.volume.copy()
     initial_gas = state.gas.concentration.copy()
@@ -258,7 +258,7 @@ def test_resolved_reference_and_restart(case, equal, device):
         result.particles.masses[:, :, 0], initial_mass[:, :, 0]
     )
     np.testing.assert_array_equal(result.particles.masses[:, 2], 0.0)
-    np.testing.assert_array_equal(result.particles.concentration, counts)
+    np.testing.assert_array_equal(result.particles.population, counts)
     np.testing.assert_array_equal(
         result.gas.concentration[:, 0], initial_gas[:, 0]
     )
@@ -345,7 +345,7 @@ def test_depletion_and_refinement(device):
         assert np.all((left >= 0) & (left < 1e-6 * initial[:, 1]))
         added = (depleted.particles.masses - state.particles.masses).sum(axis=2)
         np.testing.assert_allclose(
-            (added * state.particles.concentration).sum(axis=1),
+            (added * state.particles.population).sum(axis=1),
             (initial[:, 1] - left) * state.particles.volume,
             rtol=1e-12,
             atol=1e-22,
@@ -399,7 +399,7 @@ def test_failed_trials_and_preflight_budget():
     np.testing.assert_array_equal(state.gas.concentration, original_gas)
     with pytest.raises(ValueError, match="scratch bytes"):
         ResolvedChemistryAdapter(workspace_bytes=1).plan(process, state)
-    state.particles.concentration[1, 2] = 1
+    state.particles.population[1, 2] = 1
     with pytest.raises(ValueError, match="slot"):
         process.validate(state)
 
@@ -459,7 +459,7 @@ def test_condensation_precedes_reactive_uptake(device):
         * state.particles.volume,
         -(
             (actual.particles.masses - state.particles.masses).sum(axis=2)
-            * state.particles.concentration
+            * state.particles.population
         ).sum(axis=1),
         rtol=1e-11,
         atol=1e-22,
@@ -471,7 +471,7 @@ def test_combined_network_and_empty_population(device):
     """Same mechanism includes gas conversion, uptake and bulk aging."""
     state, original, lanes = experiment("uptake")
     state.particles.masses[1] = 0
-    state.particles.concentration[1] = 0
+    state.particles.population[1] = 0
     # Use equal mass isomers for an independent two-species gas invariant.
     state.gas.molar_mass[0] = 0.04
     record = original.bound.mechanism.to_dict()
@@ -513,7 +513,7 @@ def test_combined_network_and_empty_population(device):
     gained = result.particles.masses[0] - state.particles.masses[0]
     assert np.all(gained[:2, 1] > gained[:2, 3] / 3)
     np.testing.assert_allclose(
-        gained.sum(axis=1) @ state.particles.concentration[0],
+        gained.sum(axis=1) @ state.particles.population[0],
         (state.gas.concentration[0] - result.gas.concentration[0]).sum()
         * state.particles.volume[0],
         rtol=1e-12,

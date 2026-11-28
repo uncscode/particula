@@ -46,7 +46,7 @@ def population(slots, occupancy):
     charge[:, mask] = 0
     return ParticleData(
         masses=masses,
-        concentration=counts,
+        population=counts,
         charge=charge,
         density=np.array([1000.0, 1400.0, 1900.0]),
         volume=np.array([1e-12, 2e-12, 4e-12]),
@@ -99,8 +99,8 @@ def test_parallel_brownian_preserves_legacy_bytes_and_rng(
         legacy.selector_inputs[27],
         device=device,
     )
-    initial_mass = np.sum(cpu.masses * cpu.concentration[..., None], axis=1)
-    initial_charge = np.sum(cpu.charge * cpu.concentration, axis=1)
+    initial_mass = np.sum(cpu.masses * cpu.population[..., None], axis=1)
+    initial_charge = np.sum(cpu.charge * cpu.population, axis=1)
     events = 0
     for _ in range(100):
         # The serial implementation is a test oracle, not a production fallback.

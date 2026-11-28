@@ -109,12 +109,12 @@ def test_valid_no_work_preserves_native_storage(family, case):
     if case == "zero_time":
         dt = 0
     elif case == "zero_weights":
-        particle.concentration[:] = 0
+        particle.population[:] = 0
     elif case == "disabled":
         gas.partitioning[:] = False
     else:
         particle.masses = np.empty((1, 0, 2), dtype=np.float64)
-        particle.concentration = np.empty((1, 0), dtype=np.float64)
+        particle.population = np.empty((1, 0), dtype=np.float64)
         particle.charge = np.empty((1, 0), dtype=np.float64)
     strategy = native_strategy(family, gas, mapping)
     before = snapshot(particle, gas)
@@ -129,7 +129,7 @@ def test_repeated_native_steps_conserve_each_species(family, volume):
     """Changing material state across calls remains finite and conservative."""
     particle, gas, mapping = make_state(volume=volume)
     gas.concentration[0, 1:] = [2e-18, 3e-18]
-    counts = particle.concentration[0].copy()
+    counts = particle.population[0].copy()
     initial = np.sum(particle.masses[0] * counts[:, None], axis=0)
     initial += gas.concentration[0, [2, 1]] * volume
     strategy = native_strategy(family, gas, mapping)

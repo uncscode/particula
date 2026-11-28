@@ -104,7 +104,7 @@ def save_analysis(
             raise TypeError("provenance inputs must be JSON objects")
     metadata = {
         "schema": "particula-analysis",
-        "version": 1,
+        "version": 2,
         "package_version": __version__,
         "time_unit": "s",
         "science": recorder.metadata,
@@ -127,7 +127,7 @@ def _validate_header(metadata):
     if (
         metadata["schema"] != "particula-analysis"
         or type(metadata["version"]) is not int
-        or metadata["version"] != 1
+        or metadata["version"] not in (1, 2)
     ):
         raise ValueError("unsupported analysis schema")
     if metadata["time_unit"] != "s" or not isinstance(
@@ -177,6 +177,11 @@ def _validate_science(science):
 
 def _validate(metadata, arrays):
     science = _validate_header(metadata)
+    if (
+        metadata["version"] == 2
+        and science.get("population_storage") != "extensive"
+    ):
+        raise ValueError("invalid analysis population storage")
     dimensions, measure_units = _validate_science(science)
     time = arrays["time"]
     if (
@@ -188,6 +193,16 @@ def _validate(metadata, arrays):
         raise ValueError(
             "analysis times must be nonnegative and strictly increasing"
         )
+    _validate_observables(
+        metadata["version"], arrays, science, dimensions, measure_units
+    )
+    if any(
+        not np.all(np.isfinite(array)) for array in arrays.values()
+    ) or np.any(arrays["volume"] <= 0):
+        raise ValueError("analysis values must be finite with positive volume")
+
+
+def _validate_observables(version, arrays, science, dimensions, measure_units):
     observables = science["observables"]
     if set(arrays) != {"time", *observables} or "volume" not in observables:
         raise ValueError(
@@ -197,19 +212,23 @@ def _validate(metadata, arrays):
         if name not in OBSERVABLES:
             raise ValueError("unknown analysis observable")
         _, unit, axes = OBSERVABLES[name]
+        if name == "particle_population":
+            if version == 1:
+                raise ValueError("unknown legacy analysis observable")
+            unit = (
+                "m^-1"
+                if science["distribution_type"] == "continuous_pdf"
+                else "count"
+            )
         if name == "particle_concentration":
             unit = measure_units[science["distribution_type"]]
         if specification != {"unit": unit, "axes": ["time", *axes]}:
             raise ValueError("analysis observable units/axes mismatch")
         if arrays[name].shape != (
-            len(time),
+            len(arrays["time"]),
             *(dimensions[axis] for axis in axes),
         ):
             raise ValueError("analysis observable dimensions mismatch")
-    if any(
-        not np.all(np.isfinite(array)) for array in arrays.values()
-    ) or np.any(arrays["volume"] <= 0):
-        raise ValueError("analysis values must be finite with positive volume")
 
 
 def load_analysis(path, *, max_bytes=128 * 1024 * 1024):
@@ -225,6 +244,23 @@ def load_analysis(path, *, max_bytes=128 * 1024 * 1024):
         _validate(metadata, arrays)
     except (KeyError, TypeError, AttributeError) as error:
         raise ValueError("malformed analysis metadata") from error
+    if metadata["version"] == 1:
+        science = metadata["science"]
+        kind = science["distribution_type"]
+        if kind != "particle_resolved" and np.any(arrays["volume"] != 1):
+            raise ValueError("legacy binned analysis requires unit volume")
+        if "particle_concentration" in arrays:
+            raw = arrays.pop("particle_concentration")
+            if np.any(raw < 0):
+                raise ValueError("negative legacy particle population")
+            arrays["particle_population"] = raw
+            spec = science["observables"].pop("particle_concentration")
+            spec["unit"] = "m^-1" if kind == "continuous_pdf" else "count"
+            science["observables"]["particle_population"] = spec
+        metadata["source_analysis_version"] = 1
+        metadata["version"] = 2
+        science["population_storage"] = "extensive"
+        _validate(metadata, arrays)
     return AnalysisResult(metadata, arrays)
 
 

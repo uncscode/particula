@@ -15,7 +15,7 @@ from particula.particles.particle_data_builder import ParticleDataBuilder
 def _particles(kind: str, volume: float = 1.0) -> ParticleData:
     return ParticleData(
         masses=np.array([[[0.5e-18, 1.5e-18], [2e-18, 3e-18], [0, 0]]]),
-        concentration=np.array([[8.0, 0.5, 0.0]]),
+        population=np.array([[8.0, 0.5, 0.0]]),
         charge=np.zeros((1, 3)),
         density=np.array([1000.0, 1100.0]),
         volume=np.array([volume]),
@@ -64,7 +64,7 @@ def test_pdf_nonuniform_radius_integrates_mass_times_pdf() -> None:
     """Varying species mass distinguishes product quadrature from sums."""
     data = _particles("continuous_pdf")
     data.radius_grid = np.array([1e-9, 2e-9, 4e-9])
-    data.concentration[:] = [[1e9, 2e9, 1e9]]
+    data.population[:] = [[1e9, 2e9, 1e9]]
     # First interval: (1 * 0.5 + 2 * 2) / 2 = 2.25 (in e-18 kg/m³).
     # Second interval: (2 * 2 + 1 * 0) = 4, giving 6.25 total.
     npt.assert_allclose(data.number_density, [4.5])
@@ -74,7 +74,7 @@ def test_pdf_nonuniform_radius_integrates_mass_times_pdf() -> None:
         rtol=1e-12,
         atol=1e-30,
     )
-    data.concentration[:] = 0
+    data.population[:] = 0
     data.masses[:] = 0
     npt.assert_array_equal(data.number_density, [0])
     npt.assert_array_equal(data.species_mass_density, [[0, 0]])
@@ -105,7 +105,7 @@ def test_pdf_inventory_does_not_form_species_weighted_product(
 
 @pytest.mark.parametrize(
     "field",
-    ["masses", "concentration", "charge", "density", "volume"],
+    ["masses", "population", "charge", "density", "volume"],
 )
 def test_post_mutation_wrong_dtype_rejects_read_only(field: str) -> None:
     """Tagged helpers reject schema drift before arithmetic or mutation."""
@@ -158,8 +158,7 @@ def test_builder_kind_grid_and_volume() -> None:
     builder.set_radius_grid(np.array([1e-9, 2e-9, 4e-9]))
     assert builder.build().distribution_type == "continuous_pdf"
     builder.set_volume(np.array([0.25]))
-    with pytest.raises(ValueError, match="exactly 1"):
-        builder.build()
+    assert builder.build().volume[0] == 0.25
     builder.set_distribution_type("particle_resolved").set_radius_grid(
         np.array([])
     )
@@ -208,14 +207,14 @@ def test_one_bad_box_rejects_every_read_without_mutation() -> None:
     """A bad resolved volume cannot yield a partial bulk-density result."""
     data = _particles("particle_resolved")
     data.masses = np.repeat(data.masses, 2, axis=0)
-    data.concentration = np.repeat(data.concentration, 2, axis=0)
+    data.population = np.repeat(data.population, 2, axis=0)
     data.charge = np.repeat(data.charge, 2, axis=0)
     data.volume = np.array([0.25, 0.0])
     before = [
         values.copy()
         for values in (
             data.masses,
-            data.concentration,
+            data.population,
             data.charge,
             data.density,
             data.volume,
@@ -233,7 +232,7 @@ def test_one_bad_box_rejects_every_read_without_mutation() -> None:
         before,
         (
             data.masses,
-            data.concentration,
+            data.population,
             data.charge,
             data.density,
             data.volume,

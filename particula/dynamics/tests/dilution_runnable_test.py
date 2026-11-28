@@ -157,7 +157,7 @@ def test_concrete_dilution_preflights_before_first_substep(
 ):
     """Malformed concrete state raises before runnable strategy delegation."""
     aerosol = _make_aerosol()
-    aerosol.particles.concentration[0, 0] = np.nan
+    aerosol.particles.population[0, 0] = np.nan
     strategy = DilutionStrategy(0.25)
     calls: list[float] = []
     original_step = strategy.step

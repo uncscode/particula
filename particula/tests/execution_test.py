@@ -1766,7 +1766,7 @@ def _make_cpu_adapter_aerosol() -> Aerosol:
     particles = ParticleData(
         masses=np.array([[[1e-18], [2e-18]]], dtype=np.float64),
         density=np.array([1000.0], dtype=np.float64),
-        concentration=np.array([[4.0, 8.0]], dtype=np.float64),
+        population=np.array([[4.0, 8.0]], dtype=np.float64),
         charge=np.array([[1.0, -1.0]], dtype=np.float64),
         volume=np.array([2.0]),
         distribution_type="particle_resolved",
@@ -1793,9 +1793,7 @@ def _cpu_adapter_concentrations(
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Copy particle number density and both full-gas concentration domains."""
     return (
-        (
-            aerosol.particles.concentration[0] / aerosol.particles.volume[0]
-        ).copy(),
+        (aerosol.particles.population[0] / aerosol.particles.volume[0]).copy(),
         aerosol.gas.concentration[0, aerosol.gas.partitioning].copy(),
         aerosol.gas.concentration[0, ~aerosol.gas.partitioning].copy(),
     )

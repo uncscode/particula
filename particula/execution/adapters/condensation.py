@@ -464,8 +464,8 @@ class WarpCondensationState:
         boxes, particle_count, species = masses.shape
         device = masses.device
         _validate_array(
-            "particles.concentration",
-            particles.concentration,
+            "particles.population",
+            particles.population,
             wp.float64,
             (boxes, particle_count),
             device,
@@ -590,7 +590,7 @@ class WarpCondensationState:
             self.energy_transfer,
             (
                 particles.masses,
-                particles.concentration,
+                particles.population,
                 particles.charge,
                 particles.density,
                 particles.volume,

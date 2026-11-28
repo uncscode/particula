@@ -12,7 +12,7 @@ def native_triple(boxes=1):
     return (
         ParticleData(
             masses=np.ones((boxes, 2, 2)) * 1e-18,
-            concentration=np.ones((boxes, 2)),
+            population=np.ones((boxes, 2)),
             charge=np.zeros((boxes, 2)),
             density=np.array([1000.0, 1200.0]),
             volume=np.full(boxes, 0.25),

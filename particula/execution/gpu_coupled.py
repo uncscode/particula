@@ -289,7 +289,7 @@ class GPUCoupledSimulation:
             return
         initial = self._events.snapshot()
         self.coupling_downloads += 1
-        if not np.any(initial.particles.concentration > 0):
+        if not np.any(initial.particles.population > 0):
             return
         flow = GPUCondensationODE(
             initial,
@@ -305,7 +305,7 @@ class GPUCoupledSimulation:
         self.coupling_downloads += 1
         _cpu_batch.validate(final)
         # Only the accepted mass and gas fields may cross this boundary.
-        for name in ("concentration", "charge", "density", "volume"):
+        for name in ("population", "charge", "density", "volume"):
             if not np.array_equal(
                 getattr(initial.particles, name), getattr(final.particles, name)
             ):

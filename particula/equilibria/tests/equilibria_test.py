@@ -72,7 +72,7 @@ def test_execute_returns_aerosol_instance():
         return Aerosol(
             particles=ParticleData(
                 masses=np.ones((1, 1, 1)) * 1e-18,
-                concentration=np.ones((1, 1)),
+                population=np.ones((1, 1)),
                 charge=np.zeros((1, 1)),
                 density=np.array([1000.0]),
                 volume=np.ones(1),

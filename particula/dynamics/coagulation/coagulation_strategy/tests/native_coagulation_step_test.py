@@ -25,7 +25,7 @@ from particula.particles import ParticleData
 def _state(particle):
     return {
         name: (getattr(particle, name), getattr(particle, name).copy())
-        for name in ("masses", "concentration", "charge", "density", "volume")
+        for name in ("masses", "population", "charge", "density", "volume")
     }
 
 
@@ -37,7 +37,7 @@ def _unchanged(particle, state):
 
 def _inventory(particle):
     # Deliberately independent of ParticleData's inventory/density helpers.
-    count = particle.concentration[0]
+    count = particle.population[0]
     species = np.sum(particle.masses[0] * count[:, None], axis=0)
     charge = np.dot(particle.charge[0], count)
     return species, charge
@@ -51,8 +51,8 @@ def test_resolved_merge_weights_volume_charge_and_identity(
 ):
     """Resolved merge weights volume charge and identity."""
     particle = _particle("particle_resolved", volume)
-    particle.concentration[:] = weight
-    particle.concentration[0, 1] = 0  # Positive material but inactive slot.
+    particle.population[:] = weight
+    particle.population[0, 1] = 0  # Positive material but inactive slot.
     particle.masses[0, 0, 1] = 0  # Valid zero-material composition.
     state = _state(particle)
     mass_before, charge_before = _inventory(particle)
@@ -77,7 +77,7 @@ def test_resolved_merge_weights_volume_charge_and_identity(
     mass_after, charge_after = _inventory(particle)
     npt.assert_allclose(mass_after, mass_before, rtol=2e-15, atol=0)
     assert charge_after == charge_before
-    npt.assert_array_equal(particle.concentration, [[0, 0, 0, weight]])
+    npt.assert_array_equal(particle.population, [[0, 0, 0, weight]])
     npt.assert_allclose(
         particle.masses[0, 3],
         np.sum(state["masses"][1][0, [0, 2, 3]], axis=0),
@@ -97,7 +97,7 @@ def test_binning_preserves_species_counts_and_zero_material(volume):
     """Binning preserves species counts and zero material."""
     particle = _particle("particle_resolved", volume)
     particle.masses[0, :, 1] = 0
-    particle.concentration[0, 1] = 0
+    particle.population[0, 1] = 0
     before = _state(particle)
     edges = np.array([1e-10, 1e-5])
     result = _get_binned_kernel_data_from_particle_data(particle, edges)
@@ -107,7 +107,7 @@ def test_binning_preserves_species_counts_and_zero_material(volume):
     npt.assert_allclose(
         _inventory(result)[0], _inventory(particle)[0], rtol=2e-15
     )
-    assert result.concentration.sum() == particle.concentration.sum()
+    assert result.concentration.sum() == particle.population.sum()
     assert result.charge[0, 0] == np.median(particle.charge[0, [0, 2, 3]])
     npt.assert_array_equal(result.masses[0, :, 1], 0)
     _unchanged(particle, before)
@@ -146,12 +146,12 @@ def test_unequal_weights_reject_before_selection(monkeypatch, name, duration):
     "kind", ["discrete", "continuous_pdf", "particle_resolved"]
 )
 @pytest.mark.parametrize(
-    "field", ["masses", "concentration", "charge", "density", "volume"]
+    "field", ["masses", "population", "charge", "density", "volume"]
 )
 def test_mutated_physical_state_rejects_before_writes(kind, field):
     """Mutated physical state rejects before writes."""
     particle = _particle(kind)
-    particle.concentration[:] = 1
+    particle.population[:] = 1
     getattr(particle, field).flat[0] = np.nan
     state = _state(particle)
     with pytest.raises(ValueError):
@@ -166,7 +166,7 @@ def test_mutated_physical_state_rejects_before_writes(kind, field):
 def test_bad_time_rejects_even_zero_population(kind, duration):
     """Bad time rejects even zero population."""
     particle = _particle(kind)
-    particle.concentration[:] = 0
+    particle.population[:] = 0
     state = _state(particle)
     with pytest.raises(ValueError, match="time_step"):
         _strategy("brownian", kind).step(particle, 298.15, 101325.0, duration)
@@ -178,11 +178,11 @@ def test_empty_or_single_active_is_rng_preserving(monkeypatch, size):
     """Empty or single active is rng preserving."""
     particle = _particle("particle_resolved", 4.0)
     particle.masses = particle.masses[:, :size].copy()
-    particle.concentration = particle.concentration[:, :size].copy()
+    particle.population = particle.population[:, :size].copy()
     particle.charge = particle.charge[:, :size].copy()
-    particle.concentration[:] = 0
+    particle.population[:] = 0
     if size == 1:
-        particle.concentration[:] = 4
+        particle.population[:] = 4
     state = _state(particle)
     strategy = _strategy("brownian", "particle_resolved")
     rng = deepcopy(strategy.random_generator.bit_generator.state)
@@ -195,7 +195,7 @@ def test_empty_or_single_active_is_rng_preserving(monkeypatch, size):
 def test_invalid_bin_count_preflight(bad):
     """Invalid bin count preflight."""
     particle = _particle("particle_resolved")
-    particle.concentration[:] = 0
+    particle.population[:] = 0
     strategy = _strategy("brownian", "particle_resolved")
     strategy.particle_resolved_bins_number = bad
     with pytest.raises(ValueError, match="total_bins"):
@@ -227,13 +227,13 @@ def test_edges_do_not_silently_drop_active_particles():
 def test_readonly_writer_and_protected_alias_reject(kind):
     """Readonly writer and protected alias reject."""
     particle = _particle(kind)
-    particle.concentration[:] = 1
+    particle.population[:] = 1
     strategy = _strategy("brownian", kind)
-    particle.concentration.flags.writeable = False
+    particle.population.flags.writeable = False
     with pytest.raises(ValueError, match="writable"):
         strategy.step(particle, 298.15, 101325.0, 0)
-    particle.concentration.flags.writeable = True
-    particle.charge = particle.concentration.view()
+    particle.population.flags.writeable = True
+    particle.charge = particle.population.view()
     state = _state(particle)
     with pytest.raises(ValueError, match="alias"):
         strategy.step(particle, 298.15, 101325.0, 0)
@@ -254,7 +254,7 @@ def test_readonly_writer_and_protected_alias_reject(kind):
 def test_invalid_selection_rejects_without_particle_writes(monkeypatch, pairs):
     """Invalid selection rejects without particle writes."""
     particle = _particle("particle_resolved")
-    particle.concentration[:] = 1
+    particle.population[:] = 1
     state = _state(particle)
     monkeypatch.setattr(
         particle_resolved_method,
@@ -271,28 +271,31 @@ def test_invalid_selection_rejects_without_particle_writes(monkeypatch, pairs):
 def test_self_root_is_noop_and_duplicate_recipients_conserve():
     """Self root is noop and duplicate recipients conserve."""
     particle = _particle("particle_resolved")
-    particle.concentration[:] = 4
+    particle.population[:] = 4
     inventory = _inventory(particle)
     _native_step._merge(
         particle, np.arange(4), np.array([[0, 2], [1, 2], [2, 2]])
     )
     npt.assert_allclose(_inventory(particle)[0], inventory[0], rtol=2e-15)
     assert _inventory(particle)[1] == inventory[1]
-    assert particle.concentration[0, 2] == 4
+    assert particle.population[0, 2] == 4
 
 
 @pytest.mark.parametrize("kind", ["discrete", "continuous_pdf"])
-def test_density_step_equals_existing_rate_times_duration(kind):
+@pytest.mark.parametrize("volume", [0.25, 1.0, 4.0])
+def test_density_step_equals_existing_rate_times_duration(kind, volume):
     """Density step equals existing rate times duration."""
     particle = _particle(kind)
     strategy = _strategy("brownian", kind)
+    control = particle.copy()
+    particle.population *= volume
+    particle.volume[:] = volume
     before = _state(particle)
-    rate = strategy.net_rate(particle, 298.15, 101325.0)
-    # Material rates differ between the PMF and radius-PDF measures.
     duration = 1e-3
-    expected = particle.concentration + rate[None, :] * duration
+    rate = strategy.net_rate(control, 298.15, 101325.0)
+    expected_density = control.population + rate[None, :] * duration
     assert strategy.step(particle, 298.15, 101325.0, duration) is particle
-    npt.assert_array_equal(particle.concentration, expected)
+    npt.assert_array_equal(particle.population, expected_density * volume)
     for name in ("masses", "charge", "density", "volume"):
         npt.assert_array_equal(getattr(particle, name), before[name][1])
 
@@ -304,7 +307,7 @@ def test_negative_density_proposal_rejects_without_clipping(kind, monkeypatch):
     state = _state(particle)
     strategy = _strategy("brownian", kind)
     monkeypatch.setattr(
-        strategy, "net_rate", lambda *args: -2 * particle.concentration[0]
+        strategy, "net_rate", lambda *args: -2 * particle.population[0]
     )
     with pytest.raises(ValueError, match="smaller finite"):
         strategy.step(particle, 298.15, 101325.0, 1)
@@ -318,8 +321,8 @@ def test_direct_callback_uses_original_active_material(
 ):
     """Direct callback uses original active material."""
     particle = _particle("particle_resolved", volume)
-    particle.concentration[:] = 2
-    particle.concentration[0, 1] = 0
+    particle.population[:] = 2
+    particle.population[0, 1] = 0
     strategy = _strategy(name, "particle_resolved")
     strategy.use_direct_kernel = True
     expected = strategy.kernel(particle, 298.15, 101325.0)[0, 3]
@@ -342,7 +345,7 @@ def test_direct_callback_uses_original_active_material(
 def test_real_selector_conserves_species_and_charge(name, volume):
     """Real selector conserves species and charge."""
     particle = _particle("particle_resolved", volume)
-    particle.concentration[:] = 2
+    particle.population[:] = 2
     strategy = _strategy(name, "particle_resolved")
     strategy.use_direct_kernel = name in CHARGED
     strategy.random_generator = np.random.default_rng(123)
@@ -350,7 +353,7 @@ def test_real_selector_conserves_species_and_charge(name, volume):
     strategy.step(particle, 298.15, 101325.0, 1e16)
     npt.assert_allclose(_inventory(particle)[0], inventory[0], rtol=2e-15)
     npt.assert_allclose(_inventory(particle)[1], inventory[1], rtol=2e-15)
-    assert np.all(particle.concentration >= 0)
+    assert np.all(particle.population >= 0)
 
 
 @pytest.mark.parametrize("size", [4, 7, 10])
@@ -360,13 +363,13 @@ def test_monodisperse_single_kernel_point_is_finite(size, weight):
     particle = _particle("particle_resolved")
     particle.masses = np.repeat(particle.masses[:, :1], size, axis=1)
     particle.charge = np.zeros((1, size))
-    particle.concentration = np.full((1, size), weight)
+    particle.population = np.full((1, size), weight)
     strategy = _strategy("brownian", "particle_resolved")
     strategy.random_generator = np.random.default_rng(2)
     inventory = _inventory(particle)[0]
     strategy.step(particle, 298.15, 101325.0, 1e20)
     npt.assert_allclose(_inventory(particle)[0], inventory, rtol=2e-15)
-    assert np.count_nonzero(particle.concentration) < size
+    assert np.count_nonzero(particle.population) < size
 
 
 @pytest.mark.parametrize("volume", [0.25, 1.0, 4.0])
@@ -432,7 +435,7 @@ def test_uniform_composition_inventory_error_converges_with_grid(kind):
         )
         particle = ParticleData(
             masses=np.stack([0.4 * mass, 0.6 * mass], axis=1)[None],
-            concentration=density[None],
+            population=density[None],
             charge=np.zeros((1, count)),
             density=np.array([1000.0, 1000.0]),
             volume=np.ones(1),
@@ -471,7 +474,7 @@ def test_native_binning_retains_material_and_requested_grid(species, volume):
             1, 3, species
         )
         * 1e-18,
-        concentration=np.array([[1.0, 2.0, 3.0]]),
+        population=np.array([[1.0, 2.0, 3.0]]),
         charge=np.array([[0.0, 1.0, -1.0]]),
         density=np.full(species, 1000.0),
         volume=np.array([volume]),
@@ -492,9 +495,9 @@ def test_native_binning_retains_material_and_requested_grid(species, volume):
     npt.assert_array_equal(binned.volume, particle.volume)
     npt.assert_allclose(
         np.sum(binned.masses[0] * binned.concentration[0, :, None], axis=0),
-        np.sum(particle.masses[0] * particle.concentration[0, :, None], axis=0),
+        np.sum(particle.masses[0] * particle.population[0, :, None], axis=0),
         rtol=2e-15,
         atol=0,
     )
-    assert binned.concentration.sum() == particle.concentration.sum()
+    assert binned.concentration.sum() == particle.population.sum()
     _unchanged(particle, before)

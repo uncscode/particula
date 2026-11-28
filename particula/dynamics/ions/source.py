@@ -50,7 +50,7 @@ class IonPairSource(RunnableABC):
                 raise ValueError("ion species index is invalid")
         if self.positive_species == self.negative_species:
             raise ValueError("ion polarities require distinct material lanes")
-        if np.any((p.concentration != 0) & (p.concentration != 1)):
+        if np.any((p.population != 0) & (p.population != 1)):
             raise ValueError("ion production requires unit active counts")
 
     def execute(self, *args, **kwargs):

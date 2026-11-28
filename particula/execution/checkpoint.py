@@ -51,10 +51,10 @@ if TYPE_CHECKING:
     from particula.gas import EnvironmentData, GasData
     from particula.particles import ParticleData
 
-_SCHEMA_VERSION = 5
+_SCHEMA_VERSION = 6
 _PRIMARY_ROLES = (
     ("particles", "masses"),
-    ("particles", "concentration"),
+    ("particles", "population"),
     ("particles", "charge"),
     ("particles", "density"),
     ("particles", "volume"),
@@ -445,7 +445,7 @@ class ResidentCheckpointController:
             for carrier, roles in (
                 (
                     particles,
-                    ("masses", "concentration", "charge", "density", "volume"),
+                    ("masses", "population", "charge", "density", "volume"),
                 ),
                 (gas, ("molar_mass", "concentration", "partitioning")),
                 (environment, ("temperature", "pressure", "saturation_ratio")),
@@ -459,7 +459,7 @@ class ResidentCheckpointController:
             # canonical GPU fields need their own readback.
             primary_values = {
                 ("particles", "masses"): particles.masses,
-                ("particles", "concentration"): particles.concentration,
+                ("particles", "population"): particles.population,
                 ("particles", "charge"): particles.charge,
                 ("particles", "density"): particles.density,
                 ("particles", "volume"): particles.volume,
@@ -635,11 +635,11 @@ def restart_resident_session(  # noqa: C901
     from particula.particles import ParticleData
 
     particles = ParticleData(
-        unpack("particles", "masses"),
-        unpack("particles", "concentration"),
-        unpack("particles", "charge"),
-        unpack("particles", "density"),
-        unpack("particles", "volume"),
+        masses=unpack("particles", "masses"),
+        population=unpack("particles", "population"),
+        charge=unpack("particles", "charge"),
+        density=unpack("particles", "density"),
+        volume=unpack("particles", "volume"),
         distribution_type=checkpoint.distribution_type,
     )
     gas = GasData(
@@ -910,7 +910,7 @@ def _preflight_restart(  # noqa: C901
                 dimensions.n_species,
             ),
         ),
-        ("particles", "concentration"): (
+        ("particles", "population"): (
             "<f8",
             (dimensions.n_boxes, dimensions.n_particles),
         ),

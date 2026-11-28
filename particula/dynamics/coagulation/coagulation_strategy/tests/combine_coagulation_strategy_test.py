@@ -73,7 +73,7 @@ class TestCombineCoagulationStrategy(unittest.TestCase):
                     ]
                 ]
             ),
-            concentration=np.array([[1e6, 2e6, 1.5e6]]),
+            population=np.array([[1e6, 2e6, 1.5e6]]),
             charge=np.array([[0.0, 1.0, -1.0]]),
             density=np.array([1000.0, 1200.0]),
             volume=np.array([1.0]),
@@ -110,14 +110,14 @@ class TestCombineCoagulationStrategy(unittest.TestCase):
 
         Ensures that the step method updates the particle concentration.
         """
-        initial_concentration = self.particle.concentration[0].copy()
+        initial_concentration = self.particle.population[0].copy()
         self.combined_strategy.step(
             particle=self.particle,
             temperature=self.temperature,
             pressure=self.pressure,
             time_step=1.0e-3,
         )
-        updated_concentration = self.particle.concentration[0]
+        updated_concentration = self.particle.population[0]
         self.assertFalse(
             np.array_equal(initial_concentration, updated_concentration)
         )

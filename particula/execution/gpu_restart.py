@@ -68,7 +68,7 @@ def checkpoint_gpu_condensation(owner):
     owner._check_ready()
     forcing = checkpoint_forcing(owner._forcing)
     return GPUCondensationCheckpoint(
-        5,
+        6,
         _runtime(),
         _device_identity(owner.device),
         pack_native(owner._base),
@@ -97,7 +97,7 @@ def _validate(saved):
     if (
         type(saved) is not GPUCondensationCheckpoint
         or type(saved.schema_version) is not int
-        or saved.schema_version != 5
+        or saved.schema_version != 6
         or saved.runtime != _runtime()
     ):
         raise ValueError(

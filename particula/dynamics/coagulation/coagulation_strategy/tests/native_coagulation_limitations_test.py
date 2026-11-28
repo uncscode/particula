@@ -34,11 +34,11 @@ def test_all_mechanisms_preserve_fixed_material_and_number_update(kind, name):
     }
     strategy = _strategy(name, kind)
     expected = (
-        particle.concentration
+        particle.population
         + strategy.net_rate(particle, 298.15, 101325.0)[None] * 1e-3
     )
     assert strategy.step(particle, 298.15, 101325.0, 1e-3) is particle
-    npt.assert_array_equal(particle.concentration, expected)
+    npt.assert_array_equal(particle.population, expected)
     for key, (identity, values) in before.items():
         assert getattr(particle, key) is identity
         if key != "concentration":
@@ -83,7 +83,7 @@ def test_size_dependent_composition_defect_persists_under_refinement(
         )
         particle = ParticleData(
             masses=masses[None].copy(),
-            concentration=counts[None].copy(),
+            population=counts[None].copy(),
             charge=np.zeros((1, size)),
             density=np.array([1000.0, 1000.0]),
             volume=np.ones(1),
@@ -100,7 +100,7 @@ def test_size_dependent_composition_defect_persists_under_refinement(
         gross_loss = 1e-15 * _integral(counts, radius, kind) * before
         strategy.step(particle, 298.15, 101325.0, 100.0)
         after = _integral(
-            particle.concentration[0, :, None] * particle.masses[0],
+            particle.population[0, :, None] * particle.masses[0],
             radius,
             kind,
         )

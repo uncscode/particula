@@ -163,7 +163,7 @@ and nucleation require explicit exact-carrier species bindings. Direct and
 resident examples show their concrete preparation APIs and synchronization.
 
 A CPU aggregate replacement cannot rebind existing device arrays or a prepared
-resident request. Explicit restart uses a fresh same-device binding and schema-v5
+resident request. Explicit restart uses a fresh same-device binding and schema-v6
 canonical checkpoint bytes; CPU inspection is not continuation authority.
 There is no implicit transfer, fallback, migration or recovery. CPU dynamics runnables iterate batched storage; direct strategies retain
 their single-box contracts and existing numerical restrictions.

@@ -131,7 +131,7 @@ def _native_neutral_activities(activity, particle, temperature, targets):
         particle.masses[0],
         temperature,
         targets,
-        particle.concentration[0] > 0,
+        particle.population[0] > 0,
     )
     hook = getattr(activity, "neutral_activities", None)
     if hook is None:
@@ -387,7 +387,7 @@ class CondensationStrategy(ABC):
                 particle.masses[0],
                 temperature,
                 targets,
-                particle.concentration[0] > 0,
+                particle.population[0] > 0,
             )
         else:
             fractions = _native_neutral_activities(
@@ -533,7 +533,7 @@ class CondensationStrategy(ABC):
                     equilibrium[:, target],
                     float(diffusion[source]),
                 )
-        result[particle_data.concentration[0] == 0] = 0
+        result[particle_data.population[0] == 0] = 0
         return result
 
     def _native_latent_heat_values(
@@ -601,7 +601,7 @@ class CondensationStrategy(ABC):
             and getattr(activity, "prepared_provider_version", None) == 1
         ):
             # Validate the candidate before either inventory becomes visible.
-            active = particle.concentration[0] > 0
+            active = particle.population[0] > 0
             if particle.distribution_type == "particle_resolved":
                 active &= np.any(new_masses > 0, axis=1)
             activity.neutral_activities(
@@ -1458,7 +1458,7 @@ class CondensationIsothermalStaggered(CondensationStrategy):
                 # A material-only slice, not a separately interpreted PDF.
                 material = ParticleData(
                     masses=particle.masses[:, indices, :],
-                    concentration=particle.concentration[:, indices],
+                    population=particle.population[:, indices],
                     charge=particle.charge[:, indices],
                     density=particle.density,
                     volume=particle.volume,

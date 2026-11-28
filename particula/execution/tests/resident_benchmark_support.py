@@ -765,7 +765,7 @@ def build_resident_memory_model(
             checked_dense_array_bytes((boxes, particles, species), 8),
         ),
         _memory_category(
-            "primary.particles.concentration",
+            "primary.particles.population",
             checked_dense_array_bytes((boxes, particles), 8),
         ),
         _memory_category(

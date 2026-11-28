@@ -140,7 +140,7 @@ def test_direct_replays_ordered_pairs_and_rng(
 ):
     """Compare each pair boundary with manually replayed fixed calls."""
     initial = evolving().particles
-    initial.concentration[1] = 0
+    initial.population[1] = 0
     initial.masses[1] = 0
     initial.charge[1] = 0
     direct = to_warp_particle_data(initial, device=device)
@@ -180,27 +180,27 @@ def test_direct_replays_ordered_pairs_and_rng(
             pairs.numpy()[0, : end - begin],
         )
         begin = end
-    for name in ("masses", "charge", "concentration"):
+    for name in ("masses", "charge", "population"):
         np.testing.assert_array_equal(
             getattr(reference, name).numpy(), getattr(direct, name).numpy()
         )
     np.testing.assert_array_equal(rng.numpy(), other_rng.numpy())
     assert rng.numpy()[1] == 107
     assert (
-        np.count_nonzero(initial.concentration)
-        - np.count_nonzero(direct.concentration.numpy())
+        np.count_nonzero(initial.population)
+        - np.count_nonzero(direct.population.numpy())
         == begin
     )
-    counts = direct.concentration.numpy()
+    counts = direct.population.numpy()
     np.testing.assert_allclose(
         (direct.masses.numpy() * counts[..., None]).sum(axis=1),
-        (initial.masses * initial.concentration[..., None]).sum(axis=1),
+        (initial.masses * initial.population[..., None]).sum(axis=1),
         rtol=2e-15,
         atol=0,
     )
     np.testing.assert_array_equal(
         (direct.charge.numpy() * counts).sum(axis=1),
-        (initial.charge * initial.concentration).sum(axis=1),
+        (initial.charge * initial.population).sum(axis=1),
     )
 
 
@@ -336,7 +336,7 @@ def test_direct_partial_rejection_restores_supplied_outputs(device):
     arrays = [
         particles.masses,
         particles.charge,
-        particles.concentration,
+        particles.population,
         rng,
         pairs,
         counts,

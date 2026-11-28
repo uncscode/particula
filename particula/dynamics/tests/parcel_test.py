@@ -71,16 +71,17 @@ def test_dry_adiabat_and_dilution(initial, warp_device):
                 (first, result.volume[0]),
                 (last, result.volume[-1]),
             ]:
-                np.testing.assert_array_equal(aerosol.particles.volume, [1.0])
+                np.testing.assert_array_equal(aerosol.particles.volume, [vol])
                 np.testing.assert_allclose(
-                    aerosol.particles.concentration[0] * vol, case.number
+                    aerosol.particles.population[0], case.number
                 )
                 np.testing.assert_allclose(
                     aerosol.gas.concentration[0] * vol,
                     case.dry_air_mass * vapor,
                 )
             np.testing.assert_allclose(
-                last.particles.concentration / first.particles.concentration,
+                last.particles.slot_concentration_density
+                / first.particles.slot_concentration_density,
                 result.volume[0] / result.volume[-1],
             )
             if vapor == 0:
@@ -219,7 +220,7 @@ def test_moist_cloud_base_and_gradient(initial, warp_device):
     )
     for i in (0, 1000, 2000):
         snap = fine.aerosol_at(i, dry_density=1770.0)
-        count = snap.particles.concentration[0] * fine.volume[i]
+        count = snap.particles.population[0]
         inventories = count @ snap.particles.masses[0]
         expected_dry = initial.number @ (
             (4 * np.pi / 3) * initial.dry_radius**3 * 1770.0

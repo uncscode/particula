@@ -28,7 +28,7 @@ def test_dielectric_cuda_capture_and_restart(charge):
     dt = (
         0.999999
         * initial.particles.volume[0]
-        / (rate * initial.particles.concentration[0, 0])
+        / (rate * initial.particles.population[0, 0])
     )
     with prepare_simulation(
         (process,), initial, device="cuda:0", time_step=float(dt), root_seed=17
@@ -45,7 +45,7 @@ def test_dielectric_cuda_capture_and_restart(charge):
         after_merge = sim.checkpoint()
         sim.step()
         continued = sim.snapshot().particles
-    assert np.count_nonzero(result.concentration) == 1
+    assert np.count_nonzero(result.population) == 1
     np.testing.assert_allclose(
         result.masses.sum(axis=1),
         initial.particles.masses.sum(axis=1),
@@ -85,7 +85,7 @@ def test_direct_domain_rejection_preserves_state_and_rng():
     rng = wp.array([173], dtype=wp.uint32, device="cuda:0")
     before = [
         field.numpy()
-        for field in (device.masses, device.concentration, device.charge, rng)
+        for field in (device.masses, device.population, device.charge, rng)
     ]
     with pytest.raises(ValueError, match="capture table domain"):
         coagulation_step_gpu(
@@ -99,7 +99,7 @@ def test_direct_domain_rejection_preserves_state_and_rng():
             max_collisions=1,
         )
     for field, expected in zip(
-        (device.masses, device.concentration, device.charge, rng),
+        (device.masses, device.population, device.charge, rng),
         before,
         strict=True,
     ):

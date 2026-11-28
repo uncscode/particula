@@ -42,7 +42,7 @@ class SeedCohort(RunnableABC):
                 raise ValueError("cohort species index is invalid")
         if self.seed_species == self.background_species:
             raise ValueError("seed and background materials must be distinct")
-        if np.any((p.concentration != 0) & (p.concentration != 1)):
+        if np.any((p.population != 0) & (p.population != 1)):
             raise ValueError("seed cohorts require unit active counts")
         if (
             isinstance(self.target_diameter, bool)

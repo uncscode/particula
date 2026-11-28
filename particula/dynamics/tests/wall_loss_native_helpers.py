@@ -19,7 +19,7 @@ def _particle(kind="discrete", volume=1.0, size=64):
         )
     return ParticleData(
         masses=mass[None, :, None],
-        concentration=concentration[None],
+        population=concentration[None],
         charge=np.zeros((1, size)),
         density=np.array([1000.0]),
         volume=np.array([volume]),
@@ -29,7 +29,7 @@ def _particle(kind="discrete", volume=1.0, size=64):
 
 
 def _concentration(particle):
-    return particle.concentration[0] / particle.volume[0]
+    return particle.population[0] / particle.volume[0]
 
 
 def _total(particle):

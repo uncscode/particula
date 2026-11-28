@@ -42,17 +42,17 @@ def pair_case(kinds=(1, -1), radius=10e-9, aerosol_charge=0):
     base = state()
     return Aerosol(
         particles=ParticleData(
-            masses,
-            np.ones((1, 2)),
-            charge,
-            np.array(
+            masses=masses,
+            population=np.ones((1, 2)),
+            charge=charge,
+            density=np.array(
                 [
                     POSITIVE_ION_MASS / ion_volume,
                     NEGATIVE_ION_MASS / ion_volume,
                     1000,
                 ]
             ),
-            np.array([1e-12]),
+            volume=np.array([1e-12]),
             distribution_type="particle_resolved",
         ),
         gas=base.gas,
@@ -76,7 +76,7 @@ def test_recombination_routing_and_inert_products(device, kinds):
         ].brownian_parallel.majorants.numpy()[0]
         if kinds == (1, -1):
             assert majorant == process.recombination
-            assert result.particles.concentration.sum() == 1
+            assert result.particles.population.sum() == 1
             assert np.all(result.particles.charge == 0)
         else:
             assert majorant == 0
@@ -111,7 +111,7 @@ def test_attachment_uses_lf_rate_and_conserves_charge(device, polarity):
             "coagulation"
         ].brownian_parallel.majorants.numpy()[0]
         np.testing.assert_allclose(majorant, rate, rtol=1e-12)
-    assert result.particles.concentration.sum() == 1
+    assert result.particles.population.sum() == 1
     assert result.particles.charge.sum() == polarity
     np.testing.assert_array_equal(
         result.particles.masses.sum(axis=1),
@@ -175,11 +175,11 @@ def test_recombination_ensemble_matches_finite_population_oracle(device):
     volume = 1.7e-12 * pairs
     initial = Aerosol(
         particles=ParticleData(
-            masses,
-            np.ones((boxes, 2 * pairs)),
-            np.tile(base.particles.charge, (boxes, pairs)),
-            base.particles.density,
-            np.full(boxes, volume),
+            masses=masses,
+            population=np.ones((boxes, 2 * pairs)),
+            charge=np.tile(base.particles.charge, (boxes, pairs)),
+            density=base.particles.density,
+            volume=np.full(boxes, volume),
             distribution_type="particle_resolved",
         ),
         gas=GasData(
@@ -237,7 +237,7 @@ def test_evolving_unsupported_state_faults_before_sampling(device, invalid):
             array = session.environment.temperature
             value = np.array([300.0])
         else:
-            array = session.particles.concentration
+            array = session.particles.population
             value = np.array([[2.0, 2.0]])
         wp.copy(array, wp.array(value, dtype=wp.float64, device=device))
         rng = simulation._bindings[
@@ -282,11 +282,11 @@ def test_composed_source_cleanup_cohort_capture_restart(device):
     charges[:, :2] = base.particles.charge
     initial = Aerosol(
         particles=ParticleData(
-            masses,
-            counts,
-            charges,
-            np.append(base.particles.density, 1000),
-            base.particles.volume,
+            masses=masses,
+            population=counts,
+            charge=charges,
+            density=np.append(base.particles.density, 1000),
+            volume=base.particles.volume,
             distribution_type="particle_resolved",
         ),
         gas=base.gas,

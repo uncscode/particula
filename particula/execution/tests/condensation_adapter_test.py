@@ -278,7 +278,7 @@ def _warp_state_inputs() -> tuple[Any, Any, Any]:
     particles = WarpParticleData()
     particles.distribution_kind = wp.int32(1)
     particles.masses = wp.ones((1, 2, 1), dtype=wp.float64, device="cpu")
-    particles.concentration = wp.ones((1, 2), dtype=wp.float64, device="cpu")
+    particles.population = wp.ones((1, 2), dtype=wp.float64, device="cpu")
     particles.charge = wp.zeros((1, 2), dtype=wp.float64, device="cpu")
     particles.density = wp.ones(1, dtype=wp.float64, device="cpu")
     particles.volume = wp.ones(1, dtype=wp.float64, device="cpu")
@@ -338,7 +338,7 @@ def _primary_warp_resources(
     """
     return (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         particles.volume,
@@ -391,7 +391,7 @@ def _real_warp_condensation_state(
 
     cpu_particles = ParticleData(
         masses=np.array([[[1.0e-18, 2.0e-18], [2.0e-18, 1.0e-18]]]),
-        concentration=np.array([[1.0e6, 2.0e6]]),
+        population=np.array([[1.0e6, 2.0e6]]),
         charge=np.zeros((1, 2)),
         density=np.array([1000.0, 1200.0]),
         volume=np.array([1.0]),
@@ -1569,7 +1569,7 @@ def test_warp_execution_records_energy_without_mutating_thermal_work() -> None:
     np.testing.assert_allclose(
         energy_transfer.numpy(),
         np.sum(
-            mass_transfer.numpy() * particles.concentration.numpy()[:, :, None],
+            mass_transfer.numpy() * particles.population.numpy()[:, :, None],
             axis=1,
         )
         * particles.volume.numpy()[:, None]

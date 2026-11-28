@@ -267,7 +267,7 @@ class GPUResidentCondensation(GPUCondensationODE):
         self._check_ready()
         for target, source in (
             (self._masses, session.particles.masses),
-            (self._counts, session.particles.concentration),
+            (self._counts, session.particles.population),
             (self._volume, session.particles.volume),
             (self._gas, session.gas.concentration),
             (self._temperature, session.environment.temperature),
@@ -336,7 +336,7 @@ class GPUResidentCondensation(GPUCondensationODE):
         self._unpack_trial(self._state)
         result = _cpu_batch.detached(self._base)
         result.particles.masses[:] = self._masses.numpy()
-        result.particles.concentration[:] = self._counts.numpy()
+        result.particles.population[:] = self._counts.numpy()
         result.particles.volume[:] = self._volume.numpy()
         result.gas.concentration[:] = self._gas.numpy()
         result.environment.temperature[:] = self._temperature.numpy()

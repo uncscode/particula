@@ -941,8 +941,7 @@ def _inventory_oracle(fixture: Any) -> np.ndarray:
     gas = fixture.session.gas
     return (
         np.sum(
-            particles.masses.numpy()
-            * particles.concentration.numpy()[:, :, None],
+            particles.masses.numpy() * particles.population.numpy()[:, :, None],
             axis=1,
         )
         + gas.concentration.numpy() * particles.volume.numpy()[:, None]
@@ -1084,7 +1083,7 @@ def _snapshot(fixture: Any) -> tuple[np.ndarray, ...]:
     session = fixture.session
     return (
         session.particles.masses.numpy().copy(),
-        session.particles.concentration.numpy().copy(),
+        session.particles.population.numpy().copy(),
         session.particles.charge.numpy().copy(),
         session.particles.density.numpy().copy(),
         session.particles.volume.numpy().copy(),
@@ -1215,11 +1214,11 @@ def _build_prepared_loop_impl(
             (n_boxes, n_particles),
         ).copy()
         session.particles.masses.assign(masses)
-        session.particles.concentration.assign(counts)
+        session.particles.population.assign(counts)
     if single_active_particle:
         warp_device = session.particles.masses.device
         masses = session.particles.masses.numpy()
-        concentration = session.particles.concentration.numpy()
+        concentration = session.particles.population.numpy()
         charge = session.particles.charge.numpy()
         masses[:, 1:, :] = 0.0
         concentration[:, 1:] = 0.0
@@ -1229,7 +1228,7 @@ def _build_prepared_loop_impl(
             wp.array(masses, dtype=wp.float64, device=warp_device),
         )
         wp.copy(
-            session.particles.concentration,
+            session.particles.population,
             wp.array(concentration, dtype=wp.float64, device=warp_device),
         )
         wp.copy(
@@ -1370,9 +1369,7 @@ def _build_scenario_prepared_loop_impl(
         scenario = _captured_full_loop_scenario()
     particles = ParticleData(
         masses=scenario.particle_masses.copy(),
-        concentration=(
-            scenario.particle_concentration * scenario.volume[:, None]
-        ),
+        population=(scenario.particle_concentration * scenario.volume[:, None]),
         charge=scenario.particle_charge.copy(),
         density=np.array([1000.0, 1200.0], dtype=np.float64),
         volume=scenario.volume.copy(),
@@ -1764,7 +1761,7 @@ def _prepared_snapshot(loop: _PreparedLoop) -> dict[str, np.ndarray]:
     snapshot = {
         "particle_masses": particles.masses.numpy().copy(),
         "particle_concentration": (
-            particles.concentration.numpy() / particles.volume.numpy()[:, None]
+            particles.population.numpy() / particles.volume.numpy()[:, None]
         ),
         "particle_charge": particles.charge.numpy().copy(),
         "particle_density": particles.density.numpy().copy(),
@@ -1843,7 +1840,7 @@ def _prepared_snapshot_without_sync(
     snapshot = {
         "particle_masses": particles.masses.numpy().copy(),
         "particle_concentration": (
-            particles.concentration.numpy() / particles.volume.numpy()[:, None]
+            particles.population.numpy() / particles.volume.numpy()[:, None]
         ),
         "particle_charge": particles.charge.numpy().copy(),
         "particle_density": particles.density.numpy().copy(),
@@ -2008,7 +2005,7 @@ def _prepared_identity_signature(loop: _PreparedLoop) -> tuple[int, ...]:
         id(session.gas),
         id(session.environment),
         id(session.particles.masses),
-        id(session.particles.concentration),
+        id(session.particles.population),
         id(session.particles.charge),
         id(session.particles.density),
         id(session.particles.volume),

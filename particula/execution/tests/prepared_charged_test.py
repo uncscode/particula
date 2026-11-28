@@ -43,7 +43,7 @@ def test_prepared_charged_merge_and_restart(model, device):
     step = (
         (1 - 1e-8)
         * initial.particles.volume[0]
-        / (expected * initial.particles.concentration[0, 0])
+        / (expected * initial.particles.population[0, 0])
     )
     with prepare_simulation(
         (process,), initial, device=device, time_step=float(step), root_seed=17
@@ -58,7 +58,7 @@ def test_prepared_charged_merge_and_restart(model, device):
             "coagulation"
         ].brownian_parallel.majorants.numpy()[0]
         np.testing.assert_allclose(observed, expected, rtol=1e-10, atol=0)
-    assert np.count_nonzero(result.particles.concentration) == 1
+    assert np.count_nonzero(result.particles.population) == 1
     np.testing.assert_allclose(
         result.particles.masses.sum(axis=1),
         initial.particles.masses.sum(axis=1),

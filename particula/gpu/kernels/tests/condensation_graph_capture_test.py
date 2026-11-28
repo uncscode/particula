@@ -57,7 +57,7 @@ def _make_graph_capture_state(
     ) = support._make_production_inventory_case()
     initial_masses = particles.masses.copy()
     initial_gas = gas.concentration.copy()
-    particle_concentration = particles.concentration.copy()
+    particle_concentration = particles.population.copy()
     shape = initial_masses.shape
     n_boxes, _, n_species = shape
     wp = runtime.wp

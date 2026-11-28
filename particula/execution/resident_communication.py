@@ -268,7 +268,7 @@ def setup_prepared_resident_communication(  # noqa: C901
     gas = cast(Any, typed.session.gas)
     primaries = (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.density,
         particles.volume,
         particles.charge,
@@ -347,7 +347,7 @@ def setup_prepared_resident_communication(  # noqa: C901
         )
         communication_arguments = (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -376,7 +376,7 @@ def setup_prepared_resident_communication(  # noqa: C901
         volume_enqueue = _enqueue_prepared_resident_volume_evolution
         volume_arguments = (
             particles.volume,
-            particles.concentration,
+            particles.population,
             gas.concentration,
             boxes,
             resources.final_volumes,
@@ -388,7 +388,7 @@ def setup_prepared_resident_communication(  # noqa: C901
         prepared,
         typed,
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.density,
         particles.volume,
         particles.charge,

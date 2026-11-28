@@ -78,7 +78,7 @@ def setup_diagnostics(owner: Any):
             dim=partials.shape,
             inputs=[
                 particles.masses,
-                particles.concentration,
+                particles.population,
                 particles.charge,
                 partials,
             ],

@@ -30,7 +30,7 @@ def _repeat_particle(particle, n_boxes):
     """Construct multi-box native storage for admission rejection checks."""
     return ParticleData(
         masses=np.repeat(particle.masses, n_boxes, axis=0),
-        concentration=np.repeat(particle.concentration, n_boxes, axis=0),
+        population=np.repeat(particle.population, n_boxes, axis=0),
         charge=np.repeat(particle.charge, n_boxes, axis=0),
         density=particle.density.copy(),
         volume=np.repeat(particle.volume, n_boxes),
@@ -723,7 +723,7 @@ class TestCondensationIsothermalStaggered(unittest.TestCase):
         )
         particle = self._make_particle_with_masses(
             mass_distribution=mass_distribution,
-            concentration=float(self.particle.concentration[0, 0]),
+            concentration=float(self.particle.population[0, 0]),
         )
         gas_species = copy.deepcopy(self.gas_species)
         return particle, gas_species
@@ -1415,7 +1415,7 @@ def test_native_only_entry_points_reject_without_mutation(
     )
     original_particle, original_gas = particle, gas
     masses = particle.masses.copy()
-    concentration = particle.concentration.copy()
+    concentration = particle.population.copy()
     gas_concentration = gas.concentration.copy()
     if fault == "untagged":
         particle.distribution_type = None

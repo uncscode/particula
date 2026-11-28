@@ -138,7 +138,7 @@ def restore_host_fields(saved, host):
     fields.validate_layout(
         dimensions,
         host.particles.distribution_type,
-        host.particles.concentration > 0,
+        host.particles.population > 0,
     )
     from particula.aerosol import Aerosol
 

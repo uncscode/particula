@@ -132,7 +132,7 @@ def test_empty_resident_population_retains_gas(cuda, method):
     """An exhausted cloud can continue to a later physical boundary."""
     initial, strategy = material_case(3)
     initial.particles.masses[:] = 0
-    initial.particles.concentration[:] = 0
+    initial.particles.population[:] = 0
     initial.particles.charge[:] = 0
     owner = GPUResidentCondensation(
         initial, strategy, device=cuda, method=method

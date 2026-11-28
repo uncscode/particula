@@ -240,7 +240,7 @@ def test_native_single_step_against_independent_physics(
     """Separately prove particle changes, mapped gas changes and extensive heat."""
     particles, gas, mapping = make_state(kind, volume)
     if kind == "continuous_pdf":
-        particles.concentration *= 1e9
+        particles.population *= 1e9
     extra = {"latent_heat_strategy": ConstantLatentHeat(heat)} if heat else {}
     strategy = native_strategy(
         strategy_type, gas, mapping, update_gases=update_gases, **extra
@@ -256,7 +256,7 @@ def test_native_single_step_against_independent_physics(
         dt = 1e-3
     old_masses, old_gas = particles.masses.copy(), gas.concentration.copy()
     protected = [
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         particles.volume,
@@ -267,7 +267,7 @@ def test_native_single_step_against_independent_physics(
         protected.append(particles.radius_grid)
     snapshots = [(array, array.copy()) for array in protected]
     identities = particles.masses, gas.concentration
-    weights = particles.concentration[0].copy()
+    weights = particles.population[0].copy()
     if kind == "particle_resolved":
         weights /= volume
     elif kind == "continuous_pdf":
@@ -325,7 +325,7 @@ def test_native_single_step_against_independent_physics(
     for array, before in snapshots:
         np.testing.assert_array_equal(array, before)
     current_protected = [
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         particles.volume,
@@ -374,7 +374,7 @@ def test_latent_energy_uses_mapped_full_gas_order_and_extensive_mass(volume):
     )
     # Counts, not density: this is J, not J/m3.
     expected_energy = np.sum(
-        expected * particles.concentration[0, :, None] * [1e6, 2e6]
+        expected * particles.population[0, :, None] * [1e6, 2e6]
     )
     np.testing.assert_allclose(
         strategy.last_latent_heat_energy,

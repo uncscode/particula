@@ -66,7 +66,7 @@ def electrolyte_case(trace=False):
     mass = 5e-15 * np.asarray(rows)[None]
     particle = ParticleData(
         masses=mass,
-        concentration=np.full(mass.shape[:2], 1e10),
+        population=np.full(mass.shape[:2], 1e10),
         charge=np.zeros(mass.shape[:2]),
         density=np.full(mass.shape[-1], 1000.0),
         volume=np.ones(1),
@@ -227,7 +227,7 @@ def test_new_organic_seed_changes_first_resident_flux():
     aerosol, process = case.aerosol, case.process
     particle, gas = aerosol.particles, aerosol.gas
     particle.volume[0] = 1e-10
-    particle.concentration[0] = [1, 1, 0]
+    particle.population[0] = [1, 1, 0]
     names = ["butanediol", "vanillic_acid", "water"]
     gas.name = names
     gas.partitioning[1] = True
@@ -283,17 +283,17 @@ def test_new_organic_seed_changes_first_resident_flux():
         owner.capture_events()
         owner.step()
         before = owner.snapshot()
-        assert before.particles.concentration[0, -1] == 0
+        assert before.particles.population[0, -1] == 0
         owner.update_gas_species(
             concentrations={"vanillic_acid": seed_mass / particle.volume[0]}
         )
         owner.step()
         observed = owner.snapshot()
-    assert observed.particles.concentration[0, -1] == 1
+    assert observed.particles.population[0, -1] == 1
     np.testing.assert_allclose(
         observed.particles.masses[0, -1, 4], seed_mass, rtol=1e-13, atol=0
     )
-    before.particles.concentration[0, -1] = 1
+    before.particles.population[0, -1] = 1
     before.particles.masses[0, -1, 4] = seed_mass
     expected = box.sample(case, before)["flux"][-1]
     measured = observed.particles.masses[0, -1, case.targets] / interval

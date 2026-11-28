@@ -175,3 +175,44 @@ def test_writer_retries_failed_file_without_repeating_physics(
     assert owner.calls == calls
     npt.assert_array_equal(load_analysis(path).arrays["time"], [0.1, 0.2])
     assert not list(tmp_path.glob(".growing.pca.*"))
+
+
+def test_read_genuine_036_resolved_archive():
+    """Decode original bytes with counts, volume, and conversion provenance."""
+    from pathlib import Path
+
+    path = Path(__file__).parent / "data" / "analysis-0.3.6-resolved.pca"
+    data = load_analysis(path)
+    npt.assert_array_equal(data.arrays["particle_population"], [[[100.0]]])
+    npt.assert_array_equal(data.arrays["volume"], [[0.5]])
+    assert data.metadata["source_analysis_version"] == 1
+    assert (
+        data.metadata["science"]["observables"]["particle_population"]["unit"]
+        == "count"
+    )
+
+
+@pytest.mark.parametrize(
+    ("suffix", "unit", "total"),
+    [
+        ("discrete", "count", 12.0),
+        ("continuous_pdf", "m^-1", 23e-9),
+        ("derived", None, 12.0),
+    ],
+)
+def test_read_036_binned_and_derived_archives(suffix, unit, total):
+    """Read original 0.3.6 unit-volume files preserving PDF node units."""
+    from pathlib import Path
+
+    path = Path(__file__).parent / "data" / f"analysis-0.3.6-{suffix}.pca"
+    data = load_analysis(path)
+    assert data.metadata["source_analysis_version"] == 1
+    npt.assert_allclose(data.arrays["number_density"], [[total]], atol=0)
+    if unit is None:
+        assert "particle_population" not in data.arrays
+    else:
+        npt.assert_array_equal(
+            data.arrays["particle_population"], [[[2, 6, 4]]]
+        )
+        spec = data.metadata["science"]["observables"]["particle_population"]
+        assert spec["unit"] == unit

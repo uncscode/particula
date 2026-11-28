@@ -75,7 +75,7 @@ def _integrate(particle, values):
 
 def _inventory(particle):
     return _integrate(
-        particle, particle.masses[0] * particle.concentration[0, :, None]
+        particle, particle.masses[0] * particle.population[0, :, None]
     )
 
 
@@ -110,7 +110,7 @@ def _condense(aerosol, strategy_type):
     assert result[0] is particle and result[1] is gas
     gain = _integrate(
         particle,
-        (particle.masses[0] - old_mass[0]) * particle.concentration[0, :, None],
+        (particle.masses[0] - old_mass[0]) * particle.population[0, :, None],
     )
     loss = (
         old_gas[0, [2, 1]] - gas.concentration[0, [2, 1]]
@@ -143,7 +143,7 @@ def test_resolved_native_aggregate_through_three_processes(
         volume=volume,
     )
     aerosol = _aggregate(particle)
-    arrays = [particle.masses, particle.concentration, particle.charge]
+    arrays = [particle.masses, particle.population, particle.charge]
     protected = [
         particle.density,
         particle.volume,
@@ -157,21 +157,19 @@ def test_resolved_native_aggregate_through_three_processes(
     _condense(aerosol, strategy_type)
     gas_before = aerosol.gas.concentration.copy()
     mass_before = _inventory(particle)
-    charge_before = np.dot(particle.charge[0], particle.concentration[0])
+    charge_before = np.dot(particle.charge[0], particle.population[0])
     coagulation = BrownianCoagulationStrategy("particle_resolved")
     coagulation.random_generator = np.random.default_rng(123)
     assert (
         coagulation.step(particle, 298.15, 101325.0, 1e18 * volume / weight)
         is particle
     )
-    assert np.count_nonzero(particle.concentration) < len(masses)
+    assert np.count_nonzero(particle.population) < len(masses)
     npt.assert_allclose(_inventory(particle), mass_before, rtol=2e-15, atol=0)
-    assert (
-        np.dot(particle.charge[0], particle.concentration[0]) == charge_before
-    )
+    assert np.dot(particle.charge[0], particle.population[0]) == charge_before
 
     before_wall_mass = particle.masses.copy()
-    before_wall_count = particle.concentration.copy()
+    before_wall_count = particle.population.copy()
     before_wall_charge = particle.charge.copy()
     wall = ChargedWallLossStrategy(
         wall_eddy_diffusivity=1e-3,
@@ -182,7 +180,7 @@ def test_resolved_native_aggregate_through_three_processes(
     )
     wall.random_generator = np.random.default_rng(456)
     assert wall.step(particle, 298.15, 101325.0, 1e30) is particle
-    removed = before_wall_count[0] > particle.concentration[0]
+    removed = before_wall_count[0] > particle.population[0]
     assert np.any(removed)
     sink = np.sum(
         before_wall_mass[0, removed] * before_wall_count[0, removed, None],
@@ -199,7 +197,7 @@ def test_resolved_native_aggregate_through_three_processes(
         before_wall_charge[0, removed], before_wall_count[0, removed]
     )
     npt.assert_allclose(
-        np.dot(particle.charge[0], particle.concentration[0]) + charge_sink,
+        np.dot(particle.charge[0], particle.population[0]) + charge_sink,
         charge_before,
         rtol=2e-15,
         atol=0,
@@ -207,7 +205,7 @@ def test_resolved_native_aggregate_through_three_processes(
     npt.assert_array_equal(aerosol.gas.concentration, gas_before)
     assert aerosol.particles is particle
     for actual, original in zip(
-        (particle.masses, particle.concentration, particle.charge),
+        (particle.masses, particle.population, particle.charge),
         arrays,
         strict=True,
     ):
@@ -248,7 +246,7 @@ def test_density_native_aggregate_through_three_processes(kind, strategy_type):
     _condense(aerosol, strategy_type)
     gas_before = aerosol.gas.concentration.copy()
     coagulation = BrownianCoagulationStrategy(kind)
-    old_count = particle.concentration.copy()
+    old_count = particle.population.copy()
     old_mass = particle.masses.copy()
     old_charge = particle.charge.copy()
     expected_count = (
@@ -257,8 +255,8 @@ def test_density_native_aggregate_through_three_processes(kind, strategy_type):
     # Preserve the accepted fixed-composition method. Species closure is not
     # promised here; the independent refinement characterization documents why.
     assert coagulation.step(particle, 298.15, 101325.0, 10.0) is particle
-    assert not np.array_equal(particle.concentration, old_count)
-    npt.assert_array_equal(particle.concentration, expected_count)
+    assert not np.array_equal(particle.population, old_count)
+    npt.assert_array_equal(particle.population, expected_count)
     npt.assert_array_equal(particle.masses, old_mass)
     npt.assert_array_equal(particle.charge, old_charge)
     npt.assert_allclose(
@@ -268,13 +266,13 @@ def test_density_native_aggregate_through_three_processes(kind, strategy_type):
         atol=0,
     )
     before_wall = _inventory(particle)
-    old_count = particle.concentration.copy()
+    old_count = particle.population.copy()
     old_mass = particle.masses.copy()
     wall = SphericalWallLossStrategy(1e-3, 0.5, kind)
     assert wall.step(particle, 298.15, 101325.0, 0.1) is particle
     sink = _integrate(
         particle,
-        old_mass[0] * (old_count[0] - particle.concentration[0])[:, None],
+        old_mass[0] * (old_count[0] - particle.population[0])[:, None],
     )
     assert np.all(sink > 0)
     npt.assert_allclose(
@@ -318,20 +316,18 @@ def test_complete_evaporation_remains_consumable_by_later_processes(
     elif strategy_type is CondensationLatentHeat:
         extra = dict(latent_heat_strategy=ConstantLatentHeat(2e6))
     strategy = native_strategy(strategy_type, gas, mapping, **extra)
-    arrays = (particle.masses, particle.concentration, particle.charge)
+    arrays = (particle.masses, particle.population, particle.charge)
     strategy.step(particle, gas, 298, 101325, 1e6, 1.8e-5)
     assert all(
         a is b
         for a, b in zip(
             arrays,
-            (particle.masses, particle.concentration, particle.charge),
+            (particle.masses, particle.population, particle.charge),
             strict=True,
         )
     )
     npt.assert_array_equal(particle.masses[0, :, :2], 0)
-    npt.assert_array_equal(
-        particle.concentration, [[0, 2 if solid_core else 0]]
-    )
+    npt.assert_array_equal(particle.population, [[0, 2 if solid_core else 0]])
     npt.assert_array_equal(particle.charge, [[0, -2 if solid_core else 0]])
     npt.assert_allclose(
         gas.concentration[0, [2, 1]] * volume,

@@ -610,8 +610,8 @@ def test_benchmark_data_builders_return_expected_shapes(
     vapor_pressure = benchmark_module._make_vapor_pressure(2, 2)
 
     assert particles.masses.shape == (2, 3, 2)
-    assert particles.concentration.shape == (2, 3)
-    assert np.all(particles.concentration == 7.0)
+    assert particles.population.shape == (2, 3)
+    assert np.all(particles.population == 7.0)
     assert particles.charge.shape == (2, 3)
     assert particles.density.shape == (2,)
     assert particles.volume.shape == (2,)
@@ -627,7 +627,7 @@ def test_cpu_mass_transfer_handles_zero_concentration_and_zero_volume(
 ) -> None:
     """CPU mass-transfer helper stays deterministic on skipped particle paths."""
     particles = benchmark_module._make_particle_data(1, 2, 1)
-    particles.concentration[0, 0] = 0.0
+    particles.population[0, 0] = 0.0
     particles.masses[0, 1, 0] = 0.0
     gas = benchmark_module._make_gas_data(1, 1)
     vapor_pressure = benchmark_module._make_vapor_pressure(1, 1)
@@ -749,7 +749,7 @@ def test_cpu_coagulation_step_updates_colliding_particles(
         np.linspace(1.0e-9, 1.0e-8, 4),
     )
 
-    assert particles.concentration[0, 0] == 0.0
+    assert particles.population[0, 0] == 0.0
     assert np.all(particles.masses[0, 0] == 0.0)
     total_mass_before = np.sum(original_masses[0, 1])
     mass_fractions_before = original_masses[0, 1] / total_mass_before
@@ -1116,7 +1116,7 @@ def test_cpu_coagulation_step_handles_empty_collision_pairs(
     """CPU coagulation leaves state unchanged when no collisions occur."""
     particles = benchmark_module._make_particle_data(1, 3, 2)
     original_masses = particles.masses.copy()
-    original_concentration = particles.concentration.copy()
+    original_concentration = particles.population.copy()
     monkeypatch.setattr(
         benchmark_module,
         "get_brownian_kernel_via_system_state",
@@ -1138,7 +1138,7 @@ def test_cpu_coagulation_step_handles_empty_collision_pairs(
     )
 
     npt.assert_allclose(particles.masses, original_masses)
-    npt.assert_allclose(particles.concentration, original_concentration)
+    npt.assert_allclose(particles.population, original_concentration)
 
 
 def test_benchmark_cpu_wp_funcs_returns_timing_keys(benchmark_module) -> None:
@@ -1908,11 +1908,11 @@ def test_make_coagulation_particle_data_builds_deterministic_mixed_scale_fixture
     )
 
     assert first.masses.shape == (n_boxes, n_particles, n_species)
-    assert first.concentration.shape == (n_boxes, n_particles)
+    assert first.population.shape == (n_boxes, n_particles)
     assert first.charge.shape == (n_boxes, n_particles)
     assert first.density.shape == (n_species,)
     assert first.volume.shape == (n_boxes,)
-    assert np.all(first.concentration > 0.0)
+    assert np.all(first.population > 0.0)
 
     radii = first.radii
     assert radii.shape == (n_boxes, n_particles)
@@ -1924,15 +1924,15 @@ def test_make_coagulation_particle_data_builds_deterministic_mixed_scale_fixture
     assert np.any(radii > 1.0e-6)
 
     small_concentration = np.max(
-        first.concentration[:, : max(1, n_particles // 2)]
+        first.population[:, : max(1, n_particles // 2)]
     )
     large_concentration = np.min(
-        first.concentration[:, max(1, n_particles // 2) :]
+        first.population[:, max(1, n_particles // 2) :]
     )
     assert small_concentration > large_concentration
 
     npt.assert_allclose(first.masses, second.masses)
-    npt.assert_allclose(first.concentration, second.concentration)
+    npt.assert_allclose(first.population, second.population)
     npt.assert_allclose(first.radii, second.radii)
 
 
@@ -2223,7 +2223,7 @@ def test_native_coagulation_benchmark_workload_executes_on_warp_cpu(
     native = benchmark_module._make_native_coagulation_particle_data(2, 4, 2)
     npt.assert_array_equal(native.masses, historical.masses)
     npt.assert_array_equal(native.volume, historical.volume)
-    npt.assert_array_equal(native.concentration, np.ones((2, 4)))
+    npt.assert_array_equal(native.population, np.ones((2, 4)))
     assert native.distribution_type == "particle_resolved"
     rejected = to_warp_particle_data(historical, device="cpu")
     before = rejected.masses.numpy().copy()
@@ -2232,13 +2232,13 @@ def test_native_coagulation_benchmark_workload_executes_on_warp_cpu(
     npt.assert_array_equal(rejected.masses.numpy(), before)
 
     particles = to_warp_particle_data(native, device="cpu")
-    initial = np.sum(native.masses * native.concentration[..., None], axis=1)
+    initial = np.sum(native.masses * native.population[..., None], axis=1)
     coagulation_step_gpu(
         particles, 298.15, 101325.0, time_step=0.5, rng_seed=42
     )
     wp.synchronize()
     final = np.sum(
-        particles.masses.numpy() * particles.concentration.numpy()[..., None],
+        particles.masses.numpy() * particles.population.numpy()[..., None],
         axis=1,
     )
     npt.assert_allclose(final, initial, rtol=1e-12, atol=1e-30)
@@ -2259,7 +2259,7 @@ def test_native_condensation_benchmark_matches_numpy_and_conserves(
     particles = benchmark_module._make_particle_data(2, 4, 2)
     gas = benchmark_module._make_gas_data(2, 2)
     initial = (
-        np.sum(particles.masses * particles.concentration[..., None], axis=1)
+        np.sum(particles.masses * particles.population[..., None], axis=1)
         + gas.concentration * particles.volume[:, None]
     )
     gp = to_warp_particle_data(particles, device="cpu")
@@ -2315,9 +2315,9 @@ def test_native_condensation_benchmark_matches_numpy_and_conserves(
     npt.assert_allclose(
         gg.concentration.numpy(), gas.concentration, rtol=1e-12, atol=1e-30
     )
-    npt.assert_array_equal(gp.concentration.numpy(), particles.concentration)
+    npt.assert_array_equal(gp.population.numpy(), particles.population)
     final = (
-        np.sum(gp.masses.numpy() * gp.concentration.numpy()[..., None], axis=1)
+        np.sum(gp.masses.numpy() * gp.population.numpy()[..., None], axis=1)
         + gg.concentration.numpy() * particles.volume[:, None]
     )
     npt.assert_allclose(final, initial, rtol=1e-12, atol=1e-30)
@@ -2349,7 +2349,7 @@ def test_native_cpu_benchmark_coagulation_preserves_each_material(
         particles.masses.sum(axis=1), initial_mass, rtol=1e-12, atol=1e-30
     )
     npt.assert_array_equal(particles.charge.sum(axis=1), initial_charge)
-    assert particles.concentration.sum() == 4 - len(pairs)
+    assert particles.population.sum() == 4 - len(pairs)
     for source, _ in pairs:
         npt.assert_array_equal(particles.masses[0, source], 0.0)
         assert particles.charge[0, source] == 0.0

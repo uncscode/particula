@@ -315,7 +315,7 @@ def _validate_warp_brownian_state_ownership(
     """
     protected = _available_fields(
         state.particles,
-        ("masses", "concentration", "charge", "density", "volume"),
+        ("masses", "population", "charge", "density", "volume"),
     )
     if environment_form:
         protected += _available_fields(

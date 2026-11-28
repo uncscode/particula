@@ -438,7 +438,7 @@ class CoagulationStrategyABC(ABC):
         validate_particle(native_particle, self.distribution_type)
         kernel = validate_rate_kernel(native_particle, kernel)
         if self.distribution_type in ("discrete", "continuous_pdf"):
-            if not np.any(native_particle.concentration):
+            if not np.any(native_particle.population):
                 return np.zeros(native_particle.n_particles, dtype=np.float64)
             radius = rate_radius(native_particle)
             if (

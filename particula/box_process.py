@@ -15,7 +15,7 @@ from particula.runnable import RunnableABC
 _WRITABLE = frozenset(
     {
         "particles.masses",
-        "particles.concentration",
+        "particles.population",
         "particles.charge",
         "particles.volume",
         "gas.concentration",
@@ -203,8 +203,8 @@ def _check_candidate(  # noqa: C901
         raise ValueError("process changed field schema")
     if any("particle" in spec.axes for spec in before.fields.specs.values()):
         if not np.array_equal(
-            candidate.particles.concentration > 0,
-            before.particles.concentration > 0,
+            candidate.particles.population > 0,
+            before.particles.population > 0,
         ):
             raise ValueError("custom processes must preserve particle activity")
     from particula.extension_fields import field_dimensions
@@ -212,7 +212,7 @@ def _check_candidate(  # noqa: C901
     candidate.fields.validate_layout(
         field_dimensions(candidate.particles, candidate.gas),
         candidate.particles.distribution_type,
-        candidate.particles.concentration > 0,
+        candidate.particles.population > 0,
     )
     actual = _cpu_batch.arrays(candidate)
     original = _cpu_batch.arrays(before)

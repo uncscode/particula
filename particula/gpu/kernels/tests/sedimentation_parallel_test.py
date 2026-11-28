@@ -129,7 +129,7 @@ def test_full_biomass_capacity_settling_conserves_on_cuda():
     counts = owner.concentration.numpy()
     np.testing.assert_allclose(
         np.sum(masses * counts[..., None], axis=1),
-        np.sum(initial.masses * initial.concentration[..., None], axis=1),
+        np.sum(initial.masses * initial.population[..., None], axis=1),
         rtol=3e-14,
         atol=1e-30,
     )

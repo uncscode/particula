@@ -33,7 +33,7 @@ def _particles(device: str = "cpu"):
         dtype=wp.float64,
         device=device,
     )
-    particles.concentration = wp.array(
+    particles.population = wp.array(
         [[1.0, 0.0], [2.0, 3.0]], dtype=wp.float64, device=device
     )
     particles.charge = wp.array(
@@ -76,7 +76,7 @@ def test_prepared_wall_loss_pins_device_without_container_reread(
     particles = SimpleNamespace(
         distribution_kind=3,
         masses=source_particles.masses,
-        concentration=source_particles.concentration,
+        population=source_particles.population,
         charge=source_particles.charge,
         density=source_particles.density,
         volume=source_particles.volume,
@@ -191,7 +191,7 @@ def _snapshot(particles, rng_states=None):
             getattr(particles, name),
             getattr(particles, name).numpy().copy(),
         )
-        for name in ("masses", "concentration", "charge", "density", "volume")
+        for name in ("masses", "population", "charge", "density", "volume")
     }
     if rng_states is not None:
         snapshot["rng_states"] = (rng_states, rng_states.numpy().copy())
@@ -200,7 +200,7 @@ def _snapshot(particles, rng_states=None):
 
 def _assert_snapshot_unchanged(particles, snapshot, rng_states=None) -> None:
     """Assert preflight retained field identity and exact caller values."""
-    for name in ("masses", "concentration", "charge", "density", "volume"):
+    for name in ("masses", "population", "charge", "density", "volume"):
         original, expected = snapshot[name]
         assert getattr(particles, name) is original
         npt.assert_array_equal(getattr(particles, name).numpy(), expected)
@@ -215,11 +215,11 @@ def _assert_slots_preserved_or_cleared(particles, snapshot) -> None:
     protected data.
     """
     original_masses = snapshot["masses"][1]
-    original_concentration = snapshot["concentration"][1]
+    original_concentration = snapshot["population"][1]
     original_charge = snapshot["charge"][1]
     for box, particle in np.ndindex(original_concentration.shape):
         current_mass = particles.masses.numpy()[box, particle]
-        current_concentration = particles.concentration.numpy()[box, particle]
+        current_concentration = particles.population.numpy()[box, particle]
         current_charge = particles.charge.numpy()[box, particle]
         if (
             original_concentration[box, particle] > 0.0
@@ -527,7 +527,7 @@ def test_zero_charge_charged_mode_matches_neutral_execution(
         config=_charged_config(geometry),
         rng_states=charged_rng,
     )
-    for field in ("masses", "concentration", "charge", "density", "volume"):
+    for field in ("masses", "population", "charge", "density", "volume"):
         npt.assert_array_equal(
             getattr(charged_particles, field).numpy(),
             getattr(neutral_particles, field).numpy(),
@@ -816,7 +816,7 @@ def test_invalid_time_step_preserves_particles(time_step) -> None:
     particles = SimpleNamespace(
         distribution_kind=3,
         masses=valid_particles.masses,
-        concentration=valid_particles.concentration,
+        population=valid_particles.population,
         charge=valid_particles.charge,
         density=valid_particles.density,
         volume=valid_particles.volume,
@@ -829,7 +829,7 @@ def test_invalid_time_step_preserves_particles(time_step) -> None:
     _assert_snapshot_unchanged(particles, snapshot)
 
 
-@pytest.mark.parametrize("field", ["masses", "concentration", "charge"])
+@pytest.mark.parametrize("field", ["masses", "population", "charge"])
 def test_nonnegative_particle_metadata_rejects_nan(field: str) -> None:
     """Particle metadata domains reject NaN without mutating any field."""
     wp = _warp()
@@ -845,7 +845,7 @@ def test_nonnegative_particle_metadata_rejects_nan(field: str) -> None:
     _assert_snapshot_unchanged(particles, snapshot)
 
 
-@pytest.mark.parametrize("field", ["masses", "concentration"])
+@pytest.mark.parametrize("field", ["masses", "population"])
 def test_nonnegative_particle_storage_rejects_negative_values(
     field: str,
 ) -> None:
@@ -1019,7 +1019,7 @@ def test_positive_particle_metadata_rejects_invalid_values(
     ("field", "values", "match"),
     [
         ("masses", np.ones((2, 2), dtype=np.float64), "rank 3"),
-        ("concentration", np.ones((2, 3), dtype=np.float64), "shape"),
+        ("population", np.ones((2, 3), dtype=np.float64), "shape"),
         ("charge", np.ones((2, 2), dtype=np.float32), "use dtype float64"),
         ("density", np.ones((3,), dtype=np.float64), "shape"),
         ("volume", np.ones((2, 1), dtype=np.float64), "rank 1"),
@@ -1034,7 +1034,7 @@ def test_particle_schema_rejection_is_atomic(field, values, match) -> None:
     particles = SimpleNamespace(
         distribution_kind=3,
         masses=valid_particles.masses,
-        concentration=valid_particles.concentration,
+        population=valid_particles.population,
         charge=valid_particles.charge,
         density=valid_particles.density,
         volume=valid_particles.volume,
@@ -1277,7 +1277,7 @@ def test_large_time_step_removes_only_eligible_slots(geometry: str) -> None:
     _assert_snapshot_unchanged(particles, snapshot)
     # Native execution rejects positive counts with zero mass. Make that slot
     # inactive before checking the valid large-duration removal behavior.
-    particles.concentration = _warp().array(
+    particles.population = _warp().array(
         [[1.0, 0.0], [2.0, 0.0]], dtype=_warp().float64, device="cpu"
     )
     snapshot = _snapshot(particles)
@@ -1294,13 +1294,13 @@ def test_large_time_step_removes_only_eligible_slots(geometry: str) -> None:
     assert returned is particles
     for box, particle in ((0, 0), (1, 0)):
         npt.assert_array_equal(particles.masses.numpy()[box, particle], 0.0)
-        assert particles.concentration.numpy()[box, particle] == 0.0
+        assert particles.population.numpy()[box, particle] == 0.0
         assert particles.charge.numpy()[box, particle] == 0.0
     # The inactive and zero-mass slots are never sampled or modified.
     npt.assert_array_equal(particles.masses.numpy()[0, 1], [0.0, 0.0])
     assert particles.charge.numpy()[0, 1] == snapshot["charge"][1][0, 1]
     npt.assert_array_equal(particles.masses.numpy()[1, 1], [0.0, 0.0])
-    assert particles.concentration.numpy()[1, 1] == 0.0
+    assert particles.population.numpy()[1, 1] == 0.0
     assert particles.charge.numpy()[1, 1] == snapshot["charge"][1][1, 1]
     npt.assert_array_equal(particles.density.numpy(), snapshot["density"][1])
     npt.assert_array_equal(particles.volume.numpy(), snapshot["volume"][1])
@@ -1339,9 +1339,9 @@ def test_positive_infinite_coefficient_removes_without_advancing_rng(
     )
 
     assert returned is particles
-    for box, particle in np.argwhere(snapshot["concentration"][1] > 0.0):
+    for box, particle in np.argwhere(snapshot["population"][1] > 0.0):
         npt.assert_array_equal(particles.masses.numpy()[box, particle], 0.0)
-        assert particles.concentration.numpy()[box, particle] == 0.0
+        assert particles.population.numpy()[box, particle] == 0.0
         assert particles.charge.numpy()[box, particle] == 0.0
     npt.assert_array_equal(states.numpy(), snapshot["rng_states"][1])
     npt.assert_array_equal(particles.density.numpy(), snapshot["density"][1])
@@ -1413,7 +1413,7 @@ def test_equal_inputs_and_explicit_reset_produce_equal_slot_updates() -> None:
         initialize_rng=True,
     )
 
-    for field in ("masses", "concentration", "charge", "density", "volume"):
+    for field in ("masses", "population", "charge", "density", "volume"):
         npt.assert_array_equal(
             getattr(first, field).numpy(), getattr(second, field).numpy()
         )
@@ -1439,7 +1439,7 @@ def test_subnormal_mass_slot_survives_without_transport_calculation() -> None:
         dtype=wp.float64,
         device="cpu",
     )
-    particles.concentration = wp.array(
+    particles.population = wp.array(
         [[1.0, 0.0], [0.0, 0.0]], dtype=wp.float64, device="cpu"
     )
     snapshot = _snapshot(particles)
@@ -1468,7 +1468,7 @@ def test_overflowed_derived_properties_do_not_reset_rng_sidecar() -> None:
         dtype=wp.float64,
         device="cpu",
     )
-    particles.concentration = wp.array(
+    particles.population = wp.array(
         [[1.0, 0.0]], dtype=wp.float64, device="cpu"
     )
     particles.charge = wp.array([[1.0, 0.0]], dtype=wp.float64, device="cpu")
@@ -1519,7 +1519,7 @@ def test_missing_particle_field_and_nonarray_field_have_stable_errors() -> None:
     particles = SimpleNamespace(
         distribution_kind=3,
         masses=valid_particles.masses,
-        concentration=valid_particles.concentration,
+        population=valid_particles.population,
         charge=np.zeros((2, 2), dtype=np.float64),
         density=valid_particles.density,
         volume=valid_particles.volume,
@@ -1592,7 +1592,7 @@ def test_omitted_rng_state_is_private_seeded_convenience() -> None:
         wall_loss_step_gpu(
             particles, 298.15, 101325.0, 1.0, config=_config(), rng_seed=91
         )
-    for field in ("masses", "concentration", "charge"):
+    for field in ("masses", "population", "charge"):
         npt.assert_array_equal(
             getattr(first, field).numpy(), getattr(second, field).numpy()
         )
@@ -1669,7 +1669,7 @@ def test_all_ineligible_positive_time_preserves_rng_state() -> None:
     from particula.gpu.kernels import wall_loss_step_gpu
 
     particles = _particles()
-    particles.concentration = wp.zeros((2, 2), dtype=wp.float64, device="cpu")
+    particles.population = wp.zeros((2, 2), dtype=wp.float64, device="cpu")
     states = wp.array([7, 11], dtype=wp.uint32, device="cpu")
     snapshot = _snapshot(particles, states)
     returned = wall_loss_step_gpu(
@@ -1686,7 +1686,7 @@ def test_all_ineligible_positive_time_does_not_reset_rng_state() -> None:
     from particula.gpu.kernels import wall_loss_step_gpu
 
     particles = _particles()
-    particles.concentration = wp.zeros((2, 2), dtype=wp.float64, device="cpu")
+    particles.population = wp.zeros((2, 2), dtype=wp.float64, device="cpu")
     states = wp.array([7, 11], dtype=wp.uint32, device="cpu")
     snapshot = _snapshot(particles, states)
 
@@ -1718,7 +1718,7 @@ def test_rng_state_consumes_only_eligible_slots() -> None:
             dtype=wp.float64,
             device="cpu",
         ),
-        concentration=wp.array(
+        population=wp.array(
             [[1.0, 0.0, 1.0, 1.0]], dtype=wp.float64, device="cpu"
         ),
         charge=wp.array(
@@ -1730,7 +1730,7 @@ def test_rng_state_consumes_only_eligible_slots() -> None:
     control = SimpleNamespace(
         distribution_kind=3,
         masses=wp.array([[[1.0, 2.0]]], dtype=wp.float64, device="cpu"),
-        concentration=wp.array([[1.0]], dtype=wp.float64, device="cpu"),
+        population=wp.array([[1.0]], dtype=wp.float64, device="cpu"),
         charge=wp.array([[0.0]], dtype=wp.float64, device="cpu"),
         density=wp.array([1000.0, 1200.0], dtype=wp.float64, device="cpu"),
         volume=wp.array([1.0], dtype=wp.float64, device="cpu"),
@@ -1757,7 +1757,7 @@ def test_rng_state_consumes_only_eligible_slots() -> None:
         dtype=wp.float64,
         device="cpu",
     )
-    candidate.concentration = wp.array(
+    candidate.population = wp.array(
         [[1.0, 0.0, 0.0, 0.0]], dtype=wp.float64, device="cpu"
     )
     candidate_snapshot = _snapshot(candidate, candidate_states)
@@ -1780,8 +1780,8 @@ def test_rng_state_consumes_only_eligible_slots() -> None:
         candidate.masses.numpy()[0, 1:], candidate_snapshot["masses"][1][0, 1:]
     )
     npt.assert_array_equal(
-        candidate.concentration.numpy()[0, 1:],
-        candidate_snapshot["concentration"][1][0, 1:],
+        candidate.population.numpy()[0, 1:],
+        candidate_snapshot["population"][1][0, 1:],
     )
     npt.assert_array_equal(
         candidate.charge.numpy()[0, 1:], candidate_snapshot["charge"][1][0, 1:]
@@ -1796,7 +1796,7 @@ def _nanoparticle(charge: float = 1.0) -> SimpleNamespace:
     return SimpleNamespace(
         distribution_kind=3,
         masses=wp.array([[[mass]]], dtype=wp.float64, device="cpu"),
-        concentration=wp.array([[1.0]], dtype=wp.float64, device="cpu"),
+        population=wp.array([[1.0]], dtype=wp.float64, device="cpu"),
         charge=wp.array([[charge]], dtype=wp.float64, device="cpu"),
         density=wp.array([1000.0], dtype=wp.float64, device="cpu"),
         volume=wp.array([1.0], dtype=wp.float64, device="cpu"),
@@ -1868,10 +1868,10 @@ def test_charged_image_only_dispatch_removes_when_neutral_control_survives(
 
     npt.assert_array_equal(neutral.masses.numpy(), neutral_before["masses"][1])
     npt.assert_array_equal(
-        neutral.concentration.numpy(), neutral_before["concentration"][1]
+        neutral.population.numpy(), neutral_before["population"][1]
     )
     npt.assert_array_equal(charged.masses.numpy(), 0.0)
-    npt.assert_array_equal(charged.concentration.numpy(), 0.0)
+    npt.assert_array_equal(charged.population.numpy(), 0.0)
     npt.assert_array_equal(charged.charge.numpy(), 0.0)
     assert not np.array_equal(
         neutral_states.numpy(), neutral_before["rng_states"][1]
@@ -1913,7 +1913,7 @@ def test_charged_spherical_potential_and_charge_sign_control_draws(
 
     if removes:
         npt.assert_array_equal(particles.masses.numpy(), 0.0)
-        npt.assert_array_equal(particles.concentration.numpy(), 0.0)
+        npt.assert_array_equal(particles.population.numpy(), 0.0)
         npt.assert_array_equal(particles.charge.numpy(), 0.0)
         assert not np.array_equal(states.numpy(), snapshot["rng_states"][1])
     else:
@@ -1949,7 +1949,7 @@ def test_charged_rectangular_field_vector_lanes_drive_public_step(
     )
 
     npt.assert_array_equal(particles.masses.numpy(), 0.0)
-    npt.assert_array_equal(particles.concentration.numpy(), 0.0)
+    npt.assert_array_equal(particles.population.numpy(), 0.0)
     npt.assert_array_equal(particles.charge.numpy(), 0.0)
     assert config.wall_electric_field is field
     npt.assert_array_equal(field.numpy(), field_before)
@@ -1978,7 +1978,7 @@ def test_charged_rectangular_zero_vector_uses_image_only_draw_path() -> None:
 
     npt.assert_array_equal(particles.masses.numpy(), snapshot["masses"][1])
     npt.assert_array_equal(
-        particles.concentration.numpy(), snapshot["concentration"][1]
+        particles.population.numpy(), snapshot["population"][1]
     )
     npt.assert_array_equal(particles.charge.numpy(), snapshot["charge"][1])
     assert not np.array_equal(states.numpy(), snapshot["rng_states"][1])
@@ -2058,7 +2058,7 @@ def test_charged_saturated_coefficient_consumes_rng_before_removal(
     )
 
     npt.assert_array_equal(particles.masses.numpy(), 0.0)
-    npt.assert_array_equal(particles.concentration.numpy(), 0.0)
+    npt.assert_array_equal(particles.population.numpy(), 0.0)
     npt.assert_array_equal(particles.charge.numpy(), 0.0)
     assert not np.array_equal(states.numpy(), before["rng_states"][1])
 
@@ -2125,7 +2125,7 @@ def test_zero_charge_charged_rng_reset_matches_neutral_for_infinite_coefficient(
         initialize_rng=True,
     )
 
-    for field in ("masses", "concentration", "charge"):
+    for field in ("masses", "population", "charge"):
         npt.assert_array_equal(
             getattr(charged, field).numpy(), getattr(neutral, field).numpy()
         )
@@ -2169,7 +2169,7 @@ def test_charged_all_inactive_positive_time_preserves_requested_rng_reset(
     from particula.gpu.kernels import wall_loss_step_gpu
 
     particles = _nanoparticle(charge=-2.0)
-    particles.concentration = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
+    particles.population = wp.zeros((1, 1), dtype=wp.float64, device="cpu")
     states = wp.array([37], dtype=wp.uint32, device="cpu")
     snapshot = _snapshot(particles, states)
     config = _charged_dispatch_config(geometry)

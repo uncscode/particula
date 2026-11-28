@@ -46,7 +46,7 @@ def test_full_order_ratio_with_unequal_particle_width_fixture(
     """Real unequal-width containers retain lanes; no admission API exists."""
     particles = ParticleData(
         masses=np.array([[[1e-18, 2e-18], [3e-18, 4e-18]]]),
-        concentration=np.array([[2.0, 1.0]]),
+        population=np.array([[2.0, 1.0]]),
         charge=np.zeros((1, 2)),
         density=np.array([1000.0, 1200.0]),
         volume=np.array([0.25]),
@@ -65,7 +65,7 @@ def test_full_order_ratio_with_unequal_particle_width_fixture(
     assert particles.n_boxes == gas.n_boxes == environment.n_boxes == 1
     assert particles.masses.shape == (1, 2, 2)
     assert particles.density.shape == (2,)
-    assert particles.concentration.shape == particles.charge.shape == (1, 2)
+    assert particles.population.shape == particles.charge.shape == (1, 2)
     assert particles.volume.shape == (1,)
     assert particles.n_species == 2
     assert gas.n_species == 3

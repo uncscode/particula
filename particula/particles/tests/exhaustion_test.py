@@ -416,7 +416,7 @@ def _resampling_particles(boxes: int = 1) -> ParticleData:
     charge = np.array([[1.0, -2.0, 3.0, -4.0, 0.0]], dtype=np.float64)
     return ParticleData(
         masses=np.repeat(masses, boxes, axis=0),
-        concentration=np.repeat(concentration, boxes, axis=0),
+        population=np.repeat(concentration, boxes, axis=0),
         charge=np.repeat(charge, boxes, axis=0),
         density=np.array([1000.0, 2000.0], dtype=np.float64),
         volume=np.ones(boxes, dtype=np.float64),
@@ -453,7 +453,7 @@ def test_resampling_plan_is_deterministic_detached_and_conservative() -> None:
     assert box_plan.released_indices == (2, 3)
     before = get_weighted_inventory(
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.volume,
     )
@@ -463,23 +463,23 @@ def test_resampling_plan_is_deterministic_detached_and_conservative() -> None:
     target = _resampling_particles()
     mass_id, concentration_id, charge_id = (
         id(target.masses),
-        id(target.concentration),
+        id(target.population),
         id(target.charge),
     )
     assert apply_resampling(target, plan) is target
-    assert (id(target.masses), id(target.concentration), id(target.charge)) == (
+    assert (id(target.masses), id(target.population), id(target.charge)) == (
         mass_id,
         concentration_id,
         charge_id,
     )
     after = get_weighted_inventory(
-        target.masses, target.concentration, target.charge, target.volume
+        target.masses, target.population, target.charge, target.volume
     )
     npt.assert_allclose(after.number, before.number, rtol=1e-12, atol=1e-30)
     npt.assert_allclose(after.mass, before.mass, rtol=1e-12, atol=1e-30)
     npt.assert_allclose(after.charge, before.charge, rtol=1e-12, atol=1e-30)
     npt.assert_array_equal(target.masses[0, 2:], 0.0)
-    npt.assert_array_equal(target.concentration[0, 2:], 0.0)
+    npt.assert_array_equal(target.population[0, 2:], 0.0)
     npt.assert_array_equal(target.charge[0, 2:], 0.0)
 
 
@@ -501,7 +501,7 @@ def test_resampling_multibox_and_zero_release_are_fixed_capacity() -> None:
         field[1].tobytes()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
         )
     )
@@ -510,7 +510,7 @@ def test_resampling_multibox_and_zero_release_are_fixed_capacity() -> None:
         field[1].tobytes()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
         )
     )
@@ -557,11 +557,11 @@ def test_resampling_rejects_aliased_writable_particle_fields(
     """
     particles = _resampling_particles()
     if field_name == "charge":
-        particles.charge = particles.concentration.view()
+        particles.charge = particles.population.view()
     else:
         particles = ParticleData(
             masses=particles.masses,
-            concentration=particles.concentration,
+            population=particles.population,
             charge=particles.charge,
             density=np.array([1000.0, 2000.0], dtype=np.float64),
             volume=np.array([1000.0], dtype=np.float64),
@@ -571,7 +571,7 @@ def test_resampling_rejects_aliased_writable_particle_fields(
         field.tobytes()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -583,7 +583,7 @@ def test_resampling_rejects_aliased_writable_particle_fields(
         field.tobytes()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -620,7 +620,7 @@ def test_resampling_rejects_invalid_state_and_atomic_later_plan_failure() -> (
         field.tobytes()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
         )
     )
@@ -630,7 +630,7 @@ def test_resampling_rejects_invalid_state_and_atomic_later_plan_failure() -> (
         field.tobytes()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
         )
     )
@@ -640,14 +640,14 @@ def test_resampling_apply_rejects_stale_active_slots_without_mutation() -> None:
     """Apply rejects plans that would overwrite a pre-existing inactive slot."""
     particles = _resampling_particles()
     plan = plan_resampling(particles, _resampling_p1())
-    particles.concentration[0, 1] = 0.0
+    particles.population[0, 1] = 0.0
     particles.masses[0, 1] = 0.0
     particles.charge[0, 1] = 0.0
     snapshot = tuple(
         field.tobytes()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -659,7 +659,7 @@ def test_resampling_apply_rejects_stale_active_slots_without_mutation() -> None:
         field.tobytes()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -678,7 +678,7 @@ def test_resampling_apply_rejects_stale_source_and_forged_replacement() -> None:
         field.tobytes()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
         )
     )
@@ -688,7 +688,7 @@ def test_resampling_apply_rejects_stale_source_and_forged_replacement() -> None:
         field.tobytes()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
         )
     )
@@ -713,7 +713,7 @@ def test_resampling_apply_rejects_stale_source_and_forged_replacement() -> None:
         field.tobytes()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
         )
     )
@@ -723,7 +723,7 @@ def test_resampling_apply_rejects_stale_source_and_forged_replacement() -> None:
         field.tobytes()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
         )
     )
@@ -742,7 +742,7 @@ def test_resampling_apply_rejects_stale_source_sidecars_without_mutation(
         values.tobytes()
         for values in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
         )
     )
@@ -754,7 +754,7 @@ def test_resampling_apply_rejects_stale_source_sidecars_without_mutation(
         values.tobytes()
         for values in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
         )
     )
@@ -820,7 +820,7 @@ def test_resampling_rejects_non_exact_or_nonfinite_diagnostic_bounds(
         field.tobytes()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -836,7 +836,7 @@ def test_resampling_rejects_non_exact_or_nonfinite_diagnostic_bounds(
         field.tobytes()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -910,7 +910,7 @@ def test_resampling_apply_rejects_overlapping_plan_without_mutation() -> None:
         field.tobytes()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
         )
     )
@@ -920,7 +920,7 @@ def test_resampling_apply_rejects_overlapping_plan_without_mutation() -> None:
         field.tobytes()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
         )
     )
@@ -942,7 +942,7 @@ def test_representative_volume_scaling_scales_only_selected_rows() -> None:
         field.copy()
         for field in (particles.masses, particles.charge, particles.density)
     )
-    original_second = particles.concentration[1].copy()
+    original_second = particles.population[1].copy()
 
     result = apply_representative_volume_scaling(
         particles, demand, flags, requested, minimum, minimum_volume, resolved
@@ -952,8 +952,8 @@ def test_representative_volume_scaling_scales_only_selected_rows() -> None:
     npt.assert_allclose(particles.volume, [2.0, 5.0])
     npt.assert_allclose(demand, [1.5, 2.0])
     npt.assert_allclose(resolved, [0.5, 1.0])
-    npt.assert_allclose(particles.concentration[0], [0.5, 1.0, 1.5, 2.0, 0.0])
-    npt.assert_array_equal(particles.concentration[1], original_second)
+    npt.assert_allclose(particles.population[0], [0.5, 1.0, 1.5, 2.0, 0.0])
+    npt.assert_array_equal(particles.population[1], original_second)
     for actual, expected in zip(
         (particles.masses, particles.charge, particles.density),
         before,
@@ -983,7 +983,7 @@ def test_representative_volume_scaling_no_selected_rows_writes_diagnostic_only(
         field.tobytes()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -1004,7 +1004,7 @@ def test_representative_volume_scaling_no_selected_rows_writes_diagnostic_only(
         field.tobytes()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -1028,7 +1028,7 @@ def test_representative_volume_scaling_selected_unity_scale_is_exact_noop() -> (
         values.tobytes()
         for values in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -1047,7 +1047,7 @@ def test_representative_volume_scaling_selected_unity_scale_is_exact_noop() -> (
         values.tobytes()
         for values in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -1074,7 +1074,7 @@ def test_representative_volume_scaling_rejects_invalid_volume_atomically() -> (
         field.tobytes()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -1100,7 +1100,7 @@ def test_representative_volume_scaling_rejects_invalid_volume_atomically() -> (
         field.tobytes()
         for field in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -1121,7 +1121,7 @@ def test_representative_volume_scaling_rejects_zeroing_active_slot_atomically() 
     write.
     """
     particles = _resampling_particles()
-    particles.concentration[0, 0] = np.nextafter(0.0, 1.0)
+    particles.population[0, 0] = np.nextafter(0.0, 1.0)
     demand = np.array([1.0], dtype=np.float64)
     flags = np.array([True], dtype=np.bool_)
     requested = np.array([0.5], dtype=np.float64)
@@ -1132,7 +1132,7 @@ def test_representative_volume_scaling_rejects_zeroing_active_slot_atomically() 
         values.tobytes()
         for values in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -1156,7 +1156,7 @@ def test_representative_volume_scaling_rejects_zeroing_active_slot_atomically() 
         values.tobytes()
         for values in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -1184,7 +1184,7 @@ def test_representative_volume_scaling_preserves_intensities_and_surface() -> (
     resolved = np.zeros(1, dtype=np.float64)
     before = get_weighted_inventory(
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.volume,
     )
@@ -1194,7 +1194,7 @@ def test_representative_volume_scaling_preserves_intensities_and_surface() -> (
     )
     after = get_weighted_inventory(
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.volume,
     )
@@ -1218,7 +1218,7 @@ def test_representative_volume_scaling_accepts_empty_boxes() -> None:
     """
     particles = ParticleData(
         masses=np.empty((0, 1, 1), dtype=np.float64),
-        concentration=np.empty((0, 1), dtype=np.float64),
+        population=np.empty((0, 1), dtype=np.float64),
         charge=np.empty((0, 1), dtype=np.float64),
         density=np.array([1.0], dtype=np.float64),
         volume=np.empty(0, dtype=np.float64),
@@ -1254,7 +1254,7 @@ def test_representative_volume_scaling_rejects_factor_bounds_atomically() -> (
         value.tobytes()
         for value in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -1282,7 +1282,7 @@ def test_representative_volume_scaling_rejects_factor_bounds_atomically() -> (
         value.tobytes()
         for value in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -1328,7 +1328,7 @@ def test_representative_volume_scaling_rejects_sidecar_schema_atomically(
         value.tobytes()
         for value in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -1347,7 +1347,7 @@ def test_representative_volume_scaling_rejects_sidecar_schema_atomically(
         value.tobytes()
         for value in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -1393,7 +1393,7 @@ def test_representative_volume_scaling_rejects_aliases_atomically(
         values.tobytes()
         for values in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -1408,7 +1408,7 @@ def test_representative_volume_scaling_rejects_aliases_atomically(
         values.tobytes()
         for values in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -1434,7 +1434,7 @@ def test_representative_volume_scaling_rejects_zero_capacity(
     boxes, particles_count, species = masses.shape
     particles = ParticleData(
         masses=masses,
-        concentration=np.zeros((boxes, particles_count), dtype=np.float64),
+        population=np.zeros((boxes, particles_count), dtype=np.float64),
         charge=np.zeros((boxes, particles_count), dtype=np.float64),
         density=np.ones(species, dtype=np.float64),
         volume=np.ones(boxes, dtype=np.float64),
@@ -1494,18 +1494,18 @@ def _commit_admitted_source(
     ):
         raise ValueError("invalid test source fixture shape")
     source_mass_state = np.zeros_like(particles.masses)
-    source_concentration_state = np.zeros_like(particles.concentration)
+    source_concentration_state = np.zeros_like(particles.population)
     source_charge_state = np.zeros_like(particles.charge)
     for box, index in enumerate(indices):
         if index < 0 or index >= particles.n_particles:
             raise ValueError("test source fixture index is out of range")
-        if particles.concentration[box, index] != 0.0:
+        if particles.population[box, index] != 0.0:
             raise ValueError("test source fixture requires an available slot")
         source_mass_state[box, index] = source_masses[box]
         source_concentration_state[box, index] = source_concentration[box]
         source_charge_state[box, index] = source_charge[box]
         particles.masses[box, index] = source_masses[box]
-        particles.concentration[box, index] = source_concentration[box]
+        particles.population[box, index] = source_concentration[box]
         particles.charge[box, index] = source_charge[box]
     return _direct_ledger(
         source_mass_state,
@@ -1536,7 +1536,7 @@ def test_resampling_sparse_source_fixture_and_highest_release_conserve() -> (
     particles = _resampling_particles(2)
     before = _direct_ledger(
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.volume,
         include_volume=False,
@@ -1557,7 +1557,7 @@ def test_resampling_sparse_source_fixture_and_highest_release_conserve() -> (
     _assert_ledger_equal(
         _direct_ledger(
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.volume,
             include_volume=False,
@@ -1571,7 +1571,7 @@ def test_resampling_sparse_source_fixture_and_highest_release_conserve() -> (
     highest = _resampling_particles()
     highest_before = _direct_ledger(
         highest.masses,
-        highest.concentration,
+        highest.population,
         highest.charge,
         highest.volume,
         include_volume=False,
@@ -1590,7 +1590,7 @@ def test_resampling_sparse_source_fixture_and_highest_release_conserve() -> (
     _assert_ledger_equal(
         _direct_ledger(
             highest.masses,
-            highest.concentration,
+            highest.population,
             highest.charge,
             highest.volume,
             include_volume=False,
@@ -1606,7 +1606,7 @@ def test_resampling_all_inactive_zero_request_is_exact_noop() -> None:
     """
     particles = _resampling_particles()
     particles.masses[:] = 0.0
-    particles.concentration[:] = 0.0
+    particles.population[:] = 0.0
     particles.charge[:] = 0.0
     p1 = ExhaustionPlan(
         (ExhaustionBoxPlan(0, 0, 0, 0, POLICY_ACTIVATE, (), (), float("nan")),)
@@ -1615,7 +1615,7 @@ def test_resampling_all_inactive_zero_request_is_exact_noop() -> None:
         value.tobytes()
         for value in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -1629,7 +1629,7 @@ def test_resampling_all_inactive_zero_request_is_exact_noop() -> None:
         value.tobytes()
         for value in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -1654,14 +1654,14 @@ def test_resampling_full_capacity_and_over_capacity_plan_rejection() -> None:
             ],
             dtype=np.float64,
         ),
-        concentration=np.array([[1.0, 2.0, 3.0, 4.0, 5.0]], dtype=np.float64),
+        population=np.array([[1.0, 2.0, 3.0, 4.0, 5.0]], dtype=np.float64),
         charge=np.array([[1.0, -2.0, 3.0, -4.0, 5.0]], dtype=np.float64),
         density=np.array([1000.0, 2000.0], dtype=np.float64),
         volume=np.array([1.0], dtype=np.float64),
     )
     before = _direct_ledger(
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.volume,
         include_volume=False,
@@ -1677,7 +1677,7 @@ def test_resampling_full_capacity_and_over_capacity_plan_rejection() -> None:
     _assert_ledger_equal(
         _direct_ledger(
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.volume,
             include_volume=False,
@@ -1697,7 +1697,7 @@ def test_resampling_full_capacity_and_over_capacity_plan_rejection() -> None:
         value.tobytes()
         for value in (
             rejected.masses,
-            rejected.concentration,
+            rejected.population,
             rejected.charge,
             rejected.density,
             rejected.volume,
@@ -1709,7 +1709,7 @@ def test_resampling_full_capacity_and_over_capacity_plan_rejection() -> None:
         value.tobytes()
         for value in (
             rejected.masses,
-            rejected.concentration,
+            rejected.population,
             rejected.charge,
             rejected.density,
             rejected.volume,
@@ -1725,7 +1725,7 @@ def test_representative_scaling_source_fixture_uses_volume_ledger() -> None:
     particles.volume[:] = [4.0, 9.0]
     before = _direct_ledger(
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.volume,
         include_volume=True,
@@ -1734,7 +1734,7 @@ def test_representative_scaling_source_fixture_uses_volume_ledger() -> None:
         value[1].tobytes()
         for value in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -1780,7 +1780,7 @@ def test_representative_scaling_source_fixture_uses_volume_ledger() -> None:
     _assert_ledger_equal(
         _direct_ledger(
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.volume,
             include_volume=True,
@@ -1793,7 +1793,7 @@ def test_representative_scaling_source_fixture_uses_volume_ledger() -> None:
         value[1].tobytes()
         for value in (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -1837,13 +1837,13 @@ def test_resampling_moment_diagnostics_remain_separate_from_inventory() -> None:
     particles = _resampling_particles()
     before = _direct_moment_diagnostics(
         particles.masses[0],
-        particles.concentration[0],
+        particles.population[0],
         particles.density,
     )
     apply_resampling(particles, plan_resampling(particles, _resampling_p1()))
     after = _direct_moment_diagnostics(
         particles.masses[0],
-        particles.concentration[0],
+        particles.population[0],
         particles.density,
     )
     npt.assert_allclose(after[0], before[0], rtol=1e-12, atol=1e-30)

@@ -42,7 +42,7 @@ def native_state(device):
 
 def moments(particles):
     """Compute independent represented-count species mass and charge."""
-    counts = particles.concentration.numpy()
+    counts = particles.population.numpy()
     return (
         np.sum(particles.masses.numpy() * counts[..., None], axis=1),
         np.sum(particles.charge.numpy() * counts, axis=1),
@@ -60,7 +60,7 @@ def test_native_resampling_preserves_count_moments(device):
     for actual, expected in zip(moments(particles), before, strict=True):
         np.testing.assert_allclose(actual, expected, rtol=1e-12, atol=1e-30)
     np.testing.assert_array_equal(particles.volume.numpy(), [0.25])
-    assert np.count_nonzero(particles.concentration.numpy()) == 2
+    assert np.count_nonzero(particles.population.numpy()) == 2
 
 
 def test_native_scaling_preserves_density_and_repeated_enqueue(

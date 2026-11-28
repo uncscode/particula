@@ -42,7 +42,7 @@ def _candidate_chunks(
                 mass = masses[box, slot, material]
                 transfer = (mass + transfer) - mass
             weighted = transfer * native_slot_density(
-                concentration[box, slot], volume[box], kind == wp.int32(3)
+                concentration[box, slot], volume[box]
             )
             if transfer > wp.float64(0.0):
                 positive += weighted
@@ -83,7 +83,7 @@ def _transfer_chunks(
         stop = wp.min(start + 256, transfer.shape[1])
         for slot in range(start, stop):
             total += transfer[box, slot, material] * native_slot_density(
-                concentration[box, slot], volume[box], kind == wp.int32(3)
+                concentration[box, slot], volume[box]
             )
     partial[box, gas, chunk] = total
 
@@ -148,8 +148,6 @@ def _energy_chunks(
         stop = wp.min(start + 256, total.shape[1])
         for slot in range(start, stop):
             count = concentration[box, slot]
-            if kind == wp.int32(1):
-                count *= volume[box]
             energy_mass += total[box, slot, material] * count
     partial[box, gas, chunk] = energy_mass
 

@@ -85,7 +85,7 @@ def test_detached_arrays_and_native_population_provenance():
     """Returned arrays, native input and metadata do not alias retained rows."""
     native, recorder = state(), Recorder(("particle_concentration",))
     recorder.record(0, native)
-    native.particles.concentration[:] = 0
+    native.particles.population[:] = 0
     arrays = recorder.arrays()
     arrays["particle_concentration"][:] = 999
     assert recorder.arrays()["particle_concentration"][0, 0, 0] == 100

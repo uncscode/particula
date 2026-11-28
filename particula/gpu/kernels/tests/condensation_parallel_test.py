@@ -32,7 +32,7 @@ def population(device, slots, kind, scenario):
     state.cpu_p = replace(
         state.cpu_p,
         masses=state.cpu_p.masses[:, indices] * scale[None, :, None],
-        concentration=state.cpu_p.concentration[:, indices] * (3.0 / slots),
+        population=state.cpu_p.population[:, indices] * (3.0 / slots),
         charge=state.cpu_p.charge[:, indices].copy(),
     )
     state.p = to_warp_particle_data(state.cpu_p, device=device)
@@ -95,9 +95,7 @@ def test_chunk_reduction_matches_independent_physics_and_legacy(
         (state.energy.numpy(), legacy.energy.numpy()),
     ):
         np.testing.assert_allclose(observed, expected, rtol=2e-12, atol=1e-30)
-    weights = state.cpu_p.concentration
-    if kind == "particle_resolved":
-        weights = weights / state.cpu_p.volume[:, None]
+    weights = state.cpu_p.population / state.cpu_p.volume[:, None]
     for source, material in state.pairs:
         before = np.sum(state.cpu_p.masses[..., material] * weights, axis=1)
         after = np.sum(masses[..., material] * weights, axis=1)

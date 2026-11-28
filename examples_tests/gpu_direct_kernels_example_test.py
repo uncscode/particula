@@ -71,12 +71,12 @@ def test_cpu_builders_preserve_documented_dtype_and_species_order(
     assert particle_data.masses.shape == (1, 2, 1)
     assert particle_data.distribution_type == "particle_resolved"
     np.testing.assert_array_equal(
-        particle_data.concentration / particle_data.volume[:, None],
+        particle_data.population / particle_data.volume[:, None],
         [[1.0, 1.0]],
     )
-    assert particle_data.concentration.shape == (1, 2)
+    assert particle_data.population.shape == (1, 2)
     assert particle_data.masses.dtype == np.float64
-    assert particle_data.concentration.dtype == np.float64
+    assert particle_data.population.dtype == np.float64
     assert particle_data.charge.dtype == np.float64
     assert particle_data.density.dtype == np.float64
     assert particle_data.volume.dtype == np.float64
@@ -566,9 +566,7 @@ def test_real_warp_cpu_path_reuses_sidecars_and_couples_gas(
     assert np.any(energy != 0.0)
     np.testing.assert_allclose(
         energy,
-        np.sum(
-            transfer * result.particle_data.concentration[:, :, None], axis=1
-        )
+        np.sum(transfer * result.particle_data.population[:, :, None], axis=1)
         * latent_heat[None, :],
         rtol=1e-12,
         atol=1e-30,
@@ -577,7 +575,7 @@ def test_real_warp_cpu_path_reuses_sidecars_and_couples_gas(
     initial_gas = example_module._build_gas_data()
     particle_change = np.sum(
         (result.particle_data.masses - initial_particles.masses)
-        * result.particle_data.concentration[:, :, None],
+        * result.particle_data.population[:, :, None],
         axis=1,
     )
     gas_change = result.gas_data.concentration - initial_gas.concentration

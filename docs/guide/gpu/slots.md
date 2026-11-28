@@ -14,7 +14,7 @@ from particula.particles import ParticleData, get_slot_diagnostics
 
 particle_data = ParticleData(
     masses=np.array([[[1e-18, 2e-18], [0.0, 0.0]]]),
-    concentration=np.array([[1.0, 0.0]]), charge=np.zeros((1, 2)),
+    population=np.array([[1.0, 0.0]]), charge=np.zeros((1, 2)),
     density=np.array([1000.0, 1200.0]), volume=np.array([1e-6]),
     distribution_type="particle_resolved",
 )

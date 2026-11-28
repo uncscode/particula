@@ -18,7 +18,7 @@ class TestParticleDataInstantiation:
         """Test valid instantiation with single box (n_boxes=1)."""
         data = ParticleData(
             masses=np.random.rand(1, 5, 3) * 1e-18,
-            concentration=np.ones((1, 5)),
+            population=np.ones((1, 5)),
             charge=np.zeros((1, 5)),
             density=np.array([1000.0, 1200.0, 800.0]),
             volume=np.array([1e-6]),
@@ -33,7 +33,7 @@ class TestParticleDataInstantiation:
         """Test valid instantiation with multiple boxes (n_boxes=10)."""
         data = ParticleData(
             masses=np.zeros((10, 100, 5)),
-            concentration=np.ones((10, 100)),
+            population=np.ones((10, 100)),
             charge=np.zeros((10, 100)),
             density=np.array([1000.0, 1100.0, 1200.0, 1300.0, 1400.0]),
             volume=np.ones(10) * 1e-6,
@@ -48,7 +48,7 @@ class TestParticleDataInstantiation:
         """Test edge case: single particle (n_particles=1)."""
         data = ParticleData(
             masses=np.ones((2, 1, 3)) * 1e-18,
-            concentration=np.ones((2, 1)),
+            population=np.ones((2, 1)),
             charge=np.zeros((2, 1)),
             density=np.array([1000.0, 1200.0, 800.0]),
             volume=np.array([1e-6, 2e-6]),
@@ -60,7 +60,7 @@ class TestParticleDataInstantiation:
         """Test edge case: single species (n_species=1)."""
         data = ParticleData(
             masses=np.ones((2, 5, 1)) * 1e-18,
-            concentration=np.ones((2, 5)),
+            population=np.ones((2, 5)),
             charge=np.zeros((2, 5)),
             density=np.array([1000.0]),
             volume=np.array([1e-6, 2e-6]),
@@ -78,7 +78,7 @@ class TestParticleDataInstantiation:
 
         data = ParticleData(
             masses=masses,
-            concentration=concentration,
+            population=concentration,
             charge=charge,
             density=density,
             volume=volume,
@@ -95,7 +95,7 @@ class TestParticleDataInstantiation:
         """Test n_boxes, n_particles, n_species properties."""
         data = ParticleData(
             masses=np.zeros((5, 100, 3)),
-            concentration=np.ones((5, 100)),
+            population=np.ones((5, 100)),
             charge=np.zeros((5, 100)),
             density=np.array([1000.0, 1200.0, 800.0]),
             volume=np.ones(5),
@@ -116,7 +116,7 @@ class TestParticleDataValidation:
         ):
             ParticleData(
                 masses=np.ones((1, 5)),  # 2D instead of 3D
-                concentration=np.ones((1, 5)),
+                population=np.ones((1, 5)),
                 charge=np.zeros((1, 5)),
                 density=np.array([1000.0]),
                 volume=np.array([1e-6]),
@@ -130,7 +130,7 @@ class TestParticleDataValidation:
         ):
             ParticleData(
                 masses=np.ones((2, 5, 3)),  # n_boxes=2
-                concentration=np.ones((3, 5)),  # wrong n_boxes=3
+                population=np.ones((3, 5)),  # wrong n_boxes=3
                 charge=np.ones((2, 5)),
                 density=np.ones(3),
                 volume=np.ones(2),
@@ -144,7 +144,7 @@ class TestParticleDataValidation:
         ):
             ParticleData(
                 masses=np.ones((2, 5, 3)),  # n_particles=5
-                concentration=np.ones((2, 10)),  # wrong n_particles=10
+                population=np.ones((2, 10)),  # wrong n_particles=10
                 charge=np.ones((2, 5)),
                 density=np.ones(3),
                 volume=np.ones(2),
@@ -158,7 +158,7 @@ class TestParticleDataValidation:
         ):
             ParticleData(
                 masses=np.ones((2, 5, 3)),  # n_boxes=2
-                concentration=np.ones((2, 5)),
+                population=np.ones((2, 5)),
                 charge=np.ones((3, 5)),  # wrong n_boxes=3
                 density=np.ones(3),
                 volume=np.ones(2),
@@ -172,7 +172,7 @@ class TestParticleDataValidation:
         ):
             ParticleData(
                 masses=np.ones((2, 5, 3)),  # n_particles=5
-                concentration=np.ones((2, 5)),
+                population=np.ones((2, 5)),
                 charge=np.ones((2, 10)),  # wrong n_particles=10
                 density=np.ones(3),
                 volume=np.ones(2),
@@ -186,7 +186,7 @@ class TestParticleDataValidation:
         ):
             ParticleData(
                 masses=np.ones((2, 5, 3)),  # n_boxes=2
-                concentration=np.ones((2, 5)),
+                population=np.ones((2, 5)),
                 charge=np.ones((2, 5)),
                 density=np.ones(3),
                 volume=np.ones(3),  # wrong n_boxes=3
@@ -200,7 +200,7 @@ class TestParticleDataValidation:
         ):
             ParticleData(
                 masses=np.ones((2, 5, 3)),
-                concentration=np.ones((2, 5)),
+                population=np.ones((2, 5)),
                 charge=np.ones((2, 5)),
                 density=np.ones((1, 3)),  # 2D instead of 1D
                 volume=np.ones(2),
@@ -214,7 +214,7 @@ class TestParticleDataValidation:
         ):
             ParticleData(
                 masses=np.ones((2, 5, 3)),  # n_species=3
-                concentration=np.ones((2, 5)),
+                population=np.ones((2, 5)),
                 charge=np.ones((2, 5)),
                 density=np.ones(2),  # wrong n_species=2
                 volume=np.ones(2),
@@ -235,7 +235,7 @@ class TestParticleDataProperties:
         )
         data = ParticleData(
             masses=masses.copy(),
-            concentration=np.array([[8.0, 0.5, 0.0]], dtype=np.float64),
+            population=np.array([[8.0, 0.5, 0.0]], dtype=np.float64),
             charge=np.array([[1.0, -1.0, 0.0]], dtype=np.float64),
             density=np.array([1000.0, 1200.0], dtype=np.float64),
             volume=np.array([volume], dtype=np.float64),
@@ -286,7 +286,7 @@ class TestParticleDataProperties:
         mass = (4.0 / 3.0) * np.pi * (1e-6) ** 3 * 1000.0
         data = ParticleData(
             masses=np.array([[[mass]]]),
-            concentration=np.array([[1.0]]),
+            population=np.array([[1.0]]),
             charge=np.array([[0.0]]),
             density=np.array([1000.0]),
             volume=np.array([1e-6]),
@@ -300,7 +300,7 @@ class TestParticleDataProperties:
         density = np.array([1000.0, 1200.0, 800.0])
         data = ParticleData(
             masses=masses,
-            concentration=np.array([[1.0]]),
+            population=np.array([[1.0]]),
             charge=np.array([[0.0]]),
             density=density,
             volume=np.array([1e-6]),
@@ -315,7 +315,7 @@ class TestParticleDataProperties:
         """Radii is zero when total mass is zero."""
         data = ParticleData(
             masses=np.zeros((2, 3, 2)),
-            concentration=np.ones((2, 3)),
+            population=np.ones((2, 3)),
             charge=np.zeros((2, 3)),
             density=np.array([1000.0, 1200.0]),
             volume=np.ones(2),
@@ -327,7 +327,7 @@ class TestParticleDataProperties:
         """Total mass sums across species."""
         data = ParticleData(
             masses=np.array([[[1e-18, 2e-18, 3e-18], [4e-18, 5e-18, 6e-18]]]),
-            concentration=np.ones((1, 2)),
+            population=np.ones((1, 2)),
             charge=np.zeros((1, 2)),
             density=np.array([1000.0, 1200.0, 800.0]),
             volume=np.array([1e-6]),
@@ -339,7 +339,7 @@ class TestParticleDataProperties:
         """Effective density equals species density for single species."""
         data = ParticleData(
             masses=np.array([[[1e-18]]]),
-            concentration=np.ones((1, 1)),
+            population=np.ones((1, 1)),
             charge=np.zeros((1, 1)),
             density=np.array([1500.0]),
             volume=np.array([1e-6]),
@@ -353,7 +353,7 @@ class TestParticleDataProperties:
         density = np.array([1000.0, 1200.0, 800.0])
         data = ParticleData(
             masses=masses,
-            concentration=np.array([[1.0]]),
+            population=np.array([[1.0]]),
             charge=np.array([[0.0]]),
             density=density,
             volume=np.array([1e-6]),
@@ -367,7 +367,7 @@ class TestParticleDataProperties:
         """Effective density returns zero when total mass is zero."""
         data = ParticleData(
             masses=np.zeros((1, 2, 2)),
-            concentration=np.ones((1, 2)),
+            population=np.ones((1, 2)),
             charge=np.zeros((1, 2)),
             density=np.array([1000.0, 1200.0]),
             volume=np.array([1e-6]),
@@ -379,7 +379,7 @@ class TestParticleDataProperties:
         """Mass fractions sum to one per particle when mass present."""
         data = ParticleData(
             masses=np.array([[[1e-18, 2e-18, 3e-18], [4e-18, 5e-18, 6e-18]]]),
-            concentration=np.ones((1, 2)),
+            population=np.ones((1, 2)),
             charge=np.zeros((1, 2)),
             density=np.array([1000.0, 1200.0, 800.0]),
             volume=np.array([1e-6]),
@@ -392,7 +392,7 @@ class TestParticleDataProperties:
         """Mass fractions are zero when total mass is zero."""
         data = ParticleData(
             masses=np.zeros((2, 2, 2)),
-            concentration=np.ones((2, 2)),
+            population=np.ones((2, 2)),
             charge=np.zeros((2, 2)),
             density=np.array([1000.0, 1200.0]),
             volume=np.ones(2),
@@ -408,7 +408,7 @@ class TestParticleDataCopy:
         """copy() returns new arrays that do not share memory."""
         original = ParticleData(
             masses=np.ones((1, 3, 2)),
-            concentration=np.ones((1, 3)),
+            population=np.ones((1, 3)),
             charge=np.zeros((1, 3)),
             density=np.array([1000.0, 1200.0]),
             volume=np.array([1e-6]),
@@ -443,7 +443,7 @@ class TestParticleDataCopy:
         rng = np.random.default_rng(seed=42)
         original = ParticleData(
             masses=rng.random((2, 4, 3)),
-            concentration=rng.random((2, 4)),
+            population=rng.random((2, 4)),
             charge=rng.integers(-5, 5, (2, 4)).astype(float),
             density=np.array([1000.0, 1200.0, 800.0]),
             volume=np.array([1e-6, 2e-6]),

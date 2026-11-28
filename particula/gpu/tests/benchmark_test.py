@@ -790,7 +790,7 @@ def _make_particle_data(
     volume = np.full((n_boxes,), 1.0e-6, dtype=np.float64)
     return ParticleData(
         masses=masses,
-        concentration=concentration,
+        population=concentration,
         charge=charge,
         density=density,
         volume=volume,
@@ -852,7 +852,7 @@ def _make_coagulation_particle_data(
     volume = np.full((n_boxes,), 2.0e-6, dtype=np.float64)
     return ParticleData(
         masses=masses,
-        concentration=concentration,
+        population=concentration,
         charge=charge,
         density=density,
         volume=volume,
@@ -874,7 +874,7 @@ def _make_native_coagulation_particle_data(
     Historical unequal-weight timings are not comparable to this workload.
     """
     particles = _make_coagulation_particle_data(n_boxes, n_particles, n_species)
-    particles.concentration.fill(1.0)
+    particles.population.fill(1.0)
     return particles
 
 
@@ -972,7 +972,7 @@ def _cpu_mass_transfer(
 
     for box_idx in range(n_boxes):
         for particle_idx in range(n_particles):
-            if particles.concentration[box_idx, particle_idx] == 0.0:
+            if particles.population[box_idx, particle_idx] == 0.0:
                 continue
             total_volume = np.sum(
                 particles.masses[box_idx, particle_idx, :] / particles.density
@@ -1115,7 +1115,7 @@ def _cpu_native_condensation_step(
     gas after every substep and retires fully evaporated slots after the call.
     The historical single-proposal helper remains separately characterized.
     """
-    weights = particles.concentration / particles.volume[:, None]
+    weights = particles.population / particles.volume[:, None]
     for _ in range(4):
         proposal = _cpu_mass_transfer(
             particles,
@@ -1154,7 +1154,7 @@ def _cpu_native_condensation_step(
         )
         particles.masses[:] = updated
     empty = np.sum(particles.masses, axis=2) == 0.0
-    particles.concentration[empty] = 0.0
+    particles.population[empty] = 0.0
     particles.charge[empty] = 0.0
 
 
@@ -1233,7 +1233,7 @@ def _cpu_coagulation_step(
     )
     for box_idx in range(n_boxes):
         masses_box = particles.masses[box_idx]
-        concentration_box = particles.concentration[box_idx]
+        concentration_box = particles.population[box_idx]
         total_mass = np.sum(masses_box, axis=-1)
         total_volume = np.sum(masses_box / particles.density, axis=-1)
         radii = np.cbrt(3.0 * total_volume / (4.0 * np.pi))
@@ -1292,9 +1292,9 @@ def _cpu_native_coagulation_step(
         kernel_radius: Interpolation radii grid for kernel evaluation.
     """
     particles.validate_representation()
-    active = particles.concentration > 0.0
+    active = particles.population > 0.0
     if particles.distribution_type != "particle_resolved" or np.any(
-        particles.concentration[active] != 1.0
+        particles.population[active] != 1.0
     ):
         raise ValueError("benchmark CPU coagulation requires unit counts")
     n_boxes = particles.masses.shape[0]
@@ -1319,7 +1319,7 @@ def _cpu_native_coagulation_step(
     )
     for box_idx in range(n_boxes):
         masses_box = particles.masses[box_idx]
-        concentration_box = particles.concentration[box_idx]
+        concentration_box = particles.population[box_idx]
         total_volume = np.sum(masses_box / particles.density, axis=-1)
         radii = np.cbrt(3.0 * total_volume / (4.0 * np.pi))
         collision_pairs = get_particle_resolved_coagulation_step(

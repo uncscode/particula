@@ -42,7 +42,7 @@ def _containers(
             dtype=wp.float64,
             device=device,
         ),
-        concentration=wp.array(
+        population=wp.array(
             particle_concentration, dtype=wp.float64, device=device
         ),
         charge=wp.array(
@@ -94,7 +94,7 @@ def test_volume_evolution_matches_independent_oracle(
     final = wp.array(final_volumes, dtype=wp.float64, device="cpu")
     protected = (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         particles.volume,
@@ -115,9 +115,9 @@ def test_volume_evolution_matches_independent_oracle(
     factor = old_volumes / final_volumes
     assert returned_particles is particles
     assert returned_gas is gas
-    assert particles.concentration is not None and gas.concentration is not None
+    assert particles.population is not None and gas.concentration is not None
     npt.assert_allclose(
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         initial_particle,
         rtol=1e-12,
         atol=0.0,
@@ -132,7 +132,7 @@ def test_volume_evolution_matches_independent_oracle(
         particles.volume.numpy(), final_volumes, rtol=0.0, atol=0.0
     )
     npt.assert_allclose(
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         initial_particle,
         rtol=1e-12,
         atol=1e-30,
@@ -144,13 +144,13 @@ def test_volume_evolution_matches_independent_oracle(
         atol=1e-30,
     )
     npt.assert_allclose(
-        (particles.concentration.numpy()[..., None] * initial_masses),
+        (particles.population.numpy()[..., None] * initial_masses),
         initial_particle[..., None] * initial_masses,
         rtol=1e-12,
         atol=1e-30,
     )
     npt.assert_allclose(
-        particles.concentration.numpy() * initial_charge,
+        particles.population.numpy() * initial_charge,
         initial_particle * initial_charge,
         rtol=1e-12,
         atol=1e-30,
@@ -159,7 +159,7 @@ def test_volume_evolution_matches_independent_oracle(
         protected,
         (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -214,7 +214,7 @@ def test_prepared_resident_equal_volumes_preserve_fields_and_statuses() -> None:
     changed = wp.array([1], dtype=wp.int32, device="cpu")
     before = (
         particles.volume.numpy().copy(),
-        particles.concentration.numpy().copy(),
+        particles.population.numpy().copy(),
         gas.concentration.numpy().copy(),
         invalid.numpy().copy(),
         changed.numpy().copy(),
@@ -222,7 +222,7 @@ def test_prepared_resident_equal_volumes_preserve_fields_and_statuses() -> None:
 
     _enqueue_prepared_resident_volume_evolution(
         particles.volume,
-        particles.concentration,
+        particles.population,
         gas.concentration,
         1,
         final,
@@ -234,7 +234,7 @@ def test_prepared_resident_equal_volumes_preserve_fields_and_statuses() -> None:
     for actual, expected in zip(
         (
             particles.volume.numpy(),
-            particles.concentration.numpy(),
+            particles.population.numpy(),
             gas.concentration.numpy(),
             invalid.numpy(),
             changed.numpy(),
@@ -263,7 +263,7 @@ def test_prepared_resident_changed_volumes_preserve_inventory() -> None:
 
     _enqueue_prepared_resident_volume_evolution(
         particles.volume,
-        particles.concentration,
+        particles.population,
         gas.concentration,
         1,
         final,
@@ -274,7 +274,7 @@ def test_prepared_resident_changed_volumes_preserve_inventory() -> None:
 
     npt.assert_allclose(particles.volume.numpy(), [4.0], rtol=0.0, atol=0.0)
     npt.assert_allclose(
-        particles.concentration.numpy(), [[3.0, 5.0]], rtol=1e-12, atol=0.0
+        particles.population.numpy(), [[3.0, 5.0]], rtol=1e-12, atol=0.0
     )
     npt.assert_allclose(
         gas.concentration.numpy(), [[3.5, 5.5]], rtol=1e-12, atol=0.0
@@ -304,12 +304,12 @@ def test_unchanged_volumes_are_write_free(
     monkeypatch.setattr(communication.wp, "launch", record_launch)
     before = (
         particles.volume.numpy().copy(),
-        particles.concentration.numpy().copy(),
+        particles.population.numpy().copy(),
         gas.concentration.numpy().copy(),
     )
     communication.volume_evolution_step_gpu(particles, gas, final)
     npt.assert_array_equal(particles.volume.numpy(), before[0])
-    npt.assert_array_equal(particles.concentration.numpy(), before[1])
+    npt.assert_array_equal(particles.population.numpy(), before[1])
     npt.assert_array_equal(gas.concentration.numpy(), before[2])
 
 
@@ -327,12 +327,12 @@ def test_invalid_final_volumes_gate_writers_without_mutation(
     final = wp.array([bad], dtype=wp.float64, device="cpu")
     before = (
         particles.volume.numpy().copy(),
-        particles.concentration.numpy().copy(),
+        particles.population.numpy().copy(),
         gas.concentration.numpy().copy(),
     )
     volume_evolution_step_gpu(particles, gas, final)
     npt.assert_array_equal(particles.volume.numpy(), before[0])
-    npt.assert_array_equal(particles.concentration.numpy(), before[1])
+    npt.assert_array_equal(particles.population.numpy(), before[1])
     npt.assert_array_equal(gas.concentration.numpy(), before[2])
 
 
@@ -379,14 +379,14 @@ def test_invalid_preflight_preserves_all_mutable_state(
     final = wp.array([final_volume], dtype=wp.float64, device="cpu")
     before = (
         particles.volume.numpy().copy(),
-        particles.concentration.numpy().copy(),
+        particles.population.numpy().copy(),
         gas.concentration.numpy().copy(),
     )
 
     volume_evolution_step_gpu(particles, gas, final)
 
     npt.assert_array_equal(particles.volume.numpy(), before[0])
-    npt.assert_array_equal(particles.concentration.numpy(), before[1])
+    npt.assert_array_equal(particles.population.numpy(), before[1])
     npt.assert_array_equal(gas.concentration.numpy(), before[2])
 
 
@@ -403,7 +403,7 @@ def test_factor_first_scaling_accepts_representable_result() -> None:
 
     volume_evolution_step_gpu(particles, gas, final)
 
-    npt.assert_array_equal(particles.concentration.numpy(), [[2.0, 3.0]])
+    npt.assert_array_equal(particles.population.numpy(), [[2.0, 3.0]])
     npt.assert_array_equal(gas.concentration.numpy(), [[4.0]])
 
 
@@ -485,7 +485,7 @@ def test_zero_width_particle_and_gas_concentrations_update_volume() -> None:
 
     assert returned_particles is particles
     assert returned_gas is gas
-    assert particles.concentration.shape == (1, 0)
+    assert particles.population.shape == (1, 0)
     assert gas.concentration.shape == (1, 0)
     npt.assert_array_equal(particles.volume.numpy(), np.array([4.0]))
 
@@ -498,14 +498,14 @@ def test_primary_alias_rejects_before_mutation() -> None:
     particles, gas = _containers(
         np.array([1.0]), np.array([[2.0, 3.0]]), np.array([[4.0, 5.0]])
     )
-    gas.concentration = particles.concentration
+    gas.concentration = particles.population
     final = wp.array([2.0], dtype=wp.float64, device="cpu")
-    before = particles.concentration.numpy().copy()
+    before = particles.population.numpy().copy()
 
     with pytest.raises(ValueError, match="alias"):
         volume_evolution_step_gpu(particles, gas, final)
 
-    npt.assert_array_equal(particles.concentration.numpy(), before)
+    npt.assert_array_equal(particles.population.numpy(), before)
 
 
 @pytest.mark.cuda
@@ -527,7 +527,7 @@ def test_cuda_volume_evolution_when_available() -> None:
     volume_evolution_step_gpu(particles, gas, final)
 
     npt.assert_allclose(
-        particles.concentration.numpy(), np.array([[3.0, 0.0]]), rtol=1e-12
+        particles.population.numpy(), np.array([[3.0, 0.0]]), rtol=1e-12
     )
     npt.assert_allclose(
         gas.concentration.numpy(), np.array([[2.0, 4.0]]), rtol=1e-12
@@ -790,7 +790,7 @@ def test_gas_communication_accounts_for_open_boundary_ledgers() -> None:
     buffers = GasCommunicationBuffers(
         *(wp.empty((2, 1), dtype=wp.float64, device="cpu") for _ in range(5))
     )
-    particle_before = particles.concentration.numpy().copy()
+    particle_before = particles.population.numpy().copy()
     initial_total = np.sum(
         gas.concentration.numpy() * particles.volume.numpy()[:, None], axis=0
     )
@@ -804,7 +804,7 @@ def test_gas_communication_accounts_for_open_boundary_ledgers() -> None:
     npt.assert_allclose(source_amounts.numpy(), np.array([[0.0], [1.5]]))
     npt.assert_allclose(sink_amounts.numpy(), np.array([[2.0], [0.0]]))
     npt.assert_allclose(gas.concentration.numpy(), [[3.0], [4.5]])
-    npt.assert_array_equal(particles.concentration.numpy(), particle_before)
+    npt.assert_array_equal(particles.population.numpy(), particle_before)
     final_total = np.sum(
         gas.concentration.numpy() * particles.volume.numpy()[:, None], axis=0
     )
@@ -1554,9 +1554,7 @@ def test_particle_communication_transports_population_to_ascending_free_slot() -
     wp.synchronize()
 
     assert returned is particles
-    npt.assert_allclose(
-        particles.concentration.numpy(), [[3.0, 0.0], [1.0, 0.0]]
-    )
+    npt.assert_allclose(particles.population.numpy(), [[3.0, 0.0], [1.0, 0.0]])
     npt.assert_allclose(particles.masses.numpy()[1, 0], [2.0, 3.0])
     npt.assert_allclose(particles.charge.numpy()[1, 0], -2.0)
     npt.assert_allclose(buffers.source_debits.numpy(), [[1.0, 0.0], [0.0, 0.0]])
@@ -1644,7 +1642,7 @@ def test_particle_communication_prefers_exact_match_and_clears_source() -> None:
     wp.synchronize()
 
     npt.assert_array_equal(
-        particles.concentration.numpy(), [[0.0, 0.0], [5.0, 0.0]]
+        particles.population.numpy(), [[0.0, 0.0], [5.0, 0.0]]
     )
     npt.assert_array_equal(particles.masses.numpy()[0, 0], [0.0, 0.0])
     assert particles.charge.numpy()[0, 0] == 0.0
@@ -1684,7 +1682,7 @@ def test_particle_communication_cycle_copies_pre_step_populations() -> None:
     wp.synchronize()
 
     npt.assert_array_equal(
-        particles.concentration.numpy(), [[0.0, 3.0], [0.0, 2.0]]
+        particles.population.numpy(), [[0.0, 3.0], [0.0, 2.0]]
     )
     npt.assert_array_equal(
         particles.masses.numpy(),
@@ -1977,7 +1975,7 @@ def test_particle_communication_conserves_weighted_inventories() -> None:
         [[[2.0, 3.0]], [[0.0, 0.0]]], dtype=wp.float64, device="cpu"
     )
     particles.charge = wp.array([[-4.0], [0.0]], dtype=wp.float64, device="cpu")
-    old_concentration = particles.concentration.numpy().copy()
+    old_concentration = particles.population.numpy().copy()
     old_masses = particles.masses.numpy().copy()
     old_charge = particles.charge.numpy().copy()
 
@@ -1989,7 +1987,7 @@ def test_particle_communication_conserves_weighted_inventories() -> None:
     )
     wp.synchronize()
 
-    concentration = particles.concentration.numpy()
+    concentration = particles.population.numpy()
     npt.assert_allclose(concentration, [[2.0], [2.0]], rtol=1e-12, atol=0.0)
     for values, expected in (
         (concentration, old_concentration),
@@ -2060,7 +2058,7 @@ def test_particle_communication_registration_order_is_semantically_invariant() -
         np.array([1, 0], dtype=np.int32), np.array([3, 2], dtype=np.int32)
     )
 
-    for name in ("masses", "concentration", "charge", "density", "volume"):
+    for name in ("masses", "population", "charge", "density", "volume"):
         npt.assert_array_equal(
             getattr(first, name).numpy(), getattr(second, name).numpy()
         )
@@ -2154,7 +2152,7 @@ def test_particle_communication_matches_signed_zero_population_keys() -> None:
     wp.synchronize()
 
     npt.assert_array_equal(
-        particles.concentration.numpy(), [[0.0, 0.0], [5.0, 0.0]]
+        particles.population.numpy(), [[0.0, 0.0], [5.0, 0.0]]
     )
     npt.assert_array_equal(buffers.assignments.numpy(), [[0, -1]])
 
@@ -2237,7 +2235,7 @@ def test_prepared_resident_particle_enqueue_uses_pinned_snapshots() -> None:
 
     _enqueue_prepared_resident_particle_communication(
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         particles.volume,
@@ -2263,7 +2261,65 @@ def test_prepared_resident_particle_enqueue_uses_pinned_snapshots() -> None:
 
     npt.assert_array_equal(invalid.numpy(), [0])
     npt.assert_array_equal(demand.numpy(), [1])
-    npt.assert_allclose(particles.concentration.numpy(), [[1.0], [1.0]])
+    npt.assert_allclose(particles.population.numpy(), [[1.0], [1.0]])
     npt.assert_allclose(particles.masses.numpy()[1, 0], [2.0, 3.0])
     npt.assert_allclose(particles.charge.numpy()[1, 0], -4.0)
     npt.assert_allclose(initial_concentration.numpy(), [[2.0], [0.0]])
+
+
+@pytest.mark.parametrize("device", ["cpu", "cuda:0"])
+def test_expansion_and_flushing_have_distinct_inventories(device):
+    """A half-life and a doubled volume give equal densities at distinct counts."""
+    from particula.dynamics.wall_loss.wall_loss_strategies import (
+        SphericalWallLossStrategy,
+    )
+    from particula.gpu.conversion import from_warp_particle_data
+    from particula.gpu.kernels.communication import volume_evolution_step_gpu
+    from particula.gpu.kernels.dilution import dilution_step_gpu
+
+    wp = _warp()
+    if device != "cpu" and not wp.is_cuda_available():
+        pytest.skip("CUDA unavailable")
+    start = np.array([0.25]), np.array([[100.0]]), np.array([[4e-9]])
+    flushed, flushed_gas = _containers(*start, device=device)
+    expanded, expanded_gas = _containers(*start, device=device)
+    dilution_step_gpu(flushed, flushed_gas, np.log(2.0), 1.0)
+    volume_evolution_step_gpu(
+        expanded,
+        expanded_gas,
+        wp.array([0.50], dtype=wp.float64, device=device),
+    )
+    wall = SphericalWallLossStrategy(
+        1.0, 2.0, distribution_type="particle_resolved"
+    )
+    intensive_wall_rates = []
+    for particles, gas, count, gas_mass in (
+        (flushed, flushed_gas, 50.0, 0.5e-9),
+        (expanded, expanded_gas, 100.0, 1e-9),
+    ):
+        native = from_warp_particle_data(particles)
+        rate = wall.rate(native, 298.15, 101325.0)
+        coefficient = wall.loss_coefficient_for_particles(
+            native.radii[0], native.effective_density[0], 298.15, 101325.0
+        )
+        npt.assert_allclose(rate * native.volume[0], -count * coefficient)
+        intensive_wall_rates.append(rate)
+        for fraction in (1.0, 0.5):
+            if fraction == 0.5:
+                dilution_step_gpu(particles, gas, np.log(2.0), 1.0)
+            vol = particles.volume.numpy()[0]
+            npt.assert_allclose(
+                particles.population.numpy(), [[count * fraction]]
+            )
+            npt.assert_allclose(
+                particles.population.numpy() / vol, [[200.0 * fraction]]
+            )
+            npt.assert_allclose(
+                gas.concentration.numpy() * vol, [[gas_mass * fraction]], atol=0
+            )
+            npt.assert_allclose(
+                gas.concentration.numpy(), [[2e-9 * fraction]], atol=0
+            )
+    npt.assert_allclose(
+        intensive_wall_rates[0], intensive_wall_rates[1], atol=0
+    )

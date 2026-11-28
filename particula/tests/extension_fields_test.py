@@ -106,9 +106,7 @@ def test_native_coagulation_uses_actual_pairs_for_tracers(monkeypatch):
         ),
         np.array([[3.0, 4.0]]),
     )
-    before = np.sum(
-        aerosol.particles.concentration * aerosol.fields["lab.tracer"]
-    )
+    before = np.sum(aerosol.particles.population * aerosol.fields["lab.tracer"])
     monkeypatch.setattr(
         particle_resolved_method,
         "get_particle_resolved_coagulation_step",
@@ -119,7 +117,7 @@ def test_native_coagulation_uses_actual_pairs_for_tracers(monkeypatch):
     )
     np.testing.assert_array_equal(aerosol.fields["lab.tracer"], [[0, 7]])
     assert (
-        np.sum(aerosol.particles.concentration * aerosol.fields["lab.tracer"])
+        np.sum(aerosol.particles.population * aerosol.fields["lab.tracer"])
         == before
     )
 
@@ -186,7 +184,7 @@ def source_case(policy="additive", scaling=False):
 
     particles = ParticleData(
         masses=np.array([[[0.2], [0.3], [0.4]]]),
-        concentration=np.array([[1.0, 1.0, 1.0]]),
+        population=np.array([[1.0, 1.0, 1.0]]),
         charge=np.zeros((1, 3)),
         density=np.array([1000.0]),
         volume=np.ones(1),
@@ -239,7 +237,7 @@ def test_source_remaps_tracer_then_initializes_reused_slot():
         pointer, [[(10 + 0.5 * 20) / 1.5, (0.5 * 20 + 40) / 1.5, 7]]
     )
     assert fields["lab.tracer"] is pointer
-    np.testing.assert_allclose(np.sum(particles.concentration * pointer), 84)
+    np.testing.assert_allclose(np.sum(particles.population * pointer), 84)
     np.testing.assert_array_equal(
         fields.inventory_changes("lab.tracer")["source"], [14]
     )
@@ -266,7 +264,7 @@ def test_source_rejects_undefined_field_events_atomically(
     particles, gas, fields, config = source_case(policy, scaling)
     arrays = (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.volume,
         gas.concentration,
@@ -296,7 +294,7 @@ def test_passive_source_initializes_free_slot_without_resampling():
 
     particles, gas, fields, config = source_case("passive")
     particles.masses[0, 1] = 0
-    particles.concentration[0, 1] = 0
+    particles.population[0, 1] = 0
     fields["lab.tracer"][0, 1] = 0
     commit_particle_source(
         *_p2_records(np.array([2.0])),
@@ -330,7 +328,7 @@ def test_source_field_overflow_rejects_entire_transaction():
     )
     arrays = (
         particles.masses,
-        particles.concentration,
+        particles.population,
         gas.concentration,
         *[v for _, v in fields.items()],
         *[v for _, v in fields.transaction_arrays()],

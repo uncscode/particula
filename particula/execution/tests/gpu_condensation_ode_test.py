@@ -84,7 +84,7 @@ def test_independent_growth_accuracy_and_species_inventory(device):
     )
     npt.assert_array_equal(final.particles.masses[:, 1], 0)
     npt.assert_array_equal(
-        final.particles.concentration, initial.particles.concentration
+        final.particles.population, initial.particles.population
     )
     npt.assert_allclose(initial.particles.radii[0, 0], 1e-6, rtol=1e-15)
     final.particles.masses[:] = 999
@@ -249,8 +249,8 @@ def test_discrete_population_uses_density_without_resolved_volume_factor(
     discrete = Aerosol(
         particles=ParticleData(
             masses=resolved.particles.masses.copy(),
-            concentration=(
-                resolved.particles.concentration
+            population=(
+                resolved.particles.population
                 / resolved.particles.volume[:, None]
             ),
             charge=resolved.particles.charge.copy(),
@@ -367,14 +367,14 @@ def test_unpopulated_discrete_bins_preserve_mass_and_species_budget(
         )
     initial, strategy = case(3)
     initial.particles.distribution_type = "discrete"
-    initial.particles.concentration /= initial.particles.volume[:, None]
+    initial.particles.population /= initial.particles.volume[:, None]
     initial.particles.volume[:] = 1.0
     initial.gas.concentration[:, 1] *= [0.5, 1.0, 2.0]
     initial.particles.masses[:, 1] = initial.particles.masses[:, 0] * 0.5
     before = initial.particles.masses.copy()
     initial.particles.validate_representation()
     expected = (
-        np.sum(before[:, :, 0] * initial.particles.concentration, axis=1)
+        np.sum(before[:, :, 0] * initial.particles.population, axis=1)
         + initial.gas.concentration[:, 1]
     )
     factory = GPUResidentCondensation if resident else GPUCondensationODE
@@ -396,7 +396,7 @@ def test_unpopulated_discrete_bins_preserve_mass_and_species_budget(
     )
     npt.assert_array_equal(result.particles.masses[:, 1], before[:, 1])
     npt.assert_array_equal(
-        result.particles.concentration, initial.particles.concentration
+        result.particles.population, initial.particles.population
     )
     npt.assert_array_equal(result.gas.concentration[:, 0], [0.1] * 3)
     npt.assert_allclose(
@@ -411,7 +411,7 @@ def test_unpopulated_discrete_bins_preserve_mass_and_species_budget(
     )
     npt.assert_allclose(
         np.sum(
-            result.particles.masses[:, :, 0] * result.particles.concentration,
+            result.particles.masses[:, :, 0] * result.particles.population,
             axis=1,
         )
         + result.gas.concentration[:, 1],

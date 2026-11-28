@@ -37,7 +37,7 @@ def _particles(kind="particle_resolved", volume=0.25):
             [[[2, 3], [5, 7]], [[11, 13], [17, 19]]], dtype=np.float64
         )
         * 1e-18,
-        concentration=np.array([[2.0, 0.5], [3.0, 4.0]]),
+        population=np.array([[2.0, 0.5], [3.0, 4.0]]),
         charge=np.array([[1.0, -1.0], [2.0, 0.0]]),
         density=np.array([1000.0, 1200.0]),
         volume=np.array([volume, volume]),
@@ -70,7 +70,7 @@ def test_resolved_raw_round_trip_and_independent_inventory(
     source = _particles(volume=volume)
     before = {
         name: getattr(source, name).copy()
-        for name in ("masses", "concentration", "charge", "density", "volume")
+        for name in ("masses", "population", "charge", "density", "volume")
     }
     gpu = conversion.to_warp_particle_data(source, device=device, copy=copy)
     assert particle_distribution_code(gpu) == 3
@@ -276,7 +276,7 @@ def test_binding_validation_has_no_device_work(device, monkeypatch):
 def test_untagged_upload_rejects_before_backend_probe(monkeypatch, copy):
     """Raw CPU scratch is not a transferable population without a tag."""
     source = _particles(None)
-    before = source.masses.copy(), source.concentration.copy()
+    before = source.masses.copy(), source.population.copy()
 
     def forbidden():
         pytest.fail("untagged upload reached backend setup")
@@ -285,7 +285,7 @@ def test_untagged_upload_rejects_before_backend_probe(monkeypatch, copy):
     with pytest.raises(ValueError, match="explicit population metadata"):
         conversion.to_warp_particle_data(source, device="cpu", copy=copy)
     np.testing.assert_array_equal(source.masses, before[0])
-    np.testing.assert_array_equal(source.concentration, before[1])
+    np.testing.assert_array_equal(source.population, before[1])
 
 
 def test_missing_restore_tag_rejects_before_backend_probe(monkeypatch):

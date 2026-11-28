@@ -75,7 +75,7 @@ def test_complete_native_cpu_sequence_conserves_each_stage(
             before = inventory(state).copy()
             before_particles = (
                 np.sum(
-                    particles.masses * particles.concentration[..., None],
+                    particles.masses * particles.population[..., None],
                     axis=1,
                 )
                 / particles.volume[:, None]
@@ -100,7 +100,7 @@ def test_complete_native_cpu_sequence_conserves_each_stage(
                     rtol=1e-12,
                     atol=1e-30,
                 )
-                np.testing.assert_array_equal(particles.concentration, 0)
+                np.testing.assert_array_equal(particles.population, 0)
                 np.testing.assert_array_equal(particles.charge, 0)
             events.append(index)
             return result
@@ -113,4 +113,4 @@ def test_complete_native_cpu_sequence_conserves_each_stage(
     assert events == list(range(5))
     assert aerosol.particles is particles and aerosol.gas is gas
     assert aerosol.environment is environment
-    assert np.any(particles.concentration > 0)
+    assert np.any(particles.population > 0)

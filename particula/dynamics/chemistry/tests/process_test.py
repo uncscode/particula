@@ -80,7 +80,7 @@ def state_and_process(case, method):
     state = Aerosol(
         particles=ParticleData(
             masses=np.full((2, 1, 1), 1e-18),
-            concentration=np.ones((2, 1)),
+            population=np.ones((2, 1)),
             charge=np.zeros((2, 1)),
             density=np.array([1000.0]),
             volume=np.array([1.0, 2.0]),

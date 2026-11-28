@@ -607,7 +607,7 @@ def create_resident_graph_capture_signature(
         primary_containers=_identity_tuple(particles, gas, environment),
         primary_arrays=_identity_tuple(
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.density,
             particles.volume,
             particles.charge,
@@ -806,7 +806,7 @@ def _compare_cached_admission_signature(  # noqa: C901
         )
     current_primary_arrays = _identity_tuple(
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.density,
         particles.volume,
         particles.charge,

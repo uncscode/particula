@@ -1099,7 +1099,7 @@ def test_memory_model_uses_registry_as_diagnostic_byte_authority() -> None:
     values = {item.name: item.byte_count for item in model.categories}
     primary = {
         "primary.particles.masses": 2 * 3 * 4 * 8,
-        "primary.particles.concentration": 2 * 3 * 8,
+        "primary.particles.population": 2 * 3 * 8,
         "primary.particles.charge": 2 * 3 * 8,
         "primary.particles.density": 4 * 8,
         "primary.particles.volume": 2 * 8,

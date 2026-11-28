@@ -64,7 +64,7 @@ def _containers(
         (n_boxes, n_particles, n_species), dtype=wp.float64, device=device
     )
     particle_concentration = np.arange(n_boxes * n_particles, dtype=np.float64)
-    particles.concentration = wp.array(
+    particles.population = wp.array(
         particle_concentration.reshape(n_boxes, n_particles),
         dtype=wp.float64,
         device=device,
@@ -98,7 +98,7 @@ def _state_snapshots(particles, gas, coefficient=None) -> dict[str, np.ndarray]:
     """
     snapshots = {
         "particle_masses": particles.masses.numpy().copy(),
-        "particle_concentration": particles.concentration.numpy().copy(),
+        "particle_concentration": particles.population.numpy().copy(),
         "particle_charge": particles.charge.numpy().copy(),
         "particle_density": particles.density.numpy().copy(),
         "particle_volume": particles.volume.numpy().copy(),
@@ -131,7 +131,7 @@ def _assert_identities(
     for current, original in zip(
         (
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.charge,
             particles.density,
             particles.volume,
@@ -238,7 +238,7 @@ def test_prepared_dilution_enqueue_uses_frozen_concentration_fields() -> None:
     )
 
     particles, gas = _containers()
-    original_particle_concentration = particles.concentration
+    original_particle_concentration = particles.population
     original_gas_concentration = gas.concentration
     expected_particles = original_particle_concentration.numpy() * np.exp(-1.0)
     expected_gas = original_gas_concentration.numpy() * np.exp(-1.0)
@@ -255,7 +255,7 @@ def test_prepared_dilution_enqueue_uses_frozen_concentration_fields() -> None:
         dtype=wp.float64,
         device="cpu",
     )
-    particles.concentration = replacement_particles
+    particles.population = replacement_particles
     gas.concentration = replacement_gas
 
     returned_particles, returned_gas = _enqueue_prepared_dilution_call(prepared)
@@ -406,7 +406,7 @@ def _assert_p4_case_matches_reference(
     n_boxes, n_particles = case.particle_concentration.shape
     n_species = case.gas_concentration.shape[1]
     particles, gas = _containers(n_boxes, n_particles, n_species, device)
-    particles.concentration = wp.array(
+    particles.population = wp.array(
         case.particle_concentration.copy(), dtype=wp.float64, device=device
     )
     gas.concentration = wp.array(
@@ -425,7 +425,7 @@ def _assert_p4_case_matches_reference(
     )
     field_objects = (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         particles.volume,
@@ -455,7 +455,7 @@ def _assert_p4_case_matches_reference(
         coefficient if isinstance(case.coefficient, np.ndarray) else None,
     )
     npt.assert_allclose(
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         expected_particle,
         rtol=P4_PARITY_RTOL,
         atol=P4_PARITY_ATOL,
@@ -536,7 +536,7 @@ def test_scalar_dilution_matches_independent_oracle(coefficient) -> None:
     snapshots = _state_snapshots(particles, gas)
     field_objects = (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         particles.volume,
@@ -555,7 +555,7 @@ def test_scalar_dilution_matches_independent_oracle(coefficient) -> None:
     _assert_protected_state(particles, gas, snapshots)
     factor = np.exp(-coefficient * 2.0)
     npt.assert_allclose(
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         snapshots["particle_concentration"] * factor,
         rtol=1e-12,
         atol=0.0,
@@ -574,7 +574,7 @@ def test_per_box_dilution_preserves_zero_slots_and_compounds() -> None:
     from particula.gpu.kernels import dilution_step_gpu
 
     particles, gas = _containers()
-    particles.concentration = wp.array(
+    particles.population = wp.array(
         [[0.0, 2.0], [3.0, 0.0]], dtype=wp.float64, device="cpu"
     )
     gas.concentration = wp.array(
@@ -586,7 +586,7 @@ def test_per_box_dilution_preserves_zero_slots_and_compounds() -> None:
 
     dilution_step_gpu(particles, gas, coefficient, 2.0)
     npt.assert_allclose(
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         snapshots["particle_concentration"] * factors,
         rtol=1e-12,
         atol=0.0,
@@ -599,7 +599,7 @@ def test_per_box_dilution_preserves_zero_slots_and_compounds() -> None:
     )
     dilution_step_gpu(particles, gas, coefficient, 2.0)
     npt.assert_allclose(
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         snapshots["particle_concentration"] * factors**2,
         rtol=1e-12,
         atol=0.0,
@@ -651,7 +651,7 @@ def test_p4_warp_cpu_repeated_per_box_dilution_matches_reference() -> None:
     n_boxes, n_particles = case.particle_concentration.shape
     n_species = case.gas_concentration.shape[1]
     particles, gas = _containers(n_boxes, n_particles, n_species)
-    particles.concentration = wp.array(
+    particles.population = wp.array(
         case.particle_concentration.copy(), dtype=wp.float64, device="cpu"
     )
     gas.concentration = wp.array(
@@ -665,7 +665,7 @@ def test_p4_warp_cpu_repeated_per_box_dilution_matches_reference() -> None:
     snapshots = _state_snapshots(particles, gas, coefficient)
     field_objects = (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         particles.volume,
@@ -698,7 +698,7 @@ def test_p4_warp_cpu_repeated_per_box_dilution_matches_reference() -> None:
     assert coefficient is coefficient_object
     npt.assert_array_equal(coefficient.numpy(), case.coefficient)
     npt.assert_allclose(
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         expected_particle,
         rtol=P4_PARITY_RTOL,
         atol=P4_PARITY_ATOL,
@@ -722,7 +722,7 @@ def test_p4_warp_cpu_exact_no_ops_preserve_all_state(
     snapshots = _state_snapshots(particles, gas)
     field_objects = (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         particles.volume,
@@ -741,7 +741,7 @@ def test_p4_warp_cpu_exact_no_ops_preserve_all_state(
     )
     _assert_protected_state(particles, gas, snapshots)
     npt.assert_array_equal(
-        particles.concentration.numpy(), snapshots["particle_concentration"]
+        particles.population.numpy(), snapshots["particle_concentration"]
     )
     npt.assert_array_equal(
         gas.concentration.numpy(), snapshots["gas_concentration"]
@@ -752,7 +752,7 @@ def test_zero_scalar_and_zero_time_validate_container_metadata() -> None:
     """Scalar zero and zero time still require complete preflight."""
     from particula.gpu.kernels import dilution_step_gpu
 
-    particles = _ResolvedParticleState(concentration="not a Warp array")
+    particles = _ResolvedParticleState(population="not a Warp array")
     gas = SimpleNamespace(concentration="not a Warp array")
     with pytest.raises(
         ValueError, match="particles.masses must be a Warp array"
@@ -780,15 +780,13 @@ def test_per_box_zero_time_validates_coefficient_and_containers() -> None:
 
     _assert_protected_state(particles, gas, snapshots, coefficient)
     npt.assert_array_equal(
-        particles.concentration.numpy(), snapshots["particle_concentration"]
+        particles.population.numpy(), snapshots["particle_concentration"]
     )
     npt.assert_array_equal(
         gas.concentration.numpy(), snapshots["gas_concentration"]
     )
 
-    malformed_particles = _ResolvedParticleState(
-        concentration="not a Warp array"
-    )
+    malformed_particles = _ResolvedParticleState(population="not a Warp array")
     malformed_gas = SimpleNamespace(concentration="not a Warp array")
     with pytest.raises(
         ValueError, match=r"particles\.masses must be a Warp array"
@@ -806,7 +804,7 @@ def test_per_box_zero_coefficient_box_is_write_free() -> None:
     snapshots = _state_snapshots(particles, gas, coefficient)
     dilution_step_gpu(particles, gas, coefficient, 3.0)
     npt.assert_array_equal(
-        particles.concentration.numpy()[0],
+        particles.population.numpy()[0],
         snapshots["particle_concentration"][0],
     )
     npt.assert_array_equal(
@@ -814,7 +812,7 @@ def test_per_box_zero_coefficient_box_is_write_free() -> None:
     )
     factor = np.exp(-1.5)
     npt.assert_allclose(
-        particles.concentration.numpy()[1],
+        particles.population.numpy()[1],
         snapshots["particle_concentration"][1] * factor,
         rtol=1e-12,
         atol=0.0,
@@ -840,7 +838,7 @@ def test_zero_extent_concentrations_are_supported(
     snapshots = _state_snapshots(particles, gas)
     field_objects = (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         particles.volume,
@@ -857,7 +855,7 @@ def test_zero_extent_concentrations_are_supported(
     )
     factor = np.exp(-0.5)
     npt.assert_allclose(
-        particles.concentration.numpy(),
+        particles.population.numpy(),
         snapshots["particle_concentration"] * factor,
         rtol=1e-12,
         atol=0.0,
@@ -877,7 +875,7 @@ def test_zero_extent_concentrations_are_supported(
         (
             "particle",
             "not a Warp array",
-            "particles.concentration must be a Warp array",
+            "particles.population must be a Warp array",
         ),
         ("gas", "not a Warp array", "gas.concentration must be a Warp array"),
     ],
@@ -893,7 +891,7 @@ def test_non_warp_concentrations_reject_before_writes(
     if field == "particle":
         particles = _ResolvedParticleState(
             masses=particles.masses,
-            concentration=value,
+            population=value,
         )
     else:
         gas = SimpleNamespace(concentration=value)
@@ -905,18 +903,18 @@ def test_non_warp_concentrations_reject_before_writes(
         )
     else:
         npt.assert_array_equal(
-            particles.concentration.numpy(), snapshots["particle_concentration"]
+            particles.population.numpy(), snapshots["particle_concentration"]
         )
 
 
 @pytest.mark.parametrize(
     ("field", "shape", "message"),
     [
-        ("particle", (4,), "particles.concentration must have rank 2"),
+        ("particle", (4,), "particles.population must have rank 2"),
         (
             "particle",
             (1, 2),
-            "particles.concentration box dimension must match",
+            "particles.population box dimension must match",
         ),
         ("gas", (4,), "gas.concentration must have rank 2"),
         ("gas", (1, 2), "gas.concentration box dimension must match"),
@@ -934,7 +932,7 @@ def test_concentration_shape_errors_reject_before_writes(
     if field == "particle":
         particles = _ResolvedParticleState(
             masses=particles.masses,
-            concentration=wp.ones(shape, dtype=wp.float64, device="cpu"),
+            population=wp.ones(shape, dtype=wp.float64, device="cpu"),
         )
     else:
         gas = SimpleNamespace(
@@ -950,7 +948,7 @@ def test_concentration_shape_errors_reject_before_writes(
         )
     else:
         npt.assert_array_equal(
-            particles.concentration.numpy(), snapshots["particle_concentration"]
+            particles.population.numpy(), snapshots["particle_concentration"]
         )
 
 
@@ -967,12 +965,12 @@ def test_float32_concentrations_reject_before_any_write(field, message) -> None:
     from particula.gpu.kernels import dilution_step_gpu
 
     particles, gas = _containers()
-    particle_values = particles.concentration.numpy().copy()
+    particle_values = particles.population.numpy().copy()
     gas_values = gas.concentration.numpy().copy()
     if field == "particle":
         particles = _ResolvedParticleState(
             masses=particles.masses,
-            concentration=wp.array(
+            population=wp.array(
                 particle_values, dtype=wp.float32, device="cpu"
             ),
         )
@@ -984,7 +982,7 @@ def test_float32_concentrations_reject_before_any_write(field, message) -> None:
     with pytest.raises(ValueError, match=message):
         dilution_step_gpu(particles, gas, 1.0, 1.0)
 
-    npt.assert_array_equal(particles.concentration.numpy(), particle_values)
+    npt.assert_array_equal(particles.population.numpy(), particle_values)
     npt.assert_array_equal(gas.concentration.numpy(), gas_values)
 
 
@@ -998,7 +996,7 @@ def test_device_mismatch_rejects_before_any_write(mismatch) -> None:
     from particula.gpu.kernels import dilution_step_gpu
 
     particles, gas = _containers()
-    particle_values = particles.concentration.numpy().copy()
+    particle_values = particles.population.numpy().copy()
     gas_values = gas.concentration.numpy().copy()
     coefficient = 1.0
     if mismatch == "coefficient":
@@ -1006,7 +1004,7 @@ def test_device_mismatch_rejects_before_any_write(mismatch) -> None:
     elif mismatch == "particle":
         particles = _ResolvedParticleState(
             masses=particles.masses,
-            concentration=wp.array(
+            population=wp.array(
                 particle_values, dtype=wp.float64, device="cuda:0"
             ),
         )
@@ -1020,7 +1018,7 @@ def test_device_mismatch_rejects_before_any_write(mismatch) -> None:
     with pytest.raises(ValueError, match="device must match particle device"):
         dilution_step_gpu(particles, gas, coefficient, 1.0)
 
-    npt.assert_array_equal(particles.concentration.numpy(), particle_values)
+    npt.assert_array_equal(particles.population.numpy(), particle_values)
     npt.assert_array_equal(gas.concentration.numpy(), gas_values)
 
 
@@ -1049,7 +1047,7 @@ def test_invalid_coefficient_metadata_rejects_before_writes(
         dilution_step_gpu(particles, gas, coefficient, 1.0)
 
     npt.assert_array_equal(
-        particles.concentration.numpy(), snapshots["particle_concentration"]
+        particles.population.numpy(), snapshots["particle_concentration"]
     )
     npt.assert_array_equal(
         gas.concentration.numpy(), snapshots["gas_concentration"]
@@ -1140,18 +1138,16 @@ def test_mass_schema_rejections_are_atomic_and_side_effect_free(
 
     particles, gas = _containers()
     if mass_kind == "missing":
-        particles = _ResolvedParticleState(
-            concentration=particles.concentration
-        )
+        particles = _ResolvedParticleState(population=particles.population)
     elif mass_kind == "dtype":
         particles = _ResolvedParticleState(
             masses=wp.ones((2, 2, 2), dtype=wp.float32, device="cpu"),
-            concentration=particles.concentration,
+            population=particles.population,
         )
     else:
         particles = _ResolvedParticleState(
             masses=wp.ones((2, 2), dtype=wp.float64, device="cpu"),
-            concentration=particles.concentration,
+            population=particles.population,
         )
     snapshot = _full_state_snapshot(particles, gas, 1.0)
     _forbid_preflight_side_effects(monkeypatch)
@@ -1165,7 +1161,7 @@ def test_mass_schema_rejections_are_atomic_and_side_effect_free(
 @pytest.mark.parametrize(
     ("container_name", "message"),
     [
-        ("particles", "particles.concentration must be a Warp array"),
+        ("particles", "particles.population must be a Warp array"),
         ("gas", "gas.concentration must be a Warp array"),
     ],
 )
@@ -1215,7 +1211,7 @@ def test_invalid_coefficient_metadata_precedes_time_and_particle_access() -> (
         ("coefficient_values", "coefficient must be finite and nonnegative"),
         (
             "particle_values",
-            "particles.concentration must be finite and nonnegative",
+            "particles.population must be finite and nonnegative",
         ),
         ("gas_values", "gas.concentration must be finite and nonnegative"),
     ],
@@ -1237,7 +1233,7 @@ def test_preflight_rejections_are_atomic_and_side_effect_free(
     elif failure == "masses":
         particles = _ResolvedParticleState(
             masses="invalid",
-            concentration=particles.concentration,
+            population=particles.population,
             charge=particles.charge,
             density=particles.density,
             volume=particles.volume,
@@ -1245,7 +1241,7 @@ def test_preflight_rejections_are_atomic_and_side_effect_free(
     elif failure == "coefficient_values":
         coefficient = wp.array([-1.0, 0.5], dtype=wp.float64, device="cpu")
     elif failure == "particle_values":
-        particles.concentration = wp.array(
+        particles.population = wp.array(
             [[-1.0, 1.0], [2.0, 3.0]], dtype=wp.float64, device="cpu"
         )
     else:
@@ -1291,7 +1287,7 @@ def test_invalid_concentration_values_preserve_full_caller_state(
 
     particles, gas = _containers()
     if field == "particle":
-        particles.concentration = wp.array(
+        particles.population = wp.array(
             [[value, 1.0], [2.0, 3.0]], dtype=wp.float64, device="cpu"
         )
     else:
@@ -1299,8 +1295,10 @@ def test_invalid_concentration_values_preserve_full_caller_state(
             [[value, 1.0], [2.0, 3.0]], dtype=wp.float64, device="cpu"
         )
     snapshot = _full_state_snapshot(particles, gas, 1.0)
-    name = "particles" if field == "particle" else "gas"
-    message = f"{name}.concentration must be finite and nonnegative"
+    name = (
+        "particles.population" if field == "particle" else "gas.concentration"
+    )
+    message = f"{name} must be finite and nonnegative"
 
     with pytest.raises(ValueError, match=message):
         dilution_step_gpu(particles, gas, 1.0, 1.0)
@@ -1334,10 +1332,10 @@ def test_invalid_values_reject_before_no_op_or_dilution_effects(
         coefficient = wp.array([value, 0.5], dtype=wp.float64, device="cpu")
         message = "coefficient"
     elif field == "particle":
-        particles.concentration = wp.array(
+        particles.population = wp.array(
             [[value, 1.0], [2.0, 3.0]], dtype=wp.float64, device="cpu"
         )
-        message = "particles.concentration"
+        message = "particles.population"
     else:
         gas.concentration = wp.array(
             [[value, 1.0], [2.0, 3.0]], dtype=wp.float64, device="cpu"
@@ -1368,10 +1366,10 @@ def test_cuda_invalid_values_use_device_scan(field) -> None:
         coefficient = wp.array([np.nan, 0.5], dtype=wp.float64, device="cuda:0")
         message = "coefficient"
     elif field == "particle":
-        particles.concentration = wp.array(
+        particles.population = wp.array(
             [[np.nan, 1.0], [2.0, 3.0]], dtype=wp.float64, device="cuda:0"
         )
-        message = "particles.concentration"
+        message = "particles.population"
     else:
         gas.concentration = wp.array(
             [[np.nan, 1.0], [2.0, 3.0]], dtype=wp.float64, device="cuda:0"
@@ -1393,11 +1391,11 @@ def test_particle_concentration_second_dimension_mismatch_is_rejected() -> None:
     from particula.gpu.kernels import dilution_step_gpu
 
     particles, gas = _containers()
-    particles.concentration = wp.ones((2, 1), dtype=wp.float64, device="cpu")
+    particles.population = wp.ones((2, 1), dtype=wp.float64, device="cpu")
     snapshot = _full_state_snapshot(particles, gas, 1.0)
 
     with pytest.raises(
-        ValueError, match="particles.concentration shape must match"
+        ValueError, match="particles.population shape must match"
     ):
         dilution_step_gpu(particles, gas, 1.0, 1.0)
 
@@ -1416,15 +1414,13 @@ def test_gas_concentration_width_is_independent_of_particle_species() -> None:
     gas.molar_mass = wp.ones(2, dtype=wp.float64, device="cpu")
     gas.vapor_pressure = wp.ones((2, 2), dtype=wp.float64, device="cpu")
     gas.partitioning = wp.ones((2, 2), dtype=wp.int32, device="cpu")
-    particle_before = particles.concentration.numpy().copy()
+    particle_before = particles.population.numpy().copy()
     gas_before = gas.concentration.numpy().copy()
 
     dilution_step_gpu(particles, gas, 0.5, 2.0)
 
     factor = np.exp(-1.0)
-    npt.assert_allclose(
-        particles.concentration.numpy(), particle_before * factor
-    )
+    npt.assert_allclose(particles.population.numpy(), particle_before * factor)
     npt.assert_allclose(gas.concentration.numpy(), gas_before * factor)
 
 
@@ -1433,7 +1429,7 @@ def test_particle_and_gas_concentration_alias_is_rejected() -> None:
     from particula.gpu.kernels import dilution_step_gpu
 
     particles, gas = _containers()
-    gas.concentration = particles.concentration
+    gas.concentration = particles.population
     snapshot = _full_state_snapshot(particles, gas, 1.0)
 
     with pytest.raises(ValueError, match="must not overlap"):
@@ -1453,9 +1449,7 @@ def test_coefficient_output_storage_overlap_is_rejected(
 
     particles, gas = _containers()
     coefficient = wp.array([0.5, 0.25], dtype=wp.float64, device="cpu")
-    target = (
-        particles.concentration if output == "particle" else gas.concentration
-    )
+    target = particles.population if output == "particle" else gas.concentration
     snapshot = _full_state_snapshot(particles, gas, coefficient)
     original_memory_range = dilution_module._warp_array_memory_range
 
@@ -1482,7 +1476,7 @@ def test_preflight_validation_order_at_remaining_boundaries() -> None:
     particles, gas = _containers()
     particles = _ResolvedParticleState(
         masses="invalid",
-        concentration=particles.concentration,
+        population=particles.population,
         charge=particles.charge,
         density=particles.density,
         volume=particles.volume,
@@ -1496,7 +1490,7 @@ def test_preflight_validation_order_at_remaining_boundaries() -> None:
     particles, gas = _containers()
     particles = _ResolvedParticleState(
         masses=particles.masses,
-        concentration="invalid",
+        population="invalid",
         charge=particles.charge,
         density=particles.density,
         volume=particles.volume,
@@ -1508,7 +1502,7 @@ def test_preflight_validation_order_at_remaining_boundaries() -> None:
         dilution_step_gpu(particles, gas, invalid_coefficient, 1.0)
 
     particles, gas = _containers()
-    particles.concentration = wp.array(
+    particles.population = wp.array(
         [[-1.0, 1.0], [2.0, 3.0]], dtype=wp.float64, device="cpu"
     )
     gas = SimpleNamespace(
@@ -1519,7 +1513,7 @@ def test_preflight_validation_order_at_remaining_boundaries() -> None:
     )
     with pytest.raises(
         ValueError,
-        match="particles.concentration must be finite and nonnegative",
+        match="particles.population must be finite and nonnegative",
     ):
         dilution_step_gpu(particles, gas, 1.0, 1.0)
 

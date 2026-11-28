@@ -21,7 +21,7 @@ def _make_data(
     """Create particle data with density and volume matching its shapes."""
     return ParticleData(
         masses=np.asarray(masses, dtype=np.float64),
-        concentration=np.asarray(concentration, dtype=np.float64),
+        population=np.asarray(concentration, dtype=np.float64),
         charge=np.asarray(charge, dtype=np.float64),
         density=np.ones(masses.shape[-1], dtype=np.float64),
         volume=np.ones(masses.shape[0], dtype=np.float64),
@@ -120,7 +120,7 @@ def test_get_slot_diagnostics_accumulates_integer_masses_as_float64() -> None:
     maximum = np.iinfo(np.int64).max
     data = ParticleData(
         masses=np.array([[[maximum, maximum]]], dtype=np.int64),
-        concentration=np.array([[1.0]]),
+        population=np.array([[1.0]]),
         charge=np.array([[0.0]]),
         density=np.ones(2),
         volume=np.ones(1),

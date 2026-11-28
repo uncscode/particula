@@ -62,11 +62,11 @@ def test_access_has_explicit_count_volume_and_copy_semantics(example):
     ):
         derived = getattr(particles, name)
         assert not np.shares_memory(derived, particles.masses)
-        assert not np.shares_memory(derived, particles.concentration)
+        assert not np.shares_memory(derived, particles.population)
     copied = particles.copy()
     copied.concentration[0, 0] = 20.0
-    assert particles.concentration[0, 0] == 2.0
-    alias = aerosol.particles.concentration
+    assert particles.population[0, 0] == 2.0
+    alias = aerosol.particles.population
     alias[0, 0] = 4.0
     np.testing.assert_array_equal(particles.number_density, [24.0])
 

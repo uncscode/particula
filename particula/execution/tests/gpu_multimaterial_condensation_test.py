@@ -40,7 +40,7 @@ def material_case(materials):
     masses[:, -1] = 0
     particles = ParticleData(
         masses=masses,
-        concentration=original.particles.concentration.copy(),
+        population=original.particles.population.copy(),
         density=density,
         charge=original.particles.charge.copy(),
         volume=original.particles.volume.copy(),
@@ -159,8 +159,8 @@ def test_block_solve_matches_independent_dense_system(
     initial.particles.masses = np.tile(
         initial.particles.masses, (1, repeats, 1)
     )
-    initial.particles.concentration = np.tile(
-        initial.particles.concentration, (1, repeats)
+    initial.particles.population = np.tile(
+        initial.particles.population, (1, repeats)
     )
     initial.particles.charge = np.tile(initial.particles.charge, (1, repeats))
     initial.particles.volume *= repeats
@@ -180,7 +180,7 @@ def test_block_solve_matches_independent_dense_system(
     rhs = rng.normal(size=owner._size)
     stages.rhs.assign(rhs)
     scale = owner._host_scale
-    count = initial.particles.concentration
+    count = initial.particles.population
     # Assemble the complete independently indexed Jacobian, including inert rows.
     jac = np.zeros((owner._size, owner._size))
     weights = np.zeros((2 * materials, owner._size))

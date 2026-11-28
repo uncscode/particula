@@ -68,7 +68,7 @@ def _aerosol(capacity=3):
     """Build a tagged population and full gas with a retained inert view."""
     particles = ParticleData(
         masses=np.zeros((1, capacity, 1)),
-        concentration=np.zeros((1, capacity)),
+        population=np.zeros((1, capacity)),
         charge=np.zeros((1, capacity)),
         density=np.array([1000.0]),
         volume=np.array([1.0]),
@@ -273,26 +273,26 @@ def test_real_execution_depletes_gas_and_never_touches_gas_only():
 
     assert _runnable().execute(aerosol, 1.0, sub_steps=2) is aerosol
     assert gas.concentration[0, 0] < initial_gas[0, 0]
-    assert np.any(particles.concentration > 0.0)
+    assert np.any(particles.population > 0.0)
     npt.assert_array_equal(gas_only, initial_gas_only)
 
 
 def test_real_execution_preserves_native_arrays_and_derived_properties():
     """Native derived properties see committed arrays without facade caches."""
     aerosol, particles, _, _ = _aerosol()
-    arrays = (particles.masses, particles.concentration, particles.charge)
+    arrays = (particles.masses, particles.population, particles.charge)
     _runnable().execute(aerosol, 1.0)
     assert aerosol.particles is particles
     assert all(
         before is after
         for before, after in zip(
             arrays,
-            (particles.masses, particles.concentration, particles.charge),
+            (particles.masses, particles.population, particles.charge),
             strict=True,
         )
     )
     npt.assert_array_equal(particles.total_mass, particles.masses.sum(axis=2))
-    assert np.any(particles.concentration > 0)
+    assert np.any(particles.population > 0)
     assert np.any(particles.radii > 0)
 
 
@@ -392,7 +392,7 @@ def test_invalid_topology_is_write_free_and_skips_source_work(
         )
     arrays = (
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         particles.density,
         particles.volume,
@@ -532,7 +532,7 @@ def test_execute_skips_transactions_for_zero_rate(monkeypatch):
     aerosol, particles, gas, gas_only = _aerosol()
     snapshots = [
         particles.masses.copy(),
-        particles.concentration.copy(),
+        particles.population.copy(),
         gas.concentration.copy(),
         gas_only.copy(),
     ]
@@ -553,7 +553,7 @@ def test_execute_skips_transactions_for_zero_rate(monkeypatch):
     for actual, expected in zip(
         (
             particles.masses,
-            particles.concentration,
+            particles.population,
             gas.concentration,
             gas_only,
         ),
@@ -714,7 +714,7 @@ def test_real_substeps_read_current_gas_and_match_independent_transfer_math(
         atol=CONSERVATION_ATOL,
     )
     npt.assert_allclose(
-        np.einsum("bn,bns->bs", particles.concentration, particles.masses),
+        np.einsum("bn,bns->bs", particles.population, particles.masses),
         [[initial_gas - expected_gas]],
         rtol=CONSERVATION_RTOL,
         atol=CONSERVATION_ATOL,
@@ -818,7 +818,7 @@ def test_real_later_commit_failure_preserves_prior_substep() -> None:
     runnable = _runnable()
     assert runnable.execute(expected_aerosol, 0.5) is expected_aerosol
     expected_masses = expected_particles.masses.copy()
-    expected_concentration = expected_particles.concentration.copy()
+    expected_concentration = expected_particles.population.copy()
     expected_charge = expected_particles.charge.copy()
     expected_volume = expected_particles.volume.copy()
     expected_gas_concentration = expected_gas.concentration.copy()
@@ -837,7 +837,7 @@ def test_real_later_commit_failure_preserves_prior_substep() -> None:
         atol=CONSERVATION_ATOL,
     )
     npt.assert_allclose(
-        particles.concentration,
+        particles.population,
         expected_concentration,
         rtol=CONSERVATION_RTOL,
         atol=CONSERVATION_ATOL,

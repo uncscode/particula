@@ -159,7 +159,7 @@ class ResolvedBinding:
                 "resolved layout or metadata changed; rebind chemistry"
             )
         p.validate_representation()
-        active = p.concentration > 0
+        active = p.population > 0
         if np.any(active != np.any(p.masses > 0, axis=2)) or np.any(
             p.charge[~active] != 0
         ):

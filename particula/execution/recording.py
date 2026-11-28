@@ -25,6 +25,7 @@ OBSERVABLES = {
     "pressure": ("environment.pressure", "Pa", ("box",)),
     "volume": ("particles.volume", "m^3", ("box",)),
     "particle_masses": ("particles.masses", "kg", ("box", "slot", "material")),
+    "particle_population": ("particles.population", "count", ("box", "slot")),
     "particle_concentration": (
         "particles.concentration",
         "population_measure",
@@ -131,6 +132,13 @@ class Recorder:
                 for name in self.variables
             },
         }
+        metadata["population_storage"] = "extensive"
+        if "particle_population" in metadata["observables"]:
+            metadata["observables"]["particle_population"]["unit"] = (
+                "m^-1"
+                if particle.distribution_type == "continuous_pdf"
+                else "count"
+            )
         if "particle_concentration" in metadata["observables"]:
             metadata["observables"]["particle_concentration"]["unit"] = {
                 "particle_resolved": "count",

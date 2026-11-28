@@ -612,7 +612,7 @@ def test_public_step_sparse_inputs_are_exact_noops(name: str) -> None:
             row, fixture, n_species=2, max_collisions=1, device=device
         )
         npt.assert_array_equal(final["masses"], initial["masses"])
-        npt.assert_array_equal(final["concentration"], initial["concentration"])
+        npt.assert_array_equal(final["population"], initial["population"])
         npt.assert_array_equal(final["charge"], initial["charge"])
         npt.assert_array_equal(final["counts"], [0])
 
@@ -675,7 +675,7 @@ def test_zero_effective_rate_cases_do_not_mutate_particles(
             row, fixture, n_species=1, max_collisions=1, device=device
         )
         npt.assert_array_equal(final["masses"], initial["masses"])
-        npt.assert_array_equal(final["concentration"], initial["concentration"])
+        npt.assert_array_equal(final["population"], initial["population"])
         npt.assert_array_equal(final["charge"], initial["charge"])
         npt.assert_array_equal(final["counts"], 0)
 
@@ -852,7 +852,7 @@ def test_selected_public_preflight_failures_are_atomic(failure: str) -> None:
         kwargs = {}
         message = "sedimentation particle"
     elif failure == "sedimentation_concentration":
-        cpu_particles.concentration[0, 0] = np.nan
+        cpu_particles.population[0, 0] = np.nan
         mechanisms = ("sedimentation_sp2016",)
         kwargs = {}
         message = "sedimentation particle concentration"
@@ -870,7 +870,7 @@ def test_selected_public_preflight_failures_are_atomic(failure: str) -> None:
             "fluid_density": 1.2,
         }
         message = "turbulent_dissipation"
-    for field in ("masses", "concentration", "density", "charge"):
+    for field in ("masses", "population", "density", "charge"):
         getattr(particles, field).assign(getattr(cpu_particles, field))
     pairs = wp.full((1, 1, 2), -7, dtype=wp.int32, device="cpu")
     counts = wp.full((1,), -7, dtype=wp.int32, device="cpu")

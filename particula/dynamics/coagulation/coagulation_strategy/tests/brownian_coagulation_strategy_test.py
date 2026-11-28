@@ -51,7 +51,7 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
                     ]
                 ]
             ),
-            concentration=np.array([[1e6, 2e6, 1.5e6, 0.8e6]]),
+            population=np.array([[1e6, 2e6, 1.5e6, 0.8e6]]),
             charge=np.array([[0.0, 1.0, -1.0, 0.0]]),
             density=np.array([1000.0, 1200.0]),
             volume=np.array([1.0]),
@@ -73,14 +73,14 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
     def test_step_discrete(self):
         """Test the step method for discrete distribution."""
         # Test the step method for discrete distribution
-        initial_concentration = self.particle.concentration[0].copy()
+        initial_concentration = self.particle.population[0].copy()
         self.strategy_discrete.step(
             particle=self.particle,
             temperature=self.temperature,
             pressure=self.pressure,
             time_step=1.0,
         )
-        updated_concentration = self.particle.concentration[0]
+        updated_concentration = self.particle.population[0]
         self.assertFalse(
             np.array_equal(initial_concentration, updated_concentration)
         )
@@ -144,7 +144,7 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
     def test_brownian_step_with_particle_data(self):
         """Test coagulation step with ParticleData inputs."""
         particle_data = self.particle_data.copy()
-        initial_concentration = particle_data.concentration.copy()
+        initial_concentration = particle_data.population.copy()
         self.strategy_discrete.step(
             particle=particle_data,
             temperature=self.temperature,
@@ -152,7 +152,7 @@ class TestBrownianCoagulationStrategy(unittest.TestCase):
             time_step=1.0,
         )
         self.assertFalse(
-            np.array_equal(initial_concentration, particle_data.concentration)
+            np.array_equal(initial_concentration, particle_data.population)
         )
 
     def test_brownian_step_returns_matching_types(self):

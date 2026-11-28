@@ -64,7 +64,7 @@ def validate_physics(particles: Any) -> None:
         dim=boxes,
         inputs=[
             particles.masses,
-            particles.concentration,
+            particles.population,
             particles.density,
             particles.volume,
             invalid,
@@ -103,7 +103,7 @@ def validate_ownership(
     """Reject writer overlap with another writer or protected input storage."""
     writers = [
         particles.masses,
-        particles.concentration,
+        particles.population,
         particles.charge,
         states,
     ]

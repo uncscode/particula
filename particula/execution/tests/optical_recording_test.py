@@ -83,7 +83,7 @@ def test_dense_optics_without_snapshots(backend, mixed, tmp_path, monkeypatch):
             qext
             * np.pi
             * radii**2
-            * (particles.concentration / particles.volume[:, None])[:, None, :],
+            * (particles.population / particles.volume[:, None])[:, None, :],
             axis=-1,
         )
         expected = np.exp(-0.2 * times[:, None, None]) * initial_extinction
@@ -138,7 +138,7 @@ def test_independent_snapshot_schedule_through_growth(device, tmp_path):
                 qext = get_mie_efficiencies(
                     radius, wave, config.particle_index[0]
                 ).extinction
-                weight = particles.concentration / particles.volume[:, None]
+                weight = particles.population / particles.volume[:, None]
                 npt.assert_allclose(
                     extinction[row],
                     np.sum(

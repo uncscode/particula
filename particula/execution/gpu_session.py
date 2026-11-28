@@ -173,8 +173,8 @@ def _preflight_cpu_session(
     species = dimensions.n_species
 
     _validate_cpu_shape(
-        particles.concentration,
-        "particles.concentration",
+        particles.population,
+        "particles.population",
         (boxes, particle_count),
     )
     _validate_cpu_shape(
@@ -573,8 +573,8 @@ def _validate_schema(
         device,
     )
     _validate_array(
-        "particles.concentration",
-        cast(Any, particles).concentration,
+        "particles.population",
+        cast(Any, particles).population,
         wp.float64,
         (boxes, particle_count),
         device,
@@ -666,7 +666,7 @@ def _reject_primary_aliases(
     """Reject overlapping primary storage before publishing a session."""
     arrays = (
         cast(Any, particles).masses,
-        cast(Any, particles).concentration,
+        cast(Any, particles).population,
         cast(Any, particles).charge,
         cast(Any, particles).density,
         cast(Any, particles).volume,

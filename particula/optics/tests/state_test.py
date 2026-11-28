@@ -2,6 +2,7 @@
 
 import numpy as np
 import numpy.testing as npt
+import pytest
 from particula.optics import (
     OpticalConfig,
     get_mie_efficiencies,
@@ -11,7 +12,8 @@ from particula.particles import ParticleData
 from particula.particles._population import number_density_weights
 
 
-def test_pdf_uses_radius_grid_as_quadrature_and_optical_size():
+@pytest.mark.parametrize("volume", [0.25, 1.0, 4.0])
+def test_pdf_uses_radius_grid_as_quadrature_and_optical_size(volume):
     """Compare absorption and extinction with direct PDF integration."""
     grid = np.array([70e-9, 83e-9, 145e-9, 317e-9])
     density = np.array([[5e15, 9e15, 2e15, 1e15]])
@@ -19,9 +21,9 @@ def test_pdf_uses_radius_grid_as_quadrature_and_optical_size():
         # Hold the composition fixed independently of the PDF nodes.
         masses=np.full((1, len(grid), 1), 2e-17),
         density=np.array([1110.0]),
-        concentration=density,
+        population=density * volume,
         charge=np.zeros_like(density),
-        volume=np.ones(1),
+        volume=np.array([volume]),
         distribution_type="continuous_pdf",
         radius_grid=grid,
     )
@@ -42,7 +44,7 @@ def test_resolved_boxes_and_empty_population_match_discrete_optics():
     mass = (4 * np.pi / 3 * 1000 * radius**3)[:, None]
     particles = ParticleData(
         masses=np.stack([mass, mass, np.zeros_like(mass)]),
-        concentration=np.array([[1.0, 2.0], [16.0, 32.0], [0.0, 0.0]]),
+        population=np.array([[1.0, 2.0], [16.0, 32.0], [0.0, 0.0]]),
         charge=np.zeros((3, 2)),
         density=np.array([1000.0]),
         volume=np.array([0.25, 4.0, 1.0]),
@@ -50,7 +52,7 @@ def test_resolved_boxes_and_empty_population_match_discrete_optics():
     )
     weights = number_density_weights(particles)
     npt.assert_array_equal(weights, [[4, 8], [4, 8], [0, 0]])
-    assert not np.shares_memory(weights, particles.concentration)
+    assert not np.shares_memory(weights, particles.population)
     npt.assert_allclose(
         particles.species_mass_inventory[1],
         16 * particles.species_mass_inventory[0],
@@ -61,10 +63,10 @@ def test_resolved_boxes_and_empty_population_match_discrete_optics():
     resolved = population_optics(particles, config)
     discrete = ParticleData(
         masses=mass[None],
-        concentration=np.array([[4.0, 8.0]]),
+        population=np.array([[16.0, 32.0]]),
         charge=np.zeros((1, 2)),
         density=particles.density,
-        volume=np.ones(1),
+        volume=np.array([4.0]),
         distribution_type="discrete",
     )
     binned = population_optics(discrete, config)

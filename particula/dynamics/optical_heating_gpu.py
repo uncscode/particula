@@ -166,7 +166,7 @@ def _stage_particle(
     if failure[0] != 0:
         return
     box, slot = wp.tid()
-    if particles.concentration[box, slot] <= _ZERO:
+    if particles.population[box, slot] <= _ZERO:
         return
     liquid = particles.masses[box, slot, particle_water]
     solute = particles.masses[box, slot, 1 - particle_water]
@@ -260,7 +260,7 @@ def _stage_box(
     absorbed = wp.float64(0.0)
     energy = wp.vec4d(_ZERO, _ZERO, _ZERO, _ZERO)
     for slot in range(particles.masses.shape[1]):
-        if particles.concentration[box, slot] > _ZERO:
+        if particles.population[box, slot] > _ZERO:
             count = weights[box * waves, slot]
             lost = (
                 particles.masses[box, slot, particle_water]
@@ -314,7 +314,7 @@ def _publish(
     if failure[0] != 0:
         return
     box, slot = wp.tid()
-    if particles.concentration[box, slot] > _ZERO:
+    if particles.population[box, slot] > _ZERO:
         particles.masses[box, slot, particle_water] = proposed[box, slot, 0]
         temperature[box, slot] = proposed[box, slot, 1]
         power[box, slot] = proposed[box, slot, 2]
@@ -388,10 +388,10 @@ class OpticalHeatingAdapter:
         device = context.device
         array = context.arrays
         particles = WarpParticleData()
-        for key in ("masses", "concentration", "volume", "density"):
+        for key in ("masses", "population", "volume", "density"):
             setattr(particles, key, array["particles." + key])
         particles.distribution_kind = wp.int32(plan.values["kind"])
-        boxes, slots = particles.concentration.shape
+        boxes, slots = particles.population.shape
         optics = _optical_config(meta)
         waves = len(optics.wavelength)
         cases = ParticleOpticalCases(
