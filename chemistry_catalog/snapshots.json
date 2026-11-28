@@ -1,0 +1,280 @@
+{
+  "camx": {
+    "aerosol": "CF2E",
+    "citation": "https://www.camx.com/download/source/",
+    "count": 6,
+    "files": [
+      {
+        "name": "CAMx7.2.chemparam.CB6r5_CF2E_NH3Rscale0",
+        "sha256": "8d267b966a4cf3d9be236f4bbed5fdd52bd3cfe3e463f97c454aa7a9807bfe25",
+        "url": "https://epa-2022-modeling-platform.s3.amazonaws.com/Model_jobs_v2/2022he_CAMx_base_12US2/CAMx7.2.chemparam.CB6r5_CF2E_NH3Rscale0"
+      },
+      {
+        "name": "lsrate1.f",
+        "sha256": "6b58f8e1f62f12ef64226e026c813360337f1d76a9e2e2e62be646112ecb5e85",
+        "url": "https://raw.githubusercontent.com/wcd940816/camx7.2modified/dc4351b4dd5499cc53fc230317875ab831772473/src.v7.20/CMC/lsrate1.f"
+      },
+      {
+        "name": "lsrxn1.f",
+        "sha256": "14d3a58cf12aeea0728dd0ce826888b9779ef703314325747663417d420ace06",
+        "url": "https://raw.githubusercontent.com/wcd940816/camx7.2modified/dc4351b4dd5499cc53fc230317875ab831772473/src.v7.20/CMC/lsrxn1.f"
+      }
+    ],
+    "id": "camx:CB6r5@167227ca05db1e9d452467e98b21b7b7c1cea882b6e1be6a97c072089cb5d7bb:native@0a4fd9935455890544bbf55cd4e5361df7f689f7c458d45b9e5245bd02755129",
+    "importer_version": 4,
+    "mechanism": "CB6r5",
+    "release": "7.20",
+    "requires_closed_oxygen": 1,
+    "sha256": "0a4fd9935455890544bbf55cd4e5361df7f689f7c458d45b9e5245bd02755129",
+    "source": "camx",
+    "source_count": 234,
+    "source_snapshot": "camx:CB6r5@167227ca05db1e9d452467e98b21b7b7c1cea882b6e1be6a97c072089cb5d7bb"
+  },
+  "cmaq": {
+    "aerosol": null,
+    "citation": "https://github.com/USEPA/CMAQ/tree/5.5/CCTM/src/MECHS/cracmm2",
+    "count": 4,
+    "files": [
+      {
+        "name": "mech_cracmm2.def",
+        "sha256": "bc25a5641e2bf741dbc7cb75ec5fbef74324c894fe91be104a0531711ffbc300",
+        "url": "https://raw.githubusercontent.com/USEPA/CMAQ/5.5/CCTM/src/MECHS/cracmm2/mech_cracmm2.def"
+      }
+    ],
+    "id": "cmaq:CRACMM2@286107bb849dea42712666ec86152f78cffe102e0a634a123e81a0ac44aa1869:native@b08f70315b911a90af1e81f09f0f5f5890ca7f725a003a98c58955977b79322a",
+    "importer_version": 4,
+    "mechanism": "CRACMM2",
+    "release": "5.5",
+    "requires_closed_oxygen": 1,
+    "sha256": "b08f70315b911a90af1e81f09f0f5f5890ca7f725a003a98c58955977b79322a",
+    "source": "cmaq",
+    "source_count": 531,
+    "source_snapshot": "cmaq:CRACMM2@286107bb849dea42712666ec86152f78cffe102e0a634a123e81a0ac44aa1869"
+  },
+  "e3sm": {
+    "aerosol": "MAM5-VBS",
+    "citation": "https://github.com/E3SM-Project/E3SM/releases/tag/v3.0.0",
+    "count": 4,
+    "files": [
+      {
+        "name": "chem_mech.in",
+        "sha256": "88b6ede893374e17da718e56d1cc8f2a0b20e1dec1e6c0a611d184bab6e37514",
+        "url": "https://raw.githubusercontent.com/E3SM-Project/E3SM/v3.0.0/components/eam/src/chemistry/pp_chemuci_linozv3_mam5_vbs/chem_mech.in"
+      }
+    ],
+    "id": "e3sm:chemUCI-Linoz-v3@aff64416702aaf1a28e67c45e9e0c2df812334146977f1f034b5b1326bcbcb39:native@05f8cdf42a24baf425fbbf66abb7fbc064528dc8c384ea0006c0a25f79459a4d",
+    "importer_version": 4,
+    "mechanism": "chemUCI-Linoz-v3",
+    "release": "v3.0.0",
+    "requires_closed_oxygen": 1,
+    "sha256": "05f8cdf42a24baf425fbbf66abb7fbc064528dc8c384ea0006c0a25f79459a4d",
+    "source": "e3sm",
+    "source_count": 104,
+    "source_snapshot": "e3sm:chemUCI-Linoz-v3@aff64416702aaf1a28e67c45e9e0c2df812334146977f1f034b5b1326bcbcb39"
+  },
+  "mcm": {
+    "aerosol": null,
+    "citation": "https://www.mcm.york.ac.uk/MCM/about/cite",
+    "count": 95,
+    "files": [
+      {
+        "name": "apinene.eqn",
+        "sha256": "22f5a644a57cf412eb82e257ae44e402b2c7204c18ff551343d0ee179b30bd01",
+        "url": "https://mcm.york.ac.uk/MCM/export/download?selected%5B%5D=APINENE&inorganic=on&generic=on&format=kpp"
+      },
+      {
+        "name": "constants_mcm.f90",
+        "sha256": "d98b98ebfc168de798ecdcd2da947438a440d9e0edf95d568436387fc68aa31f",
+        "url": "https://mcm.york.ac.uk/MCM/export/kpp_constants"
+      },
+      {
+        "name": "species.tsv",
+        "sha256": "0925410e40d7a75b07aaefbf6d461e3169a12a455c7c2578b6ebc07f39191780",
+        "url": "https://mcm.york.ac.uk/MCM/export/download?selected%5B%5D=APINENE&inorganic=on&generic=on&format=species_tsv"
+      }
+    ],
+    "id": "mcm:APINENE-inorganic-generic@b1c39644dca25ac0a4d65df6ee6e69d392d0ca406845ead246a1c8f2247ce7c6:native@2b161ab56ef9bff3ffb03afc41b5646ce090ea725196562a9d89c194d6b90068",
+    "importer_version": 4,
+    "mechanism": "APINENE-inorganic-generic",
+    "release": "3.3.1",
+    "requires_closed_oxygen": 1,
+    "sha256": "2b161ab56ef9bff3ffb03afc41b5646ce090ea725196562a9d89c194d6b90068",
+    "source": "mcm",
+    "source_count": 881,
+    "source_snapshot": "mcm:APINENE-inorganic-generic@b1c39644dca25ac0a4d65df6ee6e69d392d0ca406845ead246a1c8f2247ce7c6"
+  },
+  "mcm-full": {
+    "aerosol": null,
+    "citation": "https://www.mcm.york.ac.uk/MCM/about/cite",
+    "count": 2153,
+    "files": [
+      {
+        "archive_sha256": "58f1e5451b1e9836bcdacabf3dff92c171f083bf64d0beffc54f9c7515ab11c0",
+        "member": "mcm_3-3-1_windows/mcm_3-3-1_kpp_complete.eqn",
+        "name": "mcm_3-3-1_kpp_complete.eqn",
+        "sha256": "57638851109b9d38ecfbadb707736a92aa62eabe678509769b3ce0b99c32f684",
+        "url": "https://mcm.york.ac.uk/static/MCM/download/mcm_3-3-1.zip"
+      },
+      {
+        "archive_sha256": "58f1e5451b1e9836bcdacabf3dff92c171f083bf64d0beffc54f9c7515ab11c0",
+        "member": "mcm_3-3-1_windows/mcm_3-3-1_kpp_constants_mcm.f90",
+        "name": "mcm_3-3-1_kpp_constants_mcm.f90",
+        "sha256": "d98b98ebfc168de798ecdcd2da947438a440d9e0edf95d568436387fc68aa31f",
+        "url": "https://mcm.york.ac.uk/static/MCM/download/mcm_3-3-1.zip"
+      },
+      {
+        "archive_sha256": "58f1e5451b1e9836bcdacabf3dff92c171f083bf64d0beffc54f9c7515ab11c0",
+        "member": "mcm_3-3-1_windows/mcm_3-3-1_species_complete.tsv",
+        "name": "mcm_3-3-1_species_complete.tsv",
+        "sha256": "9ab4217231532645ae2b2d8b6e0ef25542b9fe7bf25bbdad1ac90b60b548dfb3",
+        "url": "https://mcm.york.ac.uk/static/MCM/download/mcm_3-3-1.zip"
+      }
+    ],
+    "id": "mcm:complete@7689e8df8dd31650aa88c4108e80d94606f75d8ccb59b3650e3c00480b24a016:native@9615376b971bbb91c6f0b8ee3347a9129f1ed335c1225b3c03ea553ca160a308",
+    "importer_version": 4,
+    "mechanism": "complete",
+    "release": "3.3.1",
+    "requires_closed_oxygen": 1,
+    "sha256": "9615376b971bbb91c6f0b8ee3347a9129f1ed335c1225b3c03ea553ca160a308",
+    "source": "mcm",
+    "source_count": 16698,
+    "source_snapshot": "mcm:complete@7689e8df8dd31650aa88c4108e80d94606f75d8ccb59b3650e3c00480b24a016"
+  },
+  "pmcamx": {
+    "aerosol": null,
+    "citation": "https://doi.org/10.5281/zenodo.4071362",
+    "count": 6,
+    "files": [
+      {
+        "archive_sha256": "2fb6d35f0a57b470a92c7f7a5bea4dbee9b956a04aef332c5a316bfd2af76584",
+        "member": "PMCAMx-SR_v1.0/CAMx4.chemparam.7.CB5",
+        "name": "CAMx4.chemparam.7.CB5",
+        "sha256": "d0a18f9beff7538e20238220e7f57dbc3a49e7ceb134001db6d49b6b4cd1fec9",
+        "url": "https://zenodo.org/api/records/4071362/files/PMCAMx-SR_v1.0.tar/content"
+      },
+      {
+        "archive_sha256": "2fb6d35f0a57b470a92c7f7a5bea4dbee9b956a04aef332c5a316bfd2af76584",
+        "member": "PMCAMx-SR_v1.0/PMCAMx-SR-CB05/CMC/CB5/lsrate7.f",
+        "name": "lsrate7.f",
+        "sha256": "bcef206e107a6d528de23a77d5414148fd28f2de481e224c9054f95f6874be68",
+        "url": "https://zenodo.org/api/records/4071362/files/PMCAMx-SR_v1.0.tar/content"
+      },
+      {
+        "archive_sha256": "2fb6d35f0a57b470a92c7f7a5bea4dbee9b956a04aef332c5a316bfd2af76584",
+        "member": "PMCAMx-SR_v1.0/PMCAMx-SR-CB05/CMC/CB5/lsrxn7.f",
+        "name": "lsrxn7.f",
+        "sha256": "371b8b9df860694c24a7c3f96e39b71df923f0f68c712ca1cc63b3fa08d80937",
+        "url": "https://zenodo.org/api/records/4071362/files/PMCAMx-SR_v1.0.tar/content"
+      }
+    ],
+    "id": "pmcamx:CB05@be4c9a5765e4a5213c4ef84a05be5308c79d52ceec03144d793cb5005e6b0606:native@b6407093af200219df1dd145298136dd30750b0a09169f27d1947079e1fa40a3",
+    "importer_version": 4,
+    "mechanism": "CB05",
+    "release": "SR-1.0",
+    "requires_closed_oxygen": 1,
+    "sha256": "b6407093af200219df1dd145298136dd30750b0a09169f27d1947079e1fa40a3",
+    "source": "pmcamx",
+    "source_count": 190,
+    "source_snapshot": "pmcamx:CB05@be4c9a5765e4a5213c4ef84a05be5308c79d52ceec03144d793cb5005e6b0606"
+  },
+  "pmcamx-soap": {
+    "aerosol": "SOAP",
+    "citation": "https://doi.org/10.5281/zenodo.4071362",
+    "count": 0,
+    "files": [
+      {
+        "archive_sha256": "2fb6d35f0a57b470a92c7f7a5bea4dbee9b956a04aef332c5a316bfd2af76584",
+        "member": "PMCAMx-SR_v1.0/PMCAMx-SR-CB05/SOAP/soachem.f",
+        "name": "soachem.f",
+        "sha256": "44562cee761ce983bf37a11149c3f0a6b8377244e598ca07e991700359a238bd",
+        "url": "https://zenodo.org/api/records/4071362/files/PMCAMx-SR_v1.0.tar/content"
+      }
+    ],
+    "id": "pmcamx:SOAP@e2c1d70850d3f0e5d18fc329f188e376068000fcb98380db25c06e130d14ca23:native@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "importer_version": 4,
+    "mechanism": "SOAP",
+    "release": "SR-1.0",
+    "requires_closed_oxygen": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source": "pmcamx",
+    "source_count": 71,
+    "source_snapshot": "pmcamx:SOAP@e2c1d70850d3f0e5d18fc329f188e376068000fcb98380db25c06e130d14ca23"
+  },
+  "pmcamx-soap-alt": {
+    "aerosol": "SOAP",
+    "citation": "https://doi.org/10.5281/zenodo.4071362",
+    "count": 0,
+    "files": [
+      {
+        "archive_sha256": "ff5d5dd0eb41ff616a09da8d573360c4ecaab2da532df8a67e21c2753fd85ac0",
+        "container": "PMCAMx-SR_v1.0a/PMCAMx-SR-CB05.tar",
+        "container_sha256": "16eb57983b55560296565cbd0455a8d2d4877657ea9e1a5c59741e48082acb0a",
+        "member": "PMCAMx-SR-CB05/SOAP/soachem.f",
+        "name": "soachem.f",
+        "sha256": "e169b11c01b158b5e3cc89ca9f9acdfbffbb5f54147c1158c2aade8875ee9500",
+        "url": "https://zenodo.org/api/records/4071362/files/PMCAMx-SR_v1.0a.tar/content"
+      }
+    ],
+    "id": "pmcamx:SOAP@23e560249a59787e9b8bef4c40da50d60674d0d40aaa0884a4c726a16c0a63d1:native@e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "importer_version": 4,
+    "mechanism": "SOAP",
+    "release": "SR-1.0a",
+    "requires_closed_oxygen": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source": "pmcamx",
+    "source_count": 71,
+    "source_snapshot": "pmcamx:SOAP@23e560249a59787e9b8bef4c40da50d60674d0d40aaa0884a4c726a16c0a63d1"
+  },
+  "waccm": {
+    "aerosol": "MAM4",
+    "citation": "https://www.cesm.ucar.edu/working-groups/whole-atmosphere/code",
+    "count": 39,
+    "files": [
+      {
+        "name": "chem_mech.in",
+        "sha256": "c15d52909d246da8cd72c996709d848163c89ed75d4c684ba05aef5cff643664",
+        "url": "https://raw.githubusercontent.com/ESCOMP/CAM/405a3f21446439d8f952660f0300332d9b860279/src/chemistry/pp_waccm_tsmlt_mam4/chem_mech.in"
+      },
+      {
+        "name": "mo_usrrxt.F90",
+        "sha256": "5efa9cb053178448d8173a51eff6382d139edb852485e6a73198c6c80ced57eb",
+        "url": "https://raw.githubusercontent.com/ESCOMP/CAM/405a3f21446439d8f952660f0300332d9b860279/src/chemistry/mozart/mo_usrrxt.F90"
+      }
+    ],
+    "id": "waccm:TSMLT1@09cfe917ef1a2f969378802518b7e3914ade77414828fe3c6113061d701553e0:native@27ba42a9f2901a0e4247ab2c3b6986263a2d0f67eacdf9020b4f6f1c1dd6e547",
+    "importer_version": 4,
+    "mechanism": "TSMLT1",
+    "release": "405a3f21446439d8f952660f0300332d9b860279",
+    "requires_closed_oxygen": 0,
+    "sha256": "27ba42a9f2901a0e4247ab2c3b6986263a2d0f67eacdf9020b4f6f1c1dd6e547",
+    "source": "waccm",
+    "source_count": 583,
+    "source_snapshot": "waccm:TSMLT1@09cfe917ef1a2f969378802518b7e3914ade77414828fe3c6113061d701553e0"
+  },
+  "wrf-chem": {
+    "aerosol": "MOSAIC-4bin",
+    "citation": "https://github.com/wrf-model/WRF/releases/tag/v4.6.1",
+    "count": 4,
+    "files": [
+      {
+        "name": "mozart_mosaic_4bin.eqn",
+        "sha256": "1eea77d2ec635b7183566137ed3388dcd14c83538c1ef9183d6776790ae4a300",
+        "url": "https://raw.githubusercontent.com/wrf-model/WRF/v4.6.1/chem/KPP/mechanisms/mozart_mosaic_4bin/mozart_mosaic_4bin.eqn"
+      },
+      {
+        "name": "mozart_mosaic_4bin.spc",
+        "sha256": "c8a9d405495bd022c6195640b5cdbf949652dc9e40726329556520f4b87ee2ca",
+        "url": "https://raw.githubusercontent.com/wrf-model/WRF/v4.6.1/chem/KPP/mechanisms/mozart_mosaic_4bin/mozart_mosaic_4bin.spc"
+      }
+    ],
+    "id": "wrf-chem:MOZART@7416a717f6f1d1f3c667e36bb6f2f934cb97dfbef54760eff34c945015c69c7b:native@391b6442ed8106d87125c9077dc59016ffd9083a9f2ecf2e9f39a0ec8cbd04c4",
+    "importer_version": 4,
+    "mechanism": "MOZART",
+    "release": "v4.6.1",
+    "requires_closed_oxygen": 1,
+    "sha256": "391b6442ed8106d87125c9077dc59016ffd9083a9f2ecf2e9f39a0ec8cbd04c4",
+    "source": "wrf-chem",
+    "source_count": 292,
+    "source_snapshot": "wrf-chem:MOZART@7416a717f6f1d1f3c667e36bb6f2f934cb97dfbef54760eff34c945015c69c7b"
+  }
+}

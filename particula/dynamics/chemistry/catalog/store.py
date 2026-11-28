@@ -11,8 +11,8 @@ from tempfile import NamedTemporaryFile
 
 from particula.dynamics.chemistry.catalog import camx, cmc
 from particula.dynamics.chemistry.catalog.native import (
-    compile_channel,
     native_mechanism,
+    selected_channel,
 )
 from particula.dynamics.chemistry.catalog.readers import (
     SOURCES,
@@ -23,6 +23,7 @@ from particula.dynamics.chemistry.catalog.readers import (
 
 IMPORT_VERSION = 4
 LOCK_FORMAT = "particula.chemical-selection/1"
+NATIVE_LOCK_FORMAT = "particula.chemical-selection/2"
 
 
 def _json(data):
@@ -272,7 +273,9 @@ class ChemistryCatalog:
                     PARTITION BY json_remove(manifest, '$.importer_version',
                         '$.count', '$.RO2')
                     ORDER BY json_extract(manifest,'$.importer_version') DESC
-                ) AS rank FROM snapshots
+                ) AS rank FROM snapshots s
+                WHERE NOT EXISTS (SELECT 1 FROM snapshots original WHERE
+                    original.id=json_extract(s.manifest,'$.source_snapshot'))
             )
             SELECT record FROM reactions r
             WHERE (:source IS NULL OR r.source=:source)
@@ -326,7 +329,7 @@ class ChemistryCatalog:
             raise ValueError(f"unknown catalog ID: {identifier}")
         r = json.loads(row[0])
         try:
-            native, _ = compile_channel(r)
+            native, _ = selected_channel(r)
             issue = ""
         except ValueError as exc:
             native = None
@@ -370,7 +373,9 @@ class ChemistryCatalog:
         if not records:
             raise ValueError("select at least one reaction")
         lock = dict(
-            format=LOCK_FORMAT,
+            format=NATIVE_LOCK_FORMAT
+            if any("mechanism" in r for r in records.values())
+            else LOCK_FORMAT,
             close_oxygen=close_oxygen,
             snapshots=manifests,
             reactions=[records[k] for k in sorted(records)],
@@ -394,7 +399,7 @@ class ChemistryCatalog:
             output: Destination for the JSON lock or native JSON/YAML file.
                 A successful export atomically replaces this file.
             target: Use ``"lock"`` to preserve the source records and oxygen
-                assumption, or ``"native"`` to compile the selected channels.
+                assumption, or ``"native"`` to assemble the native channels.
             lock_path: Path to a saved selection lock. Replay uses the oxygen
                 treatment recorded at lock creation.
             close_oxygen: For NO + O₃ → NO₂ + O₂, include O₂ as an evolving
@@ -420,7 +425,10 @@ class ChemistryCatalog:
             if identifiers:
                 raise ValueError("select IDs or supply one lock")
             lock = json.loads(Path(lock_path).read_text(encoding="utf-8"))
-            if not isinstance(lock, dict) or lock.get("format") != LOCK_FORMAT:
+            if not isinstance(lock, dict) or lock.get("format") not in {
+                LOCK_FORMAT,
+                NATIVE_LOCK_FORMAT,
+            }:
                 raise ValueError("unsupported lock format")
             checksum = lock.pop("sha256", None)
             if checksum != _fingerprint(lock):

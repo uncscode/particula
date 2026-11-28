@@ -68,13 +68,20 @@ ambiguous. [WACCM channel](https://github.com/ESCOMP/CAM/blob/405a3f21446439d8f9
   and release manifests, reviewed mappings and compact test fixtures. Preserve
   retrieval and citation instructions. Check source-specific redistribution
   terms when choosing fixtures to publish. [MCM citation guidance](https://www.mcm.york.ac.uk/MCM/about/cite) · [CESM terms](https://www.cesm.ucar.edu/models/cesm2/copyright)
-- **GitHub Release.** The base library release job builds a fresh SQLite catalog
-  with `python -m scripts.build_chemistry_catalog --output dist/catalog`.
-  It attaches the ZIP and SHA-256 file to the matching library tag. The manifest
-  identifies each snapshot and its inputs. The initial release recipes are
-  CMAQ, E3SM and WRF-Chem, each accompanied by the notice from its pinned
-  upstream version. Add a release recipe and its applicable notices together.
-  All other pinned recipes remain available through explicit source fetches.
+- **Converted reactions.** The [native catalog](../chemistry_catalog/snapshots.json)
+  records 19,655 input entries across ten recipes. It contains 2,311 individually
+  validated native channels, including seven ozone titration channels requiring
+  explicit closed-box oxygen. The per-recipe JSON Lines files store native
+  mechanisms, source locations, revisions and assumptions. The manifest links
+  the upstream sources and records the pinned file hashes and conversion counts.
+  Refresh these files intentionally with
+  `python -m scripts.build_chemistry_catalog --refresh --output dist/catalog`
+  and review the changed reactions and counts.
+- **GitHub Release.** The base library release job packages the committed native
+  records offline with `python -m scripts.build_chemistry_catalog --output dist/catalog`.
+  It attaches the ZIP and SHA-256 file to the matching library tag. Default fetch
+  indexes those native records. Named source imports retain the upstream inputs
+  for a full source inventory and subsequent conversions.
 - **Local cache.** SQLite holds the original source bytes, immutable records
   and species index in a single file. Import commits them together. Repeating
   a recipe uses cached source bytes, and searching requires neither upstream
@@ -99,7 +106,7 @@ record. A user can lock a precursor subset even when native export requires
 additional physics. [Gas chemistry guide](../docs/guide/processes/gas-chemistry.md)
 
 ```bash
-particula chem fetch waccm
+particula chem fetch
 particula chem search --source waccm --species O3 --role reactant --json
 # Set REACTION_ID to the NO_O3 result.
 particula chem show "$REACTION_ID" --json

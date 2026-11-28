@@ -1,5 +1,6 @@
 """Install the prebuilt reaction catalog from the matching Particula release."""
 
+import hashlib
 import json
 import shutil
 import zipfile
@@ -13,8 +14,7 @@ from particula.dynamics.chemistry.catalog.sources import _verify
 from particula.dynamics.chemistry.catalog.store import IMPORT_VERSION
 
 ASSET = "particula-chemistry-catalog.zip"
-DATABASE = "chemistry.sqlite3"
-FORMAT = "particula.chemistry-catalog/1"
+FORMAT = "particula.native-chemistry-catalog/1"
 RELEASE = f"v{__version__}"
 BASE_URL = f"https://github.com/uncscode/particula/releases/download/{RELEASE}"
 
@@ -42,58 +42,77 @@ def _download(archive):
     _verify(archive, checksum[0])
 
 
+def _equation(terms):
+    return " + ".join(
+        (f"{n} " if n != 1 else "") + name.removeprefix("gas:")
+        for name, n in terms.items()
+    )
+
+
+def _install_snapshot(db, snapshot, data):
+    expected_id = f"{snapshot['source_snapshot']}:native@{snapshot['sha256']}"
+    if (
+        hashlib.sha256(data).hexdigest() != snapshot["sha256"]
+        or len(data.splitlines()) != snapshot["count"]
+        or snapshot["id"] != expected_id
+    ):
+        raise ValueError("release catalog inventory mismatch")
+    if db.execute(
+        "SELECT 1 FROM snapshots WHERE id=?", (snapshot["id"],)
+    ).fetchone():
+        return
+    provenance = {k: v for k, v in snapshot.items() if k != "id"}
+    db.execute(
+        "INSERT INTO snapshots VALUES (?,?)",
+        (snapshot["id"], json.dumps(provenance, sort_keys=True)),
+    )
+    for line in data.splitlines():
+        record = json.loads(line)
+        (reaction,) = record["mechanism"]["reactions"]
+        rid = f"{snapshot['id']}/{record['label']}"
+        record.update(
+            id=rid,
+            snapshot=snapshot["id"],
+            source=snapshot["source"],
+            equation=(
+                _equation(reaction["reactants"])
+                + " -> "
+                + _equation(reaction["products"])
+            ),
+        )
+        db.execute(
+            "INSERT INTO reactions VALUES (?,?,?,?)",
+            (rid, snapshot["id"], snapshot["source"], json.dumps(record)),
+        )
+        for role in ("reactant", "product"):
+            names = {n.removeprefix("gas:") for n in reaction[role + "s"]}
+            names.update(record["source_aliases"].get(role, ()))
+            db.executemany(
+                "INSERT INTO terms VALUES (?,?,?)",
+                ((name, role, rid) for name in sorted(names)),
+            )
+
+
 def install_release(catalog):
-    """Merge the verified release snapshots in one transaction."""
+    """Index the preconverted native records in one local transaction."""
     with TemporaryDirectory() as temp:
         archive = Path(temp) / ASSET
         _download(archive)
-        database = Path(temp) / DATABASE
         try:
-            with zipfile.ZipFile(archive) as bundle:
+            with zipfile.ZipFile(archive) as bundle, catalog._db() as db:
                 manifest = json.loads(bundle.read("manifest.json"))
                 if (
                     not isinstance(manifest, dict)
                     or manifest.get("format") != FORMAT
                     or manifest.get("release") != RELEASE
                     or manifest.get("importer_version") != IMPORT_VERSION
+                    or not isinstance(manifest.get("snapshots"), dict)
+                    or not manifest["snapshots"]
                 ):
                     raise ValueError("incompatible release catalog manifest")
-                with (
-                    bundle.open(DATABASE) as src_db,
-                    database.open("wb") as out,
-                ):
-                    shutil.copyfileobj(src_db, out)
-        except (KeyError, zipfile.BadZipFile) as exc:
+                db.execute("BEGIN IMMEDIATE")
+                for key, snapshot in manifest["snapshots"].items():
+                    _install_snapshot(db, snapshot, bundle.read(f"{key}.jsonl"))
+        except (KeyError, TypeError, zipfile.BadZipFile) as exc:
             raise ValueError("invalid release catalog archive") from exc
-
-        with catalog._db() as db:
-            db.execute("ATTACH DATABASE ? AS bundled", (str(database),))
-            db.execute("BEGIN IMMEDIATE")
-            if db.execute("PRAGMA bundled.integrity_check").fetchall() != [
-                ("ok",)
-            ]:
-                raise ValueError("invalid release catalog database")
-            inventory = dict(
-                db.execute(
-                    "SELECT s.id, count(r.id) FROM bundled.snapshots s "
-                    "LEFT JOIN bundled.reactions r ON r.snapshot=s.id "
-                    "GROUP BY s.id"
-                )
-            )
-            snapshots = manifest.get("snapshots")
-            if not isinstance(snapshots, dict) or not snapshots:
-                raise ValueError("missing release catalog inventory")
-            try:
-                expected = {
-                    item["id"]: item["count"] for item in snapshots.values()
-                }
-            except (KeyError, TypeError) as exc:
-                raise ValueError("invalid release catalog inventory") from exc
-            if inventory != expected or len(expected) != len(snapshots):
-                raise ValueError("release catalog inventory mismatch")
-            for table in ("files", "snapshots", "reactions", "terms"):
-                db.execute(
-                    f"INSERT OR IGNORE INTO main.{table} "  # noqa: S608
-                    f"SELECT * FROM bundled.{table}"
-                )
         return manifest
