@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 350.6916646268219,
-  "package_source_sha256": "a6236ea26f45c47e92cf5f818e0e45f7b8d98d04a6a061ae9a1d1f8f4993f7ea",
-  "scientific_source_sha256": "01ef0dd1c6513dddf9859b5451164a7027941f8f889732081cb063269dc9d30c",
+  "elapsed_seconds": 717.128524109954,
+  "package_source_sha256": "142dc45c78857a370342e7331e40670f99125a47f20f328815752098c59941a3",
+  "scientific_source_sha256": "02156f28723d5f1efd3cdd1cc740489c33c6744dfd5d4e3cec8f8d5b9ddf17f3",
   "input_sha256": {
-    "studies/aiomfac-mixing-state/ramp.py": "c555698660d15b6994a59047b5aec0c19c9bee88d2db0c022d3d8f44fcf43ade",
+    "studies/aiomfac-mixing-state/ramp.py": "fa84ae9ccea820c3472b71dc3910b39beececd8a544abf67eb4d224faab6ae2c",
     "studies/aiomfac-mixing-state/equilibrium.py": "2215632ee39a2c411c5a244c9778ee095fdbce1bb4f01894b2d1d297a7e2a121",
     "packages/particula-aiomfac/src/particula_aiomfac/__init__.py": "e88f4b703f5f350494efb4e1cd67a024a9b0e154627995bb89beb9fc2b352f9b",
     "packages/particula-aiomfac/src/particula_aiomfac/_condensation.py": "dd8f6cc9b62fc007d306c60882b31395e1e6d6587e10df7fe8c9de1c99ed1e9c",
@@ -32,11 +32,11 @@
     "particula/particles/prepared_activity.py": "04b1be37d8a9de2bb5dbef8c1d491306a6124dae70589dc1af7c8e287cb100b4"
   },
   "example": "aiomfac-mixing-state-ramp",
-  "fingerprint": "d9b6a460474ea470043ec61e90f855e6bc3e23d6f3429f5e36267ecd257fcf35",
+  "fingerprint": "55ca073ff0e2663f5573656eefa86508e59c5563329cbf808297c7509f4009d4",
   "source": "docs/studies/examples/thermodynamics/equilibria/aiomfac_mixing_state_ramp.py",
-  "revision": "2b8e34610db21a581a30570c59984f33d4c30ccc",
+  "revision": "2fca78e8211bc7e6e55ad6e58dfd3c2ead52a979",
   "package_dirty": false,
-  "executed_at": "2026-11-28T04:37:19.430711+00:00",
+  "executed_at": "2026-11-28T13:51:05.567385+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
@@ -57,19 +57,22 @@
     [],
     [
       {
-        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula_aiomfac._condensation 9c44814 load on device 'cuda:0' took 0.49 ms  (cached)\nModule particula_aiomfac._cuda_phases e3fbe67 load on device 'cuda:0' took 1.88 ms  (cached)\n"
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\n"
       },
       {
-        "text": "Module particula.gpu.kernels.condensation 14a649a load on device 'cuda:0' took 0.39 ms  (cached)\nModule particula.gpu.kernels.condensation 2c7d291 load on device 'cuda:0' took 0.34 ms  (cached)\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 0.26 ms  (cached)\nModule particula.gpu.kernels._condensation_native 354bfec load on device 'cuda:0' took 0.28 ms  (cached)\nModule particula.gpu.kernels.thermodynamics 563d292 load on device 'cuda:0' took 0.40 ms  (cached)\nModule particula.execution.prepared_guards 5366864 load on device 'cuda:0' took 0.37 ms  (cached)\nModule particula.gpu.kernels.condensation c7ee7df load on device 'cuda:0' took 0.37 ms  (cached)\n"
+        "text": "Module particula_aiomfac._condensation 9c44814 load on device 'cuda:0' took 5.12 ms  (cached)\nModule particula_aiomfac._cuda_phases e3fbe67 load on device 'cuda:0' took 15.35 ms  (cached)\n"
       },
       {
-        "text": "Module particula.gpu.kernels.condensation 57dfed0 load on device 'cuda:0' took 715.80 ms  (cached)\nModule particula.gpu.kernels.condensation 90d906f load on device 'cuda:0' took 0.71 ms  (cached)\nModule particula.gpu.kernels._condensation_native 6810d06 load on device 'cuda:0' took 0.40 ms  (cached)\nModule particula.gpu.kernels.condensation ad1042e load on device 'cuda:0' took 0.71 ms  (cached)\nModule particula.gpu.kernels._condensation_native ada4eab load on device 'cuda:0' took 0.39 ms  (cached)\nModule particula.gpu.kernels.condensation 988653c load on device 'cuda:0' took 0.73 ms  (cached)\nModule particula.gpu.kernels._condensation_native 374bae4 load on device 'cuda:0' took 0.39 ms  (cached)\nModule particula.gpu.kernels._condensation_native 02607db load on device 'cuda:0' took 0.44 ms  (cached)\nModule particula.gpu.kernels.condensation 6eb1df8 load on device 'cuda:0' took 0.69 ms  (cached)\nModule particula.gpu.kernels.condensation c2ff18f load on device 'cuda:0' took 0.71 ms  (cached)\nModule particula.gpu.kernels.condensation 04fd3c4 load on device 'cuda:0' took 0.80 ms  (cached)\n"
+        "text": "Module particula.gpu.kernels.condensation 14a649a load on device 'cuda:0' took 4.48 ms  (cached)\nModule particula.gpu.kernels.condensation 2c7d291 load on device 'cuda:0' took 3.79 ms  (cached)\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 5.21 ms  (cached)\nModule particula.gpu.kernels._condensation_native 354bfec load on device 'cuda:0' took 3.23 ms  (cached)\nModule particula.gpu.kernels.thermodynamics 563d292 load on device 'cuda:0' took 4.20 ms  (cached)\nModule particula.execution.prepared_guards 5366864 load on device 'cuda:0' took 1.64 ms  (cached)\nModule particula.gpu.kernels.condensation c7ee7df load on device 'cuda:0' took 4.72 ms  (cached)\n"
       },
       {
-        "text": "Module particula.gpu.kernels._condensation_native a7b72eb load on device 'cuda:0' took 1948.26 ms  (cached)\n"
+        "text": "Module particula.gpu.kernels.condensation 57dfed0 load on device 'cuda:0' took 2203.77 ms  (cached)\nModule particula.gpu.kernels.condensation 90d906f load on device 'cuda:0' took 8.74 ms  (cached)\nModule particula.gpu.kernels._condensation_native 6810d06 load on device 'cuda:0' took 4.89 ms  (cached)\nModule particula.gpu.kernels.condensation ad1042e load on device 'cuda:0' took 10.21 ms  (cached)\nModule particula.gpu.kernels._condensation_native ada4eab load on device 'cuda:0' took 4.35 ms  (cached)\nModule particula.gpu.kernels.condensation 988653c load on device 'cuda:0' took 7.57 ms  (cached)\nModule particula.gpu.kernels._condensation_native 374bae4 load on device 'cuda:0' took 2.54 ms  (cached)\nModule particula.gpu.kernels._condensation_native 02607db load on device 'cuda:0' took 5.39 ms  (cached)\nModule particula.gpu.kernels.condensation 6eb1df8 load on device 'cuda:0' took 8.85 ms  (cached)\nModule particula.gpu.kernels.condensation c2ff18f load on device 'cuda:0' took 8.30 ms  (cached)\nModule particula.gpu.kernels.condensation 04fd3c4 load on device 'cuda:0' took 9.58 ms  (cached)\n"
       },
       {
-        "text": "Module particula.gpu.kernels.condensation 6c645a6 load on device 'cuda:0' took 702.16 ms  (cached)\n"
+        "text": "Module particula.gpu.kernels._condensation_native a7b72eb load on device 'cuda:0' took 6575.42 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.condensation 6c645a6 load on device 'cuda:0' took 2177.88 ms  (cached)\n"
       },
       {
         "text": "1000 onsets bracketed between samples, 0 already split at the first sample, 0 never observed to split.\nFirst detections span 84.50\u201385.75% RH. Largest interval width is 0.25 percentage points.\n14 first splits between 86.00 and 85.75% RH, including ID 54 with 19.3% retained salt.\n25 first splits between 84.75 and 84.50% RH, including ID 42 with 35.0% retained salt.\nMaximum relative water-budget residual 9.10e-16.\nIndependent equilibrium cloud points span 85.13\u201386.21% RH.\n0 phase-count differences in 33,000 per-particle sample checks.\n"
@@ -86,11 +89,11 @@
     ]
   ],
   "files": {
-    "figure-6-3.png": "f40a597150af1ef3674b5ae816bfa7d0c5ba6a7253fa6b36deffc1506e7281be",
-    "figure-6-2.png": "0e63403edce1582ae212914131e8e4d7993e66aa17be49e0eb709bf1cedadd6b",
+    "source.py": "03b5d9e614cf652a32ec5bb956bdd89499e805de04b76a0a30f40519ed76d613",
+    "data.json": "3a7f2798a546931f86330c96b72d2b3711c524888c28a6705ee953d457e3cbb5",
     "figure-6-1.png": "239050a635781cef91a7f4652b762b697ddefd4a46df96651426ffd28cecf58d",
-    "data.json": "c01b86d3bd81ca1a2bbb1683903ef65ea7e8d55d7cbbaca3fc758be39edfd084",
-    "source.py": "03b5d9e614cf652a32ec5bb956bdd89499e805de04b76a0a30f40519ed76d613"
+    "figure-6-2.png": "0e63403edce1582ae212914131e8e4d7993e66aa17be49e0eb709bf1cedadd6b",
+    "figure-6-3.png": "f40a597150af1ef3674b5ae816bfa7d0c5ba6a7253fa6b36deffc1506e7281be"
   },
-  "simulation_fingerprint": "6726b5edee04b870975fcdc5ecaadb3de7d989d7c735cac858005848a430afbf"
+  "simulation_fingerprint": "b4bf0954f52930cdf89e5812b429c400ad7e9ed5584847d4d14bd679fe06f393"
 }

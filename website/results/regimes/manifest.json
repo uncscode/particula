@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 1225.654694102006,
-  "package_source_sha256": "fb62539e446aa9348489ec67f4eff6f98c534f6e668d75293727a4745fd40ef8",
-  "scientific_source_sha256": "de1b8e4f7828cd58d808601b3cb92b4ade18fbab99ba3c0a9792edc190f53c50",
+  "elapsed_seconds": 3237.3437023970764,
+  "package_source_sha256": "142dc45c78857a370342e7331e40670f99125a47f20f328815752098c59941a3",
+  "scientific_source_sha256": "02156f28723d5f1efd3cdd1cc740489c33c6744dfd5d4e3cec8f8d5b9ddf17f3",
   "input_sha256": {
     "scripts/mam4xx_coagulation/regimes.py": "837b5059244b93c20eb92caf34f7c1969777f9e00c7c40f1ddfa84a87302f813",
     "scripts/mam4xx_coagulation/regime_plots.py": "7549a6c1ec9c8c24c21872a3968f11643b3e0625d95c616637b71a355bb3c353",
@@ -12,9 +12,9 @@
     "scripts/mam4xx_coagulation/regime_box.py": "2b3cc0658e801b919eac070b4593d2584b91455fb3bc71db28f6943f9b4dff32",
     "scripts/mam4xx_coagulation/matched.py": "7022fde22a0f6853bc816fdfefb1a5bcfe06fa09a99e74d2b68d8f5c382c7dc1",
     "scripts/mam4xx_coagulation/campaign.py": "ac2f488f33fca6e5617f213c7283ebe457c922820edcbe337b34d0c6948b1adb",
-    "scripts/mam4xx_coagulation/particles.py": "b183a4d69ade5e1d988f1aee32a2604399eb66094f5b4b90ff9410e3ec97c0df",
+    "scripts/mam4xx_coagulation/particles.py": "8bb91c33b1e7c7d79427cd182f1a0e6edbd854a82ce711b3e1fa1f5c792513f8",
     "docs/data/mam4xx-coagulation/modal.csv": "dd609292b60baddcf6708f6664c664ce15bf21b0338f9b605093b42dd55df849",
-    "scripts/mam4xx_coagulation/native_regimes.py": "505846a7c2008d4d597cfd47e785990a1a0c00b5af3792c9ad876d101ed8fbe1",
+    "scripts/mam4xx_coagulation/native_regimes.py": "cd2009d4c8cc5234c49fa3a1d368cb376d46190cd9082a2d98b477cc260dfa57",
     "scripts/mam4xx_coagulation/regime_driver.cpp": "8d05e57b106f21e1543bab073369448bf2a34406744eed1b588090e833666ba0",
     "scripts/mam4xx_coagulation/regime_reference.py": "5186c6d06d4a44488f5453c168564098a86cc560e49fcccd00e5a4c6edd2a96e",
     "scripts/mam4xx_coagulation/reference_driver.cpp": "32388e90fa67b2f3204aeca4cd00290019e1e4c4d1f72642e893758fce900b92",
@@ -30,15 +30,15 @@
     "scripts/mam4xx_coagulation/neutral_geometry.py": "5f0046d53e845fb718b972075bb67ccda57e0cf8aa72820cc01921751402db41"
   },
   "example": "regimes",
-  "fingerprint": "5d0cebc6fbdf11833c0d41173588ae58edeb8685d1caa0e02e82e44485c13f9e",
+  "fingerprint": "46403ab82470350ba05e0435b07ef5262a5566b6f5d06b8a6e3950a9f3b1ec5d",
   "source": "docs/studies/literature/mam4xx-coagulation/regimes.py",
-  "revision": "d74cc9cb4abe8bdbc50e7d2ad129bb8720966242",
+  "revision": "2fca78e8211bc7e6e55ad6e58dfd3c2ead52a979",
   "package_dirty": false,
-  "executed_at": "2026-11-28T00:38:58.335765+00:00",
+  "executed_at": "2026-11-28T14:31:28.714773+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.6",
+    "particula": "0.4.0",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -50,10 +50,19 @@
   "outputs": [
     [
       {
-        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 0.55 ms  (cached)\nModule particula.gpu.kernels.coagulation 84ae354 load on device 'cuda:0' took 0.40 ms  (cached)\nModule particula.gpu.kernels._coagulation_native f93a244 load on device 'cuda:0' took 0.28 ms  (cached)\nModule particula.execution.prepared_guards 5366864 load on device 'cuda:0' took 0.36 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel 5433dfc load on device 'cuda:0' took 1.09 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel f84feee load on device 'cuda:0' took 2.08 ms  (cached)\nModule particula.gpu.kernels._coagulation_subcycling 93efbd4 load on device 'cuda:0' took 4.55 ms  (cached)\nModule particula.gpu.kernels._coagulation_budget b4a3978 load on device 'cuda:0' took 0.25 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel c0acfec load on device 'cuda:0' took 3.00 ms  (cached)\nModule particula.gpu.kernels.coagulation fd5b5c9 load on device 'cuda:0' took 1.52 ms  (cached)\nModule particula.gpu.kernels.coagulation 79e9aa8 load on device 'cuda:0' took 0.34 ms  (cached)\nModule particula.gpu.kernels._coagulation_subcycling ca6b3ba load on device 'cuda:0' took 0.26 ms  (cached)\nModule particula.gpu.kernels._coagulation_subcycling a49d377 load on device 'cuda:0' took 0.49 ms  (cached)\n"
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 1.33 ms  (cached)\nModule particula.gpu.kernels.coagulation 84ae354 load on device 'cuda:0' took 1.34 ms  (cached)\nModule particula.gpu.kernels._coagulation_native f93a244 load on device 'cuda:0' took 1.54 ms  (cached)\nModule particula.execution.prepared_guards 5366864 load on device 'cuda:0' took 1.36 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel 5433dfc load on device 'cuda:0' took 4.90 ms  (cached)\n"
       },
       {
-        "text": "Module scripts.mam4xx_coagulation.regime_rates b46e6d3 load on device 'cuda:0' took 0.72 ms  (cached)\nCompleted central marine\n"
+        "text": "Module particula.gpu.kernels._brownian_parallel f84feee load on device 'cuda:0' took 5.81 ms  (cached)\nModule particula.gpu.kernels._coagulation_subcycling 93efbd4 load on device 'cuda:0' took 11.22 ms  (cached)\nModule particula.gpu.kernels._coagulation_budget b4a3978 load on device 'cuda:0' took 3.49 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel c0acfec load on device 'cuda:0' took 6.92 ms  (cached)\nModule particula.gpu.kernels.coagulation fd5b5c9 load on device 'cuda:0' took 7.83 ms  (cached)\nModule particula.gpu.kernels.coagulation 79e9aa8 load on device 'cuda:0' took 3.15 ms  (cached)\nModule particula.gpu.kernels._coagulation_subcycling ca6b3ba load on device 'cuda:0' took 3.62 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels._coagulation_subcycling a49d377 load on device 'cuda:0' took 1.92 ms  (cached)\n"
+      },
+      {
+        "text": "Module scripts.mam4xx_coagulation.regime_rates b46e6d3 load on device 'cuda:0' took 8.76 ms  (cached)\n"
+      },
+      {
+        "text": "Completed central marine\n"
       },
       {
         "text": "Completed central continental\n"
@@ -125,10 +134,10 @@
   ],
   "files": {
     "source.py": "80a6a7f34c9117a2c021e798c1055552e11da80ef70ebd04c0f880e2defb2f46",
-    "data.json": "6f0171be68704ce765cae03d29519ed312eed9c9273e5e7fc0377fd9566cdce2",
+    "data.json": "567f758ecfa3ad0e8a4eef68a36e943b291754dbbc223385f129cbf6bc63a191",
     "figure-2-1.png": "55a4ee6257b1c85b90a435a6c248e445c4711c054dd213e6fff22314a8a0dc01",
     "figure-3-1.png": "7e183229563c0291ee5c37dc07978803e63951510724dace3f85fc1f7348c747",
     "figure-4-1.png": "8ed0672b4c7a2eef8e276c52b84c7f9a98cf24062edfdb03cfeeaaf082da595e"
   },
-  "simulation_fingerprint": "18bc7115427c911f991092b9696dffd2f7c273c2d34596469666927083f02c56"
+  "simulation_fingerprint": "fe2ff75477c0942d85ebf10ce80eae96e2204bc9dcda30e8c7ee219e9c63d78b"
 }

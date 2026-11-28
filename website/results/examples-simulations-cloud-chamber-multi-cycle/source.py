@@ -15,6 +15,8 @@
 # %% [markdown]
 # # Separate water cycling from seed loss in a chamber
 #
+# ![Schematic of a wet, dry, then wet chamber. Water shells shrink and regrow around the same-sized seeds. Fewer seeds remain airborne as more reach the chamber wall.](../../../../images/coupled-populations/chamber-multiple-cycles.svg)
+#
 # After repeated wet–dry forcing, how much of a droplet's change comes from water
 # exchange and how much from removal of its dry seed? Extend the
 # [single-cycle example](cloud_chamber_single_cycle.py) to four cycles and three
@@ -198,8 +200,7 @@ def run_cycle(
     for t_step in range(1, humid_steps + 1):
         # Condensation handles mass transfer and updates gas concentration internally
         before = np.sum(
-            aerosol.particles.masses
-            * aerosol.particles.concentration[..., None],
+            aerosol.particles.masses * aerosol.particles.population[..., None],
             axis=1,
         ) + (
             aerosol.gas.concentration[:, :-1]
@@ -209,8 +210,7 @@ def run_cycle(
         aerosol.particles.masses[:] = accepted.particles.masses
         aerosol.gas.concentration[:] = accepted.gas.concentration
         after = np.sum(
-            aerosol.particles.masses
-            * aerosol.particles.concentration[..., None],
+            aerosol.particles.masses * aerosol.particles.population[..., None],
             axis=1,
         ) + (
             aerosol.gas.concentration[:, :-1]
@@ -234,8 +234,7 @@ def run_cycle(
         # Retain the published condensation + wall-loss scenario. Dilution
         # is disabled; the separate count-decay exercise is not applied here.
         before = np.sum(
-            aerosol.particles.masses
-            * aerosol.particles.concentration[..., None],
+            aerosol.particles.masses * aerosol.particles.population[..., None],
             axis=1,
         ) + (
             aerosol.gas.concentration[:, :-1]
@@ -247,8 +246,7 @@ def run_cycle(
         aerosol.particles.masses[:] = accepted.particles.masses
         aerosol.gas.concentration[:] = accepted.gas.concentration
         after = np.sum(
-            aerosol.particles.masses
-            * aerosol.particles.concentration[..., None],
+            aerosol.particles.masses * aerosol.particles.population[..., None],
             axis=1,
         ) + (
             aerosol.gas.concentration[:, :-1]
