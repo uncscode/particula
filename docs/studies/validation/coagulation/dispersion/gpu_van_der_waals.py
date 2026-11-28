@@ -130,7 +130,7 @@ def simulate():
             for _ in range(steps // 2):
                 resumed.step()
             replay = resumed.snapshot().particles
-            for name in ("masses", "concentration", "charge"):
+            for name in ("masses", "population", "charge"):
                 np.testing.assert_array_equal(
                     getattr(replay, name), getattr(final, name)
                 )

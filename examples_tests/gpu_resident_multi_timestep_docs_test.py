@@ -434,14 +434,14 @@ def test_real_warp_cpu_example_has_resident_lifecycle_observations(
     assert result.checkpoint.particles.distribution_type == "particle_resolved"
     initial_p, initial_g, _ = module._build_cpu_state()
     initial_inventory = (
-        np.sum(initial_p.masses * initial_p.concentration[..., None], axis=1)
+        np.sum(initial_p.masses * initial_p.population[..., None], axis=1)
         + initial_g.concentration * initial_p.volume[:, None]
     )
     npt.assert_array_equal(result.initial_total_mass, initial_inventory)
     checkpoint_p = result.checkpoint.particles
     final_inventory = (
         np.sum(
-            checkpoint_p.masses * checkpoint_p.concentration[..., None], axis=1
+            checkpoint_p.masses * checkpoint_p.population[..., None], axis=1
         )
         + result.checkpoint.gas.concentration * checkpoint_p.volume[:, None]
     )

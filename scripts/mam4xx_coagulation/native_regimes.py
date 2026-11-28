@@ -59,9 +59,9 @@ def ensemble(modes, slots, dt, seeds, max_subcycles=4096):
                 for _ in range(round(duration / dt)):
                     owner.step()
                 p = owner.snapshot().particles
-                live = p.concentration[0] > 0
+                live = p.population[0] > 0
                 v = p.masses[0, live, 0] / DENSITY * 1e18
-                count = p.concentration[0, live] / p.volume[0] / 1e6
+                count = p.slot_concentration_density[0, live] / 1e6
                 size = 1e3 * np.cbrt(v * 6 / np.pi)
                 np.testing.assert_allclose(
                     v @ count, volume.sum() * number.sum() / slots, rtol=2e-12

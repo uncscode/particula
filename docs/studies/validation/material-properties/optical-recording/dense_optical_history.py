@@ -219,7 +219,7 @@ def timed_run(initial, process, backend, mode, grid, folder):
             native = Recorder(
                 (
                     "particle_masses",
-                    "particle_concentration",
+                    "particle_population",
                     "particle_charge",
                     "gas_concentration",
                     "temperature",

@@ -248,7 +248,7 @@ def test_real_warp_cpu_lifecycle_example() -> None:
     # survive the checkpoint boundary; lifecycle bookkeeping ran no physics.
     restored = from_warp_particle_data(restarted_session.particles)
     assert restored.distribution_type == "particle_resolved"
-    assert restored.concentration[0, 0] == 1.0
+    assert restored.population[0, 0] == 1.0
     assert restored.volume[0] == 1.0e-6
     assert restored.masses[0, 0, 0] == 1.0e-18
     first_view = restarted_registry.acquire_wall_loss()

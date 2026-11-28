@@ -124,7 +124,7 @@ def run_case(name, slots, boxes, seed, steps, physical=False):
         for k, interval_steps in observations:
             sim.run(steps=interval_steps)
             state = sim.snapshot().particles
-            counts = state.concentration
+            counts = state.population
             if not (
                 np.isfinite(state.masses).all() and np.all(state.masses >= 0)
             ):
