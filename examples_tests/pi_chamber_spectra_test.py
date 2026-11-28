@@ -64,3 +64,15 @@ def test_saved_time_zero_bins_match_restart_cohorts():
                 rtol=1e-12,
                 atol=1e-9,
             )
+        # Account for residents beyond the reported spectrum and for the dry
+        # seeds below the counter's optical limit within that spectrum.
+        for mask, expected in [
+            (diam < edges[0], [0, 0, 0, 0]),
+            (diam > edges[-1], [0, 0, 0, 0]),
+            (diam < 0.6, [1844, 0, 2365, 0]),
+            (diam > 40, [0, 0, 0, 0]),
+        ]:
+            tail = np.where(inside & mask, weights, 0).sum(axis=-1)
+            np.testing.assert_allclose(
+                tail.mean(axis=-1), expected, rtol=1e-12, atol=1e-9
+            )
