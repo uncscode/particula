@@ -36,7 +36,9 @@ plt.show()
 # the native particle ensemble at 24 hours. Shading is one sample standard
 # deviation among four refined collision histories, clipped at zero for
 # display. In the third row, solid curves are the three-mode sectional
-# spectra used for the ranking. Dashed curves and ribbons give the mean and
+# spectra used for the ranking. The log plot omits nonpositive solver tails
+# within its absolute tolerance of 10⁻¹⁰ cm⁻³. The saved arrays retain them.
+# Dashed curves and ribbons give the mean and
 # pointwise 16th–84th percentiles of 16 collision histories using the same
 # initial modes and kernel grid. The last row magnifies the percentile
 # bounds relative to each sectional bin where at least ten particles per
