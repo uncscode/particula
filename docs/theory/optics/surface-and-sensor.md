@@ -24,6 +24,10 @@ $$
                     {\int S(\lambda)\,d\lambda}.
 $$
 
+![Terra MODIS in-band relative responses peak near 658 nm for red and 863 nm for near infrared.](../../images/spectral-radiation/modis-response.png)
+
+These Terra MODIS curves show the weights used in the footprint comparison. Each of the 40 detector curves per band is normalized by its area before averaging. The displayed peak is scaled to one. A constant radiance across a band therefore gives the same band mean at any response amplitude. [NASA detector tables](https://mcst.gsfc.nasa.gov/calibration/parameters) · [Footprint comparison](../../studies/validation/spectral-radiation/observations.md)
+
 This normalization preserves the units of spectral radiance. For a reflected-solar product reporting a reflectance factor, the corresponding ratio under the same response is
 
 $$

@@ -207,6 +207,10 @@ energy budget, [surface and sensor geometry](../../theory/optics/surface-and-sen
 for radiance units, and [solver benchmarks](../../studies/validation/spectral-radiation/benchmark.md)
 for accuracy and low-Sun limits.
 
+![Cumulative aerosol-induced change in upwelling flux, reaching +3.73 W/m² over ocean and −3.36 W/m² over dusty ground.](../../../website/results/shortwave-parcel-surfaces/figure-5-2.png)
+
+In the parcel example, each point adds the reflected energy in one more wavelength band. Over dusty ground the total is still positive at 500 nm and turns negative when the band ending at 550 nm is included. Integrating through 4 µm gives opposite signs for the same aerosol over the two surfaces. [Inputs and energy budget](../../studies/examples/coupled-populations/radiation/parcel_surfaces.py)
+
 ### Compare several columns on a Warp device
 
 To isolate the effect of the ground, use the same atmospheric column and

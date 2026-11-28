@@ -55,3 +55,8 @@ A full and reduced grid store the same atmosphere. For each node the archive giv
 ## Time a resident CUDA batch
 
 Run `OPENBLAS_NUM_THREADS=1 PYTHONPATH=. python studies/spectral-radiation/benchmark/warp_scaling.py` with Warp and a CUDA device. The script prints preparation, warmed solve and sequential NumPy timings for 1, 16 and 64 two-layer columns. It synchronizes CUDA before stopping each timer, then downloads the results and checks the upwelling spectra.
+
+
+## Redraw the documentation figures
+
+Run `MPLBACKEND=Agg python studies/spectral-radiation/figures.py` from the repository root. It reads the archived low-Sun benchmark, RTX 5060 timing rows, footprint comparisons and corrected Terra detector responses, then writes four PNGs under `docs/images/spectral-radiation/`. The timing CSV records the 217-node run described above. The cumulative parcel spectrum is drawn separately from its saved band energies with `python scripts/docs_examples.py replot shortwave-parcel-surfaces`.

@@ -107,6 +107,8 @@ def simulate():
 # the aerosol present. Each horizontal step gives the band energy divided
 # by its width in nm. The right panel shows the energy budget across the
 # modeled solar spectrum, including absorption throughout the atmosphere.
+# A second figure sums the energy of successive bands from the shortest
+# wavelength upward. Each marker includes the full band ending there.
 
 
 # %%
@@ -159,6 +161,34 @@ def plot_results(report):
     )
     for ax in (spectra, budget):
         ax.axhline(0, color="0.45", lw=0.8)
+    edges = np.asarray(report["band_edges_nm"])
+    _, ax = plt.subplots(figsize=(7, 3.6), layout="constrained")
+    ax.axhline(0, color="0.45", lw=0.9)
+    for i, name in enumerate(("Ocean", "Dusty ground")):
+        field = report["surfaces"][name]
+        energy = np.asarray(field["reflected_w_m2_nm"]) * np.diff(edges)
+        cumulative = np.r_[0.0, np.cumsum(energy)]
+        ax.plot(
+            edges,
+            cumulative,
+            color=colors[i],
+            marker=["o", "s"][i],
+            markersize=3.5,
+            linestyle=["-", "--"][i],
+            label=f"{name} ({cumulative[-1]:+.2f} W/m²)",
+        )
+    ax.set(
+        xlabel="Upper wavelength of included bands (nm)",
+        ylabel="Cumulative change in reflected flux (W/m²)",
+        xscale="log",
+        xlim=(275, 4200),
+    )
+    ax.set_xticks(
+        [300, 500, 700, 1000, 2000, 4000],
+        labels=["300", "500", "700", "1000", "2000", "4000"],
+    )
+    ax.legend(frameon=False)
+    ax.spines[["top", "right"]].set_visible(False)
     return fig
 
 
