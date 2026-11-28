@@ -21,11 +21,24 @@ from particula.optics.surface import Surface
 
 @dataclass(frozen=True)
 class ShortwaveFlux:
-    """Interface flux densities in W m⁻² m⁻¹; radiance adds sr⁻¹.
+    """Spectral shortwave fluxes at every interface and optional top radiance.
 
-    Interface zero faces the source. Radiance, when requested, looks upward
-    along the emergent ray at the top of the column. Sources identify the
-    incident and surface boundary specifications.
+    Attributes:
+        wavelength_m: Increasing vacuum wavelengths [m].
+        interface_height_m: Top-first interface heights [m].
+        direct_down: Direct downward horizontal irradiance density
+            [W m⁻² m⁻¹], shape (interface, wavelength).
+        diffuse_down: Diffuse downward horizontal irradiance density on
+            the same grid and in the same units as direct_down.
+        up: Hemispheric upward irradiance density [W m⁻² m⁻¹] with axes
+            (interface, wavelength).
+        radiance: Optional spectral radiance [W m⁻² sr⁻¹ m⁻¹] leaving the
+            top interface toward the requested observer, one per wavelength.
+        quadrature_weights_m: Optional integration widths [m] per node.
+        sources: Provenance of solar input, surface and layer optics.
+        view: Optional (view zenith, solar-relative azimuth) in degrees.
+        band_bounds_m: Optional quadrature band edges [m], shape
+            (wavelength, 2).
     """
 
     wavelength_m: np.ndarray
@@ -41,16 +54,48 @@ class ShortwaveFlux:
 
     @property
     def net_down(self):
-        """Net downward flux density at each interface."""
+        """Net downward irradiance density [W m⁻² m⁻¹] at each interface.
+
+        Returns:
+            (ndarray): Direct plus diffuse downward flux minus upward flux,
+                shape (interface, wavelength). Positive values carry energy
+                downward.
+        """
         return self.direct_down + self.diffuse_down - self.up
 
     @property
     def absorption(self):
-        """Absorbed flux density in each layer, top first."""
+        """Absorbed shortwave energy per unit area, time and wavelength.
+
+        Returns:
+            (ndarray): Net downward flux at each layer top minus that at its
+                bottom [W m⁻² m⁻¹], shape (layer, wavelength). Surface
+                absorption is outside the atmospheric layers.
+        """
         return -np.diff(self.net_down, axis=0)
 
     def integrate(self, spectrum, *, band_m=None):
-        """Integrate the last spectral axis using this result's quadrature."""
+        """Integrate a spectral density over the grid or a selected interval.
+
+        Args:
+            spectrum (ArrayLike): Spectral densities with wavelength on the
+                final axis. An irradiance input in W m⁻² m⁻¹ integrates to W
+                m⁻².
+            band_m (tuple[float, float] | None): Optional (lower, upper)
+                wavelength limits [m]. Sampled spectra use trapezoids with
+                linearly interpolated endpoints. For representative nodes the
+                limits must match native band edges, and the integration uses
+                the supplied quadrature widths.
+
+        Returns:
+            (numpy.floating | ndarray): Integral over wavelength. All leading
+                input axes are preserved.
+
+        Raises:
+            ValueError: The spectral axis or interval is invalid, a sampled
+                grid lacks spectral width, or quadrature band edges are absent
+                or incompatible with the requested interval.
+        """
         spectrum = np.asarray(spectrum)
         if not spectrum.ndim or spectrum.shape[-1] != self.wavelength_m.size:
             raise ValueError("Spectrum must have a final wavelength axis")
@@ -87,7 +132,20 @@ class ShortwaveFlux:
         return np.trapezoid(spectrum, self.wavelength_m, axis=-1)
 
     def difference(self, reference):
-        """Subtract fluxes at matched heights, wavelengths and view."""
+        """Calculate the signed effect of this case relative to a reference.
+
+        Args:
+            reference (ShortwaveFlux): ShortwaveFlux with matching vertical and
+                spectral coordinates, integration weights, band edges and view.
+
+        Returns:
+            (ShortwaveFlux): Componentwise differences (this case minus
+                reference), retaining spectral densities and both source
+                records.
+
+        Raises:
+            ValueError: Coordinates, integration metadata or views differ.
+        """
         for name in (
             "wavelength_m",
             "interface_height_m",
@@ -296,14 +354,39 @@ def solve_shortwave(
     fourier_order=None,
     delta_m=True,
 ):
-    """Compute spectral hemispheric flux and optional top emergent radiance.
+    """Solve scalar plane-parallel shortwave transfer through a layered column.
 
-    Streams counts Gauss–Legendre ordinates per hemisphere. For a view,
-    solar-relative azimuth zero looks toward the observer on the Sun's side
-    of the surface; 180 degrees is the specular plane opposite the Sun.
-    A zero-weight user ordinate solves the radiance at the specified angle.
-    Delta-M removes an unresolved forward lobe when a next moment exists.
-    Returned direct flux always uses physical unscaled optical depth.
+    The discrete-ordinate solver includes multiple scattering and surface
+    reflection. Returned direct irradiance uses the unscaled extinction depth.
+    With delta-M scaling, unresolved forward-scattered light contributes to
+    diffuse downward irradiance.
+
+    Args:
+        column: Top-first layer optical properties on a common wavelength grid.
+        sun: Spectral direct-normal and diffuse-horizontal irradiance densities
+            [W m⁻² m⁻¹] at the upper interface, with the solar zenith cosine.
+        surface: Reflecting lower boundary on the column wavelength grid.
+        streams (int): Number of Gauss–Legendre ordinates per hemisphere, 2–32.
+        view_zenith_deg (float | None): Optional angle [degrees] from the
+            upward normal to the observer in [0, 90). A zero-weight ordinate
+            resolves this view.
+        relative_azimuth_deg (float): Azimuth [degrees] between surface-to-Sun
+            and surface-to-observer directions. At 180 the observer lies across
+            the surface normal from the Sun, in the specular plane.
+        fourier_order (int | None): Highest azimuthal harmonic for a
+            directional solve, 0–64. The default is 2 * streams - 1. Flux alone
+            uses order zero.
+        delta_m (bool): Apply delta-M scaling to represent a forward lobe if a
+            phase moment beyond the retained orders is available.
+
+    Returns:
+        (ShortwaveFlux): Spectral irradiance densities [W m⁻² m⁻¹] at each
+            interface and optionally the spectral radiance leaving the column
+            top [W m⁻² sr⁻¹ m⁻¹] in the requested viewing direction.
+
+    Raises:
+        ValueError: Spectral grids differ or the stream count, viewing
+            geometry or Fourier order is invalid.
     """
     require_same_grid(
         column.wavelength_m, sun.wavelength_m, "Solar wavelengths"
@@ -420,11 +503,24 @@ def solve_shortwave(
 
 
 def sensor_band_radiance(result, response):
-    """Return band-mean TOA radiance density [W m⁻² sr⁻¹ m⁻¹].
+    """Calculate the energy-response-weighted mean top-of-column radiance.
 
-    Supply the nonnegative energy response sampled on the solved wavelength
-    grid. For a photon-counting instrument use its calibrated energy response
-    or apply its specified photon weighting before this integration.
+    Args:
+        result (ShortwaveFlux): ShortwaveFlux with a directional radiance
+            spectrum.
+        response (ArrayLike): Nonnegative energy response, one value per solved
+            wavelength. Its normalization cancels in the mean. For a
+            photon-counting detector supply the calibrated energy response or
+            include the instrument's required photon weighting.
+
+    Returns:
+        (numpy.floating): Band-mean radiance density [W m⁻² sr⁻¹ m⁻¹], the
+            integral of radiance times response divided by the integrated
+            response.
+
+    Raises:
+        ValueError: Radiance is absent, the response has invalid shape,
+            sign or values, or the integrated response lacks positive width.
     """
     if result.radiance is None:
         raise ValueError("A sensor band requires directional radiance")

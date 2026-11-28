@@ -40,3 +40,17 @@ A separate libRadtran control changed only solar ray geometry between plane-para
 With solar and view zenith cosines both 0.8 and surface-relative azimuths of 60°, 170°, and 180°, the native Ross–Li land model agreed with libRadtran radiance to within 0.077% at the three wavelengths. Both codes used isotropic, volumetric and geometric coefficients of 0.22, 0.08 and 0.015. For this test the atmosphere contained a 550 nm aerosol depth of 0.1 with the same optical spectrum as the slab comparison, single-scattering albedo 0.92, and asymmetry 0.55.
 
 At 5 m/s wind speed, comparing native glint-only ocean reflection with libRadtran's default pigment and salinity ocean model also changes the physical lower boundary. Native blue (450 nm) radiance was 66.8% lower off glint at 60° separation. At 850 nm it was 2.8% lower for the same view and 8.4% lower at 180°. These residuals bound the tested simplified water surface. Water-leaving light, whitecaps, the refractive index spectrum and facet reflection affect satellite comparisons. Use measured local surface inputs and the instrument response when a directional ocean observable is the target. [Directional comparison](https://github.com/uncscode/particula/blob/main/studies/spectral-radiation/benchmark/directional.csv) · [Surface and sensor theory](../../../theory/optics/surface-and-sensor.md) · [Satellite matchups](observations.md)
+
+## How many columns benefit from CUDA?
+
+For 64 two-layer columns, Warp computed interface fluxes in **69 ms** on a GeForce RTX 5060. A sequential NumPy loop over the same columns took **899 ms** with one OpenBLAS thread. A single column took about 15 ms on either backend. The batch uses the 217-node Earth spectrum, eight ordinates per hemisphere, and one shared dusty-ground boundary.
+
+| Columns per call | Warm Warp CUDA | NumPy loop |
+| ---: | ---: | ---: |
+| 1 | 14.7 ms | 14.3 ms |
+| 16 | 17.1 ms | 219 ms |
+| 64 | 68.9 ms | 899 ms |
+
+CUDA times are medians of three synchronized solves after workspace preparation, with inputs and results on device. The first preparation took 326 ms including Warp initialization with a populated kernel cache. The benchmark checks every column's upwelling spectrum against NumPy after timing. Directional radiance, live particle Mie calculations, changing surface geometry and host downloads have separate costs. [Timing script](https://github.com/uncscode/particula/blob/main/studies/spectral-radiation/benchmark/warp_scaling.py) · [Running on a simulation stream](../../../guide/optics/index.md)
+
+At 16 ordinates per hemisphere, a separate three-wavelength CUDA calculation reproduced NumPy upwelling flux and directional radiance to within 2 × 10⁻¹⁴ of their respective peak magnitudes. The first compilation of the flux and directional kernels took about 32 s and 40 s, respectively. A 32-ordinate trial exhausted device memory on this card, so the Warp API accepts up to 16 ordinates per hemisphere.

@@ -51,3 +51,7 @@ A full and reduced grid store the same atmosphere. For each node the archive giv
 - [libRadtran download and usage terms](https://www.libradtran.org/doku.php?id=download). The external program and conda-forge package are distributed under GPL-2.0-or-later. The repository includes numerical atmosphere results, the REPTRAN band quadrature used in those results, and their derivation. The original solver and molecular lookup files are retrieved independently.
 - [Conda-forge reference package](https://anaconda.org/conda-forge/rubin-libradtran). The executable used here came from build `2.0.6-py314pl5321h3aae1cf_1`, package SHA-256 `7554c2f6704ded36e16512e27d3cba1026a0ec624eb78136f88f63ef61f7eee2`.
 - AFGL US Standard 1976 profile, Anderson et al., AFGL-TR-86-0110, `data/atmmod/afglus.dat`, SHA-256 `dab26290ed81c762ed0c607e5dc2d53393c1462a0c3a528bc5e3f5935191cfb5`. The published `reptran_solar_coarse.cdf` input digest is `14aecaa2b2207c539fd22a2b0803dbba5a9a8f072b717430048e838cea8c2be5`. [REPTRAN formulation](https://doi.org/10.1016/j.jqsrt.2014.06.024)
+
+## Time a resident CUDA batch
+
+Run `OPENBLAS_NUM_THREADS=1 PYTHONPATH=. python studies/spectral-radiation/benchmark/warp_scaling.py` with Warp and a CUDA device. The script prints preparation, warmed solve and sequential NumPy timings for 1, 16 and 64 two-layer columns. It synchronizes CUDA before stopping each timer, then downloads the results and checks the upwelling spectra.
