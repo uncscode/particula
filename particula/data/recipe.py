@@ -2,6 +2,7 @@
 
 import json
 from collections.abc import Mapping
+from copy import deepcopy
 from dataclasses import dataclass
 from os import PathLike
 
@@ -52,10 +53,10 @@ class Recipe:
         )
 
     def describe(self) -> dict:
-        """Return an equivalent portable prescription for JSON or YAML."""
+        """Return an independently editable prescription for JSON or YAML."""
         return {
             "recipe_version": "1",
-            "steps": list(self.steps),
+            "steps": deepcopy(list(self.steps)),
             "result": self.steps[-1]["output"],
         }
 

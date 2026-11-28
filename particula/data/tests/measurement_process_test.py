@@ -86,6 +86,10 @@ def test_execute_compose_and_replay(tmp_path):
     sequence = calibrate.bind(
         signal="voltage", output="calibrated"
     ) | derive.bind(rate="counter", sample_flow="calibrated", output="number")
+    exported = sequence.describe()
+    exported["steps"][0]["parameters"]["calibration"] = "other-certificate"
+    exported["steps"][0]["version"] = "2"
+    exported["steps"][1]["inputs"]["rate"] = "other-counter"
     assert describe_recipe()["properties"]["recipe_version"]["const"] == "1"
     reference_frame = None
     for batch in (1, 7):
@@ -446,6 +450,26 @@ def test_signed_clock_correction_retains_reported_time(tmp_path):
         reopened.manifest["clock_corrections"][0]["source"]
         == "reference pulse A"
     )
+
+
+def test_raw_import_retry_preserves_existing_snapshots(tmp_path):
+    """A raw import cannot reuse a selected or time-corrected snapshot."""
+    from particula.data import correct_clock
+
+    source = DATA / "counter.csv"
+    raw = read_measurement(source, profile="cpc-3010")
+    corrected = correct_clock(
+        raw, start=UTC_START, stop=UTC_STOP, offset_seconds=1, source="pulse"
+    )
+    for name, product in (
+        ("selected", raw.filter(pl.col("count_rate") == 0)),
+        ("corrected", corrected),
+    ):
+        destination = tmp_path / name
+        save_measurement(product, destination)
+        with pytest.raises(FileExistsError):
+            import_to_parquet(source, destination, profile="cpc-3010")
+        assert open_measurement(destination).frame.equals(product.frame)
 
 
 def test_registered_batch_strategy_uses_both_sinks(tmp_path):

@@ -56,7 +56,8 @@ def open_measurement(destination: str | os.PathLike[str]) -> Measurement:
     """Open a completed Parquet measurement for lazy analysis.
 
     Args:
-        destination: Dataset directory created by import_to_parquet.
+        destination: Dataset directory created by import_to_parquet or
+            save_measurement.
 
     Returns:
         Measurement with lazy scans and diagnostics, validated profile units
@@ -73,6 +74,11 @@ def open_measurement(destination: str | os.PathLike[str]) -> Measurement:
         from particula.data.snapshot import open_snapshot
 
         return open_snapshot(root, manifest)
+    return _open_import(root, manifest)
+
+
+def _open_import(root: Path, manifest: dict) -> Measurement:
+    """Validate and reopen the complete raw import at the given path."""
     if manifest.get("format_version") != 1:
         raise ValueError("Unrecognized measurement manifest version")
     profile = load_profile(manifest["profile"])
@@ -133,12 +139,12 @@ def import_to_parquet(
 
     Returns:
         Disk-backed measurement with lazy scans and source diagnostics.
-        An existing dataset is reused when the source digest, profile digest
-        and parser version match.
+        An existing raw import is reused when the source digest, profile
+        digest and parser version match.
 
     Raises:
-        FileExistsError: The destination holds an incomplete or different
-            dataset.
+        FileExistsError: The destination holds a saved snapshot, an incomplete
+            import or a different dataset.
         ProfileError: The profile or source violates the input rules.
         ValueError: A reader limit is invalid or the source changes during
             import.
@@ -175,7 +181,9 @@ def import_to_parquet(
                 _sync(dest.parent)
                 return open_measurement(dest)
         try:
-            existing = open_measurement(dest)
+            existing = _open_import(
+                dest, json.loads((dest / "manifest.json").read_bytes())
+            )
         except (
             OSError,
             ValueError,
