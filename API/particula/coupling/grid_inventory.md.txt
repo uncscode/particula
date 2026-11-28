@@ -18,9 +18,9 @@ Ordered gases, dry size classes and particle materials.
 
 Lanes contain extensive gas kg, then represented counts by bin, then
 particulate kg in bin-major/material-minor order. Native discrete boxes
-store gas kg/m³, number/m³ and kg per individual particle.
+store gas kg/m³, represented counts and kg per individual particle.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L10-L105)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L8-L111)
 
 ### particula.coupling.grid_inventory.InventoryLayout.bins
 
@@ -30,7 +30,7 @@ store gas kg/m³, number/m³ and kg per individual particle.
 bins: tuple = ()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L20-L20)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L18-L18)
 
 ### particula.coupling.grid_inventory.InventoryLayout.gases
 
@@ -40,7 +40,7 @@ bins: tuple = ()
 gases: tuple
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L19-L19)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L17-L17)
 
 ### particula.coupling.grid_inventory.InventoryLayout.materials
 
@@ -50,7 +50,7 @@ gases: tuple
 materials: tuple = ()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L21-L21)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L19-L19)
 
 ### particula.coupling.grid_inventory.InventoryLayout.width
 
@@ -62,7 +62,7 @@ width
 
 Number of extensive lanes per cell.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L38-L40)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L36-L38)
 
 ### particula.coupling.grid_inventory.InventoryLayout.__init__
 
@@ -84,7 +84,7 @@ def __post_init__()
 
 Require unique named lanes and coherent bin/material axes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L23-L35)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L21-L33)
 
 ### particula.coupling.grid_inventory.InventoryLayout._check_native
 
@@ -94,7 +94,7 @@ Require unique named lanes and coherent bin/material axes.
 def _check_native(grid, gas, particles)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L60-L73)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L58-L73)
 
 ### particula.coupling.grid_inventory.InventoryLayout.pack
 
@@ -118,7 +118,7 @@ def unpack(grid, inventory, gas, particles)
 
 Return detached native gas and particle copies in the same order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L88-L105)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L88-L111)
 
 ### particula.coupling.grid_inventory.InventoryLayout.validate
 
@@ -130,7 +130,7 @@ def validate(inventory, n)
 
 Reject nonphysical inventories including mass in an empty bin.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L42-L58)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L40-L56)
 
 ## particula.coupling.grid_inventory.Uptake
 
@@ -142,7 +142,7 @@ class Uptake
 
 First-order gas uptake (s⁻¹) into one occupied particle class.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L108-L128)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L114-L134)
 
 ### particula.coupling.grid_inventory.Uptake.gas
 
@@ -152,7 +152,7 @@ First-order gas uptake (s⁻¹) into one occupied particle class.
 gas: str
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L112-L112)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L118-L118)
 
 ### particula.coupling.grid_inventory.Uptake.material
 
@@ -162,7 +162,7 @@ gas: str
 material: str
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L114-L114)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L120-L120)
 
 ### particula.coupling.grid_inventory.Uptake.rate
 
@@ -172,7 +172,7 @@ material: str
 rate: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L115-L115)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L121-L121)
 
 ### particula.coupling.grid_inventory.Uptake.size_bin
 
@@ -182,7 +182,7 @@ rate: float
 size_bin: str
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L113-L113)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L119-L119)
 
 ### particula.coupling.grid_inventory.Uptake.__init__
 
@@ -204,4 +204,4 @@ def bind(layout)
 
 Resolve named lanes once before transport.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L117-L128)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L123-L134)

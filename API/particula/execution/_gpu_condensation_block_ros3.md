@@ -196,4 +196,4 @@ Inherited from: `particula.execution._gpu_condensation_ros3.ROS3Stages`
 
 Check the full candidate and return the embedded maximum error.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_ros3.py#L146-L200)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_ros3.py#L142-L196)

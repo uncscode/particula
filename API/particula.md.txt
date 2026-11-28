@@ -18,7 +18,7 @@ path.
 *attribute* · *module attribute*
 
 ```python
-__version__ = '0.3.6'
+__version__ = '0.4.0'
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L61-L61)
@@ -47,6 +47,7 @@ Expose prepared simulation types without loading optional runtimes.
 
 **Modules**
 
+- `particula._array_validation`
 - `particula._cpu_batch`
 - `particula.abc_builder`
 - `particula.abc_factory`

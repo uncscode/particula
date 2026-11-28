@@ -167,7 +167,7 @@ Record a complete accepted state and save its accumulated history.
 def _validate(metadata, arrays)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/analysis_io.py#L178-L212)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/analysis_io.py#L178-L203)
 
 ## particula.execution.analysis_io._validate_header
 
@@ -178,6 +178,26 @@ def _validate_header(metadata)
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/analysis_io.py#L126-L140)
+
+## particula.execution.analysis_io._validate_observables
+
+*function*
+
+```python
+def _validate_observables(version, arrays, science, dimensions, measure_units)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/analysis_io.py#L216-L242)
+
+## particula.execution.analysis_io._validate_population_observations
+
+*function*
+
+```python
+def _validate_population_observations(version, science, arrays)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/analysis_io.py#L206-L213)
 
 ## particula.execution.analysis_io._validate_science
 
@@ -197,7 +217,7 @@ def _validate_science(science)
 def _validate_species(science, dimensions)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/analysis_io.py#L231-L254)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/analysis_io.py#L275-L298)
 
 ## particula.execution.analysis_io.load_analysis
 
@@ -209,7 +229,7 @@ def load_analysis(path, *, max_bytes=128 * 1024 * 1024)
 
 Load and validate analysis data without executable deserialization.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/analysis_io.py#L215-L228)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/analysis_io.py#L245-L272)
 
 ## particula.execution.analysis_io.save_analysis
 

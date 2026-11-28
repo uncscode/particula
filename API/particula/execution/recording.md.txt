@@ -16,10 +16,10 @@ observer-invariance claims. Full particle arrays are opt-in and byte bounded.
 *attribute* · *module attribute*
 
 ```python
-OBSERVABLES = {'number_density': ('particles.number_density', 'm^-3', ('box')), 'particle_mass_density': ('particles.species_mass_density', 'kg m^-3', ('box', 'material')), 'gas_concentration': ('gas.concentration', 'kg m^-3', ('box', 'gas')), 'temperature': ('environment.temperature', 'K', ('box')), 'pressure': ('environment.pressure', 'Pa', ('box')), 'volume': ('particles.volume', 'm^3', ('box')), 'particle_masses': ('particles.masses', 'kg', ('box', 'slot', 'material')), 'particle_concentration': ('particles.concentration', 'population_measure', ('box', 'slot')), 'particle_charge': ('particles.charge', 'elementary_charge', ('box', 'slot'))}
+OBSERVABLES = {'number_density': ('particles.number_density', 'm^-3', ('box')), 'particle_mass_density': ('particles.species_mass_density', 'kg m^-3', ('box', 'material')), 'gas_concentration': ('gas.concentration', 'kg m^-3', ('box', 'gas')), 'temperature': ('environment.temperature', 'K', ('box')), 'pressure': ('environment.pressure', 'Pa', ('box')), 'volume': ('particles.volume', 'm^3', ('box')), 'particle_masses': ('particles.masses', 'kg', ('box', 'slot', 'material')), 'particle_population': ('particles.population', 'count', ('box', 'slot')), 'particle_concentration': ('particles.concentration', 'population_measure', ('box', 'slot')), 'particle_charge': ('particles.charge', 'elementary_charge', ('box', 'slot'))}
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L16-L38)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L16-L39)
 
 ## particula.execution.recording.Recorder
 
@@ -37,7 +37,7 @@ max_bytes bounds retained numeric observations including times; Python
 object overhead is additional. Full slot arrays are opt-in. Volume is always
 recorded so population measures remain interpretable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L41-L191)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L42-L199)
 
 ### particula.execution.recording.Recorder._bytes
 
@@ -47,7 +47,7 @@ recorded so population measures remain interpretable.
 _bytes = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L83-L83)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L84-L84)
 
 ### particula.execution.recording.Recorder._metadata
 
@@ -57,7 +57,7 @@ _bytes = 0
 _metadata = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L82-L82)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L83-L83)
 
 ### particula.execution.recording.Recorder._rows
 
@@ -67,7 +67,7 @@ _metadata = None
 _rows: dict[str, list[np.ndarray]] = {name: [] for name in self.variables}
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L79-L81)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L80-L82)
 
 ### particula.execution.recording.Recorder._times
 
@@ -77,7 +77,7 @@ _rows: dict[str, list[np.ndarray]] = {name: [] for name in self.variables}
 _times: list[float] = []
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L78-L78)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L79-L79)
 
 ### particula.execution.recording.Recorder.variables
 
@@ -87,7 +87,7 @@ _times: list[float] = []
 variables = tuple(variables)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L63-L63)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L64-L64)
 
 ### particula.execution.recording.Recorder.last_time
 
@@ -99,7 +99,7 @@ last_time
 
 Return the last observation time or None for an empty history.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L91-L93)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L92-L94)
 
 ### particula.execution.recording.Recorder.metadata
 
@@ -111,7 +111,7 @@ metadata
 
 Return detached dimensions, units and species provenance.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L86-L88)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L87-L89)
 
 ### particula.execution.recording.Recorder.__init__
 
@@ -123,7 +123,7 @@ def __init__(variables=('number_density', 'particle_mass_density', 'gas_concentr
 
 Validate names and limits without accessing simulation state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L51-L83)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L52-L84)
 
 ### particula.execution.recording.Recorder._append
 
@@ -135,7 +135,7 @@ def _append(time, metadata, row)
 
 Append native/reduced values through one atomic boundary.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L153-L182)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L161-L190)
 
 ### particula.execution.recording.Recorder.arrays
 
@@ -147,7 +147,7 @@ def arrays()
 
 Return detached stacked arrays; time always has units of seconds.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L184-L191)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L192-L199)
 
 ### particula.execution.recording.Recorder.record
 
@@ -162,7 +162,7 @@ Append one accepted native observation; equal-time resume is a no-op.
 All metadata, shapes and storage limits validate before append. Layout
 changes require a new recorder; widths do not imply species order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L95-L151)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L96-L159)
 
 ## particula.execution.recording._observation_times
 
@@ -172,7 +172,7 @@ changes require a new recorder; widths do not imply species order.
 def _observation_times(output_times, end_time)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L194-L206)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L202-L214)
 
 ## particula.execution.recording._optical_schedule
 
@@ -182,7 +182,7 @@ def _observation_times(output_times, end_time)
 def _optical_schedule(simulation, observer, times, initial, start, end)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L209-L225)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L217-L233)
 
 ## particula.execution.recording.run_until
 
@@ -201,4 +201,4 @@ optical_output_times may shorten CPU steps to reach those times. Set
 optical_initial=True to observe the starting state on the dense schedule.
 Fixed prepared owners instead use run_prepared.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L228-L282)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L236-L290)

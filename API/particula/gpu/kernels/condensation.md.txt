@@ -1068,7 +1068,7 @@ coupling, and diagnostic sequence four times.
 - (`Any`) — A tuple containing the resident particle container and the accumulated
 - (`Any`) — finalized mass-transfer buffer, both retained by the prepared record.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3155-L3394)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3164-L3403)
 
 ## particula.gpu.kernels.condensation._bound_evaporation_candidate_kernel
 
@@ -1120,7 +1120,7 @@ Clear the fixed-shape accumulator before the four-substep update.
 def _commit_provider_step(staged: wp.array(dtype=Any), live: wp.array(dtype=Any), failure: wp.array(dtype=int))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3083-L3092)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3092-L3101)
 
 ## particula.gpu.kernels.condensation._condensation_mass_transfer_impl
 
@@ -1237,7 +1237,7 @@ def _enqueue_prepared_condensation_call(p)
 
 Commit a provider step once every refreshed composition passes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3095-L3116)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3104-L3125)
 
 ## particula.gpu.kernels.condensation._finalize_and_apply_inventory_transfer_kernel
 
@@ -1260,7 +1260,7 @@ therefore does not perform gas coupling.
 - `scale` (`Any`) — Positive-transfer fractions by box and species.
 - `finalized` (`Any`) — Output applied transfer matching ``masses`` [kg].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1376-L1401)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1379-L1404)
 
 ## particula.gpu.kernels.condensation._finalize_inventory_limited_mass_transfer
 
@@ -1279,9 +1279,9 @@ for each box and species to gas inventory plus permitted evaporation
 release. It mutates particle masses and any supplied inventory finalization
 sidecars, but
 deliberately does not mutate ``gas.concentration``. This primitive accepts
-explicitly discrete number-density weights and equal particle/gas lanes.
+explicitly discrete counts and equal particle/gas lanes.
 The public mapped step owns its separate gas coupling and supports resolved
-counts with volume normalization; this primitive does not interpret counts.
+counts with volume normalization.
 
 **Parameters**
 
@@ -1309,7 +1309,7 @@ peer storage.
 > failures leave caller-owned state unchanged; this does not promise
 > rollback after a post-launch device-runtime failure.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2075-L2218)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2078-L2227)
 
 ## particula.gpu.kernels.condensation._mapped_condensation_mass_transfer_kernel
 
@@ -1331,7 +1331,7 @@ Compute particle-ordered proposals from full-gas mapped sources.
 def _mapped_proposal(p, activities, dest)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3119-L3152)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3128-L3161)
 
 ## particula.gpu.kernels.condensation._prepare_condensation_step_gpu
 
@@ -1471,7 +1471,7 @@ before launch to prevent non-isothermal arithmetic overflow.
 > only writes it. This write-only contract permits stale finite values and
 > NaN/Inf before a call.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2313-L3080)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2322-L3089)
 
 ## particula.gpu.kernels.condensation._prepare_environment_properties_kernel
 
@@ -1509,7 +1509,7 @@ Return a Warp array's values as a float64 NumPy array for validation.
 *function*
 
 ```python
-def _reduce_inventory_candidates_kernel(candidate: Any, concentration: Any, demand: Any, release: Any) -> None
+def _reduce_inventory_candidates_kernel(candidate: Any, population: Any, volume: Any, demand: Any, release: Any) -> None
 ```
 
 Reduce concentration-weighted demand and release in index order.
@@ -1521,11 +1521,11 @@ negative candidates contribute their magnitude to release.
 **Parameters**
 
 - `candidate` (`Any`) — Bounded, already gated transfer proposal [kg].
-- `concentration` (`Any`) — Particle number concentrations ``(n_boxes, n_particles)`` [1/m^3].
+- `concentration` — Particle number concentrations ``(n_boxes, n_particles)`` [1/m^3].
 - `demand` (`Any`) — Output positive transfer demand ``(n_boxes, n_species)`` [kg/m^3].
 - `release` (`Any`) — Output evaporation release ``(n_boxes, n_species)`` [kg/m^3].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1304-L1337)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1304-L1340)
 
 ## particula.gpu.kernels.condensation._scale_inventory_uptake_kernel
 
@@ -1548,7 +1548,7 @@ and otherwise the available-to-demand ratio clamped to ``[0, 1]``.
 - `release` (`Any`) — Evaporation release ``(n_boxes, n_species)`` [kg/m^3].
 - `scale` (`Any`) — Output positive-transfer fractions ``(n_boxes, n_species)``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1340-L1373)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1343-L1376)
 
 ## particula.gpu.kernels.condensation._validate_binary_activity_table
 
@@ -1582,7 +1582,7 @@ Validate particle and gas arrays share the same Warp device.
 
 - `ValueError` — If any particle or gas array is on a different device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2054-L2072)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2057-L2075)
 
 ## particula.gpu.kernels.condensation._validate_device_match
 
@@ -1604,7 +1604,7 @@ Validate that a Warp array is on the expected device.
 
 - `ValueError` — If the array is not on the expected device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2038-L2051)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2041-L2054)
 
 ## particula.gpu.kernels.condensation._validate_energy_transfer_buffer
 
@@ -1616,7 +1616,7 @@ def _validate_energy_transfer_buffer(energy_transfer: Any, expected_shape: tuple
 
 Validate metadata for caller-owned write-only energy output storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1529-L1549)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1532-L1552)
 
 ## particula.gpu.kernels.condensation._validate_energy_transfer_ownership
 
@@ -1628,7 +1628,7 @@ def _validate_energy_transfer_ownership(energy_transfer: Any, mutable_arrays: tu
 
 Reject energy output storage overlapping condensation state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1605-L1624)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1608-L1627)
 
 ## particula.gpu.kernels.condensation._validate_finite_gas_delta
 
@@ -1640,7 +1640,7 @@ def _validate_finite_gas_delta(gas_delta: Any, device: Any) -> None
 
 Reject non-finite finalized-transfer reductions before gas mutation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1799-L1813)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1802-L1816)
 
 ## particula.gpu.kernels.condensation._validate_float64_species_array
 
@@ -1656,7 +1656,7 @@ Numeric-domain validation runs before the step can clear or mutate any
 caller-owned output. CUDA values are checked by a device-side preflight
 kernel; only its one-element validation result is read back.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1433-L1476)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1436-L1479)
 
 ## particula.gpu.kernels.condensation._validate_gas_arrays
 
@@ -1678,7 +1678,7 @@ Validate gas array shapes and lengths.
 
 - `ValueError` — If gas array shapes do not match expectations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1955-L1981)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1958-L1984)
 
 ## particula.gpu.kernels.condensation._validate_gas_delta_values_kernel
 
@@ -1690,7 +1690,7 @@ def _validate_gas_delta_values_kernel(gas_delta: Any, invalid: Any) -> None
 
 Record a non-finite finalized-transfer gas reduction.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1685-L1691)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1688-L1694)
 
 ## particula.gpu.kernels.condensation._validate_int32_selector
 
@@ -1724,7 +1724,7 @@ Validate mass transfer buffer shape and device.
 
 - `ValueError` — If the shape or device does not match expectations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1498-L1526)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1501-L1529)
 
 ## particula.gpu.kernels.condensation._validate_mass_transfer_ownership
 
@@ -1736,7 +1736,7 @@ def _validate_mass_transfer_ownership(mass_transfer: Any, state_arrays: tuple[An
 
 Reject a total-transfer output that aliases condensation state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1627-L1648)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1630-L1651)
 
 ## particula.gpu.kernels.condensation._validate_native_ownership
 
@@ -1751,7 +1751,7 @@ Reject overlaps involving any native writer before normalization.
 Primary arrays, outputs and supplied scratch must not overwrite any peer
 or configuration array. Read-only configuration may share storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2221-L2310)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2230-L2319)
 
 ## particula.gpu.kernels.condensation._validate_no_overlap
 
@@ -1763,7 +1763,7 @@ def _validate_no_overlap(read_only_arrays: tuple[Any | None, ...], writable_arra
 
 Reject thermal sidecars that alias writable scratch property storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1583-L1602)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1586-L1605)
 
 ## particula.gpu.kernels.condensation._validate_p2_commit_values
 
@@ -1776,7 +1776,7 @@ def _validate_p2_commit_values(particles: Any, finalized: Any, total_mass_transf
 Validate every prospective inventory finalization state value before its
 first commit.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1816-L1860)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1819-L1863)
 
 ## particula.gpu.kernels.condensation._validate_p2_commit_values_kernel
 
@@ -1789,7 +1789,7 @@ def _validate_p2_commit_values_kernel(masses: Any, finalized: Any, total_mass_tr
 Record invalid prospective inventory finalization values before mutating
 public state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1694-L1729)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1697-L1732)
 
 ## particula.gpu.kernels.condensation._validate_p2_primary_state
 
@@ -1802,7 +1802,7 @@ def _validate_p2_primary_state(particles: Any, gas: Any, dimensions: tuple[int, 
 Validate finite, non-negative primary inventory finalization state before
 launch.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1732-L1775)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1735-L1778)
 
 ## particula.gpu.kernels.condensation._validate_p2_primary_values_kernel
 
@@ -1815,7 +1815,7 @@ def _validate_p2_primary_values_kernel(masses: Any, concentration: Any, gas_conc
 Record invalid primary inventory finalization state without changing
 caller data.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1651-L1672)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1654-L1675)
 
 ## particula.gpu.kernels.condensation._validate_p2_proposal_finiteness
 
@@ -1828,7 +1828,7 @@ def _validate_p2_proposal_finiteness(proposal: Any, dimensions: tuple[int, int, 
 Validate a freshly written proposal gating proposal immediately before
 inventory finalization mutation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1778-L1796)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1781-L1799)
 
 ## particula.gpu.kernels.condensation._validate_p2_proposal_values_kernel
 
@@ -1840,7 +1840,7 @@ def _validate_p2_proposal_values_kernel(proposal: Any, invalid: Any) -> None
 
 Record a non-finite freshly generated proposal gating proposal.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1675-L1682)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1678-L1685)
 
 ## particula.gpu.kernels.condensation._validate_p2_sidecar_ownership
 
@@ -1853,7 +1853,7 @@ def _validate_p2_sidecar_ownership(demand: Any | None, release: Any | None, scal
 Reject inventory finalization reduction sidecars overlapping protected or
 peer storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1863-L1890)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1866-L1893)
 
 ## particula.gpu.kernels.condensation._validate_particle_arrays
 
@@ -1876,7 +1876,7 @@ Validate particle array shapes and lengths.
 
 - `ValueError` — If particle array shapes do not match expectations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1930-L1952)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1933-L1955)
 
 ## particula.gpu.kernels.condensation._validate_partitioning_metadata
 
@@ -1888,7 +1888,7 @@ def _validate_partitioning_metadata(partitioning: Any, n_boxes: int, n_species: 
 
 Validate an active-device per-box partitioning mask's metadata.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1996-L2012)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1999-L2015)
 
 ## particula.gpu.kernels.condensation._validate_partitioning_values
 
@@ -1904,7 +1904,7 @@ The one-element status buffer is private disposable preflight state. Its
 readback is necessary to make arbitrary device-resident non-binary values
 observable before any caller-owned state is changed.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2015-L2035)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2018-L2038)
 
 ## particula.gpu.kernels.condensation._validate_partitioning_values_kernel
 
@@ -1916,7 +1916,7 @@ def _validate_partitioning_values_kernel(partitioning: Any, invalid: Any) -> Non
 
 Record non-binary entries in a per-box partitioning mask.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1984-L1993)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1987-L1996)
 
 ## particula.gpu.kernels.condensation._validate_scratch_ownership
 
@@ -1928,7 +1928,7 @@ def _validate_scratch_ownership(scratch_buffers: CondensationScratchBuffers, pro
 
 Reject all supplied scratch buffers overlapping peers or public state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1893-L1927)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1896-L1930)
 
 ## particula.gpu.kernels.condensation._validate_species_array
 
@@ -1951,7 +1951,7 @@ Validate per-species array length and device.
 
 - `ValueError` — If the array length or device mismatches expectations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1404-L1430)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1407-L1433)
 
 ## particula.gpu.kernels.condensation._validate_species_values_kernel
 
@@ -1963,7 +1963,7 @@ def _validate_species_values_kernel(values: Any, require_nonnegative: wp.int32, 
 
 Record whether a species sidecar has an invalid numeric value.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1479-L1495)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1482-L1498)
 
 ## particula.gpu.kernels.condensation._warp_array_memory_range
 
@@ -1978,7 +1978,7 @@ Return a contiguous Warp array's byte range.
 Ownership checks reject strided views because a single address range cannot
 distinguish their gaps from overlapping storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1552-L1580)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1555-L1583)
 
 ## particula.gpu.kernels.condensation.apply_mass_transfer_kernel
 
@@ -2128,7 +2128,7 @@ API.
 - `ValueError` — If preflight rejects the containers, inputs, sidecars, or
 output ownership, or if a post-launch runtime validation fails.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3397-L3483)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3406-L3492)
 
 ## particula.gpu.kernels.condensation.validate_condensation_activity_surface_config
 

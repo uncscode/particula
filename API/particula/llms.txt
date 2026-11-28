@@ -23,7 +23,7 @@ path.
 *attribute* · *module attribute*
 
 ```python
-__version__ = '0.3.6'
+__version__ = '0.4.0'
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/__init__.py#L61-L61)
@@ -52,6 +52,7 @@ Expose prepared simulation types without loading optional runtimes.
 
 **Modules**
 
+- `particula._array_validation`
 - `particula._cpu_batch`
 - `particula.abc_builder`
 - `particula.abc_factory`
@@ -78,6 +79,28 @@ Expose prepared simulation types without loading optional runtimes.
 
 ---
 
+# particula._array_validation
+
+*module*
+
+Storage validation for in-place CPU array updates.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/_array_validation.py#L1-L1)
+
+## particula._array_validation.validate_writable_arrays
+
+*function*
+
+```python
+def validate_writable_arrays(fields, writers)
+```
+
+Require each destination to have independent, writable elements.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/_array_validation.py#L6-L42)
+
+---
+
 # particula._cpu_batch
 
 *module*
@@ -96,7 +119,7 @@ def arrays(aerosol)
 
 List stored numeric arrays in a stable ownership order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L34-L54)
+[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L35-L55)
 
 ## particula._cpu_batch.box_view
 
@@ -108,7 +131,7 @@ def box_view(aerosol, box)
 
 Expose one staged box through existing native container types.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L121-L149)
+[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L87-L115)
 
 ## particula._cpu_batch.detached
 
@@ -120,7 +143,7 @@ def detached(aerosol)
 
 Stage independent containers preserving population metadata.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L111-L118)
+[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L77-L84)
 
 ## particula._cpu_batch.duration
 
@@ -132,7 +155,7 @@ def duration(time_step, sub_steps)
 
 Validate scalar controls before allocating or evaluating state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L14-L31)
+[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L15-L32)
 
 ## particula._cpu_batch.publish
 
@@ -144,7 +167,7 @@ def publish(aerosol, candidate, writers)
 
 Publish selected fields by identity with rollback on write failure.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L152-L164)
+[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L118-L130)
 
 ## particula._cpu_batch.validate
 
@@ -156,7 +179,7 @@ def validate(aerosol, writers=())
 
 Validate original storage before detached copies can hide defects.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L57-L108)
+[View source](https://github.com/uncscode/particula/blob/main/particula/_cpu_batch.py#L58-L74)
 
 ---
 
@@ -2663,7 +2686,7 @@ ratio and gas widths do not prove that their species order agrees.
 - `TypeError` — If any top-level input is not its required CPU container.
 - `ValueError` — If stored fields or cross-container shapes are malformed.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/aerosol_validation.py#L75-L146)
+[View source](https://github.com/uncscode/particula/blob/main/particula/aerosol_validation.py#L75-L144)
 
 ---
 
@@ -2680,7 +2703,7 @@ Public, staged single-box Python process extensions.
 *attribute* · *module attribute*
 
 ```python
-_WRITABLE = frozenset({'particles.masses', 'particles.concentration', 'particles.charge', 'particles.volume', 'gas.concentration', 'environment.temperature', 'environment.pressure'})
+_WRITABLE = frozenset({'particles.masses', 'particles.population', 'particles.charge', 'particles.volume', 'gas.concentration', 'environment.temperature', 'environment.pressure'})
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/box_process.py#L15-L25)
@@ -8041,9 +8064,9 @@ Ordered gases, dry size classes and particle materials.
 
 Lanes contain extensive gas kg, then represented counts by bin, then
 particulate kg in bin-major/material-minor order. Native discrete boxes
-store gas kg/m³, number/m³ and kg per individual particle.
+store gas kg/m³, represented counts and kg per individual particle.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L10-L105)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L8-L111)
 
 ### particula.coupling.grid_inventory.InventoryLayout.bins
 
@@ -8053,7 +8076,7 @@ store gas kg/m³, number/m³ and kg per individual particle.
 bins: tuple = ()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L20-L20)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L18-L18)
 
 ### particula.coupling.grid_inventory.InventoryLayout.gases
 
@@ -8063,7 +8086,7 @@ bins: tuple = ()
 gases: tuple
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L19-L19)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L17-L17)
 
 ### particula.coupling.grid_inventory.InventoryLayout.materials
 
@@ -8073,7 +8096,7 @@ gases: tuple
 materials: tuple = ()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L21-L21)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L19-L19)
 
 ### particula.coupling.grid_inventory.InventoryLayout.width
 
@@ -8085,7 +8108,7 @@ width
 
 Number of extensive lanes per cell.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L38-L40)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L36-L38)
 
 ### particula.coupling.grid_inventory.InventoryLayout.__init__
 
@@ -8107,7 +8130,7 @@ def __post_init__()
 
 Require unique named lanes and coherent bin/material axes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L23-L35)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L21-L33)
 
 ### particula.coupling.grid_inventory.InventoryLayout._check_native
 
@@ -8117,7 +8140,7 @@ Require unique named lanes and coherent bin/material axes.
 def _check_native(grid, gas, particles)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L60-L73)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L58-L73)
 
 ### particula.coupling.grid_inventory.InventoryLayout.pack
 
@@ -8141,7 +8164,7 @@ def unpack(grid, inventory, gas, particles)
 
 Return detached native gas and particle copies in the same order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L88-L105)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L88-L111)
 
 ### particula.coupling.grid_inventory.InventoryLayout.validate
 
@@ -8153,7 +8176,7 @@ def validate(inventory, n)
 
 Reject nonphysical inventories including mass in an empty bin.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L42-L58)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L40-L56)
 
 ## particula.coupling.grid_inventory.Uptake
 
@@ -8165,7 +8188,7 @@ class Uptake
 
 First-order gas uptake (s⁻¹) into one occupied particle class.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L108-L128)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L114-L134)
 
 ### particula.coupling.grid_inventory.Uptake.gas
 
@@ -8175,7 +8198,7 @@ First-order gas uptake (s⁻¹) into one occupied particle class.
 gas: str
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L112-L112)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L118-L118)
 
 ### particula.coupling.grid_inventory.Uptake.material
 
@@ -8185,7 +8208,7 @@ gas: str
 material: str
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L114-L114)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L120-L120)
 
 ### particula.coupling.grid_inventory.Uptake.rate
 
@@ -8195,7 +8218,7 @@ material: str
 rate: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L115-L115)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L121-L121)
 
 ### particula.coupling.grid_inventory.Uptake.size_bin
 
@@ -8205,7 +8228,7 @@ rate: float
 size_bin: str
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L113-L113)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L119-L119)
 
 ### particula.coupling.grid_inventory.Uptake.__init__
 
@@ -8227,7 +8250,7 @@ def bind(layout)
 
 Resolve named lanes once before transport.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L117-L128)
+[View source](https://github.com/uncscode/particula/blob/main/particula/coupling/grid_inventory.py#L123-L134)
 
 ---
 
@@ -13978,7 +14001,7 @@ Scale each particle's integrated moles by its initial volume.
 *attribute* · *instance attribute*
 
 ```python
-active = particles.concentration[0] > 0
+active = particles.population[0] > 0
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L31-L31)
@@ -30096,7 +30119,7 @@ def _finalize_species(masses: NDArray[np.float64], weights: NDArray[np.float64],
 
 Limit evaporation first, then uptake against gas plus actual release.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/_native_step.py#L98-L135)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/_native_step.py#L96-L133)
 
 ## particula.dynamics.condensation._native_step._weighted_sum
 
@@ -30108,7 +30131,7 @@ def _weighted_sum(values: NDArray[np.float64], weights: NDArray[np.float64]) -> 
 
 Sum species inventory independently of cancellation/reduction order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/_native_step.py#L79-L95)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/_native_step.py#L77-L93)
 
 ## particula.dynamics.condensation._native_step.finalize_native_transfer
 
@@ -30146,7 +30169,7 @@ request to evaporate more mass than a particle owns.
 - `ValueError` — If proposals have invalid shape/values or a transfer cannot
 be represented conservatively with finite floating-point storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/_native_step.py#L138-L188)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/_native_step.py#L136-L186)
 
 ## particula.dynamics.condensation._native_step.retire_evaporated_slots
 
@@ -30162,7 +30185,7 @@ The particle no longer exists: clear its count and charge, preserving
 fixed storage and every surviving particle. No gas-phase charge model is
 implied. Density-grid populations retain their prescribed bin semantics.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/_native_step.py#L64-L76)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/_native_step.py#L64-L74)
 
 ## particula.dynamics.condensation._native_step.validate_native_step_storage
 
@@ -48056,7 +48079,7 @@ and class. updraft_gradient is the terminal liquid mixing ratio derivative
 per m/s at fixed elapsed time, or None when unrequested. statistics
 contains work counts and step extrema for adaptive Warp execution.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L132-L194)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L132-L193)
 
 ### particula.dynamics.parcel.ParcelTrajectory.height
 
@@ -48200,11 +48223,10 @@ Return an independent native one-box snapshot at a time index.
 
 The discrete particle lanes are dry material and water, respectively.
 Supply dry material density (kg/m³) to convert the fixed dry volumes
-to mass. Gas holds water vapor in kg/m³. The native discrete volume
-is 1 m³. Multiply its density inventories by the physical parcel
-volume at this sample to recover extensive quantities.
+to mass. Gas holds water vapor in kg/m³. The native box retains its
+physical parcel volume and bin counts.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L157-L194)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L157-L193)
 
 ## particula.dynamics.parcel._ParcelAdaptiveControls
 
@@ -48280,7 +48302,7 @@ def _cpu_reference(initial, wet, time, updraft, phase_exchange)
 
 Integrate pressure, temperature, vapor and squared radii.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L267-L333)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L266-L332)
 
 ## particula.dynamics.parcel._equilibrium
 
@@ -48290,7 +48312,7 @@ Integrate pressure, temperature, vapor and squared radii.
 def _equilibrium(radius, dry_radius, temperature, kappa)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L202-L207)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L201-L206)
 
 ## particula.dynamics.parcel._initial_radii
 
@@ -48300,7 +48322,7 @@ def _equilibrium(radius, dry_radius, temperature, kappa)
 def _initial_radii(initial)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L210-L264)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L209-L263)
 
 ## particula.dynamics.parcel._parcel_output_times
 
@@ -48312,7 +48334,7 @@ def _parcel_output_times(steps, timestep, updraft)
 
 Validate common parcel forcing and construct the output time grid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L336-L348)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L335-L347)
 
 ## particula.dynamics.parcel._run_multivapor
 
@@ -48324,7 +48346,7 @@ def _run_multivapor(initial, time, updraft, device, adaptive, phase_exchange, gr
 
 Dispatch the explicit wet-state parcel after validating its controls.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L351-L373)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L350-L372)
 
 ## particula.dynamics.parcel._saturation_pressure
 
@@ -48336,7 +48358,7 @@ def _saturation_pressure(temperature)
 
 Liquid-water saturation pressure (Pa), constant-L Clausius-Clapeyron.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L197-L199)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L196-L198)
 
 ## particula.dynamics.parcel.run_parcel
 
@@ -48367,7 +48389,7 @@ Advance a single parcel under constant signed vertical velocity.
 
 - `ValueError` — Invalid state, backend, integration interval or trajectory.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L376-L488)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L375-L487)
 
 ---
 
@@ -64931,7 +64953,7 @@ def assemble_parts(local: FloatTensor, response: FloatTensor, particular: FloatM
 
 Sum fixed strided slot groups without atomic floating-point additions.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_reservoirs.py#L57-L95)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_reservoirs.py#L55-L93)
 
 ## particula.execution._condensation_reservoirs.finish_gas
 
@@ -64943,7 +64965,7 @@ def finish_gas(parts: FloatTensor, mass_size: int, scale: FloatVector, derivativ
 
 Finish in fixed lane order and write scaled gas derivatives.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_reservoirs.py#L37-L54)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_reservoirs.py#L35-L52)
 
 ## particula.execution._condensation_reservoirs.finish_schur
 
@@ -64955,7 +64977,7 @@ def finish_schur(parts: FloatTensor, rhs: FloatVector, sources: IntVector, mass_
 
 Add the diagonal/RHS once after deterministic partial reduction.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_reservoirs.py#L98-L120)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_reservoirs.py#L96-L118)
 
 ## particula.execution._condensation_reservoirs.gas_parts
 
@@ -64967,7 +64989,7 @@ def gas_parts(rate: FloatTensor, counts: FloatMatrix, volume: FloatVector, mappi
 
 Retain native slot weights and reduce independent fixed slot groups.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_reservoirs.py#L15-L34)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_reservoirs.py#L15-L32)
 
 ---
 
@@ -64996,7 +65018,7 @@ def extract_derivative(plus: FloatVector, minus: FloatVector, span: FloatVector,
 
 Extract local derivatives from colored physical-rate evaluations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L75-L106)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L76-L107)
 
 ## particula.execution._condensation_ros3_kernels.finish
 
@@ -65006,7 +65028,7 @@ Extract local derivatives from colored physical-rate evaluations.
 def finish(state: FloatVector, first: FloatVector, second: FloatVector, third: FloatVector, atol: FloatVector, rtol: FloatVector, candidate: FloatVector, norm: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L223-L243)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L221-L241)
 
 ## particula.execution._condensation_ros3_kernels.partial_time
 
@@ -65018,7 +65040,7 @@ def partial_time(base: FloatVector, shifted: FloatVector, delta: wp.float64, res
 
 Differentiate forcing at fixed state inside one smooth time segment.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L246-L255)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L244-L253)
 
 ## particula.execution._condensation_ros3_kernels.perturb
 
@@ -65030,19 +65052,19 @@ def perturb(state: FloatVector, scale: FloatVector, counts: FloatMatrix, materia
 
 Perturb independent local mass or per-box gas columns simultaneously.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L32-L72)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L33-L73)
 
 ## particula.execution._condensation_ros3_kernels.solve_gas
 
 *function*
 
 ```python
-def solve_gas(local: FloatMatrix, gas_column: FloatMatrix, counts: FloatMatrix, volume: FloatVector, scale: FloatVector, rhs: FloatVector, materials: wp.int32, gases: wp.int32, target: wp.int32, source: wp.int32, resolved: wp.int32, inverse_step_gamma: wp.float64, solution: FloatVector, invalid: IntVector)
+def solve_gas(local: FloatMatrix, gas_column: FloatMatrix, counts: FloatMatrix, volume: FloatVector, scale: FloatVector, rhs: FloatVector, materials: wp.int32, gases: wp.int32, target: wp.int32, source: wp.int32, inverse_step_gamma: wp.float64, solution: FloatVector, invalid: IntVector)
 ```
 
 Eliminate particle coordinates with conservative weighted gas rows.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L109-L152)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L110-L150)
 
 ## particula.execution._condensation_ros3_kernels.solve_remaining
 
@@ -65054,7 +65076,7 @@ def solve_remaining(local: FloatMatrix, gas_column: FloatMatrix, rhs: FloatVecto
 
 Back-substitute all local coordinates without a dense factorization.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L155-L188)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L153-L186)
 
 ## particula.execution._condensation_ros3_kernels.stage_rhs
 
@@ -65064,7 +65086,7 @@ Back-substitute all local coordinates without a dense factorization.
 def stage_rhs(rate: FloatVector, first: FloatVector, second: FloatVector, partial: FloatVector, h: wp.float64, stage: wp.int32, rhs: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L191-L212)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L189-L210)
 
 ## particula.execution._condensation_ros3_kernels.stage_state
 
@@ -65074,7 +65096,7 @@ def stage_rhs(rate: FloatVector, first: FloatVector, second: FloatVector, partia
 def stage_state(state: FloatVector, increment: FloatVector, result: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L215-L220)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L213-L218)
 
 ---
 
@@ -65448,7 +65470,7 @@ Inherited from: `particula.execution._gpu_condensation_ros3.ROS3Stages`
 
 Check the full candidate and return the embedded maximum error.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_ros3.py#L146-L200)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_ros3.py#L142-L196)
 
 ---
 
@@ -65474,7 +65496,7 @@ class ROS3Stages
 
 Allocate linear-storage scratch on the owner's requested device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_ros3.py#L15-L200)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_ros3.py#L15-L196)
 
 ### particula.execution._gpu_condensation_ros3.ROS3Stages.increments
 
@@ -65518,7 +65540,7 @@ def solve(owner, h, result)
 
 Eliminate gas coupling and back-substitute particle increments.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_ros3.py#L100-L144)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_ros3.py#L100-L140)
 
 ### particula.execution._gpu_condensation_ros3.ROS3Stages.trial
 
@@ -65530,7 +65552,7 @@ def trial(owner, h)
 
 Check the full candidate and return the embedded maximum error.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_ros3.py#L146-L200)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_gpu_condensation_ros3.py#L142-L196)
 
 ---
 
@@ -68698,7 +68720,7 @@ Record a complete accepted state and save its accumulated history.
 def _validate(metadata, arrays)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/analysis_io.py#L178-L212)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/analysis_io.py#L178-L203)
 
 ## particula.execution.analysis_io._validate_header
 
@@ -68709,6 +68731,26 @@ def _validate_header(metadata)
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/analysis_io.py#L126-L140)
+
+## particula.execution.analysis_io._validate_observables
+
+*function*
+
+```python
+def _validate_observables(version, arrays, science, dimensions, measure_units)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/analysis_io.py#L216-L242)
+
+## particula.execution.analysis_io._validate_population_observations
+
+*function*
+
+```python
+def _validate_population_observations(version, science, arrays)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/analysis_io.py#L206-L213)
 
 ## particula.execution.analysis_io._validate_science
 
@@ -68728,7 +68770,7 @@ def _validate_science(science)
 def _validate_species(science, dimensions)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/analysis_io.py#L231-L254)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/analysis_io.py#L275-L298)
 
 ## particula.execution.analysis_io.load_analysis
 
@@ -68740,7 +68782,7 @@ def load_analysis(path, *, max_bytes=128 * 1024 * 1024)
 
 Load and validate analysis data without executable deserialization.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/analysis_io.py#L215-L228)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/analysis_io.py#L245-L272)
 
 ## particula.execution.analysis_io.save_analysis
 
@@ -69333,7 +69375,7 @@ and reacquisition retain restored arrays until reset is explicitly requested.
 *attribute* · *module attribute*
 
 ```python
-_PRIMARY_ROLES = (('particles', 'masses'), ('particles', 'concentration'), ('particles', 'charge'), ('particles', 'density'), ('particles', 'volume'), ('gas', 'molar_mass'), ('gas', 'concentration'), ('gas', 'vapor_pressure'), ('gas', 'partitioning'), ('environment', 'temperature'), ('environment', 'pressure'), ('environment', 'saturation_ratio'))
+_PRIMARY_ROLES = (('particles', 'masses'), ('particles', 'population'), ('particles', 'charge'), ('particles', 'density'), ('particles', 'volume'), ('gas', 'molar_mass'), ('gas', 'concentration'), ('gas', 'vapor_pressure'), ('gas', 'partitioning'), ('environment', 'temperature'), ('environment', 'pressure'), ('environment', 'saturation_ratio'))
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/checkpoint.py#L55-L68)
@@ -69343,7 +69385,7 @@ _PRIMARY_ROLES = (('particles', 'masses'), ('particles', 'concentration'), ('par
 *attribute* · *module attribute*
 
 ```python
-_SCHEMA_VERSION = 5
+_SCHEMA_VERSION = 6
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/checkpoint.py#L54-L54)
@@ -73038,7 +73080,7 @@ only; it does not revalidate or rediscover the plan.
 
 - `plan` (`ResidentDiagnosticsPlan`) — Exact diagnostics plan validated during setup.
 - `particle_masses` (`object`) — Bound resident particle mass array.
-- `particle_concentration` (`object`) — Bound resident particle concentration array.
+- `particle_population` (`object`) — Bound resident extensive particle population.
 - `particle_volume` (`object`) — Bound resident particle volume array.
 - `gas_concentration` (`object`) — Bound resident gas concentration array.
 - `saturation_ratio` (`object`) — Bound resident saturation-ratio array.
@@ -73051,10 +73093,9 @@ only; it does not revalidate or rediscover the plan.
 - `source_ledgers` (`tuple[object | None, ...]`) — Residual source ledgers aligned with registrations.
 - `sink_ledgers` (`tuple[object | None, ...]`) — Residual sink ledgers aligned with registrations.
 - `total_mass_output` (`object | None`) — Bound total-mass output used by the residual writer.
-- `resolved_counts` (`bool`) — Whether particle population stores raw counts.
 - `particle_mass_pairs` (`tuple[tuple[int, int], ...]`) — Validated gas-to-particle inventory lane pairs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L184-L228)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L184-L226)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.baseline_total_masses
 
@@ -73064,7 +73105,7 @@ only; it does not revalidate or rediscover the plan.
 baseline_total_masses: tuple[object | None, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L223-L223)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L222-L222)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.device
 
@@ -73074,7 +73115,7 @@ baseline_total_masses: tuple[object | None, ...]
 device: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L218-L218)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L217-L217)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.dimensions
 
@@ -73084,7 +73125,7 @@ device: object
 dimensions: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L219-L219)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L218-L218)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.energy_transfers
 
@@ -73094,7 +73135,7 @@ dimensions: object
 energy_transfers: tuple[object | None, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L222-L222)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L221-L221)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.gas_concentration
 
@@ -73104,7 +73145,7 @@ energy_transfers: tuple[object | None, ...]
 gas_concentration: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L216-L216)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L215-L215)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.outputs
 
@@ -73114,17 +73155,7 @@ gas_concentration: object
 outputs: tuple[object, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L221-L221)
-
-### particula.execution.diagnostics.PreparedResidentDiagnostics.particle_concentration
-
-*attribute* · *instance attribute*
-
-```python
-particle_concentration: object
-```
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L214-L214)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L220-L220)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.particle_mass_pairs
 
@@ -73134,7 +73165,7 @@ particle_concentration: object
 particle_mass_pairs: tuple[tuple[int, int], ...] = ()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L228-L228)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L226-L226)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.particle_masses
 
@@ -73142,6 +73173,16 @@ particle_mass_pairs: tuple[tuple[int, int], ...] = ()
 
 ```python
 particle_masses: object
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L212-L212)
+
+### particula.execution.diagnostics.PreparedResidentDiagnostics.particle_population
+
+*attribute* · *instance attribute*
+
+```python
+particle_population: object
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L213-L213)
@@ -73154,7 +73195,7 @@ particle_masses: object
 particle_volume: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L215-L215)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L214-L214)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.plan
 
@@ -73164,7 +73205,7 @@ particle_volume: object
 plan: ResidentDiagnosticsPlan
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L212-L212)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L211-L211)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.registrations
 
@@ -73174,17 +73215,7 @@ plan: ResidentDiagnosticsPlan
 registrations: tuple[ResidentDiagnosticRegistration, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L220-L220)
-
-### particula.execution.diagnostics.PreparedResidentDiagnostics.resolved_counts
-
-*attribute* · *class attribute* · *instance attribute*
-
-```python
-resolved_counts: bool = False
-```
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L227-L227)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L219-L219)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.saturation_ratio
 
@@ -73194,7 +73225,7 @@ resolved_counts: bool = False
 saturation_ratio: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L217-L217)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L216-L216)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.sink_ledgers
 
@@ -73204,7 +73235,7 @@ saturation_ratio: object
 sink_ledgers: tuple[object | None, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L225-L225)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L224-L224)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.source_ledgers
 
@@ -73214,7 +73245,7 @@ sink_ledgers: tuple[object | None, ...]
 source_ledgers: tuple[object | None, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L224-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L223-L223)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.total_mass_output
 
@@ -73224,14 +73255,14 @@ source_ledgers: tuple[object | None, ...]
 total_mass_output: object | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L226-L226)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L225-L225)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.__init__
 
 *method*
 
 ```python
-def __init__(plan: ResidentDiagnosticsPlan, particle_masses: object, particle_concentration: object, particle_volume: object, gas_concentration: object, saturation_ratio: object, device: object, dimensions: object, registrations: tuple[ResidentDiagnosticRegistration, ...], outputs: tuple[object, ...], energy_transfers: tuple[object | None, ...], baseline_total_masses: tuple[object | None, ...], source_ledgers: tuple[object | None, ...], sink_ledgers: tuple[object | None, ...], total_mass_output: object | None, resolved_counts: bool = False, particle_mass_pairs: tuple[tuple[int, int], ...] = ()) -> None
+def __init__(plan: ResidentDiagnosticsPlan, particle_masses: object, particle_population: object, particle_volume: object, gas_concentration: object, saturation_ratio: object, device: object, dimensions: object, registrations: tuple[ResidentDiagnosticRegistration, ...], outputs: tuple[object, ...], energy_transfers: tuple[object | None, ...], baseline_total_masses: tuple[object | None, ...], source_ledgers: tuple[object | None, ...], sink_ledgers: tuple[object | None, ...], total_mass_output: object | None, particle_mass_pairs: tuple[tuple[int, int], ...] = ()) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L0-L0)
@@ -73447,7 +73478,7 @@ synchronization, transfer, allocation, or physics mutation. Matrix
 registrations are write-free for empty ``(B, S)`` schemas; particle number
 remains writable for ``(B, 0)``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L346-L609)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L333-L583)
 
 ### particula.execution.diagnostics.ResidentDiagnosticsExecutor._execute_validated
 
@@ -73459,7 +73490,7 @@ def _execute_validated(plan: ResidentDiagnosticsPlan) -> None
 
 Dispatch a plan already validated by its owning scheduler step.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L471-L609)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L458-L583)
 
 ### particula.execution.diagnostics.ResidentDiagnosticsExecutor._validate
 
@@ -73480,7 +73511,7 @@ Validate plan provenance, closed operation order, and outputs.
 - `ValueError` — If lifecycle, graph, schedule, protocol, or output
 metadata validation fails.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L422-L435)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L409-L422)
 
 ### particula.execution.diagnostics.ResidentDiagnosticsExecutor._validate_graph_and_schedule
 
@@ -73492,7 +73523,7 @@ def _validate_graph_and_schedule(plan: ResidentDiagnosticsPlan) -> None
 
 Validate graph provenance, membership, and canonical order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L357-L400)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L344-L387)
 
 ### particula.execution.diagnostics.ResidentDiagnosticsExecutor._validate_outputs
 
@@ -73504,7 +73535,7 @@ def _validate_outputs(plan: ResidentDiagnosticsPlan) -> None
 
 Validate caller-owned diagnostic outputs against resident state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L415-L420)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L402-L407)
 
 ### particula.execution.diagnostics.ResidentDiagnosticsExecutor._validate_registrations
 
@@ -73516,7 +73547,7 @@ def _validate_registrations(plan: ResidentDiagnosticsPlan) -> None
 
 Validate diagnostic registration ordering and uniqueness.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L402-L413)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L389-L400)
 
 ### particula.execution.diagnostics.ResidentDiagnosticsExecutor.execute
 
@@ -73542,7 +73573,7 @@ synchronize before inspecting outputs on the host.
 - `TypeError` — If ``plan`` is not an exact diagnostics plan.
 - `ValueError` — If its bindings or output metadata are invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L453-L469)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L440-L456)
 
 ### particula.execution.diagnostics.ResidentDiagnosticsExecutor.validate
 
@@ -73568,7 +73599,7 @@ Validate one exact diagnostics plan without dispatching a kernel.
 - `ValueError` — If the plan's graph, bindings, or registration protocol
 is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L437-L451)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L424-L438)
 
 ## particula.execution.diagnostics.ResidentDiagnosticsPlan
 
@@ -73685,36 +73716,24 @@ executor so plan construction does not inspect Warp-array metadata.
 *function*
 
 ```python
-def _accumulate_mapped_particle_mass(masses: Any, concentration: Any, volume: Any, output: Any, particle_species: int, gas_species: int, resolved: int) -> None
+def _accumulate_mapped_particle_mass(masses: Any, population: Any, output: Any, particle_species: int, gas_species: int) -> None
 ```
 
 Accumulate one explicit material-to-gas extensive inventory lane.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L288-L308)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L279-L295)
 
-## particula.execution.diagnostics._accumulate_particle_number
-
-*function*
-
-```python
-def _accumulate_particle_number(concentration: Any, output: Any) -> None
-```
-
-Accumulate one particle concentration lane in parallel.
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L254-L258)
-
-## particula.execution.diagnostics._accumulate_resolved_number
+## particula.execution.diagnostics._accumulate_number_density
 
 *function*
 
 ```python
-def _accumulate_resolved_number(concentration: Any, volume: Any, output: Any) -> None
+def _accumulate_number_density(concentration: Any, volume: Any, output: Any) -> None
 ```
 
 Reduce represented counts to per-volume number concentration.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L279-L285)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L270-L276)
 
 ## particula.execution.diagnostics._clear_particle_number
 
@@ -73726,7 +73745,7 @@ def _clear_particle_number(output: Any) -> None
 
 Clear one particle-number output lane before staged accumulation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L247-L251)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L245-L249)
 
 ## particula.execution.diagnostics._conservation_residual
 
@@ -73738,7 +73757,7 @@ def _conservation_residual(total_mass: Any, baseline: Any, source: Any, sink: An
 
 Write the ledger-aware residual from the already-reduced total mass.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L261-L276)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L252-L267)
 
 ## particula.execution.diagnostics._copy_snapshot
 
@@ -73750,7 +73769,7 @@ def _copy_snapshot(source: Any, output: Any) -> None
 
 Copy one resident diagnostic matrix element to its output.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L231-L235)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L229-L233)
 
 ## particula.execution.diagnostics._enqueue_prepared_resident_diagnostics
 
@@ -73774,7 +73793,7 @@ schemas remain write-free; rollback is not promised after a writer launches.
 
 - `ValueError` — If residual dispatch lacks its bound total-mass output.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L706-L827)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L679-L792)
 
 ## particula.execution.diagnostics._initialize_total_species_mass
 
@@ -73786,7 +73805,7 @@ def _initialize_total_species_mass(gas_concentration: Any, volume: Any, output: 
 
 Initialize each extensive-mass lane from resident gas.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L238-L244)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L236-L242)
 
 ## particula.execution.diagnostics._mass_pairs
 
@@ -73798,7 +73817,7 @@ def _mass_pairs(plan: ResidentDiagnosticsPlan) -> tuple[tuple[int, int], ...]
 
 Validate total-mass provenance without device work or inferred lanes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L311-L343)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L298-L330)
 
 ## particula.execution.diagnostics.setup_prepared_resident_diagnostics
 
@@ -73828,7 +73847,7 @@ Validate a declaration diagnostics attachment and bind enqueue
 primary
 arrays are invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L612-L703)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L586-L676)
 
 ## particula.execution.diagnostics.validate_resident_diagnostics_plan
 
@@ -73857,7 +73876,7 @@ resident-state mutation.
 - `TypeError` — If ``plan`` is not an exact diagnostics plan.
 - `ValueError` — If its binding, graph, or registration metadata is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L830-L899)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L795-L864)
 
 ---
 
@@ -91410,12 +91429,12 @@ Bounded, deterministic particle reductions for CPU observation.
 *function*
 
 ```python
-def _finish_partials(partials: wp.array3d(dtype=wp.float64), volume: wp.array(dtype=wp.float64), resolved: wp.int32, output: wp.array2d(dtype=wp.float64))
+def _finish_partials(partials: wp.array3d(dtype=wp.float64), volume: wp.array(dtype=wp.float64), output: wp.array2d(dtype=wp.float64))
 ```
 
-Normalize counts by volume; retain density and active-slot count.
+Convert totals to densities and keep the active-slot count.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_diagnostics.py#L35-L50)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_diagnostics.py#L35-L49)
 
 ## particula.execution.prepared_diagnostics._particle_partials
 
@@ -91439,7 +91458,7 @@ def setup_diagnostics(owner: Any)
 
 Allocate reduction storage once and return a retained observer.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_diagnostics.py#L53-L111)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_diagnostics.py#L52-L109)
 
 ---
 
@@ -94944,10 +94963,10 @@ observer-invariance claims. Full particle arrays are opt-in and byte bounded.
 *attribute* · *module attribute*
 
 ```python
-OBSERVABLES = {'number_density': ('particles.number_density', 'm^-3', ('box')), 'particle_mass_density': ('particles.species_mass_density', 'kg m^-3', ('box', 'material')), 'gas_concentration': ('gas.concentration', 'kg m^-3', ('box', 'gas')), 'temperature': ('environment.temperature', 'K', ('box')), 'pressure': ('environment.pressure', 'Pa', ('box')), 'volume': ('particles.volume', 'm^3', ('box')), 'particle_masses': ('particles.masses', 'kg', ('box', 'slot', 'material')), 'particle_concentration': ('particles.concentration', 'population_measure', ('box', 'slot')), 'particle_charge': ('particles.charge', 'elementary_charge', ('box', 'slot'))}
+OBSERVABLES = {'number_density': ('particles.number_density', 'm^-3', ('box')), 'particle_mass_density': ('particles.species_mass_density', 'kg m^-3', ('box', 'material')), 'gas_concentration': ('gas.concentration', 'kg m^-3', ('box', 'gas')), 'temperature': ('environment.temperature', 'K', ('box')), 'pressure': ('environment.pressure', 'Pa', ('box')), 'volume': ('particles.volume', 'm^3', ('box')), 'particle_masses': ('particles.masses', 'kg', ('box', 'slot', 'material')), 'particle_population': ('particles.population', 'count', ('box', 'slot')), 'particle_concentration': ('particles.concentration', 'population_measure', ('box', 'slot')), 'particle_charge': ('particles.charge', 'elementary_charge', ('box', 'slot'))}
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L16-L38)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L16-L39)
 
 ## particula.execution.recording.Recorder
 
@@ -94965,7 +94984,7 @@ max_bytes bounds retained numeric observations including times; Python
 object overhead is additional. Full slot arrays are opt-in. Volume is always
 recorded so population measures remain interpretable.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L41-L191)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L42-L199)
 
 ### particula.execution.recording.Recorder._bytes
 
@@ -94975,7 +94994,7 @@ recorded so population measures remain interpretable.
 _bytes = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L83-L83)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L84-L84)
 
 ### particula.execution.recording.Recorder._metadata
 
@@ -94985,7 +95004,7 @@ _bytes = 0
 _metadata = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L82-L82)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L83-L83)
 
 ### particula.execution.recording.Recorder._rows
 
@@ -94995,7 +95014,7 @@ _metadata = None
 _rows: dict[str, list[np.ndarray]] = {name: [] for name in self.variables}
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L79-L81)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L80-L82)
 
 ### particula.execution.recording.Recorder._times
 
@@ -95005,7 +95024,7 @@ _rows: dict[str, list[np.ndarray]] = {name: [] for name in self.variables}
 _times: list[float] = []
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L78-L78)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L79-L79)
 
 ### particula.execution.recording.Recorder.variables
 
@@ -95015,7 +95034,7 @@ _times: list[float] = []
 variables = tuple(variables)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L63-L63)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L64-L64)
 
 ### particula.execution.recording.Recorder.last_time
 
@@ -95027,7 +95046,7 @@ last_time
 
 Return the last observation time or None for an empty history.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L91-L93)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L92-L94)
 
 ### particula.execution.recording.Recorder.metadata
 
@@ -95039,7 +95058,7 @@ metadata
 
 Return detached dimensions, units and species provenance.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L86-L88)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L87-L89)
 
 ### particula.execution.recording.Recorder.__init__
 
@@ -95051,7 +95070,7 @@ def __init__(variables=('number_density', 'particle_mass_density', 'gas_concentr
 
 Validate names and limits without accessing simulation state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L51-L83)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L52-L84)
 
 ### particula.execution.recording.Recorder._append
 
@@ -95063,7 +95082,7 @@ def _append(time, metadata, row)
 
 Append native/reduced values through one atomic boundary.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L153-L182)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L161-L190)
 
 ### particula.execution.recording.Recorder.arrays
 
@@ -95075,7 +95094,7 @@ def arrays()
 
 Return detached stacked arrays; time always has units of seconds.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L184-L191)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L192-L199)
 
 ### particula.execution.recording.Recorder.record
 
@@ -95090,7 +95109,7 @@ Append one accepted native observation; equal-time resume is a no-op.
 All metadata, shapes and storage limits validate before append. Layout
 changes require a new recorder; widths do not imply species order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L95-L151)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L96-L159)
 
 ## particula.execution.recording._observation_times
 
@@ -95100,7 +95119,7 @@ changes require a new recorder; widths do not imply species order.
 def _observation_times(output_times, end_time)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L194-L206)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L202-L214)
 
 ## particula.execution.recording._optical_schedule
 
@@ -95110,7 +95129,7 @@ def _observation_times(output_times, end_time)
 def _optical_schedule(simulation, observer, times, initial, start, end)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L209-L225)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L217-L233)
 
 ## particula.execution.recording.run_until
 
@@ -95129,7 +95148,7 @@ optical_output_times may shorten CPU steps to reach those times. Set
 optical_initial=True to observe the starting state on the dense schedule.
 Fixed prepared owners instead use run_prepared.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L228-L282)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L236-L290)
 
 ---
 
@@ -118131,7 +118150,7 @@ def _validate_primary(masses: Any, concentration: Any, charge: Any, density: Any
 
 Check physical native values without writing caller storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L15-L60)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L15-L56)
 
 ## particula.gpu.kernels._condensation_native.energy_transfer
 
@@ -118143,7 +118162,7 @@ def energy_transfer(total: Any, latent_heat: Any, energy: Any, gas_to_particle: 
 
 Write signed extensive energy in J in full gas order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L233-L253)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L229-L247)
 
 ## particula.gpu.kernels._condensation_native.finalize_transfer
 
@@ -118155,7 +118174,7 @@ def finalize_transfer(masses: Any, candidate: Any, scale: Any, finalized: Any, p
 
 Retain the representable particle change after mapped limiting.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L146-L165)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L142-L161)
 
 ## particula.gpu.kernels._condensation_native.gate_transfer
 
@@ -118167,7 +118186,7 @@ def gate_transfer(partitioning: Any, concentration: Any, proposal: Any, particle
 
 Zero disabled full-gas lanes, absent links and inactive particles.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L87-L102)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L83-L98)
 
 ## particula.gpu.kernels._condensation_native.reduce_candidates
 
@@ -118179,7 +118198,7 @@ def reduce_candidates(candidate: Any, concentration: Any, demand: Any, release: 
 
 Reduce bounded particle proposals into full-gas density inventory.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L105-L143)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L101-L139)
 
 ## particula.gpu.kernels._condensation_native.reduce_finalized
 
@@ -118197,7 +118216,7 @@ gaining masses by at least one representable value (Warp has no nextafter).
 If four corrections cannot fit the budget, suppress uptake for that species.
 Nonfinite reductions suppress all transfers for that species.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L168-L230)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L164-L226)
 
 ## particula.gpu.kernels._condensation_native.retire_evaporated_slots
 
@@ -118209,7 +118228,7 @@ def retire_evaporated_slots(masses: Any, concentration: Any, charge: Any) -> Non
 
 Run the shared device operation through the direct kernel API.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L275-L282)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L269-L276)
 
 ## particula.gpu.kernels._condensation_native.retire_evaporated_slots_body
 
@@ -118221,7 +118240,7 @@ def retire_evaporated_slots_body(masses: Any, concentration: Any, charge: Any, b
 
 Clear fully evaporated resolved slots after gas/energy accounting.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L256-L272)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L250-L266)
 
 ## particula.gpu.kernels._condensation_native.retire_evaporated_slots_guarded
 
@@ -118233,7 +118252,7 @@ def retire_evaporated_slots_guarded(masses: Any, concentration: Any, charge: Any
 
 Skip this resident writer after a latched simulation failure.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L285-L297)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L279-L291)
 
 ## particula.gpu.kernels._condensation_native.validate_primary_state
 
@@ -118245,7 +118264,7 @@ def validate_primary_state(particles: Any, gas: Any, kind: int) -> None
 
 Read back only a private validation flag before any state writer.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L63-L84)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_native.py#L59-L80)
 
 ---
 
@@ -118292,7 +118311,7 @@ class _ReductionWork
 
 Private scratch, retained by the prepared call and its captured graph.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L167-L174)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L165-L172)
 
 ### particula.gpu.kernels._condensation_parallel._ReductionWork.negative
 
@@ -118302,7 +118321,7 @@ Private scratch, retained by the prepared call and its captured graph.
 negative: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L172-L172)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L170-L170)
 
 ### particula.gpu.kernels._condensation_parallel._ReductionWork.partial
 
@@ -118312,7 +118331,7 @@ negative: Any
 partial: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L173-L173)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L171-L171)
 
 ### particula.gpu.kernels._condensation_parallel._ReductionWork.positive
 
@@ -118322,7 +118341,7 @@ partial: Any
 positive: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L171-L171)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L169-L169)
 
 ### particula.gpu.kernels._condensation_parallel._ReductionWork.status
 
@@ -118332,7 +118351,7 @@ positive: Any
 status: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L174-L174)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L172-L172)
 
 ### particula.gpu.kernels._condensation_parallel._ReductionWork.__init__
 
@@ -118372,7 +118391,7 @@ def _correct_transfer(finalized: Any, masses: Any, mapping: Any, status: Any, at
 def _energy_chunks(total: Any, concentration: Any, mapping: Any, volume: Any, kind: wp.int32, partial: Any)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L133-L154)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L133-L152)
 
 ## particula.gpu.kernels._condensation_parallel._finish_candidates
 
@@ -118392,7 +118411,7 @@ def _finish_candidates(positive: Any, negative: Any, demand: Any, release: Any)
 def _finish_energy(partial: Any, latent: Any, energy: Any)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L157-L164)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L155-L162)
 
 ## particula.gpu.kernels._condensation_parallel._finish_transfer
 
@@ -118424,7 +118443,7 @@ def candidates(p)
 
 Reduce proposals into the same full-gas demand/release outputs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L186-L209)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L184-L207)
 
 ## particula.gpu.kernels._condensation_parallel.energy
 
@@ -118436,7 +118455,7 @@ def energy(p)
 
 Reduce accumulated transfer to extensive energy in full gas order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L255-L276)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L253-L274)
 
 ## particula.gpu.kernels._condensation_parallel.finalized
 
@@ -118448,7 +118467,7 @@ def finalized(p)
 
 Reconcile rounded uptake with a fixed capture-safe sequence.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L212-L252)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L210-L250)
 
 ## particula.gpu.kernels._condensation_parallel.prepare
 
@@ -118460,7 +118479,7 @@ def prepare(boxes, slots, gases, device)
 
 Allocate O(B G ceil(N/256)) storage once, outside stepping.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L177-L183)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L175-L181)
 
 ---
 
@@ -118482,7 +118501,7 @@ def _scan_population(masses: Any, counts: Any, charge: Any, density: Any, volume
 
 Check representation values on device without a caller-array readback.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L76-L113)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L74-L109)
 
 ## particula.gpu.kernels._population_validation.array_field
 
@@ -118494,7 +118513,7 @@ def array_field(container: Any, name: str, shape: tuple[int, ...], dtype: Any, d
 
 Require a contiguous same-device field without reading its payload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L24-L39)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L22-L37)
 
 ## particula.gpu.kernels._population_validation.memory_range
 
@@ -118506,19 +118525,19 @@ def memory_range(array: Any) -> tuple[int, int]
 
 Return a checked contiguous array interval for all supported dtypes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L42-L59)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L40-L57)
 
 ## particula.gpu.kernels._population_validation.native_slot_density
 
 *function*
 
 ```python
-def native_slot_density(value: wp.float64, box_volume: wp.float64, resolved: bool) -> wp.float64
+def native_slot_density(value: wp.float64, box_volume: wp.float64) -> wp.float64
 ```
 
-Read an admitted discrete density or resolved count as m⁻³.
+Read an extensive bin or slot population as m⁻³.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L14-L21)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L14-L19)
 
 ## particula.gpu.kernels._population_validation.reject_writer_aliases
 
@@ -118530,7 +118549,7 @@ def reject_writer_aliases(writers: tuple[Any, ...], protected: tuple[Any, ...]) 
 
 Reject writers overlapping other writers or protected state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L62-L73)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L60-L71)
 
 ## particula.gpu.kernels._population_validation.validate_population
 
@@ -118545,7 +118564,7 @@ Validate native PMF/resolved representation and return primary fields.
 This establishes storage interpretation only, not algorithm admission or
 active-slot geometry. Callers retain those process-specific checks.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L116-L149)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L112-L145)
 
 ---
 
@@ -122235,7 +122254,7 @@ coupling, and diagnostic sequence four times.
 - (`Any`) — A tuple containing the resident particle container and the accumulated
 - (`Any`) — finalized mass-transfer buffer, both retained by the prepared record.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3155-L3394)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3164-L3403)
 
 ## particula.gpu.kernels.condensation._bound_evaporation_candidate_kernel
 
@@ -122287,7 +122306,7 @@ Clear the fixed-shape accumulator before the four-substep update.
 def _commit_provider_step(staged: wp.array(dtype=Any), live: wp.array(dtype=Any), failure: wp.array(dtype=int))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3083-L3092)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3092-L3101)
 
 ## particula.gpu.kernels.condensation._condensation_mass_transfer_impl
 
@@ -122404,7 +122423,7 @@ def _enqueue_prepared_condensation_call(p)
 
 Commit a provider step once every refreshed composition passes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3095-L3116)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3104-L3125)
 
 ## particula.gpu.kernels.condensation._finalize_and_apply_inventory_transfer_kernel
 
@@ -122427,7 +122446,7 @@ therefore does not perform gas coupling.
 - `scale` (`Any`) — Positive-transfer fractions by box and species.
 - `finalized` (`Any`) — Output applied transfer matching ``masses`` [kg].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1376-L1401)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1379-L1404)
 
 ## particula.gpu.kernels.condensation._finalize_inventory_limited_mass_transfer
 
@@ -122446,9 +122465,9 @@ for each box and species to gas inventory plus permitted evaporation
 release. It mutates particle masses and any supplied inventory finalization
 sidecars, but
 deliberately does not mutate ``gas.concentration``. This primitive accepts
-explicitly discrete number-density weights and equal particle/gas lanes.
+explicitly discrete counts and equal particle/gas lanes.
 The public mapped step owns its separate gas coupling and supports resolved
-counts with volume normalization; this primitive does not interpret counts.
+counts with volume normalization.
 
 **Parameters**
 
@@ -122476,7 +122495,7 @@ peer storage.
 > failures leave caller-owned state unchanged; this does not promise
 > rollback after a post-launch device-runtime failure.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2075-L2218)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2078-L2227)
 
 ## particula.gpu.kernels.condensation._mapped_condensation_mass_transfer_kernel
 
@@ -122498,7 +122517,7 @@ Compute particle-ordered proposals from full-gas mapped sources.
 def _mapped_proposal(p, activities, dest)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3119-L3152)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3128-L3161)
 
 ## particula.gpu.kernels.condensation._prepare_condensation_step_gpu
 
@@ -122638,7 +122657,7 @@ before launch to prevent non-isothermal arithmetic overflow.
 > only writes it. This write-only contract permits stale finite values and
 > NaN/Inf before a call.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2313-L3080)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2322-L3089)
 
 ## particula.gpu.kernels.condensation._prepare_environment_properties_kernel
 
@@ -122676,7 +122695,7 @@ Return a Warp array's values as a float64 NumPy array for validation.
 *function*
 
 ```python
-def _reduce_inventory_candidates_kernel(candidate: Any, concentration: Any, demand: Any, release: Any) -> None
+def _reduce_inventory_candidates_kernel(candidate: Any, population: Any, volume: Any, demand: Any, release: Any) -> None
 ```
 
 Reduce concentration-weighted demand and release in index order.
@@ -122688,11 +122707,11 @@ negative candidates contribute their magnitude to release.
 **Parameters**
 
 - `candidate` (`Any`) — Bounded, already gated transfer proposal [kg].
-- `concentration` (`Any`) — Particle number concentrations ``(n_boxes, n_particles)`` [1/m^3].
+- `concentration` — Particle number concentrations ``(n_boxes, n_particles)`` [1/m^3].
 - `demand` (`Any`) — Output positive transfer demand ``(n_boxes, n_species)`` [kg/m^3].
 - `release` (`Any`) — Output evaporation release ``(n_boxes, n_species)`` [kg/m^3].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1304-L1337)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1304-L1340)
 
 ## particula.gpu.kernels.condensation._scale_inventory_uptake_kernel
 
@@ -122715,7 +122734,7 @@ and otherwise the available-to-demand ratio clamped to ``[0, 1]``.
 - `release` (`Any`) — Evaporation release ``(n_boxes, n_species)`` [kg/m^3].
 - `scale` (`Any`) — Output positive-transfer fractions ``(n_boxes, n_species)``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1340-L1373)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1343-L1376)
 
 ## particula.gpu.kernels.condensation._validate_binary_activity_table
 
@@ -122749,7 +122768,7 @@ Validate particle and gas arrays share the same Warp device.
 
 - `ValueError` — If any particle or gas array is on a different device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2054-L2072)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2057-L2075)
 
 ## particula.gpu.kernels.condensation._validate_device_match
 
@@ -122771,7 +122790,7 @@ Validate that a Warp array is on the expected device.
 
 - `ValueError` — If the array is not on the expected device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2038-L2051)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2041-L2054)
 
 ## particula.gpu.kernels.condensation._validate_energy_transfer_buffer
 
@@ -122783,7 +122802,7 @@ def _validate_energy_transfer_buffer(energy_transfer: Any, expected_shape: tuple
 
 Validate metadata for caller-owned write-only energy output storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1529-L1549)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1532-L1552)
 
 ## particula.gpu.kernels.condensation._validate_energy_transfer_ownership
 
@@ -122795,7 +122814,7 @@ def _validate_energy_transfer_ownership(energy_transfer: Any, mutable_arrays: tu
 
 Reject energy output storage overlapping condensation state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1605-L1624)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1608-L1627)
 
 ## particula.gpu.kernels.condensation._validate_finite_gas_delta
 
@@ -122807,7 +122826,7 @@ def _validate_finite_gas_delta(gas_delta: Any, device: Any) -> None
 
 Reject non-finite finalized-transfer reductions before gas mutation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1799-L1813)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1802-L1816)
 
 ## particula.gpu.kernels.condensation._validate_float64_species_array
 
@@ -122823,7 +122842,7 @@ Numeric-domain validation runs before the step can clear or mutate any
 caller-owned output. CUDA values are checked by a device-side preflight
 kernel; only its one-element validation result is read back.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1433-L1476)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1436-L1479)
 
 ## particula.gpu.kernels.condensation._validate_gas_arrays
 
@@ -122845,7 +122864,7 @@ Validate gas array shapes and lengths.
 
 - `ValueError` — If gas array shapes do not match expectations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1955-L1981)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1958-L1984)
 
 ## particula.gpu.kernels.condensation._validate_gas_delta_values_kernel
 
@@ -122857,7 +122876,7 @@ def _validate_gas_delta_values_kernel(gas_delta: Any, invalid: Any) -> None
 
 Record a non-finite finalized-transfer gas reduction.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1685-L1691)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1688-L1694)
 
 ## particula.gpu.kernels.condensation._validate_int32_selector
 
@@ -122891,7 +122910,7 @@ Validate mass transfer buffer shape and device.
 
 - `ValueError` — If the shape or device does not match expectations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1498-L1526)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1501-L1529)
 
 ## particula.gpu.kernels.condensation._validate_mass_transfer_ownership
 
@@ -122903,7 +122922,7 @@ def _validate_mass_transfer_ownership(mass_transfer: Any, state_arrays: tuple[An
 
 Reject a total-transfer output that aliases condensation state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1627-L1648)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1630-L1651)
 
 ## particula.gpu.kernels.condensation._validate_native_ownership
 
@@ -122918,7 +122937,7 @@ Reject overlaps involving any native writer before normalization.
 Primary arrays, outputs and supplied scratch must not overwrite any peer
 or configuration array. Read-only configuration may share storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2221-L2310)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2230-L2319)
 
 ## particula.gpu.kernels.condensation._validate_no_overlap
 
@@ -122930,7 +122949,7 @@ def _validate_no_overlap(read_only_arrays: tuple[Any | None, ...], writable_arra
 
 Reject thermal sidecars that alias writable scratch property storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1583-L1602)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1586-L1605)
 
 ## particula.gpu.kernels.condensation._validate_p2_commit_values
 
@@ -122943,7 +122962,7 @@ def _validate_p2_commit_values(particles: Any, finalized: Any, total_mass_transf
 Validate every prospective inventory finalization state value before its
 first commit.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1816-L1860)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1819-L1863)
 
 ## particula.gpu.kernels.condensation._validate_p2_commit_values_kernel
 
@@ -122956,7 +122975,7 @@ def _validate_p2_commit_values_kernel(masses: Any, finalized: Any, total_mass_tr
 Record invalid prospective inventory finalization values before mutating
 public state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1694-L1729)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1697-L1732)
 
 ## particula.gpu.kernels.condensation._validate_p2_primary_state
 
@@ -122969,7 +122988,7 @@ def _validate_p2_primary_state(particles: Any, gas: Any, dimensions: tuple[int, 
 Validate finite, non-negative primary inventory finalization state before
 launch.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1732-L1775)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1735-L1778)
 
 ## particula.gpu.kernels.condensation._validate_p2_primary_values_kernel
 
@@ -122982,7 +123001,7 @@ def _validate_p2_primary_values_kernel(masses: Any, concentration: Any, gas_conc
 Record invalid primary inventory finalization state without changing
 caller data.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1651-L1672)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1654-L1675)
 
 ## particula.gpu.kernels.condensation._validate_p2_proposal_finiteness
 
@@ -122995,7 +123014,7 @@ def _validate_p2_proposal_finiteness(proposal: Any, dimensions: tuple[int, int, 
 Validate a freshly written proposal gating proposal immediately before
 inventory finalization mutation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1778-L1796)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1781-L1799)
 
 ## particula.gpu.kernels.condensation._validate_p2_proposal_values_kernel
 
@@ -123007,7 +123026,7 @@ def _validate_p2_proposal_values_kernel(proposal: Any, invalid: Any) -> None
 
 Record a non-finite freshly generated proposal gating proposal.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1675-L1682)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1678-L1685)
 
 ## particula.gpu.kernels.condensation._validate_p2_sidecar_ownership
 
@@ -123020,7 +123039,7 @@ def _validate_p2_sidecar_ownership(demand: Any | None, release: Any | None, scal
 Reject inventory finalization reduction sidecars overlapping protected or
 peer storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1863-L1890)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1866-L1893)
 
 ## particula.gpu.kernels.condensation._validate_particle_arrays
 
@@ -123043,7 +123062,7 @@ Validate particle array shapes and lengths.
 
 - `ValueError` — If particle array shapes do not match expectations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1930-L1952)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1933-L1955)
 
 ## particula.gpu.kernels.condensation._validate_partitioning_metadata
 
@@ -123055,7 +123074,7 @@ def _validate_partitioning_metadata(partitioning: Any, n_boxes: int, n_species: 
 
 Validate an active-device per-box partitioning mask's metadata.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1996-L2012)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1999-L2015)
 
 ## particula.gpu.kernels.condensation._validate_partitioning_values
 
@@ -123071,7 +123090,7 @@ The one-element status buffer is private disposable preflight state. Its
 readback is necessary to make arbitrary device-resident non-binary values
 observable before any caller-owned state is changed.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2015-L2035)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L2018-L2038)
 
 ## particula.gpu.kernels.condensation._validate_partitioning_values_kernel
 
@@ -123083,7 +123102,7 @@ def _validate_partitioning_values_kernel(partitioning: Any, invalid: Any) -> Non
 
 Record non-binary entries in a per-box partitioning mask.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1984-L1993)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1987-L1996)
 
 ## particula.gpu.kernels.condensation._validate_scratch_ownership
 
@@ -123095,7 +123114,7 @@ def _validate_scratch_ownership(scratch_buffers: CondensationScratchBuffers, pro
 
 Reject all supplied scratch buffers overlapping peers or public state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1893-L1927)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1896-L1930)
 
 ## particula.gpu.kernels.condensation._validate_species_array
 
@@ -123118,7 +123137,7 @@ Validate per-species array length and device.
 
 - `ValueError` — If the array length or device mismatches expectations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1404-L1430)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1407-L1433)
 
 ## particula.gpu.kernels.condensation._validate_species_values_kernel
 
@@ -123130,7 +123149,7 @@ def _validate_species_values_kernel(values: Any, require_nonnegative: wp.int32, 
 
 Record whether a species sidecar has an invalid numeric value.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1479-L1495)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1482-L1498)
 
 ## particula.gpu.kernels.condensation._warp_array_memory_range
 
@@ -123145,7 +123164,7 @@ Return a contiguous Warp array's byte range.
 Ownership checks reject strided views because a single address range cannot
 distinguish their gaps from overlapping storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1552-L1580)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L1555-L1583)
 
 ## particula.gpu.kernels.condensation.apply_mass_transfer_kernel
 
@@ -123295,7 +123314,7 @@ API.
 - `ValueError` — If preflight rejects the containers, inputs, sidecars, or
 output ownership, or if a post-launch runtime validation fails.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3397-L3483)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/condensation.py#L3406-L3492)
 
 ## particula.gpu.kernels.condensation.validate_condensation_activity_surface_config
 
@@ -133805,7 +133824,7 @@ _GAS_FIELDS = ('concentration', 'molar_mass', 'partitioning', 'vapor_pressure')
 *attribute* · *module attribute*
 
 ```python
-_PARTICLE_FIELDS = ('masses', 'concentration', 'charge', 'density', 'volume')
+_PARTICLE_FIELDS = ('masses', 'population', 'charge', 'density', 'volume')
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/species_mapping.py#L25-L25)
@@ -134240,11 +134259,11 @@ Mirrors the shape convention of ParticleData from particula.particles.
 **Attributes**
 
 - `masses` (`wp.array3d(dtype=wp.float64)`) — Per-species masses in kg. Shape: (n_boxes, n_particles, n_species) 3D array where each particle has mass per species.
-- `concentration` (`wp.array2d(dtype=wp.float64)`) — Number concentration per particle. Shape: (n_boxes, n_particles) For particle-resolved: actual count (typically 1). For binned: number per m^3.
+- `population` (`wp.array2d(dtype=wp.float64)`) — Number concentration per particle. Shape: (n_boxes, n_particles) For particle-resolved: actual count (typically 1). For binned: represented number in the bin.
 - `charge` (`wp.array2d(dtype=wp.float64)`) — Particle charges (dimensionless integer counts). Shape: (n_boxes, n_particles) Stored as float64 for GPU compatibility.
 - `density` (`wp.array(dtype=wp.float64)`) — Material densities in kg/m^3. Shape: (n_species,) Shared across all boxes - not batched.
 - `volume` (`wp.array(dtype=wp.float64)`) — Simulation volume per box in m^3. Shape: (n_boxes,)
-- `distribution_kind` (`wp.int32`) — Stable host-visible population tag: 0 invalid/unset, 1 discrete density, 2 unsupported PDF, 3 resolved counts. Numerical arrays are never normalized by assigning this tag.
+- `distribution_kind` (`wp.int32`) — Stable host-visible population tag: 0 invalid/unset, 1 discrete counts, 2 unsupported PDF, 3 resolved counts. Numerical arrays are never normalized by assigning this tag.
 
 > **Example**
 >
@@ -134256,7 +134275,7 @@ Mirrors the shape convention of ParticleData from particula.particles.
 > >>> data.masses = wp.zeros(
 > ...     (n_boxes, n_particles, n_species), dtype=wp.float64
 > ... )
-> >>> data.concentration = wp.ones(
+> >>> data.population = wp.ones(
 > ...     (n_boxes, n_particles), dtype=wp.float64
 > ... )
 > >>> data.charge = wp.zeros(
@@ -134278,16 +134297,6 @@ charge: wp.array2d(dtype=wp.float64)
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L79-L79)
-
-### particula.gpu.warp_types.WarpParticleData.concentration
-
-*attribute* · *instance attribute*
-
-```python
-concentration: wp.array2d(dtype=wp.float64)
-```
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L78-L78)
 
 ### particula.gpu.warp_types.WarpParticleData.density
 
@@ -134318,6 +134327,16 @@ masses: wp.array3d(dtype=wp.float64)
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L77-L77)
+
+### particula.gpu.warp_types.WarpParticleData.population
+
+*attribute* · *instance attribute*
+
+```python
+population: wp.array2d(dtype=wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L78-L78)
 
 ### particula.gpu.warp_types.WarpParticleData.volume
 
@@ -137695,7 +137714,7 @@ class DeviceOpticalBatch
 
 Reduce on the owner stream and retain a fixed number of optical rows.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L164-L264)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L163-L263)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch._cases
 
@@ -137705,7 +137724,7 @@ Reduce on the owner stream and retain a fixed number of optical rows.
 _cases = ParticleOpticalCases(particles, config, device=device, stream=owner._stream)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L180-L185)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L179-L184)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch._humidity
 
@@ -137715,7 +137734,7 @@ _cases = ParticleOpticalCases(particles, config, device=device, stream=owner._st
 _humidity = wp.empty((batch_size, boxes), dtype=wp.float64, device=device) if water_lane is not None else None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L191-L195)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L190-L194)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch._owner
 
@@ -137725,7 +137744,7 @@ _humidity = wp.empty((batch_size, boxes), dtype=wp.float64, device=device) if wa
 _owner = owner
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L189-L189)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L188-L188)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch._rows
 
@@ -137735,7 +137754,7 @@ _owner = owner
 _rows = wp.empty((batch_size, groups, 9), dtype=wp.float64, device=device)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L197-L199)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L196-L198)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch._shape
 
@@ -137745,7 +137764,7 @@ _rows = wp.empty((batch_size, groups, 9), dtype=wp.float64, device=device)
 _shape = (boxes, wave_count, 9)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L196-L196)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L195-L195)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch._statuses
 
@@ -137755,7 +137774,7 @@ _shape = (boxes, wave_count, 9)
 _statuses = wp.empty((batch_size, groups), dtype=wp.int32, device=device)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L200-L202)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L199-L201)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch._water_lane
 
@@ -137765,7 +137784,7 @@ _statuses = wp.empty((batch_size, groups), dtype=wp.int32, device=device)
 _water_lane = water_lane
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L190-L190)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L189-L189)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch._workspace
 
@@ -137775,7 +137794,7 @@ _water_lane = water_lane
 _workspace = prepare_population_mie(self._cases.index, self._cases.size, self._cases.radius, self._cases.weight, particle_tile=particle_tile, coefficient_capacity=coefficient_capacity, stream=owner._stream)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L203-L211)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L202-L210)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch.__init__
 
@@ -137787,7 +137806,7 @@ def __init__(owner, config, batch_size, particle_tile, coefficient_capacity, *, 
 
 Bind device workspaces to the live particle arrays.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L167-L211)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L166-L210)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch.download
 
@@ -137799,7 +137818,7 @@ def download(count)
 
 Check physics and optics before exposing any row of the batch.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L249-L264)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L248-L263)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch.enqueue
 
@@ -137811,7 +137830,7 @@ def enqueue(row)
 
 Append device results and status to a batch slot.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L213-L247)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L212-L246)
 
 ## particula.optics.gpu.state.ParticleOpticalCases
 
@@ -137823,7 +137842,7 @@ class ParticleOpticalCases
 
 Prepare the optical inputs shared by resident observers and processes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L108-L161)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L107-L160)
 
 ### particula.optics.gpu.state.ParticleOpticalCases._fill
 
@@ -137833,7 +137852,7 @@ Prepare the optical inputs shared by resident observers and processes.
 _fill = wp.launch(_fill_cases, (groups, slots), inputs=[particles, wavelengths, indices, int(mixed), wp.float64(config.medium_index), self.index, self.size, self.radius, self.weight], device=device, stream=stream, record_cmd=True)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L140-L157)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L139-L156)
 
 ### particula.optics.gpu.state.ParticleOpticalCases._inputs
 
@@ -137843,7 +137862,7 @@ _fill = wp.launch(_fill_cases, (groups, slots), inputs=[particles, wavelengths, 
 _inputs = (particles, wavelengths, indices)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L138-L138)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L137-L137)
 
 ### particula.optics.gpu.state.ParticleOpticalCases._stream
 
@@ -137853,7 +137872,7 @@ _inputs = (particles, wavelengths, indices)
 _stream = stream
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L139-L139)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L138-L138)
 
 ### particula.optics.gpu.state.ParticleOpticalCases.index
 
@@ -137863,7 +137882,7 @@ _stream = stream
 index = wp.empty((groups, slots), dtype=wp.vec2d, device=device)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L133-L133)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L132-L132)
 
 ### particula.optics.gpu.state.ParticleOpticalCases.__init__
 
@@ -137875,7 +137894,7 @@ def __init__(particles, config, *, device, stream)
 
 Allocate input buffers and retain a refresh command.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L111-L157)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L110-L156)
 
 ### particula.optics.gpu.state.ParticleOpticalCases.enqueue
 
@@ -137887,7 +137906,7 @@ def enqueue()
 
 Fill optical coordinates from the live particle state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L159-L161)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L158-L160)
 
 ## particula.optics.gpu.state._fill_cases
 
@@ -137897,7 +137916,7 @@ Fill optical coordinates from the live particle state.
 def _fill_cases(particles: WarpParticleData, wavelengths: wp.array(dtype=wp.float64), configured_index: wp.array2d(dtype=wp.vec2d), mixed: int, medium: wp.float64, index: wp.array2d(dtype=wp.vec2d), size: wp.array2d(dtype=wp.float64), radius: wp.array2d(dtype=wp.float64), weight: wp.array2d(dtype=wp.float64))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L24-L76)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L24-L75)
 
 ## particula.optics.gpu.state._relative_humidity_row
 
@@ -137907,7 +137926,7 @@ def _fill_cases(particles: WarpParticleData, wavelengths: wp.array(dtype=wp.floa
 def _relative_humidity_row(vapor: wp.array2d(dtype=wp.float64), molar_mass: wp.array(dtype=wp.float64), temperature: wp.array(dtype=wp.float64), species: int, row: int, humidity: wp.array2d(dtype=wp.float64))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L93-L105)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L92-L104)
 
 ## particula.optics.gpu.state._store_row
 
@@ -137917,7 +137936,7 @@ def _relative_humidity_row(vapor: wp.array2d(dtype=wp.float64), molar_mass: wp.a
 def _store_row(result: wp.array2d(dtype=wp.float64), status: wp.array(dtype=wp.int32), row: int, rows: wp.array3d(dtype=wp.float64), statuses: wp.array2d(dtype=wp.int32))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L79-L90)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L78-L89)
 
 ---
 
@@ -140049,7 +140068,7 @@ def number_density_weights(particles: ParticleData) -> NDArray[np.float64]
 
 Return detached (box, slot) contributions to number density in m⁻³.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/_population.py#L41-L46)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/_population.py#L40-L45)
 
 ## particula.particles._population.radius_node_widths
 
@@ -140061,7 +140080,7 @@ def radius_node_widths(radius: NDArray[np.float64]) -> NDArray[np.float64]
 
 Trapezoidal integration widths (m) for an admitted 1-D radius grid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/_population.py#L31-L38)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/_population.py#L30-L37)
 
 ## particula.particles._population.slot_density
 
@@ -140071,11 +140090,9 @@ Trapezoidal integration widths (m) for an admitted 1-D radius grid.
 def slot_density(particles: ParticleData) -> NDArray[np.float64]
 ```
 
-Read admitted storage as m⁻³ (bins/slots) or m⁻⁴ (radius PDF).
+Convert admitted extensive bins, slots or radius ordinates to density.
 
-Binned storage is already a density. Treat the result as read-only.
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/_population.py#L12-L19)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/_population.py#L12-L14)
 
 ## particula.particles._population.write_binned_density
 
@@ -140087,7 +140104,7 @@ def write_binned_density(particles: ParticleData, density: NDArray[np.float64]) 
 
 Commit admitted bin densities or PDF ordinates to existing storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/_population.py#L22-L28)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/_population.py#L17-L27)
 
 ---
 
@@ -146748,7 +146765,7 @@ batch dimension required for CFD experiments spanning multiple boxes.
 > 
 >     data = ParticleData(
 >         masses=np.random.rand(1, 1000, 3) * 1e-18,  # 1000 particles
->         concentration=np.ones((1, 1000)),
+>         population=np.ones((1, 1000)),
 >         charge=np.zeros((1, 1000)),
 >         density=np.array([1000.0, 1200.0, 800.0]),
 >         volume=np.array([1e-6]),  # 1 cm^3
@@ -146759,7 +146776,7 @@ batch dimension required for CFD experiments spanning multiple boxes.
 > 
 >     cfd_data = ParticleData(
 >         masses=np.zeros((100, 10000, 3)),
->         concentration=np.ones((100, 10000)),
+>         population=np.ones((100, 10000)),
 >         charge=np.zeros((100, 10000)),
 >         density=np.array([1000.0, 1200.0, 800.0]),
 >         volume=np.ones(100) * 1e-6,
@@ -146788,10 +146805,10 @@ performance in tight simulation loops. Use copy() if immutability needed.
 **Attributes**
 
 - `masses` (`NDArray[np.float64]`) — Per-species masses in kg. Shape: (n_boxes, n_particles, n_species)
-- `concentration` (`NDArray[np.float64]`) — Raw slot weights of shape (n_boxes, n_particles). Discrete bins store number per m^3, PDF nodes store dN/dr in m^-4, and resolved slots store counts.
+- `population` (`NDArray[np.float64]`) — Extensive weights of shape (n_boxes, n_particles). Bins and resolved slots store counts. Radius PDFs store dN/dr in m^-1.
 - `charge` (`NDArray[np.float64]`) — Particle charges (dimensionless integer counts). Shape: (n_boxes, n_particles)
 - `density` (`NDArray[np.float64]`) — Material densities in kg/m^3. Shape: (n_species,) - shared across all boxes
-- `volume` (`NDArray[np.float64]`) — Simulation volume per box in m^3, shape (n_boxes,). Tagged discrete/PDF storage uses 1 m^3; tagged resolved storage uses positive physical volume.
+- `volume` (`NDArray[np.float64]`) — Simulation volume per box in m^3, shape (n_boxes,). All tagged populations use finite positive air volumes.
 - `distribution_type` (`str | None`) — Explicit storage interpretation, or ``None`` for untagged legacy carriers. New bulk helpers reject untagged data.
 - `radius_grid` (`NDArray[np.float64] | None`) — Explicit PDF radius nodes in metres, shape (n_particles,); absent for other kinds.
 
@@ -146799,77 +146816,89 @@ performance in tight simulation loops. Use copy() if immutability needed.
 
 - `ValueError` — If array shapes are inconsistent.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L41-L388)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L59-L525)
 
 ### particula.particles.particle_data.ParticleData.charge
 
 *attribute* · *instance attribute*
 
 ```python
-charge: NDArray[np.float64]
+charge: NDArray[np.float64] = charge
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L76-L76)
-
-### particula.particles.particle_data.ParticleData.concentration
-
-*attribute* · *instance attribute*
-
-```python
-concentration: NDArray[np.float64]
-```
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L75-L75)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L115-L115)
 
 ### particula.particles.particle_data.ParticleData.density
 
 *attribute* · *instance attribute*
 
 ```python
-density: NDArray[np.float64]
+density: NDArray[np.float64] = density
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L77-L77)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L116-L116)
 
 ### particula.particles.particle_data.ParticleData.distribution_type
 
 *attribute* · *class attribute* · *instance attribute*
 
 ```python
-distribution_type: str | None = None
+distribution_type: str | None = distribution_type
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L79-L79)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L118-L118)
 
 ### particula.particles.particle_data.ParticleData.masses
 
 *attribute* · *instance attribute*
 
 ```python
-masses: NDArray[np.float64]
+masses: NDArray[np.float64] = masses
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L74-L74)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L114-L114)
+
+### particula.particles.particle_data.ParticleData.population
+
+*attribute* · *instance attribute*
+
+```python
+population: NDArray[np.float64] = population
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L127-L127)
 
 ### particula.particles.particle_data.ParticleData.radius_grid
 
 *attribute* · *class attribute* · *instance attribute*
 
 ```python
-radius_grid: NDArray[np.float64] | None = None
+radius_grid: NDArray[np.float64] | None = radius_grid
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L80-L80)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L119-L119)
 
 ### particula.particles.particle_data.ParticleData.volume
 
 *attribute* · *instance attribute*
 
 ```python
-volume: NDArray[np.float64]
+volume: NDArray[np.float64] = volume
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L78-L78)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L117-L117)
+
+### particula.particles.particle_data.ParticleData.concentration
+
+*property* · *writable*
+
+```python
+concentration: NDArray[np.float64]
+```
+
+Deprecated writable 0.3 alias for legacy-compatible volumes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L148-L151)
 
 ### particula.particles.particle_data.ParticleData.effective_density
 
@@ -146885,7 +146914,7 @@ Mixture density from total mass divided by additive material volume.
 
 - (`NDArray[np.float64]`) — Effective density in kg/m^3 with shape (n_boxes, n_particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L341-L354)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L478-L491)
 
 ### particula.particles.particle_data.ParticleData.mass_fractions
 
@@ -146901,7 +146930,7 @@ Mass fractions per species for each particle.
 
 - (`NDArray[np.float64]`) — Mass fractions with shape (n_boxes, n_particles, n_species).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L357-L369)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L494-L506)
 
 ### particula.particles.particle_data.ParticleData.n_boxes
 
@@ -146917,7 +146946,7 @@ Number of simulation boxes.
 
 - (`int`) — The size of the batch dimension (n_boxes).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L144-L150)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L222-L228)
 
 ### particula.particles.particle_data.ParticleData.n_particles
 
@@ -146933,7 +146962,7 @@ Number of particles per box.
 
 - (`int`) — The number of particles (n_particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L153-L159)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L231-L237)
 
 ### particula.particles.particle_data.ParticleData.n_species
 
@@ -146949,7 +146978,7 @@ Number of chemical species.
 
 - (`int`) — The number of species (n_species).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L162-L168)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L240-L246)
 
 ### particula.particles.particle_data.ParticleData.number_density
 
@@ -146972,7 +147001,7 @@ over the explicit radius grid using trapezoidal quadrature.
 
 - `ValueError` — If the representation fails read-only validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L283-L301)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L414-L432)
 
 ### particula.particles.particle_data.ParticleData.radii
 
@@ -146988,7 +147017,7 @@ Particle radii derived from mass and density.
 
 - (`NDArray[np.float64]`) — Radii in meters with shape (n_boxes, n_particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L171-L180)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L249-L258)
 
 ### particula.particles.particle_data.ParticleData.slot_concentration_density
 
@@ -147002,7 +147031,7 @@ Return fresh per-slot number density or radius-PDF density.
 
 Discrete and resolved slots have units m^-3; PDF nodes have units
 m^-4. The result has shape (n_boxes, n_particles) and is detached
-from the raw concentration array.
+from the raw population array.
 
 **Returns**
 
@@ -147012,7 +147041,7 @@ from the raw concentration array.
 
 - `ValueError` — If the kind, grid, volume, or raw data is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L263-L280)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L337-L351)
 
 ### particula.particles.particle_data.ParticleData.species_mass_density
 
@@ -147036,7 +147065,7 @@ trapezoidal node weights, rather than summing PDF nodes.
 
 - `ValueError` — If the representation fails read-only validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L304-L326)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L435-L457)
 
 ### particula.particles.particle_data.ParticleData.species_mass_inventory
 
@@ -147056,7 +147085,7 @@ Return fresh extensive particle mass per species in kg.
 
 - `ValueError` — If the representation fails read-only validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L329-L338)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L460-L475)
 
 ### particula.particles.particle_data.ParticleData.total_mass
 
@@ -147072,17 +147101,19 @@ Total mass per particle.
 
 - (`NDArray[np.float64]`) — Total mass in kilograms with shape (n_boxes, n_particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L183-L189)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L261-L267)
 
 ### particula.particles.particle_data.ParticleData.__init__
 
 *method*
 
 ```python
-def __init__(masses: NDArray[np.float64], concentration: NDArray[np.float64], charge: NDArray[np.float64], density: NDArray[np.float64], volume: NDArray[np.float64], distribution_type: str | None = None, radius_grid: NDArray[np.float64] | None = None) -> None
+def __init__(masses: NDArray[np.float64], concentration: NDArray[np.float64] | None = None, charge: NDArray[np.float64] | None = None, density: NDArray[np.float64] | None = None, volume: NDArray[np.float64] | None = None, distribution_type: str | None = None, radius_grid: NDArray[np.float64] | None = None, *, population: NDArray[np.float64] | None = None) -> None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L0-L0)
+Bind extensive storage or the compatible 0.3 concentration array.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L99-L134)
 
 ### particula.particles.particle_data.ParticleData.__post_init__
 
@@ -147098,7 +147129,17 @@ Validate raw array shapes without interpreting distribution kind.
 
 - `ValueError` — If raw field shapes or species dimensions disagree.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L82-L141)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L160-L219)
+
+### particula.particles.particle_data.ParticleData._check_legacy_population
+
+*method*
+
+```python
+def _check_legacy_population() -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L136-L144)
 
 ### particula.particles.particle_data.ParticleData.copy
 
@@ -147115,7 +147156,33 @@ Create a deep copy of this ParticleData.
 - (`ParticleData`) — A new ParticleData with detached raw arrays and radius grid,
 - (`ParticleData`) — preserving the explicit distribution type when present.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L371-L388)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L508-L525)
+
+### particula.particles.particle_data.ParticleData.set_slot_concentration_density
+
+*method*
+
+```python
+def set_slot_concentration_density(density_by_slot: ArrayLike, *, volume: ArrayLike | None = None) -> None
+```
+
+Replace particle population from per-slot density and air volume.
+
+**Parameters**
+
+- `density_by_slot` (`ArrayLike`) — Nonnegative number densities (m^-3) for bins or resolved slots, or radius-PDF ordinates (m^-4). Supply shape (n_boxes, n_particles), or (n_particles,) for one box.
+- `volume` (`ArrayLike | None`) (default: `None`) — Represented air volume (m^3), as one positive scalar for all boxes or an array of shape (n_boxes,). Omit to use each box's current volume.
+
+Writes density times the selected volume into the existing population
+array. A supplied volume is committed in the same update.
+
+**Raises**
+
+- `TypeError` — If an input does not contain real numbers.
+- `ValueError` — If the representation, shape, values or storage
+prevent an in-place update. Both arrays retain their values.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L353-L411)
 
 ### particula.particles.particle_data.ParticleData.validate_representation
 
@@ -147129,15 +147196,26 @@ Validate storage for its declared distribution interpretation.
 
 Call after directly changing writable arrays. This read-only check
 never repairs state; derived population helpers call it on every read.
-Discrete and PDF storage requires exactly 1 m^3 per box; resolved
-storage requires positive volume. PDF nodes must form an increasing,
-positive radius grid with at least two nodes.
+Each box requires positive represented volume. PDF nodes must form an
+increasing, positive radius grid with at least two nodes.
 
 **Raises**
 
 - `ValueError` — If kind, grid, volume, shape, or values are invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L191-L260)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L269-L334)
+
+## particula.particles.particle_data._replacement_volumes
+
+*function*
+
+```python
+def _replacement_volumes(volume: ArrayLike, shape: tuple[int, ...]) -> NDArray[np.float64]
+```
+
+Stage an independent volume value for each box before updating state.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L43-L56)
 
 ---
 
@@ -147199,7 +147277,7 @@ available when dimensions are supplied instead of masses. Building
 requires an explicit storage kind; PDF storage also requires a radius
 grid and matching PDF concentration units.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L47-L413)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L47-L466)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._charge
 
@@ -147209,7 +147287,7 @@ grid and matching PDF concentration units.
 _charge: Optional[NDArray[np.float64]] = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L62-L62)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L64-L64)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._concentration
 
@@ -147229,7 +147307,7 @@ _concentration: Optional[NDArray[np.float64]] = None
 _concentration_units: str | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L70-L70)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L72-L72)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._density
 
@@ -147239,7 +147317,7 @@ _concentration_units: str | None = None
 _density: Optional[NDArray[np.float64]] = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L63-L63)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L65-L65)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._distribution_type
 
@@ -147249,7 +147327,7 @@ _density: Optional[NDArray[np.float64]] = None
 _distribution_type: str | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L68-L68)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L70-L70)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._masses
 
@@ -147261,6 +147339,16 @@ _masses: Optional[NDArray[np.float64]] = None
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L60-L60)
 
+### particula.particles.particle_data_builder.ParticleDataBuilder._measured_density
+
+*attribute* · *instance attribute*
+
+```python
+_measured_density = False
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L62-L62)
+
 ### particula.particles.particle_data_builder.ParticleDataBuilder._n_boxes
 
 *attribute* · *instance attribute*
@@ -147269,7 +147357,7 @@ _masses: Optional[NDArray[np.float64]] = None
 _n_boxes: Optional[int] = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L65-L65)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L67-L67)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._n_particles
 
@@ -147279,7 +147367,7 @@ _n_boxes: Optional[int] = None
 _n_particles: Optional[int] = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L66-L66)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L68-L68)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._n_species
 
@@ -147289,7 +147377,17 @@ _n_particles: Optional[int] = None
 _n_species: Optional[int] = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L67-L67)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L69-L69)
+
+### particula.particles.particle_data_builder.ParticleDataBuilder._population
+
+*attribute* · *instance attribute*
+
+```python
+_population: NDArray[np.float64] | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L63-L63)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._radius_grid
 
@@ -147299,7 +147397,7 @@ _n_species: Optional[int] = None
 _radius_grid: NDArray[np.float64] | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L69-L69)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L71-L71)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._volume
 
@@ -147309,7 +147407,7 @@ _radius_grid: NDArray[np.float64] | None = None
 _volume: Optional[NDArray[np.float64]] = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L64-L64)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L66-L66)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.__init__
 
@@ -147321,7 +147419,7 @@ def __init__() -> None
 
 Initialize empty builder state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L58-L70)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L58-L72)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._broadcast_if_needed
 
@@ -147333,7 +147431,7 @@ def _broadcast_if_needed(array: NDArray[np.float64], target_shape: tuple[int, ..
 
 Broadcast array to target shape when compatible.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L273-L295)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L305-L327)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._ensure_counts
 
@@ -147345,7 +147443,7 @@ def _ensure_counts() -> None
 
 Ensure counts are available for zero-init path.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L297-L306)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L329-L338)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._get_counts
 
@@ -147357,7 +147455,7 @@ def _get_counts() -> tuple[int, int, int]
 
 Return the integer counts currently tracked.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L308-L316)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L340-L348)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._infer_counts_from_masses
 
@@ -147369,7 +147467,7 @@ def _infer_counts_from_masses() -> tuple[int, int, int]
 
 Derive counts from masses when present.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L263-L271)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L295-L303)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.build
 
@@ -147394,7 +147492,7 @@ Validate the kind-specific volume and PDF radius grid before return.
 - `ValueError` — When required fields, units, shapes, or physical
 values do not match the declared representation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L318-L413)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L350-L466)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_charge
 
@@ -147418,7 +147516,7 @@ Set particle charge (unitless) with batch handling.
 
 - `ValueError` — When charge is not 1D or 2D.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L168-L188)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L200-L220)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_concentration
 
@@ -147433,7 +147531,7 @@ Set number concentration with optional unit conversion.
 **Parameters**
 
 - `concentration` (`NDArray[np.float64]`) — Concentration array shaped (n_boxes, n_particles) or (n_particles,).
-- `units` (`str`) (default: `'1/m^3'`) — Storage units. PMF: 1/m^3 or 1/cm^3; PDF: 1/m^4; resolved: count.
+- `units` (`str`) (default: `'1/m^3'`) — Storage units. PMF density: 1/m^3 or 1/cm^3; PDF: 1/m^4; resolved: count.
 
 **Returns**
 
@@ -147443,7 +147541,7 @@ Set number concentration with optional unit conversion.
 
 - `ValueError` — When concentration is not 1D or 2D.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L136-L166)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L138-L171)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_density
 
@@ -147468,7 +147566,7 @@ Set species densities with optional unit conversion.
 
 - `ValueError` — When density is not 1D.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L190-L213)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L222-L245)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_distribution_type
 
@@ -147492,7 +147590,7 @@ Declare the discrete, continuous PDF, or resolved storage kind.
 
 - `ValueError` — If the kind is not supported.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L72-L88)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L74-L90)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_masses
 
@@ -147517,7 +147615,7 @@ Set per-species masses with optional unit conversion.
 
 - `ValueError` — When masses are not 2D or 3D.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L108-L134)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L110-L136)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_n_boxes
 
@@ -147529,7 +147627,7 @@ def set_n_boxes(n_boxes: int) -> 'ParticleDataBuilder'
 
 Set number of boxes for zero-init or shape validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L242-L251)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L274-L283)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_n_particles
 
@@ -147541,7 +147639,7 @@ def set_n_particles(n_particles: int) -> 'ParticleDataBuilder'
 
 Set number of particles for zero-init or shape validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L253-L256)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L285-L288)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_n_species
 
@@ -147553,7 +147651,31 @@ def set_n_species(n_species: int) -> 'ParticleDataBuilder'
 
 Set number of species for zero-init or shape validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L258-L261)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L290-L293)
+
+### particula.particles.particle_data_builder.ParticleDataBuilder.set_number_density
+
+*method*
+
+```python
+def set_number_density(values: NDArray[np.float64], units: str = '1/m^3') -> 'ParticleDataBuilder'
+```
+
+Import bin/slot number density or radius PDF density in 1/m^4.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L173-L188)
+
+### particula.particles.particle_data_builder.ParticleDataBuilder.set_population
+
+*method*
+
+```python
+def set_population(population: NDArray[np.float64]) -> 'ParticleDataBuilder'
+```
+
+Set extensive slot counts, or radius PDF ordinates in m^-1.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L190-L198)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_radius_grid
 
@@ -147578,7 +147700,7 @@ Copy the explicit continuous-PDF radius grid in metres.
 - `ValueError` — At build time if the grid is invalid or the
 declared kind is not ``continuous_pdf``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L90-L106)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L92-L108)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_volume
 
@@ -147603,7 +147725,7 @@ Set per-box volume with optional unit conversion.
 
 - `ValueError` — When volume is neither scalar nor 1D.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L215-L240)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L247-L272)
 
 ---
 
@@ -147614,7 +147736,8 @@ Set per-box volume with optional unit conversion.
 Native particle initialization without strategy-bearing facades.
 
 Initialization allocates owned float64 arrays. Aggregate wrapping is a separate,
-identity-preserving operation. Binned densities use fixed volume 1 m^3.
+identity-preserving operation. Binned density inputs produce extensive
+populations.
 Canonical SI inputs do not require Pint; other unit spellings/conversions do.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L1-L1)
@@ -147629,7 +147752,7 @@ def _bin_values(value: ArrayLike, count: int, name: str) -> NDArray[np.float64]
 
 Broadcast scalar slot values without discarding any supplied lanes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L47-L54)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L48-L55)
 
 ## particula.particles.particle_data_initialization._modal_parameters
 
@@ -147641,7 +147764,7 @@ def _modal_parameters(mode: ArrayLike | None, geometric_standard_deviation: Arra
 
 Normalize existing modal defaults and validate generator inputs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L57-L93)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L58-L94)
 
 ## particula.particles.particle_data_initialization._reference_volume
 
@@ -147653,7 +147776,19 @@ def _reference_volume(value: float, units: str) -> float
 
 Canonicalize conversion roundoff only for non-SI reference volumes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L96-L101)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L97-L102)
+
+## particula.particles.particle_data_initialization._resolved_counts
+
+*function*
+
+```python
+def _resolved_counts(population, concentration, concentration_units, shape, volumes)
+```
+
+Convert measured slot densities to multiplicities once.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L316-L339)
 
 ## particula.particles.particle_data_initialization._single_density
 
@@ -147665,7 +147800,7 @@ def _single_density(value: ArrayLike, units: str) -> float
 
 Require a single material; redundant equal density values are allowed.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L36-L44)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L37-L45)
 
 ## particula.particles.particle_data_initialization._slot_values
 
@@ -147677,7 +147812,7 @@ def _slot_values(value: ArrayLike, shape: tuple[int, int, int], name: str, *, re
 
 Copy scalar/slot values; reduce redundant charge species lanes only.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L281-L304)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L290-L313)
 
 ## particula.particles.particle_data_initialization._species_density
 
@@ -147689,7 +147824,7 @@ def _species_density(value: ArrayLike, shape: tuple[int, int, int]) -> NDArray[n
 
 Reduce only scalar, species or redundant population density forms.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L260-L278)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L269-L287)
 
 ## particula.particles.particle_data_initialization._unit_factor
 
@@ -147701,7 +147836,7 @@ def _unit_factor(units: str, target: str) -> float
 
 Avoid the optional converter when inputs already use canonical units.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L21-L23)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L22-L24)
 
 ## particula.particles.particle_data_initialization._vector
 
@@ -147713,7 +147848,7 @@ def _vector(value: ArrayLike, name: str) -> NDArray[np.float64]
 
 Copy a scalar, vector, or singleton row/column into one dimension.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L26-L33)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L27-L34)
 
 ## particula.particles.particle_data_initialization.create_lognormal_binned_particle_data
 
@@ -147734,7 +147869,7 @@ Initialize native bins with the existing lognormal PDF/PMF generators.
 - `number_concentration` (`ArrayLike | None`) (default: `None`) — Modal number densities, default [1e10, 1e9] m^-3.
 - `density` (`ArrayLike`) (default: `1000.0`) — Single material density, default 1000 kg/m^3.
 - `charge` (`ArrayLike`) (default: `0.0`) — Scalar or per-node charge, default zero.
-- `volume` (`float`) (default: `1.0`) — Reference volume; must convert to exactly 1 m^3.
+- `volume` (`float`) (default: `1.0`) — Positive represented air volume.
 - `radius_units` (`str`) (default: `'m'`) — Units of supplied nodes/modes; defaults remain SI.
 - `number_concentration_units` (`str`) (default: `'1/m^3'`) — Units of supplied modal densities.
 - `density_units` (`str`) (default: `'kg/m^3'`) — Material-density units.
@@ -147753,7 +147888,7 @@ require at least three positive, strictly increasing nodes; PDFs
 require at least two. The existing PMF converter needs two
 intervals to extrapolate its last bin width.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L171-L257)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L180-L266)
 
 ## particula.particles.particle_data_initialization.create_lognormal_resolved_particle_data
 
@@ -147791,14 +147926,14 @@ Sample the existing lognormal mixture with one count per sampled slot.
 - `ValueError` — If parameters, count, shape or physical values are invalid.
 Deterministic input admission precedes random sampling.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L402-L477)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L429-L504)
 
 ## particula.particles.particle_data_initialization.create_particle_data_from_radii
 
 *function*
 
 ```python
-def create_particle_data_from_radii(radii: ArrayLike, concentration: ArrayLike, distribution_type: str, density: ArrayLike = 1000.0, charge: ArrayLike = 0.0, volume: float = 1.0, radius_units: str = 'm', concentration_units: str | None = None, density_units: str = 'kg/m^3', volume_units: str = 'm^3') -> ParticleData
+def create_particle_data_from_radii(radii: ArrayLike, concentration: ArrayLike | None = None, population: ArrayLike | None = None, distribution_type: str, density: ArrayLike = 1000.0, charge: ArrayLike = 0.0, volume: float = 1.0, radius_units: str = 'm', concentration_units: str | None = None, density_units: str = 'kg/m^3', volume_units: str = 'm^3') -> ParticleData
 ```
 
 Create owned single-box, single-material data from particle radii.
@@ -147806,11 +147941,12 @@ Create owned single-box, single-material data from particle radii.
 **Parameters**
 
 - `radii` (`ArrayLike`) — Scalar, vector or singleton row/column of positive radii.
-- `concentration` (`ArrayLike`) — Scalar or matching per-radius densities.
+- `concentration` (`ArrayLike | None`) (default: `None`) — Scalar or matching per-radius densities.
+- `population` (`ArrayLike | None`) (default: `None`) — Alternative extensive counts or dN/dr in m^-1.
 - `distribution_type` (`str`) — Required ``discrete`` or ``continuous_pdf`` kind.
 - `density` (`ArrayLike`) (default: `1000.0`) — One positive material density; redundant equal values allowed.
 - `charge` (`ArrayLike`) (default: `0.0`) — Scalar or per-radius elementary-charge counts, default zero.
-- `volume` (`float`) (default: `1.0`) — Reference volume, which must convert to exactly 1 m^3.
+- `volume` (`float`) (default: `1.0`) — Finite positive represented air volume.
 - `radius_units` (`str`) (default: `'m'`) — Radius units, default metres.
 - `concentration_units` (`str | None`) (default: `None`) — Defaults to 1/m^3 for bins, 1/m^4 for PDFs. Discrete inputs also accept 1/cm^3, as in ParticleDataBuilder.
 - `density_units` (`str`) (default: `'kg/m^3'`) — Material-density units, default kg/m^3.
@@ -147827,14 +147963,14 @@ Create owned single-box, single-material data from particle radii.
 admission. No caller arrays are modified. Empty discrete input is
 supported; PDF grids require at least two increasing nodes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L104-L168)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L105-L177)
 
 ## particula.particles.particle_data_initialization.create_resolved_particle_data
 
 *function*
 
 ```python
-def create_resolved_particle_data(masses: ArrayLike, density: ArrayLike, concentration: ArrayLike | None = None, charge: ArrayLike | None = 0.0, volume: ArrayLike = 1.0, mass_units: str = 'kg', density_units: str = 'kg/m^3', concentration_units: str = 'count', volume_units: str = 'm^3') -> ParticleData
+def create_resolved_particle_data(masses: ArrayLike, density: ArrayLike, concentration: ArrayLike | None = None, population: ArrayLike | None = None, charge: ArrayLike | None = 0.0, volume: ArrayLike = 1.0, mass_units: str = 'kg', density_units: str = 'kg/m^3', concentration_units: str = 'count', volume_units: str = 'm^3') -> ParticleData
 ```
 
 Create owned resolved data with explicit count or density input units.
@@ -147843,6 +147979,7 @@ Create owned resolved data with explicit count or density input units.
 
 - `masses` (`ArrayLike`) — Scalar, (N,) single-species, (N,S), or (B,N,S) masses.
 - `density` (`ArrayLike`) — Scalar or (S,) densities; singleton forms and identical population rows are accepted. Differing population rows reject.
+- `population` (`ArrayLike | None`) (default: `None`) — Optional explicit extensive multiplicities.
 - `concentration` (`ArrayLike | None`) (default: `None`) — Scalar, (N,), or (B,N) weights; default one count/slot. Singleton row/column forms broadcast without dropping values.
 - `charge` (`ArrayLike | None`) (default: `0.0`) — Scalar, (N,), or (B,N) charge counts; None means zero. Redundant (N,S) or (B,N,S) species lanes may reduce only when equal. Canonical (B,N) shape takes precedence over a redundant shape.
 - `volume` (`ArrayLike`) (default: `1.0`) — Positive finite physical volume, scalar or (B,).
@@ -147862,7 +147999,7 @@ Create owned resolved data with explicit count or density input units.
 - `ValueError` — If units, shapes or representation values are invalid.
 No caller arrays are changed and no species/particle lane is lost.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L307-L399)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_initialization.py#L342-L426)
 
 ---
 

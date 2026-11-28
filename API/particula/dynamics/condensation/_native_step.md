@@ -20,7 +20,7 @@ def _finalize_species(masses: NDArray[np.float64], weights: NDArray[np.float64],
 
 Limit evaporation first, then uptake against gas plus actual release.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/_native_step.py#L98-L135)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/_native_step.py#L96-L133)
 
 ## particula.dynamics.condensation._native_step._weighted_sum
 
@@ -32,7 +32,7 @@ def _weighted_sum(values: NDArray[np.float64], weights: NDArray[np.float64]) -> 
 
 Sum species inventory independently of cancellation/reduction order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/_native_step.py#L79-L95)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/_native_step.py#L77-L93)
 
 ## particula.dynamics.condensation._native_step.finalize_native_transfer
 
@@ -70,7 +70,7 @@ request to evaporate more mass than a particle owns.
 - `ValueError` — If proposals have invalid shape/values or a transfer cannot
 be represented conservatively with finite floating-point storage.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/_native_step.py#L138-L188)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/_native_step.py#L136-L186)
 
 ## particula.dynamics.condensation._native_step.retire_evaporated_slots
 
@@ -86,7 +86,7 @@ The particle no longer exists: clear its count and charge, preserving
 fixed storage and every surviving particle. No gas-phase charge model is
 implied. Density-grid populations retain their prescribed bin semantics.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/_native_step.py#L64-L76)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/_native_step.py#L64-L74)
 
 ## particula.dynamics.condensation._native_step.validate_native_step_storage
 

@@ -27,7 +27,7 @@ _GAS_FIELDS = ('concentration', 'molar_mass', 'partitioning', 'vapor_pressure')
 *attribute* · *module attribute*
 
 ```python
-_PARTICLE_FIELDS = ('masses', 'concentration', 'charge', 'density', 'volume')
+_PARTICLE_FIELDS = ('masses', 'population', 'charge', 'density', 'volume')
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/species_mapping.py#L25-L25)

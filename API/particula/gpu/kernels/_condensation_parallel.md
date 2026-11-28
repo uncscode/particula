@@ -41,7 +41,7 @@ class _ReductionWork
 
 Private scratch, retained by the prepared call and its captured graph.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L167-L174)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L165-L172)
 
 ### particula.gpu.kernels._condensation_parallel._ReductionWork.negative
 
@@ -51,7 +51,7 @@ Private scratch, retained by the prepared call and its captured graph.
 negative: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L172-L172)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L170-L170)
 
 ### particula.gpu.kernels._condensation_parallel._ReductionWork.partial
 
@@ -61,7 +61,7 @@ negative: Any
 partial: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L173-L173)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L171-L171)
 
 ### particula.gpu.kernels._condensation_parallel._ReductionWork.positive
 
@@ -71,7 +71,7 @@ partial: Any
 positive: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L171-L171)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L169-L169)
 
 ### particula.gpu.kernels._condensation_parallel._ReductionWork.status
 
@@ -81,7 +81,7 @@ positive: Any
 status: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L174-L174)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L172-L172)
 
 ### particula.gpu.kernels._condensation_parallel._ReductionWork.__init__
 
@@ -121,7 +121,7 @@ def _correct_transfer(finalized: Any, masses: Any, mapping: Any, status: Any, at
 def _energy_chunks(total: Any, concentration: Any, mapping: Any, volume: Any, kind: wp.int32, partial: Any)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L133-L154)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L133-L152)
 
 ## particula.gpu.kernels._condensation_parallel._finish_candidates
 
@@ -141,7 +141,7 @@ def _finish_candidates(positive: Any, negative: Any, demand: Any, release: Any)
 def _finish_energy(partial: Any, latent: Any, energy: Any)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L157-L164)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L155-L162)
 
 ## particula.gpu.kernels._condensation_parallel._finish_transfer
 
@@ -173,7 +173,7 @@ def candidates(p)
 
 Reduce proposals into the same full-gas demand/release outputs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L186-L209)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L184-L207)
 
 ## particula.gpu.kernels._condensation_parallel.energy
 
@@ -185,7 +185,7 @@ def energy(p)
 
 Reduce accumulated transfer to extensive energy in full gas order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L255-L276)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L253-L274)
 
 ## particula.gpu.kernels._condensation_parallel.finalized
 
@@ -197,7 +197,7 @@ def finalized(p)
 
 Reconcile rounded uptake with a fixed capture-safe sequence.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L212-L252)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L210-L250)
 
 ## particula.gpu.kernels._condensation_parallel.prepare
 
@@ -209,4 +209,4 @@ def prepare(boxes, slots, gases, device)
 
 Allocate O(B G ceil(N/256)) storage once, outside stepping.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L177-L183)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_condensation_parallel.py#L175-L181)

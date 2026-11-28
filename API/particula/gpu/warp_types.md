@@ -218,11 +218,11 @@ Mirrors the shape convention of ParticleData from particula.particles.
 **Attributes**
 
 - `masses` (`wp.array3d(dtype=wp.float64)`) — Per-species masses in kg. Shape: (n_boxes, n_particles, n_species) 3D array where each particle has mass per species.
-- `concentration` (`wp.array2d(dtype=wp.float64)`) — Number concentration per particle. Shape: (n_boxes, n_particles) For particle-resolved: actual count (typically 1). For binned: number per m^3.
+- `population` (`wp.array2d(dtype=wp.float64)`) — Number concentration per particle. Shape: (n_boxes, n_particles) For particle-resolved: actual count (typically 1). For binned: represented number in the bin.
 - `charge` (`wp.array2d(dtype=wp.float64)`) — Particle charges (dimensionless integer counts). Shape: (n_boxes, n_particles) Stored as float64 for GPU compatibility.
 - `density` (`wp.array(dtype=wp.float64)`) — Material densities in kg/m^3. Shape: (n_species,) Shared across all boxes - not batched.
 - `volume` (`wp.array(dtype=wp.float64)`) — Simulation volume per box in m^3. Shape: (n_boxes,)
-- `distribution_kind` (`wp.int32`) — Stable host-visible population tag: 0 invalid/unset, 1 discrete density, 2 unsupported PDF, 3 resolved counts. Numerical arrays are never normalized by assigning this tag.
+- `distribution_kind` (`wp.int32`) — Stable host-visible population tag: 0 invalid/unset, 1 discrete counts, 2 unsupported PDF, 3 resolved counts. Numerical arrays are never normalized by assigning this tag.
 
 > **Example**
 >
@@ -234,7 +234,7 @@ Mirrors the shape convention of ParticleData from particula.particles.
 > >>> data.masses = wp.zeros(
 > ...     (n_boxes, n_particles, n_species), dtype=wp.float64
 > ... )
-> >>> data.concentration = wp.ones(
+> >>> data.population = wp.ones(
 > ...     (n_boxes, n_particles), dtype=wp.float64
 > ... )
 > >>> data.charge = wp.zeros(
@@ -256,16 +256,6 @@ charge: wp.array2d(dtype=wp.float64)
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L79-L79)
-
-### particula.gpu.warp_types.WarpParticleData.concentration
-
-*attribute* · *instance attribute*
-
-```python
-concentration: wp.array2d(dtype=wp.float64)
-```
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L78-L78)
 
 ### particula.gpu.warp_types.WarpParticleData.density
 
@@ -296,6 +286,16 @@ masses: wp.array3d(dtype=wp.float64)
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L77-L77)
+
+### particula.gpu.warp_types.WarpParticleData.population
+
+*attribute* · *instance attribute*
+
+```python
+population: wp.array2d(dtype=wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L78-L78)
 
 ### particula.gpu.warp_types.WarpParticleData.volume
 

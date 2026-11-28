@@ -11,7 +11,7 @@ Public, staged single-box Python process extensions.
 *attribute* · *module attribute*
 
 ```python
-_WRITABLE = frozenset({'particles.masses', 'particles.concentration', 'particles.charge', 'particles.volume', 'gas.concentration', 'environment.temperature', 'environment.pressure'})
+_WRITABLE = frozenset({'particles.masses', 'particles.population', 'particles.charge', 'particles.volume', 'gas.concentration', 'environment.temperature', 'environment.pressure'})
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/box_process.py#L15-L25)

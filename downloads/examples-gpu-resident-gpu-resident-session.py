@@ -249,7 +249,7 @@ def run_publication():
     try:
         wp.synchronize_device("cuda:0")
         masses = restarted.particles.masses.numpy().copy()
-        counts = restarted.particles.concentration.numpy().copy()
+        counts = restarted.particles.population.numpy().copy()
         gas = restarted.gas.concentration.numpy().copy()
         np.testing.assert_array_equal(masses, initial_p.masses)
         np.testing.assert_array_equal(counts, initial_p.concentration)

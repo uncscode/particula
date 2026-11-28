@@ -16,7 +16,7 @@ def _scan_population(masses: Any, counts: Any, charge: Any, density: Any, volume
 
 Check representation values on device without a caller-array readback.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L76-L113)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L74-L109)
 
 ## particula.gpu.kernels._population_validation.array_field
 
@@ -28,7 +28,7 @@ def array_field(container: Any, name: str, shape: tuple[int, ...], dtype: Any, d
 
 Require a contiguous same-device field without reading its payload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L24-L39)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L22-L37)
 
 ## particula.gpu.kernels._population_validation.memory_range
 
@@ -40,19 +40,19 @@ def memory_range(array: Any) -> tuple[int, int]
 
 Return a checked contiguous array interval for all supported dtypes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L42-L59)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L40-L57)
 
 ## particula.gpu.kernels._population_validation.native_slot_density
 
 *function*
 
 ```python
-def native_slot_density(value: wp.float64, box_volume: wp.float64, resolved: bool) -> wp.float64
+def native_slot_density(value: wp.float64, box_volume: wp.float64) -> wp.float64
 ```
 
-Read an admitted discrete density or resolved count as m⁻³.
+Read an extensive bin or slot population as m⁻³.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L14-L21)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L14-L19)
 
 ## particula.gpu.kernels._population_validation.reject_writer_aliases
 
@@ -64,7 +64,7 @@ def reject_writer_aliases(writers: tuple[Any, ...], protected: tuple[Any, ...]) 
 
 Reject writers overlapping other writers or protected state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L62-L73)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L60-L71)
 
 ## particula.gpu.kernels._population_validation.validate_population
 
@@ -79,4 +79,4 @@ Validate native PMF/resolved representation and return primary fields.
 This establishes storage interpretation only, not algorithm admission or
 active-slot geometry. Callers retain those process-specific checks.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L116-L149)
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/kernels/_population_validation.py#L112-L145)

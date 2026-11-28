@@ -458,7 +458,7 @@ and class. updraft_gradient is the terminal liquid mixing ratio derivative
 per m/s at fixed elapsed time, or None when unrequested. statistics
 contains work counts and step extrema for adaptive Warp execution.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L132-L194)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L132-L193)
 
 ### particula.dynamics.parcel.ParcelTrajectory.height
 
@@ -602,11 +602,10 @@ Return an independent native one-box snapshot at a time index.
 
 The discrete particle lanes are dry material and water, respectively.
 Supply dry material density (kg/m³) to convert the fixed dry volumes
-to mass. Gas holds water vapor in kg/m³. The native discrete volume
-is 1 m³. Multiply its density inventories by the physical parcel
-volume at this sample to recover extensive quantities.
+to mass. Gas holds water vapor in kg/m³. The native box retains its
+physical parcel volume and bin counts.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L157-L194)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L157-L193)
 
 ## particula.dynamics.parcel._ParcelAdaptiveControls
 
@@ -682,7 +681,7 @@ def _cpu_reference(initial, wet, time, updraft, phase_exchange)
 
 Integrate pressure, temperature, vapor and squared radii.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L267-L333)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L266-L332)
 
 ## particula.dynamics.parcel._equilibrium
 
@@ -692,7 +691,7 @@ Integrate pressure, temperature, vapor and squared radii.
 def _equilibrium(radius, dry_radius, temperature, kappa)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L202-L207)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L201-L206)
 
 ## particula.dynamics.parcel._initial_radii
 
@@ -702,7 +701,7 @@ def _equilibrium(radius, dry_radius, temperature, kappa)
 def _initial_radii(initial)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L210-L264)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L209-L263)
 
 ## particula.dynamics.parcel._parcel_output_times
 
@@ -714,7 +713,7 @@ def _parcel_output_times(steps, timestep, updraft)
 
 Validate common parcel forcing and construct the output time grid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L336-L348)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L335-L347)
 
 ## particula.dynamics.parcel._run_multivapor
 
@@ -726,7 +725,7 @@ def _run_multivapor(initial, time, updraft, device, adaptive, phase_exchange, gr
 
 Dispatch the explicit wet-state parcel after validating its controls.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L351-L373)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L350-L372)
 
 ## particula.dynamics.parcel._saturation_pressure
 
@@ -738,7 +737,7 @@ def _saturation_pressure(temperature)
 
 Liquid-water saturation pressure (Pa), constant-L Clausius-Clapeyron.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L197-L199)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L196-L198)
 
 ## particula.dynamics.parcel.run_parcel
 
@@ -769,4 +768,4 @@ Advance a single parcel under constant signed vertical velocity.
 
 - `ValueError` — Invalid state, backend, integration interval or trajectory.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L376-L488)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/parcel.py#L375-L487)

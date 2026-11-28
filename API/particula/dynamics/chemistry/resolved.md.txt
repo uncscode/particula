@@ -458,7 +458,7 @@ Scale each particle's integrated moles by its initial volume.
 *attribute* · *instance attribute*
 
 ```python
-active = particles.concentration[0] > 0
+active = particles.population[0] > 0
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L31-L31)

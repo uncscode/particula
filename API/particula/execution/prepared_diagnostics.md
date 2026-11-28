@@ -11,12 +11,12 @@ Bounded, deterministic particle reductions for CPU observation.
 *function*
 
 ```python
-def _finish_partials(partials: wp.array3d(dtype=wp.float64), volume: wp.array(dtype=wp.float64), resolved: wp.int32, output: wp.array2d(dtype=wp.float64))
+def _finish_partials(partials: wp.array3d(dtype=wp.float64), volume: wp.array(dtype=wp.float64), output: wp.array2d(dtype=wp.float64))
 ```
 
-Normalize counts by volume; retain density and active-slot count.
+Convert totals to densities and keep the active-slot count.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_diagnostics.py#L35-L50)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_diagnostics.py#L35-L49)
 
 ## particula.execution.prepared_diagnostics._particle_partials
 
@@ -40,4 +40,4 @@ def setup_diagnostics(owner: Any)
 
 Allocate reduction storage once and return a retained observer.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_diagnostics.py#L53-L111)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_diagnostics.py#L52-L109)

@@ -56,7 +56,7 @@ available when dimensions are supplied instead of masses. Building
 requires an explicit storage kind; PDF storage also requires a radius
 grid and matching PDF concentration units.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L47-L413)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L47-L466)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._charge
 
@@ -66,7 +66,7 @@ grid and matching PDF concentration units.
 _charge: Optional[NDArray[np.float64]] = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L62-L62)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L64-L64)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._concentration
 
@@ -86,7 +86,7 @@ _concentration: Optional[NDArray[np.float64]] = None
 _concentration_units: str | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L70-L70)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L72-L72)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._density
 
@@ -96,7 +96,7 @@ _concentration_units: str | None = None
 _density: Optional[NDArray[np.float64]] = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L63-L63)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L65-L65)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._distribution_type
 
@@ -106,7 +106,7 @@ _density: Optional[NDArray[np.float64]] = None
 _distribution_type: str | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L68-L68)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L70-L70)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._masses
 
@@ -118,6 +118,16 @@ _masses: Optional[NDArray[np.float64]] = None
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L60-L60)
 
+### particula.particles.particle_data_builder.ParticleDataBuilder._measured_density
+
+*attribute* · *instance attribute*
+
+```python
+_measured_density = False
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L62-L62)
+
 ### particula.particles.particle_data_builder.ParticleDataBuilder._n_boxes
 
 *attribute* · *instance attribute*
@@ -126,7 +136,7 @@ _masses: Optional[NDArray[np.float64]] = None
 _n_boxes: Optional[int] = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L65-L65)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L67-L67)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._n_particles
 
@@ -136,7 +146,7 @@ _n_boxes: Optional[int] = None
 _n_particles: Optional[int] = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L66-L66)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L68-L68)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._n_species
 
@@ -146,7 +156,17 @@ _n_particles: Optional[int] = None
 _n_species: Optional[int] = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L67-L67)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L69-L69)
+
+### particula.particles.particle_data_builder.ParticleDataBuilder._population
+
+*attribute* · *instance attribute*
+
+```python
+_population: NDArray[np.float64] | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L63-L63)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._radius_grid
 
@@ -156,7 +176,7 @@ _n_species: Optional[int] = None
 _radius_grid: NDArray[np.float64] | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L69-L69)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L71-L71)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._volume
 
@@ -166,7 +186,7 @@ _radius_grid: NDArray[np.float64] | None = None
 _volume: Optional[NDArray[np.float64]] = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L64-L64)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L66-L66)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.__init__
 
@@ -178,7 +198,7 @@ def __init__() -> None
 
 Initialize empty builder state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L58-L70)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L58-L72)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._broadcast_if_needed
 
@@ -190,7 +210,7 @@ def _broadcast_if_needed(array: NDArray[np.float64], target_shape: tuple[int, ..
 
 Broadcast array to target shape when compatible.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L273-L295)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L305-L327)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._ensure_counts
 
@@ -202,7 +222,7 @@ def _ensure_counts() -> None
 
 Ensure counts are available for zero-init path.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L297-L306)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L329-L338)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._get_counts
 
@@ -214,7 +234,7 @@ def _get_counts() -> tuple[int, int, int]
 
 Return the integer counts currently tracked.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L308-L316)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L340-L348)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder._infer_counts_from_masses
 
@@ -226,7 +246,7 @@ def _infer_counts_from_masses() -> tuple[int, int, int]
 
 Derive counts from masses when present.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L263-L271)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L295-L303)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.build
 
@@ -251,7 +271,7 @@ Validate the kind-specific volume and PDF radius grid before return.
 - `ValueError` — When required fields, units, shapes, or physical
 values do not match the declared representation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L318-L413)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L350-L466)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_charge
 
@@ -275,7 +295,7 @@ Set particle charge (unitless) with batch handling.
 
 - `ValueError` — When charge is not 1D or 2D.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L168-L188)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L200-L220)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_concentration
 
@@ -290,7 +310,7 @@ Set number concentration with optional unit conversion.
 **Parameters**
 
 - `concentration` (`NDArray[np.float64]`) — Concentration array shaped (n_boxes, n_particles) or (n_particles,).
-- `units` (`str`) (default: `'1/m^3'`) — Storage units. PMF: 1/m^3 or 1/cm^3; PDF: 1/m^4; resolved: count.
+- `units` (`str`) (default: `'1/m^3'`) — Storage units. PMF density: 1/m^3 or 1/cm^3; PDF: 1/m^4; resolved: count.
 
 **Returns**
 
@@ -300,7 +320,7 @@ Set number concentration with optional unit conversion.
 
 - `ValueError` — When concentration is not 1D or 2D.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L136-L166)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L138-L171)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_density
 
@@ -325,7 +345,7 @@ Set species densities with optional unit conversion.
 
 - `ValueError` — When density is not 1D.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L190-L213)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L222-L245)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_distribution_type
 
@@ -349,7 +369,7 @@ Declare the discrete, continuous PDF, or resolved storage kind.
 
 - `ValueError` — If the kind is not supported.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L72-L88)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L74-L90)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_masses
 
@@ -374,7 +394,7 @@ Set per-species masses with optional unit conversion.
 
 - `ValueError` — When masses are not 2D or 3D.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L108-L134)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L110-L136)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_n_boxes
 
@@ -386,7 +406,7 @@ def set_n_boxes(n_boxes: int) -> 'ParticleDataBuilder'
 
 Set number of boxes for zero-init or shape validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L242-L251)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L274-L283)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_n_particles
 
@@ -398,7 +418,7 @@ def set_n_particles(n_particles: int) -> 'ParticleDataBuilder'
 
 Set number of particles for zero-init or shape validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L253-L256)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L285-L288)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_n_species
 
@@ -410,7 +430,31 @@ def set_n_species(n_species: int) -> 'ParticleDataBuilder'
 
 Set number of species for zero-init or shape validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L258-L261)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L290-L293)
+
+### particula.particles.particle_data_builder.ParticleDataBuilder.set_number_density
+
+*method*
+
+```python
+def set_number_density(values: NDArray[np.float64], units: str = '1/m^3') -> 'ParticleDataBuilder'
+```
+
+Import bin/slot number density or radius PDF density in 1/m^4.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L173-L188)
+
+### particula.particles.particle_data_builder.ParticleDataBuilder.set_population
+
+*method*
+
+```python
+def set_population(population: NDArray[np.float64]) -> 'ParticleDataBuilder'
+```
+
+Set extensive slot counts, or radius PDF ordinates in m^-1.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L190-L198)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_radius_grid
 
@@ -435,7 +479,7 @@ Copy the explicit continuous-PDF radius grid in metres.
 - `ValueError` — At build time if the grid is invalid or the
 declared kind is not ``continuous_pdf``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L90-L106)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L92-L108)
 
 ### particula.particles.particle_data_builder.ParticleDataBuilder.set_volume
 
@@ -460,4 +504,4 @@ Set per-box volume with optional unit conversion.
 
 - `ValueError` — When volume is neither scalar nor 1D.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L215-L240)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data_builder.py#L247-L272)

@@ -23,7 +23,7 @@ def extract_derivative(plus: FloatVector, minus: FloatVector, span: FloatVector,
 
 Extract local derivatives from colored physical-rate evaluations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L75-L106)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L76-L107)
 
 ## particula.execution._condensation_ros3_kernels.finish
 
@@ -33,7 +33,7 @@ Extract local derivatives from colored physical-rate evaluations.
 def finish(state: FloatVector, first: FloatVector, second: FloatVector, third: FloatVector, atol: FloatVector, rtol: FloatVector, candidate: FloatVector, norm: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L223-L243)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L221-L241)
 
 ## particula.execution._condensation_ros3_kernels.partial_time
 
@@ -45,7 +45,7 @@ def partial_time(base: FloatVector, shifted: FloatVector, delta: wp.float64, res
 
 Differentiate forcing at fixed state inside one smooth time segment.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L246-L255)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L244-L253)
 
 ## particula.execution._condensation_ros3_kernels.perturb
 
@@ -57,19 +57,19 @@ def perturb(state: FloatVector, scale: FloatVector, counts: FloatMatrix, materia
 
 Perturb independent local mass or per-box gas columns simultaneously.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L32-L72)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L33-L73)
 
 ## particula.execution._condensation_ros3_kernels.solve_gas
 
 *function*
 
 ```python
-def solve_gas(local: FloatMatrix, gas_column: FloatMatrix, counts: FloatMatrix, volume: FloatVector, scale: FloatVector, rhs: FloatVector, materials: wp.int32, gases: wp.int32, target: wp.int32, source: wp.int32, resolved: wp.int32, inverse_step_gamma: wp.float64, solution: FloatVector, invalid: IntVector)
+def solve_gas(local: FloatMatrix, gas_column: FloatMatrix, counts: FloatMatrix, volume: FloatVector, scale: FloatVector, rhs: FloatVector, materials: wp.int32, gases: wp.int32, target: wp.int32, source: wp.int32, inverse_step_gamma: wp.float64, solution: FloatVector, invalid: IntVector)
 ```
 
 Eliminate particle coordinates with conservative weighted gas rows.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L109-L152)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L110-L150)
 
 ## particula.execution._condensation_ros3_kernels.solve_remaining
 
@@ -81,7 +81,7 @@ def solve_remaining(local: FloatMatrix, gas_column: FloatMatrix, rhs: FloatVecto
 
 Back-substitute all local coordinates without a dense factorization.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L155-L188)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L153-L186)
 
 ## particula.execution._condensation_ros3_kernels.stage_rhs
 
@@ -91,7 +91,7 @@ Back-substitute all local coordinates without a dense factorization.
 def stage_rhs(rate: FloatVector, first: FloatVector, second: FloatVector, partial: FloatVector, h: wp.float64, stage: wp.int32, rhs: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L191-L212)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L189-L210)
 
 ## particula.execution._condensation_ros3_kernels.stage_state
 
@@ -101,4 +101,4 @@ def stage_rhs(rate: FloatVector, first: FloatVector, second: FloatVector, partia
 def stage_state(state: FloatVector, increment: FloatVector, result: FloatVector)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L215-L220)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_condensation_ros3_kernels.py#L213-L218)

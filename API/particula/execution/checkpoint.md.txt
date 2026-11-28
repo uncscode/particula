@@ -36,7 +36,7 @@ and reacquisition retain restored arrays until reset is explicitly requested.
 *attribute* · *module attribute*
 
 ```python
-_PRIMARY_ROLES = (('particles', 'masses'), ('particles', 'concentration'), ('particles', 'charge'), ('particles', 'density'), ('particles', 'volume'), ('gas', 'molar_mass'), ('gas', 'concentration'), ('gas', 'vapor_pressure'), ('gas', 'partitioning'), ('environment', 'temperature'), ('environment', 'pressure'), ('environment', 'saturation_ratio'))
+_PRIMARY_ROLES = (('particles', 'masses'), ('particles', 'population'), ('particles', 'charge'), ('particles', 'density'), ('particles', 'volume'), ('gas', 'molar_mass'), ('gas', 'concentration'), ('gas', 'vapor_pressure'), ('gas', 'partitioning'), ('environment', 'temperature'), ('environment', 'pressure'), ('environment', 'saturation_ratio'))
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/checkpoint.py#L55-L68)
@@ -46,7 +46,7 @@ _PRIMARY_ROLES = (('particles', 'masses'), ('particles', 'concentration'), ('par
 *attribute* · *module attribute*
 
 ```python
-_SCHEMA_VERSION = 5
+_SCHEMA_VERSION = 6
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/checkpoint.py#L54-L54)

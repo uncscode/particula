@@ -51,7 +51,7 @@ only; it does not revalidate or rediscover the plan.
 
 - `plan` (`ResidentDiagnosticsPlan`) — Exact diagnostics plan validated during setup.
 - `particle_masses` (`object`) — Bound resident particle mass array.
-- `particle_concentration` (`object`) — Bound resident particle concentration array.
+- `particle_population` (`object`) — Bound resident extensive particle population.
 - `particle_volume` (`object`) — Bound resident particle volume array.
 - `gas_concentration` (`object`) — Bound resident gas concentration array.
 - `saturation_ratio` (`object`) — Bound resident saturation-ratio array.
@@ -64,10 +64,9 @@ only; it does not revalidate or rediscover the plan.
 - `source_ledgers` (`tuple[object | None, ...]`) — Residual source ledgers aligned with registrations.
 - `sink_ledgers` (`tuple[object | None, ...]`) — Residual sink ledgers aligned with registrations.
 - `total_mass_output` (`object | None`) — Bound total-mass output used by the residual writer.
-- `resolved_counts` (`bool`) — Whether particle population stores raw counts.
 - `particle_mass_pairs` (`tuple[tuple[int, int], ...]`) — Validated gas-to-particle inventory lane pairs.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L184-L228)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L184-L226)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.baseline_total_masses
 
@@ -77,7 +76,7 @@ only; it does not revalidate or rediscover the plan.
 baseline_total_masses: tuple[object | None, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L223-L223)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L222-L222)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.device
 
@@ -87,7 +86,7 @@ baseline_total_masses: tuple[object | None, ...]
 device: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L218-L218)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L217-L217)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.dimensions
 
@@ -97,7 +96,7 @@ device: object
 dimensions: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L219-L219)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L218-L218)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.energy_transfers
 
@@ -107,7 +106,7 @@ dimensions: object
 energy_transfers: tuple[object | None, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L222-L222)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L221-L221)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.gas_concentration
 
@@ -117,7 +116,7 @@ energy_transfers: tuple[object | None, ...]
 gas_concentration: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L216-L216)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L215-L215)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.outputs
 
@@ -127,17 +126,7 @@ gas_concentration: object
 outputs: tuple[object, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L221-L221)
-
-### particula.execution.diagnostics.PreparedResidentDiagnostics.particle_concentration
-
-*attribute* · *instance attribute*
-
-```python
-particle_concentration: object
-```
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L214-L214)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L220-L220)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.particle_mass_pairs
 
@@ -147,7 +136,7 @@ particle_concentration: object
 particle_mass_pairs: tuple[tuple[int, int], ...] = ()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L228-L228)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L226-L226)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.particle_masses
 
@@ -155,6 +144,16 @@ particle_mass_pairs: tuple[tuple[int, int], ...] = ()
 
 ```python
 particle_masses: object
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L212-L212)
+
+### particula.execution.diagnostics.PreparedResidentDiagnostics.particle_population
+
+*attribute* · *instance attribute*
+
+```python
+particle_population: object
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L213-L213)
@@ -167,7 +166,7 @@ particle_masses: object
 particle_volume: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L215-L215)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L214-L214)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.plan
 
@@ -177,7 +176,7 @@ particle_volume: object
 plan: ResidentDiagnosticsPlan
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L212-L212)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L211-L211)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.registrations
 
@@ -187,17 +186,7 @@ plan: ResidentDiagnosticsPlan
 registrations: tuple[ResidentDiagnosticRegistration, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L220-L220)
-
-### particula.execution.diagnostics.PreparedResidentDiagnostics.resolved_counts
-
-*attribute* · *class attribute* · *instance attribute*
-
-```python
-resolved_counts: bool = False
-```
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L227-L227)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L219-L219)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.saturation_ratio
 
@@ -207,7 +196,7 @@ resolved_counts: bool = False
 saturation_ratio: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L217-L217)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L216-L216)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.sink_ledgers
 
@@ -217,7 +206,7 @@ saturation_ratio: object
 sink_ledgers: tuple[object | None, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L225-L225)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L224-L224)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.source_ledgers
 
@@ -227,7 +216,7 @@ sink_ledgers: tuple[object | None, ...]
 source_ledgers: tuple[object | None, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L224-L224)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L223-L223)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.total_mass_output
 
@@ -237,14 +226,14 @@ source_ledgers: tuple[object | None, ...]
 total_mass_output: object | None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L226-L226)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L225-L225)
 
 ### particula.execution.diagnostics.PreparedResidentDiagnostics.__init__
 
 *method*
 
 ```python
-def __init__(plan: ResidentDiagnosticsPlan, particle_masses: object, particle_concentration: object, particle_volume: object, gas_concentration: object, saturation_ratio: object, device: object, dimensions: object, registrations: tuple[ResidentDiagnosticRegistration, ...], outputs: tuple[object, ...], energy_transfers: tuple[object | None, ...], baseline_total_masses: tuple[object | None, ...], source_ledgers: tuple[object | None, ...], sink_ledgers: tuple[object | None, ...], total_mass_output: object | None, resolved_counts: bool = False, particle_mass_pairs: tuple[tuple[int, int], ...] = ()) -> None
+def __init__(plan: ResidentDiagnosticsPlan, particle_masses: object, particle_population: object, particle_volume: object, gas_concentration: object, saturation_ratio: object, device: object, dimensions: object, registrations: tuple[ResidentDiagnosticRegistration, ...], outputs: tuple[object, ...], energy_transfers: tuple[object | None, ...], baseline_total_masses: tuple[object | None, ...], source_ledgers: tuple[object | None, ...], sink_ledgers: tuple[object | None, ...], total_mass_output: object | None, particle_mass_pairs: tuple[tuple[int, int], ...] = ()) -> None
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L0-L0)
@@ -460,7 +449,7 @@ synchronization, transfer, allocation, or physics mutation. Matrix
 registrations are write-free for empty ``(B, S)`` schemas; particle number
 remains writable for ``(B, 0)``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L346-L609)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L333-L583)
 
 ### particula.execution.diagnostics.ResidentDiagnosticsExecutor._execute_validated
 
@@ -472,7 +461,7 @@ def _execute_validated(plan: ResidentDiagnosticsPlan) -> None
 
 Dispatch a plan already validated by its owning scheduler step.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L471-L609)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L458-L583)
 
 ### particula.execution.diagnostics.ResidentDiagnosticsExecutor._validate
 
@@ -493,7 +482,7 @@ Validate plan provenance, closed operation order, and outputs.
 - `ValueError` — If lifecycle, graph, schedule, protocol, or output
 metadata validation fails.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L422-L435)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L409-L422)
 
 ### particula.execution.diagnostics.ResidentDiagnosticsExecutor._validate_graph_and_schedule
 
@@ -505,7 +494,7 @@ def _validate_graph_and_schedule(plan: ResidentDiagnosticsPlan) -> None
 
 Validate graph provenance, membership, and canonical order.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L357-L400)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L344-L387)
 
 ### particula.execution.diagnostics.ResidentDiagnosticsExecutor._validate_outputs
 
@@ -517,7 +506,7 @@ def _validate_outputs(plan: ResidentDiagnosticsPlan) -> None
 
 Validate caller-owned diagnostic outputs against resident state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L415-L420)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L402-L407)
 
 ### particula.execution.diagnostics.ResidentDiagnosticsExecutor._validate_registrations
 
@@ -529,7 +518,7 @@ def _validate_registrations(plan: ResidentDiagnosticsPlan) -> None
 
 Validate diagnostic registration ordering and uniqueness.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L402-L413)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L389-L400)
 
 ### particula.execution.diagnostics.ResidentDiagnosticsExecutor.execute
 
@@ -555,7 +544,7 @@ synchronize before inspecting outputs on the host.
 - `TypeError` — If ``plan`` is not an exact diagnostics plan.
 - `ValueError` — If its bindings or output metadata are invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L453-L469)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L440-L456)
 
 ### particula.execution.diagnostics.ResidentDiagnosticsExecutor.validate
 
@@ -581,7 +570,7 @@ Validate one exact diagnostics plan without dispatching a kernel.
 - `ValueError` — If the plan's graph, bindings, or registration protocol
 is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L437-L451)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L424-L438)
 
 ## particula.execution.diagnostics.ResidentDiagnosticsPlan
 
@@ -698,36 +687,24 @@ executor so plan construction does not inspect Warp-array metadata.
 *function*
 
 ```python
-def _accumulate_mapped_particle_mass(masses: Any, concentration: Any, volume: Any, output: Any, particle_species: int, gas_species: int, resolved: int) -> None
+def _accumulate_mapped_particle_mass(masses: Any, population: Any, output: Any, particle_species: int, gas_species: int) -> None
 ```
 
 Accumulate one explicit material-to-gas extensive inventory lane.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L288-L308)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L279-L295)
 
-## particula.execution.diagnostics._accumulate_particle_number
-
-*function*
-
-```python
-def _accumulate_particle_number(concentration: Any, output: Any) -> None
-```
-
-Accumulate one particle concentration lane in parallel.
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L254-L258)
-
-## particula.execution.diagnostics._accumulate_resolved_number
+## particula.execution.diagnostics._accumulate_number_density
 
 *function*
 
 ```python
-def _accumulate_resolved_number(concentration: Any, volume: Any, output: Any) -> None
+def _accumulate_number_density(concentration: Any, volume: Any, output: Any) -> None
 ```
 
 Reduce represented counts to per-volume number concentration.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L279-L285)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L270-L276)
 
 ## particula.execution.diagnostics._clear_particle_number
 
@@ -739,7 +716,7 @@ def _clear_particle_number(output: Any) -> None
 
 Clear one particle-number output lane before staged accumulation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L247-L251)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L245-L249)
 
 ## particula.execution.diagnostics._conservation_residual
 
@@ -751,7 +728,7 @@ def _conservation_residual(total_mass: Any, baseline: Any, source: Any, sink: An
 
 Write the ledger-aware residual from the already-reduced total mass.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L261-L276)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L252-L267)
 
 ## particula.execution.diagnostics._copy_snapshot
 
@@ -763,7 +740,7 @@ def _copy_snapshot(source: Any, output: Any) -> None
 
 Copy one resident diagnostic matrix element to its output.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L231-L235)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L229-L233)
 
 ## particula.execution.diagnostics._enqueue_prepared_resident_diagnostics
 
@@ -787,7 +764,7 @@ schemas remain write-free; rollback is not promised after a writer launches.
 
 - `ValueError` — If residual dispatch lacks its bound total-mass output.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L706-L827)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L679-L792)
 
 ## particula.execution.diagnostics._initialize_total_species_mass
 
@@ -799,7 +776,7 @@ def _initialize_total_species_mass(gas_concentration: Any, volume: Any, output: 
 
 Initialize each extensive-mass lane from resident gas.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L238-L244)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L236-L242)
 
 ## particula.execution.diagnostics._mass_pairs
 
@@ -811,7 +788,7 @@ def _mass_pairs(plan: ResidentDiagnosticsPlan) -> tuple[tuple[int, int], ...]
 
 Validate total-mass provenance without device work or inferred lanes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L311-L343)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L298-L330)
 
 ## particula.execution.diagnostics.setup_prepared_resident_diagnostics
 
@@ -841,7 +818,7 @@ Validate a declaration diagnostics attachment and bind enqueue
 primary
 arrays are invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L612-L703)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L586-L676)
 
 ## particula.execution.diagnostics.validate_resident_diagnostics_plan
 
@@ -870,4 +847,4 @@ resident-state mutation.
 - `TypeError` — If ``plan`` is not an exact diagnostics plan.
 - `ValueError` — If its binding, graph, or registration metadata is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L830-L899)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/diagnostics.py#L795-L864)
