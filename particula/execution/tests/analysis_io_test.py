@@ -216,3 +216,18 @@ def test_read_036_binned_and_derived_archives(suffix, unit, total):
         )
         spec = data.metadata["science"]["observables"]["particle_population"]
         assert spec["unit"] == unit
+        old = data.metadata["source_observables"]["particle_concentration"]
+        assert old["unit"] == ("m^-4" if suffix == "continuous_pdf" else "m^-3")
+
+
+def test_legacy_nonunit_binned_archive_fails_before_conversion(tmp_path):
+    """An ambiguous history cannot be normalized using inferred units."""
+    from pathlib import Path
+
+    original = Path(__file__).parent / "data" / "analysis-0.3.6-discrete.pca"
+    metadata, arrays, _ = read_archive(original, kind="analysis")
+    arrays["volume"][:] = 0.25
+    path = tmp_path / "ambiguous.pca"
+    write_archive(path, kind="analysis", metadata=metadata, arrays=arrays)
+    with pytest.raises(ValueError, match="legacy binned"):
+        load_analysis(path)

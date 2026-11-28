@@ -196,10 +196,21 @@ def _validate(metadata, arrays):
     _validate_observables(
         metadata["version"], arrays, science, dimensions, measure_units
     )
+    _validate_population_observations(metadata["version"], science, arrays)
     if any(
         not np.all(np.isfinite(array)) for array in arrays.values()
     ) or np.any(arrays["volume"] <= 0):
         raise ValueError("analysis values must be finite with positive volume")
+
+
+def _validate_population_observations(version, science, arrays):
+    legacy = version == 1 or "particle_concentration" in arrays
+    if legacy and science["distribution_type"] != "particle_resolved":
+        if np.any(arrays["volume"] != 1):
+            raise ValueError("legacy binned analysis requires unit volume")
+    for name in ("particle_population", "particle_concentration"):
+        if name in arrays and np.any(arrays[name] < 0):
+            raise ValueError("analysis particle population must be nonnegative")
 
 
 def _validate_observables(version, arrays, science, dimensions, measure_units):
@@ -247,12 +258,9 @@ def load_analysis(path, *, max_bytes=128 * 1024 * 1024):
     if metadata["version"] == 1:
         science = metadata["science"]
         kind = science["distribution_type"]
-        if kind != "particle_resolved" and np.any(arrays["volume"] != 1):
-            raise ValueError("legacy binned analysis requires unit volume")
+        metadata["source_observables"] = deepcopy(science["observables"])
         if "particle_concentration" in arrays:
             raw = arrays.pop("particle_concentration")
-            if np.any(raw < 0):
-                raise ValueError("negative legacy particle population")
             arrays["particle_population"] = raw
             spec = science["observables"].pop("particle_concentration")
             spec["unit"] = "m^-1" if kind == "continuous_pdf" else "count"

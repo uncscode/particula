@@ -152,6 +152,8 @@ class ParticleDataBuilder:
         Raises:
             ValueError: When concentration is not 1D or 2D.
         """
+        if units == "count" and self._measured_density:
+            raise ValueError("counts conflict with the supplied number density")
         concentration_array = np.asarray(concentration, dtype=np.float64)
         if concentration_array.ndim == 1:
             concentration_array = np.expand_dims(concentration_array, axis=0)
@@ -174,6 +176,13 @@ class ParticleDataBuilder:
         """Import bin/slot number density or radius PDF density in 1/m^4."""
         if units not in ("1/m^3", "1/cm^3", "1/m^4"):
             raise ValueError("density units must be 1/m^3, 1/cm^3 or 1/m^4")
+        if (
+            self._concentration is not None
+            and self._concentration_units == "count"
+        ):
+            raise ValueError(
+                "number density conflicts with the supplied counts"
+            )
         self.set_concentration(values, units)
         self._measured_density = True
         return self

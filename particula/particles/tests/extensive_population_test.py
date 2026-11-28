@@ -135,3 +135,28 @@ def test_direct_tagged_population_rejects_invalid_volume(kind, volume):
             if kind == "continuous_pdf"
             else None,
         )
+
+
+@pytest.mark.parametrize("density_first", [True, False])
+def test_resolved_builder_density_and_count_conflict(density_first):
+    """Distinguish measured densities from legacy absolute resolved counts."""
+    builder = (
+        ParticleDataBuilder()
+        .set_distribution_type("particle_resolved")
+        .set_masses(np.ones((3, 1, 1)))
+        .set_density(np.ones(1))
+    )
+    volumes = np.array([0.25, 1.0, 4.0])
+    values = np.array([8.0])
+    if density_first:
+        builder.set_number_density(values)
+        built = builder.set_volume(volumes).build()
+        npt.assert_array_equal(built.population[:, 0], [2.0, 8.0, 32.0])
+        with pytest.raises(ValueError, match="conflict"):
+            builder.set_concentration(values, "count")
+    else:
+        builder.set_concentration(values, "count")
+        built = builder.set_volume(volumes).build()
+        npt.assert_array_equal(built.population[:, 0], [8.0, 8.0, 8.0])
+        with pytest.raises(ValueError, match="conflict"):
+            builder.set_number_density(values)

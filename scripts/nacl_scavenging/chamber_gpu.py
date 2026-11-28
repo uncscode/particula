@@ -324,7 +324,7 @@ def simulate(args):  # noqa: C901 -- ordered pulse and inventory checks
                 dim=batches,
                 inputs=[
                     aerosol.masses,
-                    aerosol.concentration,
+                    aerosol.population,
                     args.dt / 2,
                     area,
                 ],
@@ -335,7 +335,7 @@ def simulate(args):  # noqa: C901 -- ordered pulse and inventory checks
                 dim=counts.shape,
                 inputs=[
                     aerosol.masses,
-                    aerosol.concentration,
+                    aerosol.population,
                     aerosol.charge,
                     *environment,
                     args.dt,
@@ -358,7 +358,7 @@ def simulate(args):  # noqa: C901 -- ordered pulse and inventory checks
                     dim=batches,
                     inputs=[
                         aerosol.masses,
-                        aerosol.concentration,
+                        aerosol.population,
                         aerosol.charge,
                         dispersion_table,
                         float(LOG_D[0]),
@@ -375,7 +375,7 @@ def simulate(args):  # noqa: C901 -- ordered pulse and inventory checks
                 dim=batches,
                 inputs=[
                     aerosol.masses,
-                    aerosol.concentration,
+                    aerosol.population,
                     args.dt / 2,
                     area,
                 ],
@@ -387,7 +387,7 @@ def simulate(args):  # noqa: C901 -- ordered pulse and inventory checks
             collision_total = pairs.events.numpy()
             hazard = pairs.ledger.numpy()
         m = aerosol.masses.numpy()
-        c = aerosol.concentration.numpy().astype(bool)
+        c = aerosol.population.numpy().astype(bool)
         z = aerosol.charge.numpy()
         balance = ledger.numpy()
         risk = area.numpy()

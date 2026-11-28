@@ -89,7 +89,7 @@ def test_p1_raw_particle_transfer_characterization(
         assert not np.shares_memory(
             getattr(restored, field), getattr(source, field)
         )
-    source.concentration[0, 0] = 0
+    source.population[0, 0] = 0
     assert mirror.population.numpy()[0, 0] == weights[0]
 
 

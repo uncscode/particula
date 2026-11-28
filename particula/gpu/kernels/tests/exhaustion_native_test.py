@@ -28,7 +28,7 @@ def native_state(device):
             name: getattr(fields, name).numpy()
             for name in (
                 "masses",
-                "concentration",
+                "population",
                 "charge",
                 "density",
                 "volume",
