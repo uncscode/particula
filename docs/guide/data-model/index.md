@@ -141,6 +141,7 @@ These are existing signatures/properties, not additional aggregate APIs:
 | --- | --- |
 | `ParticleData.validate_representation()` | Returns `None`; read-only kind, float64 schema, physical-value, volume and grid admission; rejects without repair. |
 | `ParticleData.slot_concentration_density` | Fresh `(B,N)` array; m⁻³ for PMF/resolved, m⁻⁴ for PDF. |
+| `ParticleData.set_slot_concentration_density(density_by_slot, *, volume=None)` | Replaces population in place from per-slot density and the current or supplied volume. |
 | `ParticleData.number_density` | Fresh `(B,)` array, m⁻³. |
 | `ParticleData.species_mass_density` | Fresh `(B,Sp)` array, kg/m³. |
 | `ParticleData.species_mass_inventory` | Fresh `(B,Sp)` array, kg. |
@@ -510,6 +511,23 @@ np.testing.assert_allclose(sample.number_density, [1e6])
 The example uses SI units and works with the base installation. With the
 optional Pint unit converter installed, the same measurement can be supplied
 as `concentration=[2.0], concentration_units="1/cm^3"`.
+
+To replace the sample with a new measurement, supply a density for each
+slot. At 400 particles/m³, the current 0.25 m³ represents 100 particles.
+If the new sample represents 0.5 m³, pass its volume in the same call.
+
+```python
+sample.set_slot_concentration_density([400.0])
+np.testing.assert_allclose(sample.population, [[100.0]])
+sample.set_slot_concentration_density([400.0], volume=0.5)
+np.testing.assert_allclose(sample.population, [[200.0]])
+np.testing.assert_allclose(sample.number_density, [400.0])
+```
+
+For multiple boxes, pass a density row per box and optionally a volume per
+box. For a radius PDF, pass the measured ordinates in m⁻⁴. The setter
+multiplies each ordinate by volume and preserves the radius grid. This
+operation replaces the particle sample. Gas concentrations remain independent.
 
 For a density tendency in m⁻³ s⁻¹ (m⁻⁴ s⁻¹ for a PDF), multiply the
 increment by the row's volume before adding it to population. For a measured

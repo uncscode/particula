@@ -33,10 +33,27 @@ Example:
 from dataclasses import dataclass
 
 import numpy as np
-from numpy.typing import NDArray
+from numpy.typing import ArrayLike, NDArray
 from typing_extensions import deprecated
 
+from particula._array_validation import validate_writable_arrays
 from particula.particles._population import radius_node_widths, slot_density
+
+
+def _replacement_volumes(
+    volume: ArrayLike, shape: tuple[int, ...]
+) -> NDArray[np.float64]:
+    """Stage an independent volume value for each box before updating state."""
+    supplied = np.asarray(volume)
+    if supplied.dtype.kind not in "iuf":
+        raise TypeError("volume must contain real numbers")
+    if supplied.shape not in ((), shape):
+        raise ValueError("volume must be scalar or one value per box")
+    with np.errstate(over="ignore", under="ignore"):
+        volumes = np.array(supplied, dtype=np.float64, copy=True)
+    if not np.all(np.isfinite(volumes)) or np.any(volumes <= 0):
+        raise ValueError("volume must be finite and positive")
+    return np.broadcast_to(volumes, shape)
 
 
 @dataclass(init=False)
@@ -332,6 +349,66 @@ class ParticleData:
         """
         self.validate_representation()
         return slot_density(self)
+
+    def set_slot_concentration_density(
+        self, density_by_slot: ArrayLike, *, volume: ArrayLike | None = None
+    ) -> None:
+        """Replace particle population from per-slot density and air volume.
+
+        Args:
+            density_by_slot: Nonnegative number densities (m^-3) for bins
+                or resolved slots, or radius-PDF ordinates (m^-4). Supply
+                shape (n_boxes, n_particles), or (n_particles,) for one box.
+            volume: Represented air volume (m^3), as one positive scalar
+                for all boxes or an array of shape (n_boxes,). Omit to use
+                each box's current volume.
+
+        Writes density times the selected volume into the existing population
+        array. A supplied volume is committed in the same update.
+
+        Raises:
+            TypeError: If an input does not contain real numbers.
+            ValueError: If the representation, shape, values or storage
+                prevent an in-place update. Both arrays retain their values.
+        """
+        self.validate_representation()
+        slots = np.asarray(density_by_slot)
+        if slots.dtype.kind not in "iuf":
+            raise TypeError("density_by_slot must contain real numbers")
+        if self.n_boxes == 1 and slots.ndim == 1:
+            slots = slots[None, :]
+        if slots.shape != self.population.shape:
+            raise ValueError("density_by_slot must match the population shape")
+        if not np.all(np.isfinite(slots)) or np.any(slots < 0):
+            raise ValueError("density_by_slot must be finite and nonnegative")
+
+        volumes = self.volume
+        if volume is not None:
+            volumes = _replacement_volumes(volume, self.volume.shape)
+
+        with np.errstate(over="ignore", under="ignore", invalid="ignore"):
+            population = np.asarray(slots * volumes[:, None], dtype=np.float64)
+        if not np.all(np.isfinite(population)) or np.any(
+            (slots > 0) & (population == 0)
+        ):
+            raise ValueError("population is outside the float64 range")
+
+        fields = {
+            "population": self.population,
+            "volume": self.volume,
+            "masses": self.masses,
+            "density": self.density,
+            "charge": self.charge,
+        }
+        if self.radius_grid is not None:
+            fields["radius_grid"] = self.radius_grid
+        writers = (
+            ("population",) if volume is None else ("population", "volume")
+        )
+        validate_writable_arrays(fields, writers)
+        self.population[:] = population
+        if volume is not None:
+            self.volume[:] = volumes
 
     @property
     def number_density(self) -> NDArray[np.float64]:

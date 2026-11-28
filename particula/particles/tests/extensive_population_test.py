@@ -168,3 +168,93 @@ def test_resolved_builder_density_and_count_conflict(density_first):
         npt.assert_array_equal(built.population[:, 0], [8.0, 8.0, 8.0])
         with pytest.raises(ValueError, match="conflict"):
             builder.set_number_density(values)
+
+
+def _sample(kind="discrete", boxes=1):
+    return ParticleData(
+        masses=np.ones((boxes, 2, 1)),
+        population=np.full((boxes, 2), 3.0),
+        charge=np.zeros((boxes, 2)),
+        density=np.array([1000.0]),
+        volume=np.full(boxes, 0.25),
+        distribution_type=kind,
+        radius_grid=np.array([1e-8, 2e-8])
+        if kind == "continuous_pdf"
+        else None,
+    )
+
+
+@pytest.mark.parametrize(
+    "kind", ["discrete", "particle_resolved", "continuous_pdf"]
+)
+def test_replace_slot_density_and_volume(kind):
+    """Use each new volume once, preserving buffer identity and PDF units."""
+    data = _sample(kind, boxes=2)
+    raw, volumes = data.population, data.volume
+    slots = [[400.0, 200.0], [120.0, 80.0]]
+    data.set_slot_concentration_density(slots, volume=[0.5, 2.0])
+    assert data.population is raw and data.volume is volumes
+    npt.assert_array_equal(volumes, [0.5, 2.0])
+    npt.assert_array_equal(raw, [[200, 100], [240, 160]])
+    npt.assert_array_equal(data.slot_concentration_density, slots)
+    expected = [3e-6, 1e-6] if kind == "continuous_pdf" else [600, 200]
+    npt.assert_allclose(data.number_density, expected, atol=0)
+
+
+def test_replace_slot_density_at_current_volume():
+    """A single-box measurement needs no new volume or batch dimension."""
+    data = _sample()
+    data.volume.flags.writeable = False
+    data.set_slot_concentration_density([400, 0])
+    npt.assert_array_equal(data.population, [[100, 0]])
+
+
+def test_set_slot_density_stages_inputs():
+    """Inputs may refer to destination buffers, including strided views."""
+    data = _sample(boxes=2)
+    data.population[:] = [[2, 3], [4, 5]]
+    data.set_slot_concentration_density(
+        data.population[:, ::-1], volume=data.population[:, 0]
+    )
+    npt.assert_array_equal(data.volume, [2, 4])
+    npt.assert_array_equal(data.population, [[6, 4], [20, 16]])
+    data.set_slot_concentration_density([[1, 2], [3, 4]], volume=0.5)
+    npt.assert_array_equal(data.population, [[0.5, 1], [1.5, 2]])
+
+
+@pytest.mark.parametrize(
+    ("slots", "volume"),
+    [
+        ([1, 2], [0.5, 2]),
+        ([[1], [1]], 1),
+        ([[1, 2]] * 2, [1]),
+        ([[1, 2]] * 2, [1, 0]),
+        ([[1, 2]] * 2, [1, np.inf]),
+        ([[1, -1]] * 2, 2),
+        ([[1, np.nan]] * 2, 2),
+        ([[1, np.finfo(float).max]] * 2, 2),
+        ([[1, 2j]] * 2, 2),
+        ([[1, 2]] * 2, True),
+    ],
+)
+def test_set_slot_density_rejects_without_mutation(slots, volume):
+    """Invalid values, shape and range preserve both original buffers."""
+    data = _sample(boxes=2)
+    with pytest.raises((TypeError, ValueError)):
+        data.set_slot_concentration_density(slots, volume=volume)
+    npt.assert_array_equal(data.population, 3)
+    npt.assert_array_equal(data.volume, 0.25)
+
+
+def test_set_slot_density_rejects_unwritable_storage():
+    """Validate even the second destination before publishing the first."""
+    data = _sample()
+    data.volume.flags.writeable = False
+    with pytest.raises(ValueError, match="writable"):
+        data.set_slot_concentration_density([400, 100], volume=0.5)
+    npt.assert_array_equal(data.population, 3)
+    npt.assert_array_equal(data.volume, 0.25)
+    data.charge = data.population
+    with pytest.raises(ValueError, match="alias"):
+        data.set_slot_concentration_density([400, 100])
+    npt.assert_array_equal(data.charge, 3)
