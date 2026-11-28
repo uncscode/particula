@@ -130,6 +130,8 @@ class ChemistryCatalog:
             db.executescript("""
                 CREATE TABLE IF NOT EXISTS files(
                    digest TEXT PRIMARY KEY, data BLOB NOT NULL);
+                CREATE TABLE IF NOT EXISTS active_release_snapshots(
+                   id TEXT PRIMARY KEY);
                 CREATE TABLE IF NOT EXISTS snapshots(
                    id TEXT PRIMARY KEY, manifest TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS reactions(
@@ -155,12 +157,14 @@ class ChemistryCatalog:
             ).fetchone()
         return row[0] if row else None
 
-    def fetch(self, recipe=None):
+    def fetch(self, recipe=None, *, catalog_version=None):
         """Fetch catalog records for offline search and export.
 
         Args:
             recipe: Optional source key such as `waccm`. Omitting the key
-                downloads the catalog from the installed Particula release.
+                downloads the latest stable chemistry catalog release.
+            catalog_version: Exact catalog data version, such as ``1.0.0``,
+                when fetching the prebuilt artifact.
 
         Returns:
             The release manifest for a prebuilt catalog, or the immutable
@@ -171,7 +175,9 @@ class ChemistryCatalog:
                 install_release,
             )
 
-            return install_release(self)
+            return install_release(self, catalog_version)
+        if catalog_version is not None:
+            raise ValueError("catalog_version applies only to release fetches")
 
         from particula.dynamics.chemistry.catalog.sources import fetch
 
@@ -276,6 +282,9 @@ class ChemistryCatalog:
                 ) AS rank FROM snapshots s
                 WHERE NOT EXISTS (SELECT 1 FROM snapshots original WHERE
                     original.id=json_extract(s.manifest,'$.source_snapshot'))
+                AND (json_type(s.manifest,'$.source_snapshot') IS NULL
+                     OR s.id IN (SELECT id FROM active_release_snapshots)
+                     OR NOT EXISTS (SELECT 1 FROM active_release_snapshots))
             )
             SELECT record FROM reactions r
             WHERE (:source IS NULL OR r.source=:source)

@@ -144,6 +144,8 @@ def selected_channel(record, *, close_oxygen=False):
     """Read a released native reaction or convert a locally imported record."""
     if "mechanism" not in record:
         return compile_channel(record, close_oxygen=close_oxygen)
+    if record["mechanism"] is None:
+        raise ValueError(record["native_issue"])
     if record["requires_closed_oxygen"] and not close_oxygen:
         raise ValueError("requires explicit closed-box O2 (--close-oxygen)")
     mechanism = record["mechanism"]

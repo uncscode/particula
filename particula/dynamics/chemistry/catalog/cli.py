@@ -19,6 +19,7 @@ def main(argv=None):
         "fetch", help="install the release catalog or import a named source"
     )
     fetch.add_argument("recipe", nargs="?", choices=sorted(recipes()))
+    fetch.add_argument("--catalog-version", help="pin a catalog data release")
     ingest = commands.add_parser(
         "import", help="cache and index local model files"
     )
@@ -57,7 +58,9 @@ def main(argv=None):
     try:
         catalog = ChemistryCatalog()
         if args.command == "fetch":
-            result = catalog.fetch(args.recipe)
+            result = catalog.fetch(
+                args.recipe, catalog_version=args.catalog_version
+            )
             if args.recipe is not None:
                 result = catalog.show(result)
         elif args.command == "import":
