@@ -7059,6 +7059,51 @@
           }
         ]
       }
+    },
+    {
+      "source": "docs/guide/data-model/measurements.md",
+      "title": "Read instrument measurements",
+      "topic": "representations-measures",
+      "also": ["size"],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/validation/workflows-and-releases/measurement-import.md",
+      "title": "Importing 108 million counter readings under a 1 GiB limit",
+      "topic": "verification-qualification",
+      "also": [],
+      "role": "Studies",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/examples/measurement_import.py",
+      "title": "Read a particle counter log and a mobility size spectrum",
+      "topic": "size",
+      "also": [
+        "representations-measures"
+      ],
+      "role": "Studies",
+      "study": {
+        "id": "measurement-import",
+        "runs": [
+          "measurement-import"
+        ],
+        "companions": [
+          "docs/studies/validation/workflows-and-releases/measurement-import.md"
+        ],
+        "relations": [
+          {
+            "target": "docs/guide/data-model/measurements.md",
+            "label": "Usage guide"
+          },
+          {
+            "target": "docs/studies/tutorials/building-an-aerosol/particles/distribution_tutorial.py",
+            "label": "Compare with"
+          }
+        ],
+        "order": 2
+      }
     }
   ],
   "supporting": [

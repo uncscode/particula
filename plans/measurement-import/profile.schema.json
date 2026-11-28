@@ -1,0 +1,633 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Particula instrument import profile (design draft)",
+  "type": "object",
+  "description": "Version 1 instrument text-import design profile. Both JSON and YAML decode to this object.",
+  "properties": {
+    "$schema": {
+      "description": "Bundled schema path for editors and offline validation.",
+      "enum": [
+        "./profile.schema.json"
+      ]
+    },
+    "schema_version": {
+      "description": "Major version of the portable profile.",
+      "enum": [
+        "1"
+      ]
+    },
+    "profile_id": {
+      "type": "string",
+      "description": "Stable identity for provenance.",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "instrument_family": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "Optional vendor-independent instrument family, for example particle_counter or mobility_sizer. Validate actual quantities and axes before enabling an operation."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Instrument, export variant, and intended product."
+    },
+    "input": {
+      "type": "object",
+      "description": "Delimited file layout. Header indexes count logical CSV records from zero.",
+      "properties": {
+        "encoding": {
+          "description": "Explicit source text decoding.",
+          "enum": [
+            "utf-8",
+            "utf-8-sig",
+            "latin-1"
+          ]
+        },
+        "delimiter": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1,
+          "description": "Single CSV delimiter. Honor standard CSV quoting."
+        },
+        "header_record": {
+          "description": "Zero-based header record. Null means headerless.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "record_width": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Exact number of fields required for a data record."
+        }
+      },
+      "required": [
+        "encoding",
+        "delimiter",
+        "header_record"
+      ],
+      "additionalProperties": false
+    },
+    "time": {
+      "description": "Time coordinate returned in UTC.",
+      "oneOf": [
+        {
+          "type": "object",
+          "description": "Unix timestamp, UTC; preserve fractional seconds up to the declared output precision.",
+          "properties": {
+            "kind": {
+              "description": "Clock representation.",
+              "enum": [
+                "unix"
+              ]
+            },
+            "column": {
+              "description": "Select one source column by exact header or zero-based position.",
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Zero-based source column position."
+                },
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Exact case-sensitive CSV header."
+                }
+              ]
+            },
+            "unit": {
+              "description": "Source epoch tick.",
+              "enum": [
+                "s",
+                "ms",
+                "us",
+                "ns"
+              ]
+            },
+            "timezone": {
+              "description": "Zone of the Unix epoch.",
+              "enum": [
+                "UTC"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "column",
+            "unit",
+            "timezone"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "description": "Wall clock interpreted in the explicitly supplied IANA zone.",
+          "properties": {
+            "kind": {
+              "description": "Clock representation.",
+              "enum": [
+                "calendar"
+              ]
+            },
+            "columns": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "description": "Select one source column by exact header or zero-based position.",
+                "oneOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Zero-based source column position."
+                  },
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Exact case-sensitive CSV header."
+                  }
+                ]
+              },
+              "description": "In order; join raw text with a single space."
+            },
+            "format": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Python strptime pattern."
+            },
+            "timezone": {
+              "type": "string",
+              "minLength": 1,
+              "description": "IANA zone; ambiguous or nonexistent local times require a diagnostic."
+            }
+          },
+          "required": [
+            "kind",
+            "columns",
+            "format",
+            "timezone"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "fields": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/scalar"
+      },
+      "description": "Scalar output columns."
+    },
+    "spectrum": {
+      "$ref": "#/$defs/spectrum"
+    },
+    "on_bad_record": {
+      "description": "Reject the file, retain an issue and skip the record, or repair only the recognized CPC split and report ambiguous fragments.",
+      "enum": [
+        "error",
+        "report",
+        "join_3010_logger_fragments"
+      ]
+    },
+    "missing_tokens": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      },
+      "description": "Exact tokens decoded as missing in numeric fields; the original token is retained in the issue record."
+    },
+    "vendor_flags": {
+      "type": "object",
+      "description": "Preserve original scan status text and its tokens. Quality policy is applied separately at analysis time.",
+      "properties": {
+        "column": {
+          "$ref": "#/$defs/source_column"
+        },
+        "separator": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Literal separator between simultaneous vendor conditions."
+        }
+      },
+      "required": [
+        "column",
+        "separator"
+      ],
+      "additionalProperties": false
+    },
+    "scan_timing": {
+      "type": "object",
+      "description": "Nominal scan and retrace durations from the export. These fields describe scheduling; an incomplete-scan flag makes actual exposure uncertain.",
+      "properties": {
+        "timestamp_role": {
+          "enum": [
+            "start",
+            "midpoint",
+            "end"
+          ],
+          "description": "Position of the recorded timestamp in the nominal scan."
+        },
+        "scan_duration_column": {
+          "$ref": "#/$defs/source_column"
+        },
+        "retrace_duration_column": {
+          "$ref": "#/$defs/source_column"
+        },
+        "unit": {
+          "enum": [
+            "s",
+            "ms"
+          ],
+          "description": "Source unit shared by both duration fields."
+        }
+      },
+      "required": [
+        "timestamp_role",
+        "scan_duration_column",
+        "retrace_duration_column",
+        "unit"
+      ],
+      "additionalProperties": false
+    },
+    "measurement_principle": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "Optional physical detection or classification principle for this profile. Preserve the vendor, model and export layout separately in source metadata."
+    }
+  },
+  "required": [
+    "$schema",
+    "schema_version",
+    "profile_id",
+    "description",
+    "input",
+    "time",
+    "on_bad_record",
+    "missing_tokens"
+  ],
+  "additionalProperties": false,
+  "anyOf": [
+    {
+      "required": [
+        "fields"
+      ]
+    },
+    {
+      "required": [
+        "spectrum"
+      ]
+    }
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "on_bad_record": {
+            "const": "join_3010_logger_fragments"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "input": {
+            "required": [
+              "record_width"
+            ],
+            "properties": {
+              "header_record": {
+                "const": null
+              },
+              "record_width": {
+                "const": 5
+              }
+            }
+          },
+          "time": {
+            "properties": {
+              "kind": {
+                "const": "unix"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "scalar": {
+      "type": "object",
+      "description": "One measured scalar and its source mapping.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Stable output column name; unique in a profile.",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Physical meaning for a human or agent."
+        },
+        "quantity": {
+          "description": "Quantity identifier; defines compatible units and interpretation.",
+          "enum": [
+            "count_rate",
+            "temperature",
+            "number_concentration"
+          ]
+        },
+        "source_unit": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unit before conversion. Per-decade basis is carried in quantity."
+        },
+        "output_unit": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unit in the result and manifest."
+        },
+        "dtype": {
+          "description": "Output numeric storage type.",
+          "enum": [
+            "float64",
+            "float32"
+          ]
+        },
+        "column": {
+          "description": "Select one source column by exact header or zero-based position.",
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Zero-based source column position."
+            },
+            {
+              "type": "string",
+              "minLength": 1,
+              "description": "Exact case-sensitive CSV header."
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "quantity",
+        "source_unit",
+        "output_unit",
+        "dtype",
+        "column"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "quantity": {
+                "const": "count_rate"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source_unit": {
+                "enum": [
+                  "count/s"
+                ]
+              },
+              "output_unit": {
+                "enum": [
+                  "count/s"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "quantity": {
+                "const": "temperature"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source_unit": {
+                "enum": [
+                  "degC",
+                  "K"
+                ]
+              },
+              "output_unit": {
+                "enum": [
+                  "K",
+                  "degC"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "quantity": {
+                "const": "number_concentration"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source_unit": {
+                "enum": [
+                  "1/cm^3",
+                  "1/m^3"
+                ]
+              },
+              "output_unit": {
+                "enum": [
+                  "1/cm^3",
+                  "1/m^3"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "spectrum": {
+      "type": "object",
+      "description": "One number-weighted size spectrum per scan. Keep vendor weighting and correction history.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Stable output column name; unique in a profile.",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Physical meaning for a human or agent."
+        },
+        "quantity": {
+          "description": "Quantity identifier; defines compatible units and interpretation.",
+          "enum": [
+            "number_per_log10_diameter"
+          ]
+        },
+        "source_unit": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unit before conversion. Per-decade basis is carried in quantity."
+        },
+        "output_unit": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unit in the result and manifest."
+        },
+        "dtype": {
+          "description": "Output numeric storage type.",
+          "enum": [
+            "float64",
+            "float32"
+          ]
+        },
+        "axis": {
+          "type": "object",
+          "description": "One ordered mobility-diameter axis from a contiguous range of numeric CSV headers.",
+          "properties": {
+            "name": {
+              "description": "Axis name.",
+              "enum": [
+                "diameter"
+              ]
+            },
+            "basis": {
+              "description": "Measurement diameter convention.",
+              "enum": [
+                "electrical_mobility"
+              ]
+            },
+            "source_unit": {
+              "description": "Unit of midpoint labels.",
+              "enum": [
+                "nm",
+                "um",
+                "m"
+              ]
+            },
+            "output_unit": {
+              "description": "Output unit for the diameter coordinate.",
+              "enum": [
+                "m",
+                "nm",
+                "um"
+              ]
+            },
+            "after": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Exclusive header before the midpoint columns."
+            },
+            "before": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Exclusive header after the midpoint columns."
+            },
+            "channels_per_decade_key": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Preamble key whose positive value defines uniform log10 spacing."
+            }
+          },
+          "required": [
+            "name",
+            "basis",
+            "source_unit",
+            "output_unit",
+            "after",
+            "before",
+            "channels_per_decade_key"
+          ],
+          "additionalProperties": false
+        },
+        "require_preamble": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Exact required key/value pairs for interpreting this export."
+        },
+        "preserve_preamble": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Preamble key."
+          },
+          "description": "Keys copied into the output manifest."
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "quantity",
+        "source_unit",
+        "output_unit",
+        "dtype",
+        "axis",
+        "require_preamble",
+        "preserve_preamble"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "quantity": {
+                "const": "number_per_log10_diameter"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source_unit": {
+                "enum": [
+                  "1/cm^3",
+                  "1/m^3"
+                ]
+              },
+              "output_unit": {
+                "enum": [
+                  "1/cm^3",
+                  "1/m^3"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "source_column": {
+      "description": "Select one source column by exact header or zero-based position.",
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Zero-based source column position."
+        },
+        {
+          "type": "string",
+          "minLength": 1,
+          "description": "Exact case-sensitive CSV header."
+        }
+      ]
+    }
+  }
+}

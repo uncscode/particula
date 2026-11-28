@@ -1,0 +1,35 @@
+$schema: ./profile.schema.json
+schema_version: '1'
+profile_id: cpc_3010_logger
+instrument_family: particle_counter
+measurement_principle: condensation_particle_counting
+description: Five-field CPC 3010 field logger; detector count rate and logger temperature.
+input:
+  encoding: utf-8
+  delimiter: ','
+  header_record: null
+  record_width: 5
+time:
+  kind: unix
+  column: 0
+  unit: s
+  timezone: UTC
+fields:
+- name: count_rate
+  description: Detector counts per second.
+  quantity: count_rate
+  source_unit: count/s
+  output_unit: count/s
+  dtype: float64
+  column: 1
+- name: temperature
+  description: Logger temperature.
+  quantity: temperature
+  source_unit: degC
+  output_unit: K
+  dtype: float64
+  column: 2
+on_bad_record: join_3010_logger_fragments
+missing_tokens:
+- ''
+- .

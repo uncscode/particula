@@ -1,0 +1,74 @@
+{
+  "$schema": "./profile.schema.json",
+  "schema_version": "1",
+  "profile_id": "tsi_aim_number",
+  "instrument_family": "mobility_sizer",
+  "measurement_principle": "electrical_mobility_classification",
+  "description": "TSI AIM number-weighted SMPS scan with scalar diagnostics and a mobility-diameter spectrum.",
+  "input": {
+    "encoding": "utf-8-sig",
+    "delimiter": ",",
+    "header_record": 24
+  },
+  "time": {
+    "kind": "calendar",
+    "columns": [
+      "Date",
+      "Start Time"
+    ],
+    "format": "%m/%d/%Y %H:%M:%S",
+    "timezone": "UTC"
+  },
+  "fields": [
+    {
+      "name": "total_number",
+      "description": "Vendor integrated total number density.",
+      "quantity": "number_concentration",
+      "source_unit": "1/cm^3",
+      "output_unit": "1/m^3",
+      "dtype": "float64",
+      "column": "Total Conc. (#/cm³)"
+    }
+  ],
+  "spectrum": {
+    "name": "number_spectrum",
+    "description": "Number per log10 mobility diameter interval.",
+    "quantity": "number_per_log10_diameter",
+    "source_unit": "1/cm^3",
+    "output_unit": "1/m^3",
+    "dtype": "float64",
+    "axis": {
+      "name": "diameter",
+      "basis": "electrical_mobility",
+      "source_unit": "nm",
+      "output_unit": "m",
+      "after": "Diameter Midpoint (nm)",
+      "before": "Scan Time (s)",
+      "channels_per_decade_key": "Channels/Decade"
+    },
+    "require_preamble": {
+      "Units": "dW/dlogDp",
+      "Weight": "Number"
+    },
+    "preserve_preamble": [
+      "AIM Version",
+      "Multiple Charge Correction",
+      "DiffusionCorrection"
+    ]
+  },
+  "on_bad_record": "error",
+  "missing_tokens": [
+    "",
+    "."
+  ],
+  "vendor_flags": {
+    "column": "Instrument Errors",
+    "separator": ";"
+  },
+  "scan_timing": {
+    "timestamp_role": "start",
+    "scan_duration_column": "Scan Time (s)",
+    "retrace_duration_column": "Retrace Time (s)",
+    "unit": "s"
+  }
+}

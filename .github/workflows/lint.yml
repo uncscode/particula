@@ -37,7 +37,7 @@ jobs:
 
     - name: Install type-checking dependencies
       if: ${{ matrix.linter == 'mypy' }}
-      run: python -m pip install -e ".[dev]"
+      run: python -m pip install -e ".[dev,data]"
 
     - name: Lint with ruff
       if: ${{ matrix.linter == 'ruff' }}
