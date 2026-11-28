@@ -1,6 +1,7 @@
 """Independent raw, intensive and extensive population checks for 0.4."""
 
 from dataclasses import fields, replace
+from importlib.util import find_spec
 
 import numpy as np
 import numpy.testing as npt
@@ -97,17 +98,24 @@ def test_legacy_constructor_and_writable_alias():
         ParticleData(concentration=raw, **args)
 
 
-def test_measured_density_and_ambiguous_builder_inputs():
-    """Measure in cm^-3 and convert to represented counts only once."""
+@pytest.mark.parametrize(
+    ("measurement", "units"), [(2e6, "1/m^3"), (2.0, "1/cm^3")]
+)
+def test_measured_density_and_ambiguous_builder_inputs(measurement, units):
+    """Convert density exactly once and exercise the optional unit boundary."""
     builder = (
         ParticleDataBuilder()
         .set_masses(np.ones((3, 1, 1)))
         .set_density(np.ones(1))
         .set_distribution_type("discrete")
     )
+    if units == "1/cm^3" and find_spec("pint") is None:
+        with pytest.raises(ImportError, match="Install pint"):
+            builder.set_concentration(np.array([measurement]), units)
+        return
     volumes = np.array([0.25, 1.0, 4.0])
     data = (
-        builder.set_concentration(np.array([2.0]), "1/cm^3")
+        builder.set_concentration(np.array([measurement]), units)
         .set_volume(volumes)
         .build()
     )
