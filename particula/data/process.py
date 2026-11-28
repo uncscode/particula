@@ -36,6 +36,16 @@ def _tag(condition: pl.Expr, reason: str) -> pl.Expr:
     return pl.when(condition).then(pl.lit(reason)).otherwise(None)
 
 
+def _missing_input(value: pl.Expr, dimensions: int) -> pl.Expr:
+    """Flag a null scalar, array or channel at any depth of a scan."""
+    if dimensions == 0:
+        return value.is_null()
+    missing_channels = value.arr.to_list().list.eval(
+        _missing_input(pl.element(), dimensions - 1)
+    )
+    return value.is_null() | missing_channels.list.any()
+
+
 def _field_axes(definition: dict) -> list[dict]:
     """Return the selected field's ordered coordinates in their stored units."""
     grid = next(iter(definition["grids"].values()))
@@ -204,6 +214,8 @@ class MeasurementProcess:
             raise ValueError("Unknown positive input role")
         if self.mode not in ("elementwise", "ordered", "whole_record"):
             raise ValueError("Unknown process execution mode")
+        if self.mode == "ordered" and not self.history_parameters:
+            raise ValueError("Ordered processes require history_parameters")
         if self.inputs.keys() & self.coefficient_units.keys():
             raise ValueError(
                 "Input roles and coefficient names must be distinct"
@@ -312,7 +324,8 @@ class MeasurementProcess:
                 [
                     _tag(pl.col(link).is_null(), f"unmatched:{role}"),
                     _tag(
-                        pl.col(link).is_not_null() & value.is_null(),
+                        pl.col(link).is_not_null()
+                        & _missing_input(value, len(contract.axes)),
                         f"missing:{role}",
                     ),
                 ]

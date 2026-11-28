@@ -24,9 +24,12 @@ START = datetime(2022, 7, 10, 12, tzinfo=UTC)
 MOBILITY = documentation_path() / "data/measurement-import/mobility.csv"
 
 
-def _counter(tmp_path, alias, readings, *, count=False):
+def _counter(
+    tmp_path, alias, readings, *, count=False, rate_field="count_rate"
+):
     """Read (timestamp offset in s, count/s, verified live time in s)."""
     profile = describe_profile("cpc-3010")
+    profile["fields"][0]["name"] = rate_field
     profile["on_bad_record"] = "error"
     profile["fields"].append(
         {
@@ -147,6 +150,22 @@ def test_unverified_and_overlapping_support(tmp_path):
             weighting="exposure",
             exposure={"inlet": "temperature"},
         )
+
+
+def test_window_start_as_measurement_field(tmp_path):
+    """Preserve a physical channel named like the public UTC window key."""
+    inlet = _counter(
+        tmp_path, "inlet", [(0, 10, 1), (1, 30, 3)], rate_field="window_start"
+    )
+    for weighting, expected in [("sample", 20), ("exposure", 25)]:
+        summary = _minute_grid(
+            MeasurementCollection({"inlet": inlet}),
+            {"inlet": ["window_start"]},
+            weighting=weighting,
+            exposure={"inlet": "live_seconds"},
+        )
+        assert summary["window_start"][0] == START
+        assert summary["inlet.window_start"].to_list() == [expected, None]
 
 
 def test_ambiguous_clocks_and_duplicate_scan_ids(tmp_path):

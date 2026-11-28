@@ -253,6 +253,8 @@ def test_stateful_filter_across_parts_and_gap(tmp_path):
         .resolve("particula.signal.voltage_mean", "1")
         .configure(window=3, max_gap_seconds=2)
     )
+    with pytest.raises(ValueError, match="history_parameters"):
+        replace(rolling, history_parameters=None)
     for batch in (1, 8):
         raw = import_to_parquet(
             src, tmp_path / f"parts-{batch}", profile=profile, batch_scans=batch
@@ -421,6 +423,47 @@ def test_array_roles_compare_selected_fields_coordinates(tmp_path):
             .item()
             == 6
         )
+
+
+@pytest.mark.parametrize("multidimensional", [False, True])
+def test_missing_array_channel_flags_partial_reduction(
+    tmp_path, multidimensional
+):
+    """A finite sum from an incomplete scan is excludable by its quality flag."""
+    profile = describe_profile("cpc-3010")
+    profile["on_bad_record"] = "error"
+    field = profile.pop("fields")[0]
+    field.pop("column")
+    axes = [{"name": "x", "unit": "m", "values": [0, 1]}]
+    if multidimensional:
+        axes.append({"name": "y", "unit": "m", "values": [0, 1]})
+    columns = [1, 2, 3, 4] if multidimensional else [1, 2]
+    profile["arrays"] = [dict(field, name="signal", axes=axes, columns=columns)]
+    src = tmp_path / "counts.csv"
+    src.write_text("1700000040,1,.,3,4\n1700000041,1,2,3,4\n")
+    operation = MeasurementProcess(
+        "lab.array.channel_sum",
+        "1",
+        inputs={
+            "signal": FieldContract(
+                "count_rate",
+                "count/s",
+                axes=tuple(axis["name"] for axis in axes),
+            )
+        },
+        output=FieldContract("count_rate", "count/s"),
+        output_field="partial_sum",
+        implementation=lambda signal: (
+            signal.arr.get(0) if multidimensional else signal
+        ).arr.sum(),
+    )
+    result = operation.execute(signal=read_measurement(src, profile=profile))
+    assert result.frame["partial_sum"].to_list() == [1, 3]
+    assert result.frame["quality_flags"].to_list() == [["missing:signal"], []]
+    summary = result.quality_summary(
+        "partial_sum", exclude_flags=["missing:signal"]
+    )
+    assert summary.collect()["retained"].item() == 1
 
 
 def test_signed_clock_correction_retains_reported_time(tmp_path):

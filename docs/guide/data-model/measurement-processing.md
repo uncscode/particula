@@ -158,8 +158,9 @@ mean_voltage = smooth.execute(signal=voltage)
 ```
 
 Apply the filter to each deployment separately. For a custom filter choose
-`mode="ordered"` and implement the window, minimum sample count and reset
-rule in its expression. Choose `"elementwise"` for a calibration that uses
+`mode="ordered"` and declare the window and maximum-gap parameter names in
+`history_parameters`. Implement the same window, minimum sample count and
+reset rule in the expression. Choose `"elementwise"` for a calibration that uses
 only the current sample or `"whole_record"` for a calculation that needs the
 complete input. For example, subtracting the mean voltage makes every
 result depend on every sample used to compute the mean. Each output then
@@ -240,6 +241,8 @@ An array input contract can specify ordered `axes` and a diameter `basis`.
 When an operation combines array fields, their selected axes must have the
 same names, order, units and coordinate values. Spectra must also share a
 diameter basis and bin geometry.
+A missing channel at any depth adds `missing:<role>` to the scan, including
+when the operation can compute a partial result from the remaining channels.
 
 The causal voltage mean records the individual source IDs in
 `parent_signal_scan_ids` for each trailing window. Quality flags, repair

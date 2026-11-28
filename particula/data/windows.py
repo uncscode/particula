@@ -204,7 +204,7 @@ def _field_summary(
         weight = pl.when(value.is_not_null()).then(duration)
         summary = (
             frame.filter(duration > 0)
-            .group_by("window_start")
+            .group_by(pl.col("_window_start").alias("window_start"))
             .agg(
                 (value * weight).sum().alias("_integral"),
                 weight.sum().alias("_weight_ns"),
@@ -255,7 +255,9 @@ def _field_summary(
             value.count().alias(label + ".n"),
         ]
         zero = pl.lit(0)
-    summary = data.group_by("window_start").agg(*aggregations)
+    summary = data.group_by(pl.col("_window_start").alias("window_start")).agg(
+        *aggregations
+    )
     return (
         grid.select("window_start")
         .join(summary, on="window_start", how="left")
@@ -304,12 +306,12 @@ def _assign_windows(
         bins = (begin - anchor) // step * step + anchor
         frame = (
             frame.with_columns(
-                pl.int_ranges(bins, end, step=step).alias("window_start")
+                pl.int_ranges(bins, end, step=step).alias("_window_start")
             )
-            .explode("window_start")
+            .explode("_window_start")
             .with_columns(
-                pl.max_horizontal(begin, "window_start").alias("_begin"),
-                pl.min_horizontal(end, pl.col("window_start") + step).alias(
+                pl.max_horizontal(begin, "_window_start").alias("_begin"),
+                pl.min_horizontal(end, pl.col("_window_start") + step).alias(
                     "_end"
                 ),
             )
@@ -319,7 +321,7 @@ def _assign_windows(
             pl.col("_time").is_between(low, high, closed="left")
         ).with_columns(
             ((pl.col("_time") - anchor) // step * step + anchor).alias(
-                "window_start"
+                "_window_start"
             )
         )
     return frame
