@@ -7,8 +7,7 @@ import warp as wp
 from particula.execution import _condensation_ros3_kernels as kernels
 
 
-@pytest.mark.parametrize("resolved", [False, True])
-def test_arrowhead_solve_matches_independent_dense_matrix(device, resolved):
+def test_arrowhead_solve_matches_independent_dense_matrix(device):
     """Check mapped coupling, scaled budgets and residuals across stiffness."""
     rng = np.random.default_rng(321)
     boxes, slots, materials, gases = 2, 17, 3, 5
@@ -31,8 +30,7 @@ def test_arrowhead_solve_matches_independent_dense_matrix(device, resolved):
         for slot in range(slots):
             pi = (box * slots + slot) * materials + target
             weight = count[box, slot] * scale[pi] / scale[gi]
-            if resolved:
-                weight /= volume[box]
+            weight /= volume[box]
             weights[box, pi] = weight
             jac[pi, pi] = a[box, slot]
             jac[pi, gi] = b[box, slot]
@@ -57,7 +55,6 @@ def test_arrowhead_solve_matches_independent_dense_matrix(device, resolved):
                 gases,
                 target,
                 source,
-                int(resolved),
                 q,
                 result,
                 invalid,
@@ -105,7 +102,8 @@ def device(request):
     return request.param
 
 
-def test_ros3_growth_refines_against_inverse_radius_quadrature(device):
+@pytest.mark.parametrize("kind", ["discrete", "particle_resolved"])
+def test_ros3_growth_refines_against_inverse_radius_quadrature(device, kind):
     """Float64 coefficients retain refinement far below the float32 floor."""
     from particula.execution.gpu_condensation_ode import GPUCondensationODE
     from particula.execution.tests.condensation_ode_test import case
@@ -116,6 +114,7 @@ def test_ros3_growth_refines_against_inverse_radius_quadrature(device):
     errors = []
     for tolerance in (1e-4, 1e-6, 1e-8):
         initial, strategy = case(2)
+        initial.particles.distribution_type = kind
         owner = GPUCondensationODE(
             initial,
             strategy,

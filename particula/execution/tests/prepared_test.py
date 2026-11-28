@@ -659,9 +659,7 @@ def test_public_prepare_forcing_and_reduced_diagnostics(device, kind):
     from particula.dynamics.tests.multibox_runnable_test import batch
     from particula.execution import PreparedSimulation, SimulationDiagnostics
 
-    initial = batch(state(volume=1.0, kind=kind))
-    if kind == "discrete":
-        initial.particles.volume[:] = 1.0
+    initial = batch(state(volume=0.25, kind=kind))
     process = Dilution(DilutionStrategy(0.2))
     with process.prepare(
         initial, device=device.native, time_step=0.5
@@ -669,17 +667,18 @@ def test_public_prepare_forcing_and_reduced_diagnostics(device, kind):
         assert isinstance(simulation, PreparedSimulation)
         before = simulation.diagnostics()
         assert isinstance(before, SimulationDiagnostics)
-        expected_count = initial.particles.population.sum(axis=1)
-        expected_mass = np.sum(
-            initial.particles.masses * initial.particles.population[..., None],
-            axis=1,
+        # Each box contains 4 particles, -2 elementary charges and
+        # [12, 16] × 1e-18 kg of material in 0.25 or 4 m^3.
+        expected_count = np.array([16.0, 1.0])
+        np.testing.assert_array_equal(
+            before.number_concentration, expected_count
         )
-        if kind == "particle_resolved":
-            expected_count /= initial.particles.volume
-            expected_mass /= initial.particles.volume[:, None]
-        np.testing.assert_allclose(before.number_concentration, expected_count)
+        np.testing.assert_array_equal(before.charge_concentration, [-8.0, -0.5])
         np.testing.assert_allclose(
-            before.particle_mass_concentration, expected_mass
+            before.particle_mass_concentration,
+            np.array([[48, 64], [3, 4]]) * 1e-18,
+            rtol=1e-14,
+            atol=0,
         )
         np.testing.assert_array_equal(before.active_slots, [2, 2])
         gas = np.array([0.01, 0.02, 0.03])

@@ -37,15 +37,14 @@ def _particle_partials(
 def _finish_partials(
     partials: wp.array3d(dtype=wp.float64),
     volume: wp.array(dtype=wp.float64),
-    resolved: wp.int32,
     output: wp.array2d(dtype=wp.float64),
 ):
-    """Normalize counts by volume; retain density and active-slot count."""
+    """Convert totals to densities and keep the active-slot count."""
     box, lane = wp.tid()
     total = wp.float64(0.0)
     for chunk in range(partials.shape[1]):
         total += partials[box, chunk, lane]
-    if resolved != 0 and lane < partials.shape[2] - 1:
+    if lane < partials.shape[2] - 1:
         total /= volume[box]
     output[box, lane] = total
 
@@ -66,7 +65,6 @@ def setup_diagnostics(owner: Any):
     output = wp.empty(
         (boxes, species + 3), dtype=wp.float64, device=owner.device.native
     )
-    resolved = owner._session.metadata.distribution_type == "particle_resolved"
     condensation = owner._bindings.get("condensation")
     energy = (
         None if condensation is None else condensation.prepared.energy_transfer
@@ -87,7 +85,7 @@ def setup_diagnostics(owner: Any):
         wp.launch(
             _finish_partials,
             dim=output.shape,
-            inputs=[partials, particles.volume, int(resolved), output],
+            inputs=[partials, particles.volume, output],
             device=owner.device.native,
         )
         owner._wait()

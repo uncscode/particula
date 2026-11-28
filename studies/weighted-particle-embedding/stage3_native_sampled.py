@@ -61,7 +61,7 @@ class ResidentPairs:
         wp.synchronize_device("cuda:0")
         tic = perf_counter()
         mass = wp.to_torch(particles.masses)[0]
-        weights = wp.to_torch(particles.concentration)[0]
+        weights = wp.to_torch(particles.population)[0]
         charge = wp.to_torch(particles.charge)[0]
         for _ in range(self.parts):
             self.update(mass, weights, charge, dt / self.parts)
