@@ -86,7 +86,7 @@ gas = par.gas.GasData(
 # %% [markdown]
 # ### Bin totals: sum to obtain abundance
 #
-# The discrete concentration stores m⁻³ per bin. Summing the initialized array
+# The input gives number density in m⁻³ per bin. Summing the initialized array
 # gives the PMF number density against which the sampled population is matched.
 
 # %%
@@ -114,7 +114,7 @@ print(f"PMF initial total: {concentration_pmf.sum():.2e} m^-3")
 # %% [markdown]
 # ### Radius density: integrate to obtain abundance
 #
-# The continuous concentration stores m⁻⁴. Its total is a trapezoidal integral
+# The measured PDF gives number density per radius in m⁻⁴. Its total is a trapezoidal integral
 # over radius, not the unweighted sum of stored values. Retain this distinction
 # at every time point, including normalization.
 
@@ -183,7 +183,7 @@ aerosol_resolved = par.Aerosol(
     environment=environment.copy(),
 )
 initial_resolved_inventory = np.sum(
-    particles_resolved.masses * particles_resolved.concentration[..., None],
+    particles_resolved.masses * particles_resolved.population[..., None],
     axis=1,
 )
 print(f"Particle-resolved initial count: {len(radii_sample)} particles")
@@ -226,6 +226,11 @@ coagulation_resolved = par.dynamics.Coagulation(
     )
 )
 
+# Keep the collision stream reproducible independently of the radius draw.
+coagulation_resolved.coagulation_strategy.random_generator = (
+    np.random.default_rng(42)
+)
+
 print("PMF:", coagulation_pmf)
 print("PDF:", coagulation_pdf)
 print("Resolved:", coagulation_resolved)
@@ -249,10 +254,9 @@ n_steps = 12  # 12 steps = 2 hours total
 times = np.arange(0, (n_steps + 1) * time_step, time_step)  # 0 to 7200 s
 
 # Storage for number concentrations
-# PMF and Resolved: native number_density respects density/count semantics
-# PDF: must integrate since concentration is per unit size (m^-4)
+# number_density sums bins or resolved slots and integrates the radius PDF.
 number_pmf = [aerosol_pmf.particles.number_density[0]]
-number_pdf = [trapezoid(aerosol_pdf.particles.concentration[0], x=radius_bins)]
+number_pdf = [aerosol_pdf.particles.number_density[0]]
 number_resolved = [aerosol_resolved.particles.number_density[0]]
 
 print(
@@ -276,9 +280,7 @@ for step in range(n_steps):
     aerosol_pdf = coagulation_pdf.execute(
         aerosol_pdf, time_step=time_step, sub_steps=sub_steps
     )
-    number_pdf.append(
-        trapezoid(aerosol_pdf.particles.concentration[0], x=radius_bins)
-    )
+    number_pdf.append(aerosol_pdf.particles.number_density[0])
 
     # Particle-resolved coagulation
     aerosol_resolved = coagulation_resolved.execute(
@@ -288,7 +290,7 @@ for step in range(n_steps):
     np.testing.assert_allclose(
         np.sum(
             aerosol_resolved.particles.masses
-            * aerosol_resolved.particles.concentration[..., None],
+            * aerosol_resolved.particles.population[..., None],
             axis=1,
         ),
         initial_resolved_inventory,
@@ -443,6 +445,6 @@ print(f"  Resolved: {number_resolved[-1]:.2e} m^-3 ({res_pct:.1f}% remaining)")
 # For example, to estimate whether coagulation substantially changes a chamber's
 # particle lifetime, repeat this design over initial concentration while holding
 # size distribution fixed. Compare the time to a specified number-loss fraction
-# and its uncertainty, then introduce [wall loss](../wall-loss/index.md) as a
+# and its uncertainty, then introduce [wall loss](../../examples/particle-processes/wall-loss/index.md) as a
 # separate mechanism. That extension is proposed; it is not established by these
 # three curves.

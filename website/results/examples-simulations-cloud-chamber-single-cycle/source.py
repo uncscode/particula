@@ -15,6 +15,8 @@
 # %% [markdown]
 # # Follow droplets through one wet–dry chamber cycle
 #
+# ![A surviving seed keeps its core while its water shell expands in humid air and contracts in dry air. The three drawings follow one illustrative trajectory.](../../../../images/coupled-populations/chamber-single-cycle.svg)
+#
 # What changes when hygroscopic seeds encounter a supersaturated vapor reservoir
 # and then a drier one? This example couples condensation, evaporation, and
 # rectangular-chamber wall removal, following individual particle sizes and the
@@ -28,8 +30,8 @@
 # interval. Its local error control is distinct from convergence of the outer
 # stochastic wall-loss schedule and from a quantitative activation threshold.
 #
-# Start with [condensation](../processes/condensation/condensation_1_bin.py) and
-# [rectangular wall loss](../processes/wall-loss/rectangular_wall_loss_strategy.py)
+# Start with [condensation](../../../tutorials/condensation/condensation_1_bin.py) and
+# [rectangular wall loss](../../particle-processes/wall-loss/rectangular_wall_loss_strategy.py)
 # if either process is unfamiliar. This example adds their interaction, not a
 # validation against chamber measurements.
 
@@ -197,7 +199,7 @@ wall_loss_strategy.random_generator = np.random.default_rng(42)
 def species_inventory(aero):
     """Extensive inventory for the three mapped species, kg."""
     return np.sum(
-        aero.particles.masses * aero.particles.concentration[..., None], axis=1
+        aero.particles.masses * aero.particles.population[..., None], axis=1
     ) + (aero.gas.concentration[:, :3] * aero.particles.volume[:, None])
 
 
@@ -505,7 +507,7 @@ print("Simulation completed successfully.")
 # The calculation connects a humidity change to particle water exchange while
 # wall removal reduces the surviving population. The adaptive result resolves
 # smooth dry-phase relaxation. The independent
-# [wet–dry accuracy comparison](adaptive_cloud_relaxation.py) shows why mass
+# [wet–dry accuracy comparison](../../../validation/condensation/adaptive/adaptive_cloud_relaxation.py) shows why mass
 # conservation alone cannot establish temporal accuracy, and compares ROS2 and
 # ROS3 work at the same tolerances.
 #

@@ -86,7 +86,7 @@ def _build_particle_data() -> ParticleData:
     """
     return ParticleData(
         masses=np.array([[[1.0e-18], [1.2e-18]]], dtype=np.float64),
-        concentration=np.array([[1.0e-6, 1.0e-6]], dtype=np.float64),
+        population=np.array([[1.0e-6, 1.0e-6]], dtype=np.float64),
         charge=np.array([[0.0, 0.0]], dtype=np.float64),
         density=np.array([1000.0], dtype=np.float64),
         volume=np.array([1.0e-6], dtype=np.float64),
@@ -195,7 +195,7 @@ def _output_prefix(particle_data: ParticleData, gas_data: GasData) -> list[str]:
         (
             "ParticleData constructed: "
             f"masses={particle_data.masses.shape}, "
-            f"concentration={particle_data.concentration.shape}, "
+            f"population={particle_data.population.shape}, "
             f"charge={particle_data.charge.shape}, "
             f"density={particle_data.density.shape}, "
             f"volume={particle_data.volume.shape}"

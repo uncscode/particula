@@ -15,6 +15,8 @@
 # %% [markdown]
 # # When a size-distribution plot hides a composition error
 #
+# ![A smooth size spectrum sits above species inventories that drift in opposite directions from their common starting reference during fixed-composition binned coagulation. The marks show directions schematically.](../../../../images/coupled-populations/organic-binned-inventories.svg)
+#
 # Can a representation that conserves each species during condensation remain
 # suitable after coagulation begins? This example follows organic uptake onto
 # sulfate seeds, then exposes a limitation of fixed-composition binned coagulation.
@@ -28,8 +30,8 @@
 # −59% to +35%. Those are observed defects, not acceptable tolerances, and a
 # smaller timestep cannot supply the missing species transport.
 #
-# Read the [coagulation contract](../../guide/processes/coagulation.md). Use a
-# [supported resolved representation](../processes/coagulation/coagulation_3_particle_resolved_pattern.py)
+# Read the [coagulation contract](../../../../guide/processes/coagulation.md). Use a
+# [supported resolved representation](../../../tutorials/coagulation-populations/coagulation_3_particle_resolved_pattern.py)
 # when collisions must mix size-dependent species composition.
 
 # %% [markdown]
@@ -284,7 +286,7 @@ def species_inventory(aero):
     """Independent species mass density for this reference-volume PMF."""
     return (
         np.sum(
-            aero.particles.masses * aero.particles.concentration[..., None],
+            aero.particles.masses * aero.particles.population[..., None],
             axis=1,
         )
         + aero.gas.concentration
@@ -357,12 +359,12 @@ print(aerosol_soa)
 fig, ax = plotting.subplots(size="wide")
 ax.plot(
     aerosol_initial.particles.radii[0],
-    aerosol_initial.particles.concentration[0],
+    aerosol_initial.particles.slot_concentration_density[0],
     label="Initial Seeds",
 )
 ax.plot(
     aerosol_soa.particles.radii[0],
-    aerosol_soa.particles.concentration[0],
+    aerosol_soa.particles.slot_concentration_density[0],
     label="Seeds+SOA",
 )
 plotting.legend(ax, loc="upper left")
@@ -440,17 +442,17 @@ for _ in tqdm(range(total_steps), desc="Running Sim", mininterval=0.5):
 fig, ax = plotting.subplots(size="wide")
 ax.plot(
     aerosol_initial.particles.radii[0],
-    aerosol_initial.particles.concentration[0],
+    aerosol_initial.particles.slot_concentration_density[0],
     label="Initial Seeds",
 )
 ax.plot(
     aerosol_soa.particles.radii[0],
-    aerosol_soa.particles.concentration[0],
+    aerosol_soa.particles.slot_concentration_density[0],
     label="20 sec SOA partitioning",
 )
 ax.plot(
     aerosol_process.particles.radii[0],
-    aerosol_process.particles.concentration[0],
+    aerosol_process.particles.slot_concentration_density[0],
     label="600 sec coagulation",
     # marker=".",
 )
@@ -475,11 +477,11 @@ plt.show()
 # %%
 assert (
     0
-    < aerosol_process.particles.concentration.sum()
-    < aerosol_soa.particles.concentration.sum()
+    < aerosol_process.particles.population.sum()
+    < aerosol_soa.particles.population.sum()
 )
-assert np.all(np.isfinite(aerosol_process.particles.concentration))
-assert np.all(aerosol_process.particles.concentration >= 0)
+assert np.all(np.isfinite(aerosol_process.particles.population))
+assert np.all(aerosol_process.particles.population >= 0)
 np.testing.assert_array_equal(
     aerosol_process.gas.concentration, aerosol_soa.gas.concentration
 )

@@ -1,20 +1,20 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 4.222613906022161,
-  "package_source_sha256": "e7a8dec04ec165d4dd632a008f2c0bcbb2eeeefb92d0cacb704ceb94f8bd3be3",
-  "scientific_source_sha256": "a3ab2110331b437c679cb2b93c8ac67790e4239e684691704b25f61cc5640285",
+  "elapsed_seconds": 5.315294756088406,
+  "package_source_sha256": "142dc45c78857a370342e7331e40670f99125a47f20f328815752098c59941a3",
+  "scientific_source_sha256": "02156f28723d5f1efd3cdd1cc740489c33c6744dfd5d4e3cec8f8d5b9ddf17f3",
   "input_sha256": {},
   "example": "examples-gpu-direct-gpu-direct-kernels-quick-start",
-  "fingerprint": "e59dcb1681c23b78c191c985d3397f13f9486fff2203285b93b3d093e8ffb8c3",
+  "fingerprint": "226fb5d57fa37a2bfa41c6bc890075012ba96a57f03c07a5f3482413b36554de",
   "source": "docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_direct_kernels_quick_start.py",
-  "revision": "0c3ca2f65a88378fb2d3874d6e034880b027cd19",
+  "revision": "bba19575e4040ba2f09df07295cdd1c04fb5b668",
   "package_dirty": false,
-  "executed_at": "2026-11-20T12:59:30.462138+00:00",
+  "executed_at": "2026-11-28T13:34:10.731508+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.3",
+    "particula": "0.4.0",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -28,7 +28,10 @@
     [],
     [
       {
-        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.condensation 14a649a load on device 'cuda:0' took 0.49 ms  (cached)\nModule particula.gpu.kernels.condensation 2c7d291 load on device 'cuda:0' took 0.28 ms  (cached)\nModule particula.gpu.kernels._condensation_native 34375de load on device 'cuda:0' took 0.35 ms  (cached)\nModule particula.gpu.kernels.condensation c7ee7df load on device 'cuda:0' took 0.32 ms  (cached)\nModule particula.gpu.kernels.condensation f9b041d load on device 'cuda:0' took 0.38 ms  (cached)\nModule particula.gpu.kernels.thermodynamics 10b2126 load on device 'cuda:0' took 0.29 ms  (cached)\nModule particula.gpu.kernels.condensation e17dab7 load on device 'cuda:0' took 0.35 ms  (cached)\nModule particula.gpu.kernels.condensation 8e3ec5c load on device 'cuda:0' took 0.84 ms  (cached)\nModule particula.gpu.kernels._condensation_native 9623455 load on device 'cuda:0' took 0.31 ms  (cached)\nModule particula.gpu.kernels.condensation 5be46cb load on device 'cuda:0' took 0.73 ms  (cached)\nModule particula.gpu.kernels._condensation_native 76403ad load on device 'cuda:0' took 0.33 ms  (cached)\nModule particula.gpu.kernels.condensation daec62e load on device 'cuda:0' took 0.68 ms  (cached)\nModule particula.gpu.kernels._condensation_native c295a4d load on device 'cuda:0' took 0.36 ms  (cached)\nModule particula.gpu.kernels._condensation_native a80ebff load on device 'cuda:0' took 0.43 ms  (cached)\nModule particula.gpu.kernels.condensation fa471cb load on device 'cuda:0' took 0.59 ms  (cached)\nModule particula.gpu.kernels.condensation bd2ba31 load on device 'cuda:0' took 0.68 ms  (cached)\nModule particula.gpu.kernels.condensation 554f3d8 load on device 'cuda:0' took 0.72 ms  (cached)\nModule particula.gpu.kernels._condensation_native 6dc00df load on device 'cuda:0' took 0.45 ms  (cached)\nModule particula.gpu.kernels._condensation_native bc27112 load on device 'cuda:0' took 0.60 ms  (cached)\nCanonical path: docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_direct_kernels_quick_start.py\nParticleData constructed: masses=(1, 2, 1), concentration=(1, 2), charge=(1, 2), density=(1,), volume=(1,)\nGasData constructed: concentration=(1, 1), molar_mass=(1,), partitioning=(1,), names=['Water']\nExplicit helpers: CPU\u2192Warp conversion -> direct condensation -> CPU checkpoints\nDirect condensation complete: device=cuda:0, calls=2, final_call_transfer_shape=(1, 2, 1)\nFinal checkpoints restored: particle_masses=(1, 2, 1), gas_concentration=(1, 1), names=['Water']\nTwo-item kernel return; energy remains a caller-owned sidecar.\nFixed-shape fp64 scratch, physical-property, latent-heat, and energy sidecars reused.\nTransfer and energy diagnostics are reset per call and report the final call.\nLast-call signed latent energy (J): [[4.40376335e-18]]\n"
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.condensation 14a649a load on device 'cuda:0' took 1.29 ms  (cached)\nModule particula.gpu.kernels.condensation 2c7d291 load on device 'cuda:0' took 1.68 ms  (cached)\nModule particula.gpu.kernels._condensation_native 354bfec load on device 'cuda:0' took 1.25 ms  (cached)\nModule particula.gpu.kernels.condensation c7ee7df load on device 'cuda:0' took 0.67 ms  (cached)\nModule particula.gpu.kernels.condensation f9b041d load on device 'cuda:0' took 1.52 ms  (cached)\nModule particula.gpu.kernels.thermodynamics 10b2126 load on device 'cuda:0' took 1.29 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.condensation e17dab7 load on device 'cuda:0' took 1.05 ms  (cached)\nModule particula.gpu.kernels.condensation a3dc893 load on device 'cuda:0' took 3.21 ms  (cached)\nModule particula.gpu.kernels._condensation_native 6810d06 load on device 'cuda:0' took 1.02 ms  (cached)\nModule particula.gpu.kernels.condensation cf947c3 load on device 'cuda:0' took 3.20 ms  (cached)\nModule particula.gpu.kernels._condensation_native ada4eab load on device 'cuda:0' took 1.58 ms  (cached)\nModule particula.gpu.kernels.condensation 05ece89 load on device 'cuda:0' took 2.95 ms  (cached)\nModule particula.gpu.kernels._condensation_native 374bae4 load on device 'cuda:0' took 2.73 ms  (cached)\nModule particula.gpu.kernels._condensation_native 02607db load on device 'cuda:0' took 2.06 ms  (cached)\nModule particula.gpu.kernels.condensation f1f8301 load on device 'cuda:0' took 2.37 ms  (cached)\nModule particula.gpu.kernels.condensation 4219187 load on device 'cuda:0' took 3.16 ms  (cached)\nModule particula.gpu.kernels.condensation f8ad927 load on device 'cuda:0' took 3.18 ms  (cached)\nModule particula.gpu.kernels._condensation_native 63d2ff9 load on device 'cuda:0' took 0.93 ms  (cached)\nModule particula.gpu.kernels._condensation_native 9367a57 load on device 'cuda:0' took 1.86 ms  (cached)\nCanonical path: docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_direct_kernels_quick_start.py\nParticleData constructed: masses=(1, 2, 1), population=(1, 2), charge=(1, 2), density=(1,), volume=(1,)\nGasData constructed: concentration=(1, 1), molar_mass=(1,), partitioning=(1,), names=['Water']\nExplicit helpers: CPU\u2192Warp conversion -> direct condensation -> CPU checkpoints\nDirect condensation complete: device=cuda:0, calls=2, final_call_transfer_shape=(1, 2, 1)\nFinal checkpoints restored: particle_masses=(1, 2, 1), gas_concentration=(1, 1), names=['Water']\nTwo-item kernel return; energy remains a caller-owned sidecar.\nFixed-shape fp64 scratch, physical-property, latent-heat, and energy sidecars reused.\nTransfer and energy diagnostics are reset per call and report the final call.\nLast-call signed latent energy (J): [[4.40376335e-18]]\n"
       },
       {
         "image": "figure-3-1.png"
@@ -36,7 +39,7 @@
     ]
   ],
   "files": {
-    "figure-3-1.png": "20bf6b128ef092b5960fcf69b11ecbe61792f22c1e6e8dd38d6d3bb944fac90d",
-    "source.py": "75b3c787d8e7e3f37b54c0aff3c375121f8fe6ba992198f94ca7a471c32be651"
+    "source.py": "8124e252929ad021aac66bbbee40f19b50830c70b53ad5fa33b1b36981247846",
+    "figure-3-1.png": "20bf6b128ef092b5960fcf69b11ecbe61792f22c1e6e8dd38d6d3bb944fac90d"
   }
 }

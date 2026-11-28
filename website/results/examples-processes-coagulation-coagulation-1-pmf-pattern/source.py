@@ -35,9 +35,9 @@ Example:
 # loss from material loss: a collision merges particles rather than removing
 # their constituent mass.
 #
-# Here the stored concentration has units m⁻³ per bin. To obtain total
+# Here the per-slot concentration has units m⁻³ per bin. To obtain total
 # number density, sum the bin concentrations. Review
-# [distribution measures](../../fundamentals/particles/aerosol_distributions.py)
+# [distribution measures](../building-an-aerosol/particles/aerosol_distributions.py)
 # before comparing this plot with another representation.
 
 # %%
@@ -142,21 +142,21 @@ time_step = 3600  # 1 hour per step
 sub_steps = 100
 
 radii = pmf_aerosol.particles.radii[0]
-pmf_before = np.copy(pmf_aerosol.particles.concentration[0])
+pmf_before = np.copy(pmf_aerosol.particles.slot_concentration_density[0])
 
 # Perform coagulation process for step 1
 pmf_aerosol = coagulation_process.execute(
     pmf_aerosol, time_step=time_step, sub_steps=sub_steps
 )
 radii_after_step_1 = pmf_aerosol.particles.radii[0]
-pmf_after_step_1 = np.copy(pmf_aerosol.particles.concentration[0])
+pmf_after_step_1 = np.copy(pmf_aerosol.particles.slot_concentration_density[0])
 
 # Perform coagulation process for step 2
 pmf_aerosol = coagulation_process.execute(
     pmf_aerosol, time_step=time_step, sub_steps=sub_steps
 )
 radii_after_step_2 = pmf_aerosol.particles.radii[0]
-pmf_after_step_2 = np.copy(pmf_aerosol.particles.concentration[0])
+pmf_after_step_2 = np.copy(pmf_aerosol.particles.slot_concentration_density[0])
 
 # %%
 # Independently account for material mass; PDF values require radius integration.

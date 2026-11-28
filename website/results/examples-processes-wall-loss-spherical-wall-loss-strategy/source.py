@@ -25,7 +25,7 @@
 # ## Prepare the reference calculation
 #
 # Use Python 3.12 or newer, Particula, NumPy, and Matplotlib. Begin with
-# [distribution measures](../../fundamentals/particles/aerosol_distributions.py)
+# [distribution measures](../../../tutorials/building-an-aerosol/particles/aerosol_distributions.py)
 # if a bin total and a density per radius are unfamiliar. The
 # [combined chamber example](chamber_forward_simulation.py) adds other mechanisms.
 
@@ -56,7 +56,7 @@ particle = par.particles.create_lognormal_binned_particle_data(
 )
 
 print("Radius shape:", particle.radii[0].shape)
-print("Concentration shape:", particle.concentration[0].shape)
+print("Population shape:", particle.population[0].shape)
 print(
     "Total concentration (initial):",
     f"{particle.number_density[0]:.3e} 1/m^3",
@@ -126,7 +126,7 @@ print("Internal substeps per output interval:", sub_steps)
 times = np.arange(n_steps + 1) * dt
 total_concentration = np.zeros_like(times, dtype=float)
 
-initial_counts = particle.concentration.copy()
+initial_counts = particle.population.copy()
 initial_masses = particle.masses.copy()
 loss_coefficients = wall_loss.loss_coefficient(
     particle, temperature=T, pressure=P
@@ -147,14 +147,14 @@ for i in range(1, n_steps + 1):
 
 # Fixed radii give an independent repeated-Euler decay prediction.
 np.testing.assert_allclose(
-    particle.concentration,
+    particle.population,
     initial_counts
     * (1 - loss_coefficients * dt / sub_steps) ** (n_steps * sub_steps),
     rtol=1e-12,
     atol=1e-30,
 )
 np.testing.assert_array_equal(particle.masses, initial_masses)
-assert np.all(particle.concentration >= 0)
+assert np.all(particle.population >= 0)
 
 print(
     "Total concentration (final):",
@@ -200,12 +200,12 @@ fig, ax = plotting.subplots(size="wide")
 
 ax.plot(
     initial_particle.radii[0],
-    initial_particle.concentration[0],
+    initial_particle.slot_concentration_density[0],
     label="Initial",
 )
 ax.plot(
     particle.radii[0],
-    particle.concentration[0],
+    particle.slot_concentration_density[0],
     label="After wall loss",
 )
 
@@ -241,9 +241,8 @@ wall_loss = par.dynamics.SphericalWallLossStrategy(
 )
 
 # Condensation uses native gas/environment data and explicit process
-# configuration. For a complete
-# example that includes gas-particle condensation, see the condensation
-# tutorials in docs/examples/Dynamics/.
+# configuration. For a complete gas-particle calculation, see the
+# condensation sequence under docs/studies/tutorials/condensation/.
 
 for _ in range(10):
     # Apply wall loss to the particle distribution
@@ -265,6 +264,6 @@ for _ in range(10):
 #
 # A research extension is to infer size-dependent survival from repeated chamber
 # measurements and compare it with the modeled coefficients. First test timestep
-# refinement, then account for [dilution](../dilution/cpu_dilution.py) and possible
-# [coagulation](../coagulation/coagulation_5_time_evolution.py). Those mechanisms
+# refinement, then account for [dilution](../sources-and-dilution/cpu_dilution.py) and possible
+# [coagulation](../../../tutorials/coagulation-populations/coagulation_5_time_evolution.py). Those mechanisms
 # can lower number for different reasons and should be separated by their budgets.

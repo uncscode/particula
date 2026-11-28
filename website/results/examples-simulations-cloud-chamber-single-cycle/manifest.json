@@ -1,19 +1,20 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 313.44656674400903,
-  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
+  "elapsed_seconds": 347.5444246530533,
+  "package_source_sha256": "142dc45c78857a370342e7331e40670f99125a47f20f328815752098c59941a3",
+  "scientific_source_sha256": "02156f28723d5f1efd3cdd1cc740489c33c6744dfd5d4e3cec8f8d5b9ddf17f3",
   "input_sha256": {},
   "example": "examples-simulations-cloud-chamber-single-cycle",
-  "fingerprint": "b5766eb34c735d98d7d64b64bea9262a530b8e25c8af9f4448f25fab5522778a",
-  "source": "docs/examples/simulations/cloud_chamber_single_cycle.py",
-  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
+  "fingerprint": "2ad50dd0e0410e68e1207d94f806c395e66aa2adc562cbfdf8a7e35a9cb25e4b",
+  "source": "docs/studies/examples/coupled-populations/chambers/cloud_chamber_single_cycle.py",
+  "revision": "bba19575e4040ba2f09df07295cdd1c04fb5b668",
   "package_dirty": false,
-  "executed_at": "2026-11-19T14:37:13.694076+00:00",
+  "executed_at": "2026-11-28T13:33:51.694544+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.2",
+    "particula": "0.4.0",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -60,7 +61,7 @@
     ]
   ],
   "files": {
-    "figure-7-1.png": "0e96341b9abee402d894958f995ba23bd2e9c38a8a5c81f7602fc9c6d77afea0",
-    "source.py": "4eeeaa5a963bb1ca441ea0c2d87f93836d0fa918dac8776fc8d42f287db20348"
+    "source.py": "b71d997adad253c141b87d840fd3fd9924dc7d6a04da311f0f191b10f30c1526",
+    "figure-7-1.png": "0e96341b9abee402d894958f995ba23bd2e9c38a8a5c81f7602fc9c6d77afea0"
   }
 }

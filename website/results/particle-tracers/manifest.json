@@ -1,20 +1,20 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 5.376489183981903,
-  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
-  "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
+  "elapsed_seconds": 6.263272606069222,
+  "package_source_sha256": "142dc45c78857a370342e7331e40670f99125a47f20f328815752098c59941a3",
+  "scientific_source_sha256": "02156f28723d5f1efd3cdd1cc740489c33c6744dfd5d4e3cec8f8d5b9ddf17f3",
   "input_sha256": {},
   "example": "particle-tracers",
-  "fingerprint": "88614f2c9d04c98b1606fa4afd7ed2e3896336706960aee9b8192591bd281318",
-  "source": "docs/examples/processes/customization/particle_tracers.py",
-  "revision": "dd92d3c1ca71f36eacad56b49661b32c0da77ac7",
+  "fingerprint": "d7c01bee3dc33d325be96ab220a1cb4df61832a7cc25943380179dc2e0a2078c",
+  "source": "docs/studies/examples/custom-processes/particle_tracers.py",
+  "revision": "bba19575e4040ba2f09df07295cdd1c04fb5b668",
   "package_dirty": false,
-  "executed_at": "2026-11-19T14:42:54.161157+00:00",
+  "executed_at": "2026-11-28T13:32:48.806464+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.2",
+    "particula": "0.4.0",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -32,7 +32,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 161.39it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 108.37it/s]"
       },
       {
         "text": "\n"
@@ -41,7 +41,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 188.04it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 150.67it/s]"
       },
       {
         "text": "\n"
@@ -50,7 +50,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 202.22it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 152.06it/s]"
       },
       {
         "text": "\n"
@@ -59,7 +59,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 216.45it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 133.94it/s]"
       },
       {
         "text": "\n"
@@ -68,7 +68,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 170.69it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 115.92it/s]"
       },
       {
         "text": "\n"
@@ -77,7 +77,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 181.43it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 138.64it/s]"
       },
       {
         "text": "\n"
@@ -86,7 +86,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 185.11it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 161.92it/s]"
       },
       {
         "text": "\n"
@@ -95,7 +95,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 204.80it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 170.40it/s]"
       },
       {
         "text": "\n"
@@ -104,7 +104,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 186.70it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 177.15it/s]"
       },
       {
         "text": "\n"
@@ -113,7 +113,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 194.36it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 182.12it/s]"
       },
       {
         "text": "\n"
@@ -122,7 +122,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 171.94it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 164.34it/s]"
       },
       {
         "text": "\n"
@@ -131,7 +131,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 180.85it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 180.23it/s]"
       },
       {
         "text": "\n"
@@ -140,7 +140,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 184.27it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 171.41it/s]"
       },
       {
         "text": "\n"
@@ -149,7 +149,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 181.82it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 160.63it/s]"
       },
       {
         "text": "\n"
@@ -158,7 +158,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 187.10it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 177.33it/s]"
       },
       {
         "text": "\n"
@@ -167,7 +167,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 179.55it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 171.84it/s]"
       },
       {
         "text": "\n"
@@ -176,7 +176,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 188.47it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 172.50it/s]"
       },
       {
         "text": "\n"
@@ -185,7 +185,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 217.76it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 197.74it/s]"
       },
       {
         "text": "\n"
@@ -194,7 +194,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 206.58it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 122.73it/s]"
       },
       {
         "text": "\n"
@@ -203,7 +203,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 210.85it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 136.20it/s]"
       },
       {
         "text": "\n"
@@ -212,7 +212,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 219.04it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 195.83it/s]"
       },
       {
         "text": "\n"
@@ -221,7 +221,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 206.25it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 179.39it/s]"
       },
       {
         "text": "\n"
@@ -230,7 +230,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 224.46it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 179.68it/s]"
       },
       {
         "text": "\n"
@@ -239,7 +239,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 224.38it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 179.68it/s]"
       },
       {
         "text": "\n"
@@ -248,7 +248,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 224.98it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 197.05it/s]"
       },
       {
         "text": "\n"
@@ -257,7 +257,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 219.86it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 313.03it/s]"
       },
       {
         "text": "\n"
@@ -266,7 +266,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 211.26it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 331.33it/s]"
       },
       {
         "text": "\n"
@@ -275,7 +275,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 184.92it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 260.31it/s]"
       },
       {
         "text": "\n"
@@ -284,7 +284,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 268.42it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 353.41it/s]"
       },
       {
         "text": "\n"
@@ -293,7 +293,7 @@
         "text": "\rExecuting Runnable:   0%|          | 0/1 [00:00<?, ?it/s]"
       },
       {
-        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 274.17it/s]"
+        "text": "\rExecuting Runnable: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:00<00:00, 404.50it/s]"
       },
       {
         "text": "\n"
@@ -307,9 +307,9 @@
     ]
   ],
   "files": {
-    "figure-4-1.png": "c789b8751d4a3405c4b02924ecb956c60cfbd4979295c93ba87ec681efffd6bb",
+    "source.py": "f02cf412a1aa1989788c95fe628cb5de8023bd0d8bf0a3f45b56c1a6e3ea7c19",
     "data.json": "3c09155d460a480a7371714b391733adefa6684da17e9918a15f67e52de78995",
-    "source.py": "56c8764149fac53691ecd586d9cd2001479f43ea421d744d69fd6fc8d7d16bc6"
+    "figure-4-1.png": "c789b8751d4a3405c4b02924ecb956c60cfbd4979295c93ba87ec681efffd6bb"
   },
-  "simulation_fingerprint": "b90acddc3aae7c971c4a144583607c37a6c1aec768c6db002b95208758db2303"
+  "simulation_fingerprint": "202f650d71cbf5e1fad1be89b55494661646c352a11ca1e7d4ade0f8bce087f5"
 }

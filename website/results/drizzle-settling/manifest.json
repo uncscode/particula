@@ -1,22 +1,22 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 6.722002236172557,
-  "package_source_sha256": "6471e7faf0c8383cdb851f92580e6ca17478567c647efe39d4a80039e8a5424b",
-  "scientific_source_sha256": "24520438eb500d0b0a03e4b30a11f8a1c738ae12bb21267b4d0cf3d77ba2e4d5",
+  "elapsed_seconds": 18.154552137944847,
+  "package_source_sha256": "142dc45c78857a370342e7331e40670f99125a47f20f328815752098c59941a3",
+  "scientific_source_sha256": "02156f28723d5f1efd3cdd1cc740489c33c6744dfd5d4e3cec8f8d5b9ddf17f3",
   "input_sha256": {
     "docs/data/drizzle-settling/reference.csv": "2c3b4c8b1c88de09c7daef71afb5c0e9ca0b7e3da5836004b365cd7d5895942d"
   },
   "example": "drizzle-settling",
-  "fingerprint": "c216bbc229a0e98db51426e8a81fd67be7466ff2cef8f2d361d06daed37fd7a8",
+  "fingerprint": "a7d95aea9e0728ea63ac729b209da5bad9cfd8261e9c29de1b8a85e1e0133ee6",
   "source": "docs/studies/literature/drizzle-settling/drizzle_settling.py",
-  "revision": "75ea3a3aff85251f25ac2060593257124d7d95d9",
+  "revision": "bba19575e4040ba2f09df07295cdd1c04fb5b668",
   "package_dirty": false,
-  "executed_at": "2026-11-21T20:30:53.249638+00:00",
+  "executed_at": "2026-11-28T13:33:43.156478+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.3",
+    "particula": "0.4.0",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -34,6 +34,39 @@
     [],
     [
       {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.condensation 14a649a load on device 'cuda:0' took 1.05 ms  (cached)\nModule particula.gpu.kernels.condensation 2c7d291 load on device 'cuda:0' took 0.63 ms  (cached)\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 1.79 ms  (cached)\nModule particula.gpu.kernels._condensation_native 354bfec load on device 'cuda:0' took 0.81 ms  (cached)\nModule particula.gpu.kernels.thermodynamics 563d292 load on device 'cuda:0' took 2.80 ms  (cached)\nModule particula.execution.prepared_guards 5366864 load on device 'cuda:0' took 3.18 ms  (cached)\nModule warp.utils f35afd3 load on device 'cuda:0' took 1.38 ms  (cached)\nModule warp.math edde159 load on device 'cuda:0' took 1.22 ms  (cached)\nModule warp.marching_cubes fb6e712 load on device 'cuda:0' took 2.84 ms  (cached)\nModule particula.gpu.kernels._coagulation_budget b4a3978 load on device 'cuda:0' took 1.12 ms  (cached)\nModule particula.execution.communication 2909959 load on device 'cuda:0' took 1.00 ms  (cached)\nModule particula.gpu.kernels._population_validation edde159 load on device 'cuda:0' took 2.14 ms  (cached)\nModule particula.gpu.kernels.communication ac9b2a2 load on device 'cuda:0' took 3.11 ms  (cached)\nModule particula.gpu.properties.gas_properties edde159 load on device 'cuda:0' took 0.34 ms  (cached)\nModule particula.gpu.properties.particle_properties edde159 load on device 'cuda:0' took 0.43 ms  (cached)\nModule particula.gpu.dynamics.coagulation_funcs edde159 load on device 'cuda:0' took 2.37 ms  (cached)\nModule particula.gpu.dynamics.condensation_funcs edde159 load on device 'cuda:0' took 2.11 ms  (cached)\nModule particula.gpu.kernels._condensation_parallel edde159 load on device 'cuda:0' took 2.13 ms  (cached)\nModule particula.gpu.kernels.exhaustion 616f81d load on device 'cuda:0' took 3.95 ms  (cached)\nModule particula.gpu.kernels.slot_management 0375e2c load on device 'cuda:0' took 2.93 ms  (cached)\nModule particula.gpu.kernels.nucleation 1124f09 load on device 'cuda:0' took 7.98 ms  (cached)\nModule particula.execution.gpu_resources 30f296c load on device 'cuda:0' took 1.83 ms  (cached)\nModule particula.gpu.warp_types edde159 load on device 'cuda:0' took 2.14 ms  (cached)\nModule particula.execution.prepared_diagnostics f551690 load on device 'cuda:0' took 1.67 ms  (cached)\nModule particula.gpu.kernels.condensation c7ee7df load on device 'cuda:0' took 2.55 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.condensation f9b041d load on device 'cuda:0' took 141.81 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.condensation e17dab7 load on device 'cuda:0' took 233.25 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.condensation a3dc893 load on device 'cuda:0' took 1122.44 ms  (cached)\nModule particula.gpu.kernels._condensation_native 6810d06 load on device 'cuda:0' took 2.63 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.condensation cf947c3 load on device 'cuda:0' took 1558.74 ms  (cached)\nModule particula.gpu.kernels._condensation_native ada4eab load on device 'cuda:0' took 2.34 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.condensation 05ece89 load on device 'cuda:0' took 2129.97 ms  (cached)\nModule particula.gpu.kernels._condensation_native 374bae4 load on device 'cuda:0' took 0.98 ms  (cached)\nModule particula.gpu.kernels._condensation_native 02607db load on device 'cuda:0' took 1.85 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.condensation a0dd334 load on device 'cuda:0' took 1705.59 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.condensation 259004e load on device 'cuda:0' took 1691.82 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.condensation b7444cb load on device 'cuda:0' took 1552.75 ms  (cached)\nModule particula.gpu.kernels._condensation_native 63d2ff9 load on device 'cuda:0' took 4.41 ms  (cached)\nModule particula.gpu.kernels._condensation_native 44dc34d load on device 'cuda:0' took 4.02 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.ion_condensation 79e70b9 load on device 'cuda:0' took 3.76 ms  (cached)\n"
+      },
+      {
         "text": "Particula sphere drag differs from the table by at most 4.18% at the 9 sizes from 0.20 to 1.00 mm.\nCUDA evaporation device: NVIDIA GeForce RTX 5060\n0.20 mm at 50% RH after 1 s: 0.1980 mm, assigned 0.711 m/s, 1.24% decrease (surface heat balance 1.45%).\n1.00 mm at 50% RH after 1 s: 0.9987 mm, assigned 4.025 m/s, 0.11% decrease (surface heat balance 0.13%).\nLargest time-step effect on assigned-speed decrease: 2.66e-05 percentage points.\n"
       },
       {
@@ -42,27 +75,9 @@
     ]
   ],
   "files": {
-    "figure-7-1.png": "8900cf9915cd37c44db8349676b6602ebd0f39ba5bc2bbbe376311acec712de4",
-    "executed_source.py": "158c4ddd0113ef32ccf349a9b27ad6a72d30e613c3d29010ee201aee164e971a",
+    "source.py": "3e03c97fcedbb94204e1a248eec0f883bb23c5b2328ee837e357e7c006b0766e",
     "data.json": "fe6c19749b6cdac6db9ae01b51e77f084d51724437f599e4760bebca9b4a6580",
-    "source.py": "158c4ddd0113ef32ccf349a9b27ad6a72d30e613c3d29010ee201aee164e971a"
+    "figure-7-1.png": "8900cf9915cd37c44db8349676b6602ebd0f39ba5bc2bbbe376311acec712de4"
   },
-  "simulation_fingerprint": "c4111c5e97a345e40c9211b0a16aa3e24acbaf3f2f0030beac492c08b0588e05",
-  "render_versions": {
-    "particula": "0.3.3",
-    "numpy": "2.3.4",
-    "scipy": "1.16.2",
-    "matplotlib": "3.10.7",
-    "nbclient": "0.10.2",
-    "jupytext": "1.17.3",
-    "warp-lang": "1.11.1",
-    "particula-distribution": "0.2.14"
-  },
-  "render_device": "CPU",
-  "execution_input_sha256": {
-    "docs/data/drizzle-settling/reference.csv": "2c3b4c8b1c88de09c7daef71afb5c0e9ca0b7e3da5836004b365cd7d5895942d"
-  },
-  "rendered_at": "2026-11-21T20:30:58.295759+00:00",
-  "render_revision": "75ea3a3aff85251f25ac2060593257124d7d95d9",
-  "render_elapsed_seconds": 3.6217034820001572
+  "simulation_fingerprint": "b72929862102c93498d5cc5a3abcaadded65f918c6c04b68a83499312877a761"
 }
