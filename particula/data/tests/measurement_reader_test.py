@@ -334,9 +334,10 @@ def test_record_limits_empty_and_all_invalid(tmp_path):
     """Empty imports retain schema and issue-only batches can be reopened."""
     src = tmp_path / "empty"
     src.write_bytes(b"")
-    assert import_to_parquet(
-        src, tmp_path / "out", profile="cpc-3010"
-    ).frame.is_empty()
+    empty = import_to_parquet(src, tmp_path / "out", profile="cpc-3010")
+    assert empty.frame.is_empty()
+    section = empty.manifest["segments"][0]
+    assert section["source_line_start"] is section["source_line_end"] is None
     src.write_text("garbage\n" * 5)
     result = import_to_parquet(
         src, tmp_path / "errors", profile="cpc-3010", batch_scans=1
@@ -509,3 +510,68 @@ def test_large_quoted_field_respects_record_budget(tmp_path):
         assert csv.field_size_limit() == 131072
     finally:
         csv.field_size_limit(previous)
+
+
+@pytest.mark.parametrize("terminator", [b"\r", b"\n", b"\r\n"])
+def test_logger_line_terminators(tmp_path, terminator):
+    """Byte-sized reads preserve repairs and scan IDs with all CSV endings."""
+    path = tmp_path / "logger.csv"
+    parts = [
+        b"1700000040,100,17.0,",
+        b"1,0.017",
+        b"1700000041,101,17.0,1,0.017",
+    ]
+    path.write_bytes(terminator.join(parts))
+    result = read_particle_counter(
+        path,
+        input_chunk_bytes=1,
+        max_record_bytes=len(parts[0]) + len(parts[1]) + 2 * len(terminator),
+    )
+    assert result.frame.select(
+        "scan_id", "source_line_end", "count_rate"
+    ).rows() == [(1, 2, 100.0), (3, 3, 101.0)]
+    assert result.manifest["segments"][0]["source_line_end"] == 3
+
+
+def test_mixed_terminators_preserve_quoted_content(tmp_path):
+    """A quoted CR is retained and counts as a physical line break."""
+    profile = describe_profile("cpc-3010")
+    profile["on_bad_record"] = "error"
+    profile["vendor_flags"] = {"column": 3, "separator": ";"}
+    path = tmp_path / "mixed.csv"
+    path.write_bytes(
+        b'1700000040,100,17.0,"first\rsecond",0.017\r\n'
+        b"1700000041,101,17.0,ok,0.017\n1700000042,102,17.0,,0.017\r"
+    )
+    out = read_measurement(path, profile=profile, input_chunk_bytes=1)
+    assert out.frame["vendor_status"][0] == "first\rsecond"
+    assert out.frame.select("source_line_start", "source_line_end").rows() == [
+        (1, 2),
+        (3, 3),
+        (4, 4),
+    ]
+
+
+def test_same_grid_scans_retain_segment_corrections(tmp_path):
+    """Recover per-scan correction history from eager or reopened scans."""
+    raw = (FIXTURES / "mobility.csv").read_bytes()
+    path = tmp_path / "corrections.csv"
+    path.write_bytes(
+        raw
+        + raw.replace(b"DiffusionCorrection,true", b"DiffusionCorrection,false")
+    )
+    dest = tmp_path / "normalized"
+    import_to_parquet(path, dest, profile="smps-aim", batch_scans=1)
+    for dataset in (read_mobility_sizer(path), open_measurement(dest)):
+        sections = dataset.manifest["segments"]
+        assert sections[0]["grid_id"] == sections[1]["grid_id"]
+        assert [
+            (s["source_line_start"], s["source_line_end"]) for s in sections
+        ] == [(1, 26), (27, 52)]
+        kept = dataset.filter(pl.col("scan_id") == 52)
+        line = kept.frame["source_line_start"][0]
+        assert [
+            s["preamble"]["DiffusionCorrection"]
+            for s in kept.manifest["segments"]
+            if s["source_line_start"] <= line <= s["source_line_end"]
+        ] == ["false"]

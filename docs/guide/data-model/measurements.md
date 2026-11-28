@@ -87,7 +87,10 @@ reading across source files, filters and batch sizes.
 
 Within one grid, `number_spectrum` is a fixed-shape Polars Array column.
 Retrieve the coordinates from `product.grids[grid_id]["coordinates"]["diameter"]`.
-A repeated AIM header or preamble starts a new segment. When widths differ,
+A repeated AIM header or preamble starts a new segment. Match a scan's
+source line to the inclusive `source_line_start` and `source_line_end` in
+`product.manifest["segments"]` to recover the corrections active for that
+scan, including when consecutive segments share a grid. When widths differ,
 the combined frame exposes a List column and the stored segments retain
 their native widths. `MobilityNumberSpectrum.integrated_number()` returns
 lazy totals using the reported channels per decade. A missing channel yields

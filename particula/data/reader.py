@@ -17,6 +17,7 @@ from particula.data._binding import Binding
 from particula.data.profile import ProfileError, digest, load_profile
 
 _CSV_LIMIT_LOCK = Lock()
+_LINE_END = re.compile(rb"[\r\n]")
 
 ISSUE_SCHEMA = {
     "code": pl.String,
@@ -52,12 +53,41 @@ class _Lines:
     def __init__(self, reader, encoding, maximum, first):
         self.reader, self.encoding, self.maximum = reader, encoding, maximum
         self.line, self.used = first, 0
+        self.block = b""
+        self.cursor = 0
 
     def __iter__(self):
         return self
 
+    def _has_bytes(self):
+        if self.cursor == len(self.block):
+            self.block = self.reader.read1(min(65536, self.maximum + 1))
+            self.cursor = 0
+        return bool(self.block)
+
+    def _readline(self):
+        """Frame CR, LF and CRLF lines while retaining their original bytes."""
+        raw = bytearray()
+        limit = self.maximum - self.used + 1
+        while len(raw) < limit and self._has_bytes():
+            stop = min(len(self.block), self.cursor + limit - len(raw))
+            newline = _LINE_END.search(self.block, self.cursor, stop)
+            end = newline.end() if newline else stop
+            raw.extend(self.block[self.cursor : end])
+            self.cursor = end
+            if newline:
+                if (
+                    raw.endswith(b"\r")
+                    and self._has_bytes()
+                    and self.block.startswith(b"\n", self.cursor)
+                ):
+                    raw.extend(b"\n")
+                    self.cursor += 1
+                break
+        return raw
+
     def __next__(self):
-        raw = self.reader.readline(self.maximum - self.used + 1)
+        raw = self._readline()
         if not raw:
             raise StopIteration
         self.line += 1
@@ -138,10 +168,11 @@ def _layout(records, profile):
 def _sections(records, profile, binding, header):
     """Split concatenated AIM exports when the preamble or header recurs."""
     if "spectrum" not in profile:
-        yield binding, header, records
+        yield 1, binding, header, records
         return
     first_key = next(iter(binding.preamble), None)
     axis = profile["spectrum"]["axis"]
+    first_line = 1
     while True:
         boundary = []
 
@@ -154,10 +185,10 @@ def _sections(records, profile, binding, header):
                 return False
             return True
 
-        yield binding, header, takewhile(is_observation, records)
+        yield first_line, binding, header, takewhile(is_observation, records)
         if not boundary:
             return
-        row = boundary[0][0]
+        row, first_line, _, _ = boundary[0]
         if row[:1] == [first_key]:
             binding, header = _layout(chain(boundary, records), profile)
         else:
@@ -324,12 +355,15 @@ class MeasurementReader:
             records = _records(physical, cfg["delimiter"])
             binding, header = _layout(records, self.profile)
             segments, grids = [], {}
-            for section, (layout, labels, rows) in enumerate(
+            for section, (first_line, layout, labels, rows) in enumerate(
                 _sections(records, self.profile, binding, header)
             ):
                 self.segment = section
+                if segments:
+                    segments[-1]["source_line_end"] = first_line - 1
                 segments.append(
                     {
+                        "source_line_start": first_line,
                         "header": labels,
                         "preamble": layout.preamble,
                         "grid_id": layout.grid_id,
@@ -337,6 +371,9 @@ class MeasurementReader:
                 )
                 grids.update(layout.grids)
                 yield from self._decoded(rows, layout)
+            segments[-1]["source_line_end"] = physical.line or None
+            if not physical.line:
+                segments[-1]["source_line_start"] = None
             after = os.fstat(stream.fileno())
             if (before.st_size, before.st_mtime_ns) != (
                 after.st_size,
