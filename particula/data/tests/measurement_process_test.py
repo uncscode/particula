@@ -1,5 +1,6 @@
 """Public operation contracts tested with independently calculated controls."""
 
+import json
 from dataclasses import replace
 
 import pytest
@@ -20,6 +21,7 @@ from particula.data import (  # noqa: E402
     read_measurement,
     run_recipe,
     save_measurement,
+    validate_recipe,
 )
 from particula.instruments import Instrument, ParticleCounter  # noqa: E402
 from particula_docs import documentation_path  # noqa: E402
@@ -269,6 +271,35 @@ def test_stateful_filter_across_parts_and_gap(tmp_path):
             [6],
         ]
         assert result["quality_flags"].to_list()[0] == ["incomplete_window"]
+
+
+def test_integral_float_window_in_python_and_json(tmp_path):
+    """Python and JSON use the same whole-sample window for means and lineage."""
+    registry = OperationRegistry()
+    mean = registry.resolve("particula.signal.voltage_mean", "1")
+    signal = read_measurement(
+        DATA / "flow.csv", profile=DATA / "flow-profile.yaml"
+    )
+    integer = mean.configure(window=3, max_gap_seconds=2).execute(signal=signal)
+    configured = mean.configure(window=3.0, max_gap_seconds=2)
+    columns = ["mean_voltage", "parent_signal_scan_ids", "quality_flags"]
+    expected = integer.frame.select(columns)
+    assert (
+        configured.execute(signal=signal).frame.select(columns).equals(expected)
+    )
+
+    recipe = configured.bind(signal="volts", output="mean").describe()
+    path = tmp_path / "mean.json"
+    path.write_text(json.dumps(recipe))
+    inputs = {"volts": signal}
+    validate_recipe(path, inputs=inputs, registry=registry)
+    replay = run_recipe(path, inputs=inputs, registry=registry)
+    assert replay.frame.select(columns).equals(expected)
+
+    recipe["steps"][0]["parameters"]["window"] = 3.5
+    path.write_text(json.dumps(recipe))
+    with pytest.raises(ValueError, match="integer"):
+        validate_recipe(path, inputs=inputs, registry=registry)
 
 
 def test_trusted_reader_and_correction_history():
@@ -588,8 +619,6 @@ def test_axis_contract_and_vendor_correction():
 
 def test_swap_compatible_flow_source_and_preflight(tmp_path):
     """A replacement meter changes concentration and its traceable parent ID."""
-    from particula.data import validate_recipe
-
     registry, process, cert = _lab()
     _, _, voltage, rate = _inputs(registry, (cert,))
     file = tmp_path / "second.csv"

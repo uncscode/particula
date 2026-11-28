@@ -272,6 +272,15 @@ class MeasurementProcess:
         )
         if error:
             raise ValueError(f"{self.operation} parameters: {error.message}")
+        if self.history_parameters:
+            window_name, _ = self.history_parameters
+            window = arguments.get(window_name)
+            # JSON Schema accepts 3.0 as an integer; Polars needs a Python int.
+            if isinstance(window, float) and window.is_integer():
+                window = int(window)
+            if type(window) is not int or window < 1:
+                raise ValueError(f"{window_name} must be a positive integer")
+            arguments[window_name] = window
         canonical(arguments)
         return arguments, selector
 
