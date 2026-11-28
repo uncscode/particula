@@ -173,7 +173,7 @@ def _build_cpu_state() -> tuple[ParticleData, GasData, EnvironmentData]:
                 ],
                 dtype=np.float64,
             ),
-            concentration=np.array(
+            population=np.array(
                 [[0.75, 0.75], [3.0, 3.0], [6.75, 6.75]], dtype=np.float64
             ),
             charge=np.zeros((3, 2), dtype=np.float64),
@@ -749,7 +749,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
         )
     particles, gas, environment = _build_cpu_state()
     initial_total_mass = (
-        np.sum(particles.masses * particles.concentration[:, :, None], axis=1)
+        np.sum(particles.masses * particles.population[:, :, None], axis=1)
         + gas.concentration * particles.volume[:, None]
     )
     if not np.any(initial_total_mass > 0.0):
@@ -810,7 +810,7 @@ def run_example(device: str = "cpu") -> ExampleRun:
             checkpoint.environment,
             np.sum(
                 checkpoint.particles.masses
-                * checkpoint.particles.concentration[:, :, None],
+                * checkpoint.particles.population[:, :, None],
                 axis=1,
             )
             + checkpoint.gas.concentration

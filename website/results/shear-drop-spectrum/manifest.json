@@ -1,24 +1,24 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 184.98173184797633,
-  "package_source_sha256": "de9c4fa23fbd4833d9eeae22e97ffd8e2496acae8432510149eed8ada42f4ee3",
-  "scientific_source_sha256": "1ac66c614e80ae7a0f6aae70e885469d5f8609ca95421966dfcd08ebcf41597f",
+  "elapsed_seconds": 373.2179538931232,
+  "package_source_sha256": "142dc45c78857a370342e7331e40670f99125a47f20f328815752098c59941a3",
+  "scientific_source_sha256": "02156f28723d5f1efd3cdd1cc740489c33c6744dfd5d4e3cec8f8d5b9ddf17f3",
   "input_sha256": {
-    "scripts/shear_drop_spectrum/study.py": "9192a21d39bc196b18d426db36d11ac655927f8033b57b16c30ad5121532612d",
+    "scripts/shear_drop_spectrum/study.py": "71167b8a9791bb3e2462c36186d80815eee91f2a31cf4ee8b03e0d411d0ef340",
     "scripts/shear_drop_spectrum/plots.py": "d700426678c3c2bc7234a31adadf90c78d7b887641cf8637d77c6f27ce09ce05",
     "docs/data/shear-drop-spectrum/figure2.csv": "d83417bb963f90d5c9c453e9b7fa560f8a56c7b7daf76b60970c5861a58c6b94"
   },
   "example": "shear-drop-spectrum",
-  "fingerprint": "27e5586fe5c48a70a7e4413fb7695e6aad73f08ce76efa4e290c862fa175dcad",
+  "fingerprint": "b977045e465220e3e015b69cb930b45df86fb904a419445b41191285b5ba0069",
   "source": "docs/studies/literature/shear-drop-spectrum/shear_drop_spectrum.py",
-  "revision": "e51ed2b15f9bf790bf8b152b2c54176b6105b73f",
+  "revision": "2fca78e8211bc7e6e55ad6e58dfd3c2ead52a979",
   "package_dirty": false,
-  "executed_at": "2026-11-21T13:20:33.141756+00:00",
+  "executed_at": "2026-11-28T14:04:05.432101+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.3",
+    "particula": "0.4.0",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -30,6 +30,12 @@
   "outputs": [
     [
       {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.coagulation 54feb45 load on device 'cuda:0' took 4.20 ms  (cached)\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 1.83 ms  (cached)\nModule particula.gpu.kernels.coagulation 358b13f load on device 'cuda:0' took 2.15 ms  (cached)\nModule particula.gpu.kernels._coagulation_native f93a244 load on device 'cuda:0' took 1.44 ms  (cached)\n"
+      },
+      {
+        "text": "Module warp.utils f35afd3 load on device 'cuda:0' took 0.83 ms  (cached)\nModule warp.math edde159 load on device 'cuda:0' took 2.16 ms  (cached)\nModule warp.marching_cubes fb6e712 load on device 'cuda:0' took 2.48 ms  (cached)\nModule particula.gpu.kernels._coagulation_budget b4a3978 load on device 'cuda:0' took 1.48 ms  (cached)\nModule particula.execution.communication 2909959 load on device 'cuda:0' took 1.36 ms  (cached)\nModule particula.gpu.kernels._population_validation edde159 load on device 'cuda:0' took 2.29 ms  (cached)\nModule particula.gpu.kernels.communication ac9b2a2 load on device 'cuda:0' took 2.75 ms  (cached)\nModule particula.gpu.properties.gas_properties edde159 load on device 'cuda:0' took 0.87 ms  (cached)\nModule particula.gpu.properties.particle_properties edde159 load on device 'cuda:0' took 0.23 ms  (cached)\nModule particula.gpu.dynamics.coagulation_funcs edde159 load on device 'cuda:0' took 2.45 ms  (cached)\nModule particula.gpu.dynamics.condensation_funcs edde159 load on device 'cuda:0' took 2.28 ms  (cached)\nModule particula.gpu.kernels._condensation_native edde159 load on device 'cuda:0' took 2.28 ms  (cached)\nModule particula.gpu.kernels._condensation_parallel edde159 load on device 'cuda:0' took 2.28 ms  (cached)\nModule particula.gpu.kernels.thermodynamics edde159 load on device 'cuda:0' took 2.29 ms  (cached)\nModule particula.gpu.kernels.condensation edde159 load on device 'cuda:0' took 2.27 ms  (cached)\nModule particula.gpu.kernels.exhaustion 616f81d load on device 'cuda:0' took 2.68 ms  (cached)\nModule particula.gpu.kernels.slot_management 0375e2c load on device 'cuda:0' took 0.91 ms  (cached)\nModule particula.gpu.kernels.nucleation 1124f09 load on device 'cuda:0' took 2.55 ms  (cached)\nModule particula.execution.gpu_resources 30f296c load on device 'cuda:0' took 2.15 ms  (cached)\nModule particula.gpu.warp_types edde159 load on device 'cuda:0' took 2.28 ms  (cached)\nModule particula.execution.prepared_diagnostics f551690 load on device 'cuda:0' took 1.92 ms  (cached)\nModule particula.gpu.dynamics.ion_pair_data edde159 load on device 'cuda:0' took 2.27 ms  (cached)\nModule particula.gpu.dynamics.van_der_waals edde159 load on device 'cuda:0' took 2.29 ms  (cached)\nModule particula.gpu.kernels._coagulation_subcycling edde159 load on device 'cuda:0' took 2.29 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel 5433dfc load on device 'cuda:0' took 3.32 ms  (cached)\nModule particula.execution.prepared_guards 5366864 load on device 'cuda:0' took 1.53 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel f84feee load on device 'cuda:0' took 3.69 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel c0acfec load on device 'cuda:0' took 4.89 ms  (cached)\nModule particula.gpu.kernels.coagulation 2feff1b load on device 'cuda:0' took 4.68 ms  (cached)\nModule particula.gpu.kernels.coagulation 93d340b load on device 'cuda:0' took 2.62 ms  (cached)\n"
+      },
+      {
         "text": "Device: NVIDIA GeForce RTX 5060\nExact eightfold drops per million initial drops: 610\nConstant rate fitted to mean mass: 102\nAt 16 min, at least 4 initial masses: 89 drops/L\nAt 90 min, at least 8 initial masses: 101 drops/L\n"
       }
     ],
@@ -40,29 +46,9 @@
     ]
   ],
   "files": {
-    "figure-2-1.png": "e765936d8e38b1e0023cb52ea97dd6c23a6536e333a24ce4b8180a8efb22bdab",
-    "executed_source.py": "b60244425ee230445619c5477cc5262090cce0adb0eac7c1b831130e924942ef",
+    "source.py": "b60244425ee230445619c5477cc5262090cce0adb0eac7c1b831130e924942ef",
     "data.json": "9f421ae8fb212b20d9e4d65a2f1b888b9d1227e563d5f8d22135ce371df83c61",
-    "source.py": "b60244425ee230445619c5477cc5262090cce0adb0eac7c1b831130e924942ef"
+    "figure-2-1.png": "e765936d8e38b1e0023cb52ea97dd6c23a6536e333a24ce4b8180a8efb22bdab"
   },
-  "simulation_fingerprint": "dec47cca6cfb4b1698dece0327feaaf536c63044793ef04e9934b6cf683aff21",
-  "render_versions": {
-    "particula": "0.3.3",
-    "numpy": "2.3.4",
-    "scipy": "1.16.2",
-    "matplotlib": "3.10.7",
-    "nbclient": "0.10.2",
-    "jupytext": "1.17.3",
-    "warp-lang": "1.11.1",
-    "particula-distribution": "0.2.14"
-  },
-  "render_device": "CPU",
-  "execution_input_sha256": {
-    "scripts/shear_drop_spectrum/study.py": "9192a21d39bc196b18d426db36d11ac655927f8033b57b16c30ad5121532612d",
-    "scripts/shear_drop_spectrum/plots.py": "d700426678c3c2bc7234a31adadf90c78d7b887641cf8637d77c6f27ce09ce05",
-    "docs/data/shear-drop-spectrum/figure2.csv": "d83417bb963f90d5c9c453e9b7fa560f8a56c7b7daf76b60970c5861a58c6b94"
-  },
-  "rendered_at": "2026-11-21T13:20:58.698212+00:00",
-  "render_revision": "e51ed2b15f9bf790bf8b152b2c54176b6105b73f",
-  "render_elapsed_seconds": 1.8183182521024719
+  "simulation_fingerprint": "61b6c102fe57e5cbd2259eee53aa26732764edd80487ed5d617ec4d799d54425"
 }

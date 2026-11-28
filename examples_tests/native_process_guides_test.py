@@ -68,9 +68,9 @@ def test_wall_loss_quick_start_discrete_decay():
     coefficient = namespace["wall_loss"].loss_coefficient(
         initial, temperature=298.15, pressure=101325.0
     )
-    expected = initial.concentration * (1.0 - 0.25 * coefficient) ** 40
+    expected = initial.population * (1.0 - 0.25 * coefficient) ** 40
     final = namespace["particle"]
-    np.testing.assert_allclose(final.concentration, expected, rtol=1e-12)
+    np.testing.assert_allclose(final.population, expected, rtol=1e-12)
     np.testing.assert_array_equal(final.masses, initial.masses)
     np.testing.assert_array_equal(final.charge, initial.charge)
     assert final.number_density.item() < initial.number_density.item()
@@ -87,7 +87,7 @@ def test_brownian_quick_start_number_loss():
     )
     final = namespace["particle"]
     assert 0 < final.number_density.item() < initial.number_density.item()
-    assert np.all(final.concentration >= 0)
+    assert np.all(final.population >= 0)
     np.testing.assert_array_equal(final.masses, initial.masses)
     # This finite-grid PMF method is not an exact mass-conserving merge.
     assert np.all(np.isfinite(final.species_mass_inventory))
@@ -131,9 +131,7 @@ def test_condensation_recipe_inventories(index):
     initial_gas = gas.concentration.copy() * particle.volume[:, None]
     exec(compile(body, str(page), "exec"), namespace)  # noqa: S102
     final = namespace["particle"]
-    final_particle = np.sum(
-        final.masses * final.concentration[..., None], axis=1
-    )
+    final_particle = np.sum(final.masses * final.population[..., None], axis=1)
     np.testing.assert_allclose(
         final_particle + gas.concentration * final.volume[:, None],
         initial_particle + initial_gas,
@@ -296,7 +294,7 @@ def _foundations_namespace():
             )
             # Explicit upload/activation does not mutate the CPU source.
             np.testing.assert_array_equal(
-                namespace["particle_data"].concentration, [[1.0, 0.0]]
+                namespace["particle_data"].population, [[1.0, 0.0]]
             )
     return namespace
 

@@ -252,7 +252,7 @@ def test_run_example_warp_path_reports_round_trip_shapes_and_names(
             assert value is devices[family]
             result = function(value, **kwargs)
             fields = (
-                ("masses", "concentration", "charge", "density", "volume")
+                ("masses", "population", "charge", "density", "volume")
                 if family == "particle"
                 else ("concentration", "molar_mass", "partitioning")
             )

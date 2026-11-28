@@ -63,7 +63,7 @@ def _total_mass(particles: ParticleData, gas: GasData) -> np.ndarray:
         Total mass concentration in kg/m³ for each species.
     """
     return (
-        np.sum(particles.masses * particles.concentration[..., None], axis=1)
+        np.sum(particles.masses * particles.population[..., None], axis=1)
         / particles.volume[:, None]
         + gas.concentration[:, :1]
     )
@@ -81,7 +81,7 @@ def run_example() -> Aerosol:
     """
     particles = ParticleData(
         masses=np.zeros((1, 3, 1), dtype=np.float64),
-        concentration=np.zeros((1, 3), dtype=np.float64),
+        population=np.zeros((1, 3), dtype=np.float64),
         charge=np.zeros((1, 3), dtype=np.float64),
         density=np.array([1000.0], dtype=np.float64),
         volume=np.array([0.25], dtype=np.float64),
@@ -147,7 +147,7 @@ def run_example() -> Aerosol:
     np.testing.assert_allclose(
         _total_mass(particles, gas), before, rtol=1e-12, atol=1e-30
     )
-    assert np.any(particles.concentration > 0.0)
+    assert np.any(particles.population > 0.0)
     return aerosol
 
 

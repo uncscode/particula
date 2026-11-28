@@ -64,7 +64,7 @@ def test_access_has_explicit_count_volume_and_copy_semantics(example):
         assert not np.shares_memory(derived, particles.masses)
         assert not np.shares_memory(derived, particles.population)
     copied = particles.copy()
-    copied.concentration[0, 0] = 20.0
+    copied.population[0, 0] = 20.0
     assert particles.population[0, 0] == 2.0
     alias = aerosol.particles.population
     alias[0, 0] = 4.0
@@ -81,7 +81,7 @@ def test_individual_replacement_rejects_without_mutating_either_side(
     candidates = example["replacement_layout"](aerosol)
     candidate = candidates[("particles", "gas", "environment").index(field)]
     if field == "particles":
-        candidate.concentration[0, 0] = -1.0
+        candidate.population[0, 0] = -1.0
     containers = (*old, *candidates)
     saved = snapshot(*containers)
     with pytest.raises(ValueError):

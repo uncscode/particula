@@ -73,7 +73,7 @@ def build(args, np, par):
 
 def snapshot(aerosol, time, np):
     p = aerosol.particles
-    for name, value in (("radius", p.radii[0]), ("particle mass", p.total_mass[0]), ("concentration", p.concentration[0]), ("gas concentration", aerosol.gas.concentration[0])):
+    for name, value in (("radius", p.radii[0]), ("particle mass", p.total_mass[0]), ("concentration", p.slot_concentration_density[0]), ("gas concentration", aerosol.gas.concentration[0])):
         values = np.asarray(value)
         if not np.isfinite(values).all() or (values < 0).any():
             raise RuntimeError(f"Nonfinite or negative {name} at time {time}; inspect time step and configuration")
@@ -122,7 +122,7 @@ def main():
     import matplotlib.pyplot as plt
     aerosol, process = build(args, np, par)
     initial_radius = np.array(aerosol.particles.radii[0], copy=True)
-    initial_number = np.array(aerosol.particles.concentration[0], copy=True)
+    initial_number = np.array(aerosol.particles.slot_concentration_density[0], copy=True)
     rows = [snapshot(aerosol, 0.0, np)]
     for step in range(args.steps):
         aerosol = process.execute(aerosol, time_step=args.duration / args.steps, sub_steps=1)
@@ -136,7 +136,7 @@ def main():
     if not checks["mass_balance_pass"] or not all(v for k, v in checks.items() if k in ("number_conserved", "number_nonincreasing")):
         raise RuntimeError("Scientific checks failed: " + json.dumps(checks))
     final_radius = aerosol.particles.radii[0]
-    final_number = aerosol.particles.concentration[0]
+    final_number = aerosol.particles.slot_concentration_density[0]
     args.output.mkdir(parents=True, exist_ok=False)
     write_csv(args.output / "time_series.csv", rows)
     write_csv(args.output / "distribution.csv", [{"initial_radius_m": float(r0), "initial_number_per_bin_m-3": float(n0), "final_radius_m": float(r1), "final_number_per_bin_m-3": float(n1)} for r0,n0,r1,n1 in zip(initial_radius,initial_number,final_radius,final_number)])

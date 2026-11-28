@@ -45,12 +45,12 @@ particles and does not inherit charge from earlier calls.
 
 | Representation | Stored population | Rate measure | Native step |
 |---|---|---|---|
-| Discrete PMF | Bin number density, m⁻³, at V=1 | m⁻³ s⁻¹ | Existing forward Euler loss |
-| Radius PDF | dn/dr, m⁻⁴, at V=1 | m⁻⁴ s⁻¹ | Existing forward Euler loss; integrate inventories on `radius_grid` |
+| Discrete PMF | Count per bin | m⁻³ s⁻¹ | Forward Euler loss at fixed represented air volume |
+| Radius PDF | Represented dN/dr, m⁻¹ | m⁻⁴ s⁻¹ | Forward Euler loss at fixed represented air volume, integrated on `radius_grid` for inventories |
 | Particle resolved | Counts at positive physical V | Count/V per second, m⁻³ s⁻¹ | Bernoulli survival of each weighted representative |
 
 Density steps preserve per-particle mass and charge and publish only the
-concentration update. A negative or nonfinite Euler proposal rejects before
+population update. A negative or nonfinite Euler proposal rejects before
 mutation; use a smaller timestep. No exponential deterministic solver or
 concentration clipping is introduced. The coefficient laws retain their
 existing neutral transport, image-charge enhancement at zero potential, signed

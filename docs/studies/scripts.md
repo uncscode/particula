@@ -58,6 +58,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Connect water content to hygroscopicity](examples/thermodynamics/activity/kappa_activity_example.py)
 - [Cooling a gas: saturation without a parcel model](tutorials/building-an-aerosol/gas/environment_data.py)
 - [Cooling, heating and vapor pulses across sixteen boxes](examples/coupled-populations/forcing/gpu_prepared_forcing.py)
+- [Count particles in a represented air volume](tutorials/building-an-aerosol/particles/represented_population.py)
 - [Couple an illustrative particle source to growth and collisions](examples/particle-processes/sources-and-dilution/custom_nucleation_single_species.py)
 - [Create particles by transferring a bounded precursor source](examples/particle-processes/sources-and-dilution/cpu_nucleation.py)
 - [CUDA reproduces coupled spherical wall loss within sampling uncertainty](validation/wall-loss/spherical_wall_loss_theory.py)

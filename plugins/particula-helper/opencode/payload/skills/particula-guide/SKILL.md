@@ -6,7 +6,10 @@ description: "Explain aerosol science and Particula APIs with authoritative sour
 # Explain Particula
 1. Determine the scientific question and the user's level. Start with the physical process, then connect it to Particula objects and computations.
 2. Consult current official docs or the selected version's source. Cite precise pages for nontrivial scientific/API claims. Distinguish library release behavior from main-branch documentation and planned features.
-3. Explain assumptions, SI units, array shapes, radius versus diameter, and whether concentrations are per bin or densities per radius/log-radius.
+3. Explain assumptions, SI units, array shapes, radius versus diameter, and whether concentrations are per bin or densities per radius/log-radius. For a
+   0.3.6 to 0.4.0 migration, use the selected checkout’s
+   `docs/guide/migration/v0.4.0/index.md` and `../../references/scientific-boundaries.md`
+   to distinguish represented population, sampled air volume and cell inventory.
 4. Cover gas and particle construction, activity/equilibria, condensation/evaporation, coagulation, dilution, wall loss, and nucleation as relevant. Verify availability instead of asserting every feature exists in every release.
 5. Use a minimal concrete example. If a calculation was not run, label it as illustrative. Do not claim scientific validation from a successful import or smoke run.
 6. For GPU questions, consult the feature-specific contract and verify device, precision, transfers, synchronization and supported combinations. Do not infer a high-level GPU runnable or fallback from a direct kernel.

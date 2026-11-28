@@ -112,7 +112,7 @@ def build_aerosol() -> par.Aerosol:
     counts[: particle_mass_sample.size] = 1.0
     particles = par.particles.create_resolved_particle_data(
         masses=masses,
-        concentration=counts,
+        population=counts,
         density=density_ammonium_sulfate,
         volume=volume_sim,
     )
@@ -139,8 +139,7 @@ def total_inventory(aerosol):
     """Independent extensive particle-plus-gas inventory in kg."""
     return float(
         np.sum(
-            aerosol.particles.masses
-            * aerosol.particles.concentration[..., None]
+            aerosol.particles.masses * aerosol.particles.population[..., None]
         )
         + aerosol.gas.concentration[0, 0] * volume_sim
     )
@@ -390,7 +389,7 @@ for i, _ in enumerate(time):
     if i % 20 == 0:
         # Retrieve and print the total number of resolved particles simulated
         total_resolved_particles_in_simulation = (
-            aerosol.particles.concentration.sum()
+            aerosol.particles.population.sum()
         )
         print(
             f"Index {i}: Total resolved particles in simulation: {total_resolved_particles_in_simulation}"

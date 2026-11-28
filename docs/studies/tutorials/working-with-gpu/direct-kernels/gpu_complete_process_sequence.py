@@ -105,7 +105,7 @@ def _build_cpu_state() -> tuple[
             [[[1.0e-18, 2.0e-18], [0.0, 0.0], [3.0e-18, 0.0], [0.0, 0.0]]],
             dtype=np.float64,
         ),
-        concentration=np.array([[2.0, 0.0, 2.0, 0.0]], dtype=np.float64),
+        population=np.array([[2.0, 0.0, 2.0, 0.0]], dtype=np.float64),
         charge=np.array([[1.0, 0.0, -2.0, 0.0]], dtype=np.float64),
         density=np.array([1000.0, 1500.0], dtype=np.float64),
         volume=np.array([1.0e-6], dtype=np.float64),
@@ -629,9 +629,9 @@ def run_publication():
             (-0.18, particles, gas, "Initial"),
             (0.18, result.particle_data, result.gas_data, "Final"),
         ):
-            particle_mass = np.sum(
-                p.masses * p.concentration[..., None], axis=1
-            )[0]
+            particle_mass = np.sum(p.masses * p.population[..., None], axis=1)[
+                0
+            ]
             particle_density = particle_mass / p.volume[0]
             axes[0].bar(
                 x + offset, particle_density * 1e9, width=0.36, label=label
@@ -650,8 +650,8 @@ def run_publication():
         print("\n".join(result.output))
         print(
             "Represented number, initial/final:",
-            particles.concentration.sum(),
-            result.particle_data.concentration.sum(),
+            particles.population.sum(),
+            result.particle_data.population.sum(),
         )
         plotting.fit(fig)
         plt.show()

@@ -89,7 +89,7 @@ masses[:initial_count, 0] = particle_mass_sample
 counts[:initial_count] = 1.0
 resolved_masses = par.particles.create_resolved_particle_data(
     masses=masses,
-    concentration=counts,
+    population=counts,
     density=np.array([1500.0]),
     volume=1e-6,  # 1 cm^3 in m^3
 )
@@ -140,7 +140,7 @@ print(f"Particles to add: {particle_mass_add.shape}")
 initial_radii = aerosol.particles.radii[0, :initial_count].copy()
 initial_inventory = np.sum(masses * counts[:, None], axis=0)
 held_masses = aerosol.particles.masses
-held_counts = aerosol.particles.concentration
+held_counts = aerosol.particles.population
 held_gas = aerosol.gas.concentration.copy()
 request_masses = particle_mass_add[None, :, None]
 request_counts = concentration_add[None, :]
@@ -158,11 +158,10 @@ for step in (1, 2):
     )
     np.testing.assert_array_equal(activated, requested_counts)
     assert aerosol.particles.masses is held_masses
-    assert aerosol.particles.concentration is held_counts
+    assert aerosol.particles.population is held_counts
     np.testing.assert_array_equal(aerosol.gas.concentration, held_gas)
     actual = np.sum(
-        aerosol.particles.masses[0]
-        * aerosol.particles.concentration[0, :, None],
+        aerosol.particles.masses[0] * aerosol.particles.population[0, :, None],
         axis=0,
     )
     np.testing.assert_allclose(
@@ -171,9 +170,9 @@ for step in (1, 2):
         rtol=1e-12,
         atol=1e-30,
     )
-    active = aerosol.particles.concentration[0] > 0
+    active = aerosol.particles.population[0] > 0
     radii_after_steps.append(aerosol.particles.radii[0, active].copy())
-    number_density = aerosol.particles.concentration.sum() / 1e-6
+    number_density = aerosol.particles.population.sum() / 1e-6
     print(f"Number density after step {step}: {number_density:g} m^-3")
 
 radii_after_step_1, radii_after_step_2 = radii_after_steps

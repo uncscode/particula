@@ -1,19 +1,20 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 45.5280148970196,
-  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
+  "elapsed_seconds": 67.25469762599096,
+  "package_source_sha256": "142dc45c78857a370342e7331e40670f99125a47f20f328815752098c59941a3",
+  "scientific_source_sha256": "02156f28723d5f1efd3cdd1cc740489c33c6744dfd5d4e3cec8f8d5b9ddf17f3",
   "input_sha256": {},
   "example": "examples-processes-coagulation-coagulation-5-time-evolution",
-  "fingerprint": "8b7d66f038c8d39098a4147a25bba36f1f61f677a8d56fc0239591d33c1c2859",
-  "source": "docs/examples/processes/coagulation/coagulation_5_time_evolution.py",
-  "revision": "dd92d3c1ca71f36eacad56b49661b32c0da77ac7",
+  "fingerprint": "2c18b79f1c2017decdee762878b45ddee38e4ec996590539b2ec2708e72cc226",
+  "source": "docs/studies/tutorials/coagulation-populations/coagulation_5_time_evolution.py",
+  "revision": "bba19575e4040ba2f09df07295cdd1c04fb5b668",
   "package_dirty": false,
-  "executed_at": "2026-11-19T14:43:17.630546+00:00",
+  "executed_at": "2026-11-28T13:33:15.004497+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.2",
+    "particula": "0.4.0",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -47,7 +48,7 @@
     ],
     [
       {
-        "text": "PMF: <particula.dynamics.particle_process.Coagulation object at 0x7f6d802c4a40>\nPDF: <particula.dynamics.particle_process.Coagulation object at 0x7f6d45029eb0>\nResolved: <particula.dynamics.particle_process.Coagulation object at 0x7f6d4502b080>\n"
+        "text": "PMF: <particula.dynamics.particle_process.Coagulation object at 0x7f1c6c8cd790>\nPDF: <particula.dynamics.particle_process.Coagulation object at 0x7f1c6c654ef0>\nResolved: <particula.dynamics.particle_process.Coagulation object at 0x7f1c6c52c620>\n"
       }
     ],
     [
@@ -57,13 +58,13 @@
     ],
     [
       {
-        "text": "Step 1/12: PMF=9.96e+09, PDF=9.96e+09, Resolved=9.96e+09\n"
+        "text": "Step 1/12: PMF=9.96e+09, PDF=9.96e+09, Resolved=9.95e+09\n"
       },
       {
         "text": "Step 2/12: PMF=9.91e+09, PDF=9.92e+09, Resolved=9.91e+09\n"
       },
       {
-        "text": "Step 3/12: PMF=9.87e+09, PDF=9.88e+09, Resolved=9.88e+09\n"
+        "text": "Step 3/12: PMF=9.87e+09, PDF=9.88e+09, Resolved=9.87e+09\n"
       },
       {
         "text": "Step 4/12: PMF=9.83e+09, PDF=9.83e+09, Resolved=9.83e+09\n"
@@ -72,7 +73,7 @@
         "text": "Step 5/12: PMF=9.79e+09, PDF=9.79e+09, Resolved=9.79e+09\n"
       },
       {
-        "text": "Step 6/12: PMF=9.75e+09, PDF=9.75e+09, Resolved=9.75e+09\n"
+        "text": "Step 6/12: PMF=9.75e+09, PDF=9.75e+09, Resolved=9.74e+09\n"
       },
       {
         "text": "Step 7/12: PMF=9.71e+09, PDF=9.71e+09, Resolved=9.71e+09\n"
@@ -81,16 +82,16 @@
         "text": "Step 8/12: PMF=9.67e+09, PDF=9.68e+09, Resolved=9.67e+09\n"
       },
       {
-        "text": "Step 9/12: PMF=9.63e+09, PDF=9.64e+09, Resolved=9.64e+09\n"
+        "text": "Step 9/12: PMF=9.63e+09, PDF=9.64e+09, Resolved=9.63e+09\n"
       },
       {
-        "text": "Step 10/12: PMF=9.59e+09, PDF=9.60e+09, Resolved=9.60e+09\n"
+        "text": "Step 10/12: PMF=9.59e+09, PDF=9.60e+09, Resolved=9.59e+09\n"
       },
       {
-        "text": "Step 11/12: PMF=9.55e+09, PDF=9.56e+09, Resolved=9.56e+09\n"
+        "text": "Step 11/12: PMF=9.55e+09, PDF=9.56e+09, Resolved=9.55e+09\n"
       },
       {
-        "text": "Step 12/12: PMF=9.51e+09, PDF=9.52e+09, Resolved=9.52e+09\n"
+        "text": "Step 12/12: PMF=9.51e+09, PDF=9.52e+09, Resolved=9.51e+09\n"
       }
     ],
     [
@@ -103,13 +104,15 @@
         "image": "figure-11-1.png"
       },
       {
-        "text": "\nFinal concentrations:\n  PMF: 9.51e+09 m^-3 (95.1% remaining)\n  PDF: 9.52e+09 m^-3 (95.2% remaining)\n  Resolved: 9.52e+09 m^-3 (95.2% remaining)\n"
+        "text": "\nFinal concentrations:\n  PMF: 9.51e+09 m^-3 (95.1% remaining)\n  PDF: 9.52e+09 m^-3 (95.2% remaining)\n  Resolved: 9.51e+09 m^-3 (95.1% remaining)\n"
       }
     ]
   ],
   "files": {
-    "figure-11-1.png": "d293abd9c0aff0b9b1ae7f7f64d3570fc62691dd121b7720c3a08ad6b5638961",
-    "figure-10-1.png": "700f91d1b0a86d5dac3b15b35c46db0f1e642778eb921643b58b3a559cadd442",
-    "source.py": "ab682b01844cd3232b93a821c53ddc7463fc1dfd9f0946d407d0855e4d01ce8c"
-  }
+    "source.py": "23e8d56ddd68db4735ce9f30f62f9c3bd5ca97132f14688974e80e21e30161d3",
+    "data.json": "46638659620932cb10bfa879b620be3e7957d8b23e4c24ba3e950df83730ecd7",
+    "figure-10-1.png": "79981f4dfe359a20edc27195cc402cd4945e81c378d266a417c198c951d222e7",
+    "figure-11-1.png": "30e90eeecc2a40dbe04ace26e0a3f6ce5492fd983f4f02b3de6700a489d90767"
+  },
+  "simulation_fingerprint": "d1165c5ea957d323ec5929edfa80b10437b1b1db5966fcac01f18da5cd14c5e4"
 }

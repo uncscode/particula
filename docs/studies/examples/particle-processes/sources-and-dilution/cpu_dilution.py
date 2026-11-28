@@ -99,7 +99,7 @@ def _build_aerosol() -> par.Aerosol:
     particles = par.particles.create_resolved_particle_data(
         masses=np.array([1.0e-18, 2.0e-18]),
         density=np.array([1000.0]),
-        concentration=np.array([4.0, 8.0]),
+        population=np.array([4.0, 8.0]),
         charge=np.array([1.0, -1.0]),
         volume=2.0,
     )

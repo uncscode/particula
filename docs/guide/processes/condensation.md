@@ -113,17 +113,17 @@ vapor-pressure and latent parameters follow full gas order; activity and
 surface composition use all particle materials, including nonvolatile ones.
 
 Native `mass_transfer_rate` is kg/s per particle and material. Native `rate`
-returns each node's contribution in kg/m³/s: resolved counts use count/volume,
-PMF uses stored bin density, and radius PDF uses full-grid trapezoidal weights.
-PMF/PDF require volume exactly 1 m³; resolved volume is positive and finite.
-PDF inventory integrates mass times dn/dr on its explicit radius grid.
+returns each node's contribution in kg/m³/s. Divide represented population
+by the box's air volume for all three kinds. For radius PDFs, also multiply
+each node by its trapezoidal width on the full radius grid. Multiplying the
+per-particle transfer rate by these weights gives the bulk rate.
 
 Native steps stage particle and mapped gas updates, bound evaporation by
 remaining particle mass, and limit uptake by available mapped gas plus actual
 released inventory. Unmapped/skipped/nonpartitioning lanes remain unchanged.
 `update_gases=False` keeps the external reservoir unchanged while retaining the
 finite-stage availability limiter. Native latent energy is extensive J, using
-counts (density integrated over volume for PMF/PDF), rather than energy density.
+represented counts per slot, including the radius quadrature weights for PDFs.
 
 When a resolved particle fully evaporates (every material mass is zero), its
 count and charge are cleared after gas and energy accounting. This releases a
@@ -370,8 +370,7 @@ fallback is configured, the step follows the isothermal path and reports
 
 For native state, `last_latent_heat_energy` is signed extensive energy in J:
 sum the applied per-particle material transfer times represented counts and
-latent heat. For PMF/PDF, integrate the population density over the canonical
-reference volume. Condensation is positive and evaporation negative. The
+latent heat. For a PDF, weight each stored ordinate by its radius-node width. Condensation is positive and evaporation negative. The
 example regression checks this against the actual particle inventory change;
 it is a per-call diagnostic, not a temperature-evolution model.
 

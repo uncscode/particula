@@ -31,7 +31,9 @@ That example keeps direct step imports explicit through `particula.gpu.kernels`
 while top-level `particula.gpu` stays focused on `WARP_AVAILABLE` and the
 `to_warp_*` / `from_warp_*` transfer helpers.
 
-For migration walkthroughs and before/after examples, see
+For particle counts, measured density and archived runs, see the
+[0.3.6 to 0.4.0 upgrade guide](../migration/v0.4.0/index.md).
+For the earlier move to native aerosol containers, see
 [Particle & Gas Data Migration](../migration/v0.3.0/index.md). For future work
 and planned expansions, see the
 [Pending initial-state optimization](../../contribute/roadmap.md).
@@ -298,7 +300,7 @@ Per-box arrays always keep a leading `n_boxes` dimension, even when
 `n_boxes == 1`.
 
 - Single-box particle masses: `(1, n_particles, n_species)`
-- Single-box particle concentration: `(1, n_particles)`
+- Single-box particle population: `(1, n_particles)`
 - Single-box gas concentration: `(1, n_species)`
 - Single-box environment temperature: `(1,)`
 - Single-box environment saturation ratio: `(1, n_species)`

@@ -1,3 +1,35 @@
+# %% [markdown]
+# # Create particles by transferring a bounded precursor source
+#
+# How can new particles appear without creating material from nothing? This
+# example uses the supported CPU nucleation runnable to transfer a mapped gas
+# species into initially inactive particle slots. It demonstrates the bookkeeping
+# needed to connect a formation-rate model to a finite gas reservoir and finite
+# storage capacity.
+#
+# Read [native state and counts](../../../tutorials/building-an-aerosol/native_state_access.py) first.
+# This is a deterministic API and inventory example, not a calibration of
+# atmospheric nucleation kinetics.
+#
+# ## Separate the source law from committing new particles
+#
+# The one-box volume is 0.25 m³ with three inactive particle slots and one material
+# of density 1000 kg m⁻³. Gas contains 10⁻¹² kg m⁻³ precursor plus an inert
+# species. Temperature and pressure are 298.15 K and 101325 Pa.
+#
+# The activation strategy specifies a 0.01 s⁻¹ coefficient, a 1 nm formation
+# diameter, and explicit temperature and precursor bounds. The extremely broad
+# bounds are demonstration settings, not literature-supported validity limits.
+# The source configuration maps precursor gas lane 0 to material lane 0. The
+# commit configuration sets slot-weight and exhaustion controls, with requested
+# and minimum scale both one so the inventory comparison uses the unscaled state.
+#
+# `_total_mass` converts count-weighted particle mass to kg m⁻³ before adding
+# gas. After a 1 s advance in two substeps, the assertions require an active
+# particle population and unchanged mapped particle-plus-gas mass within tolerance.
+# Only a success message is printed; the checks are the evidence behind it.
+
+# %%
 """Run the supported bounded CPU-only nucleation example.
 
 The native ``Nucleation`` runnable reads a unified gas container and the current
@@ -31,7 +63,7 @@ def _total_mass(particles: ParticleData, gas: GasData) -> np.ndarray:
         Total mass concentration in kg/m³ for each species.
     """
     return (
-        np.sum(particles.masses * particles.concentration[..., None], axis=1)
+        np.sum(particles.masses * particles.population[..., None], axis=1)
         / particles.volume[:, None]
         + gas.concentration[:, :1]
     )
@@ -49,7 +81,7 @@ def run_example() -> Aerosol:
     """
     particles = ParticleData(
         masses=np.zeros((1, 3, 1), dtype=np.float64),
-        concentration=np.zeros((1, 3), dtype=np.float64),
+        population=np.zeros((1, 3), dtype=np.float64),
         charge=np.zeros((1, 3), dtype=np.float64),
         density=np.array([1000.0], dtype=np.float64),
         volume=np.array([0.25], dtype=np.float64),
@@ -115,10 +147,26 @@ def run_example() -> Aerosol:
     np.testing.assert_allclose(
         _total_mass(particles, gas), before, rtol=1e-12, atol=1e-30
     )
-    assert np.any(particles.concentration > 0.0)
+    assert np.any(particles.population > 0.0)
     return aerosol
 
 
 if __name__ == "__main__":
     run_example()
     print("CPU nucleation example completed.")
+
+# %% [markdown]
+# ## Use conservation as the first gate
+#
+# The run demonstrates that an initially empty active population can receive a
+# bounded source while retaining the mapped material inventory and aerosol
+# identity. Three storage slots do not limit the physical population to three
+# particles: slot weights represent counts. A successful inventory check does
+# not establish the physical correctness of the chosen formation coefficient.
+#
+# For a research application, supply a sourced rate law with its units and domain,
+# then vary precursor abundance and formation size while tracking number produced,
+# gas depletion, material balance, and capacity pressure. Test exhaustion behavior
+# before coupling growth or collisions. The [custom-source example](custom_nucleation_single_species.py)
+# shows an illustrative alternative law and external vapor supply; it should not
+# be treated as a validated replacement for the supported bounded interface.

@@ -1,18 +1,10 @@
 # Dilution Strategy System
 
-For the supported CUDA configuration of this runnable, use
-[prepared GPU simulations](../gpu/prepared.md). The CPU and direct-kernel
-contracts below retain their own, sometimes broader, capabilities.
-
-## Complete direct-process context
-
-CPU dilution remains the semantic source. The direct GPU step is one call in the
-illustrative [explicit-transfer sequence](https://github.com/Gorkowski/particula/blob/main/docs/studies/tutorials/working-with-gpu/direct-kernels/gpu_complete_process_sequence.py), backed by [direct-process validation evidence](https://github.com/Gorkowski/particula/blob/main/particula/gpu/tests/process_sequence_test.py) and its [example regression](https://github.com/Gorkowski/particula/blob/main/examples_tests/gpu_complete_process_sequence_example_test.py). It does not create public coordination, hidden transfer, CPU fallback, or a resident loop.
-
-The CPU dilution system provides a bounded chamber-loss process for a single
-`Aerosol`. It is the completed CPU contract from parent **GPU process completeness**. **GPU dilution** is a
-downstream consumer of this CPU reference only; this guide does not deliver
-GPU dilution or CPU/GPU parity.
+Use dilution for the loss of suspended particles and gas when clean air
+flushes a well-mixed chamber at fixed volume. The CPU runnable advances each
+box of a native `Aerosol`. The direct Warp example shows where to include
+dilution in a sequence, and the prepared guide lists supported CUDA
+configurations. [Explicit-transfer sequence](../../studies/tutorials/working-with-gpu/direct-kernels/gpu_complete_process_sequence.py) · [Prepared GPU simulations](../gpu/prepared.md)
 
 ## Public API and equation
 
@@ -24,7 +16,7 @@ import particula as par
 
 particles = par.particles.create_resolved_particle_data(
     masses=[1e-18, 2e-18], density=1000.0,
-    concentration=[4.0, 8.0], volume=2.0,
+    population=[4.0, 8.0], volume=2.0,
 )
 gas = par.gas.GasData(
     name=["vapor", "inert"], molar_mass=np.array([0.1, 0.04]),
@@ -43,18 +35,81 @@ assert result is aerosol
 ```
 
 Execution mutates the supplied `Aerosol` and returns that same `Aerosol`
-object. For chamber volume `V` [m³] and dilution flow `Q` [m³/s], the scalar
-coefficient is `alpha = Q / V` [s⁻¹]. Every supported concentration follows
+object. For physical chamber volume `V` [m³] and dilution flow `Q` [m³/s],
+the scalar coefficient is `alpha = Q / V` [s⁻¹]. The represented particle
+sample can occupy a different air volume. Every supported concentration follows
 the exact exponential update
 
 `c_new = c * exp(-alpha * time_step)`.
 
-Here `time_step` is in s. Native resolved particle storage holds counts;
-PMF storage holds bin number density (m⁻³), and PDF storage holds `dn/dr`
-(m⁻⁴). All receive the same multiplicative decay at fixed volume. All lanes of
+Here `time_step` is in s. Dilution multiplies the stored population in each
+slot by the decay factor at fixed represented air volume. This scales counts
+for resolved/discrete slots and represented dN/dr in m⁻¹ for radius PDFs. All lanes of
 the unified `GasData.concentration` (kg/m³) decay, regardless of partitioning.
 The native runnable applies the coefficient independently to every box.
 There is no cross-box transport.
+
+## Compare a flush with physical expansion
+
+A clean-air flush replaces sampled air while the sample volume stays fixed.
+Start with 100 represented particles and 1 µg of gas in 0.25 m³. The gas
+input is therefore 4 × 10⁻⁹ kg/m³. Over a one-second half-life, the CPU
+dilution process removes 50 particles and 0.5 µg of gas.
+
+```python
+import numpy as np
+import particula as par
+
+sample_particles = par.particles.create_resolved_particle_data(
+    masses=[1e-18], density=1000.0, population=[100.0], volume=0.25,
+)
+sample_gas = par.gas.GasData(
+    name=["tracer"], molar_mass=np.array([0.1]),
+    concentration=np.array([[4e-9]]), partitioning=np.array([False]),
+)
+sample_environment = par.gas.EnvironmentData(
+    temperature=[298.15], pressure=[101325.0], saturation_ratio=[[0.0]],
+)
+flushed = par.Aerosol(
+    particles=sample_particles.copy(), gas=sample_gas.copy(),
+    environment=sample_environment,
+)
+loss = par.dynamics.Dilution(par.dynamics.DilutionStrategy(coefficient=np.log(2)))
+loss.execute(flushed, time_step=1.0)
+np.testing.assert_allclose(flushed.particles.population, [[50.0]])
+np.testing.assert_allclose(flushed.particles.number_density, [200.0])
+np.testing.assert_allclose(flushed.gas.concentration, [[2e-9]], atol=0)
+np.testing.assert_allclose(flushed.gas.concentration * flushed.particles.volume[:, None],
+                           [[0.5e-9]], atol=0)
+```
+
+Expanding the original air sample to 0.5 m³ gives the same final number and
+gas densities. The resolved Warp prescribed-volume step retains all 100
+particles and 1 µg of gas. With Warp installed, continue from the original
+`sample_particles` and `sample_gas` above. Choose `"cpu"` to execute the Warp CPU path, or
+`"cuda:0"` to execute on CUDA hardware.
+
+```python
+import warp as wp
+from particula.gpu import from_warp_particle_data, to_warp_gas_data, to_warp_particle_data
+from particula.gpu.kernels.communication import volume_evolution_step_gpu
+
+device = "cpu"
+expanded = to_warp_particle_data(sample_particles, device=device)
+expanded_gas = to_warp_gas_data(sample_gas, device=device)
+volume_evolution_step_gpu(expanded, expanded_gas,
+                          wp.array([0.5], dtype=wp.float64, device=device))
+native = from_warp_particle_data(expanded)
+np.testing.assert_allclose(native.population, [[100.0]])
+np.testing.assert_allclose(native.number_density, [200.0])
+np.testing.assert_allclose(expanded_gas.concentration.numpy(), [[2e-9]], atol=0)
+np.testing.assert_allclose(expanded_gas.concentration.numpy() * native.volume[:, None],
+                           [[1e-9]], atol=0)
+```
+
+A manual particle-volume edit leaves gas concentration at its previous value.
+It therefore gives a different gas inventory when the new volume is applied.
+[Replacing a measured particle sample](../migration/v0.4.0/index.md#import-and-replace-a-measured-sample)
 
 ## Execution, validation, and recovery
 
@@ -82,9 +137,9 @@ environment temperature, pressure and saturation ratios.
 
 ## Boundaries and example
 
-This CPU scalar contract excludes inlet composition or source terms, multi-box
-particle data and transport, GPU, Warp, CUDA, alternate-backend implementation or parity,
-backend selection, and performance claims.
+The CPU runnable applies the same prescribed coefficient independently to
+each box. Inlet composition, sources, and transport between boxes require
+separate processes.
 
 `dilute_aerosol` and `get_dilution_step` are concrete-module-only helpers;
 they are not public `particula.dynamics` imports. Use the public strategy and

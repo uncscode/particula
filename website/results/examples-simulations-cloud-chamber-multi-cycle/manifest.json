@@ -1,19 +1,20 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 2247.5506859150482,
-  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
+  "elapsed_seconds": 2720.3976607811637,
+  "package_source_sha256": "142dc45c78857a370342e7331e40670f99125a47f20f328815752098c59941a3",
+  "scientific_source_sha256": "02156f28723d5f1efd3cdd1cc740489c33c6744dfd5d4e3cec8f8d5b9ddf17f3",
   "input_sha256": {},
   "example": "examples-simulations-cloud-chamber-multi-cycle",
-  "fingerprint": "84f61ab80bdfe0c39355f490afde523db49510eb1b3740b632ec8077de37edf7",
-  "source": "docs/examples/simulations/cloud_chamber_multi_cycle.py",
-  "revision": "0d602f8a0cf13a18f9a3581b4cbdfb1346f18d9f",
+  "fingerprint": "b9b3d57e03581b96673be228cfd3d814685913c17924e5450004cb4d706030b1",
+  "source": "docs/studies/examples/coupled-populations/chambers/cloud_chamber_multi_cycle.py",
+  "revision": "2fca78e8211bc7e6e55ad6e58dfd3c2ead52a979",
   "package_dirty": false,
-  "executed_at": "2026-11-19T15:09:27.662416+00:00",
+  "executed_at": "2026-11-28T14:13:24.578208+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.2",
+    "particula": "0.4.0",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -131,14 +132,14 @@
     ]
   ],
   "files": {
-    "figure-19-1.png": "efff7967f2999a95663877b85b3b3b5454e75216a64d9eef58f1a3ee58107e98",
-    "figure-18-1.png": "8987929454bfdf5d8a2824316e2b14ea367849c8d3565cabd486d40cd650c595",
-    "figure-17-1.png": "f29ca12d234df2f7352da05efeaa4daa79c0e5d3124f49847f9e8ba7d093c489",
-    "figure-12-1.png": "3f52ebe2a1a42ddb482562dfae158d4edd865aa1344405019842c80332d48130",
-    "figure-11-1.png": "5abaa689f0a106db687f0141ae50e9ae8d853fd4b825407ef20698e07543efb9",
-    "figure-10-1.png": "2fec96518719027528e04b43d80140cb12f1d229e3ea046cb9dc028cb308096d",
-    "figure-9-1.png": "5a21d29089f6044c0a6aa9454cc013ae76ef07dc60ad4653a14cf2c1e5d1bd09",
+    "source.py": "ed1c32f8f8757803c0fc9b9399dbf39df6543548ee0fa332dcf7a3c13d3a2019",
     "figure-8-1.png": "aae99e611f4ba8b65b8c1ea1ca62c59c82233247158e63465fdca85998cbb7a0",
-    "source.py": "31962ca9f2e70ac0cf861ba69e46200dacb07989bd840df473c2727be1515c91"
+    "figure-9-1.png": "5a21d29089f6044c0a6aa9454cc013ae76ef07dc60ad4653a14cf2c1e5d1bd09",
+    "figure-10-1.png": "2fec96518719027528e04b43d80140cb12f1d229e3ea046cb9dc028cb308096d",
+    "figure-11-1.png": "5abaa689f0a106db687f0141ae50e9ae8d853fd4b825407ef20698e07543efb9",
+    "figure-12-1.png": "3f52ebe2a1a42ddb482562dfae158d4edd865aa1344405019842c80332d48130",
+    "figure-17-1.png": "f29ca12d234df2f7352da05efeaa4daa79c0e5d3124f49847f9e8ba7d093c489",
+    "figure-18-1.png": "8987929454bfdf5d8a2824316e2b14ea367849c8d3565cabd486d40cd650c595",
+    "figure-19-1.png": "efff7967f2999a95663877b85b3b3b5454e75216a64d9eef58f1a3ee58107e98"
   }
 }

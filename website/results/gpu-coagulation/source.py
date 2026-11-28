@@ -86,7 +86,7 @@ def _build_particle_data() -> ParticleData:
             ],
             dtype=np.float64,
         ),
-        concentration=np.array(
+        population=np.array(
             [[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0]],
             dtype=np.float64,
         ),
@@ -166,7 +166,7 @@ def _output_prefix(particle_data: ParticleData) -> list[str]:
         (
             "ParticleData constructed: "
             f"masses={particle_data.masses.shape}, "
-            f"concentration={particle_data.concentration.shape}, "
+            f"population={particle_data.population.shape}, "
             f"charge={particle_data.charge.shape}, "
             f"density={particle_data.density.shape}, "
             f"volume={particle_data.volume.shape}"
@@ -241,11 +241,11 @@ def run_example(device: str = "cpu") -> ExampleRun:
     np.testing.assert_allclose(
         np.sum(
             restored_particle_data.masses
-            * restored_particle_data.concentration[:, :, None],
+            * restored_particle_data.population[:, :, None],
             axis=1,
         ),
         np.sum(
-            particle_data.masses * particle_data.concentration[:, :, None],
+            particle_data.masses * particle_data.population[:, :, None],
             axis=1,
         ),
         rtol=1e-12,
@@ -316,10 +316,10 @@ def run_publication():
             ylabel="Number density per bin (m$^{-3}$)",
         )
         plotting.legend(axes[0])
-        initial_mass = np.sum(initial.masses * initial.concentration[..., None])
-        final_mass = np.sum(final.masses * final.concentration[..., None])
+        initial_mass = np.sum(initial.masses * initial.population[..., None])
+        final_mass = np.sum(final.masses * final.population[..., None])
         fraction = [
-            final.concentration.sum() / initial.concentration.sum(),
+            final.population.sum() / initial.population.sum(),
             final_mass / initial_mass,
         ]
         axes[1].bar(

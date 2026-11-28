@@ -91,14 +91,40 @@ arbitrary supplied vector represents physically realizable light.
 
 ## Population coefficients and path geometry
 
-`get_population_weights` converts a final particle axis into number-density
-weights:
+For native CPU particle state, `population_optics` uses each box's current
+volume and distribution. An independent extinction check is the sum of
+cross section times integrated number density. For a discrete sample at a
+550 nm wavelength, compare the bulk extinction in m⁻¹ as follows.
+
+```python
+import numpy as np
+from particula.optics import OpticalConfig, particle_optics, population_optics
+from particula.particles import create_particle_data_from_radii
+
+sample = create_particle_data_from_radii(
+    radii=[50e-9, 120e-9], concentration=[4.0, 8.0], volume=0.25,
+    distribution_type="discrete",
+)
+config = OpticalConfig([550e-9], particle_index=1.5 + 0.02j)
+_, cross = particle_optics(sample, config)
+expected = np.sum(cross.extinction[0, 0] * np.array([4.0, 8.0]))
+np.testing.assert_allclose(population_optics(sample, config).extinction[0, 0],
+                           expected, atol=0)
+```
+
+For a native radius PDF, each contribution also includes its trapezoidal
+radius-node width in metres. An optical path length enters only when
+converting bulk extinction to optical depth.
+[Particle units and quadrature](../migration/v0.4.0/index.md#check-integration-mass-and-diameter-spectra)
+
+For independent measurement arrays, `get_population_weights` retains its
+input conventions. Choose the input that matches the measurement:
 
 | Distribution | Input | Required information |
 | --- | --- | --- |
 | `discrete` | Bin number density [m⁻³] | None |
 | `particle_resolved` | Represented particle count | Representative volume [m³] |
-| `continuous_pdf` | Radius density dN/dr [m⁻⁴] | Increasing radius grid [m] |
+| `continuous_pdf` | Radius density dn/dr [m⁻⁴] | Increasing radius grid [m] |
 
 Use the exact distribution names in the API. PDF weights apply trapezoidal
 quadrature to the product of number density and optical cross section.
