@@ -125,18 +125,23 @@ the package version and each source file's size and SHA-256 hash. Locate it with
 Relative links within the selected trees are preserved. Repository tooling and
 rendered-site links are not made into standalone offline pages.
 
-Build and verify release artifacts using the selected development interpreter:
+From the repository root, activate the development environment with `build` and
+the declared Flit build dependency installed. Build the wheel and source archive
+in a fresh directory so the checker selects the pair from this run, even when
+earlier builds are still on disk.
 
 ```bash
-python -m build
+mkdir -p .artifacts
+bundle_dir=$(mktemp -d .artifacts/docs-bundle.XXXXXX)
+python -m build --no-isolation --outdir "$bundle_dir"
 python scripts/check_doc_bundle.py \
-  --wheel dist/particula-0.3.0-py3-none-any.whl \
-  --sdist dist/particula-0.3.0.tar.gz \
-  --report .artifacts/docs-bundle.json
+  --wheel "$bundle_dir"/*.whl \
+  --sdist "$bundle_dir"/*.tar.gz \
+  --report "$bundle_dir/report.json"
 pytest scripts/tests/doc_bundle_test.py -q -Werror
 ```
 
-Use the filenames for the version being released. The checker verifies source
+The checker verifies source
 hashes and wheel RECORD entries, rebuilds from the source archive with no Git or
 network access, and installs both wheels in separate clean environments. It
 checks searchable guides, examples, assets, relative links and the import-free
