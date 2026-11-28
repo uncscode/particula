@@ -19,7 +19,7 @@ def state():
     return SimpleNamespace(
         particles=SimpleNamespace(
             masses=np.array([[[1.0, 1e-12], [2.0, 2e-12]]]),
-            concentration=np.array([[1.0, 2.0]]),
+            population=np.array([[1.0, 2.0]]),
             volume=np.array([4.0]),
             radii=np.array([[1.0, 2.0]]),
         ),
