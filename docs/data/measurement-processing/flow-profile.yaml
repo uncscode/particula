@@ -1,0 +1,26 @@
+$schema: ./profile.schema.json
+schema_version: "1"
+profile_id: lab_flow_voltage
+instrument_family: flow_meter
+measurement_principle: voltage_readout
+description: One voltage observation per UTC second from a bench flow meter.
+input:
+  encoding: utf-8
+  delimiter: ","
+  header_record: 0
+  record_width: 2
+time:
+  kind: unix
+  column: epoch
+  unit: s
+  timezone: UTC
+fields:
+  - name: voltage
+    description: Voltage across the flow meter output.
+    quantity: voltage
+    source_unit: V
+    output_unit: V
+    dtype: float64
+    column: signal
+on_bad_record: report
+missing_tokens: ["", "."]

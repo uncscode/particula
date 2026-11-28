@@ -2345,5 +2345,31 @@
     ],
     "plot_inputs": [],
     "full_canvas": true
+  },
+  "calibrated-particle-count": {
+    "title": "When 100 counts per second means 10 or 5 particles per cubic centimetre",
+    "source": "docs/studies/examples/calibrated_particle_count.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 120,
+    "inputs": [
+      "scripts/measurement_flow_lab.py",
+      "docs/data/measurement-processing/counter.csv",
+      "docs/data/measurement-processing/flow.csv",
+      "docs/data/measurement-processing/flow-profile.yaml",
+      "docs/data/measurement-processing/concentration.yaml",
+      "particula/data/profiles/profile.schema.json"
+    ],
+    "input_destinations": {
+      "particula/data/profiles/profile.schema.json": "docs/data/measurement-processing/profile.schema.json"
+    },
+    "invoke": "report = run_example()\nfigure = plot_results(report)",
+    "data_expression": "report",
+    "replot_invoke": "figure = plot_results(saved_data)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
   }
 }

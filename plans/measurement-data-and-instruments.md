@@ -237,7 +237,7 @@ Develop deliveries 4 and 5 independently once PR 1 supplies their inputs, then i
 
 **Start with an installable profile contract, then take one real particle-counter file all the way from raw bytes to a reopened Parquet dataset.** This is the first end-to-end milestone. It exercises units, source identity, repairs, streaming and persistence while the product still has a simple scalar shape. Publish each instrument's worked import example alongside its reader.
 
-The schema fixtures, donor-file checks and small Polars/Warp experiments above supply reference results. Deliveries 1–3 are implemented on this branch. Deliveries 4–6 remain planned. The prerequisite column identifies what each change actually needs; independent branches can proceed once their prerequisites pass.
+The schema fixtures, donor-file checks and small Polars/Warp experiments above supply reference results. [PR 1758](https://github.com/uncscode/particula/pull/1758) delivered the import and typed products (1–3). This branch implements deliveries 4–6. The [campaign qualification](../docs/studies/validation/workflows-and-releases/measurement-import.md) compares every July 10 minute with independently decoded observations. The [calibration example](../docs/studies/examples/calibrated_particle_count.py) runs the direct, YAML and JSON paths and reopens the result. See the [collection guide](../docs/guide/data-model/measurement-collections.md) and [processing contracts](../docs/guide/data-model/measurement-processing.md) for supported calls. The prerequisite column identifies what each change actually needs; independent branches can proceed once their prerequisites pass.
 
 | Order | Deliverable and prerequisite | Observable completion criterion |
 | --- | --- | --- |

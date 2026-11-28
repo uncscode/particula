@@ -84,3 +84,45 @@ surviving complete rows. The beta's character filter drops the fragments.
 For the spectra, compare channel order and inclusive bounds before converting
 units. The packaged tests use small excerpts and synthetic failure cases so
 that ordinary test runs work offline.
+
+## Compare an hour on a minute grid
+
+On 10 July 2022, the particle counter reported observations in every minute
+from 12:00 to 13:00 UTC. The mobility sizer reported scan starts in 40 of those
+60 minutes. Those 40 windows support a comparison of minute summaries even
+when individual readings occurred at different times. The remaining 20 retain
+the counter mean and a null sizer concentration.
+
+| Source quantity | Observations in the hour | Valid readings per minute | Mean at 12:00 UTC |
+| --- | ---: | ---: | ---: |
+| Counter detector rate | 1,203 | 20–21 | 17,260.6 counts/s |
+| Sizer vendor number concentration | 40 | 0–1 | 1.38240 × 10¹⁰ m⁻³ |
+
+The comparison uses the 10 July files in the [pinned checkout above](#compare-with-the-original-field-exports).
+The reference decoder reads the counter's Unix timestamp and the sizer's
+printed date and scan start with Python's CSV reader. It interprets the
+sizer clock as UTC per the donor settings, converts the printed concentration
+from cm⁻³ to m⁻³, and assigns readings to left-closed one-minute windows.
+NumPy independently calculates each denominator and arithmetic mean. The
+test compares these arrays, including all empty windows, against aligned
+Parquet members reopened through the measurement API.
+
+All 40 sizer scans report both `Detector aerosol flow rate error` and
+`Incomplete Scan`. Including these numerical records checks the placement
+of scan starts. Excluding the incomplete-scan flag leaves 60 null sizer means
+and preserves the 1,203 counter samples. Actual exposure within those
+windows remains unknown.
+
+Use the same donor checkout and `PARTICULA_BETA_FIXTURES` directory as in the
+single-instrument comparison above. This command imports into temporary
+datasets, reopens them lazily and checks the entire hour. To reuse archived
+datasets produced with the earlier importer, set `PARTICULA_CAMPAIGN_DATASETS`
+to a directory containing the two completed datasets named `counter` and
+`sizer`. The test verifies the source digest of each.
+
+```bash
+PARTICULA_BETA_FIXTURES=.artifacts/particula-dev-data/particula_beta/data/tests/example_data \
+    python -m pytest particula/data/tests/campaign_field_test.py
+```
+
+[Build a collection and choose weighting and exclusions](../../../guide/data-model/measurement-collections.md).

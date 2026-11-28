@@ -1,5 +1,7 @@
 # User-defined instruments and prescribed measurement processes
 
+The sections below record the design proposal. The [processing guide](../../docs/guide/data-model/measurement-processing.md) and [executed two-instrument example](../../docs/studies/examples/calibrated_particle_count.py) show the shipped interfaces and their calibration and lineage checks.
+
 A lab should be able to add its own instrument, supply its calibration or signal-processing code, and combine its outputs with a built-in Particula instrument. Use the simulation API's pattern of a configured process, explicit execution, and ordered composition via `|`. Implement a measurement-specific executor: the existing `RunnableABC.execute` advances an `Aerosol` over a time step and stages per-box writes. Observations already have timestamps and exposure. Executing a measurement process produces a new product with its own identity. [Simulation runnable and sequence](../../particula/runnable.py) · [Measurement collection and product types](../measurement-data-and-instruments.md#multiple-instruments-in-one-collection)
 
 ## Public responsibilities

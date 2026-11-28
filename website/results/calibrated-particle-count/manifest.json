@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 5.577393485000357,
+  "package_source_sha256": "458df8d6fa506908db272d0393243924ada27df029dec359721e49196e92f4a7",
+  "scientific_source_sha256": "deca62acb544c885ec3e7764c2867034d5e3a178f4c2a752cca736db8f326a88",
+  "input_sha256": {
+    "scripts/measurement_flow_lab.py": "f3e2de3fa79f78ae7718e99a21b297c6b26478f0ed1ddc01c2dee1ec8454fce4",
+    "docs/data/measurement-processing/counter.csv": "0442d6a947216baf6de5a6fcefec178fb4f16feff16358aa3f1256f514ebda1f",
+    "docs/data/measurement-processing/flow.csv": "326df289379bba6f5ddb08f3f4eb37231b186789f9ab562acd1299aa7a307e5e",
+    "docs/data/measurement-processing/flow-profile.yaml": "ad8c95237e92e6f6b6546d115d6bdad86210ca10eec87a6cf31ca65ea8d30aa9",
+    "docs/data/measurement-processing/concentration.yaml": "a23bfb68405855b95c05af27727314dcbdf31fbb06568dacb0b5042a45812050",
+    "particula/data/profiles/profile.schema.json": "7138a58ba0ffc23619c2e72d45ccf79837330d44aec86e09a4a3d02de7ecceee"
+  },
+  "example": "calibrated-particle-count",
+  "fingerprint": "5fd0ea3d1a360ade45585ccbb1ff9fcacbafadff1f6e7c26019f7ecd08959691",
+  "source": "docs/studies/examples/calibrated_particle_count.py",
+  "revision": "2320b8071ceff8222098a21fd9c4b9af49b06444",
+  "package_dirty": true,
+  "executed_at": "2026-11-28T16:21:33.928446+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.4.0",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Time   Number concentration   Calibration   Quality flags\n0 s    10 cm\u207b\u00b3       bench-A      \u2014\n1 s    0 cm\u207b\u00b3        bench-A      \u2014\n2 s    5 cm\u207b\u00b3        bench-B      \u2014\n3 s    missing       bench-B      nonpositive:sample_flow\n4 s    missing       \u2014            unmatched:sample_flow\n"
+      },
+      {
+        "image": "figure-5-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "c2cb21f70c5a344464c1ab5b9b6f7a8847d2b5fb1d079c1566f3619fee337180",
+    "data.json": "a7c87723690e4f7e6a379e702a9eb16176f1e92704d844ba9efeee819cf06d80",
+    "figure-5-1.png": "086796f15ff58861208207fd3386604f6affc3457b7ca7da56a7b49227aaedec"
+  },
+  "simulation_fingerprint": "95d13ec0729372ed655373b3872e4332d0f7a78ddea32dfc3c4961a0e9db4f59"
+}

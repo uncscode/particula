@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Particula measurement processing recipe",
+  "description": "An ordered sequence of versioned operations from a caller-provided registry. Time alignment, units and parameter schemas are declared by each operation.",
+  "type": "object",
+  "required": ["recipe_version","steps","result"],
+  "additionalProperties": false,
+  "properties": {
+    "recipe_version": {"const":"1","description":"Major version of the recipe contract."},
+    "result": {"$ref":"#/$defs/alias","description":"Output alias of the final step."},
+    "steps": {"type":"array","minItems":1,"items":{
+      "type":"object","additionalProperties":false,
+      "required":["operation","version","inputs","output"],
+      "properties":{
+        "operation":{"type":"string","pattern":"^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$","description":"Qualified registered operation ID."},
+        "version":{"type":"string","minLength":1,"description":"Exact implementation version."},
+        "inputs":{"type":"object","minProperties":1,"additionalProperties":{"$ref":"#/$defs/alias"},"description":"Map each physical role to an external input or preceding step."},
+        "output":{"$ref":"#/$defs/alias","description":"New alias for the step's product."},
+        "parameters":{"type":"object","description":"Operation parameters, including an effective-dated calibration reference when required."}
+      }
+    }}
+  },
+  "$defs":{"alias":{"type":"string","pattern":"^[a-z][a-z0-9_]*$"}}
+}

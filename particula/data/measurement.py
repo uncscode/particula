@@ -1,12 +1,14 @@
 """Measurement products with unit definitions, grids and source-scoped IDs."""
 
-from collections.abc import Iterable
+import hashlib
+from collections.abc import Iterable, Iterator
 from typing import Self
 
 import numpy as np
 import polars as pl
 
 from particula.data._binding import Binding
+from particula.data.profile import digest
 
 
 class Measurement:
@@ -59,6 +61,23 @@ class Measurement:
             raise ValueError("Grid definitions disagree with the source layout")
 
     @property
+    def product_id(self) -> str:
+        """Identify the source interpretation, deployment and selected scans."""
+        return digest(
+            {
+                key: self.manifest.get(key)
+                for key in (
+                    "source_sha256",
+                    "profile_sha256",
+                    "parser_version",
+                    "deployment",
+                    "selection",
+                    "clock_corrections",
+                )
+            }
+        )
+
+    @property
     def frame(self) -> pl.DataFrame:
         """Collect the selected scans in memory, including their source IDs."""
         return self.lazy_frame.collect()
@@ -88,9 +107,21 @@ class Measurement:
             Measurement of the same type with a lazily filtered scan table.
             The manifest and diagnostics still describe the full source.
         """
-        return type(self)(
-            self.lazy_frame.filter(predicate), self.lazy_issues, self.manifest
-        )
+        if isinstance(predicate, Iterator):
+            predicate = list(predicate)
+        selected = self.lazy_frame.filter(predicate)
+        # Stamp the actual Polars predicate so filtered products can be
+        # persisted or used as distinct parents without collecting their scans.
+        expression = pl.LazyFrame().filter(predicate).serialize()
+
+        manifest = {
+            **self.manifest,
+            "selection": [
+                *self.manifest.get("selection", []),
+                hashlib.sha256(expression).hexdigest(),
+            ],
+        }
+        return type(self)(selected, self.lazy_issues, manifest)
 
     def quality_summary(
         self,
@@ -103,7 +134,7 @@ class Measurement:
 
         Args:
             field: Name of a scalar field declared in the profile.
-            exclude_flags: Omit scans carrying any of these vendor flags.
+            exclude_flags: Exclude scans carrying these vendor or derived flags.
             exclude_repaired: Omit scans reconstructed from logger fragments.
 
         Returns:
@@ -125,10 +156,11 @@ class Measurement:
         )
         keep = ~pl.col("repaired") if exclude_repaired else pl.lit(True)
         if flags:
-            if "vendor_flags" not in self.manifest["profile"]:
+            flag_column = self._flag_column()
+            if flag_column is None:
                 raise ValueError("This source has no vendor status field")
             keep = keep & ~pl.any_horizontal(
-                [pl.col("vendor_flags").list.contains(flag) for flag in flags]
+                [pl.col(flag_column).list.contains(flag) for flag in flags]
             )
         value = pl.col(field).filter(pl.col("_keep"))
         excluded = pl.col("time_utc").filter(~pl.col("_keep"))
@@ -144,33 +176,41 @@ class Measurement:
             excluded.max().alias("last_excluded"),
         )
 
+    def _flag_column(self) -> str | None:
+        if "lineage" in self.manifest:
+            return "quality_flags"
+        return (
+            "vendor_flags"
+            if "vendor_flags" in self.manifest["profile"]
+            else None
+        )
+
     def flag_summary(self) -> pl.LazyFrame:
-        """Count each vendor condition once per scan.
+        """Count each quality condition once per scan.
 
         Returns:
             Lazy table of flag labels, affected and total scan counts, and
             the first and last UTC time at which each flag appeared.
 
         Raises:
-            ValueError: The profile does not declare vendor flags.
+            ValueError: The measurement has no declared quality flags.
         """
-        if "vendor_flags" not in self.manifest["profile"]:
+        flags = self._flag_column()
+        if flags is None:
             raise ValueError("This source has no vendor status field")
         return (
-            self.lazy_frame.select(
-                "time_utc", pl.col("vendor_flags").list.unique()
-            )
+            self.lazy_frame.select("time_utc", pl.col(flags).list.unique())
             .with_columns(pl.len().alias("total_scans"))
-            .explode("vendor_flags")
-            .drop_nulls("vendor_flags")
-            .group_by("vendor_flags")
+            .explode(flags)
+            .drop_nulls(flags)
+            .group_by(flags)
             .agg(
                 pl.len().alias("scans"),
                 pl.first("total_scans"),
                 pl.col("time_utc").min().alias("first_seen"),
                 pl.col("time_utc").max().alias("last_seen"),
             )
-            .sort("vendor_flags")
+            .sort(flags)
         )
 
     def available_operations(self) -> dict[str, tuple[str, ...]]:
@@ -179,7 +219,7 @@ class Measurement:
         operations: dict[str, tuple[str, ...]] = {"filter": ()}
         if profile.get("fields"):
             operations["quality_summary"] = ("field",)
-        if "vendor_flags" in profile:
+        if self._flag_column():
             operations["flag_summary"] = ()
         return operations
 

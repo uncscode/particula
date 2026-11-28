@@ -42,7 +42,7 @@ def read_mobility_sizer(
     Raises:
         ValueError: The profile produces a different measurement type.
     """
-    result = MobilitySizer(profile).read(source, **limits)
+    result = MobilitySizer(profile).read(source, as_product=None, **limits)
     if not isinstance(result, MobilityNumberSpectrum):
         raise ValueError("Expected a mobility number spectrum")
     return result

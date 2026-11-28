@@ -111,3 +111,8 @@ Access units and the full shape definition through `product.manifest["profile"]`
 The worked example includes both source excerpts, the recovered observations
 and the plotted spectrum. [Worked imports](../../studies/examples/measurement_import.py)
 and [streaming qualification](../../studies/validation/workflows-and-releases/measurement-import.md).
+
+To compare observations from several instruments, preserve their separate sampling
+rates and align window summaries. [Compare instruments on a common time grid](measurement-collections.md).
+To combine a detector rate with calibrated sample flow, see
+[Calibrate instrument signals and prescribe a measurement product](measurement-processing.md).

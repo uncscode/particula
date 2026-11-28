@@ -5,6 +5,22 @@ from sys import modules
 from typing import Any
 
 _MODULES = {
+    "WindowComparison": "windows",
+    "BatchReader": "reader",
+    "correct_clock": "clock",
+    "Calibration": "deployment",
+    "Deployment": "deployment",
+    "DerivedMeasurement": "product",
+    "FieldContract": "product",
+    "OperationRegistry": "registry",
+    "MeasurementProcess": "process",
+    "Recipe": "recipe",
+    "describe_recipe": "recipe",
+    "run_recipe": "recipe",
+    "validate_recipe": "recipe",
+    "save_measurement": "snapshot",
+    "CampaignEvent": "collection",
+    "MeasurementCollection": "collection",
     "Measurement": "measurement",
     "MobilityNumberSpectrum": "measurement",
     "ParticleCountRate": "measurement",
