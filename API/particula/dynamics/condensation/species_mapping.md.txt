@@ -30,7 +30,7 @@ Immutable process-owned gas order and gas-to-particle lane pairs.
 
 - `ValueError` — If names or pairs are ambiguous or malformed.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/species_mapping.py#L20-L53)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/species_mapping.py#L21-L54)
 
 ### particula.dynamics.condensation.species_mapping.CondensationSpeciesMap.gas_names
 
@@ -40,7 +40,7 @@ Immutable process-owned gas order and gas-to-particle lane pairs.
 gas_names: tuple[str, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/species_mapping.py#L35-L35)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/species_mapping.py#L36-L36)
 
 ### particula.dynamics.condensation.species_mapping.CondensationSpeciesMap.gas_to_particle
 
@@ -50,7 +50,7 @@ gas_names: tuple[str, ...]
 gas_to_particle: tuple[tuple[int, int], ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/species_mapping.py#L36-L36)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/species_mapping.py#L37-L37)
 
 ### particula.dynamics.condensation.species_mapping.CondensationSpeciesMap.__init__
 
@@ -72,7 +72,7 @@ def __post_init__() -> None
 
 Detach caller sequences and reject ambiguous alignment.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/species_mapping.py#L38-L53)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/species_mapping.py#L39-L54)
 
 ## particula.dynamics.condensation.species_mapping._validate_gas_state
 
@@ -84,7 +84,7 @@ def _validate_gas_state(gas: GasData, species_map: CondensationSpeciesMap) -> No
 
 Validate full gas schema, physical state and ordered provenance.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/species_mapping.py#L82-L112)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/species_mapping.py#L83-L113)
 
 ## particula.dynamics.condensation.species_mapping._validate_pairs
 
@@ -96,7 +96,7 @@ def _validate_pairs(values: Sequence[tuple[int, int]], width: int) -> list[tuple
 
 Validate integer lane pairs and detach caller-owned sequences.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/species_mapping.py#L56-L79)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/species_mapping.py#L57-L80)
 
 ## particula.dynamics.condensation.species_mapping.condensation_population_weights
 
@@ -125,7 +125,7 @@ radius grid nor raw concentration is modified.
 
 - `ValueError` — If representation validation fails or boxes differ from 1.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/species_mapping.py#L190-L222)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/species_mapping.py#L191-L213)
 
 ## particula.dynamics.condensation.species_mapping.validate_condensation_state
 
@@ -161,4 +161,4 @@ full gas order. Nonpartitioning or unmapped gas never transfers.
 - `TypeError` — If containers or the process map have incorrect types.
 - `ValueError` — If current state, configuration or physical inputs fail.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/species_mapping.py#L115-L187)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/condensation/species_mapping.py#L116-L188)

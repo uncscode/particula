@@ -67,7 +67,7 @@ performance in tight simulation loops. Use copy() if immutability needed.
 
 - `ValueError` — If array shapes are inconsistent.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L39-L389)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L41-L388)
 
 ### particula.particles.particle_data.ParticleData.charge
 
@@ -77,7 +77,7 @@ performance in tight simulation loops. Use copy() if immutability needed.
 charge: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L74-L74)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L76-L76)
 
 ### particula.particles.particle_data.ParticleData.concentration
 
@@ -87,7 +87,7 @@ charge: NDArray[np.float64]
 concentration: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L73-L73)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L75-L75)
 
 ### particula.particles.particle_data.ParticleData.density
 
@@ -97,7 +97,7 @@ concentration: NDArray[np.float64]
 density: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L75-L75)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L77-L77)
 
 ### particula.particles.particle_data.ParticleData.distribution_type
 
@@ -107,7 +107,7 @@ density: NDArray[np.float64]
 distribution_type: str | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L77-L77)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L79-L79)
 
 ### particula.particles.particle_data.ParticleData.masses
 
@@ -117,7 +117,7 @@ distribution_type: str | None = None
 masses: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L72-L72)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L74-L74)
 
 ### particula.particles.particle_data.ParticleData.radius_grid
 
@@ -127,7 +127,7 @@ masses: NDArray[np.float64]
 radius_grid: NDArray[np.float64] | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L78-L78)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L80-L80)
 
 ### particula.particles.particle_data.ParticleData.volume
 
@@ -137,7 +137,7 @@ radius_grid: NDArray[np.float64] | None = None
 volume: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L76-L76)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L78-L78)
 
 ### particula.particles.particle_data.ParticleData.effective_density
 
@@ -153,7 +153,7 @@ Mixture density from total mass divided by additive material volume.
 
 - (`NDArray[np.float64]`) — Effective density in kg/m^3 with shape (n_boxes, n_particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L342-L355)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L341-L354)
 
 ### particula.particles.particle_data.ParticleData.mass_fractions
 
@@ -169,7 +169,7 @@ Mass fractions per species for each particle.
 
 - (`NDArray[np.float64]`) — Mass fractions with shape (n_boxes, n_particles, n_species).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L358-L370)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L357-L369)
 
 ### particula.particles.particle_data.ParticleData.n_boxes
 
@@ -185,7 +185,7 @@ Number of simulation boxes.
 
 - (`int`) — The size of the batch dimension (n_boxes).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L142-L148)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L144-L150)
 
 ### particula.particles.particle_data.ParticleData.n_particles
 
@@ -201,7 +201,7 @@ Number of particles per box.
 
 - (`int`) — The number of particles (n_particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L151-L157)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L153-L159)
 
 ### particula.particles.particle_data.ParticleData.n_species
 
@@ -217,7 +217,7 @@ Number of chemical species.
 
 - (`int`) — The number of species (n_species).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L160-L166)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L162-L168)
 
 ### particula.particles.particle_data.ParticleData.number_density
 
@@ -240,7 +240,7 @@ over the explicit radius grid using trapezoidal quadrature.
 
 - `ValueError` — If the representation fails read-only validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L280-L298)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L283-L301)
 
 ### particula.particles.particle_data.ParticleData.radii
 
@@ -256,7 +256,7 @@ Particle radii derived from mass and density.
 
 - (`NDArray[np.float64]`) — Radii in meters with shape (n_boxes, n_particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L169-L178)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L171-L180)
 
 ### particula.particles.particle_data.ParticleData.slot_concentration_density
 
@@ -280,7 +280,7 @@ from the raw concentration array.
 
 - `ValueError` — If the kind, grid, volume, or raw data is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L261-L277)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L263-L280)
 
 ### particula.particles.particle_data.ParticleData.species_mass_density
 
@@ -304,7 +304,7 @@ trapezoidal node weights, rather than summing PDF nodes.
 
 - `ValueError` — If the representation fails read-only validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L301-L327)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L304-L326)
 
 ### particula.particles.particle_data.ParticleData.species_mass_inventory
 
@@ -324,7 +324,7 @@ Return fresh extensive particle mass per species in kg.
 
 - `ValueError` — If the representation fails read-only validation.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L330-L339)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L329-L338)
 
 ### particula.particles.particle_data.ParticleData.total_mass
 
@@ -340,7 +340,7 @@ Total mass per particle.
 
 - (`NDArray[np.float64]`) — Total mass in kilograms with shape (n_boxes, n_particles).
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L181-L187)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L183-L189)
 
 ### particula.particles.particle_data.ParticleData.__init__
 
@@ -366,7 +366,7 @@ Validate raw array shapes without interpreting distribution kind.
 
 - `ValueError` — If raw field shapes or species dimensions disagree.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L80-L139)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L82-L141)
 
 ### particula.particles.particle_data.ParticleData.copy
 
@@ -383,7 +383,7 @@ Create a deep copy of this ParticleData.
 - (`ParticleData`) — A new ParticleData with detached raw arrays and radius grid,
 - (`ParticleData`) — preserving the explicit distribution type when present.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L372-L389)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L371-L388)
 
 ### particula.particles.particle_data.ParticleData.validate_representation
 
@@ -405,4 +405,4 @@ positive radius grid with at least two nodes.
 
 - `ValueError` — If kind, grid, volume, shape, or values are invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L189-L258)
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/particle_data.py#L191-L260)

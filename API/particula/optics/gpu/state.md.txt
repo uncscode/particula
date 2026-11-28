@@ -14,7 +14,7 @@ Read live native particle arrays into the prepared optical workspace.
 _CUBE_ROOT = wp.constant(wp.float64(1.0 / 3.0))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L18-L18)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L19-L19)
 
 ## particula.optics.gpu.state._GAS
 
@@ -24,7 +24,7 @@ _CUBE_ROOT = wp.constant(wp.float64(1.0 / 3.0))
 _GAS = wp.constant(wp.float64(GAS_CONSTANT))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L20-L20)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L21-L21)
 
 ## particula.optics.gpu.state._RADIUS_FACTOR
 
@@ -34,7 +34,7 @@ _GAS = wp.constant(wp.float64(GAS_CONSTANT))
 _RADIUS_FACTOR = wp.constant(wp.float64(3.0 / 4.0 * pi))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L17-L17)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L18-L18)
 
 ## particula.optics.gpu.state._TWO_PI
 
@@ -44,7 +44,7 @@ _RADIUS_FACTOR = wp.constant(wp.float64(3.0 / 4.0 * pi))
 _TWO_PI = wp.constant(wp.float64(2.0 * pi))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L19-L19)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L20-L20)
 
 ## particula.optics.gpu.state.DeviceOpticalBatch
 
@@ -56,7 +56,7 @@ class DeviceOpticalBatch
 
 Reduce on the owner stream and retain a fixed number of optical rows.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L161-L261)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L164-L264)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch._cases
 
@@ -66,7 +66,7 @@ Reduce on the owner stream and retain a fixed number of optical rows.
 _cases = ParticleOpticalCases(particles, config, device=device, stream=owner._stream)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L177-L182)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L180-L185)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch._humidity
 
@@ -76,7 +76,7 @@ _cases = ParticleOpticalCases(particles, config, device=device, stream=owner._st
 _humidity = wp.empty((batch_size, boxes), dtype=wp.float64, device=device) if water_lane is not None else None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L188-L192)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L191-L195)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch._owner
 
@@ -86,7 +86,7 @@ _humidity = wp.empty((batch_size, boxes), dtype=wp.float64, device=device) if wa
 _owner = owner
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L186-L186)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L189-L189)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch._rows
 
@@ -96,7 +96,7 @@ _owner = owner
 _rows = wp.empty((batch_size, groups, 9), dtype=wp.float64, device=device)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L194-L196)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L197-L199)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch._shape
 
@@ -106,7 +106,7 @@ _rows = wp.empty((batch_size, groups, 9), dtype=wp.float64, device=device)
 _shape = (boxes, wave_count, 9)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L193-L193)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L196-L196)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch._statuses
 
@@ -116,7 +116,7 @@ _shape = (boxes, wave_count, 9)
 _statuses = wp.empty((batch_size, groups), dtype=wp.int32, device=device)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L197-L199)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L200-L202)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch._water_lane
 
@@ -126,7 +126,7 @@ _statuses = wp.empty((batch_size, groups), dtype=wp.int32, device=device)
 _water_lane = water_lane
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L187-L187)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L190-L190)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch._workspace
 
@@ -136,7 +136,7 @@ _water_lane = water_lane
 _workspace = prepare_population_mie(self._cases.index, self._cases.size, self._cases.radius, self._cases.weight, particle_tile=particle_tile, coefficient_capacity=coefficient_capacity, stream=owner._stream)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L200-L208)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L203-L211)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch.__init__
 
@@ -148,7 +148,7 @@ def __init__(owner, config, batch_size, particle_tile, coefficient_capacity, *, 
 
 Bind device workspaces to the live particle arrays.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L164-L208)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L167-L211)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch.download
 
@@ -160,7 +160,7 @@ def download(count)
 
 Check physics and optics before exposing any row of the batch.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L246-L261)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L249-L264)
 
 ### particula.optics.gpu.state.DeviceOpticalBatch.enqueue
 
@@ -172,7 +172,7 @@ def enqueue(row)
 
 Append device results and status to a batch slot.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L210-L244)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L213-L247)
 
 ## particula.optics.gpu.state.ParticleOpticalCases
 
@@ -184,7 +184,7 @@ class ParticleOpticalCases
 
 Prepare the optical inputs shared by resident observers and processes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L105-L158)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L108-L161)
 
 ### particula.optics.gpu.state.ParticleOpticalCases._fill
 
@@ -194,7 +194,7 @@ Prepare the optical inputs shared by resident observers and processes.
 _fill = wp.launch(_fill_cases, (groups, slots), inputs=[particles, wavelengths, indices, int(mixed), wp.float64(config.medium_index), self.index, self.size, self.radius, self.weight], device=device, stream=stream, record_cmd=True)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L137-L154)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L140-L157)
 
 ### particula.optics.gpu.state.ParticleOpticalCases._inputs
 
@@ -204,7 +204,7 @@ _fill = wp.launch(_fill_cases, (groups, slots), inputs=[particles, wavelengths, 
 _inputs = (particles, wavelengths, indices)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L135-L135)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L138-L138)
 
 ### particula.optics.gpu.state.ParticleOpticalCases._stream
 
@@ -214,7 +214,7 @@ _inputs = (particles, wavelengths, indices)
 _stream = stream
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L136-L136)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L139-L139)
 
 ### particula.optics.gpu.state.ParticleOpticalCases.index
 
@@ -224,7 +224,7 @@ _stream = stream
 index = wp.empty((groups, slots), dtype=wp.vec2d, device=device)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L130-L130)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L133-L133)
 
 ### particula.optics.gpu.state.ParticleOpticalCases.__init__
 
@@ -236,7 +236,7 @@ def __init__(particles, config, *, device, stream)
 
 Allocate input buffers and retain a refresh command.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L108-L154)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L111-L157)
 
 ### particula.optics.gpu.state.ParticleOpticalCases.enqueue
 
@@ -248,7 +248,7 @@ def enqueue()
 
 Fill optical coordinates from the live particle state.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L156-L158)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L159-L161)
 
 ## particula.optics.gpu.state._fill_cases
 
@@ -258,7 +258,7 @@ Fill optical coordinates from the live particle state.
 def _fill_cases(particles: WarpParticleData, wavelengths: wp.array(dtype=wp.float64), configured_index: wp.array2d(dtype=wp.vec2d), mixed: int, medium: wp.float64, index: wp.array2d(dtype=wp.vec2d), size: wp.array2d(dtype=wp.float64), radius: wp.array2d(dtype=wp.float64), weight: wp.array2d(dtype=wp.float64))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L23-L73)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L24-L76)
 
 ## particula.optics.gpu.state._relative_humidity_row
 
@@ -268,7 +268,7 @@ def _fill_cases(particles: WarpParticleData, wavelengths: wp.array(dtype=wp.floa
 def _relative_humidity_row(vapor: wp.array2d(dtype=wp.float64), molar_mass: wp.array(dtype=wp.float64), temperature: wp.array(dtype=wp.float64), species: int, row: int, humidity: wp.array2d(dtype=wp.float64))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L90-L102)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L93-L105)
 
 ## particula.optics.gpu.state._store_row
 
@@ -278,4 +278,4 @@ def _relative_humidity_row(vapor: wp.array2d(dtype=wp.float64), molar_mass: wp.a
 def _store_row(result: wp.array2d(dtype=wp.float64), status: wp.array(dtype=wp.int32), row: int, rows: wp.array3d(dtype=wp.float64), statuses: wp.array2d(dtype=wp.int32))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L76-L87)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/gpu/state.py#L79-L90)

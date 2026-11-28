@@ -162,4 +162,4 @@ def population_optics(particles, config) -> PopulationOptics
 
 Evaluate live CPU particle state into (box, wavelength) results.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L188-L217)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/state.py#L188-L212)

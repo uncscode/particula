@@ -34,7 +34,7 @@ Bulk optical coefficients and intensive properties.
 - `extinction_valid` (`NDArray[np.bool_]`) — Whether single-scattering albedo is defined.
 - `scattering_valid` (`NDArray[np.bool_]`) — Whether asymmetry is defined.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L16-L39)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L17-L40)
 
 ### particula.optics.population.PopulationOptics.absorption
 
@@ -44,7 +44,7 @@ Bulk optical coefficients and intensive properties.
 absorption: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L33-L33)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L34-L34)
 
 ### particula.optics.population.PopulationOptics.asymmetry
 
@@ -54,7 +54,7 @@ absorption: NDArray[np.float64]
 asymmetry: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L37-L37)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L38-L38)
 
 ### particula.optics.population.PopulationOptics.backscatter
 
@@ -64,7 +64,7 @@ asymmetry: NDArray[np.float64]
 backscatter: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L34-L34)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L35-L35)
 
 ### particula.optics.population.PopulationOptics.extinction
 
@@ -74,7 +74,7 @@ backscatter: NDArray[np.float64]
 extinction: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L31-L31)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L32-L32)
 
 ### particula.optics.population.PopulationOptics.extinction_valid
 
@@ -84,7 +84,7 @@ extinction: NDArray[np.float64]
 extinction_valid: NDArray[np.bool_]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L38-L38)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L39-L39)
 
 ### particula.optics.population.PopulationOptics.radiation_pressure
 
@@ -94,7 +94,7 @@ extinction_valid: NDArray[np.bool_]
 radiation_pressure: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L35-L35)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L36-L36)
 
 ### particula.optics.population.PopulationOptics.scattering
 
@@ -104,7 +104,7 @@ radiation_pressure: NDArray[np.float64]
 scattering: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L32-L32)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L33-L33)
 
 ### particula.optics.population.PopulationOptics.scattering_valid
 
@@ -114,7 +114,7 @@ scattering: NDArray[np.float64]
 scattering_valid: NDArray[np.bool_]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L39-L39)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L40-L40)
 
 ### particula.optics.population.PopulationOptics.single_scattering_albedo
 
@@ -124,7 +124,7 @@ scattering_valid: NDArray[np.bool_]
 single_scattering_albedo: NDArray[np.float64]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L36-L36)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L37-L37)
 
 ## particula.optics.population._nonnegative
 
@@ -136,7 +136,7 @@ def _nonnegative(values: ArrayLike, name: str) -> NDArray[np.float64]
 
 Coerce a finite nonnegative physical array without modifying it.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L42-L49)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L43-L50)
 
 ## particula.optics.population.get_population_mueller_matrix
 
@@ -163,7 +163,7 @@ Sum independent-particle differential Mueller matrices by number.
 
 - `ValueError` — If inputs or resulting matrix values are invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L189-L231)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L187-L229)
 
 ## particula.optics.population.get_population_optics
 
@@ -191,7 +191,7 @@ Reduce per-particle optical areas to bulk optical coefficients.
 
 - `ValueError` — If inputs, reduction axis or resulting values are invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L117-L186)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L115-L184)
 
 ## particula.optics.population.get_population_weights
 
@@ -219,4 +219,4 @@ Convert native population measures to number-density weights.
 
 - `ValueError` — If the measure, shape, values or supplied metadata conflict.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L52-L114)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/population.py#L53-L112)

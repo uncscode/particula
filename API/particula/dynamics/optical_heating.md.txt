@@ -14,7 +14,7 @@ Optically thin heating and one-way water evaporation of wet spheres.
 _HEAT_CHANNELS = ('absorbed', 'conduction', 'radiation', 'latent', 'sensible')
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L15-L15)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L16-L16)
 
 ## particula.dynamics.optical_heating._MAX_K
 
@@ -24,7 +24,7 @@ _HEAT_CHANNELS = ('absorbed', 'conduction', 'radiation', 'latent', 'sensible')
 _MAX_K = 373.15
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L17-L17)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L18-L18)
 
 ## particula.dynamics.optical_heating._MIN_K
 
@@ -34,7 +34,7 @@ _MAX_K = 373.15
 _MIN_K = 273.15
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L16-L16)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L17-L17)
 
 ## particula.dynamics.optical_heating._WATER
 
@@ -44,7 +44,7 @@ _MIN_K = 273.15
 _WATER = WaterBuckStrategy()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L18-L18)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L19-L19)
 
 ## particula.dynamics.optical_heating.HeatingPhysics
 
@@ -60,7 +60,7 @@ Conductivity is W/(m K), water diffusivity is m²/s, specific heat
 capacities are J/(kg K), latent heat is J/kg, and radiation_temperature
 is K. Kappa and grey infrared emissivity are dimensionless.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L21-L57)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L22-L58)
 
 ### particula.dynamics.optical_heating.HeatingPhysics.conductivity
 
@@ -70,7 +70,7 @@ is K. Kappa and grey infrared emissivity are dimensionless.
 conductivity: float = 0.026
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L31-L31)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L32-L32)
 
 ### particula.dynamics.optical_heating.HeatingPhysics.diffusivity
 
@@ -80,7 +80,7 @@ conductivity: float = 0.026
 diffusivity: float = 2.5e-05
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L32-L32)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L33-L33)
 
 ### particula.dynamics.optical_heating.HeatingPhysics.emissivity
 
@@ -90,7 +90,7 @@ diffusivity: float = 2.5e-05
 emissivity: float = 0.95
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L36-L36)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L37-L37)
 
 ### particula.dynamics.optical_heating.HeatingPhysics.kappa
 
@@ -100,7 +100,7 @@ emissivity: float = 0.95
 kappa: float = 0.3
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L30-L30)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L31-L31)
 
 ### particula.dynamics.optical_heating.HeatingPhysics.latent_heat
 
@@ -110,7 +110,7 @@ kappa: float = 0.3
 latent_heat: float = 2440000.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L35-L35)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L36-L36)
 
 ### particula.dynamics.optical_heating.HeatingPhysics.radiation_temperature
 
@@ -120,7 +120,7 @@ latent_heat: float = 2440000.0
 radiation_temperature: float = 298.15
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L37-L37)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L38-L38)
 
 ### particula.dynamics.optical_heating.HeatingPhysics.solute_heat_capacity
 
@@ -130,7 +130,7 @@ radiation_temperature: float = 298.15
 solute_heat_capacity: float = 1500.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L34-L34)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L35-L35)
 
 ### particula.dynamics.optical_heating.HeatingPhysics.water_heat_capacity
 
@@ -140,7 +140,7 @@ solute_heat_capacity: float = 1500.0
 water_heat_capacity: float = 4180.0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L33-L33)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L34-L34)
 
 ### particula.dynamics.optical_heating.HeatingPhysics.__init__
 
@@ -162,7 +162,7 @@ def __post_init__()
 
 Validate physical constants before evaluating a temperature root.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L39-L57)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L40-L58)
 
 ## particula.dynamics.optical_heating.OpticalHeating
 
@@ -188,7 +188,7 @@ heat exchange and mass loss are implicit in particle temperature.
 Geometry, irradiance, heat capacity and surrounding gas are evaluated
 at the beginning of each cycle.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L129-L333)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L130-L334)
 
 ### particula.dynamics.optical_heating.OpticalHeating._namespace
 
@@ -198,7 +198,7 @@ at the beginning of each cycle.
 _namespace = 'optical_heating'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L145-L145)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L146-L146)
 
 ### particula.dynamics.optical_heating.OpticalHeating.energy_fields
 
@@ -208,7 +208,7 @@ _namespace = 'optical_heating'
 energy_fields = tuple(({name}.{key}_energy for key in _HEAT_CHANNELS))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L184-L186)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L185-L187)
 
 ### particula.dynamics.optical_heating.OpticalHeating.gas_water
 
@@ -218,7 +218,7 @@ energy_fields = tuple(({name}.{key}_energy for key in _HEAT_CHANNELS))
 gas_water = gas_water
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L180-L180)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L181-L181)
 
 ### particula.dynamics.optical_heating.OpticalHeating.irradiance
 
@@ -228,7 +228,7 @@ gas_water = gas_water
 irradiance = tuple((float(value) for value in flux))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L179-L179)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L180-L180)
 
 ### particula.dynamics.optical_heating.OpticalHeating.optics
 
@@ -238,7 +238,7 @@ irradiance = tuple((float(value) for value in flux))
 optics = optics
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L160-L160)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L161-L161)
 
 ### particula.dynamics.optical_heating.OpticalHeating.physics
 
@@ -248,7 +248,7 @@ optics = optics
 physics = HeatingPhysics() if physics is None else physics
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L161-L161)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L162-L162)
 
 ### particula.dynamics.optical_heating.OpticalHeating.power_field
 
@@ -258,7 +258,7 @@ physics = HeatingPhysics() if physics is None else physics
 power_field = {name}.absorbed_power
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L183-L183)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L184-L184)
 
 ### particula.dynamics.optical_heating.OpticalHeating.temperature_field
 
@@ -268,7 +268,7 @@ power_field = {name}.absorbed_power
 temperature_field = {name}.temperature
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L182-L182)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L183-L183)
 
 ### particula.dynamics.optical_heating.OpticalHeating.water_material
 
@@ -278,7 +278,7 @@ temperature_field = {name}.temperature
 water_material = water_material
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L181-L181)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L182-L182)
 
 ### particula.dynamics.optical_heating.OpticalHeating.extension_id
 
@@ -386,7 +386,7 @@ def __init__(optics, irradiance, *, gas_water, water_material=0, physics=None, n
 
 Bind optical forcing, liquid material index and gas species name.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L147-L210)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L148-L211)
 
 ### particula.dynamics.optical_heating.OpticalHeating._specs
 
@@ -396,7 +396,7 @@ Bind optical forcing, liquid material index and gas species name.
 def _specs()
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L222-L229)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L223-L230)
 
 ### particula.dynamics.optical_heating.OpticalHeating._validate_representation
 
@@ -406,7 +406,7 @@ def _specs()
 def _validate_representation(aerosol)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L231-L235)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L232-L236)
 
 ### particula.dynamics.optical_heating.OpticalHeating.advance
 
@@ -418,7 +418,7 @@ def advance(aerosol, *, time, time_step, context)
 
 Advance one box and add represented water and energy inventories.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L286-L333)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L287-L334)
 
 ### particula.dynamics.optical_heating.OpticalHeating.attach_fields
 
@@ -430,7 +430,7 @@ def attach_fields(aerosol)
 
 Register diagnostic and thermal state on the initial aerosol.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L237-L244)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L238-L245)
 
 ### particula.dynamics.optical_heating.OpticalHeating.configuration
 
@@ -442,7 +442,7 @@ def configuration()
 
 Return the parameters retained in exact process identity.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L212-L220)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L213-L221)
 
 ### particula.dynamics.optical_heating.OpticalHeating.validate
 
@@ -454,7 +454,7 @@ def validate(aerosol)
 
 Require resolved slots, two materials and mapped vapor.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L246-L284)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L247-L285)
 
 ### particula.dynamics.optical_heating.OpticalHeating.execute
 
@@ -711,4 +711,4 @@ Solve one frozen-radius energy balance with conservative mass loss.
 Returns new temperature [K], water transferred to gas [kg per particle],
 and one energy amount [J per particle] for each heating ledger.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L60-L126)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/optical_heating.py#L61-L127)

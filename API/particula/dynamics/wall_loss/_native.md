@@ -16,7 +16,7 @@ def _controls(strategy: Any) -> None
 
 Revalidate mutable concrete geometry and field configuration.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/wall_loss/_native.py#L23-L60)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/wall_loss/_native.py#L24-L61)
 
 ## particula.dynamics.wall_loss._native._scalar
 
@@ -26,7 +26,7 @@ Revalidate mutable concrete geometry and field configuration.
 def _scalar(value: Any, name: str, *, positive: bool = False) -> None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/wall_loss/_native.py#L12-L20)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/wall_loss/_native.py#L13-L21)
 
 ## particula.dynamics.wall_loss._native._storage
 
@@ -36,7 +36,7 @@ def _scalar(value: Any, name: str, *, positive: bool = False) -> None
 def _storage(strategy: Any, particle: ParticleData, resolved: bool) -> None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/wall_loss/_native.py#L159-L184)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/wall_loss/_native.py#L160-L185)
 
 ## particula.dynamics.wall_loss._native.coefficient
 
@@ -48,7 +48,7 @@ def coefficient(strategy: Any, particle: ParticleData, temperature: float, press
 
 Apply existing coefficient laws to native material and charge arrays.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/wall_loss/_native.py#L101-L144)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/wall_loss/_native.py#L102-L145)
 
 ## particula.dynamics.wall_loss._native.rate
 
@@ -60,7 +60,7 @@ def rate(strategy: Any, particle: ParticleData, temperature: float, pressure: fl
 
 Return number-density (or dn/dr) loss per second.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/wall_loss/_native.py#L147-L156)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/wall_loss/_native.py#L148-L157)
 
 ## particula.dynamics.wall_loss._native.step
 
@@ -76,7 +76,7 @@ Resolved removal clears selected masses/counts/charge so removed slots can
 be reused. Untouched inactive lanes are not repaired. The CPU Bernoulli
 removal law and its random lifecycle are unchanged.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/wall_loss/_native.py#L187-L271)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/wall_loss/_native.py#L188-L272)
 
 ## particula.dynamics.wall_loss._native.validate
 
@@ -88,4 +88,4 @@ def validate(strategy: Any, particle: ParticleData, temperature: float, pressure
 
 Check current native storage, physics, representation and controls.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/wall_loss/_native.py#L63-L98)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/wall_loss/_native.py#L64-L99)

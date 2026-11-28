@@ -47,7 +47,7 @@ Declare immutable dimensions for caller-owned resident state.
 - `n_species` (`int`) — Nonnegative number of particle material species.
 - `n_gas_species` (`int`) — Explicit independent nonnegative gas width.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L224-L255)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L223-L254)
 
 ### particula.execution.gpu_session.ResidentDimensions.n_boxes
 
@@ -57,7 +57,7 @@ Declare immutable dimensions for caller-owned resident state.
 n_boxes: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L235-L235)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L234-L234)
 
 ### particula.execution.gpu_session.ResidentDimensions.n_gas_species
 
@@ -67,7 +67,7 @@ n_boxes: int
 n_gas_species: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L238-L238)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L237-L237)
 
 ### particula.execution.gpu_session.ResidentDimensions.n_particles
 
@@ -77,7 +77,7 @@ n_gas_species: int
 n_particles: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L236-L236)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L235-L235)
 
 ### particula.execution.gpu_session.ResidentDimensions.n_species
 
@@ -87,7 +87,7 @@ n_particles: int
 n_species: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L237-L237)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L236-L236)
 
 ### particula.execution.gpu_session.ResidentDimensions.gas_species
 
@@ -99,7 +99,7 @@ gas_species: int
 
 Return the explicitly declared independent gas width.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L241-L243)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L240-L242)
 
 ### particula.execution.gpu_session.ResidentDimensions.__init__
 
@@ -126,7 +126,7 @@ Validate the immutable resident dimensions.
 - `TypeError` — If a dimension is not an integral value or is boolean.
 - `ValueError` — If a dimension violates its required lower bound.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L245-L255)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L244-L254)
 
 ## particula.execution.gpu_session.ResidentLifecycle
 
@@ -146,7 +146,7 @@ can transition ACTIVE to FAULTED after a writer may have launched; close or
 discard transitions ACTIVE or FAULTED to CLOSED. Faulting and closing do
 not roll back resident payloads.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L333-L346)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L332-L345)
 
 ### particula.execution.gpu_session.ResidentLifecycle.ACTIVE
 
@@ -156,7 +156,7 @@ not roll back resident payloads.
 ACTIVE = 'active'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L343-L343)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L342-L342)
 
 ### particula.execution.gpu_session.ResidentLifecycle.CLOSED
 
@@ -166,7 +166,7 @@ ACTIVE = 'active'
 CLOSED = 'closed'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L346-L346)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L345-L345)
 
 ### particula.execution.gpu_session.ResidentLifecycle.FAULTED
 
@@ -176,7 +176,7 @@ CLOSED = 'closed'
 FAULTED = 'faulted'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L344-L344)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L343-L343)
 
 ### particula.execution.gpu_session.ResidentLifecycle.FINALIZED
 
@@ -186,7 +186,7 @@ FAULTED = 'faulted'
 FINALIZED = 'finalized'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L345-L345)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L344-L344)
 
 ## particula.execution.gpu_session.ResidentMetadata
 
@@ -204,7 +204,7 @@ Retain declared Warp-device and ordered gas-name metadata by identity.
 - `gas_names` (`tuple[str, ...]`) — Ordered caller-declared gas names; entries are not inspected or normalized at this boundary.
 - `stream` (`ResidentStreamMetadata`) — Immutable host-only session metadata stream identity matching resident boxes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L362-L398)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L361-L397)
 
 ### particula.execution.gpu_session.ResidentMetadata.device
 
@@ -214,7 +214,7 @@ Retain declared Warp-device and ordered gas-name metadata by identity.
 device: Device
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L374-L374)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L373-L373)
 
 ### particula.execution.gpu_session.ResidentMetadata.distribution_type
 
@@ -224,7 +224,7 @@ device: Device
 distribution_type: str = ''
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L377-L377)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L376-L376)
 
 ### particula.execution.gpu_session.ResidentMetadata.gas_names
 
@@ -234,7 +234,7 @@ distribution_type: str = ''
 gas_names: tuple[str, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L375-L375)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L374-L374)
 
 ### particula.execution.gpu_session.ResidentMetadata.stream
 
@@ -244,7 +244,7 @@ gas_names: tuple[str, ...]
 stream: ResidentStreamMetadata = ResidentStreamMetadata(0, 0, (), ())
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L376-L376)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L375-L375)
 
 ### particula.execution.gpu_session.ResidentMetadata.__init__
 
@@ -271,7 +271,7 @@ Validate fixed-cost metadata declarations without normalizing names.
 - `TypeError` — If the device or name tuple has the wrong type.
 - `ValueError` — If the device does not declare the Warp backend.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L379-L398)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L378-L397)
 
 ## particula.execution.gpu_session.ResidentSession
 
@@ -300,7 +300,7 @@ provide migration, CPU fallback, or rollback after launched device work.
 - `metadata` (`ResidentMetadata`) — Immutable device, gas-name, and host-only stream metadata.
 - `lifecycle` (`ResidentLifecycle`) — Current lifecycle value. Checkpoint finalization can change ACTIVE to FINALIZED; classified writer failures can fault ACTIVE; and close or discard can close ACTIVE or FAULTED.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L762-L1091)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L761-L1090)
 
 ### particula.execution.gpu_session.ResidentSession._lifecycle_lock
 
@@ -310,7 +310,7 @@ provide migration, CPU fallback, or rollback after launched device work.
 _lifecycle_lock: Any = field(init=False, repr=False, compare=False)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L791-L791)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L790-L790)
 
 ### particula.execution.gpu_session.ResidentSession._native_operation
 
@@ -320,7 +320,7 @@ _lifecycle_lock: Any = field(init=False, repr=False, compare=False)
 _native_operation: object | None = field(init=False, repr=False, compare=False, default=None)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L795-L797)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L794-L796)
 
 ### particula.execution.gpu_session.ResidentSession._terminal_intent
 
@@ -330,7 +330,7 @@ _native_operation: object | None = field(init=False, repr=False, compare=False, 
 _terminal_intent: tuple[str, object, int] | None = field(init=False, repr=False, compare=False, default=None)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L792-L794)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L791-L793)
 
 ### particula.execution.gpu_session.ResidentSession.dimensions
 
@@ -340,7 +340,7 @@ _terminal_intent: tuple[str, object, int] | None = field(init=False, repr=False,
 dimensions: ResidentDimensions
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L788-L788)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L787-L787)
 
 ### particula.execution.gpu_session.ResidentSession.environment
 
@@ -350,7 +350,7 @@ dimensions: ResidentDimensions
 environment: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L787-L787)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L786-L786)
 
 ### particula.execution.gpu_session.ResidentSession.gas
 
@@ -360,7 +360,7 @@ environment: object
 gas: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L786-L786)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L785-L785)
 
 ### particula.execution.gpu_session.ResidentSession.lifecycle
 
@@ -370,7 +370,7 @@ gas: object
 lifecycle: ResidentLifecycle
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L790-L790)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L789-L789)
 
 ### particula.execution.gpu_session.ResidentSession.metadata
 
@@ -380,7 +380,7 @@ lifecycle: ResidentLifecycle
 metadata: ResidentMetadata
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L789-L789)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L788-L788)
 
 ### particula.execution.gpu_session.ResidentSession.particles
 
@@ -390,7 +390,7 @@ metadata: ResidentMetadata
 particles: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L785-L785)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L784-L784)
 
 ### particula.execution.gpu_session.ResidentSession.__init__
 
@@ -420,7 +420,7 @@ invalid.
 - `RuntimeError` — If resident validation requires an unavailable Warp
 runtime.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L799-L841)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L798-L840)
 
 ### particula.execution.gpu_session.ResidentSession._acquire_native_operation
 
@@ -432,7 +432,7 @@ def _acquire_native_operation(kind: str) -> object
 
 Acquire this session's private capture/replay lifecycle lease.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L843-L859)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L842-L858)
 
 ### particula.execution.gpu_session.ResidentSession._begin_terminal_transition
 
@@ -444,7 +444,7 @@ def _begin_terminal_transition(intent: str) -> object
 
 Publish terminal intent before any caller-controlled callback.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L868-L879)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L867-L878)
 
 ### particula.execution.gpu_session.ResidentSession._checkpoint_controller
 
@@ -461,7 +461,7 @@ fields so construction remains a metadata-only operation. Its binding is
 exact: a different registry or guard is rejected rather than rebinding
 the session or transferring ownership.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L891-L914)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L890-L913)
 
 ### particula.execution.gpu_session.ResidentSession._end_terminal_transition
 
@@ -473,7 +473,7 @@ def _end_terminal_transition(token: object) -> None
 
 Clear the exact private terminal-transition intent.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L881-L889)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L880-L888)
 
 ### particula.execution.gpu_session.ResidentSession._finalize_checkpoint
 
@@ -489,7 +489,7 @@ This checkpoint-only helper performs no transfer, allocation, or
 payload mutation.  Its narrow transition prevents a controller from
 silently overwriting any lifecycle state other than ``ACTIVE``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1013-L1022)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1012-L1021)
 
 ### particula.execution.gpu_session.ResidentSession._release_native_operation
 
@@ -501,7 +501,7 @@ def _release_native_operation(lease: object) -> None
 
 Release the exact private capture/replay lifecycle lease.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L861-L866)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L860-L865)
 
 ### particula.execution.gpu_session.ResidentSession.checkpoint
 
@@ -527,7 +527,7 @@ and all resident identities remain active and caller-owned.
 
 - (`Any`) — A fresh immutable checkpoint record.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L916-L933)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L915-L932)
 
 ### particula.execution.gpu_session.ResidentSession.close
 
@@ -560,7 +560,7 @@ idempotent write-free no-ops. Finalization retains its cached
 - `BaseException` — Propagates an attached graph-handle teardown failure
 after transitioning this session to CLOSED.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1024-L1072)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1023-L1071)
 
 ### particula.execution.gpu_session.ResidentSession.discard
 
@@ -586,7 +586,7 @@ does not restore, synchronize, allocate, or mutate resident payloads.
 - `ValueError` — If the binding is wrong or the lifecycle is invalid.
 - `RuntimeError` — If a resident timestep remains open.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1074-L1091)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1073-L1090)
 
 ### particula.execution.gpu_session.ResidentSession.finalize
 
@@ -613,7 +613,7 @@ guaranteed after an already-launched device operation.
 
 - (`Any`) — The immutable cached terminal checkpoint.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L935-L953)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L934-L952)
 
 ### particula.execution.gpu_session.ResidentSession.initialize_streams
 
@@ -644,7 +644,7 @@ invalid.
 - `BaseException` — Propagates a stream-writer failure after faulting the
 binding.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L962-L995)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L961-L994)
 
 ### particula.execution.gpu_session.ResidentSession.inspect_streams
 
@@ -656,7 +656,7 @@ def inspect_streams(registry: GPUResourceRegistry, guard: ResidentStepGuard) -> 
 
 Return immutable metadata for published binding RNG streams.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L955-L960)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L954-L959)
 
 ### particula.execution.gpu_session.ResidentSession.reset_streams
 
@@ -668,7 +668,7 @@ def reset_streams(registry: GPUResourceRegistry, guard: ResidentStepGuard, *, pr
 
 Alias :meth:`initialize_streams` for deliberate stream resets.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L997-L1011)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L996-L1010)
 
 ## particula.execution.gpu_session.ResidentStepGuard
 
@@ -695,7 +695,7 @@ boundaries must call :meth:`assert_step_closed` before their own work. The
 gate does not intercept callers that bypass those lifecycle boundaries with
 raw low-level helpers.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1114-L1347)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1113-L1346)
 
 ### particula.execution.gpu_session.ResidentStepGuard._completed_steps
 
@@ -705,7 +705,7 @@ raw low-level helpers.
 _completed_steps = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1160-L1160)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1159-L1159)
 
 ### particula.execution.gpu_session.ResidentStepGuard._open_token
 
@@ -715,7 +715,7 @@ _completed_steps = 0
 _open_token: ResidentStepToken | None = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1159-L1159)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1158-L1158)
 
 ### particula.execution.gpu_session.ResidentStepGuard._registry
 
@@ -725,7 +725,7 @@ _open_token: ResidentStepToken | None = None
 _registry = registry
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1158-L1158)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1157-L1157)
 
 ### particula.execution.gpu_session.ResidentStepGuard._session
 
@@ -735,7 +735,7 @@ _registry = registry
 _session = session
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1157-L1157)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1156-L1156)
 
 ### particula.execution.gpu_session.ResidentStepGuard._simulated_time
 
@@ -745,7 +745,7 @@ _session = session
 _simulated_time: Any = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1164-L1164)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1163-L1163)
 
 ### particula.execution.gpu_session.ResidentStepGuard.completed_steps
 
@@ -761,7 +761,7 @@ Return the number of successfully completed guarded timesteps.
 
 - (`int`) — Count advanced only after successful matching completion.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1167-L1173)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1166-L1172)
 
 ### particula.execution.gpu_session.ResidentStepGuard.simulated_time
 
@@ -778,7 +778,7 @@ Return the sum of successfully completed timestep durations.
 - (`Real`) — Uncoerced-real sum advanced only after successful matching
 - (`Real`) — completion.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1176-L1183)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1175-L1182)
 
 ### particula.execution.gpu_session.ResidentStepGuard.__init__
 
@@ -804,7 +804,7 @@ executing, transferring, synchronizing, or mutating resident state.
 - `ValueError` — If the registry does not retain ``session`` or its
 active metadata-only signature is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1133-L1164)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1132-L1163)
 
 ### particula.execution.gpu_session.ResidentStepGuard._abort_step
 
@@ -830,7 +830,7 @@ synchronize, or roll back any device payload mutation.
 invalid.
 - `RuntimeError` — If no resident timestep is open.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1270-L1293)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1269-L1292)
 
 ### particula.execution.gpu_session.ResidentStepGuard._restore_checkpoint_counters
 
@@ -857,7 +857,7 @@ launched device operation.
 - `ValueError` — If the guard is not fresh and closed, its pinned binding
 is inactive, or a counter violates its invariant.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1309-L1347)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1308-L1346)
 
 ### particula.execution.gpu_session.ResidentStepGuard._validate_duration
 
@@ -882,7 +882,7 @@ Validate one nonnegative finite real duration without coercion.
 - `TypeError` — If the duration is boolean or not a real number.
 - `ValueError` — If the duration is negative or non-finite.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1185-L1203)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1184-L1202)
 
 ### particula.execution.gpu_session.ResidentStepGuard.assert_step_closed
 
@@ -903,7 +903,7 @@ globally intercept direct raw helper calls.
 
 - `RuntimeError` — If this guard has an outstanding timestep token.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1295-L1307)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1294-L1306)
 
 ### particula.execution.gpu_session.ResidentStepGuard.begin_step
 
@@ -935,7 +935,7 @@ after that work succeeds.
 is no longer valid and active.
 - `RuntimeError` — If another timestep is already open.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1205-L1237)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1204-L1236)
 
 ### particula.execution.gpu_session.ResidentStepGuard.complete_step
 
@@ -962,7 +962,7 @@ for external process work.
 does not match the open token by identity.
 - `RuntimeError` — If no timestep is open.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1239-L1268)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1238-L1267)
 
 ## particula.execution.gpu_session.ResidentStepToken
 
@@ -985,7 +985,7 @@ allocate resources, or provide a fallback.
 - `_guard` (`object`) — Guard that created this token.
 - `_duration` (`Any`) — Validated nonnegative finite duration retained without coercion.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1094-L1111)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1093-L1110)
 
 ### particula.execution.gpu_session.ResidentStepToken._duration
 
@@ -995,7 +995,7 @@ allocate resources, or provide a fallback.
 _duration: Any
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1111-L1111)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1110-L1110)
 
 ### particula.execution.gpu_session.ResidentStepToken._guard
 
@@ -1005,7 +1005,7 @@ _duration: Any
 _guard: object
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1110-L1110)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1109-L1109)
 
 ### particula.execution.gpu_session.ResidentStepToken.__init__
 
@@ -1041,7 +1041,7 @@ persist any native RNG state.
 - `logical_box_ids` (`tuple[str, ...]`) — Unique logical identifiers in box order.
 - `lanes` (`tuple[int, ...]`) — session metadata lane permutation for the resident boxes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L258-L330)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L257-L329)
 
 ### particula.execution.gpu_session.ResidentStreamMetadata.lanes
 
@@ -1051,7 +1051,7 @@ persist any native RNG state.
 lanes: tuple[int, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L279-L279)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L278-L278)
 
 ### particula.execution.gpu_session.ResidentStreamMetadata.logical_box_ids
 
@@ -1061,7 +1061,7 @@ lanes: tuple[int, ...]
 logical_box_ids: tuple[str, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L278-L278)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L277-L277)
 
 ### particula.execution.gpu_session.ResidentStreamMetadata.n_boxes
 
@@ -1071,7 +1071,7 @@ logical_box_ids: tuple[str, ...]
 n_boxes: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L276-L276)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L275-L275)
 
 ### particula.execution.gpu_session.ResidentStreamMetadata.root_seed
 
@@ -1081,7 +1081,7 @@ n_boxes: int
 root_seed: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L277-L277)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L276-L276)
 
 ### particula.execution.gpu_session.ResidentStreamMetadata.__init__
 
@@ -1110,7 +1110,7 @@ types.
 - `ValueError` — If the seed, ID uniqueness, lengths, or lane permutation
 violates the session metadata contract.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L281-L294)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L280-L293)
 
 ### particula.execution.gpu_session.ResidentStreamMetadata._validate_root_seed
 
@@ -1123,7 +1123,7 @@ def _validate_root_seed(maximum: int) -> None
 Validate the immutable root seed against the session metadata
 unsigned range.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L296-L305)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L295-L304)
 
 ### particula.execution.gpu_session.ResidentStreamMetadata._validate_stream_arrays
 
@@ -1135,7 +1135,7 @@ def _validate_stream_arrays() -> None
 
 Validate logical IDs and lane ordering against the box count.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L307-L330)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L306-L329)
 
 ## particula.execution.gpu_session._ResidentOperationOutcome
 
@@ -1154,7 +1154,7 @@ read-only failure leaves a successfully aborted session active; a failure
 after a writer may have launched faults it because resident payload mutation
 is observable and no rollback is available.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L349-L359)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L348-L358)
 
 ### particula.execution.gpu_session._ResidentOperationOutcome.READ_ONLY
 
@@ -1164,7 +1164,7 @@ is observable and no rollback is available.
 READ_ONLY = 'read_only'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L358-L358)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L357-L357)
 
 ### particula.execution.gpu_session._ResidentOperationOutcome.WRITER_MAY_HAVE_LAUNCHED
 
@@ -1174,7 +1174,7 @@ READ_ONLY = 'read_only'
 WRITER_MAY_HAVE_LAUNCHED = 'writer_may_have_launched'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L359-L359)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L358-L358)
 
 ## particula.execution.gpu_session._fault_resident_session
 
@@ -1186,7 +1186,7 @@ def _fault_resident_session(session: ResidentSession) -> None
 
 Mark one resident session as faulted without any recovery work.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1404-L1406)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1403-L1405)
 
 ## particula.execution.gpu_session._fault_resident_session_with_context
 
@@ -1209,7 +1209,7 @@ Notify graph capture, then fault even if notification fails.
 - `BaseException` — Propagates a graph-capture notification failure after
 marking ``session`` faulted.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1433-L1452)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1432-L1451)
 
 ## particula.execution.gpu_session._gas_shape
 
@@ -1221,7 +1221,7 @@ def _gas_shape(gas: GasData) -> tuple[int, int]
 
 Validate gas rank before using its independent width.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L117-L122)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L116-L121)
 
 ## particula.execution.gpu_session._handle_failed_resident_operation
 
@@ -1256,7 +1256,7 @@ synchronization, retry, or recovery occurs here.
 - `TypeError` — If any argument is not the exact required concrete type.
 - `ValueError` — If the binding, lifecycle, or token identity is invalid.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1487-L1527)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1486-L1526)
 
 ## particula.execution.gpu_session._notify_resident_graph_capture
 
@@ -1278,7 +1278,7 @@ graph-capture module validates the exact context and owns all teardown.
 - `guard` (`ResidentStepGuard`) — Exact closed guard bound to ``session`` and ``registry``.
 - `cause` (`str`) — Graph-capture teardown cause.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1409-L1430)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1408-L1429)
 
 ## particula.execution.gpu_session._preflight_cpu_session
 
@@ -1295,7 +1295,7 @@ policy is an upstream execution capability policy responsibility and the
 selected device is
 assumed to have been capability-approved before this boundary.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L125-L221)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L124-L220)
 
 ## particula.execution.gpu_session._reject_primary_aliases
 
@@ -1307,7 +1307,7 @@ def _reject_primary_aliases(particles: object, gas: object, environment: object)
 
 Reject overlapping primary storage before publishing a session.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L664-L697)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L663-L696)
 
 ## particula.execution.gpu_session._require_native_population_kind
 
@@ -1331,7 +1331,7 @@ def _validate_active_stream_binding(session: ResidentSession, registry: GPUResou
 
 Require an exact active, closed session/registry/guard stream binding.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1377-L1401)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1376-L1400)
 
 ## particula.execution.gpu_session._validate_array
 
@@ -1355,7 +1355,7 @@ Validate only one Warp primary-array metadata declaration.
 
 - `ValueError` — If the array metadata is absent or differs from the schema.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L401-L442)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L400-L441)
 
 ## particula.execution.gpu_session._validate_contiguous_array
 
@@ -1380,7 +1380,7 @@ Validate contiguous-stride primary metadata and nonempty pointers.
 invalid pointer, alignment, or capacity metadata. Canonical empty
 schemas require no pointer.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L445-L491)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L444-L490)
 
 ## particula.execution.gpu_session._validate_cpu_shape
 
@@ -1437,7 +1437,7 @@ def _validate_failed_operation_context(session: ResidentSession, registry: GPURe
 
 Validate the exact resident failure context before cleanup.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1455-L1484)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1454-L1483)
 
 ## particula.execution.gpu_session._validate_gas_names
 
@@ -1479,7 +1479,7 @@ Validate generated Warp structs without reading their payloads.
 
 - `TypeError` — If a container is not its required generated Warp struct.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L494-L523)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L493-L522)
 
 ## particula.execution.gpu_session._validate_native_cpu_population
 
@@ -1491,7 +1491,7 @@ def _validate_native_cpu_population(particles: ParticleData) -> None
 
 Check explicit population admission before upload.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L107-L114)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L107-L113)
 
 ## particula.execution.gpu_session._validate_resident_carriers
 
@@ -1513,7 +1513,7 @@ Validate exact resident carrier declarations.
 
 - (`tuple[ResidentDimensions, ResidentMetadata, ResidentLifecycle]`) — The validated resident carriers.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L700-L738)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L699-L737)
 
 ## particula.execution.gpu_session._validate_resident_imports
 
@@ -1534,7 +1534,7 @@ Import Warp for resident checks and preserve missing-runtime errors.
 - `RuntimeError` — If Warp is unavailable.
 - `ModuleNotFoundError` — If a different import name is missing.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L741-L759)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L740-L758)
 
 ## particula.execution.gpu_session._validate_schema
 
@@ -1559,7 +1559,7 @@ Validate fixed primary schemas and shared Warp-device metadata.
 
 - `ValueError` — If a primary array has incompatible metadata or device.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L526-L661)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L525-L660)
 
 ## particula.execution.gpu_session._validate_terminal_binding
 
@@ -1575,7 +1575,7 @@ Unlike ``GPUResourceRegistry.validate_pinned_session``, this local check is
 valid for a FAULTED session and intentionally performs no lifecycle/schema
 validation or runtime work.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1350-L1374)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1349-L1373)
 
 ## particula.execution.gpu_session.setup_resident_session
 
@@ -1623,4 +1623,4 @@ invalid.
 - `RuntimeError` — If optional Warp conversion or session validation requires
 an unavailable runtime.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1530-L1625)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/gpu_session.py#L1529-L1624)

@@ -9,6 +9,7 @@ Import all the particle classes and functions, so they can be accessed from
 
 **Modules**
 
+- `particula.particles._population`
 - `particula.particles.activity_builders`
 - `particula.particles.activity_factories`
 - `particula.particles.activity_strategies`

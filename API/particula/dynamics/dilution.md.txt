@@ -44,7 +44,7 @@ strategy is exported from :mod:`particula.dynamics`.
 
 - `coefficient` (`float | np.number`) — Scalar chamber dilution coefficient [s⁻¹], finite and nonnegative.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L447-L528)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L448-L527)
 
 ### particula.dynamics.dilution.DilutionStrategy.coefficient
 
@@ -54,7 +54,7 @@ strategy is exported from :mod:`particula.dynamics`.
 coefficient = _validate_nonnegative_scalar(coefficient, 'coefficient')
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L468-L470)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L469-L471)
 
 ### particula.dynamics.dilution.DilutionStrategy.__init__
 
@@ -70,7 +70,7 @@ Initialize the strategy with a validated dilution coefficient.
 
 - `coefficient` (`float | np.number`) — Scalar chamber dilution coefficient [s⁻¹], finite and nonnegative.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L461-L470)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L462-L471)
 
 ### particula.dynamics.dilution.DilutionStrategy._preflight
 
@@ -93,7 +93,7 @@ Validate supported aerosol state before runnable substeps.
 numeric.
 - `ValueError` — If supported aerosol state cannot be safely diluted.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L491-L503)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L490-L502)
 
 ### particula.dynamics.dilution.DilutionStrategy.rate
 
@@ -111,10 +111,10 @@ Calculate the particle-number dilution rate.
 
 **Returns**
 
-- (`float | NDArray[np.float64]`) — Particle-number concentration rate [1/(m³ s)] with the scalar or
-- (`float | NDArray[np.float64]`) — array shape of the physical particle-number concentration.
+- (`float | NDArray[np.float64]`) — Per-slot number-density rate [m⁻³ s⁻¹], or the rate of change
+- (`float | NDArray[np.float64]`) — of the radius PDF [m⁻⁴ s⁻¹] at its nodes.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L472-L489)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L473-L488)
 
 ### particula.dynamics.dilution.DilutionStrategy.step
 
@@ -145,7 +145,7 @@ write failure restores previously written concentration backing state.
 - `ValueError` — If ``time_step`` is nonfinite, negative, or nonscalar,
 or supported aerosol state cannot be safely committed.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L505-L528)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L504-L527)
 
 ## particula.dynamics.dilution._commit_native_dilution
 
@@ -157,7 +157,7 @@ def _commit_native_dilution(preflight: dict[str, Any]) -> None
 
 Publish concentrations, restoring writes on an unexpected error.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L98-L119)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L99-L120)
 
 ## particula.dynamics.dilution._preflight_concentration
 
@@ -184,7 +184,7 @@ Validate a concentration candidate before an in-place commit.
 - `ValueError` — If the candidate is nonfinite, negative, or has a shape
 different from ``source``.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L362-L395)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L363-L396)
 
 ## particula.dynamics.dilution._preflight_native_dilution
 
@@ -200,7 +200,7 @@ Every gas lane is treated equally. Raw resolved counts and PMF/PDF density
 storage receive the same decay; volume normalization is only for rates.
 Protected-field aliases reject even for zero-work calls.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L33-L95)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L34-L96)
 
 ## particula.dynamics.dilution._require_finite_result
 
@@ -225,7 +225,7 @@ Raise when a computed dilution quantity is nonfinite.
 
 - `ValueError` — If any computed value is nonfinite.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L141-L159)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L142-L160)
 
 ## particula.dynamics.dilution._return_scalar_if_appropriate
 
@@ -247,7 +247,7 @@ Return a scalar result only when every operand is scalar.
 - (`float | NDArray[np.float64]`) — The scalar value in ``result`` if all operands are scalars; otherwise,
 - (`float | NDArray[np.float64]`) — ``result`` unchanged.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L122-L138)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L123-L139)
 
 ## particula.dynamics.dilution._validate_nonnegative_scalar
 
@@ -276,7 +276,7 @@ shapes are rejected so container dilution always has one shared decay.
 - `TypeError` — If ``value`` is ``None`` or is not numeric.
 - `ValueError` — If ``value`` is nonscalar, nonfinite, or negative.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L316-L359)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L317-L360)
 
 ## particula.dynamics.dilution.dilute_aerosol
 
@@ -315,7 +315,7 @@ storage value is not numeric.
 supported aerosol state or a concentration candidate cannot be
 safely committed.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L398-L444)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L399-L445)
 
 ## particula.dynamics.dilution.get_dilution_rate
 
@@ -347,7 +347,7 @@ any array input returns an array with the broadcast shape.
 - `ValueError` — If an operand is outside its finite physical domain or the
 operand shapes cannot be broadcast.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L206-L247)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L207-L248)
 
 ## particula.dynamics.dilution.get_dilution_step
 
@@ -383,7 +383,7 @@ module-only and is not exported from ``particula.dynamics``.
 - `ValueError` — If an operand is outside its finite physical domain or the
 operand shapes cannot be broadcast.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L250-L313)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L251-L314)
 
 ## particula.dynamics.dilution.get_volume_dilution_coefficient
 
@@ -415,4 +415,4 @@ array input returns an array with the broadcast shape.
 - `ValueError` — If an operand is outside its finite physical domain or the
 operand shapes cannot be broadcast.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L162-L203)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/dilution.py#L163-L204)

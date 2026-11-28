@@ -23,7 +23,7 @@ a spherical collision area, prescribed net uptake probability and mean
 molecular speed. RK23 absolute tolerances use mol/m³ of air for gas
 and mol/m³ of the initial particle volume for each process interval.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L119-L194)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L120-L195)
 
 ### particula.dynamics.chemistry.resolved.ResolvedChemistry._namespace
 
@@ -33,7 +33,7 @@ and mol/m³ of the initial particle volume for each process interval.
 _namespace = 'resolved_chemistry'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L128-L128)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L129-L129)
 
 ### particula.dynamics.chemistry.resolved.ResolvedChemistry.bound
 
@@ -43,7 +43,7 @@ _namespace = 'resolved_chemistry'
 bound = bound
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L146-L146)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L147-L147)
 
 ### particula.dynamics.chemistry.resolved.ResolvedChemistry.solver
 
@@ -53,7 +53,7 @@ bound = bound
 solver = solver
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L147-L147)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L148-L148)
 
 ### particula.dynamics.chemistry.resolved.ResolvedChemistry.extension_id
 
@@ -161,7 +161,7 @@ def __init__(bound: ResolvedBinding, solver=_DEFAULT_SOLVER, *, name='resolved_c
 
 Select the immutable layout and per-box adaptive controls.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L130-L164)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L131-L165)
 
 ### particula.dynamics.chemistry.resolved.ResolvedChemistry.advance
 
@@ -173,7 +173,7 @@ def advance(aerosol, *, time, time_step, context)
 
 Integrate one simultaneous closed material balance within a box.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L184-L194)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L185-L195)
 
 ### particula.dynamics.chemistry.resolved.ResolvedChemistry.configuration
 
@@ -185,7 +185,7 @@ def configuration()
 
 Return restart identity including densities, mappings and solver.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L166-L178)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L167-L179)
 
 ### particula.dynamics.chemistry.resolved.ResolvedChemistry.validate
 
@@ -197,7 +197,7 @@ def validate(aerosol)
 
 Validate current representation, layout and inventories.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L180-L182)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L181-L183)
 
 ### particula.dynamics.chemistry.resolved.ResolvedChemistry.execute
 
@@ -451,7 +451,7 @@ class _BoxKinetics
 
 Scale each particle's integrated moles by its initial volume.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L24-L116)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L25-L117)
 
 ### particula.dynamics.chemistry.resolved._BoxKinetics.active
 
@@ -461,7 +461,7 @@ Scale each particle's integrated moles by its initial volume.
 active = particles.concentration[0] > 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L30-L30)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L31-L31)
 
 ### particula.dynamics.chemistry.resolved._BoxKinetics.gm
 
@@ -471,7 +471,7 @@ active = particles.concentration[0] > 0
 gm = np.asarray(bound.gas_masses)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L34-L34)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L35-L35)
 
 ### particula.dynamics.chemistry.resolved._BoxKinetics.initial
 
@@ -481,7 +481,7 @@ gm = np.asarray(bound.gas_masses)
 initial = np.concatenate((aerosol.gas.concentration[0] / self.gm, masses / self.pm / reference[:, None].ravel()))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L38-L43)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L39-L44)
 
 ### particula.dynamics.chemistry.resolved._BoxKinetics.k
 
@@ -491,7 +491,7 @@ initial = np.concatenate((aerosol.gas.concentration[0] / self.gm, masses / self.
 k = a * temp / t_ref ** exponent * np.exp(-energy / GAS_CONSTANT * temp)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L46-L50)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L47-L51)
 
 ### particula.dynamics.chemistry.resolved._BoxKinetics.kinds
 
@@ -501,7 +501,7 @@ k = a * temp / t_ref ** exponent * np.exp(-energy / GAS_CONSTANT * temp)
 kinds = bound.kinds
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L53-L53)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L54-L54)
 
 ### particula.dynamics.chemistry.resolved._BoxKinetics.net
 
@@ -511,7 +511,7 @@ kinds = bound.kinds
 net = np.asarray(bound.net)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L52-L52)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L53-L53)
 
 ### particula.dynamics.chemistry.resolved._BoxKinetics.ng
 
@@ -521,7 +521,7 @@ net = np.asarray(bound.net)
 ng = self.gm.size
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L35-L35)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L36-L36)
 
 ### particula.dynamics.chemistry.resolved._BoxKinetics.orders
 
@@ -531,7 +531,7 @@ ng = self.gm.size
 orders = np.asarray(bound.orders)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L51-L51)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L52-L52)
 
 ### particula.dynamics.chemistry.resolved._BoxKinetics.partial_volume
 
@@ -541,7 +541,7 @@ orders = np.asarray(bound.orders)
 partial_volume = self.pm / particles.density
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L36-L36)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L37-L37)
 
 ### particula.dynamics.chemistry.resolved._BoxKinetics.pm
 
@@ -551,7 +551,7 @@ partial_volume = self.pm / particles.density
 pm = np.asarray(bound.particle_masses)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L33-L33)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L34-L34)
 
 ### particula.dynamics.chemistry.resolved._BoxKinetics.reference
 
@@ -561,7 +561,7 @@ pm = np.asarray(bound.particle_masses)
 reference = masses / particles.density.sum(axis=1)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L32-L32)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L33-L33)
 
 ### particula.dynamics.chemistry.resolved._BoxKinetics.sources
 
@@ -571,7 +571,7 @@ reference = masses / particles.density.sum(axis=1)
 sources = bound.sources
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L54-L54)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L55-L55)
 
 ### particula.dynamics.chemistry.resolved._BoxKinetics.speed
 
@@ -581,17 +581,17 @@ sources = bound.sources
 speed = np.sqrt(8 * GAS_CONSTANT * temp / np.pi * self.gm)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L55-L55)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L56-L56)
 
 ### particula.dynamics.chemistry.resolved._BoxKinetics.weights
 
 *attribute* · *instance attribute*
 
 ```python
-weights = particles.concentration[0] / particles.volume[0]
+weights = slot_density(particles)[0]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L31-L31)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L32-L32)
 
 ### particula.dynamics.chemistry.resolved._BoxKinetics.__init__
 
@@ -601,7 +601,7 @@ weights = particles.concentration[0] / particles.volume[0]
 def __init__(bound, aerosol)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L27-L57)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L28-L58)
 
 ### particula.dynamics.chemistry.resolved._BoxKinetics.admissible
 
@@ -613,7 +613,7 @@ def admissible(state)
 
 Reject a negative concentration or an emptied active slot.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L59-L66)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L60-L67)
 
 ### particula.dynamics.chemistry.resolved._BoxKinetics.publish
 
@@ -625,7 +625,7 @@ def publish(aerosol, final)
 
 Publish changed lanes and preserve inactive and inert values.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L105-L116)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L106-L117)
 
 ### particula.dynamics.chemistry.resolved._BoxKinetics.rate
 
@@ -637,4 +637,4 @@ def rate(time, state)
 
 Return gas mol/m³-air/s and material mol/m³-initial-particle/s.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L68-L103)
+[View source](https://github.com/uncscode/particula/blob/main/particula/dynamics/chemistry/resolved.py#L69-L104)
