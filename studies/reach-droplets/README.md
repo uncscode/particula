@@ -1,6 +1,6 @@
 # Reproducing the REACh droplet study
 
-The [study](../../docs/studies/literature/reach-droplets/index.md) compares one expansion with fans and one without. The independent input records are digitizations of Figures 6 and 7 of Sagan et al. and Figure S2 of the supplement. Diameter is wet diameter in µm. Time is in seconds from recording start. The source uses `forced` and `unforced` for fans on and off. [Article](https://doi.org/10.1063/5.0344133) · [Supplement](https://doi.org/10.60893/figshare.jcp.32982017)
+The [study](../../docs/studies/literature/reach-droplets/index.md) compares one expansion with fans and one without. The inputs are digitizations of Figures 6 and 7 of Sagan et al. and Figure S2 of the supplement. Diameter is wet diameter in µm. Time is in seconds from recording start. The source uses `forced` and `unforced` for fans on and off. [Article](https://doi.org/10.1063/5.0344133) · [Supplement](https://doi.org/10.60893/figshare.jcp.32982017)
 
 ## Replot the published figures
 
