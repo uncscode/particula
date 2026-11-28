@@ -219,7 +219,7 @@ def timed_run(initial, process, backend, mode, grid, folder):
             native = Recorder(
                 (
                     "particle_masses",
-                    "particle_concentration",
+                    "particle_population",
                     "particle_charge",
                     "gas_concentration",
                     "temperature",
@@ -275,7 +275,7 @@ def snapshot_optics(snapshot):
     q = np.stack(
         [getattr(efficiencies, channel) for channel in CHANNELS], axis=-1
     )
-    number = particles.concentration[0] / particles.volume[0]
+    number = particles.slot_concentration_density[0]
     return (q * (np.pi * radius**2 * number)[:, None, None]).sum(axis=0)
 
 
@@ -287,7 +287,7 @@ def sparse_reference(initial, process, backend, grid):
     start = 0
     initial_vapor = initial.gas.concentration[0, 0]
     initial_mass = initial.particles.masses[0, :, 0]
-    number = initial.particles.concentration[0] / initial.particles.volume[0]
+    number = initial.particles.population[0] / initial.particles.volume[0]
     with bind(initial, process, backend) as owner:
         for row in rows:
             advance(owner, backend, grid[start : row + 1])

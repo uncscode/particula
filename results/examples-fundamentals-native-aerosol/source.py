@@ -13,22 +13,29 @@
 # ---
 
 # %% [markdown]
-# # Aerosol Tutorial
+# # From a population to an evolving aerosol
 #
-# An aerosol holds three native containers: particle material and population,
-# ordered gas species, and environment. Physics configuration stays separate.
-# Here we initialize glycerol at half its saturation concentration and a
-# lognormal particle population. Construction retains the supplied objects.
+# What information must be shared before particles and gas can evolve together?
+# An `Aerosol` holds particle, gas, and environment containers; a process supplies
+# the physical rules. This example first assembles a single-box glycerol state,
+# then uses a separate two-box population to demonstrate dilution and wall loss.
+# You will learn to distinguish stored counts, concentrations, and material mass
+# before interpreting a process result. Read [particle construction](particles/particle_data.py)
+# and [gas storage](gas/gas_data.py) if those quantities are unfamiliar.
 
 # %%
 import numpy as np
 import particula as par
 
 # %% [markdown]
-# ## Glycerol thermodynamics
+# ## Specify an initial vapor reservoir
 #
-# A vapor-pressure strategy computes the initial saturation concentration.
-# It is not stored in gas data; a subsequent process owns its configuration.
+# The vapor-pressure strategy converts a reference pressure and temperature into
+# an initial saturation concentration at 298.15 K. Half of that value is put in
+# the gas container. The retained glycerol parameters are arithmetic demonstration
+# inputs, not a calibrated glycerol property model; the printed concentration
+# should not be used as a reference measurement. The strategy is configuration,
+# not a field stored in `GasData`.
 
 # %%
 molar_mass_glycerol = 92.09382e-3  # kg/mol
@@ -67,7 +74,7 @@ environment = par.gas.EnvironmentData(
 # %% [markdown]
 # ## Native particle initialization
 #
-# Discrete bins store number density in m^-3 at reference volume 1 m^3.
+# Each discrete bin stores the number represented in the sampled air volume.
 # Each mass lane is per-particle mass in kg, not population mass. The preset
 # retains the original 100 nm mode, geometric spread, and number density.
 
@@ -94,29 +101,35 @@ assert aerosol.particles is particles
 assert aerosol.gas is glycerol_gas
 assert aerosol.environment is environment
 print(aerosol)
-print("Number density [m^-3]:", particles.concentration.sum(axis=1))
+print("Number density [m^-3]:", particles.number_density)
 print(
     "Particle mass density [kg/m^3]:",
-    np.sum(particles.masses * particles.concentration[:, :, None], axis=1),
+    particles.species_mass_density,
 )
 
 # %% [markdown]
-# The aggregate exposes its held containers through properties. Mutating their
-# arrays changes the held state; use `copy()` for detached inspection. Processes
-# validate their own scientific requirements before using this state.
+# The identity assertions show that assembly holds the supplied containers.
+# Consequently, editing a held array edits the aerosol. A detached `copy()` is
+# needed for a control case. The printed number and mass densities describe the
+# initialized population; no glycerol condensation step has been executed.
 
 # %% [markdown]
-# ## Two boxes through the same CPU runnable
+# ## Compare two boxes under the same dilution law
 #
-# Boxes share one population type and material layout. Each resolved box has
-# its own physical volume, environment, gas inventory, and particle counts.
-# Runnables iterate boxes; direct strategy methods still operate on one box.
+# The next population is particle-resolved, so its weights are represented counts.
+# The boxes have different counts and volumes (0.25 and 4 m³); equal raw weights
+# would therefore not imply equal number densities. Dilution at 0.1 s⁻¹ over 2 s
+# multiplies each inventory by exp(−0.2). The assertions compare with that analytic
+# factor, while `rate` returns slot number-density rates in m⁻³ s⁻¹.
+#
+# This gives a useful controlled comparison: the fractional change is the same
+# in both boxes even though their absolute concentrations differ.
 
 # %%
 box_particles = par.particles.create_resolved_particle_data(
     masses=np.array([[[1e-18], [2e-18]], [[1e-18], [2e-18]]]),
     density=1000.0,
-    concentration=np.array([[10.0, 20.0], [30.0, 40.0]]),
+    population=np.array([[10.0, 20.0], [30.0, 40.0]]),
     volume=np.array([0.25, 4.0]),
 )
 box_gas = (
@@ -135,7 +148,7 @@ box_aerosol = par.Aerosol(
     ),
 )
 dilution = par.dynamics.Dilution(par.dynamics.DilutionStrategy(0.1))
-initial_counts = box_particles.concentration.copy()
+initial_counts = box_particles.population.copy()
 initial_gas = box_gas.concentration.copy()
 box_rates = dilution.rate(box_aerosol)
 assert box_rates.shape == (2, 2)
@@ -144,7 +157,7 @@ np.testing.assert_allclose(
 )
 assert dilution.execute(box_aerosol, time_step=2.0, sub_steps=2) is box_aerosol
 np.testing.assert_allclose(
-    box_particles.concentration, initial_counts * np.exp(-0.2)
+    box_particles.population, initial_counts * np.exp(-0.2)
 )
 np.testing.assert_allclose(box_gas.concentration, initial_gas * np.exp(-0.2))
 print(
@@ -154,10 +167,12 @@ print(
 print("Runnable rate shape (boxes, slots):", box_rates.shape)
 
 # %% [markdown]
-# Stochastic multi-box execution requires stable logical box IDs. Reuse this
-# context to continue streams; if arrays are reordered, use a matching
-# `context.with_box_ids(...)` view. Reusing a seed does not reset a context.
-# A failed process substep commits neither box state nor random streams.
+# ## Add a stochastic loss process
+#
+# Spherical wall loss now acts on the diluted population. Stable logical box IDs
+# keep random streams associated with the boxes. Reuse the context to continue
+# those streams; a seed is not a request to restart them on every call. The printed
+# post-loss densities describe this realization, not an ensemble-average loss law.
 
 # %%
 context = par.CPUExecutionContext(
@@ -173,3 +188,17 @@ wall_loss = par.dynamics.WallLoss(
 wall_loss.execute(box_aerosol, time_step=0.1, context=context)
 print("Per-box volumes [m^3]:", box_particles.volume)
 print("Number densities after wall loss [m^-3]:", box_particles.number_density)
+
+# %% [markdown]
+# ## What the assembled state lets you investigate
+#
+# The example separates three questions: what is stored, how a deterministic
+# process changes it, and how a stochastic step samples change. The dilution
+# assertions support the specified exponential decay; they do not validate the
+# wall-loss model or the illustrative glycerol parameters.
+#
+# For a chamber comparison, vary physical volume while preserving initial number
+# density, then compare normalized losses across repeated wall-loss realizations.
+# That requires adjusting represented counts and checking material inventories,
+# not merely changing `volume`. Continue with [state access and replacement](native_state_access.py)
+# or the [wall-loss examples](../../examples/particle-processes/wall-loss/index.md).

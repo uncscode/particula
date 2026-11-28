@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 4.858077745186165,
+  "package_source_sha256": "142dc45c78857a370342e7331e40670f99125a47f20f328815752098c59941a3",
+  "scientific_source_sha256": "02156f28723d5f1efd3cdd1cc740489c33c6744dfd5d4e3cec8f8d5b9ddf17f3",
+  "input_sha256": {},
+  "example": "represented-population",
+  "fingerprint": "c5984547bee977873cdc7af4e1bcf7ffd02631f88c39c3208ade58a8a9b1dee7",
+  "source": "docs/studies/tutorials/building-an-aerosol/particles/represented_population.py",
+  "revision": "bba19575e4040ba2f09df07295cdd1c04fb5b668",
+  "package_dirty": false,
+  "executed_at": "2026-11-28T13:32:55.584763+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.4.0",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Volume (m\u00b3)   Number    Species A (kg)   Species B (kg)\ndiscrete\n       0.25        3             5e-21          1.1e-20\n          4       48             8e-20         1.76e-19\nparticle_resolved\n       0.25        3             5e-21          1.1e-20\n          4       48             8e-20         1.76e-19\ncontinuous_pdf\n       0.25     2.25         1.259e-22        5.943e-23\n          4       36         2.015e-21        9.509e-22\n"
+      },
+      {
+        "image": "figure-8-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "f745b674edf1c10126dd908514916510258716f2d5ccf9fa1659f048223f7af8",
+    "data.json": "19eb5ed43bfb8b6f01649a803526d192627bf379dafe74cb3ca0d7533430f70a",
+    "figure-8-1.png": "ef75cefc8ce79061da5b8d280ad7d5e1c1e6a603af2b3cb259a0e2f64bbec14c"
+  },
+  "simulation_fingerprint": "e546bbef690a574ada67c63a3be09885b6b180339739afcbdf586b01d2fbc939"
+}

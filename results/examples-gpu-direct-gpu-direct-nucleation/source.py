@@ -4,7 +4,7 @@
 # Why does a larger simulated volume create more particles without changing the
 # formation rate per cubic metre? This deliberately tiny example separates unit
 # events, represented counts, and gas mass density. Read
-# [CPU nucleation](../../processes/nucleation/cpu_nucleation.py) for the source law
+# [CPU nucleation](../../../examples/particle-processes/sources-and-dilution/cpu_nucleation.py) for the source law
 # before following explicit device storage and species binding.
 #
 # Map precursor gas to particle material and inject unit-count neutral
@@ -158,7 +158,7 @@ def run_example(
     """
     particles = ParticleData(
         masses=np.zeros((1, 2, 1), dtype=np.float64),
-        concentration=np.zeros((1, 2), dtype=np.float64),
+        population=np.zeros((1, 2), dtype=np.float64),
         charge=np.zeros((1, 2), dtype=np.float64),
         density=np.array([1000.0], dtype=np.float64),
         volume=np.array([volume], dtype=np.float64),
@@ -223,11 +223,10 @@ def run_example(
     )
     assert restored_particles.masses.shape == (1, 2, 1)
     assert restored_gas.concentration.shape == (1, 1)
-    assert int(np.count_nonzero(restored_particles.concentration)) > 0
+    assert int(np.count_nonzero(restored_particles.population)) > 0
     assert restored_gas.concentration[0, 0] <= gas.concentration[0, 0]
     particle_inventory = np.sum(
-        restored_particles.masses
-        * restored_particles.concentration[:, :, None],
+        restored_particles.masses * restored_particles.population[:, :, None],
         axis=1,
     )
     npt.assert_allclose(
@@ -258,7 +257,7 @@ def run_publication():
     if not wp.is_cuda_available():
         raise RuntimeError("This publication run requires CUDA")
     results = [run_example(volume=v, device="cuda:0") for v in (1.0, 2.0)]
-    count = np.array([p.concentration.sum() for p, _, _ in results])
+    count = np.array([p.population.sum() for p, _, _ in results])
     volumes = np.array([1.0, 2.0])
     npt.assert_array_equal(count, volumes)
     with plt.style.context("particula.default"):
@@ -310,5 +309,5 @@ if __name__ == "__main__":
 # as strong evidence of small gas-consumption accuracy. For a nucleation study,
 # choose a defensible rate and nucleus composition, compare event demand with
 # available gas and free slots, and test per-species source accounting at a
-# resolvable scale. The [prepared lifecycle](../prepared/gpu_prepared_lifecycle.py)
+# resolvable scale. The [prepared lifecycle](../../../examples/coupled-populations/forcing/gpu_prepared_lifecycle.py)
 # adds active source pulses to an evolving population.

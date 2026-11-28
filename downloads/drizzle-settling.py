@@ -130,7 +130,7 @@ def evaporate_on_cuda(diameter_mm, humidity, step_s):
         particles=par.particles.ParticleData(
             masses=liquid[:, None, None],
             density=np.array([WATER_DENSITY]),
-            concentration=np.ones((boxes, 1)),
+            population=np.ones((boxes, 1)),
             charge=np.zeros((boxes, 1)),
             volume=np.ones(boxes),
             distribution_type="particle_resolved",
@@ -177,7 +177,7 @@ def evaporate_on_cuda(diameter_mm, humidity, step_s):
             assert np.all(np.isfinite(wet_mass)) and np.all(wet_mass > 0)
             assert np.all(np.isfinite(gas_mass)) and np.all(gas_mass >= 0)
             np.testing.assert_array_equal(
-                snapshot.particles.concentration[:, 0], np.ones(boxes)
+                snapshot.particles.population[:, 0], np.ones(boxes)
             )
             inventory_change = np.max(
                 np.abs((wet_mass + gas_mass) / inventory - 1)

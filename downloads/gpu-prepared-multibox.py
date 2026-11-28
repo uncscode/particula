@@ -54,7 +54,7 @@ def run_example():
         "64 heterogeneous boxes · " + wp.get_device("cuda:0").name,
         forcing=False,
     )
-    print("Active particles:", int(initial.particles.concentration.sum()))
+    print("Active particles:", int(initial.particles.population.sum()))
     print("Timestep refinement:", report["refinement"])
     plt.show()
     return report

@@ -308,7 +308,7 @@ aerosol = par.Aerosol(
 def species_inventory(aero):
     """Independent species inventory in kg, including represented volume."""
     return np.sum(
-        aero.particles.masses * aero.particles.concentration[..., None], axis=1
+        aero.particles.masses * aero.particles.population[..., None], axis=1
     ) + (aero.gas.concentration * aero.particles.volume[:, None])
 
 
@@ -453,7 +453,7 @@ for step, _t in enumerate(
     # Record species mass in particles
     species_temp = aerosol_process.particles.masses[0].copy()
     species_mass[step, :] = np.sum(
-        species_temp * aerosol_process.particles.concentration[0, :, None],
+        species_temp * aerosol_process.particles.population[0, :, None],
         axis=0,
     )
     np.testing.assert_allclose(

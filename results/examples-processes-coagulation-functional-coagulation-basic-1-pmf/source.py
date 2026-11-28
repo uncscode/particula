@@ -21,7 +21,7 @@
 # coagulation. Its 200 s horizon is intended to make the workflow easy to inspect;
 # a subtle before/after difference is not evidence that coagulation is absent.
 #
-# Read [distribution measures](../../../fundamentals/particles/aerosol_distributions.py)
+# Read [distribution measures](../../../../tutorials/building-an-aerosol/particles/aerosol_distributions.py)
 # to connect these concentrations with measurements. The companion
 # [alternative representation](coagulation_basic_2_pdf.py) uses different initial parameters,
 # so the two pages are not a controlled solver comparison.
@@ -41,7 +41,7 @@ plt.style.use("particula.default")
 #
 # The 120 radius nodes span 10 nm–1 µm. The lognormal radius scale is
 # 80 nm, geometric standard deviation 1.5, and target number density
-# 5×10⁸ m⁻³. Concentration stores number per volume in each bin (m⁻³);
+# 5×10⁸ m⁻³. The density accessor reports number per volume in each bin (m⁻³);
 # sum to obtain the total. Density is 1000 kg m⁻³.
 #
 # The environment stays at 298.15 K and 101325 Pa. A zero-concentration carrier
@@ -94,7 +94,7 @@ pmf_aerosol = par.Aerosol(
 # The builder specifies Brownian collision physics and the distribution type.
 # The wrapper then advances the aerosol. This separation matters when replacing
 # the collision mechanism: changing a strategy must not silently reinterpret
-# the stored concentration units.
+# the per-slot density units.
 
 # %%
 coagulation_strategy = (
@@ -119,13 +119,13 @@ print(coagulation_process)
 time_step = 200  # seconds
 time_substeps = 10
 
-pmf_before = pmf_aerosol.particles.concentration[0].copy()
+pmf_before = pmf_aerosol.particles.slot_concentration_density[0].copy()
 radii = pmf_aerosol.particles.radii[0].copy()
 
 pmf_after_aerosol = coagulation_process.execute(
     pmf_aerosol, time_step=time_step, sub_steps=time_substeps
 )
-pmf_after = pmf_after_aerosol.particles.concentration[0].copy()
+pmf_after = pmf_after_aerosol.particles.slot_concentration_density[0].copy()
 
 # %% [markdown]
 # ## Read a small change in the correct units

@@ -50,7 +50,7 @@ def state(masses, counts, volume, gas_concentration):
     return Aerosol(
         particles=ParticleData(
             masses=np.asarray(masses, dtype=float).reshape(1, -1, 1),
-            concentration=np.asarray(counts, dtype=float).reshape(1, -1),
+            population=np.asarray(counts, dtype=float).reshape(1, -1),
             charge=np.zeros((1, len(counts))),
             density=np.array([1000.0]),
             volume=np.array([volume]),
@@ -72,7 +72,7 @@ def state(masses, counts, volume, gas_concentration):
 
 def tag_inventory(aerosol):
     """Independently compute represented tag equivalents in one box."""
-    return float(np.sum(aerosol.particles.concentration * aerosol.fields[TAG]))
+    return float(np.sum(aerosol.particles.population * aerosol.fields[TAG]))
 
 
 def coagulation_case():
@@ -105,19 +105,19 @@ def coagulation_case():
         np.testing.assert_array_equal(ledger["source"], 0)
         inventories.append(inventory)
         removals.append(removed)
-        active.append(int(np.count_nonzero(aerosol.particles.concentration)))
+        active.append(int(np.count_nonzero(aerosol.particles.population)))
     assert active[-1] < slots, "the example must contain actual mergers"
     np.testing.assert_allclose(
         inventories, initial_inventory * np.exp(-0.03 * times), rtol=2e-13
     )
-    mask = aerosol.particles.concentration[0] > 0
+    mask = aerosol.particles.population[0] > 0
     np.testing.assert_array_equal(aerosol.fields[TAG][0, ~mask], 0)
     # Save compact weighted histograms, not full particle trajectories.
     edges = np.arange(0, int(aerosol.fields[TAG].max()) + 2) - 0.5
     histogram, _ = np.histogram(
         aerosol.fields[TAG][0, mask],
         bins=edges,
-        weights=aerosol.particles.concentration[0, mask],
+        weights=aerosol.particles.population[0, mask],
     )
     initial_histogram, _ = np.histogram(tags[0], bins=edges)
     return dict(
@@ -208,7 +208,7 @@ def source_case():
     def material_inventory():
         p = aerosol.particles
         return float(
-            np.sum(p.masses[..., 0] * p.concentration)
+            np.sum(p.masses[..., 0] * p.population)
             + aerosol.gas.concentration[0, 0] * p.volume[0]
         )
 
@@ -216,7 +216,7 @@ def source_case():
     initial_tags = aerosol.fields[TAG].copy()
     process.execute(aerosol, 1.0)
     np.testing.assert_allclose(
-        aerosol.particles.concentration, [[1.5, 1.5, 1, 1]], rtol=1e-14
+        aerosol.particles.population, [[1.5, 1.5, 1, 1]], rtol=1e-14
     )
     np.testing.assert_allclose(
         aerosol.fields[TAG], [[40 / 3, 100 / 3, 7, 7]], rtol=1e-14
@@ -231,7 +231,7 @@ def source_case():
     return dict(
         before=initial_tags[0].tolist(),
         after=aerosol.fields[TAG][0].tolist(),
-        counts=aerosol.particles.concentration[0].tolist(),
+        counts=aerosol.particles.population[0].tolist(),
         inventory=tag_inventory(aerosol),
         added=float(ledger["source"][0]),
     )

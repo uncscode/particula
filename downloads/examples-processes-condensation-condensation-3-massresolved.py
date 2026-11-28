@@ -215,7 +215,7 @@ print(f"Total iterations to do: {len(time) * sub_steps}")
 # Independent per-species extensive inventory before the full published run.
 initial_inventory = (
     np.sum(
-        resolved_masses.masses * resolved_masses.concentration[..., None],
+        resolved_masses.masses * resolved_masses.population[..., None],
         axis=1,
     )
     + gas_phase.concentration * resolved_masses.volume[:, None]
@@ -230,7 +230,7 @@ for i, _t in enumerate(time):
 
     current_inventory = (
         np.sum(
-            resolved_masses.masses * resolved_masses.concentration[..., None],
+            resolved_masses.masses * resolved_masses.population[..., None],
             axis=1,
         )
         + gas_phase.concentration * resolved_masses.volume[:, None]

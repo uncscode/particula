@@ -123,7 +123,7 @@ sub_steps = max(
     ),
 )
 print("Internal substeps per output interval:", sub_steps)
-initial_counts = particle.concentration.copy()
+initial_counts = particle.population.copy()
 initial_masses = particle.masses.copy()
 loss_coefficients = wall_loss.loss_coefficient(
     particle, temperature=T, pressure=P
@@ -143,14 +143,14 @@ for i in range(1, steps + 1):
 
 # Fixed radii give an independent repeated-Euler decay prediction.
 np.testing.assert_allclose(
-    particle.concentration,
+    particle.population,
     initial_counts
     * (1 - loss_coefficients * dt / sub_steps) ** (steps * sub_steps),
     rtol=1e-12,
     atol=1e-30,
 )
 np.testing.assert_array_equal(particle.masses, initial_masses)
-assert np.all(particle.concentration >= 0)
+assert np.all(particle.population >= 0)
 
 print("Final concentration:", f"{history[-1]:.3e} 1/m^3")
 print("Relative decay:", f"{history[-1] / history[0]:.3f}")

@@ -41,7 +41,7 @@ plt.style.use("particula.default")
 #
 # The 140 radius nodes span 10 nm–1 µm. The lognormal radius scale is
 # 120 nm, geometric standard deviation 1.5, and target number density
-# 8×10⁸ m⁻³. Concentration stores number per volume per metre of radius (m⁻⁴);
+# 8×10⁸ m⁻³. The density accessor reports number per volume per metre of radius (m⁻⁴);
 # integrate over radius to obtain the total. Density is 1000 kg m⁻³.
 #
 # The environment stays at 298.15 K and 101325 Pa. A zero-concentration carrier
@@ -93,7 +93,7 @@ aerosol_pdf = par.Aerosol(
 # The builder specifies Brownian collision physics and the distribution type.
 # The wrapper then advances the aerosol. This separation matters when replacing
 # the collision mechanism: changing a strategy must not silently reinterpret
-# the stored concentration units.
+# the per-slot density units.
 
 # %%
 coagulation_strategy = (
@@ -118,13 +118,13 @@ print(coagulation_process)
 time_step = 200  # seconds
 sub_steps = 10
 
-pdf_before = aerosol_pdf.particles.concentration[0].copy()
+pdf_before = aerosol_pdf.particles.slot_concentration_density[0].copy()
 radii = aerosol_pdf.particles.radii[0].copy()
 
 aerosol_pdf_after = coagulation_process.execute(
     aerosol_pdf, time_step=time_step, sub_steps=sub_steps
 )
-pdf_after = aerosol_pdf_after.particles.concentration[0].copy()
+pdf_after = aerosol_pdf_after.particles.slot_concentration_density[0].copy()
 
 # %% [markdown]
 # ## Read a small change in the correct units

@@ -128,13 +128,13 @@ radii_after = _aerosol_after.particles.radii[0].copy()
 np.testing.assert_allclose(
     np.sum(
         _aerosol_after.particles.masses
-        * _aerosol_after.particles.concentration[..., None]
+        * _aerosol_after.particles.population[..., None]
     ),
     initial_mass,
     rtol=1e-12,
     atol=1e-30,
 )
-radii_after = radii_after[_aerosol_after.particles.concentration[0] > 0]
+radii_after = radii_after[_aerosol_after.particles.population[0] > 0]
 
 # %% [markdown]
 # ## Interpret the normalized histogram cautiously

@@ -425,7 +425,7 @@ def run_example() -> ExampleRun:  # noqa: C901
     device = execution.Device(execution.Backend.WARP, native)
     particles, gas, environment = _build_cpu_state()
     initial_total_mass = (
-        np.sum(particles.masses * particles.concentration[:, :, None], axis=1)
+        np.sum(particles.masses * particles.population[:, :, None], axis=1)
         + gas.concentration * particles.volume[:, None]
     )
     session = None

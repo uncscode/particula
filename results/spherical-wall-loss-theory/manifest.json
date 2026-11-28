@@ -1,20 +1,20 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 268.11597911291756,
-  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
-  "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
+  "elapsed_seconds": 448.66002038586885,
+  "package_source_sha256": "142dc45c78857a370342e7331e40670f99125a47f20f328815752098c59941a3",
+  "scientific_source_sha256": "02156f28723d5f1efd3cdd1cc740489c33c6744dfd5d4e3cec8f8d5b9ddf17f3",
   "input_sha256": {},
   "example": "spherical-wall-loss-theory",
-  "fingerprint": "989aeea4c977598bedb7efa692675bb042a103997097db30c397ac79d2033103",
-  "source": "docs/examples/processes/wall-loss/spherical_wall_loss_theory.py",
-  "revision": "9ab2fa66ef3d5e94551cc8942cc955990b732397",
+  "fingerprint": "2060c67c5392b91eb52e8d67c0ea03a55188d8a67a200c55a39196068e92f5b0",
+  "source": "docs/studies/validation/wall-loss/spherical_wall_loss_theory.py",
+  "revision": "bd9ecdfd0ddcda886b538e6a910c3f9f2a71a9b5",
   "package_dirty": false,
-  "executed_at": "2026-11-19T14:59:42.920310+00:00",
+  "executed_at": "2026-11-28T13:45:37.341019+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.2",
+    "particula": "0.4.0",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -29,30 +29,23 @@
     [],
     [
       {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.wall_loss 6dc09db load on device 'cuda:0' took 15.09 ms  (cached)\nModule particula.gpu.kernels._wall_loss_native 314c0ac load on device 'cuda:0' took 3.03 ms  (cached)\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 4.02 ms  (cached)\n"
+      },
+      {
+        "text": "Completed 580 CUDA boxes; CPU coefficient maximum relative error 0.001001\n1 \u00b5m: CUDA 68.546% \u00b1 0.266 pp (95% MC); theory 68.414%; additive 58.242%\n"
+      },
+      {
         "image": "figure-4-1.png"
       }
     ]
   ],
   "files": {
-    "figure-4-1.png": "0591ce4e2e82f248cca3a980d5638d79ad16c986ae107d1423227bfe8858b937",
-    "executed_source.py": "86de4d832efb2176b589790cbe62d91b250b7f01000d34e7ddcb9633fee0311e",
-    "data.json": "aa7b4bef16ef33bbc058731e666f345f5fc60ac17338d433813604cf04c5f8c2",
-    "source.py": "f8640df4d701a304397df463484cd7a103ce1fafecc2832df3a8a591b0143ba6"
+    "source.py": "0654d588b2513705e578bddbff81f4b0e6834c137c9046f8c62e38a2d272717c",
+    "data.json": "1110a079b2b9d9ffbd45a805fb2b767ed51130393d5d57792c18894117c2a4be",
+    "figure-4-1.png": "0591ce4e2e82f248cca3a980d5638d79ad16c986ae107d1423227bfe8858b937"
   },
-  "simulation_fingerprint": "2be573244c305b3fa2ff59db31c297420818d88be2d9ba70e8ce297a855bd25f",
-  "render_versions": {
-    "particula": "0.3.2",
-    "numpy": "2.3.4",
-    "scipy": "1.16.2",
-    "matplotlib": "3.10.7",
-    "nbclient": "0.10.2",
-    "jupytext": "1.17.3",
-    "warp-lang": "1.11.1",
-    "particula-distribution": "0.2.14"
-  },
-  "render_device": "CPU",
-  "execution_input_sha256": {},
-  "rendered_at": "2026-11-19T15:03:42.922319+00:00",
-  "render_revision": "9ab2fa66ef3d5e94551cc8942cc955990b732397",
-  "render_elapsed_seconds": 4.053122082026675
+  "simulation_fingerprint": "78e96f2f2899fcde132074de534132d91fc76fc97b4287b73d4db19806e6e7ba"
 }

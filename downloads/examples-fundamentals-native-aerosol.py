@@ -74,7 +74,7 @@ environment = par.gas.EnvironmentData(
 # %% [markdown]
 # ## Native particle initialization
 #
-# Discrete bins store number density in m^-3 at reference volume 1 m^3.
+# Each discrete bin stores the number represented in the sampled air volume.
 # Each mass lane is per-particle mass in kg, not population mass. The preset
 # retains the original 100 nm mode, geometric spread, and number density.
 
@@ -101,10 +101,10 @@ assert aerosol.particles is particles
 assert aerosol.gas is glycerol_gas
 assert aerosol.environment is environment
 print(aerosol)
-print("Number density [m^-3]:", particles.concentration.sum(axis=1))
+print("Number density [m^-3]:", particles.number_density)
 print(
     "Particle mass density [kg/m^3]:",
-    np.sum(particles.masses * particles.concentration[:, :, None], axis=1),
+    particles.species_mass_density,
 )
 
 # %% [markdown]
@@ -129,7 +129,7 @@ print(
 box_particles = par.particles.create_resolved_particle_data(
     masses=np.array([[[1e-18], [2e-18]], [[1e-18], [2e-18]]]),
     density=1000.0,
-    concentration=np.array([[10.0, 20.0], [30.0, 40.0]]),
+    population=np.array([[10.0, 20.0], [30.0, 40.0]]),
     volume=np.array([0.25, 4.0]),
 )
 box_gas = (
@@ -148,7 +148,7 @@ box_aerosol = par.Aerosol(
     ),
 )
 dilution = par.dynamics.Dilution(par.dynamics.DilutionStrategy(0.1))
-initial_counts = box_particles.concentration.copy()
+initial_counts = box_particles.population.copy()
 initial_gas = box_gas.concentration.copy()
 box_rates = dilution.rate(box_aerosol)
 assert box_rates.shape == (2, 2)
@@ -157,7 +157,7 @@ np.testing.assert_allclose(
 )
 assert dilution.execute(box_aerosol, time_step=2.0, sub_steps=2) is box_aerosol
 np.testing.assert_allclose(
-    box_particles.concentration, initial_counts * np.exp(-0.2)
+    box_particles.population, initial_counts * np.exp(-0.2)
 )
 np.testing.assert_allclose(box_gas.concentration, initial_gas * np.exp(-0.2))
 print(

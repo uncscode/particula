@@ -1,19 +1,20 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 7.034362373990007,
-  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
+  "elapsed_seconds": 6.409540819004178,
+  "package_source_sha256": "142dc45c78857a370342e7331e40670f99125a47f20f328815752098c59941a3",
+  "scientific_source_sha256": "02156f28723d5f1efd3cdd1cc740489c33c6744dfd5d4e3cec8f8d5b9ddf17f3",
   "input_sha256": {},
   "example": "examples-processes-coagulation-coagulation-4-compared",
-  "fingerprint": "07a0662ca78779a85cdabc25c101905aee2cbe2efa54f45dee302838dae36e54",
-  "source": "docs/examples/processes/coagulation/coagulation_4_compared.py",
-  "revision": "dd92d3c1ca71f36eacad56b49661b32c0da77ac7",
+  "fingerprint": "8de450a03083749504aabaf752f85a76bf30c745581bcfd4c692b60efdf6fa16",
+  "source": "docs/studies/tutorials/coagulation-populations/coagulation_4_compared.py",
+  "revision": "bba19575e4040ba2f09df07295cdd1c04fb5b668",
   "package_dirty": false,
-  "executed_at": "2026-11-19T14:42:38.334178+00:00",
+  "executed_at": "2026-11-28T13:32:07.347451+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.2",
+    "particula": "0.4.0",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -32,7 +33,7 @@
     [],
     [
       {
-        "text": "<particula.dynamics.particle_process.Coagulation object at 0x7fc014aa7170>\n<particula.dynamics.particle_process.Coagulation object at 0x7fc014aa74a0>\n"
+        "text": "<particula.dynamics.particle_process.Coagulation object at 0x7f4735b151c0>\n<particula.dynamics.particle_process.Coagulation object at 0x7f4735b154c0>\n"
       }
     ],
     [],
@@ -53,8 +54,8 @@
     ]
   ],
   "files": {
-    "figure-8-1.png": "0b0dbb547c4fd67d7ba651283ddb4ac8e69c8f7abdd08bba4d75cdc5ac736d21",
+    "source.py": "8271885201f3a653ddd7123dde4dda9ec8495f540714adc5ffae3021e7b2ee9c",
     "figure-7-1.png": "d1f56504f0b57964326d9a85b68323b5de6ee37f4d16c068e33dcbcffa677326",
-    "source.py": "1f34f6842d99dc3964eba7fdb11392bb7a8e49c6b10a481bdff0841038d15dcf"
+    "figure-8-1.png": "0b0dbb547c4fd67d7ba651283ddb4ac8e69c8f7abdd08bba4d75cdc5ac736d21"
   }
 }
