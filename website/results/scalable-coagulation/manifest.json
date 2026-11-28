@@ -1,20 +1,20 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 7.747161475941539,
-  "package_source_sha256": "1e49dd9483c562209be46f56e8819d719b9a61ef9293575023e748e935367106",
-  "scientific_source_sha256": "c491d38a0f3b014be11117e77bf7f5ed27e4a834ba024ddbac813c1eefd5b6db",
+  "elapsed_seconds": 9.488972869934514,
+  "package_source_sha256": "142dc45c78857a370342e7331e40670f99125a47f20f328815752098c59941a3",
+  "scientific_source_sha256": "02156f28723d5f1efd3cdd1cc740489c33c6744dfd5d4e3cec8f8d5b9ddf17f3",
   "input_sha256": {},
   "example": "scalable-coagulation",
-  "fingerprint": "57af7deb28d73bdc283914530595f865771b5644223bc864eb09440421e7d216",
-  "source": "docs/examples/gpu/direct/scalable_coagulation.py",
-  "revision": "6af97152d1570464ac5ccae56e3110001657e170",
+  "fingerprint": "7800208f306892111423abd30d771db69b3a7713978b05c9903e3815b858e76f",
+  "source": "docs/studies/validation/coagulation/native-sampling/scalable_coagulation.py",
+  "revision": "bba19575e4040ba2f09df07295cdd1c04fb5b668",
   "package_dirty": false,
-  "executed_at": "2026-11-19T14:34:30.020117+00:00",
+  "executed_at": "2026-11-28T13:33:07.317628+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.2",
+    "particula": "0.4.0",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -27,10 +27,10 @@
     [],
     [
       {
-        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.coagulation be5b77f load on device 'cpu' took 2.39 ms  (cached)\nModule particula.gpu.kernels.coagulation 6d96d28 load on device 'cpu' took 0.84 ms  (cached)\nModule particula.gpu.kernels.environment 0749c5a load on device 'cpu' took 0.29 ms  (cached)\nModule particula.gpu.kernels._coagulation_native c1df7de load on device 'cpu' took 0.27 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel 1e32053 load on device 'cpu' took 0.33 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel 9a1a29e load on device 'cpu' took 0.38 ms  (cached)\nModule particula.gpu.kernels._coagulation_budget 45a9ea0 load on device 'cpu' took 0.25 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel 4924ae3 load on device 'cpu' took 0.36 ms  (cached)\nModule particula.gpu.kernels.coagulation de78f7b load on device 'cpu' took 0.38 ms  (cached)\nModule particula.gpu.kernels.coagulation f8eed71 load on device 'cpu' took 0.31 ms  (cached)\n"
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.coagulation be5b77f load on device 'cpu' took 3.21 ms  (cached)\nModule particula.gpu.kernels.coagulation 6d96d28 load on device 'cpu' took 1.22 ms  (cached)\nModule particula.gpu.kernels.environment 0749c5a load on device 'cpu' took 0.81 ms  (cached)\nModule particula.gpu.kernels._coagulation_native c1df7de load on device 'cpu' took 2.11 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel 1e32053 load on device 'cpu' took 0.46 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel 9a1a29e load on device 'cpu' took 0.53 ms  (cached)\nModule particula.gpu.kernels._coagulation_budget 45a9ea0 load on device 'cpu' took 0.78 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel 0b09bee load on device 'cpu' took 0.54 ms  (cached)\nModule particula.gpu.kernels.coagulation de78f7b load on device 'cpu' took 2.15 ms  (cached)\nModule particula.gpu.kernels.coagulation f8eed71 load on device 'cpu' took 1.28 ms  (cached)\n"
       },
       {
-        "text": "{'device': 'cpu', 'warp_version': '1.11.1', 'rows': [{'particles': 257, 'timestep_s': 92.42142091505107, 'collisions': 0, 'scheduled_trials': 64, 'attempted_trials': 64, 'expected_trials_at_1s': 0.6924801562921808, 'workspace_bytes': 32036, 'inspection_seconds': 0.04862615594174713}, {'particles': 2000, 'timestep_s': 23.671902195712104, 'collisions': 4, 'scheduled_trials': 128, 'attempted_trials': 128, 'expected_trials_at_1s': 5.407254513884641, 'workspace_bytes': 152868, 'inspection_seconds': 0.12291695410385728}, {'particles': 5000, 'timestep_s': 9.46585764479806, 'collisions': 6, 'scheduled_trials': 128, 'attempted_trials': 128, 'expected_trials_at_1s': 13.522282375579787, 'workspace_bytes': 332868, 'inspection_seconds': 0.7532710119849071}]}\n"
+        "text": "{'device': 'cpu', 'warp_version': '1.11.1', 'rows': [{'particles': 257, 'timestep_s': 92.42142091505107, 'collisions': 0, 'scheduled_trials': 64, 'attempted_trials': 64, 'expected_trials_at_1s': 0.6924801562921808, 'workspace_bytes': 32036, 'inspection_seconds': 0.06900255801156163}, {'particles': 2000, 'timestep_s': 23.671902195712104, 'collisions': 4, 'scheduled_trials': 128, 'attempted_trials': 128, 'expected_trials_at_1s': 5.407254513884641, 'workspace_bytes': 152868, 'inspection_seconds': 0.19849318894557655}, {'particles': 5000, 'timestep_s': 9.46585764479806, 'collisions': 6, 'scheduled_trials': 128, 'attempted_trials': 128, 'expected_trials_at_1s': 13.522282375579787, 'workspace_bytes': 332868, 'inspection_seconds': 0.8226123419590294}]}\n"
       },
       {
         "image": "figure-2-1.png"
@@ -38,9 +38,9 @@
     ]
   ],
   "files": {
-    "figure-2-1.png": "ed8dfce8b040edf279444586ed22770336781e1b797c9ec1315d485aeb479f46",
-    "data.json": "84fa447b62c42e1340900585d2846d8d8a4014c19b2e22bb2bc0507bcbb10686",
-    "source.py": "290ba58d7178deb7a9e123bd7eab435f80f60f49cc934b0cb3a0bdf215f6854d"
+    "source.py": "e598a1e0b8a40aab54d6345941ea5508fe726a6fd793eb69c47e7fd35387db78",
+    "data.json": "3e496506447895f17f682a50bea05bdb86b7ed012d7d1b7b3cd8b374f4244264",
+    "figure-2-1.png": "ed8dfce8b040edf279444586ed22770336781e1b797c9ec1315d485aeb479f46"
   },
-  "simulation_fingerprint": "e8cedd066c1b049060b4010c392e794323003304e5ca5455659f3383028c4b52"
+  "simulation_fingerprint": "a934bd42dd66ca71360fee835eee016663bb8a47cdeca6d60e57aa45ba9e93cc"
 }

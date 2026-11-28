@@ -1,5 +1,5 @@
 # %% [markdown]
-# # Does CUDA wall loss reproduce spherical deposition theory?
+# # CUDA reproduces coupled spherical wall loss within sampling uncertainty
 #
 # **Yes, for the tested conditions:** Particula's CUDA particle-removal
 # simulation agrees with the theoretical survival prediction within sampling
@@ -160,7 +160,7 @@ def run(label, ke, n, reps, dt, diameters, seed):
     state = result.particles
     alive = state.masses[:, :, 0] > 0
     survival = alive.sum(axis=1) / n
-    mass_ratio = (state.masses[:, :, 0] * state.concentration).sum(axis=1) / (
+    mass_ratio = (state.masses[:, :, 0] * state.population).sum(axis=1) / (
         mass * n
     )
     assert np.all(np.isfinite(state.masses)) and np.all(state.masses >= 0)
@@ -353,7 +353,9 @@ if __name__ == "__main__":
     plt.show()
 
 # %% [markdown]
-# ## Agreement with theory is established; agreement with measurements is open
+# <a id="agreement-with-theory-is-established-agreement-with-measurements-is-open"></a>
+#
+# ## The theory comparison leaves measured chamber decay as the next test
 #
 # The original 580-box study agreed with theory in all 36 ensemble comparisons.
 # At 1 µm and kₑ=3.6 s⁻¹, CUDA and theory differed by 0.132 percentage points,
@@ -365,7 +367,7 @@ if __name__ == "__main__":
 # case. Across the scanned diameters its largest difference is 13.361 points
 # at kₑ=36 s⁻¹. Original timestep and population refinement shifts were at most
 # 0.504 and 0.359 points, respectively, including independent sampling noise.
-# See the [validation record](../../../contribute/validation/gpu/spherical-wall-loss.md)
+# See the [validation record](index.md)
 # for the full evidence and provenance. Current saved outputs above record
 # the deliberate publication rerun separately from the original study.
 #
@@ -377,4 +379,4 @@ if __name__ == "__main__":
 # a proposed next investigation.
 #
 # Continue with the [wall-loss guide](../../../guide/processes/wall-loss.md)
-# or [spherical strategy example](spherical_wall_loss_strategy.py).
+# or [spherical strategy example](../../examples/particle-processes/wall-loss/spherical_wall_loss_strategy.py).

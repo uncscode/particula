@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 4.7229893889743835,
-  "package_source_sha256": "3acfe639f9c9e0d6ffccc303a1089127ff9fa645713517dec49b3f5ef54894eb",
-  "scientific_source_sha256": "f638f3caa8c640ef4617ca2ef5cb404ce2c3b5216713b24a1de59f687de2bbc5",
+  "elapsed_seconds": 6.579594781855121,
+  "package_source_sha256": "142dc45c78857a370342e7331e40670f99125a47f20f328815752098c59941a3",
+  "scientific_source_sha256": "02156f28723d5f1efd3cdd1cc740489c33c6744dfd5d4e3cec8f8d5b9ddf17f3",
   "input_sha256": {},
   "example": "examples-gpu-resident-gpu-resident-session",
-  "fingerprint": "624c5a8d918face0078e911b61c7be2c5d204ab0eba9c3b61c7a7b7ccf06fff4",
+  "fingerprint": "0771f72e48ee283de459d9340d9ffd8e90c055a0ff354c38d2265790f1327837",
   "source": "docs/studies/tutorials/working-with-gpu/resident/gpu_resident_session.py",
-  "revision": "94148f31e6b5324b65de8040555c6f88670d3921",
-  "package_dirty": true,
-  "executed_at": "2026-11-28T04:28:08.391640+00:00",
+  "revision": "f3426b90027286bf57666888a648a4e52582035a",
+  "package_dirty": false,
+  "executed_at": "2026-11-28T13:38:06.666964+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
@@ -39,7 +39,7 @@
     ]
   ],
   "files": {
-    "source.py": "c869b79e51a2499460fa9a0f71861b7b927911361db2ffa65e88be9bfa0b7482",
+    "source.py": "e76ae8d75fed25d36ff94bd95fbbee89fb69cc33bebb69ded7d9943fe9d2d9e2",
     "figure-3-1.png": "b105abde35fe4a5385c3ff63902a1a52fd4c8419a77ac8c853616dece78941f6"
   }
 }

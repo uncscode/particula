@@ -36,8 +36,8 @@ plt.style.use("particula.default")
 # %% [markdown]
 # ## Initialize from radii with explicit units
 #
-# Discrete concentrations are number densities. Binned data uses a unit
-# reference volume; per-particle masses follow the spherical volume formula.
+# These measured densities specify particles per cm³ of air. The factory
+# converts to SI and multiplies by the represented volume (here 1 m³).
 
 # %%
 input_radius_nm = np.array([100, 200, 300], dtype=np.float64)
@@ -80,7 +80,7 @@ speciated_data = (
     .set_distribution_type("discrete")
     .set_masses(mass_distribution_pg * 1e-15)
     .set_density(np.full(3, 2500.0))
-    .set_concentration(concentration_cm3, "1/cm^3")
+    .set_number_density(concentration_cm3, "1/cm^3")
     .set_charge(np.zeros(500))
     .set_volume(np.array([1.0]))
     .build()

@@ -1,25 +1,27 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 2.8633197500021197,
-  "package_source_sha256": "4d0e6a1f95c63fcc96efe0f89fe07c34608c7e29d6ebfe8b54c383353b832cfe",
+  "elapsed_seconds": 5.07611977099441,
+  "package_source_sha256": "142dc45c78857a370342e7331e40670f99125a47f20f328815752098c59941a3",
+  "scientific_source_sha256": "02156f28723d5f1efd3cdd1cc740489c33c6744dfd5d4e3cec8f8d5b9ddf17f3",
   "input_sha256": {},
   "example": "examples-processes-nucleation-cpu-nucleation",
-  "fingerprint": "363cfab00ddcaf6b12159bf0227456e5ea28152cf76310bdd8583cbc8ad3c797",
-  "source": "docs/examples/processes/nucleation/cpu_nucleation.py",
-  "revision": "4dbaa05af3fdc8a6ae3dc32cbec5f3bd2d167ece",
+  "fingerprint": "1432aac7bed20ae9def9a24fa9be5f6739690831ab6a7795e5714ddd680c0995",
+  "source": "docs/studies/examples/particle-processes/sources-and-dilution/cpu_nucleation.py",
+  "revision": "bba19575e4040ba2f09df07295cdd1c04fb5b668",
   "package_dirty": false,
-  "executed_at": "2026-11-13T15:01:24.953834+00:00",
+  "executed_at": "2026-11-28T13:32:31.853320+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.2.14",
+    "particula": "0.4.0",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
     "nbclient": "0.10.2",
     "jupytext": "1.17.3",
-    "warp-lang": "1.11.1"
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
   },
   "outputs": [
     [
@@ -29,6 +31,6 @@
     ]
   ],
   "files": {
-    "source.py": "ab87f5e84875c6e247dc793cb2ae9d5b7968ca949b93a8a8594030e2b133449c"
+    "source.py": "38bcde766472c20c3dae9c089c0c500d04743b1faa9aa12dbf4e73779eab2ecc"
   }
 }

@@ -39,7 +39,7 @@ Example:
 #
 # Start with [PMF evolution](coagulation_1_pmf_pattern.py),
 # [PDF evolution](coagulation_2_pdf_pattern.py), or the
-# [distribution conversion example](../../fundamentals/particles/aerosol_distributions.py).
+# [distribution conversion example](../building-an-aerosol/particles/aerosol_distributions.py).
 
 # %%
 # In Colab uncomment the following command to install particula:
@@ -58,7 +58,7 @@ plt.style.use("particula.default")
 # Both populations use 150 radius nodes over 10 nm–10 µm, a 120 nm lognormal
 # radius scale, geometric standard deviation 1.5, and target number density
 # 10¹⁰ m⁻³. Density is 1000 kg m⁻³, temperature 298.15 K, and pressure 101325 Pa.
-# The PMF stores m⁻³ per bin; the PDF stores m⁻⁴ per radius. Separate container
+# The PMF density is in m⁻³ per bin. The PDF density is in m⁻⁴. Separate container
 # copies keep advancing one population from changing the other.
 
 # %%
@@ -166,18 +166,18 @@ time_step = 3600  # seconds (1 hour)
 sub_steps = 100
 
 # PMF run
-pmf_before = aerosol_pmf.particles.concentration[0].copy()
+pmf_before = aerosol_pmf.particles.slot_concentration_density[0].copy()
 aerosol_pmf_after = coagulation_pmf.execute(
     aerosol_pmf, time_step=time_step, sub_steps=sub_steps
 )
-pmf_after = aerosol_pmf_after.particles.concentration[0].copy()
+pmf_after = aerosol_pmf_after.particles.slot_concentration_density[0].copy()
 
 # PDF run
-pdf_before = aerosol_pdf.particles.concentration[0].copy()
+pdf_before = aerosol_pdf.particles.slot_concentration_density[0].copy()
 aerosol_pdf_after = coagulation_pdf.execute(
     aerosol_pdf, time_step=time_step, sub_steps=sub_steps
 )
-pdf_after = aerosol_pdf_after.particles.concentration[0].copy()
+pdf_after = aerosol_pdf_after.particles.slot_concentration_density[0].copy()
 
 # %% [markdown]
 # ## Put both results in common units

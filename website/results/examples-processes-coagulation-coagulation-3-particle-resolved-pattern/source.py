@@ -138,7 +138,7 @@ sub_steps = 20
 radii_before = aerosol_resolved.particles.radii[0].copy()
 initial_mass = np.sum(
     aerosol_resolved.particles.masses
-    * aerosol_resolved.particles.concentration[..., None],
+    * aerosol_resolved.particles.population[..., None],
     axis=1,
 )
 
@@ -149,7 +149,7 @@ radii_after = aerosol_after.particles.radii[0]
 np.testing.assert_allclose(
     np.sum(
         aerosol_after.particles.masses
-        * aerosol_after.particles.concentration[..., None],
+        * aerosol_after.particles.population[..., None],
         axis=1,
     ),
     initial_mass,
@@ -157,9 +157,9 @@ np.testing.assert_allclose(
     atol=1e-30,
 )
 assert np.all(aerosol_after.particles.masses >= 0)
-assert np.sum(aerosol_after.particles.concentration) <= 50_000
+assert np.sum(aerosol_after.particles.population) <= 50_000
 # Free slots have radius zero; exclude them from the normalized active PDF.
-radii_after = radii_after[aerosol_after.particles.concentration[0] > 0]
+radii_after = radii_after[aerosol_after.particles.population[0] > 0]
 
 # %% [markdown]
 # ## Separate size-distribution shape from number loss

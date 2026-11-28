@@ -123,7 +123,7 @@ def _build_cpu_state() -> tuple[ParticleData, GasData, EnvironmentData]:
     """
     particles = ParticleData(
         masses=np.array([[[1.0e-18]]], dtype=np.float64),
-        concentration=np.array([[1.0]], dtype=np.float64),
+        population=np.array([[1.0]], dtype=np.float64),
         charge=np.array([[0.0]], dtype=np.float64),
         density=np.array([1000.0], dtype=np.float64),
         volume=np.array([1.0e-6], dtype=np.float64),
@@ -252,20 +252,20 @@ def run_publication():
         counts = restarted.particles.population.numpy().copy()
         gas = restarted.gas.concentration.numpy().copy()
         np.testing.assert_array_equal(masses, initial_p.masses)
-        np.testing.assert_array_equal(counts, initial_p.concentration)
+        np.testing.assert_array_equal(counts, initial_p.population)
         np.testing.assert_array_equal(gas, initial_g.concentration)
         checkpoint = result.checkpoint
         numbers = [
-            initial_p.concentration.sum(),
-            checkpoint.particles.concentration.sum(),
+            initial_p.population.sum(),
+            checkpoint.particles.population.sum(),
             counts.sum(),
         ]
         inventories = [
-            np.sum(initial_p.masses * initial_p.concentration[..., None])
+            np.sum(initial_p.masses * initial_p.population[..., None])
             + np.sum(initial_g.concentration * initial_p.volume[:, None]),
             np.sum(
                 checkpoint.particles.masses
-                * checkpoint.particles.concentration[..., None]
+                * checkpoint.particles.population[..., None]
             )
             + np.sum(
                 checkpoint.gas.concentration
