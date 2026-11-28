@@ -59,12 +59,14 @@ Expose prepared simulation types without loading optional runtimes.
 - `particula.builder_mixin`
 - `particula.coupling`
 - `particula.cpu_transfer`
+- `particula.data`
 - `particula.dynamics`
 - `particula.equilibria`
 - `particula.execution`
 - `particula.extension_fields`
 - `particula.gas`
 - `particula.gpu`
+- `particula.instruments`
 - `particula.logger_setup`
 - `particula.optics`
 - `particula.particles`

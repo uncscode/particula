@@ -64,12 +64,14 @@ Expose prepared simulation types without loading optional runtimes.
 - `particula.builder_mixin`
 - `particula.coupling`
 - `particula.cpu_transfer`
+- `particula.data`
 - `particula.dynamics`
 - `particula.equilibria`
 - `particula.execution`
 - `particula.extension_fields`
 - `particula.gas`
 - `particula.gpu`
+- `particula.instruments`
 - `particula.logger_setup`
 - `particula.optics`
 - `particula.particles`
@@ -10567,6 +10569,3195 @@ def plan(wrapper, aerosol)
 Check all callback requirements without advancing or drawing RNG.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/cpu_transfer.py#L36-L64)
+
+---
+
+# particula.data
+
+*module*
+
+Import unit-described measurements with the optional data extra.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/__init__.py#L1-L1)
+
+## particula.data.Measurement
+
+*class*
+
+```python
+class Measurement
+```
+
+Re-exported from: `particula.data.measurement`
+
+Measurements from one source, with a row per accepted scan.
+
+**Attributes**
+
+- `lazy_frame` — Scan columns in profile output units, with UTC timestamps. The source digest and first physical line identify each scan.
+- `lazy_issues` — Parse diagnostics with inclusive physical line spans.
+- `manifest` — Import provenance, including the profile and source layouts.
+- `grids` — Coordinate definitions keyed by the grid ID stored on each scan that contains spectral or array data.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L12-L184)
+
+### particula.data.Measurement.grids
+
+*attribute* · *instance attribute*
+
+```python
+grids = manifest['grids']
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L43-L43)
+
+### particula.data.Measurement.lazy_frame
+
+*attribute* · *instance attribute*
+
+```python
+lazy_frame = scans.with_columns(pl.lit(manifest['source_sha256']).alias('source_sha256'))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L38-L40)
+
+### particula.data.Measurement.lazy_issues
+
+*attribute* · *instance attribute*
+
+```python
+lazy_issues = issues
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L41-L41)
+
+### particula.data.Measurement.manifest
+
+*attribute* · *instance attribute*
+
+```python
+manifest = manifest
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L42-L42)
+
+### particula.data.Measurement.frame
+
+*property*
+
+```python
+frame: pl.DataFrame
+```
+
+Collect the selected scans in memory, including their source IDs.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L62-L64)
+
+### particula.data.Measurement.issues
+
+*property*
+
+```python
+issues: pl.DataFrame
+```
+
+Collect source-located diagnostics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L67-L69)
+
+### particula.data.Measurement.__init__
+
+*method*
+
+```python
+def __init__(scans: pl.LazyFrame, issues: pl.LazyFrame, manifest: dict) -> None
+```
+
+Validate scan columns and coordinates against the source layouts.
+
+**Parameters**
+
+- `scans` (`pl.LazyFrame`) — Lazy scan table with columns defined by the profile.
+- `issues` (`pl.LazyFrame`) — Lazy diagnostic table for the original source.
+- `manifest` (`dict`) — Import manifest containing the profile, segment headers, grids and source digest.
+
+**Raises**
+
+- `ValueError` — Scan column types or grids disagree with the layouts.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L24-L59)
+
+### particula.data.Measurement.available_operations
+
+*method*
+
+```python
+def available_operations() -> dict[str, tuple[str, ...]]
+```
+
+Map compatible operation names to their required input names.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L176-L184)
+
+### particula.data.Measurement.filter
+
+*method*
+
+```python
+def filter(predicate: pl.Expr | pl.Series | str | Iterable[pl.Expr | pl.Series | str] | bool | list[bool] | np.ndarray) -> Self
+```
+
+Select scans while retaining the original source diagnostics.
+
+**Parameters**
+
+- `predicate` (`pl.Expr | pl.Series | str | Iterable[pl.Expr | pl.Series | str] | bool | list[bool] | np.ndarray`) — Boolean expression, column, mask, or predicates accepted by Polars LazyFrame.filter.
+
+**Returns**
+
+- (`Self`) — Measurement of the same type with a lazily filtered scan table.
+- (`Self`) — The manifest and diagnostics still describe the full source.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L71-L93)
+
+### particula.data.Measurement.flag_summary
+
+*method*
+
+```python
+def flag_summary() -> pl.LazyFrame
+```
+
+Count each vendor condition once per scan.
+
+**Returns**
+
+- (`pl.LazyFrame`) — Lazy table of flag labels, affected and total scan counts, and
+- (`pl.LazyFrame`) — the first and last UTC time at which each flag appeared.
+
+**Raises**
+
+- `ValueError` — The profile does not declare vendor flags.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L147-L174)
+
+### particula.data.Measurement.quality_summary
+
+*method*
+
+```python
+def quality_summary(field: str, *, exclude_flags: str | Iterable[str] = (), exclude_repaired: bool = False) -> pl.LazyFrame
+```
+
+Summarize a scalar field after explicit source-quality exclusions.
+
+**Parameters**
+
+- `field` (`str`) — Name of a scalar field declared in the profile.
+- `exclude_flags` (`str | Iterable[str]`) (default: `()`) — Omit scans carrying any of these vendor flags.
+- `exclude_repaired` (`bool`) (default: `False`) — Omit scans reconstructed from logger fragments.
+
+**Returns**
+
+- (`pl.LazyFrame`) — One lazy row with the source, exclusion policy, scan and sample
+- (`pl.LazyFrame`) — counts, and UTC bounds of excluded scans. The mean weights each
+- (`pl.LazyFrame`) — retained, non-null sample equally and uses the field's output unit.
+
+**Raises**
+
+- `ValueError` — The field is undeclared or the requested flag
+exclusions require a missing vendor status field.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L95-L145)
+
+## particula.data.MeasurementReader
+
+*class*
+
+```python
+class MeasurementReader
+```
+
+Re-exported from: `particula.data.reader`
+
+Read one source in batches while tracking layouts and diagnostics.
+
+**Attributes**
+
+- `manifest` (`dict | None`) — Import provenance, including the source digest, grids and scan count. Available only after batches() reaches end of file.
+- `segment` — Zero-based source layout index for the current batch.
+- `issue_counts` (`Counter[str]`) — Number of diagnostics emitted per code during decoding.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L335-L528)
+
+### particula.data.MeasurementReader.count
+
+*attribute* · *instance attribute*
+
+```python
+count = 0
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L378-L378)
+
+### particula.data.MeasurementReader.issue_counts
+
+*attribute* · *instance attribute*
+
+```python
+issue_counts: Counter[str] = Counter()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L377-L377)
+
+### particula.data.MeasurementReader.manifest
+
+*attribute* · *instance attribute*
+
+```python
+manifest: dict | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L379-L379)
+
+### particula.data.MeasurementReader.profile
+
+*attribute* · *instance attribute*
+
+```python
+profile = load_profile(profile)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L372-L372)
+
+### particula.data.MeasurementReader.segment
+
+*attribute* · *instance attribute*
+
+```python
+segment = 0
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L380-L380)
+
+### particula.data.MeasurementReader.source
+
+*attribute* · *instance attribute*
+
+```python
+source = Path(source)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L371-L371)
+
+### particula.data.MeasurementReader.__init__
+
+*method*
+
+```python
+def __init__(source: str | os.PathLike[str], profile: ProfileSource, *, input_chunk_bytes: int = 2 ** 20, batch_scans: int = 32768, batch_bytes: int = 2 ** 23, max_record_bytes: int = 2 ** 22) -> None
+```
+
+Configure the source and batching limits.
+
+**Parameters**
+
+- `source` (`str | os.PathLike[str]`) — Path to the delimited instrument export.
+- `profile` (`ProfileSource`) — Built-in ID, mapping, or path to a JSON or YAML profile.
+- `input_chunk_bytes` (`int`) (default: `2 ** 20`) — Maximum bytes requested per raw input read.
+- `batch_scans` (`int`) (default: `32768`) — Target maximum scan rows per emitted batch.
+- `batch_bytes` (`int`) (default: `2 ** 23`) — Target working size of a batch in bytes. A single record and its diagnostics can exceed this target.
+- `max_record_bytes` (`int`) (default: `2 ** 22`) — Maximum raw bytes in one logical record, including embedded newlines and any repaired fragments.
+
+**Raises**
+
+- `ValueError` — A limit is not a positive integer.
+- `ProfileError` — The profile cannot be loaded or validated.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L345-L380)
+
+### particula.data.MeasurementReader._decoded
+
+*method*
+
+```python
+def _decoded(records, binding)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L459-L508)
+
+### particula.data.MeasurementReader._issue
+
+*method*
+
+```python
+def _issue(code, start, end, message)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L521-L528)
+
+### particula.data.MeasurementReader._missing
+
+*method*
+
+```python
+def _missing(row, binding, start, end)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L510-L519)
+
+### particula.data.MeasurementReader.batches
+
+*method*
+
+```python
+def batches() -> Iterator[tuple[pl.DataFrame, pl.DataFrame]]
+```
+
+Read scans in source order and finalize the manifest at end of file.
+
+**Yields**
+
+- (`pl.DataFrame`) — Pairs of scan and diagnostic frames for one source layout.
+- (`pl.DataFrame`) — Either frame may be empty. Scan times are UTC nanoseconds, and
+- (`tuple[pl.DataFrame, pl.DataFrame]`) — source spans use inclusive, one-based physical line numbers.
+
+**Raises**
+
+- `ProfileError` — A layout or record fails the profile's input rules.
+- `ValueError` — The source size or modification time changes during
+import.
+- `OSError` — The source cannot be opened or read.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L382-L457)
+
+## particula.data.MobilityNumberSpectrum
+
+*class*
+
+```python
+class MobilityNumberSpectrum(Measurement)
+```
+
+Bases: `particula.data.measurement.Measurement`
+
+Re-exported from: `particula.data.measurement`
+
+Number per log10 electrical-mobility diameter on a declared grid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L211-L255)
+
+### particula.data.MobilityNumberSpectrum.grids
+
+*attribute* · *instance attribute*
+
+```python
+grids = manifest['grids']
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L43-L43)
+
+### particula.data.MobilityNumberSpectrum.lazy_frame
+
+*attribute* · *instance attribute*
+
+```python
+lazy_frame = scans.with_columns(pl.lit(manifest['source_sha256']).alias('source_sha256'))
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L38-L40)
+
+### particula.data.MobilityNumberSpectrum.lazy_issues
+
+*attribute* · *instance attribute*
+
+```python
+lazy_issues = issues
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L41-L41)
+
+### particula.data.MobilityNumberSpectrum.manifest
+
+*attribute* · *instance attribute*
+
+```python
+manifest = manifest
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L42-L42)
+
+### particula.data.MobilityNumberSpectrum.frame
+
+*property*
+
+```python
+frame: pl.DataFrame
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+Collect the selected scans in memory, including their source IDs.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L62-L64)
+
+### particula.data.MobilityNumberSpectrum.issues
+
+*property*
+
+```python
+issues: pl.DataFrame
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+Collect source-located diagnostics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L67-L69)
+
+### particula.data.MobilityNumberSpectrum.__init__
+
+*method*
+
+```python
+def __init__(scans: pl.LazyFrame, issues: pl.LazyFrame, manifest: dict) -> None
+```
+
+Require a number-per-decade spectrum and mobility diameter grid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L214-L227)
+
+### particula.data.MobilityNumberSpectrum.available_operations
+
+*method*
+
+```python
+def available_operations() -> dict[str, tuple[str, ...]]
+```
+
+Report the spectrum integral.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L253-L255)
+
+### particula.data.MobilityNumberSpectrum.integrated_number
+
+*method*
+
+```python
+def integrated_number() -> pl.LazyFrame
+```
+
+Integrate number concentration over measured mobility diameters.
+
+Each channel contributes its number density per decade multiplied by
+the reciprocal of the grid's reported channels per decade.
+
+**Returns**
+
+- (`pl.LazyFrame`) — Lazy table of scan IDs, UTC times and integrated number in the
+- (`pl.LazyFrame`) — profile's concentration unit. A missing channel yields a null
+- (`pl.LazyFrame`) — total for that scan.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L229-L251)
+
+### particula.data.MobilityNumberSpectrum.filter
+
+*method*
+
+```python
+def filter(predicate: pl.Expr | pl.Series | str | Iterable[pl.Expr | pl.Series | str] | bool | list[bool] | np.ndarray) -> Self
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+Select scans while retaining the original source diagnostics.
+
+**Parameters**
+
+- `predicate` (`pl.Expr | pl.Series | str | Iterable[pl.Expr | pl.Series | str] | bool | list[bool] | np.ndarray`) — Boolean expression, column, mask, or predicates accepted by Polars LazyFrame.filter.
+
+**Returns**
+
+- (`Self`) — Measurement of the same type with a lazily filtered scan table.
+- (`Self`) — The manifest and diagnostics still describe the full source.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L71-L93)
+
+### particula.data.MobilityNumberSpectrum.flag_summary
+
+*method*
+
+```python
+def flag_summary() -> pl.LazyFrame
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+Count each vendor condition once per scan.
+
+**Returns**
+
+- (`pl.LazyFrame`) — Lazy table of flag labels, affected and total scan counts, and
+- (`pl.LazyFrame`) — the first and last UTC time at which each flag appeared.
+
+**Raises**
+
+- `ValueError` — The profile does not declare vendor flags.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L147-L174)
+
+### particula.data.MobilityNumberSpectrum.quality_summary
+
+*method*
+
+```python
+def quality_summary(field: str, *, exclude_flags: str | Iterable[str] = (), exclude_repaired: bool = False) -> pl.LazyFrame
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+Summarize a scalar field after explicit source-quality exclusions.
+
+**Parameters**
+
+- `field` (`str`) — Name of a scalar field declared in the profile.
+- `exclude_flags` (`str | Iterable[str]`) (default: `()`) — Omit scans carrying any of these vendor flags.
+- `exclude_repaired` (`bool`) (default: `False`) — Omit scans reconstructed from logger fragments.
+
+**Returns**
+
+- (`pl.LazyFrame`) — One lazy row with the source, exclusion policy, scan and sample
+- (`pl.LazyFrame`) — counts, and UTC bounds of excluded scans. The mean weights each
+- (`pl.LazyFrame`) — retained, non-null sample equally and uses the field's output unit.
+
+**Raises**
+
+- `ValueError` — The field is undeclared or the requested flag
+exclusions require a missing vendor status field.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L95-L145)
+
+## particula.data.ParticleCountRate
+
+*class*
+
+```python
+class ParticleCountRate(Measurement)
+```
+
+Bases: `particula.data.measurement.Measurement`
+
+Re-exported from: `particula.data.measurement`
+
+A measurement containing detector count rate in declared units.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L187-L208)
+
+### particula.data.ParticleCountRate.grids
+
+*attribute* · *instance attribute*
+
+```python
+grids = manifest['grids']
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L43-L43)
+
+### particula.data.ParticleCountRate.lazy_frame
+
+*attribute* · *instance attribute*
+
+```python
+lazy_frame = scans.with_columns(pl.lit(manifest['source_sha256']).alias('source_sha256'))
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L38-L40)
+
+### particula.data.ParticleCountRate.lazy_issues
+
+*attribute* · *instance attribute*
+
+```python
+lazy_issues = issues
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L41-L41)
+
+### particula.data.ParticleCountRate.manifest
+
+*attribute* · *instance attribute*
+
+```python
+manifest = manifest
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L42-L42)
+
+### particula.data.ParticleCountRate.frame
+
+*property*
+
+```python
+frame: pl.DataFrame
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+Collect the selected scans in memory, including their source IDs.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L62-L64)
+
+### particula.data.ParticleCountRate.issues
+
+*property*
+
+```python
+issues: pl.DataFrame
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+Collect source-located diagnostics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L67-L69)
+
+### particula.data.ParticleCountRate.__init__
+
+*method*
+
+```python
+def __init__(scans: pl.LazyFrame, issues: pl.LazyFrame, manifest: dict) -> None
+```
+
+Require a profile that declares a detector count-rate field.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L190-L201)
+
+### particula.data.ParticleCountRate.available_operations
+
+*method*
+
+```python
+def available_operations() -> dict[str, tuple[str, ...]]
+```
+
+Include sample flow as a prerequisite for number concentration.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L203-L208)
+
+### particula.data.ParticleCountRate.filter
+
+*method*
+
+```python
+def filter(predicate: pl.Expr | pl.Series | str | Iterable[pl.Expr | pl.Series | str] | bool | list[bool] | np.ndarray) -> Self
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+Select scans while retaining the original source diagnostics.
+
+**Parameters**
+
+- `predicate` (`pl.Expr | pl.Series | str | Iterable[pl.Expr | pl.Series | str] | bool | list[bool] | np.ndarray`) — Boolean expression, column, mask, or predicates accepted by Polars LazyFrame.filter.
+
+**Returns**
+
+- (`Self`) — Measurement of the same type with a lazily filtered scan table.
+- (`Self`) — The manifest and diagnostics still describe the full source.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L71-L93)
+
+### particula.data.ParticleCountRate.flag_summary
+
+*method*
+
+```python
+def flag_summary() -> pl.LazyFrame
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+Count each vendor condition once per scan.
+
+**Returns**
+
+- (`pl.LazyFrame`) — Lazy table of flag labels, affected and total scan counts, and
+- (`pl.LazyFrame`) — the first and last UTC time at which each flag appeared.
+
+**Raises**
+
+- `ValueError` — The profile does not declare vendor flags.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L147-L174)
+
+### particula.data.ParticleCountRate.quality_summary
+
+*method*
+
+```python
+def quality_summary(field: str, *, exclude_flags: str | Iterable[str] = (), exclude_repaired: bool = False) -> pl.LazyFrame
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+Summarize a scalar field after explicit source-quality exclusions.
+
+**Parameters**
+
+- `field` (`str`) — Name of a scalar field declared in the profile.
+- `exclude_flags` (`str | Iterable[str]`) (default: `()`) — Omit scans carrying any of these vendor flags.
+- `exclude_repaired` (`bool`) (default: `False`) — Omit scans reconstructed from logger fragments.
+
+**Returns**
+
+- (`pl.LazyFrame`) — One lazy row with the source, exclusion policy, scan and sample
+- (`pl.LazyFrame`) — counts, and UTC bounds of excluded scans. The mean weights each
+- (`pl.LazyFrame`) — retained, non-null sample equally and uses the field's output unit.
+
+**Raises**
+
+- `ValueError` — The field is undeclared or the requested flag
+exclusions require a missing vendor status field.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L95-L145)
+
+## particula.data.ProfileError
+
+*class*
+
+```python
+class ProfileError(ValueError)
+```
+
+Bases: `ValueError`
+
+Re-exported from: `particula.data.profile`
+
+A machine-readable diagnostic for a profile or its source binding.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L34-L67)
+
+### particula.data.ProfileError.code
+
+*attribute* · *instance attribute*
+
+```python
+code = code
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L64-L64)
+
+### particula.data.ProfileError.expected
+
+*attribute* · *instance attribute*
+
+```python
+expected = expected
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L61-L61)
+
+### particula.data.ProfileError.message
+
+*attribute* · *instance attribute*
+
+```python
+message = message
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L66-L66)
+
+### particula.data.ProfileError.observed
+
+*attribute* · *instance attribute*
+
+```python
+observed = observed
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L60-L60)
+
+### particula.data.ProfileError.path
+
+*attribute* · *instance attribute*
+
+```python
+path = path
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L65-L65)
+
+### particula.data.ProfileError.severity
+
+*attribute* · *instance attribute*
+
+```python
+severity = 'error'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L59-L59)
+
+### particula.data.ProfileError.source_line_end
+
+*attribute* · *instance attribute*
+
+```python
+source_line_end = source_line_end
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L63-L63)
+
+### particula.data.ProfileError.source_line_start
+
+*attribute* · *instance attribute*
+
+```python
+source_line_start = source_line_start
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L62-L62)
+
+### particula.data.ProfileError.__init__
+
+*method*
+
+```python
+def __init__(code: str, path: str, message: str, *, observed: object = None, expected: object = None, source_line_start: int | None = None, source_line_end: int | None = None) -> None
+```
+
+Describe a profile error and its location.
+
+**Parameters**
+
+- `code` (`str`) — Machine-readable diagnostic identifier.
+- `path` (`str`) — JSON Pointer within the profile, or empty for its root.
+- `message` (`str`) — Human-readable explanation.
+- `observed` (`object`) (default: `None`) — Value that failed validation, when available.
+- `expected` (`object`) (default: `None`) — Constraint or expected value, when available.
+- `source_line_start` (`int | None`) (default: `None`) — First physical source line, counted from one.
+- `source_line_end` (`int | None`) (default: `None`) — Last physical source line, inclusive.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L37-L67)
+
+## particula.data.describe_profile
+
+*function*
+
+```python
+def describe_profile(profile: ProfileSource | None = None) -> dict
+```
+
+Re-exported from: `particula.data.profile`
+
+Describe the profile format or resolve a particular profile.
+
+**Parameters**
+
+- `profile` (`ProfileSource | None`) (default: `None`) — Built-in ID, mapping, or path to a JSON or YAML file. Omit to retrieve the installed JSON Schema.
+
+**Returns**
+
+- (`dict`) — A fresh dictionary containing the schema or the validated profile,
+- (`dict`) — including its declared quantities, units and clock interpretation.
+
+**Raises**
+
+- `ProfileError` — The supplied profile cannot be loaded or validated.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L127-L143)
+
+## particula.data.import_to_parquet
+
+*function*
+
+```python
+def import_to_parquet(source: str | os.PathLike[str], destination: str | os.PathLike[str], *, profile: ProfileSource, **limits: int) -> Measurement
+```
+
+Re-exported from: `particula.data.storage`
+
+Write bounded Parquet parts and atomically publish a completed import.
+
+**Parameters**
+
+- `source` (`str | os.PathLike[str]`) — Path to a delimited instrument export.
+- `destination` (`str | os.PathLike[str]`) — Directory to publish after all parts have been written.
+- `profile` (`ProfileSource`) — Built-in ID, mapping, or path to a JSON or YAML profile.
+- `**limits` (`int`) (default: `{}`) — Optional MeasurementReader chunk, record and batch limits.
+
+**Returns**
+
+- (`Measurement`) — Disk-backed measurement with lazy scans and source diagnostics.
+- (`Measurement`) — An existing dataset is reused when the source digest, profile digest
+- (`Measurement`) — and parser version match.
+
+**Raises**
+
+- `FileExistsError` — The destination holds an incomplete or different
+dataset.
+- `ProfileError` — The profile or source violates the input rules.
+- `ValueError` — A reader limit is invalid or the source changes during
+import.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/storage.py#L107-L183)
+
+## particula.data.inspect_source
+
+*function*
+
+```python
+def inspect_source(source: str | os.PathLike[str], profile: ProfileSource) -> dict
+```
+
+Re-exported from: `particula.data.reader`
+
+Inspect the preamble, header and first observation in a delimited export.
+
+**Parameters**
+
+- `source` (`str | os.PathLike[str]`) — Path to the instrument export.
+- `profile` (`ProfileSource`) — Built-in ID, mapping, or path to a JSON or YAML profile.
+
+**Returns**
+
+- (`dict`) — Encoding, header, preamble and coordinate grids for the first layout.
+- (`dict`) — The clock example contains raw tokens and its starting physical line.
+- (`dict`) — Both are null when the layout has no following record.
+
+**Raises**
+
+- `ProfileError` — The profile or source layout fails validation.
+- `OSError` — The source cannot be opened or read.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L207-L246)
+
+## particula.data.migrate_settings
+
+*function*
+
+```python
+def migrate_settings(settings: dict, *, fields: dict | None = None, on_bad_record: str | None = None) -> Migration
+```
+
+Re-exported from: `particula.data.migration`
+
+Translate a beta 1D or AIM 2D settings mapping.
+
+**Parameters**
+
+- `settings` (`dict`) — Beta scalar or sizer stream settings, including its clock, column selectors and source discovery rules.
+- `fields` (`dict | None`) (default: `None`) — Scalar field definitions keyed by legacy output label. Supply the quantity, source unit and output unit for unfamiliar channels.
+- `on_bad_record` (`str | None`) (default: `None`) — Profile policy for malformed rows. An explicit choice is required to replace legacy character and length filters.
+
+**Returns**
+
+- (`Migration`) — Candidate profile, original settings and diagnostics for unresolved
+- (`Migration`) — choices. Call resolved_profile() before using the result for import.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/migration.py#L185-L247)
+
+## particula.data.open_measurement
+
+*function*
+
+```python
+def open_measurement(destination: str | os.PathLike[str]) -> Measurement
+```
+
+Re-exported from: `particula.data.storage`
+
+Open a completed Parquet measurement for lazy analysis.
+
+**Parameters**
+
+- `destination` (`str | os.PathLike[str]`) — Dataset directory created by import_to_parquet.
+
+**Returns**
+
+- (`Measurement`) — Measurement with lazy scans and diagnostics, validated profile units
+- (`Measurement`) — and coordinates from the stored manifest.
+
+**Raises**
+
+- `OSError` — The manifest cannot be opened or read.
+- `ValueError` — The format, profile or grid digests, part inventory, or
+scan layout fails validation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/storage.py#L49-L94)
+
+## particula.data.read_measurement
+
+*function*
+
+```python
+def read_measurement(source: str | os.PathLike[str], *, profile: ProfileSource, **limits: int) -> Measurement
+```
+
+Re-exported from: `particula.data.storage`
+
+Read a single instrument export into memory.
+
+**Parameters**
+
+- `source` (`str | os.PathLike[str]`) — Path to the delimited export.
+- `profile` (`ProfileSource`) — Built-in ID, mapping, or path to a JSON or YAML profile.
+- `**limits` (`int`) (default: `{}`) — Optional MeasurementReader chunk, record and batch limits.
+
+**Returns**
+
+- (`Measurement`) — Measurement selected from the profile's quantities and coordinate
+- (`Measurement`) — basis. Scans use the declared output units and include UTC timestamps.
+
+**Raises**
+
+- `ProfileError` — The profile or source violates the input rules.
+- `ValueError` — A reader limit is invalid or the source changes during
+import.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/storage.py#L21-L46)
+
+## particula.data.validate_profile
+
+*function*
+
+```python
+def validate_profile(profile: ProfileSource, *, source: str | PathLike[str] | None = None) -> ValidationResult
+```
+
+Re-exported from: `particula.data.profile`
+
+Check a profile and optionally bind it to the first source layout.
+
+**Parameters**
+
+- `profile` (`ProfileSource`) — Built-in ID, mapping, or path to a JSON or YAML file.
+- `source` (`str | PathLike[str] | None`) (default: `None`) — Optional delimited export for checking column selectors, coordinate definitions and preamble requirements.
+
+**Returns**
+
+- (`ValidationResult`) — Validation result with the first profile diagnostic, or an empty
+- (`ValidationResult`) — error tuple on success.
+
+**Raises**
+
+- `OSError` — The supplied source cannot be opened or read.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L255-L280)
+
+**Modules**
+
+- `particula.data._binding`
+- `particula.data._exports`
+- `particula.data.measurement`
+- `particula.data.migration`
+- `particula.data.profile`
+- `particula.data.reader`
+- `particula.data.storage`
+
+---
+
+# particula.data._binding
+
+*module*
+
+Bind source selectors, measurement units, coordinates and clocks once.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L1-L1)
+
+## particula.data._binding._EPOCH
+
+*attribute* · *module attribute*
+
+```python
+_EPOCH = datetime(1970, 1, 1, tzinfo=UTC)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L16-L16)
+
+## particula.data._binding._TICKS
+
+*attribute* · *module attribute*
+
+```python
+_TICKS = {'s': 10 ** 9, 'ms': 10 ** 6, 'us': 1000, 'ns': 1}
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L15-L15)
+
+## particula.data._binding.Binding
+
+*class*
+
+```python
+class Binding
+```
+
+Unit-checked mapping from one input layout to a typed scan frame.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L157-L306)
+
+### particula.data._binding.Binding.clock
+
+*attribute* · *instance attribute*
+
+```python
+clock = clock
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L170-L170)
+
+### particula.data._binding.Binding.clock_columns
+
+*attribute* · *instance attribute*
+
+```python
+clock_columns = [index(x, '/time') for x in selectors]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L181-L181)
+
+### particula.data._binding.Binding.fields
+
+*attribute* · *instance attribute*
+
+```python
+fields = []
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L189-L189)
+
+### particula.data._binding.Binding.flag
+
+*attribute* · *instance attribute*
+
+```python
+flag = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L221-L221)
+
+### particula.data._binding.Binding.grid_id
+
+*attribute* · *instance attribute*
+
+```python
+grid_id = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L191-L191)
+
+### particula.data._binding.Binding.grids
+
+*attribute* · *instance attribute*
+
+```python
+grids = {}
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L190-L190)
+
+### particula.data._binding.Binding.preamble
+
+*attribute* · *instance attribute*
+
+```python
+preamble = preamble
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L192-L192)
+
+### particula.data._binding.Binding.profile
+
+*attribute* · *instance attribute*
+
+```python
+profile = profile
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L161-L161)
+
+### particula.data._binding.Binding.schema
+
+*attribute* · *instance attribute*
+
+```python
+schema = {'scan_id': pl.UInt64, 'source_line_start': pl.UInt64, 'source_line_end': pl.UInt64, 'repaired': pl.Boolean, 'time_utc': pl.Datetime('ns', 'UTC')}
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L182-L188)
+
+### particula.data._binding.Binding.shift_ns
+
+*attribute* · *instance attribute*
+
+```python
+shift_ns = int(shift)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L178-L178)
+
+### particula.data._binding.Binding.timing
+
+*attribute* · *instance attribute*
+
+```python
+timing = {}
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L231-L231)
+
+### particula.data._binding.Binding.width
+
+*attribute* · *instance attribute*
+
+```python
+width = profile['input'].get('record_width', len(header) if header else None)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L162-L164)
+
+### particula.data._binding.Binding.zone
+
+*attribute* · *instance attribute*
+
+```python
+zone = ZoneInfo(clock['timezone'])
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L179-L179)
+
+### particula.data._binding.Binding.__init__
+
+*method*
+
+```python
+def __init__(profile, header, preamble)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L160-L240)
+
+### particula.data._binding.Binding.decode
+
+*method*
+
+```python
+def decode(row: list[str], start: int, end: int, repaired: bool = False) -> dict
+```
+
+Decode a record using its source line as its local scan ID.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L280-L306)
+
+### particula.data._binding.Binding.timestamp
+
+*method*
+
+```python
+def timestamp(row: list[str]) -> int
+```
+
+Parse epoch ticks or an unambiguous local wall time to UTC ns.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L242-L278)
+
+## particula.data._binding._Field
+
+*class*
+
+```python
+class _Field
+```
+
+Decode selected columns as a scalar or an array on the declared axes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L47-L80)
+
+### particula.data._binding._Field.dtype
+
+*attribute* · *instance attribute*
+
+```python
+dtype = pl.Array(dtype, shape) if shape else dtype
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L61-L61)
+
+### particula.data._binding._Field.indices
+
+*attribute* · *instance attribute*
+
+```python
+indices = indices
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L52-L52)
+
+### particula.data._binding._Field.maximum
+
+*attribute* · *instance attribute*
+
+```python
+maximum = np.finfo(np.float32).max.item() if dtype == pl.Float32 else math.inf
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L58-L60)
+
+### particula.data._binding._Field.missing
+
+*attribute* · *instance attribute*
+
+```python
+missing = missing
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L53-L53)
+
+### particula.data._binding._Field.name
+
+*attribute* · *instance attribute*
+
+```python
+name = spec['name']
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L51-L51)
+
+### particula.data._binding._Field.shape
+
+*attribute* · *instance attribute*
+
+```python
+shape = shape
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L62-L62)
+
+### particula.data._binding._Field.__init__
+
+*method*
+
+```python
+def __init__(spec, indices, missing, shape=())
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L50-L62)
+
+### particula.data._binding._Field.decode
+
+*method*
+
+```python
+def decode(row: list[str])
+```
+
+Convert values to output units and retain missing tokens as nulls.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L64-L80)
+
+## particula.data._binding._affine
+
+*function* · *cached*
+
+```python
+def _affine(source: str, target: str) -> tuple[float, float]
+```
+
+Return scale and offset for converting source units to output units.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L36-L44)
+
+## particula.data._binding._index
+
+*function*
+
+```python
+def _index(selector, header, width, path)
+```
+
+Resolve a numeric offset or unique header label within the layout.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L19-L33)
+
+## particula.data._binding._sizer_grid
+
+*function*
+
+```python
+def _sizer_grid(profile, header, preamble, index)
+```
+
+Read diameter midpoints and bin width from the source layout.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_binding.py#L83-L154)
+
+---
+
+# particula.data._exports
+
+*module*
+
+Resolve public data imports without loading optional packages at startup.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_exports.py#L1-L1)
+
+## particula.data._exports._MODULES
+
+*attribute* · *module attribute*
+
+```python
+_MODULES = {'Measurement': 'measurement', 'MobilityNumberSpectrum': 'measurement', 'ParticleCountRate': 'measurement', 'migrate_settings': 'migration', 'ProfileError': 'profile', 'describe_profile': 'profile', 'validate_profile': 'profile', 'MeasurementReader': 'reader', 'inspect_source': 'reader', 'import_to_parquet': 'storage', 'open_measurement': 'storage', 'read_measurement': 'storage'}
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_exports.py#L7-L20)
+
+## particula.data._exports.load_export
+
+*function*
+
+```python
+def load_export(name: str) -> Any
+```
+
+Load a public object on first access and cache it on the data package.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/_exports.py#L23-L31)
+
+---
+
+# particula.data.measurement
+
+*module*
+
+Measurement products with unit definitions, grids and source-scoped IDs.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L1-L1)
+
+## particula.data.measurement.Measurement
+
+*class*
+
+```python
+class Measurement
+```
+
+Measurements from one source, with a row per accepted scan.
+
+**Attributes**
+
+- `lazy_frame` — Scan columns in profile output units, with UTC timestamps. The source digest and first physical line identify each scan.
+- `lazy_issues` — Parse diagnostics with inclusive physical line spans.
+- `manifest` — Import provenance, including the profile and source layouts.
+- `grids` — Coordinate definitions keyed by the grid ID stored on each scan that contains spectral or array data.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L12-L184)
+
+### particula.data.measurement.Measurement.grids
+
+*attribute* · *instance attribute*
+
+```python
+grids = manifest['grids']
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L43-L43)
+
+### particula.data.measurement.Measurement.lazy_frame
+
+*attribute* · *instance attribute*
+
+```python
+lazy_frame = scans.with_columns(pl.lit(manifest['source_sha256']).alias('source_sha256'))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L38-L40)
+
+### particula.data.measurement.Measurement.lazy_issues
+
+*attribute* · *instance attribute*
+
+```python
+lazy_issues = issues
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L41-L41)
+
+### particula.data.measurement.Measurement.manifest
+
+*attribute* · *instance attribute*
+
+```python
+manifest = manifest
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L42-L42)
+
+### particula.data.measurement.Measurement.frame
+
+*property*
+
+```python
+frame: pl.DataFrame
+```
+
+Collect the selected scans in memory, including their source IDs.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L62-L64)
+
+### particula.data.measurement.Measurement.issues
+
+*property*
+
+```python
+issues: pl.DataFrame
+```
+
+Collect source-located diagnostics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L67-L69)
+
+### particula.data.measurement.Measurement.__init__
+
+*method*
+
+```python
+def __init__(scans: pl.LazyFrame, issues: pl.LazyFrame, manifest: dict) -> None
+```
+
+Validate scan columns and coordinates against the source layouts.
+
+**Parameters**
+
+- `scans` (`pl.LazyFrame`) — Lazy scan table with columns defined by the profile.
+- `issues` (`pl.LazyFrame`) — Lazy diagnostic table for the original source.
+- `manifest` (`dict`) — Import manifest containing the profile, segment headers, grids and source digest.
+
+**Raises**
+
+- `ValueError` — Scan column types or grids disagree with the layouts.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L24-L59)
+
+### particula.data.measurement.Measurement.available_operations
+
+*method*
+
+```python
+def available_operations() -> dict[str, tuple[str, ...]]
+```
+
+Map compatible operation names to their required input names.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L176-L184)
+
+### particula.data.measurement.Measurement.filter
+
+*method*
+
+```python
+def filter(predicate: pl.Expr | pl.Series | str | Iterable[pl.Expr | pl.Series | str] | bool | list[bool] | np.ndarray) -> Self
+```
+
+Select scans while retaining the original source diagnostics.
+
+**Parameters**
+
+- `predicate` (`pl.Expr | pl.Series | str | Iterable[pl.Expr | pl.Series | str] | bool | list[bool] | np.ndarray`) — Boolean expression, column, mask, or predicates accepted by Polars LazyFrame.filter.
+
+**Returns**
+
+- (`Self`) — Measurement of the same type with a lazily filtered scan table.
+- (`Self`) — The manifest and diagnostics still describe the full source.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L71-L93)
+
+### particula.data.measurement.Measurement.flag_summary
+
+*method*
+
+```python
+def flag_summary() -> pl.LazyFrame
+```
+
+Count each vendor condition once per scan.
+
+**Returns**
+
+- (`pl.LazyFrame`) — Lazy table of flag labels, affected and total scan counts, and
+- (`pl.LazyFrame`) — the first and last UTC time at which each flag appeared.
+
+**Raises**
+
+- `ValueError` — The profile does not declare vendor flags.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L147-L174)
+
+### particula.data.measurement.Measurement.quality_summary
+
+*method*
+
+```python
+def quality_summary(field: str, *, exclude_flags: str | Iterable[str] = (), exclude_repaired: bool = False) -> pl.LazyFrame
+```
+
+Summarize a scalar field after explicit source-quality exclusions.
+
+**Parameters**
+
+- `field` (`str`) — Name of a scalar field declared in the profile.
+- `exclude_flags` (`str | Iterable[str]`) (default: `()`) — Omit scans carrying any of these vendor flags.
+- `exclude_repaired` (`bool`) (default: `False`) — Omit scans reconstructed from logger fragments.
+
+**Returns**
+
+- (`pl.LazyFrame`) — One lazy row with the source, exclusion policy, scan and sample
+- (`pl.LazyFrame`) — counts, and UTC bounds of excluded scans. The mean weights each
+- (`pl.LazyFrame`) — retained, non-null sample equally and uses the field's output unit.
+
+**Raises**
+
+- `ValueError` — The field is undeclared or the requested flag
+exclusions require a missing vendor status field.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L95-L145)
+
+## particula.data.measurement.MobilityNumberSpectrum
+
+*class*
+
+```python
+class MobilityNumberSpectrum(Measurement)
+```
+
+Bases: `particula.data.measurement.Measurement`
+
+Number per log10 electrical-mobility diameter on a declared grid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L211-L255)
+
+### particula.data.measurement.MobilityNumberSpectrum.grids
+
+*attribute* · *instance attribute*
+
+```python
+grids = manifest['grids']
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L43-L43)
+
+### particula.data.measurement.MobilityNumberSpectrum.lazy_frame
+
+*attribute* · *instance attribute*
+
+```python
+lazy_frame = scans.with_columns(pl.lit(manifest['source_sha256']).alias('source_sha256'))
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L38-L40)
+
+### particula.data.measurement.MobilityNumberSpectrum.lazy_issues
+
+*attribute* · *instance attribute*
+
+```python
+lazy_issues = issues
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L41-L41)
+
+### particula.data.measurement.MobilityNumberSpectrum.manifest
+
+*attribute* · *instance attribute*
+
+```python
+manifest = manifest
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L42-L42)
+
+### particula.data.measurement.MobilityNumberSpectrum.frame
+
+*property*
+
+```python
+frame: pl.DataFrame
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+Collect the selected scans in memory, including their source IDs.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L62-L64)
+
+### particula.data.measurement.MobilityNumberSpectrum.issues
+
+*property*
+
+```python
+issues: pl.DataFrame
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+Collect source-located diagnostics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L67-L69)
+
+### particula.data.measurement.MobilityNumberSpectrum.__init__
+
+*method*
+
+```python
+def __init__(scans: pl.LazyFrame, issues: pl.LazyFrame, manifest: dict) -> None
+```
+
+Require a number-per-decade spectrum and mobility diameter grid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L214-L227)
+
+### particula.data.measurement.MobilityNumberSpectrum.available_operations
+
+*method*
+
+```python
+def available_operations() -> dict[str, tuple[str, ...]]
+```
+
+Report the spectrum integral.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L253-L255)
+
+### particula.data.measurement.MobilityNumberSpectrum.integrated_number
+
+*method*
+
+```python
+def integrated_number() -> pl.LazyFrame
+```
+
+Integrate number concentration over measured mobility diameters.
+
+Each channel contributes its number density per decade multiplied by
+the reciprocal of the grid's reported channels per decade.
+
+**Returns**
+
+- (`pl.LazyFrame`) — Lazy table of scan IDs, UTC times and integrated number in the
+- (`pl.LazyFrame`) — profile's concentration unit. A missing channel yields a null
+- (`pl.LazyFrame`) — total for that scan.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L229-L251)
+
+### particula.data.measurement.MobilityNumberSpectrum.filter
+
+*method*
+
+```python
+def filter(predicate: pl.Expr | pl.Series | str | Iterable[pl.Expr | pl.Series | str] | bool | list[bool] | np.ndarray) -> Self
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+Select scans while retaining the original source diagnostics.
+
+**Parameters**
+
+- `predicate` (`pl.Expr | pl.Series | str | Iterable[pl.Expr | pl.Series | str] | bool | list[bool] | np.ndarray`) — Boolean expression, column, mask, or predicates accepted by Polars LazyFrame.filter.
+
+**Returns**
+
+- (`Self`) — Measurement of the same type with a lazily filtered scan table.
+- (`Self`) — The manifest and diagnostics still describe the full source.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L71-L93)
+
+### particula.data.measurement.MobilityNumberSpectrum.flag_summary
+
+*method*
+
+```python
+def flag_summary() -> pl.LazyFrame
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+Count each vendor condition once per scan.
+
+**Returns**
+
+- (`pl.LazyFrame`) — Lazy table of flag labels, affected and total scan counts, and
+- (`pl.LazyFrame`) — the first and last UTC time at which each flag appeared.
+
+**Raises**
+
+- `ValueError` — The profile does not declare vendor flags.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L147-L174)
+
+### particula.data.measurement.MobilityNumberSpectrum.quality_summary
+
+*method*
+
+```python
+def quality_summary(field: str, *, exclude_flags: str | Iterable[str] = (), exclude_repaired: bool = False) -> pl.LazyFrame
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+Summarize a scalar field after explicit source-quality exclusions.
+
+**Parameters**
+
+- `field` (`str`) — Name of a scalar field declared in the profile.
+- `exclude_flags` (`str | Iterable[str]`) (default: `()`) — Omit scans carrying any of these vendor flags.
+- `exclude_repaired` (`bool`) (default: `False`) — Omit scans reconstructed from logger fragments.
+
+**Returns**
+
+- (`pl.LazyFrame`) — One lazy row with the source, exclusion policy, scan and sample
+- (`pl.LazyFrame`) — counts, and UTC bounds of excluded scans. The mean weights each
+- (`pl.LazyFrame`) — retained, non-null sample equally and uses the field's output unit.
+
+**Raises**
+
+- `ValueError` — The field is undeclared or the requested flag
+exclusions require a missing vendor status field.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L95-L145)
+
+## particula.data.measurement.ParticleCountRate
+
+*class*
+
+```python
+class ParticleCountRate(Measurement)
+```
+
+Bases: `particula.data.measurement.Measurement`
+
+A measurement containing detector count rate in declared units.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L187-L208)
+
+### particula.data.measurement.ParticleCountRate.grids
+
+*attribute* · *instance attribute*
+
+```python
+grids = manifest['grids']
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L43-L43)
+
+### particula.data.measurement.ParticleCountRate.lazy_frame
+
+*attribute* · *instance attribute*
+
+```python
+lazy_frame = scans.with_columns(pl.lit(manifest['source_sha256']).alias('source_sha256'))
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L38-L40)
+
+### particula.data.measurement.ParticleCountRate.lazy_issues
+
+*attribute* · *instance attribute*
+
+```python
+lazy_issues = issues
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L41-L41)
+
+### particula.data.measurement.ParticleCountRate.manifest
+
+*attribute* · *instance attribute*
+
+```python
+manifest = manifest
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L42-L42)
+
+### particula.data.measurement.ParticleCountRate.frame
+
+*property*
+
+```python
+frame: pl.DataFrame
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+Collect the selected scans in memory, including their source IDs.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L62-L64)
+
+### particula.data.measurement.ParticleCountRate.issues
+
+*property*
+
+```python
+issues: pl.DataFrame
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+Collect source-located diagnostics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L67-L69)
+
+### particula.data.measurement.ParticleCountRate.__init__
+
+*method*
+
+```python
+def __init__(scans: pl.LazyFrame, issues: pl.LazyFrame, manifest: dict) -> None
+```
+
+Require a profile that declares a detector count-rate field.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L190-L201)
+
+### particula.data.measurement.ParticleCountRate.available_operations
+
+*method*
+
+```python
+def available_operations() -> dict[str, tuple[str, ...]]
+```
+
+Include sample flow as a prerequisite for number concentration.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L203-L208)
+
+### particula.data.measurement.ParticleCountRate.filter
+
+*method*
+
+```python
+def filter(predicate: pl.Expr | pl.Series | str | Iterable[pl.Expr | pl.Series | str] | bool | list[bool] | np.ndarray) -> Self
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+Select scans while retaining the original source diagnostics.
+
+**Parameters**
+
+- `predicate` (`pl.Expr | pl.Series | str | Iterable[pl.Expr | pl.Series | str] | bool | list[bool] | np.ndarray`) — Boolean expression, column, mask, or predicates accepted by Polars LazyFrame.filter.
+
+**Returns**
+
+- (`Self`) — Measurement of the same type with a lazily filtered scan table.
+- (`Self`) — The manifest and diagnostics still describe the full source.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L71-L93)
+
+### particula.data.measurement.ParticleCountRate.flag_summary
+
+*method*
+
+```python
+def flag_summary() -> pl.LazyFrame
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+Count each vendor condition once per scan.
+
+**Returns**
+
+- (`pl.LazyFrame`) — Lazy table of flag labels, affected and total scan counts, and
+- (`pl.LazyFrame`) — the first and last UTC time at which each flag appeared.
+
+**Raises**
+
+- `ValueError` — The profile does not declare vendor flags.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L147-L174)
+
+### particula.data.measurement.ParticleCountRate.quality_summary
+
+*method*
+
+```python
+def quality_summary(field: str, *, exclude_flags: str | Iterable[str] = (), exclude_repaired: bool = False) -> pl.LazyFrame
+```
+
+Inherited from: `particula.data.measurement.Measurement`
+
+Summarize a scalar field after explicit source-quality exclusions.
+
+**Parameters**
+
+- `field` (`str`) — Name of a scalar field declared in the profile.
+- `exclude_flags` (`str | Iterable[str]`) (default: `()`) — Omit scans carrying any of these vendor flags.
+- `exclude_repaired` (`bool`) (default: `False`) — Omit scans reconstructed from logger fragments.
+
+**Returns**
+
+- (`pl.LazyFrame`) — One lazy row with the source, exclusion policy, scan and sample
+- (`pl.LazyFrame`) — counts, and UTC bounds of excluded scans. The mean weights each
+- (`pl.LazyFrame`) — retained, non-null sample equally and uses the field's output unit.
+
+**Raises**
+
+- `ValueError` — The field is undeclared or the requested flag
+exclusions require a missing vendor status field.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L95-L145)
+
+## particula.data.measurement.measurement
+
+*function*
+
+```python
+def measurement(scans: pl.LazyFrame, issues: pl.LazyFrame, manifest: dict) -> Measurement
+```
+
+Select the product by measured quantities and coordinate basis.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/measurement.py#L258-L271)
+
+---
+
+# particula.data.migration
+
+*module*
+
+Translate beta stream settings while preserving the original filter audit.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/migration.py#L1-L1)
+
+## particula.data.migration._AIM_FIELDS
+
+*attribute* · *module attribute*
+
+```python
+_AIM_FIELDS = {'Lower Size (nm)': ('lower_size', 'length', 'nm', 'm'), 'Upper Size (nm)': ('upper_size', 'length', 'nm', 'm'), 'Sample Temp (C)': ('sample_temperature', 'temperature', 'degC', 'K'), 'Sample Pressure (kPa)': ('sample_pressure', 'pressure', 'kPa', 'Pa'), 'Relative Humidity (%)': ('relative_humidity', 'relative_humidity', '%', '%'), 'Median (nm)': ('median_diameter', 'length', 'nm', 'm'), 'Mean (nm)': ('mean_diameter', 'length', 'nm', 'm'), 'Geo. Mean (nm)': ('geometric_mean_diameter', 'length', 'nm', 'm'), 'Mode (nm)': ('mode_diameter', 'length', 'nm', 'm'), 'Geo. Std. Dev.': ('geometric_standard_deviation', 'ratio', '1', '1'), 'Total Conc. (#/cm³)': ('total_number', 'number_concentration', '1/cm^3', '1/m^3')}
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/migration.py#L25-L47)
+
+## particula.data.migration._SUPPORTED
+
+*attribute* · *module attribute*
+
+```python
+_SUPPORTED = {'relative_data_folder', 'filename_regex', 'MIN_SIZE_BYTES', 'data_loading_function', 'header_row', 'data_checks', 'data_column', 'data_header', 'time_column', 'time_format', 'delimiter', 'time_shift_seconds', 'timezone_identifier', 'data_sizer_reader'}
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/migration.py#L8-L23)
+
+## particula.data.migration.Migration
+
+*class* · *dataclass*
+
+```python
+class Migration
+```
+
+Result of translating a beta stream configuration.
+
+**Attributes**
+
+- `profile` (`dict`) — Candidate import profile with the original settings under `legacy_settings`.
+- `errors` (`list[ProfileError]`) — Diagnostics for settings requiring a migration decision.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/migration.py#L50-L72)
+
+### particula.data.migration.Migration.errors
+
+*attribute* · *instance attribute*
+
+```python
+errors: list[ProfileError]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/migration.py#L61-L61)
+
+### particula.data.migration.Migration.profile
+
+*attribute* · *instance attribute*
+
+```python
+profile: dict
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/migration.py#L60-L60)
+
+### particula.data.migration.Migration.__init__
+
+*method*
+
+```python
+def __init__(profile: dict, errors: list[ProfileError]) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/migration.py#L0-L0)
+
+### particula.data.migration.Migration.resolved_profile
+
+*method*
+
+```python
+def resolved_profile() -> dict
+```
+
+Return the validated profile when every legacy option is resolved.
+
+**Raises**
+
+- `ProfileError` — Migration recorded an unresolved setting or the
+candidate profile fails validation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/migration.py#L63-L72)
+
+## particula.data.migration._legacy_clock
+
+*function*
+
+```python
+def _legacy_clock(settings)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/migration.py#L163-L182)
+
+## particula.data.migration._legacy_header
+
+*function*
+
+```python
+def _legacy_header(settings, on_bad_record, issue)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/migration.py#L114-L138)
+
+## particula.data.migration._scalar_fields
+
+*function*
+
+```python
+def _scalar_fields(settings, overrides, errors)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/migration.py#L75-L111)
+
+## particula.data.migration._sizer_options
+
+*function*
+
+```python
+def _sizer_options(profile, settings, issue)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/migration.py#L141-L160)
+
+## particula.data.migration.migrate_settings
+
+*function*
+
+```python
+def migrate_settings(settings: dict, *, fields: dict | None = None, on_bad_record: str | None = None) -> Migration
+```
+
+Translate a beta 1D or AIM 2D settings mapping.
+
+**Parameters**
+
+- `settings` (`dict`) — Beta scalar or sizer stream settings, including its clock, column selectors and source discovery rules.
+- `fields` (`dict | None`) (default: `None`) — Scalar field definitions keyed by legacy output label. Supply the quantity, source unit and output unit for unfamiliar channels.
+- `on_bad_record` (`str | None`) (default: `None`) — Profile policy for malformed rows. An explicit choice is required to replace legacy character and length filters.
+
+**Returns**
+
+- (`Migration`) — Candidate profile, original settings and diagnostics for unresolved
+- (`Migration`) — choices. Call resolved_profile() before using the result for import.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/migration.py#L185-L247)
+
+---
+
+# particula.data.profile
+
+*module*
+
+Portable measurement profiles and source-located diagnostics.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L1-L1)
+
+## particula.data.profile.ProfileSource
+
+*attribute* · *module attribute*
+
+```python
+ProfileSource = str | PathLike[str] | dict
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L16-L16)
+
+## particula.data.profile._BUILTINS
+
+*attribute* · *module attribute*
+
+```python
+_BUILTINS = ('cpc-3010', 'smps-aim')
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L18-L18)
+
+## particula.data.profile._RESERVED
+
+*attribute* · *module attribute*
+
+```python
+_RESERVED = {'scan_id', 'source_sha256', 'time_utc', 'source_line_start', 'source_line_end', 'repaired', 'grid_id', 'vendor_status', 'vendor_flags', 'scan_duration_s', 'retrace_duration_s'}
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L19-L31)
+
+## particula.data.profile.ProfileError
+
+*class*
+
+```python
+class ProfileError(ValueError)
+```
+
+Bases: `ValueError`
+
+A machine-readable diagnostic for a profile or its source binding.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L34-L67)
+
+### particula.data.profile.ProfileError.code
+
+*attribute* · *instance attribute*
+
+```python
+code = code
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L64-L64)
+
+### particula.data.profile.ProfileError.expected
+
+*attribute* · *instance attribute*
+
+```python
+expected = expected
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L61-L61)
+
+### particula.data.profile.ProfileError.message
+
+*attribute* · *instance attribute*
+
+```python
+message = message
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L66-L66)
+
+### particula.data.profile.ProfileError.observed
+
+*attribute* · *instance attribute*
+
+```python
+observed = observed
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L60-L60)
+
+### particula.data.profile.ProfileError.path
+
+*attribute* · *instance attribute*
+
+```python
+path = path
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L65-L65)
+
+### particula.data.profile.ProfileError.severity
+
+*attribute* · *instance attribute*
+
+```python
+severity = 'error'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L59-L59)
+
+### particula.data.profile.ProfileError.source_line_end
+
+*attribute* · *instance attribute*
+
+```python
+source_line_end = source_line_end
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L63-L63)
+
+### particula.data.profile.ProfileError.source_line_start
+
+*attribute* · *instance attribute*
+
+```python
+source_line_start = source_line_start
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L62-L62)
+
+### particula.data.profile.ProfileError.__init__
+
+*method*
+
+```python
+def __init__(code: str, path: str, message: str, *, observed: object = None, expected: object = None, source_line_start: int | None = None, source_line_end: int | None = None) -> None
+```
+
+Describe a profile error and its location.
+
+**Parameters**
+
+- `code` (`str`) — Machine-readable diagnostic identifier.
+- `path` (`str`) — JSON Pointer within the profile, or empty for its root.
+- `message` (`str`) — Human-readable explanation.
+- `observed` (`object`) (default: `None`) — Value that failed validation, when available.
+- `expected` (`object`) (default: `None`) — Constraint or expected value, when available.
+- `source_line_start` (`int | None`) (default: `None`) — First physical source line, counted from one.
+- `source_line_end` (`int | None`) (default: `None`) — Last physical source line, inclusive.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L37-L67)
+
+## particula.data.profile.ValidationResult
+
+*class* · *dataclass*
+
+```python
+class ValidationResult
+```
+
+Result of checking one profile and optionally its source header.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L70-L79)
+
+### particula.data.profile.ValidationResult.errors
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+errors: tuple[ProfileError, ...] = ()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L74-L74)
+
+### particula.data.profile.ValidationResult.__init__
+
+*method*
+
+```python
+def __init__(errors: tuple[ProfileError, ...] = ()) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L0-L0)
+
+### particula.data.profile.ValidationResult.raise_for_errors
+
+*method*
+
+```python
+def raise_for_errors() -> None
+```
+
+Raise the first ProfileError if validation recorded any errors.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L76-L79)
+
+## particula.data.profile._Loader
+
+*class*
+
+```python
+class _Loader(yaml.SafeLoader)
+```
+
+Bases: `yaml.SafeLoader`
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L93-L95)
+
+### particula.data.profile._Loader.construct_mapping
+
+*method*
+
+```python
+def construct_mapping(node, deep=False)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L94-L95)
+
+## particula.data.profile._decode
+
+*function*
+
+```python
+def _decode(profile)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L146-L162)
+
+## particula.data.profile._pairs
+
+*function*
+
+```python
+def _pairs(pairs)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L82-L90)
+
+## particula.data.profile._resource
+
+*function*
+
+```python
+def _resource(name)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L114-L119)
+
+## particula.data.profile._validate_array
+
+*function*
+
+```python
+def _validate_array(field, index)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L165-L189)
+
+## particula.data.profile._validator
+
+*function* · *cached*
+
+```python
+def _validator()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L122-L124)
+
+## particula.data.profile.canonical
+
+*function*
+
+```python
+def canonical(value: object) -> bytes
+```
+
+Serialize JSON values deterministically for provenance.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L98-L106)
+
+## particula.data.profile.describe_profile
+
+*function*
+
+```python
+def describe_profile(profile: ProfileSource | None = None) -> dict
+```
+
+Describe the profile format or resolve a particular profile.
+
+**Parameters**
+
+- `profile` (`ProfileSource | None`) (default: `None`) — Built-in ID, mapping, or path to a JSON or YAML file. Omit to retrieve the installed JSON Schema.
+
+**Returns**
+
+- (`dict`) — A fresh dictionary containing the schema or the validated profile,
+- (`dict`) — including its declared quantities, units and clock interpretation.
+
+**Raises**
+
+- `ProfileError` — The supplied profile cannot be loaded or validated.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L127-L143)
+
+## particula.data.profile.digest
+
+*function*
+
+```python
+def digest(value: object) -> str
+```
+
+Return the SHA-256 of a normalized definition.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L109-L111)
+
+## particula.data.profile.load_profile
+
+*function*
+
+```python
+def load_profile(profile: ProfileSource) -> dict
+```
+
+Load a profile and validate its schema, names, axes and time zone.
+
+**Parameters**
+
+- `profile` (`ProfileSource`) — Built-in ID, mapping, or path to a JSON or YAML file.
+
+**Returns**
+
+- (`dict`) — Validated profile independent of the caller's input mapping.
+
+**Raises**
+
+- `ProfileError` — The input cannot be decoded or violates a profile
+constraint. The diagnostic identifies the location when available.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L192-L252)
+
+## particula.data.profile.validate_profile
+
+*function*
+
+```python
+def validate_profile(profile: ProfileSource, *, source: str | PathLike[str] | None = None) -> ValidationResult
+```
+
+Check a profile and optionally bind it to the first source layout.
+
+**Parameters**
+
+- `profile` (`ProfileSource`) — Built-in ID, mapping, or path to a JSON or YAML file.
+- `source` (`str | PathLike[str] | None`) (default: `None`) — Optional delimited export for checking column selectors, coordinate definitions and preamble requirements.
+
+**Returns**
+
+- (`ValidationResult`) — Validation result with the first profile diagnostic, or an empty
+- (`ValidationResult`) — error tuple on success.
+
+**Raises**
+
+- `OSError` — The supplied source cannot be opened or read.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/profile.py#L255-L280)
+
+---
+
+# particula.data.reader
+
+*module*
+
+Stream one delimited measurement export, preserving physical source spans.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L1-L1)
+
+## particula.data.reader.ISSUE_SCHEMA
+
+*attribute* · *module attribute*
+
+```python
+ISSUE_SCHEMA = {'code': pl.String, 'source_line_start': pl.UInt64, 'source_line_end': pl.UInt64, 'message': pl.String}
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L28-L33)
+
+## particula.data.reader._COMPLETE
+
+*attribute* · *module attribute*
+
+```python
+_COMPLETE = re.compile('[0-9]{10}(?:,[0-9]+(?:\\.[0-9]+)?){4}')
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L40-L40)
+
+## particula.data.reader._CSV_LIMIT_LOCK
+
+*attribute* · *module attribute*
+
+```python
+_CSV_LIMIT_LOCK = Lock()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L25-L25)
+
+## particula.data.reader._FRAGMENT
+
+*attribute* · *module attribute*
+
+```python
+_FRAGMENT = re.compile('[0-9]{10},(?:[0-9]+(?:\\.[0-9]+)?,){0,2}')
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L39-L39)
+
+## particula.data.reader._LINE_END
+
+*attribute* · *module attribute*
+
+```python
+_LINE_END = re.compile(b'[\\r\\n]')
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L26-L26)
+
+## particula.data.reader._PLAIN
+
+*attribute* · *module attribute*
+
+```python
+_PLAIN = re.compile(b'[12][0-9]{9},[0-9]{1,9},[0-9]{1,3}\\.[0-9]{1,4},[0-9]{1,3},[0-9]{1,3}\\.[0-9]{1,6}\\r?\\n')
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L36-L38)
+
+## particula.data.reader.MeasurementReader
+
+*class*
+
+```python
+class MeasurementReader
+```
+
+Read one source in batches while tracking layouts and diagnostics.
+
+**Attributes**
+
+- `manifest` (`dict | None`) — Import provenance, including the source digest, grids and scan count. Available only after batches() reaches end of file.
+- `segment` — Zero-based source layout index for the current batch.
+- `issue_counts` (`Counter[str]`) — Number of diagnostics emitted per code during decoding.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L335-L528)
+
+### particula.data.reader.MeasurementReader.count
+
+*attribute* · *instance attribute*
+
+```python
+count = 0
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L378-L378)
+
+### particula.data.reader.MeasurementReader.issue_counts
+
+*attribute* · *instance attribute*
+
+```python
+issue_counts: Counter[str] = Counter()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L377-L377)
+
+### particula.data.reader.MeasurementReader.manifest
+
+*attribute* · *instance attribute*
+
+```python
+manifest: dict | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L379-L379)
+
+### particula.data.reader.MeasurementReader.profile
+
+*attribute* · *instance attribute*
+
+```python
+profile = load_profile(profile)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L372-L372)
+
+### particula.data.reader.MeasurementReader.segment
+
+*attribute* · *instance attribute*
+
+```python
+segment = 0
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L380-L380)
+
+### particula.data.reader.MeasurementReader.source
+
+*attribute* · *instance attribute*
+
+```python
+source = Path(source)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L371-L371)
+
+### particula.data.reader.MeasurementReader.__init__
+
+*method*
+
+```python
+def __init__(source: str | os.PathLike[str], profile: ProfileSource, *, input_chunk_bytes: int = 2 ** 20, batch_scans: int = 32768, batch_bytes: int = 2 ** 23, max_record_bytes: int = 2 ** 22) -> None
+```
+
+Configure the source and batching limits.
+
+**Parameters**
+
+- `source` (`str | os.PathLike[str]`) — Path to the delimited instrument export.
+- `profile` (`ProfileSource`) — Built-in ID, mapping, or path to a JSON or YAML profile.
+- `input_chunk_bytes` (`int`) (default: `2 ** 20`) — Maximum bytes requested per raw input read.
+- `batch_scans` (`int`) (default: `32768`) — Target maximum scan rows per emitted batch.
+- `batch_bytes` (`int`) (default: `2 ** 23`) — Target working size of a batch in bytes. A single record and its diagnostics can exceed this target.
+- `max_record_bytes` (`int`) (default: `2 ** 22`) — Maximum raw bytes in one logical record, including embedded newlines and any repaired fragments.
+
+**Raises**
+
+- `ValueError` — A limit is not a positive integer.
+- `ProfileError` — The profile cannot be loaded or validated.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L345-L380)
+
+### particula.data.reader.MeasurementReader._decoded
+
+*method*
+
+```python
+def _decoded(records, binding)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L459-L508)
+
+### particula.data.reader.MeasurementReader._issue
+
+*method*
+
+```python
+def _issue(code, start, end, message)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L521-L528)
+
+### particula.data.reader.MeasurementReader._missing
+
+*method*
+
+```python
+def _missing(row, binding, start, end)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L510-L519)
+
+### particula.data.reader.MeasurementReader.batches
+
+*method*
+
+```python
+def batches() -> Iterator[tuple[pl.DataFrame, pl.DataFrame]]
+```
+
+Read scans in source order and finalize the manifest at end of file.
+
+**Yields**
+
+- (`pl.DataFrame`) — Pairs of scan and diagnostic frames for one source layout.
+- (`pl.DataFrame`) — Either frame may be empty. Scan times are UTC nanoseconds, and
+- (`tuple[pl.DataFrame, pl.DataFrame]`) — source spans use inclusive, one-based physical line numbers.
+
+**Raises**
+
+- `ProfileError` — A layout or record fails the profile's input rules.
+- `ValueError` — The source size or modification time changes during
+import.
+- `OSError` — The source cannot be opened or read.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L382-L457)
+
+## particula.data.reader._Lines
+
+*class*
+
+```python
+class _Lines
+```
+
+Track inclusive physical line spans and bytes used by each CSV record.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L58-L123)
+
+### particula.data.reader._Lines.block
+
+*attribute* · *instance attribute*
+
+```python
+block = b''
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L64-L64)
+
+### particula.data.reader._Lines.cursor
+
+*attribute* · *instance attribute*
+
+```python
+cursor = 0
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L65-L65)
+
+### particula.data.reader._Lines.__init__
+
+*method*
+
+```python
+def __init__(reader, encoding, maximum, first)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L61-L65)
+
+### particula.data.reader._Lines.__iter__
+
+*method*
+
+```python
+def __iter__()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L67-L68)
+
+### particula.data.reader._Lines.__next__
+
+*method*
+
+```python
+def __next__()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L97-L123)
+
+### particula.data.reader._Lines._has_bytes
+
+*method*
+
+```python
+def _has_bytes()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L70-L74)
+
+### particula.data.reader._Lines._readline
+
+*method*
+
+```python
+def _readline()
+```
+
+Frame CR, LF and CRLF lines while retaining their original bytes.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L76-L95)
+
+## particula.data.reader._Source
+
+*class*
+
+```python
+class _Source(io.RawIOBase)
+```
+
+Bases: `io.RawIOBase`
+
+Hash bytes received from the file and cap each underlying read.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L43-L55)
+
+### particula.data.reader._Source.__init__
+
+*method*
+
+```python
+def __init__(stream, chunk, hasher)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L46-L47)
+
+### particula.data.reader._Source.readable
+
+*method*
+
+```python
+def readable()
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L49-L50)
+
+### particula.data.reader._Source.readinto
+
+*method*
+
+```python
+def readinto(buffer)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L52-L55)
+
+## particula.data.reader._events
+
+*function*
+
+```python
+def _events(records, profile)
+```
+
+Recognize only a comma-terminated prefix and its numeric continuation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L303-L332)
+
+## particula.data.reader._fast_counter
+
+*function*
+
+```python
+def _fast_counter(block, start)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L249-L274)
+
+## particula.data.reader._frames
+
+*function*
+
+```python
+def _frames(rows, issues, binding)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L531-L539)
+
+## particula.data.reader._layout
+
+*function*
+
+```python
+def _layout(records, profile)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L157-L173)
+
+## particula.data.reader._next_record
+
+*function*
+
+```python
+def _next_record(rows, maximum)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L126-L137)
+
+## particula.data.reader._plain_batches
+
+*function*
+
+```python
+def _plain_batches(stream, hasher, size, row_limit)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L277-L300)
+
+## particula.data.reader._records
+
+*function*
+
+```python
+def _records(lines, delimiter)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L140-L154)
+
+## particula.data.reader._sections
+
+*function*
+
+```python
+def _sections(records, profile, binding, header)
+```
+
+Split concatenated AIM exports when the preamble or header recurs.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L176-L204)
+
+## particula.data.reader.inspect_source
+
+*function*
+
+```python
+def inspect_source(source: str | os.PathLike[str], profile: ProfileSource) -> dict
+```
+
+Inspect the preamble, header and first observation in a delimited export.
+
+**Parameters**
+
+- `source` (`str | os.PathLike[str]`) — Path to the instrument export.
+- `profile` (`ProfileSource`) — Built-in ID, mapping, or path to a JSON or YAML profile.
+
+**Returns**
+
+- (`dict`) — Encoding, header, preamble and coordinate grids for the first layout.
+- (`dict`) — The clock example contains raw tokens and its starting physical line.
+- (`dict`) — Both are null when the layout has no following record.
+
+**Raises**
+
+- `ProfileError` — The profile or source layout fails validation.
+- `OSError` — The source cannot be opened or read.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/reader.py#L207-L246)
+
+---
+
+# particula.data.storage
+
+*module*
+
+Collect reader batches in memory or publish a complete Parquet dataset.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/storage.py#L1-L1)
+
+## particula.data.storage._sync
+
+*function*
+
+```python
+def _sync(path: Path) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/storage.py#L97-L104)
+
+## particula.data.storage.import_to_parquet
+
+*function*
+
+```python
+def import_to_parquet(source: str | os.PathLike[str], destination: str | os.PathLike[str], *, profile: ProfileSource, **limits: int) -> Measurement
+```
+
+Write bounded Parquet parts and atomically publish a completed import.
+
+**Parameters**
+
+- `source` (`str | os.PathLike[str]`) — Path to a delimited instrument export.
+- `destination` (`str | os.PathLike[str]`) — Directory to publish after all parts have been written.
+- `profile` (`ProfileSource`) — Built-in ID, mapping, or path to a JSON or YAML profile.
+- `**limits` (`int`) (default: `{}`) — Optional MeasurementReader chunk, record and batch limits.
+
+**Returns**
+
+- (`Measurement`) — Disk-backed measurement with lazy scans and source diagnostics.
+- (`Measurement`) — An existing dataset is reused when the source digest, profile digest
+- (`Measurement`) — and parser version match.
+
+**Raises**
+
+- `FileExistsError` — The destination holds an incomplete or different
+dataset.
+- `ProfileError` — The profile or source violates the input rules.
+- `ValueError` — A reader limit is invalid or the source changes during
+import.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/storage.py#L107-L183)
+
+## particula.data.storage.open_measurement
+
+*function*
+
+```python
+def open_measurement(destination: str | os.PathLike[str]) -> Measurement
+```
+
+Open a completed Parquet measurement for lazy analysis.
+
+**Parameters**
+
+- `destination` (`str | os.PathLike[str]`) — Dataset directory created by import_to_parquet.
+
+**Returns**
+
+- (`Measurement`) — Measurement with lazy scans and diagnostics, validated profile units
+- (`Measurement`) — and coordinates from the stored manifest.
+
+**Raises**
+
+- `OSError` — The manifest cannot be opened or read.
+- `ValueError` — The format, profile or grid digests, part inventory, or
+scan layout fails validation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/storage.py#L49-L94)
+
+## particula.data.storage.read_measurement
+
+*function*
+
+```python
+def read_measurement(source: str | os.PathLike[str], *, profile: ProfileSource, **limits: int) -> Measurement
+```
+
+Read a single instrument export into memory.
+
+**Parameters**
+
+- `source` (`str | os.PathLike[str]`) — Path to the delimited export.
+- `profile` (`ProfileSource`) — Built-in ID, mapping, or path to a JSON or YAML profile.
+- `**limits` (`int`) (default: `{}`) — Optional MeasurementReader chunk, record and batch limits.
+
+**Returns**
+
+- (`Measurement`) — Measurement selected from the profile's quantities and coordinate
+- (`Measurement`) — basis. Scans use the declared output units and include UTC timestamps.
+
+**Raises**
+
+- `ProfileError` — The profile or source violates the input rules.
+- `ValueError` — A reader limit is invalid or the source changes during
+import.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/data/storage.py#L21-L46)
 
 ---
 
@@ -134347,6 +137538,620 @@ volume: wp.array(dtype=wp.float64)
 ```
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/warp_types.py#L81-L81)
+
+---
+
+# particula.instruments
+
+*module*
+
+Read instrument exports using built-in or user-defined profiles.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/__init__.py#L1-L1)
+
+## particula.instruments.Instrument
+
+*class* · *dataclass*
+
+```python
+class Instrument
+```
+
+Re-exported from: `particula.instruments.instrument`
+
+Read delimited exports that share one profile.
+
+**Parameters**
+
+- `profile` (`ProfileSource`) — Built-in profile ID, JSON or YAML file path, or profile mapping. Construction validates and stores a copy of the profile.
+
+**Raises**
+
+- `ProfileError` — The profile cannot be loaded or fails validation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/instrument.py#L11-L41)
+
+### particula.instruments.Instrument.profile
+
+*attribute* · *instance attribute*
+
+```python
+profile: ProfileSource
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/instrument.py#L23-L23)
+
+### particula.instruments.Instrument.__init__
+
+*method*
+
+```python
+def __init__(profile: ProfileSource) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/instrument.py#L0-L0)
+
+### particula.instruments.Instrument.__post_init__
+
+*method*
+
+```python
+def __post_init__() -> None
+```
+
+Resolve the supplied profile before reading any sources.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/instrument.py#L25-L27)
+
+### particula.instruments.Instrument.read
+
+*method*
+
+```python
+def read(source: str | PathLike[str], **limits: int) -> Measurement
+```
+
+Read one export into memory using this instrument's profile.
+
+**Parameters**
+
+- `source` (`str | PathLike[str]`) — Path to the delimited instrument export.
+- `**limits` (`int`) (default: `{}`) — Optional chunk, record and batch limits accepted by MeasurementReader.
+
+**Returns**
+
+- (`Measurement`) — Measurement with scans in the profile's output units, source
+- (`Measurement`) — diagnostics and the import manifest.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/instrument.py#L29-L41)
+
+## particula.instruments.MobilitySizer
+
+*class* · *dataclass*
+
+```python
+class MobilitySizer(Instrument)
+```
+
+Bases: `particula.instruments.instrument.Instrument`
+
+Re-exported from: `particula.instruments.mobility_sizer`
+
+Read an electrical-mobility sizer export with a configurable profile.
+
+**Parameters**
+
+- `profile` (`ProfileSource`) (default: `'smps-aim'`) — Import profile accepted by Instrument. The default AIM number export uses mobility diameter in metres and number concentration per decade of diameter in particles per cubic metre.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/mobility_sizer.py#L11-L21)
+
+### particula.instruments.MobilitySizer.profile
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+profile: ProfileSource = 'smps-aim'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/mobility_sizer.py#L21-L21)
+
+### particula.instruments.MobilitySizer.__init__
+
+*method*
+
+```python
+def __init__(profile: ProfileSource = 'smps-aim') -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/mobility_sizer.py#L0-L0)
+
+### particula.instruments.MobilitySizer.__post_init__
+
+*method*
+
+```python
+def __post_init__() -> None
+```
+
+Inherited from: `particula.instruments.instrument.Instrument`
+
+Resolve the supplied profile before reading any sources.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/instrument.py#L25-L27)
+
+### particula.instruments.MobilitySizer.read
+
+*method*
+
+```python
+def read(source: str | PathLike[str], **limits: int) -> Measurement
+```
+
+Inherited from: `particula.instruments.instrument.Instrument`
+
+Read one export into memory using this instrument's profile.
+
+**Parameters**
+
+- `source` (`str | PathLike[str]`) — Path to the delimited instrument export.
+- `**limits` (`int`) (default: `{}`) — Optional chunk, record and batch limits accepted by MeasurementReader.
+
+**Returns**
+
+- (`Measurement`) — Measurement with scans in the profile's output units, source
+- (`Measurement`) — diagnostics and the import manifest.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/instrument.py#L29-L41)
+
+## particula.instruments.ParticleCounter
+
+*class* · *dataclass*
+
+```python
+class ParticleCounter(Instrument)
+```
+
+Bases: `particula.instruments.instrument.Instrument`
+
+Re-exported from: `particula.instruments.particle_counter`
+
+Read a particle counter export with a configurable profile.
+
+**Parameters**
+
+- `profile` (`ProfileSource`) (default: `'cpc-3010'`) — Import profile accepted by Instrument. The default 3010 logger profile reports detector count rate in counts per second and logger temperature in kelvin.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/particle_counter.py#L11-L21)
+
+### particula.instruments.ParticleCounter.profile
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+profile: ProfileSource = 'cpc-3010'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/particle_counter.py#L21-L21)
+
+### particula.instruments.ParticleCounter.__init__
+
+*method*
+
+```python
+def __init__(profile: ProfileSource = 'cpc-3010') -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/particle_counter.py#L0-L0)
+
+### particula.instruments.ParticleCounter.__post_init__
+
+*method*
+
+```python
+def __post_init__() -> None
+```
+
+Inherited from: `particula.instruments.instrument.Instrument`
+
+Resolve the supplied profile before reading any sources.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/instrument.py#L25-L27)
+
+### particula.instruments.ParticleCounter.read
+
+*method*
+
+```python
+def read(source: str | PathLike[str], **limits: int) -> Measurement
+```
+
+Inherited from: `particula.instruments.instrument.Instrument`
+
+Read one export into memory using this instrument's profile.
+
+**Parameters**
+
+- `source` (`str | PathLike[str]`) — Path to the delimited instrument export.
+- `**limits` (`int`) (default: `{}`) — Optional chunk, record and batch limits accepted by MeasurementReader.
+
+**Returns**
+
+- (`Measurement`) — Measurement with scans in the profile's output units, source
+- (`Measurement`) — diagnostics and the import manifest.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/instrument.py#L29-L41)
+
+## particula.instruments.read_mobility_sizer
+
+*function*
+
+```python
+def read_mobility_sizer(source: str | PathLike[str], *, profile: ProfileSource = 'smps-aim', **limits: int) -> MobilityNumberSpectrum
+```
+
+Re-exported from: `particula.instruments.mobility_sizer`
+
+Read number spectra and verify the electrical-mobility diameter axis.
+
+**Parameters**
+
+- `source` (`str | PathLike[str]`) — Path to the delimited sizer export.
+- `profile` (`ProfileSource`) (default: `'smps-aim'`) — Built-in profile ID, JSON or YAML file path, or profile mapping describing the spectrum and diameter axis.
+- `**limits` (`int`) (default: `{}`) — Optional MeasurementReader chunk, record and batch limits.
+
+**Returns**
+
+- (`MobilityNumberSpectrum`) — Number concentration per decade of mobility diameter, with each
+- (`MobilityNumberSpectrum`) — scan linked to its diameter grid and declared output units.
+
+**Raises**
+
+- `ValueError` — The profile produces a different measurement type.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/mobility_sizer.py#L24-L48)
+
+## particula.instruments.read_particle_counter
+
+*function*
+
+```python
+def read_particle_counter(source: str | PathLike[str], *, profile: ProfileSource = 'cpc-3010', **limits: int) -> ParticleCountRate
+```
+
+Re-exported from: `particula.instruments.particle_counter`
+
+Read a particle counter export and verify its count-rate field.
+
+**Parameters**
+
+- `source` (`str | PathLike[str]`) — Path to the delimited counter export.
+- `profile` (`ProfileSource`) (default: `'cpc-3010'`) — Built-in profile ID, JSON or YAML file path, or profile mapping describing the detector channels and their units.
+- `**limits` (`int`) (default: `{}`) — Optional MeasurementReader chunk, record and batch limits.
+
+**Returns**
+
+- (`ParticleCountRate`) — Count-rate scans in the profile's output units with source diagnostics.
+
+**Raises**
+
+- `ValueError` — The profile produces a different measurement type.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/particle_counter.py#L24-L47)
+
+**Modules**
+
+- `particula.instruments.instrument`
+- `particula.instruments.mobility_sizer`
+- `particula.instruments.particle_counter`
+
+---
+
+# particula.instruments.instrument
+
+*module*
+
+Read measurements from an instrument with a declared import profile.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/instrument.py#L1-L1)
+
+## particula.instruments.instrument.Instrument
+
+*class* · *dataclass*
+
+```python
+class Instrument
+```
+
+Read delimited exports that share one profile.
+
+**Parameters**
+
+- `profile` (`ProfileSource`) — Built-in profile ID, JSON or YAML file path, or profile mapping. Construction validates and stores a copy of the profile.
+
+**Raises**
+
+- `ProfileError` — The profile cannot be loaded or fails validation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/instrument.py#L11-L41)
+
+### particula.instruments.instrument.Instrument.profile
+
+*attribute* · *instance attribute*
+
+```python
+profile: ProfileSource
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/instrument.py#L23-L23)
+
+### particula.instruments.instrument.Instrument.__init__
+
+*method*
+
+```python
+def __init__(profile: ProfileSource) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/instrument.py#L0-L0)
+
+### particula.instruments.instrument.Instrument.__post_init__
+
+*method*
+
+```python
+def __post_init__() -> None
+```
+
+Resolve the supplied profile before reading any sources.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/instrument.py#L25-L27)
+
+### particula.instruments.instrument.Instrument.read
+
+*method*
+
+```python
+def read(source: str | PathLike[str], **limits: int) -> Measurement
+```
+
+Read one export into memory using this instrument's profile.
+
+**Parameters**
+
+- `source` (`str | PathLike[str]`) — Path to the delimited instrument export.
+- `**limits` (`int`) (default: `{}`) — Optional chunk, record and batch limits accepted by MeasurementReader.
+
+**Returns**
+
+- (`Measurement`) — Measurement with scans in the profile's output units, source
+- (`Measurement`) — diagnostics and the import manifest.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/instrument.py#L29-L41)
+
+---
+
+# particula.instruments.mobility_sizer
+
+*module*
+
+Import particle number spectra resolved by electrical-mobility diameter.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/mobility_sizer.py#L1-L1)
+
+## particula.instruments.mobility_sizer.MobilitySizer
+
+*class* · *dataclass*
+
+```python
+class MobilitySizer(Instrument)
+```
+
+Bases: `particula.instruments.instrument.Instrument`
+
+Read an electrical-mobility sizer export with a configurable profile.
+
+**Parameters**
+
+- `profile` (`ProfileSource`) (default: `'smps-aim'`) — Import profile accepted by Instrument. The default AIM number export uses mobility diameter in metres and number concentration per decade of diameter in particles per cubic metre.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/mobility_sizer.py#L11-L21)
+
+### particula.instruments.mobility_sizer.MobilitySizer.profile
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+profile: ProfileSource = 'smps-aim'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/mobility_sizer.py#L21-L21)
+
+### particula.instruments.mobility_sizer.MobilitySizer.__init__
+
+*method*
+
+```python
+def __init__(profile: ProfileSource = 'smps-aim') -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/mobility_sizer.py#L0-L0)
+
+### particula.instruments.mobility_sizer.MobilitySizer.__post_init__
+
+*method*
+
+```python
+def __post_init__() -> None
+```
+
+Inherited from: `particula.instruments.instrument.Instrument`
+
+Resolve the supplied profile before reading any sources.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/instrument.py#L25-L27)
+
+### particula.instruments.mobility_sizer.MobilitySizer.read
+
+*method*
+
+```python
+def read(source: str | PathLike[str], **limits: int) -> Measurement
+```
+
+Inherited from: `particula.instruments.instrument.Instrument`
+
+Read one export into memory using this instrument's profile.
+
+**Parameters**
+
+- `source` (`str | PathLike[str]`) — Path to the delimited instrument export.
+- `**limits` (`int`) (default: `{}`) — Optional chunk, record and batch limits accepted by MeasurementReader.
+
+**Returns**
+
+- (`Measurement`) — Measurement with scans in the profile's output units, source
+- (`Measurement`) — diagnostics and the import manifest.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/instrument.py#L29-L41)
+
+## particula.instruments.mobility_sizer.read_mobility_sizer
+
+*function*
+
+```python
+def read_mobility_sizer(source: str | PathLike[str], *, profile: ProfileSource = 'smps-aim', **limits: int) -> MobilityNumberSpectrum
+```
+
+Read number spectra and verify the electrical-mobility diameter axis.
+
+**Parameters**
+
+- `source` (`str | PathLike[str]`) — Path to the delimited sizer export.
+- `profile` (`ProfileSource`) (default: `'smps-aim'`) — Built-in profile ID, JSON or YAML file path, or profile mapping describing the spectrum and diameter axis.
+- `**limits` (`int`) (default: `{}`) — Optional MeasurementReader chunk, record and batch limits.
+
+**Returns**
+
+- (`MobilityNumberSpectrum`) — Number concentration per decade of mobility diameter, with each
+- (`MobilityNumberSpectrum`) — scan linked to its diameter grid and declared output units.
+
+**Raises**
+
+- `ValueError` — The profile produces a different measurement type.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/mobility_sizer.py#L24-L48)
+
+---
+
+# particula.instruments.particle_counter
+
+*module*
+
+Import particle detector count rates and associated logger channels.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/particle_counter.py#L1-L1)
+
+## particula.instruments.particle_counter.ParticleCounter
+
+*class* · *dataclass*
+
+```python
+class ParticleCounter(Instrument)
+```
+
+Bases: `particula.instruments.instrument.Instrument`
+
+Read a particle counter export with a configurable profile.
+
+**Parameters**
+
+- `profile` (`ProfileSource`) (default: `'cpc-3010'`) — Import profile accepted by Instrument. The default 3010 logger profile reports detector count rate in counts per second and logger temperature in kelvin.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/particle_counter.py#L11-L21)
+
+### particula.instruments.particle_counter.ParticleCounter.profile
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+profile: ProfileSource = 'cpc-3010'
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/particle_counter.py#L21-L21)
+
+### particula.instruments.particle_counter.ParticleCounter.__init__
+
+*method*
+
+```python
+def __init__(profile: ProfileSource = 'cpc-3010') -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/particle_counter.py#L0-L0)
+
+### particula.instruments.particle_counter.ParticleCounter.__post_init__
+
+*method*
+
+```python
+def __post_init__() -> None
+```
+
+Inherited from: `particula.instruments.instrument.Instrument`
+
+Resolve the supplied profile before reading any sources.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/instrument.py#L25-L27)
+
+### particula.instruments.particle_counter.ParticleCounter.read
+
+*method*
+
+```python
+def read(source: str | PathLike[str], **limits: int) -> Measurement
+```
+
+Inherited from: `particula.instruments.instrument.Instrument`
+
+Read one export into memory using this instrument's profile.
+
+**Parameters**
+
+- `source` (`str | PathLike[str]`) — Path to the delimited instrument export.
+- `**limits` (`int`) (default: `{}`) — Optional chunk, record and batch limits accepted by MeasurementReader.
+
+**Returns**
+
+- (`Measurement`) — Measurement with scans in the profile's output units, source
+- (`Measurement`) — diagnostics and the import manifest.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/instrument.py#L29-L41)
+
+## particula.instruments.particle_counter.read_particle_counter
+
+*function*
+
+```python
+def read_particle_counter(source: str | PathLike[str], *, profile: ProfileSource = 'cpc-3010', **limits: int) -> ParticleCountRate
+```
+
+Read a particle counter export and verify its count-rate field.
+
+**Parameters**
+
+- `source` (`str | PathLike[str]`) — Path to the delimited counter export.
+- `profile` (`ProfileSource`) (default: `'cpc-3010'`) — Built-in profile ID, JSON or YAML file path, or profile mapping describing the detector channels and their units.
+- `**limits` (`int`) (default: `{}`) — Optional MeasurementReader chunk, record and batch limits.
+
+**Returns**
+
+- (`ParticleCountRate`) — Count-rate scans in the profile's output units with source diagnostics.
+
+**Raises**
+
+- `ValueError` — The profile produces a different measurement type.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/instruments/particle_counter.py#L24-L47)
 
 ---
 
