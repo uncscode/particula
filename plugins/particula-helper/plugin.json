@@ -25,7 +25,7 @@
       },
       "requires_local_executor": true,
       "publication": {
-        "release_notes": "Documentation drafters and editors share a before-and-after example for number-heavy results. It shows how to lead with a plain-language comparison, preserve the evidence and uncertainty, and use standalone emphasis sparingly."
+        "release_notes": "The literature-study skill helps researchers identify unresolved assumptions, check what later studies established, and design a controlled test of the atmospheric consequence that motivated the original paper."
       }
     }
   },
@@ -37,7 +37,7 @@
     "scientific-computing"
   ],
   "name": "particula-helper",
-  "version": "0.3.11",
+  "version": "0.3.12",
   "license": "MIT",
   "homepage": "https://uncscode.github.io/particula/guide/agent-plugins/",
   "repository": "https://github.com/uncscode/particula"
