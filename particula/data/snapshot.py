@@ -13,8 +13,12 @@ from particula.data.product import DerivedMeasurement
 from particula.data.profile import canonical, digest
 
 
-def publish_directory(destination: Path, write: Callable[[Path], None]) -> None:
-    """Publish a complete directory, accepting a matching concurrent retry."""
+def publish_directory(
+    destination: Path,
+    write: Callable[[Path], None],
+    reopen: Callable[[Path], object],
+) -> None:
+    """Publish a directory or verify a matching existing product on retry."""
     from particula.data.storage import _sync
 
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -44,6 +48,17 @@ def publish_directory(destination: Path, write: Callable[[Path], None]) -> None:
             raise FileExistsError(
                 f"Destination contains a different product: {destination}"
             )
+        try:
+            reopen(destination)
+        except (
+            OSError,
+            ValueError,
+            KeyError,
+            pl.exceptions.PolarsError,
+        ) as exc:
+            raise FileExistsError(
+                f"Existing product is incomplete or invalid: {destination}"
+            ) from exc
 
 
 def save_measurement(
@@ -87,7 +102,7 @@ def save_measurement(
             (stage / "recipe.json").write_bytes(canonical(metadata["recipe"]))
 
     root = Path(destination)
-    publish_directory(root, write)
+    publish_directory(root, write, open_measurement)
     return open_measurement(root)
 
 

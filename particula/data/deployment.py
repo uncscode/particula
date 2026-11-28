@@ -1,13 +1,21 @@
 """Deployment and calibration records for time-resolved instrument products."""
 
+import re
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from math import isfinite
 
 
 def utc_time(value: datetime | str) -> datetime:
-    """Normalize an offset-aware campaign time to UTC."""
-    instant = datetime.fromisoformat(value) if isinstance(value, str) else value
+    """Normalize an offset-aware bound exactly representable in microseconds."""
+    if isinstance(value, str):
+        # fromisoformat silently discards digits past microsecond precision.
+        for remainder in re.findall(r"[.,][0-9]{6}([0-9]+)", value):
+            if remainder.strip("0"):
+                raise ValueError("Time bounds require microsecond precision")
+        instant = datetime.fromisoformat(value)
+    else:
+        instant = value
     if instant.tzinfo is None or instant.utcoffset() is None:
         raise ValueError("An explicit time zone or UTC offset is required")
     return instant.astimezone(UTC)

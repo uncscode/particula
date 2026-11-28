@@ -152,6 +152,106 @@ def test_unverified_and_overlapping_support(tmp_path):
         )
 
 
+def test_exposure_validates_only_retained_intervals(tmp_path):
+    """Clip the crossing scan and ignore invalid support outside the analysis."""
+    readings = [
+        (-100, 5, "."),
+        (-10, 20, 20),
+        (5, 999, "."),
+        (20, 40, 5),
+        (60, 7, "."),
+        (70, 4, 20),
+        (75, 8, 20),
+    ]
+    raw = _counter(tmp_path, "inlet", readings)
+    profile = raw.manifest["profile"]
+    profile["vendor_flags"] = {"column": 1, "separator": ";"}
+    product = read_measurement(tmp_path / "inlet.csv", profile=profile)
+    selected = MeasurementCollection({"inlet": product}).select_time(
+        START, START + timedelta(minutes=1)
+    )
+    fields = {"inlet": ["count_rate"]}
+    exposure = {"inlet": "live_seconds"}
+    flags = {"inlet": ["999"]}
+    average = selected.average(
+        every="1m",
+        origin=START,
+        fields=fields,
+        weighting="exposure",
+        exposure=exposure,
+        exclude_flags=flags,
+    )
+    with pytest.raises(ValueError, match="Invalid or overlapping"):
+        selected.average(
+            every="1m",
+            origin=START,
+            fields=fields,
+            weighting="exposure",
+            exposure=exposure,
+        ).align_windows().collect()
+    # The 10 s before the crossing scan ends and the later 5 s both count.
+    row = average.align_windows().collect().row(0, named=True)
+    assert row["inlet.count_rate"] == pytest.approx((20 * 10 + 40 * 5) / 15)
+    assert row["inlet.count_rate.exposure_s"] == 15
+    assert row["inlet.count_rate.n"] == 2
+
+    fields["inlet"].append("temperature")
+    flags["inlet"].append("40")
+    exposure["inlet"] = "temperature"
+    average.save(tmp_path / "windows")
+    restored = type(average).open(tmp_path / "windows")
+    assert restored.manifest["fields"] == {"inlet": ["count_rate"]}
+    assert restored.manifest["exposure"] == {"inlet": "live_seconds"}
+    assert restored.manifest["exclude_flags"] == {"inlet": ["999"]}
+    assert restored.align_windows().collect().row(0, named=True) == row
+
+
+def test_save_retry_rejects_incomplete_payloads(tmp_path):
+    """An intact root manifest cannot stand in for a missing nested dataset."""
+    product = _counter(tmp_path, "meter", [(0, 10, 1)])
+    collection = MeasurementCollection({"meter": product}).select_time(
+        START, START + timedelta(minutes=1)
+    )
+    windows = collection.average(
+        every="1m",
+        origin=START,
+        fields={"meter": ["count_rate"]},
+        weighting="sample",
+    )
+    for result, name, payload in [
+        (collection, "campaign", "member-000000"),
+        (windows, "comparison", "windows.parquet"),
+        (collection, "nested", "member-000000/issues.parquet"),
+    ]:
+        destination = tmp_path / name
+        result.save(destination)
+        result.save(destination)
+        (destination / payload).rename(tmp_path / f"removed-{name}")
+        with pytest.raises(FileExistsError, match="incomplete or invalid"):
+            result.save(destination)
+        assert not (destination / payload).exists()
+
+
+def test_time_bounds_reject_precision_loss(tmp_path):
+    """Preserve nanosecond readings and reject unrepresentable UTC bounds."""
+    source = tmp_path / "counter.csv"
+    source.write_text("1700000040.000000123,12,17,1,0\n")
+    campaign = MeasurementCollection(
+        {"meter": read_measurement(source, profile="cpc-3010")}
+    )
+    low, high = "2023-11-14T22:14:00", "2023-11-14T22:14:01Z"
+    for fraction in (".0000002Z", ",00000020+00:00", ".000000200Z"):
+        with pytest.raises(ValueError, match="microsecond"):
+            campaign.select_time(low + fraction, high)
+    reading = campaign.select_time(low + ".000000000Z", high)["meter"]
+    assert (
+        reading.frame["time_utc"].cast(pl.Int64).item() == 1700000040000000123
+    )
+    assert campaign.select_time(low + ".000001000Z", high)[
+        "meter"
+    ].frame.is_empty()
+
+
 def test_window_start_as_measurement_field(tmp_path):
     """Preserve a physical channel named like the public UTC window key."""
     inlet = _counter(

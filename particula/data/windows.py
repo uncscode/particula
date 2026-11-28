@@ -2,6 +2,7 @@
 
 import json
 import re
+from copy import deepcopy
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from os import PathLike
@@ -110,7 +111,7 @@ class WindowComparison:
     def __init__(self, frame: pl.LazyFrame, metadata: dict) -> None:
         """Bind the aligned query to its units and analysis policy."""
         self._frame = frame
-        self.manifest = metadata
+        self.manifest = deepcopy(metadata)
 
     def align_windows(self, how: str = "grid") -> pl.LazyFrame:
         """Return the full grid, including empty windows, for lazy analysis."""
@@ -138,7 +139,7 @@ class WindowComparison:
             }
             (stage / "manifest.json").write_bytes(canonical(envelope))
 
-        publish_directory(Path(destination), write)
+        publish_directory(Path(destination), write, self.open)
 
     @classmethod
     def open(cls, destination: str | PathLike[str]) -> "WindowComparison":
@@ -286,21 +287,25 @@ def _assign_windows(
                 "Exposure requires a verified duration field in seconds"
             )
         length = pl.col(support)
-        frame = frame.sort("_time").with_columns(
-            (pl.col("_time") + (length * 1e9).round().cast(pl.Int64)).alias(
-                "_stop"
-            )
+        frame = frame.filter(pl.col("_time") < high).with_columns(
+            (
+                pl.col("_time")
+                + (length * 1e9).round().cast(pl.Int64, strict=False)
+            ).alias("_stop")
         )
+        # Keep in-range starts (including invalid durations) and verified
+        # intervals which start earlier and extend into the selection.
+        frame = frame.filter(
+            (pl.col("_time") >= low) | (pl.col("_stop") > low)
+        ).sort("_time")
         invalid = (
-            length.is_null()
-            | ~length.is_finite()
+            pl.col("_stop").is_null()
             | (pl.col("_stop") <= pl.col("_time"))
             | (pl.col("_time") < pl.col("_stop").cum_max().shift(1))
         ).any()
         frame = checked_rows(
             frame, invalid, "Invalid or overlapping verified exposure intervals"
         )
-        frame = frame.filter((pl.col("_stop") > low) & (pl.col("_time") < high))
         begin = pl.max_horizontal("_time", pl.lit(low))
         end = pl.min_horizontal("_stop", pl.lit(high))
         bins = (begin - anchor) // step * step + anchor
@@ -425,15 +430,16 @@ def average_members(
             if weighting == "sample" and support
             else (weighting,)
         )
+        frame = _quality_filter(
+            frame,
+            product,
+            alias,
+            exclude_repaired,
+            exclude_flags.get(alias, []),
+        )
         frames = {
-            mode: _quality_filter(
-                _assign_windows(
-                    frame, definitions, support, mode, anchor, step, low, high
-                ),
-                product,
-                alias,
-                exclude_repaired,
-                exclude_flags.get(alias, []),
+            mode: _assign_windows(
+                frame, definitions, support, mode, anchor, step, low, high
             )
             for mode in modes
         }

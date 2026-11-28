@@ -211,7 +211,7 @@ class MeasurementCollection(Mapping[str, Measurement]):
             }
             (stage / "manifest.json").write_bytes(canonical(manifest))
 
-        publish_directory(Path(destination), write)
+        publish_directory(Path(destination), write, self.open)
 
     @classmethod
     def open(cls, destination: str | PathLike[str]) -> Self:

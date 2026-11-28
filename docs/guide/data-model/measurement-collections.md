@@ -11,7 +11,10 @@ grids, and source diagnostics. Install the `data` extra and
 
 Open two imported datasets and identify them by their roles in this campaign.
 Choose distinct member names without periods, such as `inlet` and `outlet`
-for two physical counters with the same profile. Supply timezone-aware bounds. Here the counter uses Unix seconds and
+for two physical counters with the same profile. Supply timezone-aware bounds
+at microsecond precision. An ISO bound with a nonzero sub-microsecond part
+raises an error. Imported scan timestamps retain their nanosecond precision.
+Here the counter uses Unix seconds and
 the mobility export uses the UTC interpretation specified in the donor's
 settings. An export that only prints a date and time needs a site clock
 interpretation before comparison.
@@ -75,8 +78,10 @@ column records independently verified sample exposure. Each scan contributes
 its valid overlap with the window. For example, a 75 s acquisition that starts
 at 12:00:45 contributes 15 s before 12:01 and 60 s after it. In those
 minutes, `.exposure_s` is 15 and 60 seconds and `.coverage` is 0.25 and 1.0
-if this was the only acquisition. Overlapping exposure intervals on the same
-member are ambiguous and raise an error. Recorded pulse totals lack
+if this was the only acquisition. Duration and overlap checks apply after
+flag and repair exclusions, to scans starting in the selection and earlier
+scans with verified exposure extending into it. Overlapping retained exposures
+on the same member are ambiguous and raise an error. Recorded pulse totals lack
 within-interval timing, so exposure weighting rejects those fields. Retrace
 time lies outside sample exposure. An incomplete mobility scan's nominal scan
 duration cannot establish its actual exposure or an individual channel's dwell
