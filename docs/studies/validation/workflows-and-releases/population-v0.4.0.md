@@ -11,7 +11,7 @@ The old package reference is `v0.3.6` (`3435f653ae`). The migration entered upst
 | Π Chamber | Saved 0.3.6 ensembles at `ecc1d88a5c`. Interior occupies 85% of modeled air. | Sum interior cohort weights per cm³ into 18 wet-diameter bins. |
 | Pallas probes | Field-study source `3435f653ae`, archived tables at `3562abffaf`. Each probe supplies an instrument-normalized density. | Integrate each plotted probe spectrum over five common intervals. |
 | Jeju chamber | Fit engine `2db6a77323`, public plot data at `34b9bf25e8`. The data are concentrations at chamber conditions. | Integrate per-decade Welas spectra back to the measured and simulated band concentrations. |
-| Parcel export | Moist parcel solver at `a3ff1e82e7`; analytic dry inventory and independently evolved liquid mixing ratio. | Compare native counts and inventories at the physical volume of each parcel sample. |
+| Parcel export | Moist parcel solver at `a3ff1e82e7`; analytic dry inventory and solver-reported liquid mixing ratio. | Compare native counts and inventories at the physical volume of each parcel sample. |
 | Cavity | OpenFOAM fixture at `50d4230deb`, saved CUDA replay at `bac5acf6bb`. Fluxes connect physical cells. | Compare cell inventories, the final tracer field, centroid and local uptake. |
 | Sphere optics | Native state tests at `0fa70c4964`, with the independent measurement-array reference corpus at `240a07398a`. | Compare native extinction and absorption with cross sections weighted by integrated number per m³. |
 
@@ -25,7 +25,7 @@ The CPU tutorial starts with a lognormal distribution at 10¹⁰ particles m⁻�
 | Radius PDF | 9,522,210,158.11 | 0 | 0 |
 | Resolved | 9,511,400,000.00 | 0 | 0 |
 
-The originally published resolved plot seeded the radii only and printed a final 9.52 × 10⁹ m⁻³. The paired comparison fixes the collision draw so a second run can reproduce the difference attributed to migration. To repeat it, run the tutorial from `0fa70c4964` against package tag `v0.3.6`, setting `coagulation_resolved.coagulation_strategy.random_generator = np.random.default_rng(42)` immediately after constructing the resolved runnable. Compare `number_pmf`, `number_pdf` and `number_resolved` with the corresponding arrays in the current tutorial's downloadable results. The irregular-grid worked example separately checks the PDF quadrature and species inventories at 0.25 and 4 m³. [Population and volume example](../../tutorials/building-an-aerosol/particles/represented_population.py)
+The originally published resolved plot seeded the radii only and printed a final 9.52 × 10⁹ m⁻³. The paired comparison fixes the collision draw so a second run can reproduce the difference attributed to migration. To repeat it, run the tutorial from `0fa70c4964` against package tag `v0.3.6`, setting `coagulation_resolved.coagulation_strategy.random_generator = np.random.default_rng(42)` immediately after constructing the resolved runnable. Compare `number_pmf`, `number_pdf` and `number_resolved` with `pmf_m3`, `pdf_m3` and `resolved_m3`, respectively, in the current tutorial's downloadable results. The irregular-grid worked example separately checks the PDF quadrature and species inventories at 0.25 and 4 m³. [Population and volume example](../../tutorials/building-an-aerosol/particles/represented_population.py)
 
 ## A flush and an expansion give the same density with different inventories
 
@@ -55,11 +55,11 @@ We regenerated the initial residents from each archived seed, excluded future bi
 
 A full CUDA replay with the two archived seeds reproduced all 2,304 spectral ordinates across 16 output times exactly (maximum difference 0 cm⁻³, relative 0). The 128 cloud-number Monte Carlo half-widths and 64 dry/wet separation values also matched exactly. Both dry/wet pairs still first fell below 1% separation at the 32 s sample. This tests reproducibility for the original draws and time grid.
 
-The original cohort test allows a relative difference of 10⁻¹² and an absolute difference of 10⁻⁹ cm⁻³ per bin. These checks preserve both the counter range and the dry-seed population outside it. [Time-zero checks](../../../../examples_tests/pi_chamber_spectra_test.py) · [Restart quantiles](https://github.com/uncscode/particula/blob/main/docs/data/pi-chamber/restart.json)
+The original cohort test allows a relative difference of 10⁻¹² and an absolute difference of 10⁻⁹ cm⁻³ per bin. These checks preserve both the counter range and the dry-seed population outside it. [Time-zero checks](../../../../examples_tests/pi_chamber_spectra_test.py) · [Restart quantiles](https://github.com/uncscode/particula/blob/0fa70c4964/docs/data/pi-chamber/restart.json)
 
 ## The Pallas probes retain their reversal between dates
 
-The FSSP counted fewer 6–13 µm droplets than the ICEMET imager on 15 September 2022, and more the next day. For each curve, the CPU plotting check multiplied its height in cm⁻³ per decade by each interval's Δlog₁₀D and summed. The six diameter edges were 6, 7.5, 9, 10.5, 12 and 13 µm. The reference uses the two observed columns of the nominal, refined, frozen-calibration CDA rows in the attribution table. The observed columns retain each probe's sampling and reporting response. [Pallas study and corrected source data](../../literature/pallas-cloud-probes/index.md) · [Attribution table](https://github.com/uncscode/particula/blob/main/docs/data/pallas-cloud-probes/attribution.csv)
+The FSSP counted fewer 6–13 µm droplets than the ICEMET imager on 15 September 2022, and more the next day. For each curve, the CPU plotting check multiplied its height in cm⁻³ per decade by each interval's Δlog₁₀D and summed. The six diameter edges were 6, 7.5, 9, 10.5, 12 and 13 µm. The reference uses the two observed columns of the nominal, refined, frozen-calibration CDA rows in the attribution table. The observed columns retain each probe's sampling and reporting response. [Pallas study and corrected source data](../../literature/pallas-cloud-probes/index.md) · [Attribution table](https://github.com/uncscode/particula/blob/0fa70c4964/docs/data/pallas-cloud-probes/attribution.csv)
 
 | September date | Matched minutes | FSSP (cm⁻³) | ICEMET (cm⁻³) | Largest absolute / relative difference from the attribution table |
 |---|---:|---:|---:|---:|
@@ -70,7 +70,7 @@ This deterministic comparison checks the displayed field concentrations. The opt
 
 ## The Jeju fits still undercount the 5–10 µm particles
 
-Both full-record fits underpredict the run-5 concentration in the Welas band. Over the same 41 valid minutes, the shared fit accounts for about 36% of the observed concentration and the individual fit about 11%. Integrating the distributed plot table gives the same result to its eight-significant-digit precision. [Published size comparison](../../literature/jeju-chamber/spectra.md)
+Both full-record fits underpredict the run-5 concentration in the Welas band. Over the same 41 valid minutes, the shared fit accounts for about 36% of the observed concentration and the individual fit about 11%. The published plot values have eight significant digits. Integrating them recovers the reference bands within the study’s 10⁻⁶ relative tolerance. [Published size comparison](../../literature/jeju-chamber/spectra.md)
 
 | Run-5 record mean, 5–10 µm | Original ten-bin sum (cm⁻³) | Integral of public spectrum (cm⁻³) |
 |---|---:|---:|
@@ -107,7 +107,7 @@ The companion two-cell check isolates the mapping from an aerosol sample into a 
 
 ## Native optical coefficients close against a cross-section sum
 
-For spheres of radii 60 and 120 nm at 4 and 8 particles/m³, the 500 nm extinction coefficient is 5.63106521 × 10⁻¹³ m⁻¹. The corresponding absorption coefficient is 9.67440123 × 10⁻¹⁴ m⁻¹. We evaluated both coefficients at 500 and 650 nm with index 1.65 + 0.04i. The independent reduction sums πr² times the single-sphere efficiency times the measured number density. On CPU the largest discrete or resolved difference for sample volumes of 0.25 and 4 m³ was 1.01 × 10⁻²⁸ m⁻¹, with maximum relative difference 1.91 × 10⁻¹⁶. [Optical population weighting](../../../guide/optics/index.md) · [Native-state tests](../../../../particula/optics/tests/state_test.py)
+For spheres of radii 60 and 120 nm at 4 and 8 particles/m³, the 500 nm extinction coefficient is 5.63106521 × 10⁻¹³ m⁻¹. The corresponding absorption coefficient is 9.67440123 × 10⁻¹⁴ m⁻¹. We evaluated both coefficients at 500 and 650 nm with index 1.65 + 0.04i. The independent reduction sums πr² times the single-sphere efficiency times the prescribed number density. On CPU the largest discrete or resolved difference for sample volumes of 0.25 and 4 m³ was 1.01 × 10⁻²⁸ m⁻¹, with maximum relative difference 1.91 × 10⁻¹⁶. [Optical population weighting](../../../guide/optics/index.md) · [Native-state tests](../../../../particula/optics/tests/state_test.py)
 
 For a continuous PDF we used radii of 70, 83, 145 and 317 nm and density ordinates of (5, 9, 2, 1) × 10¹⁵ m⁻⁴. Trapezoidal integration of the complete product over radius gives 1.44870888 × 10⁻⁴ m⁻¹ extinction at 500 nm. Both coefficient checks at both wavelengths and volumes agreed within 2.72 × 10⁻²⁰ m⁻¹, with maximum relative difference 2.09 × 10⁻¹⁶. The separate measurement-array API accepts declared counts or densities and explicit measure information. Its saved PyMieScatt tests and the GPU reduction tests exercise that path independently. [Population tests and external reference](../../../../particula/optics/tests/population_test.py)
 
