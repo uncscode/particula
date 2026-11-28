@@ -62,7 +62,11 @@ class Measurement:
         fields = {f["name"] for f in self.manifest["profile"].get("fields", [])}
         if field not in fields:
             raise ValueError(f"Expected a declared scalar field: {field}")
-        flags = sorted(set(exclude_flags))
+        flags = (
+            [exclude_flags]
+            if isinstance(exclude_flags, str)
+            else sorted(set(exclude_flags))
+        )
         keep = ~pl.col("repaired") if exclude_repaired else pl.lit(True)
         if flags:
             if "vendor_flags" not in self.manifest["profile"]:
@@ -89,7 +93,9 @@ class Measurement:
         if "vendor_flags" not in self.manifest["profile"]:
             raise ValueError("This source has no vendor status field")
         return (
-            self.lazy_frame.select("time_utc", "vendor_flags")
+            self.lazy_frame.select(
+                "time_utc", pl.col("vendor_flags").list.unique()
+            )
             .with_columns(pl.len().alias("total_scans"))
             .explode("vendor_flags")
             .drop_nulls("vendor_flags")
@@ -105,7 +111,13 @@ class Measurement:
 
     def available_operations(self):
         """Describe compatible operations and any required additional inputs."""
-        return {"filter": ()}
+        profile = self.manifest["profile"]
+        operations = {"filter": ()}
+        if profile.get("fields"):
+            operations["quality_summary"] = ("field",)
+        if "vendor_flags" in profile:
+            operations["flag_summary"] = ()
+        return operations
 
 
 class ParticleCountRate(Measurement):

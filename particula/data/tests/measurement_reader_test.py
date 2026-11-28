@@ -395,7 +395,7 @@ def test_source_edit_during_import_and_missing_part(tmp_path):
         open_measurement(dest)
 
 
-def test_quality_policy_and_empty_mean():
+def test_quality_policy_and_empty_mean(tmp_path):
     """Record analyst exclusions separately from the instrument's raw status."""
     scan = read_mobility_sizer(FIXTURES / "mobility.csv")
     q = (
@@ -412,6 +412,25 @@ def test_quality_policy_and_empty_mean():
     assert q["excluded_flags"] == ["Incomplete Scan"]
     assert q["first_excluded"] == q["last_excluded"]
     assert scan.flag_summary().collect()["scans"].to_list() == [1, 1]
+    repeated = tmp_path / "repeated.csv"
+    repeated.write_bytes(
+        (FIXTURES / "mobility.csv")
+        .read_bytes()
+        .replace(b"Incomplete Scan", b"Incomplete Scan;Incomplete Scan")
+    )
+    duplicate = read_mobility_sizer(repeated)
+    assert (
+        duplicate.frame["vendor_flags"].to_list()[0].count("Incomplete Scan")
+        == 2
+    )
+    assert duplicate.flag_summary().collect()["scans"].to_list() == [1, 1]
+    assert (
+        duplicate.quality_summary(
+            "total_number", exclude_flags="Incomplete Scan"
+        ).collect()["retained"][0]
+        == 0
+    )
+    assert "flag_summary" in duplicate.available_operations()
     counter = read_particle_counter(FIXTURES / "counter.csv")
     q = (
         counter.quality_summary("count_rate", exclude_repaired=True)
