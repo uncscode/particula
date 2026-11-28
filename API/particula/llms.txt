@@ -67561,6 +67561,7 @@ invalid.
 - `particula.execution._adaptive_condensation_physics`
 - `particula.execution._adaptive_condensation_plan`
 - `particula.execution._bat_table`
+- `particula.execution._ccn_device`
 - `particula.execution._condensation_block_kernels`
 - `particula.execution._condensation_device_control`
 - `particula.execution._condensation_jacobian`
@@ -67578,6 +67579,7 @@ invalid.
 - `particula.execution.analysis_io`
 - `particula.execution.archive`
 - `particula.execution.availability`
+- `particula.execution.ccn_recording`
 - `particula.execution.checkpoint`
 - `particula.execution.checkpoint_extensions`
 - `particula.execution.checkpoint_io`
@@ -67751,6 +67753,324 @@ def _binary_activity_table(activity)
 Tabulate both activities on a uniform organic mole-fraction grid.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/_bat_table.py#L6-L23)
+
+---
+
+# particula.execution._ccn_device
+
+*module*
+
+Resident equilibrium CCN sampling, using the prepared owner's stream.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L1-L1)
+
+## particula.execution._ccn_device._TIE
+
+*attribute* · *module attribute*
+
+```python
+_TIE = wp.constant(wp.float64(1.0 - 32 * np.finfo(float).eps))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L14-L14)
+
+## particula.execution._ccn_device._VOLUME_FACTOR
+
+*attribute* · *module attribute*
+
+```python
+_VOLUME_FACTOR = wp.constant(wp.float64(6.0 / np.pi))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L13-L13)
+
+## particula.execution._ccn_device._ZERO
+
+*attribute* · *module attribute*
+
+```python
+_ZERO = wp.constant(wp.float64(0.0))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L12-L12)
+
+## particula.execution._ccn_device.DeviceCCNBatch
+
+*class*
+
+```python
+class DeviceCCNBatch
+```
+
+Prepare constant inputs and reusable compact output buffers.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L142-L267)
+
+### particula.execution._ccn_device.DeviceCCNBatch.common
+
+*attribute* · *instance attribute*
+
+```python
+common = upload(np.zeros(boxes) if self.mixed else common)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L162-L162)
+
+### particula.execution._ccn_device.DeviceCCNBatch.counts
+
+*attribute* · *instance attribute*
+
+```python
+counts = wp.empty((capacity, *self.groups), dtype=wp.float64, device=device)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L171-L173)
+
+### particula.execution._ccn_device.DeviceCCNBatch.diameters
+
+*attribute* · *instance attribute*
+
+```python
+diameters = wp.empty((capacity if not self.mixed else 1, *self.groups), dtype=wp.float64, device=device)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L174-L178)
+
+### particula.execution._ccn_device.DeviceCCNBatch.dynamic
+
+*attribute* · *instance attribute*
+
+```python
+dynamic = length is None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L168-L168)
+
+### particula.execution._ccn_device.DeviceCCNBatch.groups
+
+*attribute* · *instance attribute*
+
+```python
+groups = (boxes, len(config.saturation_ratios))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L153-L153)
+
+### particula.execution._ccn_device.DeviceCCNBatch.length
+
+*attribute* · *instance attribute*
+
+```python
+length = upload(np.ones(boxes) if length is None else length)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L164-L164)
+
+### particula.execution._ccn_device.DeviceCCNBatch.mixed
+
+*attribute* · *instance attribute*
+
+```python
+mixed = common is None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L161-L161)
+
+### particula.execution._ccn_device.DeviceCCNBatch.owner
+
+*attribute* · *instance attribute*
+
+```python
+owner = owner
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L146-L146)
+
+### particula.execution._ccn_device.DeviceCCNBatch.product
+
+*attribute* · *instance attribute*
+
+```python
+product = wp.float64(config.kelvin_temperature_product if length is None else 0)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L165-L167)
+
+### particula.execution._ccn_device.DeviceCCNBatch.ratios
+
+*attribute* · *instance attribute*
+
+```python
+ratios = upload(config.saturation_ratios)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L160-L160)
+
+### particula.execution._ccn_device.DeviceCCNBatch.shape
+
+*attribute* · *instance attribute*
+
+```python
+shape = (boxes, slots, self.groups[1])
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L154-L154)
+
+### particula.execution._ccn_device.DeviceCCNBatch.species
+
+*attribute* · *instance attribute*
+
+```python
+species = upload(config.material_kappa or (0.0))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L163-L163)
+
+### particula.execution._ccn_device.DeviceCCNBatch.status
+
+*attribute* · *instance attribute*
+
+```python
+status = wp.zeros((capacity, boxes), dtype=int, device=device)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L179-L179)
+
+### particula.execution._ccn_device.DeviceCCNBatch.thresholds
+
+*attribute* · *instance attribute*
+
+```python
+thresholds = wp.empty(self.groups, dtype=wp.float64, device=device)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L170-L170)
+
+### particula.execution._ccn_device.DeviceCCNBatch.water
+
+*attribute* · *instance attribute*
+
+```python
+water = -1 if config.water_index is None else config.water_index
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L169-L169)
+
+### particula.execution._ccn_device.DeviceCCNBatch.__init__
+
+*method*
+
+```python
+def __init__(owner, config, capacity)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L145-L181)
+
+### particula.execution._ccn_device.DeviceCCNBatch._launch
+
+*method*
+
+```python
+def _launch(kernel, shape, args)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L183-L190)
+
+### particula.execution._ccn_device.DeviceCCNBatch.download
+
+*method*
+
+```python
+def download(count)
+```
+
+Return validated compact rows on explicit flush.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L249-L267)
+
+### particula.execution._ccn_device.DeviceCCNBatch.enqueue
+
+*method*
+
+```python
+def enqueue(row)
+```
+
+Sample the current accepted device state.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L207-L247)
+
+### particula.execution._ccn_device.DeviceCCNBatch.refresh
+
+*method*
+
+```python
+def refresh()
+```
+
+Compute common thresholds once per setting and box.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L192-L205)
+
+## particula.execution._ccn_device._begin
+
+*function*
+
+```python
+def _begin(row: int, thresholds: wp.array2d(dtype=wp.float64), common: int, counts: wp.array3d(dtype=wp.float64), diameters: wp.array3d(dtype=wp.float64), status: wp.array2d(dtype=int))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L35-L50)
+
+## particula.execution._ccn_device._count
+
+*function*
+
+```python
+def _count(p: WarpParticleData, temperature: wp.array(dtype=wp.float64), ratios: wp.array(dtype=wp.float64), species: wp.array(dtype=wp.float64), length: wp.array(dtype=wp.float64), product: wp.float64, water: int, mixed: int, thresholds: wp.array2d(dtype=wp.float64), row: int, counts: wp.array3d(dtype=wp.float64), status: wp.array2d(dtype=int))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L83-L129)
+
+## particula.execution._ccn_device._dry_volume
+
+*function*
+
+```python
+def _dry_volume(p: WarpParticleData, box: int, slot: int, water: int)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L53-L62)
+
+## particula.execution._ccn_device._normalize
+
+*function*
+
+```python
+def _normalize(row: int, volume: wp.array(dtype=wp.float64), counts: wp.array3d(dtype=wp.float64))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L132-L139)
+
+## particula.execution._ccn_device._thresholds
+
+*function*
+
+```python
+def _thresholds(common: wp.array(dtype=wp.float64), ratios: wp.array(dtype=wp.float64), length: wp.array(dtype=wp.float64), temperature: wp.array(dtype=wp.float64), product: wp.float64, scales: wp.array2d(dtype=wp.float64))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L17-L32)
+
+## particula.execution._ccn_device._volume_weighted_kappa
+
+*function*
+
+```python
+def _volume_weighted_kappa(p: WarpParticleData, box: int, slot: int, water: int, dry: wp.float64, species: wp.array(dtype=wp.float64))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/_ccn_device.py#L65-L80)
 
 ---
 
@@ -72525,6 +72845,266 @@ declarations, runtime status, device status, and request-associated state.
 - `InvalidExecutionStateError` — If request-associated state is invalid.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/availability.py#L303-L403)
+
+---
+
+# particula.execution.ccn_recording
+
+*module*
+
+Accepted-step equilibrium CCN histories for CPU and prepared Warp owners.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L1-L1)
+
+## particula.execution.ccn_recording.CCNObserver
+
+*class*
+
+```python
+class CCNObserver
+```
+
+Sample equilibrium CCN on the owner's backend, retaining bounded history.
+
+Common-κ configurations also record critical dry diameters. Slots with
+different compositions can have different thresholds. Their bulk output
+retains number concentration; evaluate_ccn exposes individual thresholds.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L23-L195)
+
+### particula.execution.ccn_recording.CCNObserver._capacity
+
+*attribute* · *instance attribute*
+
+```python
+_capacity = min(self._capacity, self._max_bytes // self._row_bytes)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L92-L92)
+
+### particula.execution.ccn_recording.CCNObserver._device_batch
+
+*attribute* · *instance attribute*
+
+```python
+_device_batch = DeviceCCNBatch(simulation, config, self._capacity)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L104-L106)
+
+### particula.execution.ccn_recording.CCNObserver._fixed
+
+*attribute* · *instance attribute*
+
+```python
+_fixed = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L68-L68)
+
+### particula.execution.ccn_recording.CCNObserver._max_bytes
+
+*attribute* · *instance attribute*
+
+```python
+_max_bytes = index(max_bytes)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L45-L45)
+
+### particula.execution.ccn_recording.CCNObserver._metadata
+
+*attribute* · *instance attribute*
+
+```python
+_metadata = {'schema': 'equilibrium-ccn-v1', 'configuration': asdict(config), 'distribution_type': distribution, 'boxes': boxes, 'materials': materials, 'axes': ['time', 'box', 'saturation_ratio'], 'units': _history_units(config)}
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L77-L85)
+
+### particula.execution.ccn_recording.CCNObserver._pending
+
+*attribute* · *instance attribute*
+
+```python
+_pending = []
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L97-L97)
+
+### particula.execution.ccn_recording.CCNObserver._published
+
+*attribute* · *instance attribute*
+
+```python
+_published = []
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L96-L96)
+
+### particula.execution.ccn_recording.CCNObserver._row_bytes
+
+*attribute* · *instance attribute*
+
+```python
+_row_bytes = 8 * 1 + boxes * len(config.saturation_ratios) * 1 + int(config.kappa is not None)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L86-L91)
+
+### particula.execution.ccn_recording.CCNObserver._size
+
+*attribute* · *instance attribute*
+
+```python
+_size = 0
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L98-L98)
+
+### particula.execution.ccn_recording.CCNObserver._times
+
+*attribute* · *instance attribute*
+
+```python
+_times = []
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L95-L95)
+
+### particula.execution.ccn_recording.CCNObserver.config
+
+*attribute* · *instance attribute*
+
+```python
+config = config
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L41-L41)
+
+### particula.execution.ccn_recording.CCNObserver.simulation
+
+*attribute* · *instance attribute*
+
+```python
+simulation = simulation
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L42-L42)
+
+### particula.execution.ccn_recording.CCNObserver.__init__
+
+*method*
+
+```python
+def __init__(simulation, config, *, batch_size=32, max_bytes=64 << 20)
+```
+
+Bind a frozen configuration and reserve capacity for compact rows.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L31-L106)
+
+### particula.execution.ccn_recording.CCNObserver._check_start
+
+*method*
+
+```python
+def _check_start(time)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L108-L116)
+
+### particula.execution.ccn_recording.CCNObserver._record
+
+*method*
+
+```python
+def _record(time)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L129-L151)
+
+### particula.execution.ccn_recording.CCNObserver.arrays
+
+*method*
+
+```python
+def arrays()
+```
+
+Flush and return detached arrays on their recorded time grid.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L171-L179)
+
+### particula.execution.ccn_recording.CCNObserver.flush
+
+*method*
+
+```python
+def flush()
+```
+
+Transfer and publish the complete pending batch after validation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L153-L169)
+
+### particula.execution.ccn_recording.CCNObserver.latest
+
+*method*
+
+```python
+def latest()
+```
+
+Flush and return only the latest detached observation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L181-L189)
+
+### particula.execution.ccn_recording.CCNObserver.record
+
+*method*
+
+```python
+def record()
+```
+
+Sample one accepted state, skipping the equal-time continuation.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L118-L127)
+
+### particula.execution.ccn_recording.CCNObserver.save
+
+*method*
+
+```python
+def save(path)
+```
+
+Save compact rows and configuration by atomic replacement.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L191-L195)
+
+## particula.execution.ccn_recording._history_units
+
+*function*
+
+```python
+def _history_units(config)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L16-L20)
+
+## particula.execution.ccn_recording.read_ccn_history
+
+*function*
+
+```python
+def read_ccn_history(path, *, max_bytes=128 << 20)
+```
+
+Read CCN output with units, axes and material configuration.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/ccn_recording.py#L198-L234)
 
 ---
 
@@ -95413,7 +95993,7 @@ def _time(simulation)
 *function*
 
 ```python
-def run_prepared(simulation, end_time, *, output_times=(), observer=None, optics=None, optical_output_times=None, optical_initial=False)
+def run_prepared(simulation, end_time, *, output_times=(), observer=None, optics=None, optical_output_times=None, optical_initial=False, ccn=None, ccn_output_times=None, ccn_initial=False)
 ```
 
 Run complete fixed steps and explicitly observe the requested grid.
@@ -95426,8 +96006,9 @@ shortened step, automatic capture or checkpoint is performed. The final
 synchronize surfaces asynchronous failures even without an observer.
 An OpticalObserver uses its own schedule. By default it records every
 accepted step, plus the starting state if optical_initial is true.
+CCNObserver supports the same independent scheduling via ccn_output_times.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L162-L230)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L162-L249)
 
 ---
 
@@ -98302,6 +98883,18 @@ changes require a new recorder; widths do not imply species order.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L96-L159)
 
+## particula.execution.recording._analysis_schedules
+
+*function*
+
+```python
+def _analysis_schedules(simulation, start, end, optics, optical_times, optical_initial, ccn, ccn_times, ccn_initial)
+```
+
+Bind passive observers and their independent accepted-state schedules.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L217-L253)
+
 ## particula.execution.recording._observation_times
 
 *function*
@@ -98312,22 +98905,12 @@ def _observation_times(output_times, end_time)
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L202-L214)
 
-## particula.execution.recording._optical_schedule
-
-*function*
-
-```python
-def _optical_schedule(simulation, observer, times, initial, start, end)
-```
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L217-L233)
-
 ## particula.execution.recording.run_until
 
 *function*
 
 ```python
-def run_until(simulation, end_time, *, output_times=(), recorder=None, optics=None, optical_output_times=None, optical_initial=False)
+def run_until(simulation, end_time, *, output_times=(), recorder=None, optics=None, optical_output_times=None, optical_initial=False, ccn=None, ccn_output_times=None, ccn_initial=False)
 ```
 
 Advance an owner and observe requested times plus final time.
@@ -98337,9 +98920,10 @@ is at a complete accepted step. With an OpticalObserver, the default optical
 schedule observes every accepted step without taking snapshots. Explicit
 optical_output_times may shorten CPU steps to reach those times. Set
 optical_initial=True to observe the starting state on the dense schedule.
+CCNObserver accepts an independent ccn_output_times grid and ccn_initial.
 Fixed prepared owners instead use run_prepared.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L236-L290)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L256-L319)
 
 ---
 
@@ -135991,6 +136575,7 @@ cancellation. The factor supports the rearranged rectangular term
 **Modules**
 
 - `particula.gpu.properties.gas_properties`
+- `particula.gpu.properties.kappa_kohler`
 - `particula.gpu.properties.particle_properties`
 
 ---
@@ -136093,6 +136678,88 @@ Port of ``particula.gas.properties.pressure_function.get_partial_pressure``.
 - (`wp.float64`) — Partial pressure [Pa].
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/gpu/properties/gas_properties.py#L70-L90)
+
+---
+
+# particula.gpu.properties.kappa_kohler
+
+*module*
+
+Float64 device evaluation of the global equilibrium κ-Köhler barrier.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/properties/kappa_kohler.py#L1-L1)
+
+## particula.gpu.properties.kappa_kohler._ONE
+
+*attribute* · *module attribute*
+
+```python
+_ONE = wp.constant(wp.float64(1.0))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/properties/kappa_kohler.py#L7-L7)
+
+## particula.gpu.properties.kappa_kohler._THREE
+
+*attribute* · *module attribute*
+
+```python
+_THREE = wp.constant(wp.float64(3.0))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/properties/kappa_kohler.py#L8-L8)
+
+## particula.gpu.properties.kappa_kohler._ZERO
+
+*attribute* · *module attribute*
+
+```python
+_ZERO = wp.constant(wp.float64(0.0))
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/properties/kappa_kohler.py#L6-L6)
+
+## particula.gpu.properties.kappa_kohler._log_wet
+
+*function*
+
+```python
+def _log_wet(t: wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/properties/kappa_kohler.py#L11-L18)
+
+## particula.gpu.properties.kappa_kohler._peak
+
+*function*
+
+```python
+def _peak(left: wp.float64, right: wp.float64, log_k: wp.float64, log_s: wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/properties/kappa_kohler.py#L28-L44)
+
+## particula.gpu.properties.kappa_kohler._softplus
+
+*function*
+
+```python
+def _softplus(x: wp.float64)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/properties/kappa_kohler.py#L21-L25)
+
+## particula.gpu.properties.kappa_kohler.kappa_kohler_critical_dry_diameter
+
+*function*
+
+```python
+def kappa_kohler_critical_dry_diameter(kappa: wp.float64, saturation_ratio: wp.float64, kelvin_diameter: wp.float64)
+```
+
+Return metres, or a negative sentinel when the result is undefined.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/gpu/properties/kappa_kohler.py#L47-L86)
 
 ---
 
@@ -151910,6 +152577,7 @@ Particle property utilities.
 - `particula.particles.properties.aerodynamic_mobility_module`
 - `particula.particles.properties.aerodynamic_size`
 - `particula.particles.properties.bipolar_charge`
+- `particula.particles.properties.ccn`
 - `particula.particles.properties.collision_radius_module`
 - `particula.particles.properties.convert_kappa_volumes`
 - `particula.particles.properties.convert_mass_concentration`
@@ -151920,6 +152588,7 @@ Particle property utilities.
 - `particula.particles.properties.diffusive_knudsen_module`
 - `particula.particles.properties.friction_factor_module`
 - `particula.particles.properties.inertia_time`
+- `particula.particles.properties.kappa_kohler`
 - `particula.particles.properties.kelvin_effect_module`
 - `particula.particles.properties.knudsen_number_module`
 - `particula.particles.properties.lognormal_size_distribution`
@@ -152399,6 +153068,264 @@ a population requires choosing the charge tails and normalizing it.
 > https://doi.org/10.5194/amt-5-657-2012.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/bipolar_charge.py#L18-L58)
+
+---
+
+# particula.particles.properties.ccn
+
+*module*
+
+Equilibrium CCN spectra of dry material in discrete or resolved particles.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L1-L1)
+
+## particula.particles.properties.ccn.CCNConfig
+
+*class* · *dataclass*
+
+```python
+class CCNConfig
+```
+
+Define counter settings and the dry material model.
+
+saturation_ratios are dimensionless and above one. Supply either kappa
+(one value or one per box) or material_kappa in particle material order,
+with zero in the water lane. Supply water_index explicitly, using None
+for an all-dry material list. kelvin_diameter is A in metres, scalar or
+per box. If omitted, use the live box temperature (K), surface tension
+(N/m), water density (kg/m³) and water molar mass (kg/mol).
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L27-L109)
+
+### particula.particles.properties.ccn.CCNConfig.kappa
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+kappa: float | tuple[float, ...] | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L41-L41)
+
+### particula.particles.properties.ccn.CCNConfig.kelvin_diameter
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+kelvin_diameter: float | tuple[float, ...] | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L43-L43)
+
+### particula.particles.properties.ccn.CCNConfig.material_kappa
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+material_kappa: tuple[float, ...] | None = None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L42-L42)
+
+### particula.particles.properties.ccn.CCNConfig.saturation_ratios
+
+*attribute* · *instance attribute*
+
+```python
+saturation_ratios: tuple[float, ...]
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L39-L39)
+
+### particula.particles.properties.ccn.CCNConfig.surface_tension
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+surface_tension: float = 0.072
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L44-L44)
+
+### particula.particles.properties.ccn.CCNConfig.water_density
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+water_density: float = 997.0
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L45-L45)
+
+### particula.particles.properties.ccn.CCNConfig.water_index
+
+*attribute* · *instance attribute*
+
+```python
+water_index: int | None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L40-L40)
+
+### particula.particles.properties.ccn.CCNConfig.water_molar_mass
+
+*attribute* · *class attribute* · *instance attribute*
+
+```python
+water_molar_mass: float = 0.01801528
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L46-L46)
+
+### particula.particles.properties.ccn.CCNConfig.kelvin_temperature_product
+
+*property*
+
+```python
+kelvin_temperature_product
+```
+
+Return A times T in m K for constant water properties.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L77-L81)
+
+### particula.particles.properties.ccn.CCNConfig.__init__
+
+*method*
+
+```python
+def __init__(saturation_ratios: tuple[float, ...], water_index: int | None, kappa: float | tuple[float, ...] | None = None, material_kappa: tuple[float, ...] | None = None, kelvin_diameter: float | tuple[float, ...] | None = None, surface_tension: float = 0.072, water_density: float = 997.0, water_molar_mass: float = 0.01801528) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L0-L0)
+
+### particula.particles.properties.ccn.CCNConfig.__post_init__
+
+*method*
+
+```python
+def __post_init__()
+```
+
+Freeze input coordinates and reject conflicting material models.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L48-L74)
+
+### particula.particles.properties.ccn.CCNConfig.bind
+
+*method*
+
+```python
+def bind(boxes, materials, distribution)
+```
+
+Validate population and material axes and expand per-box inputs.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L83-L109)
+
+## particula.particles.properties.ccn.CCNResult
+
+*class* · *dataclass*
+
+```python
+class CCNResult
+```
+
+Number density (box, setting) and critical dry diameters [m].
+
+Common κ yields diameters (box, setting). Mixed material yields individual
+diameters (box, slot, setting), with NaN for slots without a dry seed.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L112-L121)
+
+### particula.particles.properties.ccn.CCNResult.critical_dry_diameter
+
+*attribute* · *instance attribute*
+
+```python
+critical_dry_diameter: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L121-L121)
+
+### particula.particles.properties.ccn.CCNResult.equilibrium_ccn_number_concentration
+
+*attribute* · *instance attribute*
+
+```python
+equilibrium_ccn_number_concentration: np.ndarray
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L120-L120)
+
+### particula.particles.properties.ccn.CCNResult.__init__
+
+*method*
+
+```python
+def __init__(equilibrium_ccn_number_concentration: np.ndarray, critical_dry_diameter: np.ndarray) -> None
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L0-L0)
+
+## particula.particles.properties.ccn._evaluate
+
+*function*
+
+```python
+def _evaluate(masses, population, volume, density, temperature, distribution, config, fixed=None)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L124-L176)
+
+## particula.particles.properties.ccn._sample_state
+
+*function*
+
+```python
+def _sample_state(state, config, fixed)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L184-L196)
+
+## particula.particles.properties.ccn._values
+
+*function*
+
+```python
+def _values(value, name, lower=0.0, strict=False)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L16-L24)
+
+## particula.particles.properties.ccn.evaluate_ccn
+
+*function*
+
+```python
+def evaluate_ccn(state, config: CCNConfig) -> CCNResult
+```
+
+Evaluate CCN number [m⁻³] and dry thresholds [m] on a snapshot.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L179-L181)
+
+## particula.particles.properties.ccn.evaluate_ccn_history
+
+*function*
+
+```python
+def evaluate_ccn_history(history, config: CCNConfig) -> CCNResult
+```
+
+Evaluate a saved native history on a new saturation grid.
+
+Requires slot masses, populations, sampled volume and material densities.
+Temperature is needed for a temperature-derived Kelvin length. Legacy
+discrete concentration histories use their per-volume convention.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/ccn.py#L199-L238)
 
 ---
 
@@ -154126,6 +155053,82 @@ par.particles.get_particle_inertia_time(
 >   https://doi.org/10.1088/1367-2630/10/7/075016
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/inertia_time.py#L11-L69)
+
+---
+
+# particula.particles.properties.kappa_kohler
+
+*module*
+
+Equilibrium activation of an insoluble or constant-κ dry particle.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/kappa_kohler.py#L1-L1)
+
+## particula.particles.properties.kappa_kohler._log_activity_penalty
+
+*function*
+
+```python
+def _log_activity_penalty(t, log_kappa)
+```
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/kappa_kohler.py#L7-L10)
+
+## particula.particles.properties.kappa_kohler._peak
+
+*function*
+
+```python
+def _peak(left, right, log_kappa, log_s)
+```
+
+Find a maximum on a bracket where the slope changes from + to −.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/kappa_kohler.py#L13-L25)
+
+## particula.particles.properties.kappa_kohler._threshold_scale
+
+*function*
+
+```python
+def _threshold_scale(kappa, log_s)
+```
+
+Return critical diameter per unit Kelvin length for positive κ.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/kappa_kohler.py#L28-L48)
+
+## particula.particles.properties.kappa_kohler.get_kappa_kohler_critical_dry_diameter
+
+*function*
+
+```python
+def get_kappa_kohler_critical_dry_diameter(kappa: ArrayLike, saturation_ratio: ArrayLike, kelvin_diameter: ArrayLike) -> float | NDArray[np.float64]
+```
+
+Invert the global maximum of the equilibrium κ-Köhler curve.
+
+**Parameters**
+
+- `kappa` (`ArrayLike`) — Dimensionless nonnegative hygroscopicity, constant during growth.
+- `saturation_ratio` (`ArrayLike`) — Water vapor pressure ratio over flat water (> 1).
+- `kelvin_diameter` (`ArrayLike`) — Positive diameter-basis Kelvin length in m, twice the Kelvin radius. Surface tension stays constant during growth.
+
+**Returns**
+
+- (`float | NDArray[np.float64]`) — Minimum dry diameter in m, as a float or a float64 array with the
+- (`float | NDArray[np.float64]`) — NumPy broadcast shape. At zero κ the result is A / log(S).
+
+**Raises**
+
+- `ValueError` — For nonfinite, incompatible or out-of-domain inputs.
+- `FloatingPointError` — If the result cannot be represented in float64.
+
+> **References**
+>
+> Petters and Kreidenweis (2007), Eq. 6, doi:10.5194/acp-7-1961-2007.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/particles/properties/kappa_kohler.py#L51-L98)
 
 ---
 

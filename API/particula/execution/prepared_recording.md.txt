@@ -148,7 +148,7 @@ def _time(simulation)
 *function*
 
 ```python
-def run_prepared(simulation, end_time, *, output_times=(), observer=None, optics=None, optical_output_times=None, optical_initial=False)
+def run_prepared(simulation, end_time, *, output_times=(), observer=None, optics=None, optical_output_times=None, optical_initial=False, ccn=None, ccn_output_times=None, ccn_initial=False)
 ```
 
 Run complete fixed steps and explicitly observe the requested grid.
@@ -161,5 +161,6 @@ shortened step, automatic capture or checkpoint is performed. The final
 synchronize surfaces asynchronous failures even without an observer.
 An OpticalObserver uses its own schedule. By default it records every
 accepted step, plus the starting state if optical_initial is true.
+CCNObserver supports the same independent scheduling via ccn_output_times.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L162-L230)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/prepared_recording.py#L162-L249)

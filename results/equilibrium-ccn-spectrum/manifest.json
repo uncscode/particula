@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 5.973698843969032,
+  "package_source_sha256": "0384c054652bf313256ee035f243aa3e04637c9a85739794aa2c1acb64da9516",
+  "scientific_source_sha256": "4a482ce55b9e0349f83b48f0d2ffbbb455c26dc1c8eeca6945ab25f5483aa69f",
+  "input_sha256": {
+    "particula/particles/properties/kappa_kohler.py": "6acbb2ed3895a22f4e073aa4a48e631e67b4f09205815e2fcc9595dc32c1604a",
+    "particula/gpu/properties/kappa_kohler.py": "a7822c13bdf0f913a64810dc6b07400a18793aab01d371bfa0c6b7004a9f9425",
+    "particula/particles/properties/ccn.py": "32f8ea5371e1418eba58923f44078ba6bb78a4d3ae7e043e84f5bba2fff133a9",
+    "particula/execution/_ccn_device.py": "d584020f3610f62fdf69eb7ceb6c06136a5b8b48ab78fbb6b633abab8decea65",
+    "particula/execution/ccn_recording.py": "7e10dfd30e56b62a72ffd53980f0a8187d7478870238f3e28acbfb8bc791569b",
+    "particula/execution/recording.py": "5aff1a68f6701da439fb70e249ef8e173c8764a0d34f5d2da50f4cdac4db4f3c",
+    "particula/execution/prepared_recording.py": "490b8fd388a9b31623d3b9d63de70ef2f82e97058e44283a8559e7ed36013e03"
+  },
+  "example": "equilibrium-ccn-spectrum",
+  "fingerprint": "2948d2bce68ce6430fbe0454bdcddba862b6585050e2c699010dfb68624c5df2",
+  "source": "docs/studies/examples/thermodynamics/activity/equilibrium_ccn_spectrum.py",
+  "revision": "fdc1f943307d0c92e6646e381e5ab1e6dd121b91",
+  "package_dirty": false,
+  "executed_at": "2026-11-28T16:08:19.195527+00:00",
+  "device": "cuda:0: NVIDIA GeForce RTX 5060",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.4.0",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\n"
+      },
+      {
+        "text": "Module particula.gpu.kernels.dilution 0472484 load on device 'cuda:0' took 1.56 ms  (cached)\nModule particula.gpu.kernels._population_validation c29373d load on device 'cuda:0' took 1.55 ms  (cached)\nModule particula.optics.gpu.state 82fac11 load on device 'cuda:0' took 1.21 ms  (cached)\nModule particula.optics.gpu.mie 36c0414 load on device 'cuda:0' took 2.14 ms  (cached)\nModule particula.optics.gpu._bulk 8686aab load on device 'cuda:0' took 0.89 ms  (cached)\nModule particula.execution._ccn_device db9848d load on device 'cuda:0' took 3.22 ms  (cached)\n"
+      },
+      {
+        "text": "Native CUDA device: NVIDIA GeForce RTX 5060\nNumPy: optics 12.1 ms; optics + CCN 13.4 ms; CCN archive 1573 bytes\nCUDA: optics 7.8 ms; optics + CCN 8.1 ms; CCN archive 1573 bytes\n"
+      },
+      {
+        "image": "figure-5-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "8814bf9eacb6ee23ab1cd1606a814ac3291a18b8cd4fd436ead8facc7839e401",
+    "data.json": "abea58efba10747eb954f2657d996a93090b99dbfb67b16e3a46b6c80759cc15",
+    "figure-5-1.png": "6f85b32d51d122d596bb3f8823127e99fb88bf98f30f5b3191970607327d1d56"
+  },
+  "simulation_fingerprint": "41c33109430ef92cdd6fde20c8e7d53060d2874a5475c3fdd188736650119ea9"
+}

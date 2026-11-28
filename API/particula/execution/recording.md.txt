@@ -164,6 +164,18 @@ changes require a new recorder; widths do not imply species order.
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L96-L159)
 
+## particula.execution.recording._analysis_schedules
+
+*function*
+
+```python
+def _analysis_schedules(simulation, start, end, optics, optical_times, optical_initial, ccn, ccn_times, ccn_initial)
+```
+
+Bind passive observers and their independent accepted-state schedules.
+
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L217-L253)
+
 ## particula.execution.recording._observation_times
 
 *function*
@@ -174,22 +186,12 @@ def _observation_times(output_times, end_time)
 
 [View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L202-L214)
 
-## particula.execution.recording._optical_schedule
-
-*function*
-
-```python
-def _optical_schedule(simulation, observer, times, initial, start, end)
-```
-
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L217-L233)
-
 ## particula.execution.recording.run_until
 
 *function*
 
 ```python
-def run_until(simulation, end_time, *, output_times=(), recorder=None, optics=None, optical_output_times=None, optical_initial=False)
+def run_until(simulation, end_time, *, output_times=(), recorder=None, optics=None, optical_output_times=None, optical_initial=False, ccn=None, ccn_output_times=None, ccn_initial=False)
 ```
 
 Advance an owner and observe requested times plus final time.
@@ -199,6 +201,7 @@ is at a complete accepted step. With an OpticalObserver, the default optical
 schedule observes every accepted step without taking snapshots. Explicit
 optical_output_times may shorten CPU steps to reach those times. Set
 optical_initial=True to observe the starting state on the dense schedule.
+CCNObserver accepts an independent ccn_output_times grid and ccn_initial.
 Fixed prepared owners instead use run_prepared.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L236-L290)
+[View source](https://github.com/uncscode/particula/blob/main/particula/execution/recording.py#L256-L319)

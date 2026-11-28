@@ -570,4 +570,5 @@ cancellation. The factor supports the rearranged rectangular term
 **Modules**
 
 - `particula.gpu.properties.gas_properties`
+- `particula.gpu.properties.kappa_kohler`
 - `particula.gpu.properties.particle_properties`

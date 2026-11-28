@@ -3571,6 +3571,7 @@ invalid.
 - `particula.execution._adaptive_condensation_physics`
 - `particula.execution._adaptive_condensation_plan`
 - `particula.execution._bat_table`
+- `particula.execution._ccn_device`
 - `particula.execution._condensation_block_kernels`
 - `particula.execution._condensation_device_control`
 - `particula.execution._condensation_jacobian`
@@ -3588,6 +3589,7 @@ invalid.
 - `particula.execution.analysis_io`
 - `particula.execution.archive`
 - `particula.execution.availability`
+- `particula.execution.ccn_recording`
 - `particula.execution.checkpoint`
 - `particula.execution.checkpoint_extensions`
 - `particula.execution.checkpoint_io`

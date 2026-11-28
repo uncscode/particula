@@ -12,6 +12,7 @@ Particle property utilities.
 - `particula.particles.properties.aerodynamic_mobility_module`
 - `particula.particles.properties.aerodynamic_size`
 - `particula.particles.properties.bipolar_charge`
+- `particula.particles.properties.ccn`
 - `particula.particles.properties.collision_radius_module`
 - `particula.particles.properties.convert_kappa_volumes`
 - `particula.particles.properties.convert_mass_concentration`
@@ -22,6 +23,7 @@ Particle property utilities.
 - `particula.particles.properties.diffusive_knudsen_module`
 - `particula.particles.properties.friction_factor_module`
 - `particula.particles.properties.inertia_time`
+- `particula.particles.properties.kappa_kohler`
 - `particula.particles.properties.kelvin_effect_module`
 - `particula.particles.properties.knudsen_number_module`
 - `particula.particles.properties.lognormal_size_distribution`
