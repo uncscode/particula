@@ -175,7 +175,7 @@ def run_example():
     with process.resume(saved) as resumed:
         resumed.run(steps=1000)
         continued = resumed.snapshot()
-    for field in ("masses", "concentration", "charge", "volume"):
+    for field in ("masses", "population", "charge", "volume"):
         np.testing.assert_array_equal(
             getattr(final.particles, field), getattr(continued.particles, field)
         )

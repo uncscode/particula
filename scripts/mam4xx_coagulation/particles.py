@@ -66,9 +66,9 @@ def cpu_initial_rate(diameter_nm, ratio, order):
 
 def observe(particles):
     """Return total number and the spectrum including outside counts."""
-    keep = particles.concentration[0] > 0
+    keep = particles.population[0] > 0
     masses = particles.masses[0, keep, 0]
-    concentration = particles.concentration[0, keep] / particles.volume[0]
+    concentration = particles.slot_concentration_density[0, keep]
     diameter = 1e9 * np.cbrt(6 * masses / (np.pi * DENSITY))
     bins, low, high = get_binned_number_spectrum(
         diameter * 1e-9,

@@ -252,16 +252,16 @@ def run_publication():
         counts = restarted.particles.population.numpy().copy()
         gas = restarted.gas.concentration.numpy().copy()
         np.testing.assert_array_equal(masses, initial_p.masses)
-        np.testing.assert_array_equal(counts, initial_p.concentration)
+        np.testing.assert_array_equal(counts, initial_p.population)
         np.testing.assert_array_equal(gas, initial_g.concentration)
         checkpoint = result.checkpoint
         numbers = [
-            initial_p.concentration.sum(),
+            initial_p.population.sum(),
             checkpoint.particles.population.sum(),
             counts.sum(),
         ]
         inventories = [
-            np.sum(initial_p.masses * initial_p.concentration[..., None])
+            np.sum(initial_p.masses * initial_p.population[..., None])
             + np.sum(initial_g.concentration * initial_p.volume[:, None]),
             np.sum(
                 checkpoint.particles.masses

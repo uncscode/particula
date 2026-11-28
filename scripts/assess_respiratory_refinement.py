@@ -98,7 +98,7 @@ def load_setup(source, filename):
 def inventory(state):
     """Return particle and gas masses [kg] separately for each species."""
     particles = np.sum(
-        state.particles.masses * state.particles.concentration[..., None],
+        state.particles.masses * state.particles.population[..., None],
         axis=1,
     )
     gas = state.gas.concentration * state.particles.volume[:, None]
@@ -123,7 +123,7 @@ def compare(initial, coarse, fine):
             particle + gas, total, rtol=1e-12, atol=1e-30
         )
         np.testing.assert_array_equal(
-            state.particles.concentration, initial.particles.concentration
+            state.particles.population, initial.particles.population
         )
     radii = fine.particles.radii
     if np.any(radii <= 0):

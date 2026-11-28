@@ -30,7 +30,7 @@ def run(trials=1024):
             state = initial_state(1)
             for _ in range(steps):
                 strategy.step(state.particles, 298.0, 101325.0, dt)
-                if np.count_nonzero(state.particles.concentration) == 1:
+                if np.count_nonzero(state.particles.population) == 1:
                     break
             merged, m, q = inventory(state)
             np.testing.assert_allclose(m, mass, rtol=1e-13, atol=0)

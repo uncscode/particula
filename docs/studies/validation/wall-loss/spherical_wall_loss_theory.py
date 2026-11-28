@@ -160,7 +160,7 @@ def run(label, ke, n, reps, dt, diameters, seed):
     state = result.particles
     alive = state.masses[:, :, 0] > 0
     survival = alive.sum(axis=1) / n
-    mass_ratio = (state.masses[:, :, 0] * state.concentration).sum(axis=1) / (
+    mass_ratio = (state.masses[:, :, 0] * state.population).sum(axis=1) / (
         mass * n
     )
     assert np.all(np.isfinite(state.masses)) and np.all(state.masses >= 0)

@@ -158,7 +158,7 @@ def run_ramp(
     # number density by scaling only the observation volume.
     volume = VOLUME * len(ids) / n_particles
     box.particles.masses = box.particles.masses[:, ids].copy()
-    box.particles.concentration = box.particles.concentration[:, ids].copy()
+    box.particles.population = box.particles.population[:, ids].copy()
     box.particles.charge = box.particles.charge[:, ids].copy()
     box.particles.volume[:] = volume
     n_particles = len(ids)
@@ -204,7 +204,7 @@ def run_ramp(
             owner.run(substeps)
             result = owner.snapshot()
             current = result.particles.masses[0]
-            if np.any(result.particles.concentration[0] != 1):
+            if np.any(result.particles.population[0] != 1):
                 raise RuntimeError("particle ID occupancy changed")
             dry_error = np.maximum(
                 dry_error, np.max(abs(current[:, 1:] - initial[:, 1:]), axis=1)
