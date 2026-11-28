@@ -293,7 +293,7 @@ class ResidentShortwave:
         """Synchronize physics and optics and return detached ShortwaveFluxes.
 
         Returns:
-            tuple[ShortwaveFlux, ...]: One result per column for the latest
+            (tuple[ShortwaveFlux, ...]): One result per column for the latest
                 enqueue call.
 
         Raises:
