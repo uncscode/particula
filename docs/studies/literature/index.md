@@ -23,6 +23,15 @@ Sea2Cloud’s March 22 spectra favor earlier arrival of larger particles in a tw
 
 </div>
 
+## Stratospheric aerosol chemistry
+
+<div class="study-figures">
+
+[![The small mode supplies 63–68% of calculated wet surface. Changes in its share allow a 1.13-fold contrast in uptake probability across eight SABRE air-mass groups. Preliminary estimates span 11.2-fold.](../../images/sabre-small-mode/toc.svg)\
+SABRE’s inferred N₂O₅ uptake probabilities vary more than small-mode surface fractions can explain](sabre-small-mode/index.md)
+
+</div>
+
 ## Organic chemistry and evaporation
 
 <div class="study-figures">
@@ -153,6 +162,10 @@ Adding settling and diffusion lowers predicted one-hour survival of 1 µm partic
 - [At low ion production, CLOUD’s 70% humidity measurement exceeds the ceiling set by the reported wall loss](cloud-ion-humidity/index.md)
 - [Particula fits the measured rise in particle number with sulfur dioxide in a straw-combustion analogue](straw-combustion/index.md)
 - [Sea2Cloud’s March 22 spectra favor earlier arrival of larger particles in a two-hour exchange model](sea2cloud-events/index.md)
+
+**Stratospheric aerosol chemistry**
+
+- [SABRE’s inferred N₂O₅ uptake probabilities vary more than small-mode surface fractions can explain](sabre-small-mode/index.md)
 
 **Organic chemistry and evaporation**
 

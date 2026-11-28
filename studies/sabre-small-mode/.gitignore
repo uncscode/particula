@@ -1,0 +1,9 @@
+# Recover original files locally and regenerate numerical intermediates.
+raw/
+*.csv
+*.json
+*.npz
+*.png
+!raw-manifest.csv
+!chemistry/chemistry-sources.csv
+!chemistry/composition-sources.csv
