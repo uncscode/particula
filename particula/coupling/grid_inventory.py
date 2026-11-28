@@ -4,6 +4,8 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from particula.particles._population import slot_density, write_binned_density
+
 
 @dataclass(frozen=True)
 class InventoryLayout:
@@ -74,7 +76,7 @@ class InventoryLayout:
         """Convert native neutral discrete boxes to extensive quantities."""
         self._check_native(grid, gas, particles)
         vol = grid.volume[:, None]
-        counts = particles.concentration * vol
+        counts = slot_density(particles) * vol
         mass = particles.masses * counts[:, :, None]
         return self.validate(
             np.column_stack(
@@ -92,7 +94,7 @@ class InventoryLayout:
         counts = a[:, g : g + b]
         gas, particles = gas.copy(), particles.copy()
         gas.concentration[:] = a[:, :g] / grid.volume[:, None]
-        particles.concentration[:] = counts / grid.volume[:, None]
+        write_binned_density(particles, counts / grid.volume[:, None])
         mass = a[:, g + b :].reshape(n, b, -1)
         particles.masses[:] = np.divide(
             mass,

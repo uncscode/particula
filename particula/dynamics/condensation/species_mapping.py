@@ -14,6 +14,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from particula.gas.gas_data import GasData
+from particula.particles._population import number_density_weights
 from particula.particles.particle_data import ParticleData
 
 
@@ -206,17 +207,7 @@ def condensation_population_weights(
     Raises:
         ValueError: If representation validation fails or boxes differ from 1.
     """
-    density = particle.slot_concentration_density
+    weights = number_density_weights(particle)
     if particle.n_boxes != 1:
         raise ValueError("ParticleData must have n_boxes=1 for condensation")
-    weights = density[0].copy()
-    if particle.distribution_type == "continuous_pdf":
-        grid = particle.radius_grid
-        if grid is None:
-            raise ValueError("PDF radius grid is required")
-        intervals = np.diff(grid)
-        widths = np.empty_like(grid)
-        widths[0], widths[-1] = intervals[0] / 2, intervals[-1] / 2
-        widths[1:-1] = (intervals[:-1] + intervals[1:]) / 2
-        weights *= widths
-    return weights
+    return weights[0]

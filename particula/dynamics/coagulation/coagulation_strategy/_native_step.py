@@ -19,6 +19,7 @@ from particula.dynamics.coagulation import charged_kernel_strategy as models
 from particula.dynamics.coagulation.particle_resolved_step import (
     particle_resolved_method,
 )
+from particula.particles._population import slot_density, write_binned_density
 from particula.particles.particle_data import ParticleData
 
 from ._native_validation import (
@@ -284,10 +285,10 @@ def _density_step(
     if time_step == 0:
         return particle
     with np.errstate(over="ignore", invalid="ignore"):
-        updated = particle.concentration + rate[None, :] * time_step
+        updated = slot_density(particle) + rate[None, :] * time_step
     if not np.all(np.isfinite(updated)) or np.any(updated < 0):
         raise ValueError("coagulation step requires a smaller finite time_step")
-    np.copyto(particle.concentration, updated)
+    write_binned_density(particle, updated)
     return particle
 
 

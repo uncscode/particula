@@ -512,3 +512,32 @@ def test_live_step_replay_and_resume(tmp_path, device):
     zero = initial * 0
     external.advance_interval(f, HostTransport(0, 0.3, transported, zero, zero))
     np.testing.assert_array_equal(external.snapshot()["state"], transported)
+
+
+def test_native_inventory_round_trip_in_unequal_cells():
+    """Each cell's physical volume independently converts densities to amounts."""
+    grid = FlowGrid((2, 1, 1), ((0, 2), (0, 1), (0, 4)), bed=(0, 0, 2))
+    layout = InventoryLayout(("A",), ("bin",), ("dry",))
+    gas = GasData(
+        ["A"], np.array([0.1]), np.array([[2.0], [3.0]]), np.array([True])
+    )
+    particles = ParticleData(
+        masses=np.array([[[2.0]], [[3.0]]]),
+        concentration=np.array([[5.0], [7.0]]),
+        charge=np.zeros((2, 1)),
+        density=np.ones(1),
+        volume=np.ones(2),
+        distribution_type="discrete",
+    )
+
+    np.testing.assert_array_equal(grid.volume, [4, 3])
+    inventory = layout.pack(grid, gas, particles)
+    np.testing.assert_array_equal(inventory, [[8, 20, 40], [9, 21, 63]])
+    restored_gas, restored_particles = layout.unpack(
+        grid, inventory, gas, particles
+    )
+    np.testing.assert_array_equal(restored_gas.concentration, gas.concentration)
+    np.testing.assert_array_equal(
+        restored_particles.concentration, particles.concentration
+    )
+    np.testing.assert_array_equal(restored_particles.masses, particles.masses)

@@ -11,6 +11,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from particula.optics.cross_sections import OpticalCrossSections
+from particula.particles._population import radius_node_widths
 
 
 class PopulationOptics(NamedTuple):
@@ -104,10 +105,7 @@ def get_population_weights(
             or np.any(np.diff(grid) <= 0)
         ):
             raise ValueError("PDF requires matching positive increasing nodes")
-        spacing = np.diff(grid)
-        weights = np.zeros_like(grid)
-        weights[:-1] += spacing / 2
-        weights[1:] += spacing / 2
+        weights = radius_node_widths(grid)
         with np.errstate(over="ignore", invalid="ignore"):
             result = values * weights
         return _nonnegative(result, "PDF number weights")

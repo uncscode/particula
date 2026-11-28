@@ -27,6 +27,7 @@ from numpy.typing import NDArray
 
 from particula.aerosol import Aerosol
 from particula.aerosol_validation import validate_aerosol_structure
+from particula.particles._population import slot_density
 from particula.util.validate_inputs import validate_inputs
 
 
@@ -476,16 +477,14 @@ class DilutionStrategy:
             aerosol: Aerosol providing physical particle-number concentration.
 
         Returns:
-            Particle-number concentration rate [1/(m³ s)] with the scalar or
-            array shape of the physical particle-number concentration.
+            Per-slot number-density rate [m⁻³ s⁻¹], or the rate of change
+            of the radius PDF [m⁻⁴ s⁻¹] at its nodes.
         """
         _preflight_native_dilution(
             aerosol, self.coefficient, np.float64(0), writable=False
         )
-        concentration = aerosol.particles.concentration[0]
-        if aerosol.particles.distribution_type == "particle_resolved":
-            with np.errstate(over="ignore", invalid="ignore"):
-                concentration = concentration / aerosol.particles.volume[0]
+        with np.errstate(over="ignore", invalid="ignore"):
+            concentration = slot_density(aerosol.particles)[0]
         return get_dilution_rate(self.coefficient, concentration)
 
     def _preflight(self, aerosol: "Aerosol", time_step: np.float64) -> None:

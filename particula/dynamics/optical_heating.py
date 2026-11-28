@@ -10,6 +10,7 @@ from particula.box_process import BoxProcess
 from particula.extension_fields import FieldSpec
 from particula.gas.vapor_pressure_strategies import WaterBuckStrategy
 from particula.optics.state import OpticalConfig, particle_optics
+from particula.particles._population import slot_density
 from particula.util.constants import GAS_CONSTANT
 
 _HEAT_CHANNELS = ("absorbed", "conduction", "radiation", "latent", "sensible")
@@ -323,7 +324,7 @@ class OpticalHeating(BoxProcess):
             time_step,
             self.physics,
         )
-        weight = particles.concentration[0, active] / particles.volume[0]
+        weight = slot_density(particles)[0, active]
         remaining = water - loss
         particles.masses[0, active, water_index] = remaining
         aerosol.gas.concentration[0, gas_index] += weight @ (water - remaining)

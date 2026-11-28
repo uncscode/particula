@@ -6,6 +6,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
+from particula.particles._population import slot_density
 from particula.particles.particle_data import ParticleData
 
 
@@ -83,7 +84,7 @@ def validate(
     with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
         mass = particle.masses.sum(axis=2)
         material_volume = (particle.masses / particle.density).sum(axis=2)
-        population = particle.concentration / particle.volume[:, None]
+        population = slot_density(particle)
         radius = particle.radii[0]
         density = particle.effective_density[0]
     if not all(
@@ -150,7 +151,7 @@ def rate(
     """Return number-density (or dn/dr) loss per second."""
     values = coefficient(strategy, particle, temperature, pressure)
     with np.errstate(over="ignore", invalid="ignore"):
-        result = -values * (particle.concentration[0] / particle.volume[0])
+        result = -values * slot_density(particle)[0]
     if not np.all(np.isfinite(result)):
         raise ValueError("native wall-loss rate must remain finite")
     return result
@@ -249,7 +250,7 @@ def step(
             survived = get_particle_resolved_wall_loss_step(
                 radius,
                 density,
-                particle.concentration[0] / particle.volume[0],
+                slot_density(particle)[0],
                 lambda r, d: values[active],
                 time_step,
                 strategy.random_generator,

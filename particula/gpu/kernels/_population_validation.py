@@ -11,6 +11,16 @@ from particula.gpu.population_metadata import (
 )
 
 
+@wp.func
+def native_slot_density(
+    value: wp.float64, box_volume: wp.float64, resolved: bool
+) -> wp.float64:
+    """Read an admitted discrete density or resolved count as m⁻³."""
+    if resolved:
+        return value / box_volume
+    return value
+
+
 def array_field(
     container: Any, name: str, shape: tuple[int, ...], dtype: Any, device: Any
 ) -> Any:

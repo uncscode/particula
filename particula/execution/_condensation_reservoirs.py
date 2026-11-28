@@ -9,6 +9,7 @@ from particula.execution._condensation_ode_kernels import (
     IntVector,
 )
 from particula.execution._condensation_ros3_kernels import GAMMA
+from particula.gpu.kernels._population_validation import native_slot_density
 
 
 @wp.kernel
@@ -26,9 +27,9 @@ def gas_parts(
     value = wp.float64(0.0)
     if material >= 0:
         for slot in range(lane, rate.shape[1], parts.shape[2]):
-            weight = counts[box, slot]
-            if resolved == 1:
-                weight /= volume[box]
+            weight = native_slot_density(
+                counts[box, slot], volume[box], resolved == 1
+            )
             value -= weight * rate[box, slot, material]
     parts[box, gas, lane] = value
 
@@ -83,8 +84,7 @@ def assemble_parts(
         weight = (
             counts[box, slot] * scale[p * materials + targets[i]] / scale[gi]
         )
-        if resolved == 1:
-            weight /= volume[box]
+        weight = native_slot_density(weight, volume[box], resolved == 1)
         if column == n:
             product = wp.float64(0.0)
             for j in range(n):
