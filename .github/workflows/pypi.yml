@@ -22,7 +22,7 @@ jobs:
   testing:
     if: >-
       github.event_name != 'workflow_dispatch' &&
-      (github.event_name != 'release' || (!startsWith(github.event.release.tag_name, 'particula-helper-v') && !startsWith(github.event.release.tag_name, 'particula-aiomfac-v')))
+      (github.event_name != 'release' || (!startsWith(github.event.release.tag_name, 'chemistry-catalog-v') && !startsWith(github.event.release.tag_name, 'particula-helper-v') && !startsWith(github.event.release.tag_name, 'particula-aiomfac-v')))
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -55,7 +55,7 @@ jobs:
 
   release-plan:
     if: >-
-      (github.event_name != 'release' || (!startsWith(github.event.release.tag_name, 'particula-helper-v') && !startsWith(github.event.release.tag_name, 'particula-aiomfac-v')))
+      (github.event_name != 'release' || (!startsWith(github.event.release.tag_name, 'chemistry-catalog-v') && !startsWith(github.event.release.tag_name, 'particula-helper-v') && !startsWith(github.event.release.tag_name, 'particula-aiomfac-v')))
     runs-on: ubuntu-latest
     outputs:
       backend-version: ${{ steps.backend.outputs.version }}
@@ -164,7 +164,7 @@ jobs:
           python -m pytest examples_tests -Werror -m "slow and not performance" --durations=10
 
   validate:
-    if: github.event_name != 'release' || (!startsWith(github.event.release.tag_name, 'particula-helper-v') && !startsWith(github.event.release.tag_name, 'particula-aiomfac-v'))
+    if: github.event_name != 'release' || (!startsWith(github.event.release.tag_name, 'chemistry-catalog-v') && !startsWith(github.event.release.tag_name, 'particula-helper-v') && !startsWith(github.event.release.tag_name, 'particula-aiomfac-v'))
     runs-on: ubuntu-latest
     timeout-minutes: 20
     outputs:

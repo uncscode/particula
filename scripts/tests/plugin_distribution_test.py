@@ -405,6 +405,7 @@ def test_publication_requires_validated_upstream_version_bump(
     [
         ("particula-helper-v0.3.4", False),
         ("particula-aiomfac-v0.1.4", False),
+        ("chemistry-catalog-v1.0.0", False),
         ("v0.3.1", True),
     ],
 )

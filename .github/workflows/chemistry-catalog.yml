@@ -1,0 +1,48 @@
+name: Chemistry catalog release
+
+on:
+  push:
+    branches: [main]
+    paths: [chemistry_catalog/VERSION]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    if: github.repository == 'uncscode/particula'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - run: python -m pip install . pytest pytest-cov
+      - run: python -m pytest -q -W error --no-cov scripts/tests/chemistry_bundle_test.py
+      - run: python -m scripts.build_chemistry_catalog --output dist/catalog
+      - uses: actions/upload-artifact@v7
+        with:
+          name: chemistry-catalog-${{ github.sha }}
+          path: dist/catalog/
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v4
+        with:
+          name: chemistry-catalog-${{ github.sha }}
+          path: dist/catalog
+      - name: Verify the tested archive
+        working-directory: dist/catalog
+        run: sha256sum --strict --check particula-chemistry-catalog.zip.sha256
+      - name: Publish the catalog data release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python -m scripts.publish_chemistry_catalog

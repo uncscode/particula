@@ -76,6 +76,141 @@ coefficients and ordinary evolving species. It accepts either `C` in kelvin or
 other reaction types and unrecognized fields produce an error before export.
 [NCAR rate definition](https://github.com/NCAR/MechanismConfiguration/blob/2069f9c97f08399b34ca3dcb104d3a5bf596ce40/docs/source/v1/reactions/arrhenius.rst)
 
+## Select chemistry from an atmospheric model
+
+Use the reaction catalog when you need a published equation and rate law in a
+Particula box. For example, a study of ozone loss by NO can use one WACCM
+reaction from a whole-atmosphere mechanism. Fetch a versioned Particula chemistry catalog release, retrieve a named source recipe, or import a local
+model case. Particula indexes released reaction records and local source imports
+in a SQLite catalog. Named source imports also retain the original files. The Python API and CLI use the same catalog.
+
+### Choose the source files
+
+| Import key | Source files and scientific choices |
+| --- | --- |
+| `waccm` | Use the `chem_mech.in` from your case or the pinned TSMLT1 mechanism. Some rates refer to CAM routines, and photolysis requires a light field. [TSMLT1 mechanism](https://github.com/ESCOMP/CAM/blob/405a3f21446439d8f952660f0300332d9b860279/src/chemistry/pp_waccm_tsmlt_mam4/chem_mech.in) |
+| `e3sm` | Choose a tagged EAM chemistry option. The v3.0.0 chemUCI–Linoz v3–MAM5–VBS file describes both molecular channels and yields into volatility classes. Keep the prescribed oxidants and aerosol treatment associated with that option. [E3SM mechanism](https://github.com/E3SM-Project/E3SM/blob/v3.0.0/components/eam/src/chemistry/pp_chemuci_linozv3_mam5_vbs/chem_mech.in) |
+| `mcm` | In York's exporter, select the emitted precursors, inorganic chemistry and generic rates needed for your study. Download the KPP equations and retain the corresponding rate definitions and species table. Reactions that reference RO₂ use a sum of concentrations from the selected mechanism. [York exporter](https://mcm.york.ac.uk/MCM/export) · [Versioned archive](https://www.mcm.york.ac.uk/MCM/about/archive) |
+| `wrf-chem` | Select the KPP equation file for the specific gas chemistry and aerosol configuration, such as MOZART with four-bin MOSAIC in v4.6.1. The mechanism includes comments about species omitted from the active equations and calls to WRF-supplied rate functions. [WRF-Chem equations](https://github.com/wrf-model/WRF/blob/v4.6.1/chem/KPP/mechanisms/mozart_mosaic_4bin/mozart_mosaic_4bin.eqn) |
+| `cmaq` | Use the named mechanism's definition file. For example, CRACMM2 uses lumped organics, diagnostic species and rates that refer to other expressions. Preserve the source species names when deciding which channels can close a gas budget. [CMAQ 5.5 CRACMM2](https://github.com/USEPA/CMAQ/blob/5.5/CCTM/src/MECHS/cracmm2/mech_cracmm2.def) |
+| `camx` | Match the versioned chemistry-parameter file to the gas mechanism selected in the model. The recipe pairs the EPA rate deck with the CAMx 7.20 CMC gain/loss and flux tables from a pinned source mirror. Local imports accept the matching pair or a numbered `mech.*` equation listing via `--companion`. Particula recognizes the ozone titration entry in the exact EPA CB6r5 parameter file below. [CMC source mirror](https://github.com/wcd940816/camx7.2modified/tree/dc4351b4dd5499cc53fc230317875ab831772473/src.v7.20/CMC) · [EPA CB6r5 parameters for CAMx 7.2](https://epa-2022-modeling-platform.s3.amazonaws.com/Model_jobs_v2/2022he_CAMx_base_12US2/CAMx7.2.chemparam.CB6r5_CF2E_NH3Rscale0) · [CAMx guide, §3.1](https://camx.com/Files/CAMxUsersGuide_v7.20.pdf) |
+| `pmcamx` | Select the source archive for the biomass-burning aerosol treatment used in your case. Import `CAMx4.chemparam.7.CB5` for gas rates or `SOAP/soachem.f` as the primary file to inspect precursor oxidation, low/high-NOₓ yields and volatility-bin aging. Recipes `pmcamx-soap` and `pmcamx-soap-alt` select the base and alternative VBS schemes. The SOAP records require the host’s prescribed oxidants, yield interpolation and partitioning assumptions to calculate organic aerosol formation. [Archived PMCAMx-SR sources](https://doi.org/10.5281/zenodo.4071362) · [Comparison of biomass-burning schemes](https://doi.org/10.5194/gmd-14-2041-2021) |
+
+For a local CAMx or PMCAMx gas deck, inspect `metadata.source_rate_units`
+in the reaction record. The pinned decks use molecular concentrations and
+seconds. Local decks can declare `molecular units` or `ppm units` as a
+distinct clause in the Description header. For a bimolecular reaction these
+mean cm³ molecule⁻¹ s⁻¹ and ppm⁻¹ min⁻¹, respectively. The catalog preserves
+declared ppm rates for inspection. Native export requires an implemented
+conversion. If the evidence is missing or conflicting, the concentration and
+time units are null in the record and the study lock.
+[CAMx 7.20 guide, §3.1](https://www.camx.com/Files/CAMxUsersGuide_v7.20.pdf)
+
+### Export a selected gas reaction
+
+Run `particula chem fetch` for the latest stable catalog release. To reproduce
+a study, use `particula chem fetch --catalog-version 1.0.0` or
+`ChemistryCatalog().fetch(catalog_version="1.0.0")`. Catalog data versions
+are independent of the installed Particula version.
+
+Catalog 1.0.0 contains all 19,655 entries from the ten pinned configurations.
+Of these, 2,311 carry executable native conversions. Every entry retains its
+reported chemistry and source location. For example, you can inspect and lock
+both PMCAMx SOAP yield schemes. Entries that require host physics report the
+reason when you request a native export. The two MCM configurations overlap.
+[NCAR WACCM](https://www.cesm.ucar.edu/working-groups/whole-atmosphere/code) ·
+[University of York MCM citation guidance](https://www.mcm.york.ac.uk/MCM/about/cite)
+
+Fetch the ZIP once, then search and export offline. Particula verifies its
+SHA-256 checksum and indexes its records alongside your local studies.
+Use `particula chem fetch --json` for the release tag, snapshot IDs and citations.
+A named import such as `particula chem fetch waccm` retrieves or reuses the
+original upstream files when you need to audit or regenerate the conversion.
+Set `PARTICULA_CHEM_CATALOG` to choose a SQLite path. The default is
+`particula/chemistry.sqlite3` under the user's cache directory.
+
+```bash
+particula chem fetch
+particula chem search --source waccm --species NO --role reactant --json
+```
+
+For a local case, use the import command below.
+
+```bash
+particula chem import waccm chem_mech.in --release MY_TAG --mechanism MY_CASE
+```
+
+Record the origin of local inputs with the
+study. A snapshot ID pins the host, release, mechanism, optional aerosol
+scheme, input digests and importer version. Use `--snapshot ID` to search just
+that import. Pass a snapshot ID to export to lock its complete inventory.
+
+For local MCM and WRF-Chem mechanisms, include the companion species file
+with `--companion` when it defines the reservoirs. The importer applies
+individual `#SETFIX` and `#SETVAR` overrides in file order. If different files
+set the same species to conflicting types, consolidate those overrides into
+one file. Expand KPP group selectors such as `ALL_SPEC` into individual names
+before import.
+
+Choose the result for `NO_O3`, the reaction NO + O₃ → NO₂ + O₂. Copy its
+exact ID from the search results into `REACTION_ID` below. Inspect the
+record before exporting, particularly when another source has a different
+Arrhenius coefficient or assumes that a product belongs to a background
+reservoir.
+
+```bash
+REACTION_ID='replace-with-the-returned-ID'
+particula chem show "$REACTION_ID" --json
+particula chem export "$REACTION_ID" --target lock --output ozone-loss.lock.json
+particula chem export --lock ozone-loss.lock.json --target native --output ozone-loss.json
+```
+
+In Python, the WACCM source label can be appended directly to the ID returned
+in the release manifest. This selects the same reaction even when other snapshots have
+been imported.
+
+```python
+from particula.dynamics.chemistry.catalog import ChemistryCatalog
+
+catalog = ChemistryCatalog()
+snapshot = catalog.fetch()["snapshots"]["waccm"]["id"]
+catalog.export([f"{snapshot}/NO_O3"], "ozone-loss.json")
+```
+
+Keep both files with the study. The lock identifies the source selection,
+and the native JSON loads offline in a compatible Particula installation.
+For a kinetic check, give an aerosol box gas columns named `NO`, `O3`,
+`NO2` and `O2`. Start NO and O₃ at 1 µmol/m³ each by setting each reactant's
+concentration in kg/m³ to `1e-6 * molar_mass_kg_per_mol`. Set the product
+concentrations to zero and the box temperature to 298 K. With the classes
+imported in the binding example above, advance the gas chemistry alone.
+
+```python
+mechanism = ReactionMechanism.load("ozone-loss.json")
+solver = ChemistrySolver(method="rk23", rtol=1e-8, atol=1e-16)
+GasChemistry(mechanism.bind(aerosol.gas), solver).execute(aerosol, time_step=60.0)
+```
+
+After 60 s, each reactant should have 0.586070 µmol/m³ remaining.
+The analytical bimolecular solution is $c(t)=c_0/(1+k c_0 t)$ with $k$ in
+m³ mol⁻¹ s⁻¹. [Original WACCM rate](https://github.com/ESCOMP/CAM/blob/405a3f21446439d8f952660f0300332d9b860279/src/chemistry/pp_waccm_tsmlt_mam4/chem_mech.in#L785)
+
+Inspect dependencies before expanding a single reaction into a pathway.
+A photolysis rate needs a channel-specific frequency in s⁻¹. A volatility
+class needs a partitioning model to predict particle mass. A hidden oxygen
+reservoir can supply atoms that a closed native mechanism must account for.
+For the reviewed NO + O₃ channel, `--close-oxygen` at lock creation or direct native export explicitly
+includes O₂ in the closed gas inventory when the host treats it implicitly
+or as a prescribed species. Provide its gas column when binding the result.
+Retain such source records for comparison and check their export diagnostics
+before selecting chemistry for a run. To trace a supported gas mechanism
+into the implementation with CodeGraph, explore `ReactionMechanism.bind`
+and `GasChemistry.execute`.
+
+From a source checkout, run `python -m scripts.assess_chemical_catalog` to
+check all seven source families at 250, 298 and 320 K and compare the two
+PMCAMx-SR biomass-burning aging coefficients.
+
 ## Rates, units and temperature
 
 For reaction $r$ the molar extent rate per volume of air is
