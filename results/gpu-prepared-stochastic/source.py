@@ -1,15 +1,14 @@
 # %% [markdown]
 # # Separate stochastic coagulation from initial-state variability
 #
-# The figure uses a new CUDA run with the archived scientific code. Its
-# library, example source and input files matched the original publication
-# by SHA-256. With the same one-second interval, current Particula requests
-# 6,512 collision trials in box zero and has capacity for 512.
+# The collision sampler can divide each one-second observation interval into
+# shorter passes. Each pass schedules the full trial demand for its duration.
+# All boxes reach the same observation time.
 #
 # Would a second simulation tell the same physical story if only its collision
 # seed changed? This experiment isolates process randomness from initial sampling.
 # It teaches you to compare an ensemble spread with a proposed model effect.
-# Start with [particle-resolved coagulation](../../processes/coagulation/coagulation_3_particle_resolved_pattern.py)
+# Start with [particle-resolved coagulation](../../../tutorials/coagulation-populations/coagulation_3_particle_resolved_pattern.py)
 # for the number-loss and material-conservation distinction.
 #
 # Sixteen boxes each begin with 1,024 active, mixed-material particles.

@@ -27,6 +27,7 @@ Particle property utilities.
 - `particula.particles.properties.lognormal_size_distribution`
 - `particula.particles.properties.mean_thermal_speed_module`
 - `particula.particles.properties.mixing_state_index`
+- `particula.particles.properties.number_spectrum`
 - `particula.particles.properties.organic_density_module`
 - `particula.particles.properties.partial_pressure_module`
 - `particula.particles.properties.reynolds_number`

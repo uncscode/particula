@@ -14,7 +14,7 @@ Optical closure with prescribed size distributions and measurement errors.
 CHANNELS = ('extinction', 'scattering', 'absorption')
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L13-L13)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L16-L16)
 
 ## particula.optics.retrieval.EffectiveIndexModel
 
@@ -35,7 +35,7 @@ growth factor to determine water volume directly. Supply sizing RH if
 the measured distribution retains water at a known equilibrium RH.
 This model shares one dry index across all wavelengths and RH groups.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L155-L251)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L158-L254)
 
 ### particula.optics.retrieval.EffectiveIndexModel._kappa
 
@@ -45,7 +45,7 @@ This model shares one dry index across all wavelengths and RH groups.
 _kappa = kappa
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L188-L188)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L191-L191)
 
 ### particula.optics.retrieval.EffectiveIndexModel._ratio
 
@@ -55,7 +55,7 @@ _kappa = kappa
 _ratio = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L187-L187)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L190-L190)
 
 ### particula.optics.retrieval.EffectiveIndexModel._rh
 
@@ -65,7 +65,7 @@ _ratio = None
 _rh = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L186-L186)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L189-L189)
 
 ### particula.optics.retrieval.EffectiveIndexModel._sizing_rh
 
@@ -75,7 +75,7 @@ _rh = None
 _sizing_rh = np.zeros(groups)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L202-L202)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L205-L205)
 
 ### particula.optics.retrieval.EffectiveIndexModel.grid
 
@@ -85,7 +85,7 @@ _sizing_rh = np.zeros(groups)
 grid = grid
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L179-L179)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L182-L182)
 
 ### particula.optics.retrieval.EffectiveIndexModel.kelvin
 
@@ -95,7 +95,7 @@ grid = grid
 kelvin = _freeze(np.broadcast_to(_real(kelvin_length), (groups)))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L185-L185)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L188-L188)
 
 ### particula.optics.retrieval.EffectiveIndexModel.parameters
 
@@ -105,7 +105,7 @@ kelvin = _freeze(np.broadcast_to(_real(kelvin_length), (groups)))
 parameters = ('n', 'k', 'kappa') if self._rh is not None and self._ratio is None and kappa is None else ('n', 'k')
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L214-L218)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L217-L221)
 
 ### particula.optics.retrieval.EffectiveIndexModel.water_index
 
@@ -115,7 +115,7 @@ parameters = ('n', 'k', 'kappa') if self._rh is not None and self._ratio is None
 water_index = _freeze(np.broadcast_to(_physical_index(water_index), (groups)))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L182-L184)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L185-L187)
 
 ### particula.optics.retrieval.EffectiveIndexModel.wavelength
 
@@ -125,7 +125,7 @@ water_index = _freeze(np.broadcast_to(_physical_index(water_index), (groups)))
 wavelength = grid.wavelength
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L180-L180)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L183-L183)
 
 ### particula.optics.retrieval.EffectiveIndexModel.__init__
 
@@ -137,7 +137,7 @@ def __init__(grid, *, relative_humidity=None, sizing_relative_humidity=None, kap
 
 Prepare the measured grid and a CPU or explicit Warp backend.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L166-L219)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L169-L222)
 
 ### particula.optics.retrieval.EffectiveIndexModel._parameters
 
@@ -147,7 +147,7 @@ Prepare the measured grid and a CPU or explicit Warp backend.
 def _parameters(values)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L221-L225)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L224-L228)
 
 ### particula.optics.retrieval.EffectiveIndexModel._population
 
@@ -157,7 +157,7 @@ def _parameters(values)
 def _population(values)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L227-L251)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L230-L254)
 
 ### particula.optics.retrieval.EffectiveIndexModel._eval
 
@@ -169,7 +169,7 @@ def _eval(parameters, seeds)
 
 Inherited from: `particula.optics.retrieval._OpticalModel`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L128-L134)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L131-L137)
 
 ### particula.optics.retrieval.EffectiveIndexModel._setup
 
@@ -181,7 +181,7 @@ def _setup(wavelength, shape, backend)
 
 Inherited from: `particula.optics.retrieval._OpticalModel`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L115-L122)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L118-L125)
 
 ### particula.optics.retrieval.EffectiveIndexModel.predictions
 
@@ -195,7 +195,7 @@ Inherited from: `particula.optics.retrieval._OpticalModel`
 
 Return bulk extinction, scattering and absorption [m⁻¹].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L124-L126)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L127-L129)
 
 ## particula.optics.retrieval.MixingStateModel
 
@@ -214,7 +214,7 @@ pure-species external populations. The endpoints have the same dry
 number density and per-bin species inventories. Volume fractions may
 be uniform across bins or specified per group and bin.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L254-L364)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L257-L367)
 
 ### particula.optics.retrieval.MixingStateModel._band
 
@@ -224,7 +224,7 @@ be uniform across bins or specified per group and bin.
 _band = _freeze(np.zeros(grid.radius.shape, dtype=np.int32) if dry_boundary is None else 2 * grid.radius >= dry_boundary.astype(np.int32))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L327-L331)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L330-L334)
 
 ### particula.optics.retrieval.MixingStateModel._endpoint_density
 
@@ -234,7 +234,7 @@ _band = _freeze(np.zeros(grid.radius.shape, dtype=np.int32) if dry_boundary is N
 _endpoint_density = _freeze(grid.number_density[..., None] * np.concatenate((np.ones_like(fraction[..., :1]), fraction), axis=-1).reshape(shape))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L319-L326)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L322-L329)
 
 ### particula.optics.retrieval.MixingStateModel._index
 
@@ -244,7 +244,7 @@ _endpoint_density = _freeze(grid.number_density[..., None] * np.concatenate((np.
 _index = _freeze(wet_index.reshape(shape))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L318-L318)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L321-L321)
 
 ### particula.optics.retrieval.MixingStateModel._radius
 
@@ -254,7 +254,7 @@ _index = _freeze(wet_index.reshape(shape))
 _radius = _freeze(wet.reshape(shape))
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L317-L317)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L320-L320)
 
 ### particula.optics.retrieval.MixingStateModel._subpopulations
 
@@ -264,7 +264,7 @@ _radius = _freeze(wet.reshape(shape))
 _subpopulations = species + 1
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L315-L315)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L318-L318)
 
 ### particula.optics.retrieval.MixingStateModel.grid
 
@@ -274,7 +274,7 @@ _subpopulations = species + 1
 grid = grid
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L313-L313)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L316-L316)
 
 ### particula.optics.retrieval.MixingStateModel.parameters
 
@@ -284,7 +284,7 @@ grid = grid
 parameters = ('internal_fraction')
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L332-L332)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L335-L335)
 
 ### particula.optics.retrieval.MixingStateModel.wavelength
 
@@ -294,7 +294,7 @@ parameters = ('internal_fraction')
 wavelength = grid.wavelength
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L314-L314)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L317-L317)
 
 ### particula.optics.retrieval.MixingStateModel.__init__
 
@@ -306,7 +306,7 @@ def __init__(grid, *, volume_fractions, species_index, species_kappa, relative_h
 
 Prepare optics inputs for both endpoint populations.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L263-L346)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L266-L349)
 
 ### particula.optics.retrieval.MixingStateModel._parameters
 
@@ -316,7 +316,7 @@ Prepare optics inputs for both endpoint populations.
 def _parameters(values)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L348-L352)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L351-L355)
 
 ### particula.optics.retrieval.MixingStateModel._population
 
@@ -326,7 +326,7 @@ def _parameters(values)
 def _population(values)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L354-L364)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L357-L367)
 
 ### particula.optics.retrieval.MixingStateModel._eval
 
@@ -338,7 +338,7 @@ def _eval(parameters, seeds)
 
 Inherited from: `particula.optics.retrieval._OpticalModel`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L128-L134)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L131-L137)
 
 ### particula.optics.retrieval.MixingStateModel._setup
 
@@ -350,7 +350,7 @@ def _setup(wavelength, shape, backend)
 
 Inherited from: `particula.optics.retrieval._OpticalModel`
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L115-L122)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L118-L125)
 
 ### particula.optics.retrieval.MixingStateModel.predictions
 
@@ -364,7 +364,7 @@ Inherited from: `particula.optics.retrieval._OpticalModel`
 
 Return bulk extinction, scattering and absorption [m⁻¹].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L124-L126)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L127-L129)
 
 ## particula.optics.retrieval.OpticalFit
 
@@ -376,7 +376,7 @@ class OpticalFit
 
 Best bounded fit, with sensitivity diagnostics in measurement space.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L461-L476)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L464-L479)
 
 ### particula.optics.retrieval.OpticalFit.active_bounds
 
@@ -386,7 +386,7 @@ Best bounded fit, with sensitivity diagnostics in measurement space.
 active_bounds: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L472-L472)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L475-L475)
 
 ### particula.optics.retrieval.OpticalFit.backward_evaluations
 
@@ -396,7 +396,7 @@ active_bounds: np.ndarray
 backward_evaluations: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L476-L476)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L479-L479)
 
 ### particula.optics.retrieval.OpticalFit.chi_square
 
@@ -406,7 +406,7 @@ backward_evaluations: int
 chi_square: float
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L473-L473)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L476-L476)
 
 ### particula.optics.retrieval.OpticalFit.forward_evaluations
 
@@ -416,7 +416,7 @@ chi_square: float
 forward_evaluations: int
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L475-L475)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L478-L478)
 
 ### particula.optics.retrieval.OpticalFit.names
 
@@ -426,7 +426,7 @@ forward_evaluations: int
 names: tuple[str, ...]
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L465-L465)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L468-L468)
 
 ### particula.optics.retrieval.OpticalFit.parameters
 
@@ -436,7 +436,7 @@ names: tuple[str, ...]
 parameters: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L466-L466)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L469-L469)
 
 ### particula.optics.retrieval.OpticalFit.predictions
 
@@ -446,7 +446,7 @@ parameters: np.ndarray
 predictions: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L467-L467)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L470-L470)
 
 ### particula.optics.retrieval.OpticalFit.residual
 
@@ -456,7 +456,7 @@ predictions: np.ndarray
 residual: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L468-L468)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L471-L471)
 
 ### particula.optics.retrieval.OpticalFit.sensitivity
 
@@ -466,7 +466,7 @@ residual: np.ndarray
 sensitivity: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L470-L470)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L473-L473)
 
 ### particula.optics.retrieval.OpticalFit.singular_values
 
@@ -476,7 +476,7 @@ sensitivity: np.ndarray
 singular_values: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L471-L471)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L474-L474)
 
 ### particula.optics.retrieval.OpticalFit.success
 
@@ -486,7 +486,7 @@ singular_values: np.ndarray
 success: bool
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L474-L474)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L477-L477)
 
 ### particula.optics.retrieval.OpticalFit.whitened_residual
 
@@ -496,7 +496,7 @@ success: bool
 whitened_residual: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L469-L469)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L472-L472)
 
 ### particula.optics.retrieval.OpticalFit.__init__
 
@@ -523,7 +523,7 @@ spectrum broadcasts over groups. Radii and vacuum wavelengths are in
 metres and number densities are integrated counts per bin in m⁻³.
 Groups can repeat a wavelength at different humidity or time conditions.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L42-L102)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L45-L105)
 
 ### particula.optics.retrieval.OpticalGrid.number_density
 
@@ -533,7 +533,7 @@ Groups can repeat a wavelength at different humidity or time conditions.
 number_density: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L53-L53)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L56-L56)
 
 ### particula.optics.retrieval.OpticalGrid.radius
 
@@ -543,7 +543,7 @@ number_density: np.ndarray
 radius: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L52-L52)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L55-L55)
 
 ### particula.optics.retrieval.OpticalGrid.wavelength
 
@@ -553,7 +553,7 @@ radius: np.ndarray
 wavelength: np.ndarray
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L54-L54)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L57-L57)
 
 ### particula.optics.retrieval.OpticalGrid.__init__
 
@@ -575,7 +575,7 @@ def __post_init__()
 
 Validate and detach fixed measurement coordinates.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L56-L76)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L59-L79)
 
 ### particula.optics.retrieval.OpticalGrid.from_diameter_bins
 
@@ -591,7 +591,7 @@ Use `bin_density` for number per m³ already integrated across the
 bin or `dN_dlog10D` for number per m³ per decade. The spectrum
 must already use the same volume basis as the optical coefficients.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L78-L102)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L81-L105)
 
 ## particula.optics.retrieval.OpticalObservations
 
@@ -610,7 +610,7 @@ Observations and standard deviations have units m⁻¹. Covariance entries
 have units m⁻². Include environmental and sizing uncertainty through
 sensitivity cases or a supplied covariance.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L381-L458)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L384-L461)
 
 ### particula.optics.retrieval.OpticalObservations._factor
 
@@ -620,7 +620,7 @@ sensitivity cases or a supplied covariance.
 _factor = _freeze(factor)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L432-L432)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L435-L435)
 
 ### particula.optics.retrieval.OpticalObservations.response
 
@@ -630,7 +630,7 @@ _factor = _freeze(factor)
 response = _freeze(response)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L430-L430)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L433-L433)
 
 ### particula.optics.retrieval.OpticalObservations.values
 
@@ -640,7 +640,7 @@ response = _freeze(response)
 values = _freeze(values)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L431-L431)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L434-L434)
 
 ### particula.optics.retrieval.OpticalObservations.__init__
 
@@ -652,7 +652,7 @@ def __init__(response, values, *, standard_deviation=None, covariance=None)
 
 Validate the response and factor its measurement covariance.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L392-L432)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L395-L435)
 
 ### particula.optics.retrieval.OpticalObservations._whiten
 
@@ -662,7 +662,7 @@ Validate the response and factor its measurement covariance.
 def _whiten(residual)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L457-L458)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L460-L461)
 
 ### particula.optics.retrieval.OpticalObservations.channels
 
@@ -674,7 +674,7 @@ def channels(groups, selectors, values, **uncertainty)
 
 Construct observations from (group index, channel name) selectors.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L434-L448)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L437-L451)
 
 ### particula.optics.retrieval.OpticalObservations.project
 
@@ -686,7 +686,7 @@ def project(coefficients)
 
 Apply the calibrated linear response in measurement coordinates.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L450-L455)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L453-L458)
 
 ## particula.optics.retrieval._OpticalModel
 
@@ -696,7 +696,7 @@ Apply the calibrated linear response in measurement coordinates.
 class _OpticalModel
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L114-L134)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L117-L137)
 
 ### particula.optics.retrieval._OpticalModel._eval
 
@@ -706,7 +706,7 @@ class _OpticalModel
 def _eval(parameters, seeds)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L128-L134)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L131-L137)
 
 ### particula.optics.retrieval._OpticalModel._setup
 
@@ -716,7 +716,7 @@ def _eval(parameters, seeds)
 def _setup(wavelength, shape, backend)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L115-L122)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L118-L125)
 
 ### particula.optics.retrieval._OpticalModel.predictions
 
@@ -728,7 +728,7 @@ def predictions(parameters)
 
 Return bulk extinction, scattering and absorption [m⁻¹].
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L124-L126)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L127-L129)
 
 ## particula.optics.retrieval._Residual
 
@@ -738,7 +738,7 @@ Return bulk extinction, scattering and absorption [m⁻¹].
 class _Residual
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L479-L518)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L482-L521)
 
 ### particula.optics.retrieval._Residual.autodiff
 
@@ -748,7 +748,7 @@ class _Residual
 autodiff = method == 'autodiff'
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L489-L489)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L492-L492)
 
 ### particula.optics.retrieval._Residual.backwards
 
@@ -758,7 +758,7 @@ autodiff = method == 'autodiff'
 backwards = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L494-L494)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L497-L497)
 
 ### particula.optics.retrieval._Residual.forwards
 
@@ -768,7 +768,7 @@ backwards = 0
 forwards = 0
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L493-L493)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L496-L496)
 
 ### particula.optics.retrieval._Residual.jacobian
 
@@ -778,7 +778,7 @@ forwards = 0
 jacobian = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L492-L492)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L495-L495)
 
 ### particula.optics.retrieval._Residual.model
 
@@ -788,7 +788,7 @@ jacobian = None
 model = model
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L487-L487)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L490-L490)
 
 ### particula.optics.retrieval._Residual.observations
 
@@ -798,7 +798,7 @@ model = model
 observations = observations
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L488-L488)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L491-L491)
 
 ### particula.optics.retrieval._Residual.point
 
@@ -808,7 +808,7 @@ observations = observations
 point = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L490-L490)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L493-L493)
 
 ### particula.optics.retrieval._Residual.values
 
@@ -818,7 +818,7 @@ point = None
 values = None
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L491-L491)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L494-L494)
 
 ### particula.optics.retrieval._Residual.__init__
 
@@ -828,7 +828,7 @@ values = None
 def __init__(model, observations, method)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L480-L494)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L483-L497)
 
 ### particula.optics.retrieval._Residual.calculate
 
@@ -838,7 +838,7 @@ def __init__(model, observations, method)
 def calculate(point, *, jacobian=False)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L496-L510)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L499-L513)
 
 ### particula.optics.retrieval._Residual.derivative
 
@@ -848,7 +848,7 @@ def calculate(point, *, jacobian=False)
 def derivative(point)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L516-L518)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L519-L521)
 
 ### particula.optics.retrieval._Residual.residual
 
@@ -858,7 +858,7 @@ def derivative(point)
 def residual(point)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L512-L514)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L515-L517)
 
 ## particula.optics.retrieval._bulk
 
@@ -868,7 +868,7 @@ def residual(point)
 def _bulk(radius, index, density, wave)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L105-L111)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L108-L114)
 
 ## particula.optics.retrieval._fit_inputs
 
@@ -878,7 +878,7 @@ def _bulk(radius, index, density, wave)
 def _fit_inputs(model, bounds, starts, method)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L521-L539)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L524-L542)
 
 ## particula.optics.retrieval._freeze
 
@@ -888,7 +888,7 @@ def _fit_inputs(model, bounds, starts, method)
 def _freeze(value)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L25-L28)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L28-L31)
 
 ## particula.optics.retrieval._humidity
 
@@ -898,7 +898,7 @@ def _freeze(value)
 def _humidity(value, groups)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L137-L141)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L140-L144)
 
 ## particula.optics.retrieval._measured_water
 
@@ -908,7 +908,7 @@ def _humidity(value, groups)
 def _measured_water(growth_factor, shape, kappa)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L144-L152)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L147-L155)
 
 ## particula.optics.retrieval._physical_index
 
@@ -918,7 +918,7 @@ def _measured_water(growth_factor, shape, kappa)
 def _physical_index(value)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L31-L39)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L34-L42)
 
 ## particula.optics.retrieval._real
 
@@ -928,7 +928,7 @@ def _physical_index(value)
 def _real(value)
 ```
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L16-L22)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L19-L25)
 
 ## particula.optics.retrieval.dry_volume_fractions
 
@@ -940,7 +940,7 @@ def dry_volume_fractions(mass, density)
 
 Convert measured dry species mass and density to volume fractions.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L367-L378)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L370-L381)
 
 ## particula.optics.retrieval.fit_optical
 
@@ -957,7 +957,7 @@ Singular values include structural zeros when there are fewer independent
 observations than unknowns. Inspect profiles and held-out predictions
 before treating a least-squares solution as a unique retrieval.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L542-L593)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L545-L596)
 
 ## particula.optics.retrieval.profile_optical
 
@@ -974,4 +974,4 @@ grid and threshold. A component touching either search bound is limited
 by that bound. The default delta is the asymptotic 95% cutoff for one
 parameter under a regular Gaussian measurement model.
 
-[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L596-L683)
+[View source](https://github.com/uncscode/particula/blob/main/particula/optics/retrieval.py#L599-L686)

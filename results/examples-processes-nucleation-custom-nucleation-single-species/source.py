@@ -339,8 +339,6 @@ mass_nucleated_particle = (
 exponent_nucleation = 2  # Nucleation rate exponent (empirical)
 
 
-bin_edges = bins_lognormal
-
 initial_inventory = total_inventory(aerosol)
 for i, _ in enumerate(time):
     if i > 0:
@@ -381,11 +379,11 @@ for i, _ in enumerate(time):
     )
     total_mass_resolved[i] = aerosol.particles.species_mass_density[0, 0]
     number_distribution = aerosol.particles.radii[0].copy()
-    number_distribution_binned[i, :], edges = np.histogram(
-        number_distribution, bins=bins_lognormal
+    number_distribution_binned[i, :] = (
+        par.particles.get_particle_number_spectrum(
+            aerosol.particles, 2 * bins_lognormal
+        ).bin_number_density[0]
     )
-    if i == 0:
-        bin_edges = edges
     total_number_resolved[i] = np.sum(number_distribution > 0)
     saturation_ratio_output[i] = np.asarray(current_saturation(aerosol)).flat[0]
 
@@ -398,11 +396,8 @@ for i, _ in enumerate(time):
             f"Index {i}: Total resolved particles in simulation: {total_resolved_particles_in_simulation}"
         )
 
-# ensure bin_edges is defined for plotting
-bin_edges = bin_edges if "bin_edges" in locals() else bins_lognormal
-plot_edges = bin_edges
+plot_edges = bins_lognormal
 
-number_distribution_binned = number_distribution_binned / volume_sim
 
 # %% [markdown]
 # ## Read the size map together with mass and saturation

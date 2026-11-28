@@ -3,8 +3,10 @@
 #
 # Would a faster timestep make your whole study faster? Use these measurements
 # to distinguish particle scaling, box scaling, and setup/transfer cost before
-# choosing an execution path. The [prepared quick start](gpu_prepared_quick_start.py)
-# explains the workflow whose costs are separated here.
+# choosing an execution path. The [prepared quick start](../../tutorials/working-with-gpu/gpu_prepared_quick_start.py)
+# explains the workflow whose costs are separated here. Read the
+# [campaign measurements](campaign.md) for the timing breakdown and the
+# [qualification record](qualification.md) for the machine, commands and acceptance checks.
 #
 # This CPU plotting script reads saved, qualified measurements. It does not
 # rerun the GPU campaign. Its small data file contains only plotted point/line
@@ -263,6 +265,8 @@ def cost_and_science_figures(rows):
     )
     plotting.legend(axes[0, 1])
     row = next(r for r in selected if r["mode"] == "captured")
+    from particula.particles import get_number_per_decade
+
     edges = np.array(row["radius_edges_m"])
     centres = np.sqrt(edges[:-1] * edges[1:]) * 1e9
     for key, label in (
@@ -270,7 +274,7 @@ def cost_and_science_figures(rows):
         ("final_mean_histogram_number_m3", "After three steps"),
     ):
         axes[1, 0].semilogx(
-            centres, np.array(row[key]) / np.diff(np.log10(edges)), label=label
+            centres, get_number_per_decade(row[key], 2 * edges), label=label
         )
     axes[1, 0].set(
         xlabel="Radius (nm)", ylabel="dN / dlog₁₀ r (m$^{-3}$)", xlim=(5, 500)

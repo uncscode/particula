@@ -295,6 +295,7 @@ def run_example():
 def plot_history(frames):
     """Plot CPU observations without any further GPU calculation."""
     from matplotlib.colors import LogNorm
+    from particula.particles import get_number_per_decade
 
     time = np.array([f["time"] for f in frames])
     number = np.array([f["number"] for f in frames])
@@ -304,7 +305,7 @@ def plot_history(frames):
     histogram = np.array(
         [np.asarray(f["histogram"]).mean(axis=0) for f in frames]
     )
-    distribution = histogram / np.diff(np.log10(edges))
+    distribution = get_number_per_decade(histogram, 2 * edges)
     fig, axes = plotting.subplots(2, 2, size="wide")
     for box in (0, 15, 31):
         axes[0, 0].plot(time, temperature[:, box], label=f"Box {box + 1}")

@@ -1,14 +1,14 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 4.705327130970545,
-  "package_source_sha256": "de9c4fa23fbd4833d9eeae22e97ffd8e2496acae8432510149eed8ada42f4ee3",
-  "scientific_source_sha256": "1ac66c614e80ae7a0f6aae70e885469d5f8609ca95421966dfcd08ebcf41597f",
+  "elapsed_seconds": 5.836712860967964,
+  "package_source_sha256": "fb62539e446aa9348489ec67f4eff6f98c534f6e668d75293727a4745fd40ef8",
+  "scientific_source_sha256": "de1b8e4f7828cd58d808601b3cb92b4ade18fbab99ba3c0a9792edc190f53c50",
   "input_sha256": {
     "scripts/sea2cloud_events/marine_history.py": "07aa5d4a328bb3bef81918d1e26884c73de6d6d27a2d7dd2a988d71e1a57f8e4",
     "scripts/sea2cloud_events/replay_plots.py": "3c9022506be616df480b0418ce27ab988c7eb5e9bcc459480c72373105590d2c",
     "scripts/sea2cloud_events/study.py": "ccb2afd28de18b48fedb4c992f13e5b008e4c4dde38fc2643bc37ca7badba845",
-    "scripts/sea2cloud_events/figure_inputs.py": "1d4a0680947faba1d3d432d6ae6757c51417d64e62af34e308c39488f301c340",
+    "scripts/sea2cloud_events/figure_inputs.py": "eb06f77f58e31c12e35a2c844daf94fb3336ded92058981bcbd14aa261b34099",
     "docs/data/sea2cloud-events/hourly-acid.csv": "66c7f684f821b1d34bd399bad7c1664169adfb308d72d6c3596fbd69c4d8d958",
     "docs/data/sea2cloud-events/observations.csv": "e6a4162d2e78fa1fc10694169502bf1ceaac9c892149ac834d1f52debeb4e54f",
     "docs/data/sea2cloud-events/background.csv": "13a8f31368c4da48de13dcf083c8d9cfba08f11980264b3927590d041667fcf6",
@@ -16,15 +16,15 @@
     "docs/data/sea2cloud-events/track.csv": "17f0f30c52f14eeb57dafba1f04b28df00afa164dd3e0ea7fef624207fe10969"
   },
   "example": "marine-history",
-  "fingerprint": "d8799e97e446b947bfc74dfb272dad239c553ed8ebb1c2eadf6f6db6b875e5f6",
+  "fingerprint": "deac2fbb5a77eba94ef4ff26934293775acd9ce0b5ea8fda8aca8a060370428d",
   "source": "docs/studies/literature/sea2cloud-events/marine_history.py",
-  "revision": "9dcde92f00a24c1abb86920fc11ea271ac4d59f4",
+  "revision": "ecc1d88a5c626ed7c761bdc3e296f99a00d14226",
   "package_dirty": false,
-  "executed_at": "2026-11-21T03:39:53.502866+00:00",
+  "executed_at": "2026-11-27T23:02:39.585096+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.3",
+    "particula": "0.3.6",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -34,7 +34,14 @@
     "particula-distribution": "0.2.14"
   },
   "outputs": [
-    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\n"
+      },
+      {
+        "text": "Module scripts.sea2cloud_events.study 4a22478 load on device 'cuda:0' took 234.20 ms  (cached)\n"
+      }
+    ],
     [
       {
         "image": "figure-2-1.png"
@@ -42,35 +49,9 @@
     ]
   ],
   "files": {
-    "figure-2-1.png": "63739326c707ef391018b12d78b36f764270524811b8e568ca0a2acfe4aa825e",
-    "executed_source.py": "2be199c5070b2ff46c17163c05558627f5084398c0c6411aaaad4a4b49142c6b",
+    "source.py": "10a24419390e6e853379bb92a9599c8b3daab08a542c2e78601468235e78738a",
     "data.json": "81c521c697bddfa697044c9842c00c750cdc15c96e4bede48ec4663b757db8ae",
-    "source.py": "10a24419390e6e853379bb92a9599c8b3daab08a542c2e78601468235e78738a"
+    "figure-2-1.png": "63739326c707ef391018b12d78b36f764270524811b8e568ca0a2acfe4aa825e"
   },
-  "simulation_fingerprint": "2309b0cc5e61a2da98052229f0872002503bbffce3f1f2243114e7a63b223206",
-  "render_versions": {
-    "particula": "0.3.3",
-    "numpy": "2.3.4",
-    "scipy": "1.16.2",
-    "matplotlib": "3.10.7",
-    "nbclient": "0.10.2",
-    "jupytext": "1.17.3",
-    "warp-lang": "1.11.1",
-    "particula-distribution": "0.2.14"
-  },
-  "render_device": "CPU",
-  "execution_input_sha256": {
-    "scripts/sea2cloud_events/marine_history.py": "07aa5d4a328bb3bef81918d1e26884c73de6d6d27a2d7dd2a988d71e1a57f8e4",
-    "scripts/sea2cloud_events/replay_plots.py": "d978d2081648e07e29b3dd6409721c77054077d4781e5c4e8686c8d3d3250c11",
-    "scripts/sea2cloud_events/study.py": "ccb2afd28de18b48fedb4c992f13e5b008e4c4dde38fc2643bc37ca7badba845",
-    "scripts/sea2cloud_events/figure_inputs.py": "1d4a0680947faba1d3d432d6ae6757c51417d64e62af34e308c39488f301c340",
-    "docs/data/sea2cloud-events/hourly-acid.csv": "66c7f684f821b1d34bd399bad7c1664169adfb308d72d6c3596fbd69c4d8d958",
-    "docs/data/sea2cloud-events/observations.csv": "e6a4162d2e78fa1fc10694169502bf1ceaac9c892149ac834d1f52debeb4e54f",
-    "docs/data/sea2cloud-events/background.csv": "13a8f31368c4da48de13dcf083c8d9cfba08f11980264b3927590d041667fcf6",
-    "scripts/sea2cloud_events/navigation.py": "eefced49957f41669bfe760c433429e26ef48d8a97d530d2fc96a35800f3436e",
-    "docs/data/sea2cloud-events/track.csv": "17f0f30c52f14eeb57dafba1f04b28df00afa164dd3e0ea7fef624207fe10969"
-  },
-  "rendered_at": "2026-11-21T03:43:20.688694+00:00",
-  "render_revision": "9dcde92f00a24c1abb86920fc11ea271ac4d59f4",
-  "render_elapsed_seconds": 1.7315455910284072
+  "simulation_fingerprint": "93f5e44755b07ae5eef149ca43fd56e7ddfdbf1932792a03f04b8ef207f4a507"
 }

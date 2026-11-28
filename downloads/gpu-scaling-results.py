@@ -265,6 +265,8 @@ def cost_and_science_figures(rows):
     )
     plotting.legend(axes[0, 1])
     row = next(r for r in selected if r["mode"] == "captured")
+    from particula.particles import get_number_per_decade
+
     edges = np.array(row["radius_edges_m"])
     centres = np.sqrt(edges[:-1] * edges[1:]) * 1e9
     for key, label in (
@@ -272,7 +274,7 @@ def cost_and_science_figures(rows):
         ("final_mean_histogram_number_m3", "After three steps"),
     ):
         axes[1, 0].semilogx(
-            centres, np.array(row[key]) / np.diff(np.log10(edges)), label=label
+            centres, get_number_per_decade(row[key], 2 * edges), label=label
         )
     axes[1, 0].set(
         xlabel="Radius (nm)", ylabel="dN / dlog₁₀ r (m$^{-3}$)", xlim=(5, 500)

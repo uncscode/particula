@@ -246,8 +246,10 @@ for i, _t in enumerate(time):
         aerosol_resolved.particles.species_mass_density.sum()
     )
     number_distribution_resolved[i, :] = aerosol_resolved.particles.radii[0]
-    number_distribution_binned[i, :], edges = np.histogram(
-        number_distribution_resolved[i, :], bins=bins_lognormal
+    number_distribution_binned[i, :] = (
+        par.particles.get_particle_number_spectrum(
+            aerosol_resolved.particles, 2 * bins_lognormal
+        ).bin_number_density[0]
     )
     total_number_resolved[i] = np.sum(number_distribution_resolved[i, :] > 0)
     water_saturation_in_time[i] = vapor_pressure_water.saturation_ratio(
@@ -256,8 +258,6 @@ for i, _t in enumerate(time):
         aerosol_resolved.environment.temperature[0],
     )
 
-
-number_distribution_binned = number_distribution_binned / volume_sim
 
 print(aerosol_resolved)
 
@@ -279,9 +279,9 @@ print(aerosol_resolved)
 fig, ax = plotting.subplots(size="wide")
 
 ax.bar(
-    edges[:-1],
+    bins_lognormal[:-1],
     number_distribution_binned[0, :],
-    width=np.diff(edges),
+    width=np.diff(bins_lognormal),
     align="edge",
     label="Resolved initial",
     color=plotting.COLORS["rust"],
@@ -289,18 +289,18 @@ ax.bar(
 )
 plot_index = 100
 ax.bar(
-    edges[:-1],
+    bins_lognormal[:-1],
     number_distribution_binned[plot_index, :],
-    width=np.diff(edges),
+    width=np.diff(bins_lognormal),
     align="edge",
     label="CCN overshoot time: {:.1f} s".format(time[plot_index]),
     color=plotting.COLORS["berry"],
     alpha=0.5,
 )
 ax.bar(
-    edges[:-1],
+    bins_lognormal[:-1],
     number_distribution_binned[-1, :],
-    width=np.diff(edges),
+    width=np.diff(bins_lognormal),
     align="edge",
     label="Resolved final",
     color=plotting.COLORS["teal"],
@@ -319,7 +319,7 @@ fig, ax = plotting.subplots(size="wide")
 
 # Swap X and Y to reverse axes
 X, Y = np.meshgrid(
-    time, edges[:-1]
+    time, bins_lognormal[:-1]
 )  # Now time is on the x-axis and edges on the y-axis
 
 # Plot the contour with updated X and Y
