@@ -1091,8 +1091,10 @@ Check a profile and optionally bind it to the first source layout.
 
 - `particula.data._binding`
 - `particula.data._exports`
+- `particula.data.mcd43`
 - `particula.data.measurement`
 - `particula.data.migration`
+- `particula.data.power`
 - `particula.data.profile`
 - `particula.data.reader`
 - `particula.data.storage`
