@@ -4,7 +4,7 @@ This guide describes native construction used by the supported migrated
 examples. Native CPU processes and runnables consume these held containers;
 see [dynamics migration](../migration/v0.3.0/dynamics.md) for configuration and runnable batching.
 The [access walkthrough](ownership.md) demonstrates executable replacement and
-rejection checks. See also [container foundations](index.md).
+rejection checks. See also [container foundations](index.md) and the [0.4.0 upgrade guide](../migration/v0.4.0/index.md) for importing measured densities.
 
 ## Assemble three containers
 

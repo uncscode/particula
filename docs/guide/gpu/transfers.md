@@ -49,14 +49,16 @@ Across this boundary, the shipped particle schema stays aligned:
 | Field | CPU `ParticleData` | GPU `WarpParticleData` | Contract |
 | --- | --- | --- | --- |
 | `masses` | `(n_boxes, n_particles, n_species)` | `(n_boxes, n_particles, n_species)` | Authoritative per-particle, per-species masses round-trip without shape drift. |
-| `concentration` | `(n_boxes, n_particles)` | `(n_boxes, n_particles)` | Preserves the leading `n_boxes` axis for single-box and multi-box storage. |
+| `population` | `(n_boxes, n_particles)` | `(n_boxes, n_particles)` | Represented counts per discrete bin or resolved slot, including fractional values. |
 | `charge` | `(n_boxes, n_particles)` | `(n_boxes, n_particles)` | Preserves dimensionless elementary-charge counts without hidden conversion. |
 | `density` | `(n_species,)` | `(n_species,)` | Shared species density remains shared; it does not gain a box axis. |
 | `volume` | `(n_boxes,)` | `(n_boxes,)` | Per-box simulation volume stays particle-owned across the helper boundary. |
 
-As with the gas and environment helpers, kernels and runnables do not perform
-hidden CPU↔GPU synchronization or implicit container transfers for particle
-state.
+Transfer the per-box air volume with the population. A kernel that needs
+number density divides counts by that box's volume. The density replacement
+method is CPU-only. To import a measured sample, call
+`set_slot_concentration_density` before uploading it. Continuous radius PDFs
+require their CPU radius grid and quadrature. [Population migration](../migration/v0.4.0/index.md)
 
 For direct GPU coagulation, `WarpParticleData.charge` is caller-owned,
 device-resident particle state, not a sidecar or hidden transfer result. It

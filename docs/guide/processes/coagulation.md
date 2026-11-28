@@ -54,9 +54,9 @@ existing ambient-pressure convention; this migration does not change its law.
 
 | Native quantity | Interpretation |
 |---|---|
-| Resolved concentration | Raw counts; density is N/V for positive physical volume |
-| Discrete PMF concentration | Bin number density, m⁻³; volume must be exactly 1 m³ |
-| Radius PDF concentration | dn/dr, m⁻⁴; integrate on explicit increasing `radius_grid`, at volume 1 m³ |
+| Resolved population | Count per slot, divided by V for m⁻³ |
+| Discrete PMF population | Count per bin, divided by V for m⁻³ |
+| Radius PDF population | Represented number per metre of radius, divided by V for m⁻⁴ and integrated on the increasing `radius_grid` |
 | Discrete gain/loss/net rate | Number-density change, m⁻³ s⁻¹ |
 | Radius-PDF gain/loss/net rate | Radius-density change, m⁻⁴ s⁻¹ |
 | Friction factor | kg/s |
@@ -89,8 +89,8 @@ The `Coagulation` runnable stages and iterates all boxes, with explicit
 [batched CPU execution](index.md#batched-cpu-runnable-execution).
 
 Discrete/PDF stepping preserves the existing explicit number gain/loss
-update on a fixed composition grid. It writes concentration only; per-bin
-species masses and charge remain unchanged. Negative or nonfinite proposed
+update on a fixed composition grid. It multiplies the density increment by the box's represented air volume
+before updating raw population. Per-bin masses and charge stay fixed. Negative or nonfinite proposed
 concentrations reject before publication, without clipping.
 
 **Intended use:** this fixed-composition PMF/PDF method is suited to particles

@@ -12,6 +12,9 @@ execution boundaries after the v0.3.0 handoff.
 See the [v0.3.0 closeout record](../../../studies/validation/workflows-and-releases/native-api-v0.3.0.md) for
 revision-specific validation and outstanding readiness gates.
 
+For the change from native 0.3.6 storage to extensive particle populations,
+continue with the [0.4.0 upgrade guide](../v0.4.0/index.md).
+
 ## Migration topics
 
 - [Construction and replacement](../../data-model/construction.md): three-container assembly,

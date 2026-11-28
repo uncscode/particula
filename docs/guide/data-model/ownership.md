@@ -48,7 +48,8 @@ For every kind, `population / volume[:, None]` gives the per-slot density.
 Sum bin and resolved densities across slots. For a radius PDF, integrate the
 density over the explicit radius grid. For species mass density, integrate
 the product of per-particle mass and PDF density over that same grid. See
-[distribution rules](construction.md#distribution-and-volume-rules).
+[distribution rules](construction.md#distribution-and-volume-rules) and the
+[0.4.0 guide to updating raw writers](../migration/v0.4.0/index.md).
 
 ## Executable access and replacement walkthrough
 

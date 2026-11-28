@@ -28,9 +28,9 @@ through the v0.3.0 public initializers/builders and forbids facade construction.
 
 | Representation | Population storage | Species inventory in kg | Volume |
 |---|---|---|---|
-| `discrete` | Bin number density, m^-3 | Sum of per-particle mass times bin density, times V | Exactly 1 m^3 |
-| `continuous_pdf` | Radius PDF dn/dr, m^-4 | Radius trapezoidal integral of mass times PDF, times V | Exactly 1 m^3 |
-| `particle_resolved` | Raw representative counts | Sum of per-particle mass times count | Positive physical V |
+| `discrete` | Represented count per bin | Sum of per-particle mass times bin count | Positive represented air volume |
+| `continuous_pdf` | Represented number per metre of radius, m⁻¹ | Radius trapezoidal integral of mass times stored PDF | Positive represented air volume |
+| `particle_resolved` | Represented count per slot | Sum of per-particle mass times count | Positive represented air volume |
 
 Per-particle species mass is kg. Resolved number density is count/V. Gas
 concentration is kg/m^3 in complete gas order, including inert lanes. CPU
@@ -251,13 +251,13 @@ original arrays only after every box succeeds. Earlier completed substeps and
 processes remain committed if a later one fails. Concurrent mutation is not
 supported. A `RunnableSequence` orders work as substep, process, then boxes.
 
-One `ParticleData.distribution_type` applies to the entire batch. Discrete/PMF
-and continuous-PDF boxes retain exactly 1 m³ reference volume; resolved boxes
-can have different positive physical volumes. Strategies with a declared kind
+One `ParticleData.distribution_type` applies to the entire batch. Each box
+may have its own positive represented air volume for all three kinds.
+[Population units and migration](../migration/v0.4.0/index.md) Strategies with a declared kind
 must match it. Nucleation accepts resolved populations only. No implicit type
 conversion, cross-box transport, or per-box physics configuration is added.
 Material densities, gas names, species maps, and process configuration are
-shared; gas inventories, temperature, pressure, and resolved volumes are per box.
+shared; gas inventories, temperature, pressure, and represented air volumes are per box.
 
 Runnable rates preserve the box axis even when B=1:
 

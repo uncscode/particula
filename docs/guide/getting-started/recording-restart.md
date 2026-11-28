@@ -3,9 +3,8 @@
 Use this workflow to retain a physical-time history and continue a supported
 calculation from its accepted state. Start with the
 [first CPU experiment](first-simulation.md) for executable native state and
-physics setup. These concrete `particula.execution` imports describe development
-0.3.1; they do not change existing runnable calls or select physical assumptions
-for you. Choose tolerances using the
+physics setup. The examples use the concrete `particula.execution` interfaces
+in 0.4.0. Choose tolerances using the
 [numerical-method guide](../processes/numerical-integration.md).
 
 ## Select an execution owner
@@ -67,13 +66,16 @@ against an independent accuracy target or stochastic uncertainty.
 | `temperature`, `pressure` | K, Pa | box |
 | `volume` | m³ | box |
 | `particle_masses` | kg per particle | box, slot, material |
-| `particle_concentration` | native population measure | box, slot |
+| `particle_population` | count per discrete bin/resolved slot, or m⁻¹ for a radius PDF | box, slot |
 | `particle_charge` | elementary charges | box, slot |
 
-Volume is always retained. Slot variables are opt-in: resolved concentration is
-represented count, discrete concentration is number density, and a PDF is
-*dN/dr*. Metadata retains dimensions, units, gas order and molar masses,
-partitioning, material densities and population interpretation. Rows and
+The recorder always retains volume. Request `particle_population` to keep the
+raw slots as well. On readback, `arrays["particle_population"] /
+arrays["volume"][..., None]` gives per-slot densities at the recorded times.
+Discrete and resolved rows sum to the recorded `number_density`; integrate a
+PDF row on the saved `radius_grid_m` in the scientific metadata. Metadata
+retains dimensions, units, gas order and molar masses, partitioning, material
+densities and population interpretation. Rows and
 returned arrays are detached. The byte limit bounds retained numerical data,
 including times; Python overhead and serialization copies require extra memory.
 A capacity failure leaves accepted physics intact and appends no partial row.
@@ -116,6 +118,106 @@ After resolving the storage problem, call `writer.flush()` to retry without
 advancing physics or duplicating that row. File failure does not roll physics
 back. Use separate output paths for separate studies and keep the recorder under
 one caller's control while recording or saving.
+
+## Record raw particles with the sampled air volume
+
+For a short raw history, request both `particle_population` and `volume`.
+This example records two prescribed particle samples with the same density.
+At the second time point, twice as much sampled air represents twice as many
+particles. Saving the time-dependent volume lets the reader recover the same
+400 m⁻³ for both observations.
+
+```python
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+import numpy as np
+import particula as par
+from particula.execution.analysis_io import load_analysis, save_analysis
+from particula.execution.recording import Recorder
+
+particles = par.particles.create_resolved_particle_data(
+    masses=[1e-18], density=1000.0, population=[100.0], volume=0.25,
+)
+state = par.Aerosol(
+    particles=particles,
+    gas=par.gas.GasData(name=["tracer"], molar_mass=np.array([0.1]),
+                        concentration=np.array([[0.0]]), partitioning=np.array([False])),
+    environment=par.gas.EnvironmentData([298.15], [101325.0], [[0.0]]),
+)
+history = Recorder(("particle_population", "volume", "number_density"))
+history.record(0.0, state)
+particles.set_slot_concentration_density([400.0], volume=0.5)
+history.record(1.0, state)
+with TemporaryDirectory() as directory:
+    path = Path(directory) / "two-samples.pca"
+    save_analysis(history, path, configuration={"measurement_m-3": 400},
+                  numerical_settings={}, source_identity={"case": "two prescribed samples"})
+    result = load_analysis(path)
+counts = result.arrays["particle_population"]
+densities = counts / result.arrays["volume"][..., None]
+np.testing.assert_equal(counts[:, 0, 0], [100, 200])
+np.testing.assert_equal(densities.sum(axis=-1), result.arrays["number_density"])
+np.testing.assert_equal(densities[:, 0, 0], [400, 400])
+```
+
+## Read a 0.3.6 particle history
+
+Load old analysis files with `load_analysis`. A valid 0.3.6 file is returned
+as analysis schema 2. Its `package_version`, `source_analysis_version`, and
+`source_observables` identify the original writer, schema and observable
+units. For new schema-2 files, read the units directly from
+`metadata["science"]["observables"]`. The original files stay intact.
+
+Run this check from the Particula repository root against the four original
+0.3.6 files. The resolved example recorded raw counts and volume. Its number
+density is reconstructed here. The other three examples also saved the total.
+
+```python
+from pathlib import Path
+
+import numpy as np
+from particula.execution.analysis_io import load_analysis
+
+folder = Path("particula/execution/tests/data")
+for kind, old_unit, new_unit, expected in (
+    ("resolved", "count", "count", 200.0),
+    ("discrete", "m^-3", "count", 12.0),
+    ("continuous_pdf", "m^-4", "m^-1", 23e-9),
+    ("derived", None, None, 12.0),
+):
+    data = load_analysis(folder / f"analysis-0.3.6-{kind}.pca")
+    meta, arrays = data.metadata, data.arrays
+    science = meta["science"]
+    assert meta["package_version"] == "0.3.6"
+    assert meta["source_analysis_version"] == 1 and meta["version"] == 2
+    assert science["observables"]["volume"]["unit"] == "m^3"
+    if new_unit is None:
+        assert "particle_population" not in arrays
+        density = arrays["number_density"]
+    else:
+        assert meta["source_observables"]["particle_concentration"]["unit"] == old_unit
+        assert science["observables"]["particle_population"]["unit"] == new_unit
+        slots = arrays["particle_population"] / arrays["volume"][..., None]
+        if kind == "continuous_pdf":
+            radius = np.array(science["radius_grid_m"])
+            density = np.sum((slots[..., 1:] + slots[..., :-1]) * np.diff(radius) / 2,
+                             axis=-1)
+        else:
+            density = slots.sum(axis=-1)
+    np.testing.assert_allclose(density, [[expected]], atol=0)
+    if "number_density" in arrays:
+        assert science["observables"]["number_density"]["unit"] == "m^-3"
+        np.testing.assert_allclose(density, arrays["number_density"], atol=0)
+```
+
+The resolved file represents 100 particles in 0.5 m³. The discrete and PDF
+files both store three raw values, [2, 6, 4], at 1 m³. The discrete values
+sum to 12 m⁻³, while trapezoidal integration on the PDF's [1, 3, 6] nm
+radius grid gives 2.3 × 10⁻⁸ m⁻³. The derived-only file retains its 12 m⁻³
+total without reconstructing missing slots. Legacy binned files require unit
+volume for every recorded box and time. The loader rejects incompatible
+files so the reader can check the original volume provenance.
 
 ## Apply a reproducible environmental history
 
@@ -212,6 +314,12 @@ parallel reservoir-reduction order. Earlier
 adaptive GPU records are rejected rather than resumed with different numerical
 semantics. This version is distinct from the prepared resident checkpoint and
 the outer archive format. Retain the earlier checkout to continue an older run.
+
+Reading an analysis history across versions does not resume its RNG,
+integrator or accepted timestep. To continue a 0.3.6 run exactly, use its
+original environment and checkpoint. To initialize 0.4.0 from a physical
+snapshot, convert its measured or extensive inputs and begin a new run.
+[Particle population migration](../migration/v0.4.0/index.md)
 
 CPU disk restart requires matching package and NumPy versions. GPU restart also
 requires matching Warp and the existing device/configuration contract. Unsupported

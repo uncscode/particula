@@ -25,7 +25,7 @@
       },
       "requires_local_executor": true,
       "publication": {
-        "release_notes": "The literature-study skill helps researchers identify unresolved assumptions, check what later studies established, and design a controlled test of the atmospheric consequence that motivated the original paper."
+        "release_notes": "Guidance for Particula 0.4.0 shows how to import particle measurements, convert represented counts to density, and check old analysis files. The CPU starter reads per-bin density directly."
       }
     }
   },
@@ -37,7 +37,7 @@
     "scientific-computing"
   ],
   "name": "particula-helper",
-  "version": "0.3.12",
+  "version": "0.3.13",
   "license": "MIT",
   "homepage": "https://uncscode.github.io/particula/guide/agent-plugins/",
   "repository": "https://github.com/uncscode/particula"

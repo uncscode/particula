@@ -30,8 +30,15 @@ hardware/runtime requirement; requesting CUDA never selects Warp CPU silently.
 | Coupled adaptive simulation | `GPUCoupledSimulation(..., resident=True)` | Fixed event schedule and persistent RNG; device-only stage handoff, explicit observations and boundary restart. |
 | Warp CPU | Separate regression target | CPU evidence is labeled separately from actual CUDA execution and performance. |
 
-Prepared coagulation are particle-resolved and require
-equal active counts. Prepared nucleation injects neutral unit-count events with integral
+Discrete and resolved Warp state holds raw `population` and per-box air
+`volume`. Physical number density for either is count divided by that volume.
+Native radius PDFs and the measured-density setter stay on the CPU.
+[Transfer fields and units](transfers.md#particle-transfer-boundary)
+
+Fractional weights are supported by dilution, particle mass transfer, and
+resolved wall loss. For resolved Brownian coagulation, equal positive active
+weights within each box may be fractional. A wall-loss event removes the
+whole weight of the selected representative. Prepared nucleation injects neutral unit-count events with integral
 demand and explicit capacity policies. Their evolving compatibility matters;
 see [failure boundaries](prepared.md#evolving-compatibility-and-failure).
 Prepared atmospheric coagulation additionally requires unit counts, reference
@@ -59,7 +66,7 @@ resources. Omitted optional sidecars may allocate call-local storage. Supplied
 RNG advances in place; `initialize_rng=True` explicitly resets it. These are
 execution resources, not new native container fields.
 
-`ParticleData.volume` owns per-box physical volume. `EnvironmentData` owns CPU
+`ParticleData.volume` owns each box's represented air volume. `EnvironmentData` owns CPU
 temperature, pressure and saturation. Device vapor pressure is derived helper
 state and has no native CPU `GasData` field. Direct restore therefore needs
 externally retained gas names and drops vapor pressure; prepared snapshots retain

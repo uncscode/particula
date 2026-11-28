@@ -1,19 +1,32 @@
 # Scientific and execution boundaries
 
-These are contribution guardrails for the native 0.3.0 data model. Resolve all
+These are contribution guardrails for native 0.4.0 particle populations. Resolve all
 repository paths against the user's checkout and verify its current owning
 source before changing a contract. This summary is not an API signature manual.
 
 ## Native state
 
 Read `docs/guide/data-model/index.md`, `docs/guide/data-model/ownership.md`, and
-`docs/guide/migration/v0.3.0/index.md` for schemas and migration details.
+`docs/guide/migration/v0.4.0/index.md` for the 0.3.6 migration. Use the older
+0.3.0 migration guide for the move from facades to native containers.
 
 - Construct `Aerosol` from native `ParticleData`, full ordered `GasData`, and
   `EnvironmentData`. Legacy particle/species/atmosphere facades are removed.
-- Resolved concentration is represented count, discrete concentration is number
-  density, and continuous PDF is dN/dr. Account for representative volume in
-  density and extensive-inventory comparisons. GPU PDF remains unsupported.
+- In 0.4.0, raw `ParticleData.population` holds counts per discrete bin or
+  resolved slot, or represented dN/dr (m⁻¹) for a continuous radius PDF.
+  Divide by per-box represented air volume for slot density. Integrate PDFs
+  on their radius nodes in metres. Read `number_density`, `species_mass_density`
+  (kg/m³ air) and `species_mass_inventory` (kg per box) for physical comparisons.
+  Gas concentration is kg/m³ air. Check both a sub-unit and a larger sample.
+- To import measurements, use builder `set_number_density` with units or the
+  CPU instance's SI `set_slot_concentration_density(values, volume=...)`.
+  For a raw writer use the owned `population` array. Derived reads detach.
+  Transfer raw bin/resolved counts and their sample volumes to Warp. Native
+  radius PDFs stay on CPU. Confirm each process's multiplicity requirements.
+- Use `particle_population` and `volume` for new recordings. Read historical
+  analysis files via `load_analysis` and inspect returned source units and
+  schema. Resume exact checkpoints only under the owning version, schema,
+  runtime and device contract.
 - Particle-material width and full-gas width are independent. Preserve ordered
   names, inert lanes, partitioning masks and explicit process species maps.
   Physical configuration belongs to processes.
@@ -22,9 +35,9 @@ Read `docs/guide/data-model/index.md`, `docs/guide/data-model/ownership.md`, and
   rebuilding process maps and prepared GPU bindings; there is no auto-rebinding.
 - The five native dynamics runnables support batched CPU execution through the
   shared transactional box loop. Direct strategy methods remain single-box.
-- Fixed slots are active only with finite positive concentration, finite
+- Fixed slots are active only with finite positive represented count, finite
   nonnegative masses with positive total mass, and finite charge. Free slots
-  have exactly zero concentration, all masses and charge. Reject other states.
+  have exactly zero count, masses and charge. Reject other states.
   Preserve fixed capacity; never silently resize, compact or truncate demand.
 
 ## Process behavior
@@ -75,7 +88,7 @@ Read `docs/guide/gpu/prepared.md`, `support.md`, `transfers.md`,
   a root seed does not reset them; initialization/reset is deliberate.
 - Resident resources require exact session/registry/closed-guard bindings.
   Normal steps do not reseed, checkpoint, restart or recreate bindings.
-- Schema-v5 checkpoints own immutable canonical device bytes and RNG
+- Schema-v6 resident checkpoints own immutable canonical device bytes and RNG
   continuation metadata. CPU inspection carriers are lossy. Restart is explicit
   with fresh identities on an exactly compatible device, with no inferred old
   schema migration or cross-device continuation.
