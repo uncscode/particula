@@ -440,9 +440,7 @@ def test_real_warp_cpu_example_has_resident_lifecycle_observations(
     npt.assert_array_equal(result.initial_total_mass, initial_inventory)
     checkpoint_p = result.checkpoint.particles
     final_inventory = (
-        np.sum(
-            checkpoint_p.masses * checkpoint_p.population[..., None], axis=1
-        )
+        np.sum(checkpoint_p.masses * checkpoint_p.population[..., None], axis=1)
         + result.checkpoint.gas.concentration * checkpoint_p.volume[:, None]
     )
     # Prescribed gas and stochastic wall removal make this an open system;

@@ -40,7 +40,7 @@ The expansion uses the resolved Warp volume step, which updates particle volume 
 
 ## Four original analysis archives retain their recorded quantities
 
-Loading the v0.3.6 resolved fixture yields 100 particles in 0.5 m³. The discrete fixture yields 12 m⁻³ and the radius PDF integrates to 2.3 × 10⁻⁸ m⁻³. Their raw arrays retain counts for discrete and resolved slots and m⁻¹ for the PDF. The derived-only archive yields its recorded 12 m⁻³. All four retain source schema version 1, and the loader retains the original field descriptions for interpreting historical files. The guide includes a runnable comparison and the exact-restart constraints. [Read a 0.3.6 particle history](../../../guide/getting-started/recording-restart.md#read-a-036-particle-history)
+Loading the v0.3.6 resolved fixture yields 100 particles in 0.5 m³. The discrete fixture yields 12 m⁻³ and the radius PDF integrates to 2.3 × 10⁻⁸ m⁻³. The resolved archive stores counts. The old unit-volume discrete and PDF archives store m⁻³ and m⁻⁴ respectively. With volume equal to 1 m³, the numerical values carry over to the returned raw populations in counts and m⁻¹. The derived-only archive yields its recorded 12 m⁻³. All four retain source schema version 1, and the loader retains the original field descriptions for interpreting historical files. The guide includes a runnable comparison and the exact-restart constraints. [Read a 0.3.6 particle history](../../../guide/getting-started/recording-restart.md#read-a-036-particle-history)
 
 ## Π Chamber residents below the optical limit
 
