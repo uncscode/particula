@@ -39,9 +39,13 @@ Recurring paper discovery and selection follow the
 
 ## Prompt for a literature comparison
 
+*Which inference is still open?* Use the [literature question guide](../plugins/particula-helper/skills/particula-studies-literature/SKILL.md#choose-a-question-whose-answer-changes-the-interpretation) to trace the paper's conclusion to a consequential assumption. Identify the evidence that could distinguish a competing explanation and the further inference each outcome would permit. Consider papers of any age. For older work, cite the closest later tests and state what remains unresolved in the proposed regime.
+
 *What did the paper establish?* Select one published claim. Identify the
 observations or theory behind it, the authors' model or fit where available,
 its inputs and its domain. Record the exact release, figure panel or equation.
+
+*Can we test the consequence the authors cared about?* Cite the motivation in the introduction and identify how far the measurements reach toward it. When a broader comparison is informative, carry the reproduced result into one new setting under matched controls. Specify a downstream observable, the new assumption most likely to change the answer, and the evidence that could test the prediction. The [literature guide gives examples for cloud activation, transport and mixed emissions](../plugins/particula-helper/skills/particula-studies-literature/SKILL.md#test-the-atmospheric-consequence-that-motivated-the-paper).
 
 *Can we repeat the comparison?* Put the published reference and the Particula
 baseline on the same time origin, axes and sampling basis. Include the measured

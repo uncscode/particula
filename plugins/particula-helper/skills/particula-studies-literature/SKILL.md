@@ -10,6 +10,35 @@ when framing a study question or writing its report. An independently launched
 literature analysis can originate the question. The study owner can select
 it from the primary evidence and proceed without an intake interview.
 
+## Choose a question whose answer changes the interpretation
+
+Screen across publication years. Start from a phenomenon or disputed inference and read outward through original experiments, later measurements and analyses using different terminology. For scheduled discovery, roughly 12–20 distinct papers is a starting pool when useful leads are available. Widen it when the first results repeat the same question. The shortlist can be empty.
+
+For each serious candidate, link four pieces of reasoning in ordinary scientific prose:
+
+1. **What does the paper conclude?** Point to the measurement or comparison and the passage where the authors interpret it. Distinguish an assumption you infer from one the authors explicitly make.
+2. **What must hold for that inference to follow?** Identify a consequential step the authors left untested or tested only in a narrower regime. Describe a plausible alternative that could produce the reported observation.
+3. **Which observation separates the explanations?** Give the expected pattern in physical units and compare its size with the uncertainty. Composition resolved at the relevant size, repeated transitions under different forcing, or instruments with independent responses can each supply the decisive constraint. Identify shared inputs and retrievals.
+4. **What else could we infer from the answer?** Say which part of the original conclusion would survive each outcome and what that would imply for a second observable, a model choice or another regime. If the measurements cannot distinguish the alternatives, name the bound they can establish.
+
+For example, a difference in water uptake between two dry sizes could reflect composition, external mixing or non-ideal activity. Bulk chemistry and two growth-factor distributions leave those explanations entangled. If composition is measured for the relevant populations, test whether the residual from an additive water-uptake model persists across humidity. Its onset and magnitude could then identify where an activity correction matters. A sequence of familiar effects such as humidity, growth and extinction earns priority only when it exposes an unresolved inference.
+
+For an older paper, follow forward citations and search independently for the mechanism, observable and experimental regime. Open the closest later primary studies. Cite what they tested, what they settled and the specific gap that survives. Drop a resolved question. If the search cannot establish whether it remains open, retain it as unverified. Record the search date and terms or citation trail so the novelty judgment can be revisited.
+
+Rank research questions first by the consequence of testing the assumption, then by how well the observations distinguish the alternatives, then by feasibility in Particula. Keep teaching applications, technical checks and narrow instrument benchmarks identifiable for their own uses. An instrument question can rank highly when its answer changes a broader physical inference. Carry forward the researcher's judgments about each paper and comparison.
+
+## Test the atmospheric consequence that motivated the paper
+
+Read the introduction for the reason the authors studied this system. Compare that passage with the conditions and observables they actually tested. A chamber result can be convincing and still leave its atmospheric importance open. Ask what would have to remain true as the particles enter the setting the authors care about. Cite their motivation and identify the extension as our question.
+
+Carry one measured quantity, or a range of model parameters consistent with it, into a comparison where the answer could change. Name the reference, the new process or environment, and a downstream observable with units. For example:
+
+- **From a droplet to a cloud.** Two surfactant mixtures can take up similar amounts of water yet have different surface tensions. Does the mixture with lower measured tension still produce more activated droplets (cm⁻³) as rising air cools, the surfactant dilutes and growing droplets compete for vapor? Use matched seed spectra and updrafts. If time above the activation threshold matters, compare steady ascent with paired fluctuating updraft histories.
+- **From a chamber to a moving air mass.** Given a chamber-constrained evaporation rate, does enough particle mass survive dilution during transport to reach a downwind site? Compare the same initial aerosol and travel time with and without repartitioning. Use excess particle mass per unit excess conserved tracer to distinguish evaporation from dilution, and bound the background vapor concentration that could change the answer.
+- **From one plant precursor to mixed emissions.** Do single-precursor isoprene and α-pinene experiments predict the organic aerosol mass (µg m⁻³) when the two emissions mix before oxidation? Compare the prediction from separately oxidized precursors with co-oxidation at matched precursor consumption, seed loading and dilution. Account for partitioning to the combined organic mass before attributing a residual to cross-reactions. A mixture yield or product measurement can test that attribution.
+
+Choose an extension when its answer would change the interpretation or use of the original result. Check whether later work already tested that particular transfer, which parts the current Particula checkout supports, and which would need a study-specific treatment. Record which inputs come from measurements and which describe a scenario. Carry the source uncertainty and the most consequential new assumption through the prediction. If plausible conditions give opposite outcomes, report where the conclusion changes and the observation that would decide it.
+
 ## From the paper to a new physical question
 
 1. **Establish what the paper showed.** Choose a claim and its figure, table or equation. Identify what the authors measured, inferred, fitted and predicted. Record the data release and the conditions over which the claim was tested.
