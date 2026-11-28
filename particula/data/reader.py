@@ -7,6 +7,7 @@ import os
 import re
 import sys
 from collections import Counter
+from collections.abc import Iterator
 from itertools import chain, takewhile
 from pathlib import Path
 from threading import Lock
@@ -14,7 +15,12 @@ from threading import Lock
 import polars as pl
 
 from particula.data._binding import Binding
-from particula.data.profile import ProfileError, digest, load_profile
+from particula.data.profile import (
+    ProfileError,
+    ProfileSource,
+    digest,
+    load_profile,
+)
 
 _CSV_LIMIT_LOCK = Lock()
 _LINE_END = re.compile(rb"[\r\n]")
@@ -50,6 +56,8 @@ class _Source(io.RawIOBase):
 
 
 class _Lines:
+    """Track inclusive physical line spans and bytes used by each CSV record."""
+
     def __init__(self, reader, encoding, maximum, first):
         self.reader, self.encoding, self.maximum = reader, encoding, maximum
         self.line, self.used = first, 0
@@ -196,16 +204,32 @@ def _sections(records, profile, binding, header):
             binding = Binding(profile, header, binding.preamble)
 
 
-def inspect_source(source, profile) -> dict:
-    """Bind selectors and return the source layout and clock example."""
-    profile = load_profile(profile)
+def inspect_source(
+    source: str | os.PathLike[str], profile: ProfileSource
+) -> dict:
+    """Inspect the preamble, header and first observation in a delimited export.
+
+    Args:
+        source: Path to the instrument export.
+        profile: Built-in ID, mapping, or path to a JSON or YAML profile.
+
+    Returns:
+        Encoding, header, preamble and coordinate grids for the first layout.
+        The clock example contains raw tokens and its starting physical line.
+        Both are null when the layout has no following record.
+
+    Raises:
+        ProfileError: The profile or source layout fails validation.
+        OSError: The source cannot be opened or read.
+    """
+    definition = load_profile(profile)
     with Path(source).open("rb") as stream:
-        lines = _Lines(stream, profile["input"]["encoding"], 2**22, 0)
-        rows = _records(lines, profile["input"]["delimiter"])
-        binding, header = _layout(rows, profile)
+        lines = _Lines(stream, definition["input"]["encoding"], 2**22, 0)
+        rows = _records(lines, definition["input"]["delimiter"])
+        binding, header = _layout(rows, definition)
         example = next(rows, None)
     return {
-        "encoding": profile["input"]["encoding"],
+        "encoding": definition["input"]["encoding"],
         "clock_example": (
             [
                 example[0][i]
@@ -309,32 +333,66 @@ def _events(records, profile):
 
 
 class MeasurementReader:
-    """Stream batches containing scan and diagnostic frames."""
+    """Read one source in batches while tracking layouts and diagnostics.
+
+    Attributes:
+        manifest: Import provenance, including the source digest, grids and
+            scan count. Available only after batches() reaches end of file.
+        segment: Zero-based source layout index for the current batch.
+        issue_counts: Number of diagnostics emitted per code during decoding.
+    """
 
     def __init__(
         self,
-        source,
-        profile,
+        source: str | os.PathLike[str],
+        profile: ProfileSource,
         *,
-        input_chunk_bytes=2**20,
-        batch_scans=32768,
-        batch_bytes=2**23,
-        max_record_bytes=2**22,
-    ):
-        """Set independent limits for raw chunks, batches and records."""
+        input_chunk_bytes: int = 2**20,
+        batch_scans: int = 32768,
+        batch_bytes: int = 2**23,
+        max_record_bytes: int = 2**22,
+    ) -> None:
+        """Configure the source and batching limits.
+
+        Args:
+            source: Path to the delimited instrument export.
+            profile: Built-in ID, mapping, or path to a JSON or YAML profile.
+            input_chunk_bytes: Maximum bytes requested per raw input read.
+            batch_scans: Target maximum scan rows per emitted batch.
+            batch_bytes: Target working size of a batch in bytes. A single
+                record and its diagnostics can exceed this target.
+            max_record_bytes: Maximum raw bytes in one logical record,
+                including embedded newlines and any repaired fragments.
+
+        Raises:
+            ValueError: A limit is not a positive integer.
+            ProfileError: The profile cannot be loaded or validated.
+        """
         self.source = Path(source)
         self.profile = load_profile(profile)
         limits = input_chunk_bytes, batch_scans, batch_bytes, max_record_bytes
         if any(type(limit) is not int or limit <= 0 for limit in limits):
             raise ValueError("Reader limits must be positive integers")
         self.chunk, self.rows, self.bytes, self.maximum = limits
-        self.issue_counts = Counter()
+        self.issue_counts: Counter[str] = Counter()
         self.count = 0
-        self.manifest = None
+        self.manifest: dict | None = None
         self.segment = 0
 
-    def batches(self):
-        """Yield bounded batches and finalize provenance at EOF."""
+    def batches(self) -> Iterator[tuple[pl.DataFrame, pl.DataFrame]]:
+        """Read scans in source order and finalize the manifest at end of file.
+
+        Yields:
+            Pairs of scan and diagnostic frames for one source layout.
+            Either frame may be empty. Scan times are UTC nanoseconds, and
+            source spans use inclusive, one-based physical line numbers.
+
+        Raises:
+            ProfileError: A layout or record fails the profile's input rules.
+            ValueError: The source size or modification time changes during
+                import.
+            OSError: The source cannot be opened or read.
+        """
         self.manifest = None
         self.issue_counts.clear()
         self.segment = 0
@@ -354,7 +412,8 @@ class MeasurementReader:
             physical = _Lines(buffered, cfg["encoding"], self.maximum, initial)
             records = _records(physical, cfg["delimiter"])
             binding, header = _layout(records, self.profile)
-            segments, grids = [], {}
+            segments: list[dict] = []
+            grids: dict = {}
             for section, (first_line, layout, labels, rows) in enumerate(
                 _sections(records, self.profile, binding, header)
             ):

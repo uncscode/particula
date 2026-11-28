@@ -4,27 +4,63 @@ import json
 import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import cast
 
 import polars as pl
 
 from particula.data.measurement import Measurement, measurement
-from particula.data.profile import canonical, digest, load_profile
+from particula.data.profile import (
+    ProfileSource,
+    canonical,
+    digest,
+    load_profile,
+)
 from particula.data.reader import MeasurementReader
 
 
-def read_measurement(source, *, profile, **limits) -> Measurement:
-    """Import one raw source into memory, applying the supplied profile."""
+def read_measurement(
+    source: str | os.PathLike[str], *, profile: ProfileSource, **limits: int
+) -> Measurement:
+    """Read a single instrument export into memory.
+
+    Args:
+        source: Path to the delimited export.
+        profile: Built-in ID, mapping, or path to a JSON or YAML profile.
+        **limits: Optional MeasurementReader chunk, record and batch limits.
+
+    Returns:
+        Measurement selected from the profile's quantities and coordinate
+        basis. Scans use the declared output units and include UTC timestamps.
+
+    Raises:
+        ProfileError: The profile or source violates the input rules.
+        ValueError: A reader limit is invalid or the source changes during
+            import.
+    """
     reader = MeasurementReader(source, profile, **limits)
     scans, issues = zip(*reader.batches(), strict=True)
     return measurement(
         pl.concat(scans, how="vertical_relaxed").lazy(),
         pl.concat(issues).lazy(),
-        reader.manifest,
+        cast(dict, reader.manifest),  # Finalized by exhausting batches().
     )
 
 
-def open_measurement(destination) -> Measurement:
-    """Open the completed scans and diagnostics with their units."""
+def open_measurement(destination: str | os.PathLike[str]) -> Measurement:
+    """Open a completed Parquet measurement for lazy analysis.
+
+    Args:
+        destination: Dataset directory created by import_to_parquet.
+
+    Returns:
+        Measurement with lazy scans and diagnostics, validated profile units
+        and coordinates from the stored manifest.
+
+    Raises:
+        OSError: The manifest cannot be opened or read.
+        ValueError: The format, profile or grid digests, part inventory, or
+            scan layout fails validation.
+    """
     root = Path(destination)
     manifest = json.loads((root / "manifest.json").read_bytes())
     if manifest.get("format_version") != 1:
@@ -35,7 +71,7 @@ def open_measurement(destination) -> Measurement:
     if any(digest(grid) != key for key, grid in manifest["grids"].items()):
         raise ValueError("Measurement grid digest mismatch")
 
-    def parts(prefix):
+    def parts(prefix: str) -> pl.LazyFrame:
         count = manifest["part_counts"][prefix]
         paths = sorted(root.glob(prefix + "-*.parquet"))
         if (
@@ -58,7 +94,7 @@ def open_measurement(destination) -> Measurement:
     )
 
 
-def _sync(path):
+def _sync(path: Path) -> None:
     if os.name == "nt" and path.is_dir():
         return
     descriptor = os.open(path, os.O_RDONLY)
@@ -68,11 +104,32 @@ def _sync(path):
         os.close(descriptor)
 
 
-def import_to_parquet(source, destination, *, profile, **limits) -> Measurement:
+def import_to_parquet(
+    source: str | os.PathLike[str],
+    destination: str | os.PathLike[str],
+    *,
+    profile: ProfileSource,
+    **limits: int,
+) -> Measurement:
     """Write bounded Parquet parts and atomically publish a completed import.
 
-    Repeating an import with identical source bytes and profile reopens the
-    existing result. A conflicting destination raises FileExistsError.
+    Args:
+        source: Path to a delimited instrument export.
+        destination: Directory to publish after all parts have been written.
+        profile: Built-in ID, mapping, or path to a JSON or YAML profile.
+        **limits: Optional MeasurementReader chunk, record and batch limits.
+
+    Returns:
+        Disk-backed measurement with lazy scans and source diagnostics.
+        An existing dataset is reused when the source digest, profile digest
+        and parser version match.
+
+    Raises:
+        FileExistsError: The destination holds an incomplete or different
+            dataset.
+        ProfileError: The profile or source violates the input rules.
+        ValueError: A reader limit is invalid or the source changes during
+            import.
     """
     reader = MeasurementReader(source, profile, **limits)
     dest = Path(destination)
@@ -90,7 +147,7 @@ def import_to_parquet(source, destination, *, profile, **limits) -> Measurement:
                     frame.write_parquet(path)
                     _sync(path)
                     counts[prefix] += 1
-        manifest = reader.manifest
+        manifest = cast(dict, reader.manifest)  # All batches are written.
         manifest["part_counts"] = counts
         meta = stage / "manifest.json"
         meta.write_bytes(canonical(manifest))

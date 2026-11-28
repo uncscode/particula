@@ -1,7 +1,10 @@
 """Import unit-described measurements with the optional data extra."""
 
-from importlib import import_module
 from typing import TYPE_CHECKING
+
+from particula.data._exports import load_export as _load_export
+
+__getattr__ = _load_export
 
 if TYPE_CHECKING:
     from particula.data.measurement import (
@@ -22,21 +25,6 @@ if TYPE_CHECKING:
         read_measurement,
     )
 
-_MODULES = {
-    "Measurement": "measurement",
-    "MobilityNumberSpectrum": "measurement",
-    "ParticleCountRate": "measurement",
-    "migrate_settings": "migration",
-    "ProfileError": "profile",
-    "describe_profile": "profile",
-    "validate_profile": "profile",
-    "MeasurementReader": "reader",
-    "inspect_source": "reader",
-    "import_to_parquet": "storage",
-    "open_measurement": "storage",
-    "read_measurement": "storage",
-}
-
 __all__ = [
     "Measurement",
     "MeasurementReader",
@@ -51,12 +39,3 @@ __all__ = [
     "read_measurement",
     "validate_profile",
 ]
-
-
-def __getattr__(name: str):
-    """Load a public data feature and its dependencies on first use."""
-    if name not in _MODULES:
-        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
-    value = getattr(import_module(f".{_MODULES[name]}", __name__), name)
-    globals()[name] = value
-    return value

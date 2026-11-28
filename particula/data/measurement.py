@@ -1,17 +1,40 @@
 """Measurement products with unit definitions, grids and source-scoped IDs."""
 
+from collections.abc import Iterable
+from typing import Self
+
+import numpy as np
 import polars as pl
 
 from particula.data._binding import Binding
 
 
 class Measurement:
-    """A Polars scan table and its profile, grids and parse diagnostics."""
+    """Measurements from one source, with a row per accepted scan.
+
+    Attributes:
+        lazy_frame: Scan columns in profile output units, with UTC timestamps.
+            The source digest and first physical line identify each scan.
+        lazy_issues: Parse diagnostics with inclusive physical line spans.
+        manifest: Import provenance, including the profile and source layouts.
+        grids: Coordinate definitions keyed by the grid ID stored on each scan
+            that contains spectral or array data.
+    """
 
     def __init__(
         self, scans: pl.LazyFrame, issues: pl.LazyFrame, manifest: dict
-    ):
-        """Validate columns and grids against the source layouts."""
+    ) -> None:
+        """Validate scan columns and coordinates against the source layouts.
+
+        Args:
+            scans: Lazy scan table with columns defined by the profile.
+            issues: Lazy diagnostic table for the original source.
+            manifest: Import manifest containing the profile, segment headers,
+                grids and source digest.
+
+        Raises:
+            ValueError: Scan column types or grids disagree with the layouts.
+        """
         self.lazy_frame = scans.with_columns(
             pl.lit(manifest["source_sha256"]).alias("source_sha256")
         )
@@ -37,7 +60,7 @@ class Measurement:
 
     @property
     def frame(self) -> pl.DataFrame:
-        """Collect all scans in memory; use lazy_frame for disk-sized inputs."""
+        """Collect the selected scans in memory, including their source IDs."""
         return self.lazy_frame.collect()
 
     @property
@@ -45,19 +68,52 @@ class Measurement:
         """Collect source-located diagnostics."""
         return self.lazy_issues.collect()
 
-    def filter(self, predicate):
-        """Select scans and retain their source identity and report."""
+    def filter(
+        self,
+        predicate: pl.Expr
+        | pl.Series
+        | str
+        | Iterable[pl.Expr | pl.Series | str]
+        | bool
+        | list[bool]
+        | np.ndarray,
+    ) -> Self:
+        """Select scans while retaining the original source diagnostics.
+
+        Args:
+            predicate: Boolean expression, column, mask, or predicates
+                accepted by Polars LazyFrame.filter.
+
+        Returns:
+            Measurement of the same type with a lazily filtered scan table.
+            The manifest and diagnostics still describe the full source.
+        """
         return type(self)(
             self.lazy_frame.filter(predicate), self.lazy_issues, self.manifest
         )
 
     def quality_summary(
-        self, field, *, exclude_flags=(), exclude_repaired=False
-    ):
+        self,
+        field: str,
+        *,
+        exclude_flags: str | Iterable[str] = (),
+        exclude_repaired: bool = False,
+    ) -> pl.LazyFrame:
         """Summarize a scalar field after explicit source-quality exclusions.
 
-        The mean uses valid samples with equal weight. Report populations,
-        the time range affected and the applied policy with the result.
+        Args:
+            field: Name of a scalar field declared in the profile.
+            exclude_flags: Omit scans carrying any of these vendor flags.
+            exclude_repaired: Omit scans reconstructed from logger fragments.
+
+        Returns:
+            One lazy row with the source, exclusion policy, scan and sample
+            counts, and UTC bounds of excluded scans. The mean weights each
+            retained, non-null sample equally and uses the field's output unit.
+
+        Raises:
+            ValueError: The field is undeclared or the requested flag
+                exclusions require a missing vendor status field.
         """
         fields = {f["name"] for f in self.manifest["profile"].get("fields", [])}
         if field not in fields:
@@ -88,8 +144,16 @@ class Measurement:
             excluded.max().alias("last_excluded"),
         )
 
-    def flag_summary(self):
-        """Count each raw vendor condition and report its observed time span."""
+    def flag_summary(self) -> pl.LazyFrame:
+        """Count each vendor condition once per scan.
+
+        Returns:
+            Lazy table of flag labels, affected and total scan counts, and
+            the first and last UTC time at which each flag appeared.
+
+        Raises:
+            ValueError: The profile does not declare vendor flags.
+        """
         if "vendor_flags" not in self.manifest["profile"]:
             raise ValueError("This source has no vendor status field")
         return (
@@ -109,10 +173,10 @@ class Measurement:
             .sort("vendor_flags")
         )
 
-    def available_operations(self):
-        """Describe compatible operations and any required additional inputs."""
+    def available_operations(self) -> dict[str, tuple[str, ...]]:
+        """Map compatible operation names to their required input names."""
         profile = self.manifest["profile"]
-        operations = {"filter": ()}
+        operations: dict[str, tuple[str, ...]] = {"filter": ()}
         if profile.get("fields"):
             operations["quality_summary"] = ("field",)
         if "vendor_flags" in profile:
@@ -123,8 +187,10 @@ class Measurement:
 class ParticleCountRate(Measurement):
     """A measurement containing detector count rate in declared units."""
 
-    def __init__(self, scans, issues, manifest):
-        """Check the physical product and its source schema."""
+    def __init__(
+        self, scans: pl.LazyFrame, issues: pl.LazyFrame, manifest: dict
+    ) -> None:
+        """Require a profile that declares a detector count-rate field."""
         super().__init__(scans, issues, manifest)
         if not any(
             f["quantity"] == "count_rate"
@@ -134,8 +200,8 @@ class ParticleCountRate(Measurement):
                 "ParticleCountRate requires a detector count-rate field"
             )
 
-    def available_operations(self):
-        """Report the flow input needed to derive sampled concentration."""
+    def available_operations(self) -> dict[str, tuple[str, ...]]:
+        """Include sample flow as a prerequisite for number concentration."""
         return {
             **super().available_operations(),
             "number_concentration": ("sample_flow",),
@@ -145,8 +211,10 @@ class ParticleCountRate(Measurement):
 class MobilityNumberSpectrum(Measurement):
     """Number per log10 electrical-mobility diameter on a declared grid."""
 
-    def __init__(self, scans, issues, manifest):
-        """Check the physical product and its source schema."""
+    def __init__(
+        self, scans: pl.LazyFrame, issues: pl.LazyFrame, manifest: dict
+    ) -> None:
+        """Require a number-per-decade spectrum and mobility diameter grid."""
         super().__init__(scans, issues, manifest)
         spec = manifest["profile"].get("spectrum", {})
         if (
@@ -159,10 +227,15 @@ class MobilityNumberSpectrum(Measurement):
             )
 
     def integrated_number(self) -> pl.LazyFrame:
-        """Return lazy scan totals in the declared concentration unit.
+        """Integrate number concentration over measured mobility diameters.
 
-        Missing channels leave the total null. Each grid supplies its own
-        decimal-log width, derived from the instrument's channels per decade.
+        Each channel contributes its number density per decade multiplied by
+        the reciprocal of the grid's reported channels per decade.
+
+        Returns:
+            Lazy table of scan IDs, UTC times and integrated number in the
+            profile's concentration unit. A missing channel yields a null
+            total for that scan.
         """
         name = self.manifest["profile"]["spectrum"]["name"]
         widths = {k: v["log10_bin_width"] for k, v in self.grids.items()}
@@ -177,12 +250,14 @@ class MobilityNumberSpectrum(Measurement):
             "scan_id", "time_utc", total.alias("integrated_number")
         )
 
-    def available_operations(self):
+    def available_operations(self) -> dict[str, tuple[str, ...]]:
         """Report the spectrum integral."""
         return {**super().available_operations(), "integrated_number": ()}
 
 
-def measurement(scans, issues, manifest):
+def measurement(
+    scans: pl.LazyFrame, issues: pl.LazyFrame, manifest: dict
+) -> Measurement:
     """Select the product by measured quantities and coordinate basis."""
     profile = manifest["profile"]
     spectrum = profile.get("spectrum", {})

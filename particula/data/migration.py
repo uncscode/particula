@@ -49,13 +49,24 @@ _AIM_FIELDS = {
 
 @dataclass
 class Migration:
-    """Translated fields, original settings and unresolved decisions."""
+    """Result of translating a beta stream configuration.
+
+    Attributes:
+        profile: Candidate import profile with the original settings under
+            `legacy_settings`.
+        errors: Diagnostics for settings requiring a migration decision.
+    """
 
     profile: dict
     errors: list[ProfileError]
 
-    def resolved_profile(self):
-        """Return the validated profile when every legacy option is resolved."""
+    def resolved_profile(self) -> dict:
+        """Return the validated profile when every legacy option is resolved.
+
+        Raises:
+            ProfileError: Migration recorded an unresolved setting or the
+                candidate profile fails validation.
+        """
         if self.errors:
             raise self.errors[0]
         return load_profile(self.profile)
@@ -172,15 +183,26 @@ def _legacy_clock(settings):
 
 
 def migrate_settings(
-    settings: dict, *, fields=None, on_bad_record=None
+    settings: dict,
+    *,
+    fields: dict | None = None,
+    on_bad_record: str | None = None,
 ) -> Migration:
     """Translate a beta 1D or AIM 2D settings mapping.
 
-    Supply definitions by legacy output label for unknown quantities.
-    A bad-record policy replaces old length and character filters. Original
-    settings, including discovery rules, are retained in profile provenance.
+    Args:
+        settings: Beta scalar or sizer stream settings, including its clock,
+            column selectors and source discovery rules.
+        fields: Scalar field definitions keyed by legacy output label. Supply
+            the quantity, source unit and output unit for unfamiliar channels.
+        on_bad_record: Profile policy for malformed rows. An explicit choice
+            is required to replace legacy character and length filters.
+
+    Returns:
+        Candidate profile, original settings and diagnostics for unresolved
+        choices. Call resolved_profile() before using the result for import.
     """
-    errors = []
+    errors: list[ProfileError] = []
 
     def issue(path, message):
         errors.append(ProfileError("legacy_setting", path, message))

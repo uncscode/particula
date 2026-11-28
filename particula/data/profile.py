@@ -36,16 +36,26 @@ class ProfileError(ValueError):
 
     def __init__(
         self,
-        code,
-        path,
-        message,
+        code: str,
+        path: str,
+        message: str,
         *,
-        observed=None,
-        expected=None,
-        source_line_start=None,
-        source_line_end=None,
-    ):
-        """Attach a stable code and JSON Pointer to the diagnostic."""
+        observed: object = None,
+        expected: object = None,
+        source_line_start: int | None = None,
+        source_line_end: int | None = None,
+    ) -> None:
+        """Describe a profile error and its location.
+
+        Args:
+            code: Machine-readable diagnostic identifier.
+            path: JSON Pointer within the profile, or empty for its root.
+            message: Human-readable explanation.
+            observed: Value that failed validation, when available.
+            expected: Constraint or expected value, when available.
+            source_line_start: First physical source line, counted from one.
+            source_line_end: Last physical source line, inclusive.
+        """
         self.severity = "error"
         self.observed = observed
         self.expected = expected
@@ -63,8 +73,8 @@ class ValidationResult:
 
     errors: tuple[ProfileError, ...] = ()
 
-    def raise_for_errors(self):
-        """Raise the first diagnostic, when present."""
+    def raise_for_errors(self) -> None:
+        """Raise the first ProfileError if validation recorded any errors."""
         if self.errors:
             raise self.errors[0]
 
@@ -85,7 +95,7 @@ class _Loader(yaml.SafeLoader):
         return _pairs(self.construct_pairs(node, deep=True))
 
 
-def canonical(value):
+def canonical(value: object) -> bytes:
     """Serialize JSON values deterministically for provenance."""
     return json.dumps(
         value,
@@ -96,7 +106,7 @@ def canonical(value):
     ).encode()
 
 
-def digest(value):
+def digest(value: object) -> str:
     """Return the SHA-256 of a normalized definition."""
     return hashlib.sha256(canonical(value)).hexdigest()
 
@@ -115,7 +125,19 @@ def _validator():
 
 
 def describe_profile(profile: ProfileSource | None = None) -> dict:
-    """Return the installed schema or a validated profile."""
+    """Describe the profile format or resolve a particular profile.
+
+    Args:
+        profile: Built-in ID, mapping, or path to a JSON or YAML file.
+            Omit to retrieve the installed JSON Schema.
+
+    Returns:
+        A fresh dictionary containing the schema or the validated profile,
+        including its declared quantities, units and clock interpretation.
+
+    Raises:
+        ProfileError: The supplied profile cannot be loaded or validated.
+    """
     if profile is None:
         return json.loads(_resource("profile.schema.json"))
     return load_profile(profile)
@@ -168,7 +190,18 @@ def _validate_array(field, index):
 
 
 def load_profile(profile: ProfileSource) -> dict:
-    """Load and validate a built-in ID, mapping, YAML or JSON file."""
+    """Load a profile and validate its schema, names, axes and time zone.
+
+    Args:
+        profile: Built-in ID, mapping, or path to a JSON or YAML file.
+
+    Returns:
+        Validated profile independent of the caller's input mapping.
+
+    Raises:
+        ProfileError: The input cannot be decoded or violates a profile
+            constraint. The diagnostic identifies the location when available.
+    """
     try:
         value = _decode(profile)
         canonical(value)
@@ -220,9 +253,22 @@ def load_profile(profile: ProfileSource) -> dict:
 
 
 def validate_profile(
-    profile: ProfileSource, *, source=None
+    profile: ProfileSource, *, source: str | PathLike[str] | None = None
 ) -> ValidationResult:
-    """Check profile semantics and optionally bind a source header."""
+    """Check a profile and optionally bind it to the first source layout.
+
+    Args:
+        profile: Built-in ID, mapping, or path to a JSON or YAML file.
+        source: Optional delimited export for checking column selectors,
+            coordinate definitions and preamble requirements.
+
+    Returns:
+        Validation result with the first profile diagnostic, or an empty
+        error tuple on success.
+
+    Raises:
+        OSError: The supplied source cannot be opened or read.
+    """
     try:
         value = load_profile(profile)
         if source is not None:

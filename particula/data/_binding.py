@@ -17,30 +17,36 @@ _EPOCH = datetime(1970, 1, 1, tzinfo=UTC)
 
 
 def _index(selector, header, width, path):
+    """Resolve a numeric offset or unique header label within the layout."""
     if isinstance(selector, int):
-        n = selector
+        index = selector
     elif header is None or header.count(selector) != 1:
         raise ProfileError(
             "source_column", path, f"Expected one header {selector!r}"
         )
     else:
-        n = header.index(selector)
-    if width is not None and n >= width:
+        index = header.index(selector)
+    if width is not None and index >= width:
         raise ProfileError(
-            "source_column", path, f"Column {n} exceeds width {width}"
+            "source_column", path, f"Column {index} exceeds width {width}"
         )
-    return n
+    return index
 
 
 @lru_cache(maxsize=128)
-def _affine(source, target):
+def _affine(source: str, target: str) -> tuple[float, float]:
+    """Return scale and offset for converting source units to output units."""
     if source == target:
         return 1.0, 0.0
-    zero, one = get_unit_conversion(source, target, value=np.array([0.0, 1.0]))
+    zero, one = np.asarray(
+        get_unit_conversion(source, target, value=np.array([0.0, 1.0]))
+    )
     return float(one - zero), float(zero)
 
 
 class _Field:
+    """Decode selected columns as a scalar or an array on the declared axes."""
+
     def __init__(self, spec, indices, missing, shape=()):
         self.name = spec["name"]
         self.indices = indices
@@ -55,8 +61,9 @@ class _Field:
         self.dtype = pl.Array(dtype, shape) if shape else dtype
         self.shape = shape
 
-    def decode(self, row):
-        values = []
+    def decode(self, row: list[str]):
+        """Convert values to output units and retain missing tokens as nulls."""
+        values: list[float | None] = []
         for idx in self.indices:
             token = row[idx].strip()
             if token in self.missing:
@@ -74,6 +81,7 @@ class _Field:
 
 
 def _sizer_grid(profile, header, preamble, index):
+    """Read diameter midpoints and bin width from the source layout."""
     spec = profile["spectrum"]
     axis = spec["axis"]
     for k, expected in spec["require_preamble"].items():
@@ -102,19 +110,21 @@ def _sizer_grid(profile, header, preamble, index):
         start, stop = first, last + 1
     try:
         scale, offset = _affine(axis["source_unit"], axis["output_unit"])
-        mid = np.array(header[start:stop], dtype=float) * scale + offset
-        cpd = float(preamble[axis["channels_per_decade_key"]])
+        midpoints = np.array(header[start:stop], dtype=float) * scale + offset
+        channels_per_decade = float(preamble[axis["channels_per_decade_key"]])
         if not (
-            math.isfinite(cpd)
-            and cpd > 0
-            and mid.size
-            and np.all(np.isfinite(mid))
-            and np.all(mid > 0)
-            and np.all(np.diff(mid) > 0)
+            math.isfinite(channels_per_decade)
+            and channels_per_decade > 0
+            and midpoints.size
+            and np.all(np.isfinite(midpoints))
+            and np.all(midpoints > 0)
+            and np.all(np.diff(midpoints) > 0)
         ):
             raise ValueError("Invalid diameter grid or channels per decade")
         # Rounded vendor midpoint labels may differ by one last printed digit.
-        nominal = mid[0] * 10.0 ** (np.arange(len(mid)) / cpd)
+        nominal = midpoints[0] * 10.0 ** (
+            np.arange(len(midpoints)) / channels_per_decade
+        )
         tolerance = (
             np.array(
                 [
@@ -125,8 +135,8 @@ def _sizer_grid(profile, header, preamble, index):
             * scale
         )
         if np.any(
-            np.abs(nominal - mid)
-            > (tolerance + tolerance[0] * nominal / mid[0])
+            np.abs(nominal - midpoints)
+            > (tolerance + tolerance[0] * nominal / midpoints[0])
         ):
             raise ValueError(
                 "Midpoints disagree with reported channels per decade"
@@ -134,10 +144,10 @@ def _sizer_grid(profile, header, preamble, index):
     except (KeyError, ValueError, InvalidOperation) as exc:
         raise ProfileError("grid", "/spectrum/axis", str(exc)) from exc
     grid = {
-        "coordinates": {"diameter": mid.tolist()},
+        "coordinates": {"diameter": midpoints.tolist()},
         "axes": [axis],
-        "channels_per_decade": cpd,
-        "log10_bin_width": 1.0 / cpd,
+        "channels_per_decade": channels_per_decade,
+        "log10_bin_width": 1.0 / channels_per_decade,
         "edge_convention": "midpoint times 10^(±0.5/channels_per_decade)",
         "source_midpoints": header[start:stop],
     }
@@ -210,23 +220,26 @@ class Binding:
         self.schema.update({f.name: f.dtype for f in self.fields})
         self.flag = None
         if "vendor_flags" in profile:
-            f = profile["vendor_flags"]
-            self.flag = (index(f["column"], "/vendor_flags"), f["separator"])
+            flags = profile["vendor_flags"]
+            self.flag = (
+                index(flags["column"], "/vendor_flags"),
+                flags["separator"],
+            )
             self.schema.update(
                 vendor_status=pl.String, vendor_flags=pl.List(pl.String)
             )
         self.timing = {}
         if "scan_timing" in profile:
-            t = profile["scan_timing"]
+            timing = profile["scan_timing"]
             for key in ("scan", "retrace"):
                 name = key + "_duration_s"
                 self.timing[name] = (
-                    index(t[key + "_duration_column"], "/scan_timing"),
-                    0.001 if t["unit"] == "ms" else 1.0,
+                    index(timing[key + "_duration_column"], "/scan_timing"),
+                    0.001 if timing["unit"] == "ms" else 1.0,
                 )
                 self.schema[name] = pl.Float64
 
-    def timestamp(self, row):
+    def timestamp(self, row: list[str]) -> int:
         """Parse epoch ticks or an unambiguous local wall time to UTC ns."""
         if self.clock["kind"] == "unix":
             try:
@@ -264,11 +277,13 @@ class Binding:
             raise ValueError("Timestamp outside nanosecond range")
         return result
 
-    def decode(self, row, start, end, repaired=False):
+    def decode(
+        self, row: list[str], start: int, end: int, repaired: bool = False
+    ) -> dict:
         """Decode a record using its source line as its local scan ID."""
         if self.width is not None and len(row) != self.width:
             raise ValueError(f"Expected {self.width} fields; found {len(row)}")
-        data = {
+        data: dict = {
             "scan_id": start,
             "source_line_start": start,
             "source_line_end": end,
