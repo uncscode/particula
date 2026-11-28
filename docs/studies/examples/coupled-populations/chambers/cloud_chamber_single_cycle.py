@@ -199,7 +199,7 @@ wall_loss_strategy.random_generator = np.random.default_rng(42)
 def species_inventory(aero):
     """Extensive inventory for the three mapped species, kg."""
     return np.sum(
-        aero.particles.masses * aero.particles.concentration[..., None], axis=1
+        aero.particles.masses * aero.particles.population[..., None], axis=1
     ) + (aero.gas.concentration[:, :3] * aero.particles.volume[:, None])
 
 

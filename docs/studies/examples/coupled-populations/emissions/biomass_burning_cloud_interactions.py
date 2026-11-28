@@ -179,7 +179,7 @@ def species_inventory(aero):
     """Independent extensive material inventory, kg per species."""
     return (
         np.sum(
-            aero.particles.masses * aero.particles.concentration[..., None],
+            aero.particles.masses * aero.particles.population[..., None],
             axis=1,
         )
         + aero.gas.concentration * aero.particles.volume[:, None]
@@ -426,7 +426,7 @@ for name, collision in [
             obj = coupled.snapshot()
             assert coupled.coupling_uploads == coupled.coupling_downloads == 0
             assert coupled.completed_steps == 10_000
-            assert np.count_nonzero(obj.particles.concentration) == (
+            assert np.count_nonzero(obj.particles.population) == (
                 number_of_samples - mergers
             )
             print(
