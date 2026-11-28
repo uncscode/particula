@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "figure_dpi": 300,
+  "elapsed_seconds": 3.6835455161053687,
+  "package_source_sha256": "369b5b6034c27333eef745bfc4b7373753c599cdd397cc98b2cabe12f8455028",
+  "scientific_source_sha256": "0a7055faa19d97b279f458b4d93eb29a47c0a12c5534b3b0684e5ae9883ffb9b",
+  "input_sha256": {
+    "particula/optics/reference_data/gas_reduced.npz": "92ddac24d33d8966ca1226f54a8c67ff84b83f68fc24e7512315a026eb648834",
+    "particula/optics/reference_data/tsis1.txt": "3fccfc7415b2cf4743905c9f7566ed632046c7badbe59dec350dc108bc5b7b3f"
+  },
+  "example": "shortwave-parcel-surfaces",
+  "fingerprint": "84686bcf0eca11bc781c479ce9abc21fd28896659ead66bec31da47514af23af",
+  "source": "docs/studies/examples/coupled-populations/radiation/parcel_surfaces.py",
+  "revision": "2320b8071ceff8222098a21fd9c4b9af49b06444",
+  "package_dirty": true,
+  "executed_at": "2026-11-28T16:28:48.545516+00:00",
+  "device": "CPU",
+  "python": "3.12.12",
+  "versions": {
+    "particula": "0.4.0",
+    "numpy": "2.3.4",
+    "scipy": "1.16.2",
+    "matplotlib": "3.10.7",
+    "nbclient": "0.10.2",
+    "jupytext": "1.17.3",
+    "warp-lang": "1.11.1",
+    "particula-distribution": "0.2.14"
+  },
+  "outputs": [
+    [],
+    [],
+    [],
+    [],
+    [
+      {
+        "text": "Ocean: reflected +3.73, surface uptake -13.19, air absorption +9.46 W/m\u00b2 (case minus aerosol-free)\nDusty ground: reflected -3.36, surface uptake -8.63, air absorption +11.99 W/m\u00b2 (case minus aerosol-free)\n"
+      },
+      {
+        "image": "figure-5-1.png"
+      }
+    ]
+  ],
+  "files": {
+    "source.py": "a573198433dc31bae9e2e2ad7186e5c733474682b6b7800b96f022da0a40f217",
+    "data.json": "5cee7fd57d57d4cfcd253c4b01e4d5fe89234ccfda947d68db6cd545c7aa0e47",
+    "figure-5-1.png": "7ea081ba1507dcb4158a0d97ae203f69863910450ed9edaf99470ea3d86c859d"
+  },
+  "simulation_fingerprint": "1d70ade7dfbfda07678f8658e3fb72bc864f7cc15fa545d5ab6ed5149f56ce23"
+}

@@ -2373,5 +2373,52 @@
     ],
     "plot_inputs": [],
     "full_canvas": true
+  },
+  "shortwave-parcel-surfaces": {
+    "title": "How does the ground change the sunlight reflected by an aerosol layer?",
+    "source": "docs/studies/examples/coupled-populations/radiation/parcel_surfaces.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 600,
+    "inputs": [],
+    "science_inputs": [
+      "particula/optics/reference_data/gas_reduced.npz",
+      "particula/optics/reference_data/tsis1.txt"
+    ],
+    "invoke": "report = simulate()\nplot_results(report)\nplt.show()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nplot_results(report)\nplt.show()",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
+  },
+  "shortwave-layer-altitude": {
+    "title": "Does moving an absorbing layer change where sunlight is lost?",
+    "source": "docs/studies/examples/coupled-populations/radiation/layer_altitude.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 600,
+    "science_inputs": [
+      "particula/optics/reference_data/gas_reduced.npz",
+      "particula/optics/reference_data/tsis1.txt"
+    ],
+    "inputs": [
+      "docs/data/shortwave/sodankyla-20220715/manifest.json",
+      "docs/data/shortwave/sodankyla-20220715/power-hourly.json"
+    ],
+    "invoke": "report = simulate()\nplot_results(report)\nplt.show()",
+    "data_expression": "report",
+    "replot_invoke": "report = saved_data\nplot_results(report)\nplt.show()",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true,
+    "input_destinations": {
+      "docs/data/shortwave/sodankyla-20220715/manifest.json": "sodankyla-20220715/manifest.json",
+      "docs/data/shortwave/sodankyla-20220715/power-hourly.json": "sodankyla-20220715/power-hourly.json"
+    }
   }
 }

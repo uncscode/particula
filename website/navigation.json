@@ -375,6 +375,20 @@
       {
         "label": "Ion–particle encounters",
         "slug": "theory/dynamics/ion-particle-encounters"
+      },
+      {
+        "label": "Optics",
+        "collapsed": true,
+        "items": [
+          {
+            "label": "Spectral transport in parcels and columns",
+            "slug": "theory/optics/spectral-transport"
+          },
+          {
+            "label": "Surface reflection and satellite observables",
+            "slug": "theory/optics/surface-and-sensor"
+          }
+        ]
       }
     ]
   },

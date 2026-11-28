@@ -39,4 +39,5 @@ material model.
 - [Dry aerosols and humid air with ions](environment/index.md)
 - [Emissions and partitioning](emissions/index.md)
 - [Forcing and heterogeneous boxes](forcing/index.md)
+- [Sunlight through aerosol layers](radiation/index.md)
 <!-- STUDY_LIST_END -->

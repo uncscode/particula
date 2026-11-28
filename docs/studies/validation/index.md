@@ -14,5 +14,6 @@ Inspect what was compared, which reference was used, and the range of workloads 
 - [Mechanism discovery](chemistry/index.md)
 - [Optics](optics/index.md)
 - [Prescribed flow and CFD replay](prescribed-flow/index.md)
+- [Shortwave radiation](spectral-radiation/index.md)
 - [Workflow and release qualification](workflows-and-releases/index.md)
 <!-- STUDY_LIST_END -->

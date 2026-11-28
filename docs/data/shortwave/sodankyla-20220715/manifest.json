@@ -1,0 +1,17 @@
+{
+  "source": "NASA Langley Research Center POWER Hourly API",
+  "api_version": "v2.10.5",
+  "source_products": [
+    "SYN1DEG",
+    "POWER"
+  ],
+  "terms": "https://power.larc.nasa.gov/docs/referencing/",
+  "request": "https://power.larc.nasa.gov/api/temporal/hourly/point?parameters=ALLSKY_SFC_SW_DWN%2CALLSKY_SFC_SW_DNI%2CALLSKY_SFC_SW_DIFF&community=RE&longitude=26.62901&latitude=67.36663&start=20220715&end=20220715&format=JSON&time-standard=UTC",
+  "retrieved_utc": "2026-11-28T16:01:30.332495+00:00",
+  "file": "power-hourly.json",
+  "sha256": "cdcbe9ea94f156c4f6004a3d2094f3ef2f9bbf921f643c142545f29af29d7c5f",
+  "parameter_sha256": "2f7049dfc7658e55d05786035ff2aedd2619bf9ca735167e037a8bb48bd9332e",
+  "quality": "Reject missing, fill, nonfinite and negative values at use.",
+  "transformation": "Wh/m\u00b2 over one UTC hour divided by 1 h yields mean W/m\u00b2.",
+  "license": "Public domain. NASA POWER requests acknowledgement."
+}
