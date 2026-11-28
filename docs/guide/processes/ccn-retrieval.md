@@ -4,6 +4,26 @@ Suppose a differential mobility analyzer selects 100 nm particles and a cloud co
 
 This technical note follows a synthetic 100 nm selection from scan design to an independent test of the fitted κ. The numerical reference extends from 10 to 200 nm. It assumes spherical, singly charged particles initially equilibrated at 95% relative humidity (RH), followed by a step to prescribed water supersaturation at 298.15 K. Count a particle when its wet diameter reaches 1 µm. The actual instrument's calibrated supersaturation, optical response and residence history belong in an experimental analysis. [Model specification and reproducibility](../../studies/literature/particle-water-uptake/ccn-retrieval/index.md)
 
+## Calculate the equilibrium cutoff for a counter setting
+
+For a specified material and counter setting, calculate the smallest dry particle whose equilibrium barrier is at or below the imposed water saturation ratio. Convert percent supersaturation to a ratio and express the diameter-basis Kelvin length in metres.
+
+```python
+from particula.particles import get_kappa_kohler_critical_dry_diameter
+
+supersaturation_percent = 0.2
+dry_cutoff_m = get_kappa_kohler_critical_dry_diameter(
+    kappa=0.3,
+    saturation_ratio=1 + supersaturation_percent / 100,
+    kelvin_diameter=2.1e-9,
+)
+print(f"{dry_cutoff_m * 1e9:.5f} nm")  # 104.53745 nm
+```
+
+If you have the Kelvin radius from `get_kelvin_radius`, double it before supplying `kelvin_diameter`. Compare the cutoff with the volume-equivalent **dry** diameters of the sampled particles. Predicting how many reach the counter's optical size during their residence time adds a separate growth calculation. [Derivation and dry-volume weighting](../../theory/thermodynamics/kappa-kohler-activation.md) · [Run the equilibrium spectrum example](../../studies/examples/thermodynamics/activity/equilibrium_ccn_spectrum.py)
+
+For live simulation output, attach a `CCNObserver` using `ccn=` in `run_until` (CPU) or `run_prepared` (Warp CPU or CUDA). Use `ccn_output_times` for selected times or omit it to sample each accepted step. Use `latest()` for one row, `arrays()` for the history, or `save(path)` for a compact archive. The count includes dry diameters within 32 float64 machine epsilons of the cutoff to make a numerical tie consistent across backends. Discrete and resolved populations use represented counts divided by the box volume. With material-specific κ, the history retains the bulk number at each setting. To recover individual thresholds or add a setting, evaluate a snapshot with `evaluate_ccn`, or use `evaluate_ccn_history` on an analysis archive with slot masses, populations and volume. Include temperature when deriving the Kelvin length from the live environment.
+
 ## Choose a scan that can see the transition
 
 Start with the dry **number** distribution transmitted by the differential mobility analyzer (DMA), the classifier used in a scanning mobility particle sizer (SMPS). Record its median mobility diameter and geometric standard deviation (GSD). Check the transmitted distribution and possible contributions from larger, multiply charged particles. For a size-selected CCN measurement, pair counts from the CCN counter with total condensation nuclei (CN) counts for the same selection. Align sampling intervals and account for flow, dilution and transmission differences before taking their ratio. Salt calibration measurements by Rose and colleagues illustrate how uncertainty in size selection and effective supersaturation enters this ratio. [Rose et al. (2008)](https://doi.org/10.5194/acp-8-1153-2008)

@@ -28,6 +28,7 @@ hardware/runtime requirement; requesting CUDA never selects Warp CPU silently.
 | Sparse AIOMFAC neutral activities | Fixed-step box condensation, host or resident RK23 and ROS3 boxes, and resident RK23 and ROS3 multi-vapor parcels | Select `evaluation="hybrid"` and a matching `table`. Stage fluxes use guarded lookup. ROS3 evaluates the physical Jacobian with direct CUDA activities. [Measured accuracy, timings and activation](../../studies/validation/condensation/aiomfac-sparse/index.md) |
 | Multi-vapor rising parcel | Explicit wet classes, finite vapor mixing ratios and shared surface heat balance through `run_parcel` | Constant updraft, continuum transport, unit accommodation and resident RK23/ROS3. [Parcel example](../../studies/examples/thermodynamics/parcel-experiments/aiomfac_multivapor_parcel.py) |
 | Coupled adaptive simulation | `GPUCoupledSimulation(..., resident=True)` | Fixed event schedule and persistent RNG; device-only stage handoff, explicit observations and boundary restart. |
+| Shortwave radiative transfer | [Batched columns and live parcel diagnostics](../optics/index.md#compare-several-columns-on-a-warp-device) | Spectral flux, directional radiance and paired broadband changes. A prepared simulation can sample discrete or resolved particles between steps. |
 | Warp CPU | Separate regression target | CPU evidence is labeled separately from actual CUDA execution and performance. |
 
 Discrete and resolved Warp state holds raw `population` and per-box air

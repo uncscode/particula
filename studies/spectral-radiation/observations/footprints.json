@@ -1,0 +1,1176 @@
+{
+  "sources": [
+    {
+      "granule": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001111308",
+      "sha256": "76c8fc088466dd2c4784ce076a8790a397279dd6d85384282357bfab71c3700f",
+      "counts": {
+        "total": 99361,
+        "outside_subtropical_sample": 45175,
+        "outside_daylight_angle_range": 18091,
+        "ceres_instrument_or_earth_view": 0,
+        "missing_imager": 2584,
+        "cloud": 23798,
+        "mixture": 6462,
+        "missing_flux_or_view": 2,
+        "outside_ocean_wind_domain": 59,
+        "outside_profile_domain": 0,
+        "missing_aod_or_land_reflectance": 225,
+        "missing_aod": 160,
+        "retained": 2805
+      },
+      "eligible_strata": {
+        "land_high_view": 1010,
+        "ocean_off_glint": 408,
+        "land_low_view": 1213,
+        "ocean_near_glint": 174
+      }
+    },
+    {
+      "granule": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001112908",
+      "sha256": "46426430b8086aa24fb2afce2d8afdc0c823c45af697f825f488df16f422e2db",
+      "counts": {
+        "total": 99358,
+        "outside_subtropical_sample": 45173,
+        "outside_daylight_angle_range": 18362,
+        "ceres_instrument_or_earth_view": 0,
+        "missing_imager": 2463,
+        "cloud": 26547,
+        "mixture": 4883,
+        "missing_flux_or_view": 0,
+        "outside_ocean_wind_domain": 4,
+        "outside_profile_domain": 3,
+        "missing_aod_or_land_reflectance": 146,
+        "missing_aod": 60,
+        "retained": 1717
+      },
+      "eligible_strata": {
+        "land_low_view": 687,
+        "ocean_off_glint": 223,
+        "land_high_view": 686,
+        "ocean_near_glint": 121
+      }
+    }
+  ],
+  "footprints": [
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001111308",
+      "footprint": 5833,
+      "surface": "bare",
+      "time": "2001-11-13T08:03:32.880935+00:00",
+      "latitude": 24.289451599121094,
+      "longitude": 50.75609588623047,
+      "elevation_m": 92.48223876953125,
+      "solar_zenith_deg": 42.517784118652344,
+      "view_zenith_deg": 58.63999938964844,
+      "relative_azimuth_deg": 109.04000854492188,
+      "clear_percent": 100.0,
+      "wind_m_s": 1.8186190491497862,
+      "aod550": 0.31540924310684204,
+      "angstrom": 0.7423907518386841,
+      "aod_donor_footprint": 5833,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 55.1211126730199,
+      "land_surface_reflectance": [
+        0.1334087997674942,
+        0.1797327697277069,
+        0.37742093205451965
+      ],
+      "land_ssa659": 0.975428581237793,
+      "pressure_hpa": 997.25341796875,
+      "precipitable_water_cm": 1.79976487159729,
+      "ceres_sw_w_m2": 321.42767333984375,
+      "modis_radiance_w_m2_sr_um": [
+        144.44798278808594,
+        110.75081634521484
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        9.668102264404297,
+        9.418420791625977
+      ],
+      "stratum": "land_high_view"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001111308",
+      "footprint": 7562,
+      "surface": "bare",
+      "time": "2001-11-13T08:04:35.580735+00:00",
+      "latitude": 23.17090606689453,
+      "longitude": 31.647377014160156,
+      "elevation_m": 251.17489624023438,
+      "solar_zenith_deg": 47.03925704956055,
+      "view_zenith_deg": 58.90999984741211,
+      "relative_azimuth_deg": 305.9700012207031,
+      "clear_percent": 100.0,
+      "wind_m_s": 3.739594931752878,
+      "aod550": 0.1657615751028061,
+      "angstrom": 1.0,
+      "aod_donor_footprint": 7562,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 90.92739640142308,
+      "land_surface_reflectance": [
+        0.1117069199681282,
+        0.1546431928873062,
+        0.3838835060596466
+      ],
+      "land_ssa659": 0.9750078320503235,
+      "pressure_hpa": 988.7024536132812,
+      "precipitable_water_cm": 1.029731273651123,
+      "ceres_sw_w_m2": 286.4847717285156,
+      "modis_radiance_w_m2_sr_um": [
+        134.89788818359375,
+        102.72185516357422
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        25.780757904052734,
+        22.425460815429688
+      ],
+      "stratum": "land_high_view"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001111308",
+      "footprint": 8758,
+      "surface": "bare",
+      "time": "2001-11-13T08:05:18.740630+00:00",
+      "latitude": 18.80451202392578,
+      "longitude": 44.682884216308594,
+      "elevation_m": 1047.2869873046875,
+      "solar_zenith_deg": 38.11708450317383,
+      "view_zenith_deg": 38.400001525878906,
+      "relative_azimuth_deg": 115.19000244140625,
+      "clear_percent": 100.0,
+      "wind_m_s": 3.4293997760163943,
+      "aod550": 0.06479042023420334,
+      "angstrom": 1.0,
+      "aod_donor_footprint": 8758,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 38.76123404521315,
+      "land_surface_reflectance": [
+        0.11215322464704514,
+        0.14976327121257782,
+        0.35459041595458984
+      ],
+      "land_ssa659": 0.9752681851387024,
+      "pressure_hpa": 857.3822021484375,
+      "precipitable_water_cm": 1.32401442527771,
+      "ceres_sw_w_m2": 331.75457763671875,
+      "modis_radiance_w_m2_sr_um": [
+        143.61276245117188,
+        114.8697738647461
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        13.933615684509277,
+        11.52142333984375
+      ],
+      "stratum": "land_high_view"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001111308",
+      "footprint": 10087,
+      "surface": "bare",
+      "time": "2001-11-13T08:06:06.050492+00:00",
+      "latitude": 17.315414428710938,
+      "longitude": 34.52721405029297,
+      "elevation_m": 369.5682067871094,
+      "solar_zenith_deg": 40.4442024230957,
+      "view_zenith_deg": 40.939998626708984,
+      "relative_azimuth_deg": 307.45001220703125,
+      "clear_percent": 100.0,
+      "wind_m_s": 3.512309996788348,
+      "aod550": 0.18499259650707245,
+      "angstrom": 1.0,
+      "aod_donor_footprint": 10087,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 71.55410921115212,
+      "land_surface_reflectance": [
+        0.0952390804886818,
+        0.127966970205307,
+        0.24774940311908722
+      ],
+      "land_ssa659": 0.9756123423576355,
+      "pressure_hpa": 966.3637084960938,
+      "precipitable_water_cm": 2.558485269546509,
+      "ceres_sw_w_m2": 204.02012634277344,
+      "modis_radiance_w_m2_sr_um": [
+        88.1225357055664,
+        73.6607894897461
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        15.347430229187012,
+        6.51961088180542
+      ],
+      "stratum": "land_high_view"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001111308",
+      "footprint": 3486,
+      "surface": "bare",
+      "time": "2001-11-13T08:02:07.471138+00:00",
+      "latitude": 30.484882354736328,
+      "longitude": 46.47524642944336,
+      "elevation_m": 50.612220764160156,
+      "solar_zenith_deg": 49.27153778076172,
+      "view_zenith_deg": 29.010000228881836,
+      "relative_azimuth_deg": 112.6199951171875,
+      "clear_percent": 100.0,
+      "wind_m_s": 3.0557664779714018,
+      "aod550": 0.1528220772743225,
+      "angstrom": 1.0,
+      "aod_donor_footprint": 3486,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 44.60516410812583,
+      "land_surface_reflectance": [
+        0.1216956228017807,
+        0.16311459243297577,
+        0.296811580657959
+      ],
+      "land_ssa659": 0.9754374623298645,
+      "pressure_hpa": 1002.1810913085938,
+      "precipitable_water_cm": 1.568727731704712,
+      "ceres_sw_w_m2": 247.460693359375,
+      "modis_radiance_w_m2_sr_um": [
+        101.37115478515625,
+        76.03531646728516
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        3.992966413497925,
+        3.3841373920440674
+      ],
+      "stratum": "land_low_view"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001111308",
+      "footprint": 4981,
+      "surface": "bare",
+      "time": "2001-11-13T08:03:01.051013+00:00",
+      "latitude": 28.23630142211914,
+      "longitude": 38.981597900390625,
+      "elevation_m": 865.271484375,
+      "solar_zenith_deg": 48.87076187133789,
+      "view_zenith_deg": 26.280000686645508,
+      "relative_azimuth_deg": 299.4800109863281,
+      "clear_percent": 100.0,
+      "wind_m_s": 2.995882736074796,
+      "aod550": 0.07478709518909454,
+      "angstrom": 1.0,
+      "aod_donor_footprint": 4981,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 64.80796988087393,
+      "land_surface_reflectance": [
+        0.0800664871931076,
+        0.13147710263729095,
+        0.34630635380744934
+      ],
+      "land_ssa659": 0.9750000238418579,
+      "pressure_hpa": 911.0001831054688,
+      "precipitable_water_cm": 0.9144052267074585,
+      "ceres_sw_w_m2": 264.69281005859375,
+      "modis_radiance_w_m2_sr_um": [
+        111.76720428466797,
+        85.01182556152344
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        10.869718551635742,
+        9.290714263916016
+      ],
+      "stratum": "land_low_view"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001111308",
+      "footprint": 6607,
+      "surface": "bare",
+      "time": "2001-11-13T08:04:00.200843+00:00",
+      "latitude": 24.391700744628906,
+      "longitude": 40.29267501831055,
+      "elevation_m": 784.631103515625,
+      "solar_zenith_deg": 44.78101348876953,
+      "view_zenith_deg": 8.4399995803833,
+      "relative_azimuth_deg": 302.67999267578125,
+      "clear_percent": 99.69512176513672,
+      "wind_m_s": 5.228135057940729,
+      "aod550": 0.054811593145132065,
+      "angstrom": 1.0,
+      "aod_donor_footprint": 6607,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 49.73726970997063,
+      "land_surface_reflectance": [
+        0.08473895490169525,
+        0.12348882853984833,
+        0.2453259378671646
+      ],
+      "land_ssa659": null,
+      "pressure_hpa": 916.642822265625,
+      "precipitable_water_cm": 1.1461273431777954,
+      "ceres_sw_w_m2": 200.08456420898438,
+      "modis_radiance_w_m2_sr_um": [
+        78.25726318359375,
+        57.78014373779297
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        8.698970794677734,
+        7.065799713134766
+      ],
+      "stratum": "land_low_view"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001111308",
+      "footprint": 8768,
+      "surface": "bare",
+      "time": "2001-11-13T08:05:18.940629+00:00",
+      "latitude": 19.11528778076172,
+      "longitude": 42.71601104736328,
+      "elevation_m": 1655.7198486328125,
+      "solar_zenith_deg": 38.957801818847656,
+      "view_zenith_deg": 23.84000015258789,
+      "relative_azimuth_deg": 117.42999267578125,
+      "clear_percent": 99.73084259033203,
+      "wind_m_s": 1.2291021706644887,
+      "aod550": 0.05300070717930794,
+      "angstrom": 1.0,
+      "aod_donor_footprint": 8768,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 34.07238865509212,
+      "land_surface_reflectance": [
+        0.08322832733392715,
+        0.10646040737628937,
+        0.19545221328735352
+      ],
+      "land_ssa659": null,
+      "pressure_hpa": 868.6851196289062,
+      "precipitable_water_cm": 1.7961256504058838,
+      "ceres_sw_w_m2": 184.5994415283203,
+      "modis_radiance_w_m2_sr_um": [
+        66.93358612060547,
+        48.54706954956055
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        9.937654495239258,
+        7.833413124084473
+      ],
+      "stratum": "land_low_view"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001111308",
+      "footprint": 33499,
+      "surface": "ocean",
+      "time": "2001-11-13T08:20:16.258071+00:00",
+      "latitude": -35.38794708251953,
+      "longitude": 34.4044189453125,
+      "elevation_m": 0.0,
+      "solar_zenith_deg": 22.77152442932129,
+      "view_zenith_deg": 44.349998474121094,
+      "relative_azimuth_deg": 231.8500099182129,
+      "clear_percent": 99.9758529663086,
+      "wind_m_s": 3.171237806060388,
+      "aod550": 0.03825283423066139,
+      "angstrom": 0.3656155130161393,
+      "aod_donor_footprint": 33131,
+      "aod_donor_distance_km": 162.99496276014483,
+      "glint_angle_deg": 34.260923676717525,
+      "land_surface_reflectance": null,
+      "land_ssa659": null,
+      "pressure_hpa": 1021.1387939453125,
+      "precipitable_water_cm": 1.8367199897766113,
+      "ceres_sw_w_m2": 82.04618072509766,
+      "modis_radiance_w_m2_sr_um": [
+        13.461318016052246,
+        4.537872791290283
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        0.6422029137611389,
+        0.44098520278930664
+      ],
+      "stratum": "ocean_near_glint"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001111308",
+      "footprint": 34617,
+      "surface": "ocean",
+      "time": "2001-11-13T08:20:56.377950+00:00",
+      "latitude": -37.14710998535156,
+      "longitude": 28.015506744384766,
+      "elevation_m": 0.0,
+      "solar_zenith_deg": 27.697856903076172,
+      "view_zenith_deg": 6.820000171661377,
+      "relative_azimuth_deg": 224.92000198364258,
+      "clear_percent": 100.0,
+      "wind_m_s": 2.768047115753014,
+      "aod550": 0.036605093628168106,
+      "angstrom": 1.064978737547632,
+      "aod_donor_footprint": 34703,
+      "aod_donor_distance_km": 247.6999501715507,
+      "glint_angle_deg": 23.33130896982233,
+      "land_surface_reflectance": null,
+      "land_ssa659": null,
+      "pressure_hpa": 1021.245361328125,
+      "precipitable_water_cm": 1.7260092496871948,
+      "ceres_sw_w_m2": 85.71126556396484,
+      "modis_radiance_w_m2_sr_um": [
+        23.872493743896484,
+        11.806461334228516
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        0.8588882088661194,
+        0.5765557885169983
+      ],
+      "stratum": "ocean_near_glint"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001111308",
+      "footprint": 34704,
+      "surface": "ocean",
+      "time": "2001-11-13T08:20:59.587951+00:00",
+      "latitude": -36.96385955810547,
+      "longitude": 25.422163009643555,
+      "elevation_m": 0.0,
+      "solar_zenith_deg": 29.268840789794922,
+      "view_zenith_deg": 13.09000015258789,
+      "relative_azimuth_deg": 45.089996337890625,
+      "clear_percent": 100.0,
+      "wind_m_s": 6.3887542826240615,
+      "aod550": 0.036605093628168106,
+      "angstrom": 1.064978737547632,
+      "aod_donor_footprint": 34703,
+      "aod_donor_distance_km": 16.7581388046516,
+      "glint_angle_deg": 39.511737143799046,
+      "land_surface_reflectance": null,
+      "land_ssa659": null,
+      "pressure_hpa": 1019.8460693359375,
+      "precipitable_water_cm": 1.7643972635269165,
+      "ceres_sw_w_m2": 80.45162963867188,
+      "modis_radiance_w_m2_sr_um": [
+        13.359915733337402,
+        4.224282741546631
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        0.14343677461147308,
+        0.09834553301334381
+      ],
+      "stratum": "ocean_near_glint"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001111308",
+      "footprint": 35167,
+      "surface": "ocean",
+      "time": "2001-11-13T08:21:16.267925+00:00",
+      "latitude": -38.224365234375,
+      "longitude": 26.870635986328125,
+      "elevation_m": 0.0,
+      "solar_zenith_deg": 29.02024269104004,
+      "view_zenith_deg": 0.6700000166893005,
+      "relative_azimuth_deg": 236.23001098632812,
+      "clear_percent": 100.0,
+      "wind_m_s": 2.9208610387605662,
+      "aod550": 0.03268285468220711,
+      "angstrom": 2.3293705228145267,
+      "aod_donor_footprint": 34996,
+      "aod_donor_distance_km": 172.04270760180688,
+      "glint_angle_deg": 28.652759200015076,
+      "land_surface_reflectance": null,
+      "land_ssa659": null,
+      "pressure_hpa": 1021.4765625,
+      "precipitable_water_cm": 2.2578516006469727,
+      "ceres_sw_w_m2": 80.99049377441406,
+      "modis_radiance_w_m2_sr_um": [
+        13.871546745300293,
+        4.906364917755127
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        1.3972907066345215,
+        0.9514078497886658
+      ],
+      "stratum": "ocean_near_glint"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001111308",
+      "footprint": 5749,
+      "surface": "ocean",
+      "time": "2001-11-13T08:03:29.720904+00:00",
+      "latitude": 26.883716583251953,
+      "longitude": 35.138614654541016,
+      "elevation_m": 0.0,
+      "solar_zenith_deg": 48.92963790893555,
+      "view_zenith_deg": 47.619998931884766,
+      "relative_azimuth_deg": 301.8300018310547,
+      "clear_percent": 100.0,
+      "wind_m_s": 3.439159979919953,
+      "aod550": 0.08250309526920319,
+      "angstrom": 0.8608172267466655,
+      "aod_donor_footprint": 5749,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 81.42364824755005,
+      "land_surface_reflectance": null,
+      "land_ssa659": null,
+      "pressure_hpa": 1013.2139282226562,
+      "precipitable_water_cm": 1.495719313621521,
+      "ceres_sw_w_m2": 82.34550476074219,
+      "modis_radiance_w_m2_sr_um": [
+        14.619811058044434,
+        3.929788589477539
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        0.4535845220088959,
+        0.2114524245262146
+      ],
+      "stratum": "ocean_off_glint"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001111308",
+      "footprint": 7219,
+      "surface": "ocean",
+      "time": "2001-11-13T08:04:22.800761+00:00",
+      "latitude": 23.30706787109375,
+      "longitude": 37.8441276550293,
+      "elevation_m": 0.0,
+      "solar_zenith_deg": 44.57517623901367,
+      "view_zenith_deg": 26.649999618530273,
+      "relative_azimuth_deg": 301.6300048828125,
+      "clear_percent": 100.0,
+      "wind_m_s": 3.5361416447423544,
+      "aod550": 0.16588233411312103,
+      "angstrom": 0.9686347845310161,
+      "aod_donor_footprint": 7219,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 61.86433927457248,
+      "land_surface_reflectance": null,
+      "land_ssa659": null,
+      "pressure_hpa": 1011.4019165039062,
+      "precipitable_water_cm": 2.065128803253174,
+      "ceres_sw_w_m2": 87.67001342773438,
+      "modis_radiance_w_m2_sr_um": [
+        13.969145774841309,
+        4.267246723175049
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        0.18614201247692108,
+        0.09645527601242065
+      ],
+      "stratum": "ocean_off_glint"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001111308",
+      "footprint": 8681,
+      "surface": "ocean",
+      "time": "2001-11-13T08:05:15.720610+00:00",
+      "latitude": 19.97613525390625,
+      "longitude": 38.19198226928711,
+      "elevation_m": 0.0,
+      "solar_zenith_deg": 41.31558609008789,
+      "view_zenith_deg": 18.219999313354492,
+      "relative_azimuth_deg": 303.4599914550781,
+      "clear_percent": 99.48703002929688,
+      "wind_m_s": 4.361099548061825,
+      "aod550": 0.23103845119476318,
+      "angstrom": 0.7962105000594895,
+      "aod_donor_footprint": 8681,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 53.157711024835024,
+      "land_surface_reflectance": null,
+      "land_ssa659": null,
+      "pressure_hpa": 1010.6213989257812,
+      "precipitable_water_cm": 3.6198506355285645,
+      "ceres_sw_w_m2": 95.19020080566406,
+      "modis_radiance_w_m2_sr_um": [
+        16.623031616210938,
+        5.814846515655518
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        0.8390042781829834,
+        0.5187546014785767
+      ],
+      "stratum": "ocean_off_glint"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001111308",
+      "footprint": 34820,
+      "surface": "ocean",
+      "time": "2001-11-13T08:21:03.407966+00:00",
+      "latitude": -36.96247100830078,
+      "longitude": 23.969425201416016,
+      "elevation_m": 0.0,
+      "solar_zenith_deg": 30.23661994934082,
+      "view_zenith_deg": 23.31999969482422,
+      "relative_azimuth_deg": 42.5,
+      "clear_percent": 100.0,
+      "wind_m_s": 7.257242982559885,
+      "aod550": 0.0849987044930458,
+      "angstrom": 0.3878978384426365,
+      "aod_donor_footprint": 34820,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 49.7291901611755,
+      "land_surface_reflectance": null,
+      "land_ssa659": null,
+      "pressure_hpa": 1019.0638427734375,
+      "precipitable_water_cm": 1.8999764919281006,
+      "ceres_sw_w_m2": 82.87969207763672,
+      "modis_radiance_w_m2_sr_um": [
+        14.005240440368652,
+        4.298863887786865
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        0.2586265504360199,
+        0.17164486646652222
+      ],
+      "stratum": "ocean_off_glint"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001112908",
+      "footprint": 7209,
+      "surface": "bare",
+      "time": "2001-11-29T08:04:22.606193+00:00",
+      "latitude": 23.09803009033203,
+      "longitude": 34.331207275390625,
+      "elevation_m": 537.1734008789062,
+      "solar_zenith_deg": 49.33675765991211,
+      "view_zenith_deg": 47.61000061035156,
+      "relative_azimuth_deg": 303.0299987792969,
+      "clear_percent": 100.0,
+      "wind_m_s": 1.5177911086972724,
+      "aod550": 0.23538236320018768,
+      "angstrom": 1.0,
+      "aod_donor_footprint": 7209,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 82.30374475362758,
+      "land_surface_reflectance": [
+        0.07583200931549072,
+        0.11614139378070831,
+        0.28197330236434937
+      ],
+      "land_ssa659": 0.9753703474998474,
+      "pressure_hpa": 961.0596313476562,
+      "precipitable_water_cm": 1.056552529335022,
+      "ceres_sw_w_m2": 226.81204223632812,
+      "modis_radiance_w_m2_sr_um": [
+        100.55814361572266,
+        75.5858154296875
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        21.146329879760742,
+        16.906381607055664
+      ],
+      "stratum": "land_high_view"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001112908",
+      "footprint": 8360,
+      "surface": "bare",
+      "time": "2001-11-29T08:05:03.386137+00:00",
+      "latitude": 19.16547393798828,
+      "longitude": 44.49346160888672,
+      "elevation_m": 1126.1768798828125,
+      "solar_zenith_deg": 42.15168762207031,
+      "view_zenith_deg": 37.2599983215332,
+      "relative_azimuth_deg": 115.6199951171875,
+      "clear_percent": 100.0,
+      "wind_m_s": 2.0025225382976504,
+      "aod550": 0.083115354180336,
+      "angstrom": 1.0,
+      "aod_donor_footprint": 8360,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 40.02712536117758,
+      "land_surface_reflectance": [
+        0.10853420943021774,
+        0.14768822491168976,
+        0.3559431731700897
+      ],
+      "land_ssa659": 0.9754055142402649,
+      "pressure_hpa": 883.5477905273438,
+      "precipitable_water_cm": 1.3133955001831055,
+      "ceres_sw_w_m2": 306.40625,
+      "modis_radiance_w_m2_sr_um": [
+        127.97388458251953,
+        101.48733520507812
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        27.593759536743164,
+        22.730573654174805
+      ],
+      "stratum": "land_high_view"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001112908",
+      "footprint": 9093,
+      "surface": "bare",
+      "time": "2001-11-29T08:05:29.886054+00:00",
+      "latitude": 17.367584228515625,
+      "longitude": 45.308738708496094,
+      "elevation_m": 990.10205078125,
+      "solar_zenith_deg": 40.18479537963867,
+      "view_zenith_deg": 44.59000015258789,
+      "relative_azimuth_deg": 115.14999389648438,
+      "clear_percent": 100.0,
+      "wind_m_s": 1.7632993568493074,
+      "aod550": 0.09489796310663223,
+      "angstrom": 1.0,
+      "aod_donor_footprint": 9093,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 42.55968783147949,
+      "land_surface_reflectance": [
+        0.06693214178085327,
+        0.11299659311771393,
+        0.37698420882225037
+      ],
+      "land_ssa659": 0.9750669002532959,
+      "pressure_hpa": 886.0446166992188,
+      "precipitable_water_cm": 1.0193551778793335,
+      "ceres_sw_w_m2": 338.75946044921875,
+      "modis_radiance_w_m2_sr_um": [
+        148.0782012939453,
+        119.32161712646484
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        4.472541332244873,
+        4.512232303619385
+      ],
+      "stratum": "land_high_view"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001112908",
+      "footprint": 9946,
+      "surface": "bare",
+      "time": "2001-11-29T08:06:01.745989+00:00",
+      "latitude": 16.91925048828125,
+      "longitude": 34.87420654296875,
+      "elevation_m": 376.5279541015625,
+      "solar_zenith_deg": 43.44819259643555,
+      "view_zenith_deg": 37.5,
+      "relative_azimuth_deg": 306.3399963378906,
+      "clear_percent": 100.0,
+      "wind_m_s": 2.8340197118493355,
+      "aod550": 0.1681782454252243,
+      "angstrom": 1.0,
+      "aod_donor_footprint": 9946,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 70.85903952191738,
+      "land_surface_reflectance": [
+        0.08810541778802872,
+        0.12157643586397171,
+        0.2603960931301117
+      ],
+      "land_ssa659": null,
+      "pressure_hpa": 960.3048095703125,
+      "precipitable_water_cm": 1.9812490940093994,
+      "ceres_sw_w_m2": 210.6206817626953,
+      "modis_radiance_w_m2_sr_um": [
+        94.08055114746094,
+        72.91529083251953
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        10.514711380004883,
+        8.148066520690918
+      ],
+      "stratum": "land_high_view"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001112908",
+      "footprint": 3318,
+      "surface": "bare",
+      "time": "2001-11-29T08:02:01.146530+00:00",
+      "latitude": 30.563858032226562,
+      "longitude": 44.565834045410156,
+      "elevation_m": 244.6442108154297,
+      "solar_zenith_deg": 53.33139419555664,
+      "view_zenith_deg": 15.4399995803833,
+      "relative_azimuth_deg": 112.77001953125,
+      "clear_percent": 100.0,
+      "wind_m_s": 0.7089571634191871,
+      "aod550": 0.08011653274297714,
+      "angstrom": 1.0,
+      "aod_donor_footprint": 3318,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 48.831061605767836,
+      "land_surface_reflectance": [
+        0.11755027621984482,
+        0.15767870843410492,
+        0.35142141580581665
+      ],
+      "land_ssa659": 0.9759124517440796,
+      "pressure_hpa": 979.9989624023438,
+      "precipitable_water_cm": 1.4336336851119995,
+      "ceres_sw_w_m2": 243.1328887939453,
+      "modis_radiance_w_m2_sr_um": [
+        96.21524047851562,
+        77.30342102050781
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        4.979869842529297,
+        3.787222146987915
+      ],
+      "stratum": "land_low_view"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001112908",
+      "footprint": 6333,
+      "surface": "bare",
+      "time": "2001-11-29T08:03:50.276294+00:00",
+      "latitude": 24.252029418945312,
+      "longitude": 41.217857360839844,
+      "elevation_m": 921.582763671875,
+      "solar_zenith_deg": 47.996192932128906,
+      "view_zenith_deg": 1.1299999952316284,
+      "relative_azimuth_deg": 86.6199951171875,
+      "clear_percent": 100.0,
+      "wind_m_s": 1.1847439941304418,
+      "aod550": 0.18168431520462036,
+      "angstrom": 0.9952349066734314,
+      "aod_donor_footprint": 6333,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 48.0727993284542,
+      "land_surface_reflectance": [
+        0.07439399510622025,
+        0.10405586659908295,
+        0.21821802854537964
+      ],
+      "land_ssa659": 0.9750000238418579,
+      "pressure_hpa": 908.8951416015625,
+      "precipitable_water_cm": 2.046739339828491,
+      "ceres_sw_w_m2": 176.5648193359375,
+      "modis_radiance_w_m2_sr_um": [
+        69.11795806884766,
+        50.48429489135742
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        7.592827320098877,
+        6.181979179382324
+      ],
+      "stratum": "land_low_view"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001112908",
+      "footprint": 7677,
+      "surface": "bare",
+      "time": "2001-11-29T08:04:39.366191+00:00",
+      "latitude": 20.814659118652344,
+      "longitude": 43.61224365234375,
+      "elevation_m": 856.8309936523438,
+      "solar_zenith_deg": 43.99246597290039,
+      "view_zenith_deg": 28.270000457763672,
+      "relative_azimuth_deg": 115.66000366210938,
+      "clear_percent": 100.0,
+      "wind_m_s": 1.067678693100733,
+      "aod550": 0.18529042601585388,
+      "angstrom": 1.0,
+      "aod_donor_footprint": 7677,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 39.09761142026409,
+      "land_surface_reflectance": [
+        0.10073098540306091,
+        0.1419869065284729,
+        0.289011150598526
+      ],
+      "land_ssa659": 0.9752759337425232,
+      "pressure_hpa": 893.4767456054688,
+      "precipitable_water_cm": 1.6051225662231445,
+      "ceres_sw_w_m2": 254.653564453125,
+      "modis_radiance_w_m2_sr_um": [
+        107.3504867553711,
+        77.54048156738281
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        13.409377098083496,
+        10.637923240661621
+      ],
+      "stratum": "land_low_view"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001112908",
+      "footprint": 9768,
+      "surface": "bare",
+      "time": "2001-11-29T08:05:55.226009+00:00",
+      "latitude": 17.19709014892578,
+      "longitude": 35.890541076660156,
+      "elevation_m": 459.96221923828125,
+      "solar_zenith_deg": 43.25120544433594,
+      "view_zenith_deg": 31.09000015258789,
+      "relative_azimuth_deg": 304.7200012207031,
+      "clear_percent": 100.0,
+      "wind_m_s": 2.459937686699988,
+      "aod550": 0.1982131451368332,
+      "angstrom": 1.0,
+      "aod_donor_footprint": 9768,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 65.02603932303414,
+      "land_surface_reflectance": [
+        0.08289755880832672,
+        0.12297990918159485,
+        0.28571727871894836
+      ],
+      "land_ssa659": 0.9759054183959961,
+      "pressure_hpa": 961.96728515625,
+      "precipitable_water_cm": 2.161623239517212,
+      "ceres_sw_w_m2": 237.55181884765625,
+      "modis_radiance_w_m2_sr_um": [
+        105.1839599609375,
+        81.02241516113281
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        8.004776954650879,
+        6.77004861831665
+      ],
+      "stratum": "land_low_view"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001112908",
+      "footprint": 9616,
+      "surface": "ocean",
+      "time": "2001-11-29T08:05:49.216023+00:00",
+      "latitude": 16.925926208496094,
+      "longitude": 40.56968307495117,
+      "elevation_m": 0.0,
+      "solar_zenith_deg": 41.16499328613281,
+      "view_zenith_deg": 10.729999542236328,
+      "relative_azimuth_deg": 120.34002685546875,
+      "clear_percent": 100.0,
+      "wind_m_s": 8.145294029525024,
+      "aod550": 0.3008606731891632,
+      "angstrom": 0.3969387927938291,
+      "aod_donor_footprint": 9515,
+      "aod_donor_distance_km": 90.8728932332973,
+      "glint_angle_deg": 36.720836271017234,
+      "land_surface_reflectance": null,
+      "land_ssa659": null,
+      "pressure_hpa": 1008.5317993164062,
+      "precipitable_water_cm": 3.0226728916168213,
+      "ceres_sw_w_m2": 99.72947692871094,
+      "modis_radiance_w_m2_sr_um": [
+        20.278696060180664,
+        9.09157657623291
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        0.22548295557498932,
+        0.1652381867170334
+      ],
+      "stratum": "ocean_near_glint"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001112908",
+      "footprint": 9869,
+      "surface": "ocean",
+      "time": "2001-11-29T08:05:58.726010+00:00",
+      "latitude": 16.252731323242188,
+      "longitude": 41.09583282470703,
+      "elevation_m": 0.0,
+      "solar_zenith_deg": 40.34084701538086,
+      "view_zenith_deg": 16.90999984741211,
+      "relative_azimuth_deg": 118.19000244140625,
+      "clear_percent": 99.47880554199219,
+      "wind_m_s": 8.244191358795609,
+      "aod550": 0.27597978711128235,
+      "angstrom": 0.4796241758129355,
+      "aod_donor_footprint": 9697,
+      "aod_donor_distance_km": 171.01102661750244,
+      "glint_angle_deg": 35.09512269254432,
+      "land_surface_reflectance": null,
+      "land_ssa659": null,
+      "pressure_hpa": 1009.5738525390625,
+      "precipitable_water_cm": 2.8990986347198486,
+      "ceres_sw_w_m2": 98.24746704101562,
+      "modis_radiance_w_m2_sr_um": [
+        20.503538131713867,
+        9.33065414428711
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        0.5953887104988098,
+        0.4423414170742035
+      ],
+      "stratum": "ocean_near_glint"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001112908",
+      "footprint": 10351,
+      "surface": "ocean",
+      "time": "2001-11-29T08:06:15.755972+00:00",
+      "latitude": 15.161087036132812,
+      "longitude": 41.27906799316406,
+      "elevation_m": 0.0,
+      "solar_zenith_deg": 39.23442459106445,
+      "view_zenith_deg": 20.549999237060547,
+      "relative_azimuth_deg": 119.73001098632812,
+      "clear_percent": 99.47186279296875,
+      "wind_m_s": 8.363637295524677,
+      "aod550": 0.23085084557533264,
+      "angstrom": 0.5721811672331478,
+      "aod_donor_footprint": 9880,
+      "aod_donor_distance_km": 243.39993912313776,
+      "glint_angle_deg": 33.34462542662693,
+      "land_surface_reflectance": null,
+      "land_ssa659": null,
+      "pressure_hpa": 1008.7913208007812,
+      "precipitable_water_cm": 2.69474720954895,
+      "ceres_sw_w_m2": 95.17765045166016,
+      "modis_radiance_w_m2_sr_um": [
+        20.933734893798828,
+        9.696106910705566
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        0.276542603969574,
+        0.18176127970218658
+      ],
+      "stratum": "ocean_near_glint"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001112908",
+      "footprint": 18404,
+      "surface": "ocean",
+      "time": "2001-11-29T08:11:08.555309+00:00",
+      "latitude": -2.9543914794921875,
+      "longitude": 40.49087905883789,
+      "elevation_m": 0.009708241559565067,
+      "solar_zenith_deg": 22.8946475982666,
+      "view_zenith_deg": 43.459999084472656,
+      "relative_azimuth_deg": 132.92999267578125,
+      "clear_percent": 99.70967102050781,
+      "wind_m_s": 2.78483254484571,
+      "aod550": 0.0670919343829155,
+      "angstrom": 1.0235886341850304,
+      "aod_donor_footprint": 18380,
+      "aod_donor_distance_km": 169.85094787008637,
+      "glint_angle_deg": 31.68638308854133,
+      "land_surface_reflectance": null,
+      "land_ssa659": null,
+      "pressure_hpa": 1006.1251220703125,
+      "precipitable_water_cm": 4.300818920135498,
+      "ceres_sw_w_m2": 82.71048736572266,
+      "modis_radiance_w_m2_sr_um": [
+        15.672147750854492,
+        5.493768692016602
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        2.7941718101501465,
+        3.5335030555725098
+      ],
+      "stratum": "ocean_near_glint"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001112908",
+      "footprint": 6996,
+      "surface": "ocean",
+      "time": "2001-11-29T08:04:13.906220+00:00",
+      "latitude": 23.45159149169922,
+      "longitude": 36.02447509765625,
+      "elevation_m": 0.04439230635762215,
+      "solar_zenith_deg": 48.98940658569336,
+      "view_zenith_deg": 38.650001525878906,
+      "relative_azimuth_deg": 302.5,
+      "clear_percent": 100.0,
+      "wind_m_s": 3.4877757388344683,
+      "aod550": 0.12070436030626297,
+      "angstrom": 0.6294484851937999,
+      "aod_donor_footprint": 6996,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 74.9742585209676,
+      "land_surface_reflectance": null,
+      "land_ssa659": null,
+      "pressure_hpa": 1008.77490234375,
+      "precipitable_water_cm": 1.9992241859436035,
+      "ceres_sw_w_m2": 84.35364532470703,
+      "modis_radiance_w_m2_sr_um": [
+        14.220209121704102,
+        4.199064254760742
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        0.4336322844028473,
+        0.3156277537345886
+      ],
+      "stratum": "ocean_off_glint"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001112908",
+      "footprint": 9698,
+      "surface": "ocean",
+      "time": "2001-11-29T08:05:52.356018+00:00",
+      "latitude": 16.88995361328125,
+      "longitude": 39.48112487792969,
+      "elevation_m": 0.0,
+      "solar_zenith_deg": 41.5211067199707,
+      "view_zenith_deg": 0.6200000047683716,
+      "relative_azimuth_deg": 120.64999389648438,
+      "clear_percent": 100.0,
+      "wind_m_s": 3.6261771979475226,
+      "aod550": 0.26934030652046204,
+      "angstrom": 0.4573757882684828,
+      "aod_donor_footprint": 9698,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 41.20786173901962,
+      "land_surface_reflectance": null,
+      "land_ssa659": null,
+      "pressure_hpa": 966.4883422851562,
+      "precipitable_water_cm": 2.6508970260620117,
+      "ceres_sw_w_m2": 97.61848449707031,
+      "modis_radiance_w_m2_sr_um": [
+        18.13271713256836,
+        7.408200263977051
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        0.22103090584278107,
+        0.16675730049610138
+      ],
+      "stratum": "ocean_off_glint"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001112908",
+      "footprint": 17848,
+      "surface": "ocean",
+      "time": "2001-11-29T08:10:48.545359+00:00",
+      "latitude": -2.2667160034179688,
+      "longitude": 44.42090606689453,
+      "elevation_m": 0.0,
+      "solar_zenith_deg": 21.540225982666016,
+      "view_zenith_deg": 60.4900016784668,
+      "relative_azimuth_deg": 124.29998779296875,
+      "clear_percent": 100.0,
+      "wind_m_s": 1.8937396176284345,
+      "aod550": 0.05371555685997009,
+      "angstrom": 0.8089117717161837,
+      "aod_donor_footprint": 17848,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 50.33976748908479,
+      "land_surface_reflectance": null,
+      "land_ssa659": null,
+      "pressure_hpa": 1010.9557495117188,
+      "precipitable_water_cm": 3.829763889312744,
+      "ceres_sw_w_m2": 87.01295471191406,
+      "modis_radiance_w_m2_sr_um": [
+        16.233795166015625,
+        4.519275665283203
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        0.6616619825363159,
+        0.27273261547088623
+      ],
+      "stratum": "ocean_off_glint"
+    },
+    {
+      "source": "CER_SSF_Terra-FM1-MODIS_Edition4A_400403.2001112908",
+      "footprint": 20943,
+      "surface": "ocean",
+      "time": "2001-11-29T08:12:40.775126+00:00",
+      "latitude": -8.896484375,
+      "longitude": 42.38246154785156,
+      "elevation_m": 0.0,
+      "solar_zenith_deg": 16.793170928955078,
+      "view_zenith_deg": 57.84000015258789,
+      "relative_azimuth_deg": 137.55999755859375,
+      "clear_percent": 100.0,
+      "wind_m_s": 3.122941581200653,
+      "aod550": 0.16996338963508606,
+      "angstrom": 1.262127025410354,
+      "aod_donor_footprint": 20943,
+      "aod_donor_distance_km": 0.0,
+      "glint_angle_deg": 46.36297672681737,
+      "land_surface_reflectance": null,
+      "land_ssa659": null,
+      "pressure_hpa": 1011.3112182617188,
+      "precipitable_water_cm": 3.548311233520508,
+      "ceres_sw_w_m2": 93.39262390136719,
+      "modis_radiance_w_m2_sr_um": [
+        24.3189640045166,
+        8.088027000427246
+      ],
+      "modis_spatial_sd_w_m2_sr_um": [
+        2.13869309425354,
+        0.9480381608009338
+      ],
+      "stratum": "ocean_off_glint"
+    }
+  ]
+}
