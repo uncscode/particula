@@ -111,6 +111,13 @@ jobs:
             cat candidates/release.json
             echo '~~~'
           } >> "$GITHUB_STEP_SUMMARY"
+      - name: Build the chemistry catalog for the matching library release
+        if: needs.release-plan.outputs.publish == 'true'
+        run: |
+          python -m pip install candidates/base/*.whl
+          python -m scripts.build_chemistry_catalog --output candidates/catalog
+          (cd candidates/catalog && sha256sum --strict --check particula-chemistry-catalog.zip.sha256)
+          (cd candidates && sha256sum catalog/* >> SHA256SUMS)
       - name: Retain the exact candidate files for qualification and publication
         uses: actions/upload-artifact@v7
         with:
@@ -415,6 +422,7 @@ jobs:
           python packages/particula-aiomfac/tools/public_probe.py --base-wheel candidates/base/*.whl
           mkdir release-assets
           cp candidates/base/* candidates/*.json release-assets/
+          cp candidates/catalog/particula-chemistry-catalog.zip{,.sha256} release-assets/
           (cd release-assets && sha256sum *.whl *.tar.gz > PYTHON-SHA256SUMS)
       - name: Download the tested plugin packages
         uses: actions/download-artifact@v4

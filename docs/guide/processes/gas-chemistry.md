@@ -80,8 +80,9 @@ other reaction types and unrecognized fields produce an error before export.
 
 Use the reaction catalog when you need a published equation and rate law in a
 Particula box. For example, a study of ozone loss by NO can use one WACCM
-reaction from a whole-atmosphere mechanism. Use a published recipe to retrieve and verify the source files, or import a
-local model case. Particula keeps the original bytes and the searchable
+reaction from a whole-atmosphere mechanism. Fetch the catalog from the matching
+Particula GitHub Release, retrieve a named source recipe, or import a local
+model case. Particula keeps the original bytes and the searchable
 records in a local SQLite catalog. The Python API and CLI use the same catalog.
 
 ### Choose the source files
@@ -108,7 +109,15 @@ time units are null in the record and the study lock.
 
 ### Export a selected gas reaction
 
-Fetch the WACCM recipe and search its channels. The other recipe names are
+Run `particula chem fetch` to download the prebuilt catalog for the installed
+Particula version. Python users can call `ChemistryCatalog().fetch()`.
+The download includes E3SM, CMAQ and WRF-Chem. Particula verifies the ZIP’s
+SHA-256 checksum and merges its snapshots with your local imports. Search,
+inspection and export then work offline. Run `particula chem fetch --json`
+to see the included snapshot IDs, input digests and source citations.
+For a package release that predates the catalog asset, fetch a named recipe.
+
+To add WACCM from the pinned upstream files, fetch its recipe by name. The other recipe names are
 `e3sm`, `mcm` (α-pinene), `mcm-full`, `wrf-chem`, `cmaq`, `camx`, `pmcamx`,
 `pmcamx-soap` and `pmcamx-soap-alt`. You can set
 `PARTICULA_CHEM_CATALOG` to a specific SQLite path. By default the file lives

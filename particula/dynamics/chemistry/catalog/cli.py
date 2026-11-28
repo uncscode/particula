@@ -16,9 +16,9 @@ def main(argv=None):
     chem = top.add_parser("chem")
     commands = chem.add_subparsers(dest="command", required=True)
     fetch = commands.add_parser(
-        "fetch", help="import a verified published source"
+        "fetch", help="install the release catalog or import a named source"
     )
-    fetch.add_argument("recipe", choices=sorted(recipes()))
+    fetch.add_argument("recipe", nargs="?", choices=sorted(recipes()))
     ingest = commands.add_parser(
         "import", help="cache and index local model files"
     )
@@ -57,7 +57,9 @@ def main(argv=None):
     try:
         catalog = ChemistryCatalog()
         if args.command == "fetch":
-            result = catalog.show(catalog.fetch(args.recipe))
+            result = catalog.fetch(args.recipe)
+            if args.recipe is not None:
+                result = catalog.show(result)
         elif args.command == "import":
             snap = catalog.import_file(
                 args.source,

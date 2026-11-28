@@ -154,8 +154,24 @@ class ChemistryCatalog:
             ).fetchone()
         return row[0] if row else None
 
-    def fetch(self, recipe):
-        """Import the verified files of a bundled source recipe."""
+    def fetch(self, recipe=None):
+        """Fetch catalog records for offline search and export.
+
+        Args:
+            recipe: Optional source key such as `waccm`. Omitting the key
+                downloads the catalog from the installed Particula release.
+
+        Returns:
+            The release manifest for a prebuilt catalog, or the immutable
+            snapshot ID for a named source import.
+        """
+        if recipe is None:
+            from particula.dynamics.chemistry.catalog.bundle import (
+                install_release,
+            )
+
+            return install_release(self)
+
         from particula.dynamics.chemistry.catalog.sources import fetch
 
         return fetch(self, recipe)
