@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 3.6995340411085635,
-  "package_source_sha256": "e6cf31245b68fa3bebcd0daf47a5875b405f6f0d07702290aadeac1573d54e7d",
-  "scientific_source_sha256": "5d05996c4cce5010a4f6001b78d5393383a6b487c1c8be456ec4eef9049d5a02",
+  "elapsed_seconds": 3.37445659795776,
+  "package_source_sha256": "0b940c0f82f1ac67dddf632113a9359124b4246cf34ea85177fb77f38a31f827",
+  "scientific_source_sha256": "f7f7367a4d96e22ce2f679654def23c4a3b366d04a7ee285569ce6e9191127d2",
   "input_sha256": {
     "particula/optics/reference_data/gas_reduced.npz": "92ddac24d33d8966ca1226f54a8c67ff84b83f68fc24e7512315a026eb648834",
     "particula/optics/reference_data/tsis1.txt": "3fccfc7415b2cf4743905c9f7566ed632046c7badbe59dec350dc108bc5b7b3f"
@@ -11,9 +11,9 @@
   "example": "shortwave-parcel-surfaces",
   "fingerprint": "84686bcf0eca11bc781c479ce9abc21fd28896659ead66bec31da47514af23af",
   "source": "docs/studies/examples/coupled-populations/radiation/parcel_surfaces.py",
-  "revision": "74aad2022981df7665f0cd745f68719f0b738342",
+  "revision": "634fcbc90688d529e7265c8e6260b3547a6e2475",
   "package_dirty": true,
-  "executed_at": "2026-11-28T16:43:10.094900+00:00",
+  "executed_at": "2026-11-28T17:17:54.752545+00:00",
   "device": "CPU",
   "python": "3.12.12",
   "versions": {

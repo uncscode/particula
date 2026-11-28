@@ -26,11 +26,18 @@ POWER_CHANNELS = (
 
 @dataclass(frozen=True)
 class PowerHour:
-    """Hourly average surface irradiances [W/m²] from a POWER grid cell.
+    """Independently reported mean surface irradiances in one NASA POWER hour.
 
-    Coordinates follow the provider response in degrees and metres. The
-    timestamp is the UTC start of a one-hour interval. The digest identifies
-    the source file, including its original values, units and metadata.
+    Attributes:
+        start_utc: UTC start of the one-hour averaging interval.
+        longitude_deg: Longitude of the response point [degrees east].
+        latitude_deg: Latitude of the response point [degrees north].
+        elevation_m: Provider-reported elevation [m].
+        global_horizontal: All-sky global horizontal irradiance [W m⁻²].
+        direct_normal: All-sky direct-normal irradiance [W m⁻²].
+        diffuse_horizontal: All-sky diffuse horizontal irradiance [W m⁻²].
+        api_version: POWER API version in the response header.
+        sha256: SHA-256 digest of the raw response file.
     """
 
     start_utc: datetime
@@ -50,13 +57,28 @@ class PowerHour:
         direct_fraction: float,
         diffuse_fraction: float,
     ) -> SolarInput:
-        """Place the hourly surface fields above an additional modeled slab.
+        """Illuminate an additional slab with the POWER surface hourly mean.
 
-        Supply the cosine of solar zenith, wavelengths and relative spectral
-        shapes in `spectral_shape`. State what fraction [0, 1] of each
-        broadband component lies in those wavelengths. Each output spectrum
-        integrates to its chosen fraction of the corresponding POWER mean.
-        Projection onto a horizontal plane happens inside the solver.
+        Each component is distributed using a prescribed spectral shape. The
+        global horizontal field remains available for comparison. It does not
+        enter the normalization of the direct and diffuse components.
+
+        Args:
+            spectral_shape: SolarInput supplying solar zenith cosine,
+                wavelengths, integration rule and relative spectral shapes.
+            direct_fraction: Fraction in [0, 1] of broadband direct-normal
+                irradiance assigned to the modeled wavelength range.
+            diffuse_fraction: Fraction in [0, 1] of broadband diffuse-horizontal
+                irradiance assigned to the same wavelength range.
+
+        Returns:
+            (SolarInput): Spectral densities [W m⁻² m⁻¹] on the supplied grid.
+                Each component integrates to its POWER mean times its assigned
+                fraction. Apply this boundary at the top of the added slab.
+
+        Raises:
+            ValueError: A fraction is invalid, a positive target has zero
+                spectral area, or a positive direct component has mu0 of zero.
         """
         wave = spectral_shape.wavelength_m
         weights = spectral_shape.quadrature_weights_m
@@ -105,16 +127,23 @@ class PowerHour:
 def read_power_hour(
     path: str | Path, start: datetime, *, sha256: str | None = None
 ) -> PowerHour:
-    """Read one UTC hour of all-sky shortwave data, entirely offline.
+    """Read one hour of all-sky surface shortwave irradiance from local JSON.
 
     Args:
-        path: Unmodified hourly point API JSON response in UTC.
+        path: Original NASA POWER hourly point API response in UTC with
+            global horizontal, direct-normal and diffuse-horizontal fields.
         start: Timezone-aware interval start aligned with a UTC hour.
-        sha256: Optional expected SHA-256 digest of the raw bytes.
+        sha256: Optional expected SHA-256 hex digest of the raw bytes.
+
+    Returns:
+        (PowerHour): Interval-mean irradiances [W m⁻²], location and
+            provenance. Values in Wh m⁻² over one hour give the same numerical
+            mean in W m⁻².
 
     Raises:
-        ValueError: Missing interval, fill value, non-UTC data, unsupported
-            unit, invalid coordinates, or a mismatched expected digest.
+        OSError: The local file cannot be read.
+        ValueError: The response, selected hour, time standard, field values,
+            units, coordinates or expected digest are invalid.
     """
     if start.utcoffset() is None:
         raise ValueError("POWER interval start must have a timezone")

@@ -1,8 +1,10 @@
 """Load a local MODIS Collection 6.1 land BRDF pixel with band quality.
 
-MCD43A1 supplies iso/vol/geo coefficients. The matched MCD43A2 tile
-supplies the full-inversion quality flag for each band. Provider specs:
-https://ladsweb.modaps.eosdis.nasa.gov/filespec/MODIS/61/MCD43A1
+MCD43A1 supplies isotropic, volumetric and geometric coefficients. MCD43A2
+supplies the retrieval quality flag for each band. See the Collection 6.1
+product specifications at
+https://ladsweb.modaps.eosdis.nasa.gov/filespec/MODIS/61/MCD43A1 and
+https://ladsweb.modaps.eosdis.nasa.gov/filespec/MODIS/61/MCD43A2.
 """
 
 import re
@@ -50,12 +52,32 @@ def _pixel(dataset, field, row, col, with_parameters=False):
 def read_mcd43_surface(
     parameters_path, quality_path, *, row, col, wavelength_m, band_ids
 ):
-    """Read one local A1/A2 tile pixel as a Ross–Li lower boundary.
+    """Read a MODIS Collection 6.1 land BRDF for one pixel in matched tiles.
 
-    Row and column are zero-based tile indices. Assign a MODIS band (1–7)
-    to each modeled wavelength explicitly. The user owns interpolation or
-    extrapolation between observed bands. Only full inversions (QA 0 or 1)
-    with valid packed coefficients are accepted. Requires optional pyhdf.
+    Args:
+        parameters_path (str | Path): Local native MCD43A1 HDF4 granule with
+            packed RossThick/LiSparseReciprocal parameters.
+        quality_path (str | Path): Local MCD43A2 HDF4 granule with the same
+            tile and retrieval date as the parameters granule.
+        row (int): Zero-based integer pixel row within the tile.
+        col (int): Zero-based integer pixel column within the tile.
+        wavelength_m (ArrayLike): Increasing positive modeled vacuum
+            wavelengths [m].
+        band_ids (ArrayLike): One MODIS band number (integer 1–7) for each
+            wavelength. This mapping assigns retrieved coefficients directly to
+            the grid.
+
+    Returns:
+        (Surface): The isotropic, volumetric and geometric coefficients after
+            applying the 0.001 packing scale. Its source records the files,
+            pixel and per-band full-inversion quality flags.
+
+    Raises:
+        ImportError: The optional HDF4 reader pyhdf is unavailable.
+        ValueError: The filenames or pixel/band mapping are invalid, a band
+            has a quality flag other than 0 or 1, or a packed coefficient
+            is outside its valid range.
+        HDF4Error: The HDF4 reader cannot access a file or required dataset.
     """
     from pyhdf.SD import SDC
 

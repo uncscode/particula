@@ -207,6 +207,97 @@ energy budget, [surface and sensor geometry](../../theory/optics/surface-and-sen
 for radiance units, and [solver benchmarks](../../studies/validation/spectral-radiation/benchmark.md)
 for accuracy and low-Sun limits.
 
+### Compare several columns on a Warp device
+
+To isolate the effect of the ground, use the same atmospheric column and
+sunlight for two calculations and change only the surface. Here a clear
+column at 20° N extends from sea level to 120 km. Prepare the optical
+inputs once in Python before sending the two cases to the device.
+
+```python
+from datetime import UTC, datetime
+
+from particula.optics import dusty_ground, earth_reference, ocean_surface
+
+earth = earth_reference(
+    20.0, 0.0, datetime(2022, 6, 21, 12, tzinfo=UTC), [120_000, 1_000, 0]
+)
+wave = earth.sun.wavelength_m
+surfaces = [ocean_surface(wave), dusty_ground(wave)]
+```
+
+Prepare both cases together on CUDA. A batch shares its wavelength grid
+and layer count. Warp supports 2–16 angular ordinates per hemisphere
+and the NumPy solver supports 2–32. Paired differences also require matching
+interface heights, spectral weights and band edges. Set case 0 (ocean)
+as the reference for both. `enqueue()` solves, integrates over wavelength,
+and subtracts the requested reference on the device. Check the result and
+read the top-interface flux change
+for case 1 (soil). Component 2 is the flux reflected upward.
+
+```python
+from particula.optics.gpu.shortwave import prepare_shortwave
+
+columns = [earth.column, earth.column]
+batch = prepare_shortwave(
+    columns, earth.sun, surfaces, device="cuda:0", reference_cases=[0, 0]
+)
+batch.enqueue()
+batch.check()
+top = batch.broadband_delta[1, :1].numpy()[0]
+print(f"{top[2]:+.1f} W/m² at the column top")
+```
+
+The dusty ground returns 258.2 W/m² more sunlight to the top of the
+clear column than the ocean does. To use the result in another device
+kernel, pass its CUDA stream as `stream=` during preparation. Subsequent
+work on that stream can read `batch.broadband` and `batch.broadband_delta`
+directly. Both have axes (case, interface) and components direct downward,
+diffuse downward and upward in W/m². Use `batch.download()` for the full
+spectral results on the host. For a satellite band, also pass
+`view_zenith_deg`, `relative_azimuth_deg` and a `sensor_response` on the
+wavelength grid. The device array `batch.band_radiance` then gives one
+response-weighted radiance per case in W m⁻² sr⁻¹ m⁻¹.
+
+To follow changing particles, bind a diagnostic to a prepared simulation.
+The following uses the one-box aerosol and condensation settings from the
+[optical history example](../../studies/validation/material-properties/optical-recording/dense_optical_history.py).
+Run it from a checkout after the setup above. Both cases treat the live
+particles in box 0 as uniform throughout the lowest kilometre. The upper
+layer keeps its reference molecular optics. A `-1` in the top-first box
+map skips particle contributions to that layer.
+
+```python
+from runpy import run_path
+
+from particula.optics import OpticalConfig
+from particula.optics.gpu.shortwave_resident import ResidentShortwave
+
+setup = run_path(
+    "docs/studies/validation/material-properties/optical-recording/"
+    "dense_optical_history.py"
+)
+aerosol, condensation = setup["chamber"]()
+config = OpticalConfig(wave, particle_index=1.5 + 0.02j)
+with condensation.prepare(aerosol, time_step=0.1, device="cuda:0") as sim:
+    diagnostic = ResidentShortwave(
+        sim, config, columns, earth.sun, surfaces,
+        box_indices=[[-1, 0], [-1, 0]], reference_cases=[0, 0],
+        coefficient_capacity=48,
+    )
+    sim.run(steps=1)
+    diagnostic.enqueue()
+    diagnostic.check()
+    wet_top = diagnostic.workspace.broadband_delta[1, :1].numpy()[0]
+    print(f"{wet_top[2]:+.1f} W/m² at the column top")
+```
+
+With the absorbing particles present, the contrast between surfaces falls
+to 113.4 W/m². Reuse the diagnostic after later simulation steps to
+recompute the particle optics and fluxes on the simulation stream. The
+[batch timing study](../../studies/validation/spectral-radiation/benchmark.md#how-many-columns-benefit-from-cuda)
+compares prepared transfer time across different numbers of columns.
+
 ## Device calculations
 
 Run the [CUDA optics example](../../studies/validation/material-properties/cuda-optics/cuda_optics.py) for explicit

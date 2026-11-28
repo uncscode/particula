@@ -7,9 +7,12 @@ from particula.optics.gpu.bulk import (
     PopulationWorkspace,
     prepare_population_mie,
 )
+from particula.optics.gpu.shortwave import ShortwaveWorkspace, prepare_shortwave
 from particula.optics.gpu.workspace import MieWorkspace, prepare_mie
 
 __all__ = [
+    "ShortwaveWorkspace",
+    "prepare_shortwave",
     "MieWorkspace",
     "prepare_mie",
     "PopulationWorkspace",

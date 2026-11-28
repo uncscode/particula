@@ -2,6 +2,9 @@
 
 Solar position uses the apparent solar longitude and equation of time
 (Meeus, Astronomical Algorithms, ch. 25). Solar zenith is geometrical.
+The reference combines the TSIS-1 spectrum (Coddington et al.,
+doi:10.1029/2022EA002637) with REPTRAN gas absorption (Gasteiger et al.,
+doi:10.1016/j.jqsrt.2014.06.024) in the AFGL US standard atmosphere.
 """
 
 from dataclasses import dataclass
@@ -26,11 +29,23 @@ _DATA = Path(__file__).with_name("reference_data")
 
 @dataclass(frozen=True, init=False)
 class SolarInput:
-    """Upper boundary irradiance densities [W m⁻² m⁻¹].
+    """Collimated and isotropic diffuse illumination at the top of a column.
 
-    The collimated beam is normal to the ray. Diffuse horizontal irradiance
-    illuminates the downward hemisphere with uniform radiance. Optional
-    quadrature weights in metres integrate representative spectral nodes.
+    Attributes:
+        wavelength_m: Increasing positive vacuum wavelengths [m].
+        mu0: Solar zenith cosine in [0, 1]. The solver uses zero for a Sun
+            at or below the horizon and suppresses the collimated beam.
+        direct_normal: Incident beam irradiance density [W m⁻² m⁻¹],
+            measured normal to the ray. Its horizontal component is
+            mu0 times direct_normal.
+        diffuse_horizontal: Downward diffuse irradiance density [W m⁻² m⁻¹]
+            on a horizontal plane. Incident diffuse radiance is
+            diffuse_horizontal divided by pi, uniform over the hemisphere.
+        quadrature_weights_m: Optional effective integration widths [m] at the
+            representative wavelengths. Without weights the grid is sampled.
+        source: Provenance of the illumination and spectral distribution.
+        band_bounds_m: Optional lower and upper wavelengths [m] for each
+            quadrature node, shape (wavelength, 2).
     """
 
     wavelength_m: np.ndarray
@@ -51,7 +66,25 @@ class SolarInput:
         source: str = "user upper boundary",
         band_bounds_m: ArrayLike | None = None,
     ):
-        """Freeze the boundary and broadcast scalar densities to its grid."""
+        """Copy spectral boundary data onto a common read-only wavelength grid.
+
+        Args:
+            wavelength_m: One-dimensional increasing positive wavelengths [m].
+            mu0: Scalar cosine of the solar zenith angle in [0, 1].
+            direct_normal: Nonnegative beam density [W m⁻² m⁻¹], a scalar or
+                one value per wavelength.
+            diffuse_horizontal: Nonnegative diffuse density [W m⁻² m⁻¹],
+                a scalar or one value per wavelength.
+            quadrature_weights_m: Optional positive integration widths [m],
+                scalar or one per wavelength.
+            source: Description of the source of the boundary data.
+            band_bounds_m: Optional pairs of ordered band edges [m], one pair
+                per wavelength. Each pair must contain its quadrature node.
+
+        Raises:
+            ValueError: Coordinates, cosine or spectral fields are invalid,
+                or band bounds lack quadrature weights.
+        """
         wave = wavelengths(wavelength_m)
         if np.ndim(mu0) or not np.isfinite(mu0) or not 0 <= mu0 <= 1:
             raise ValueError("Solar zenith cosine must be in [0, 1]")
@@ -87,7 +120,14 @@ class SolarInput:
 
 @dataclass(frozen=True)
 class SolarPosition:
-    """Geometric Sun direction [degrees] and Earth–Sun distance [au]."""
+    """Solar direction at a location and Earth–Sun distance at that instant.
+
+    Attributes:
+        zenith_deg: Geometric zenith angle [degrees], zero directly overhead
+            and greater than 90 below the horizon.
+        azimuth_deg: Bearing [degrees] clockwise from north on [0, 360).
+        distance_au: Earth–Sun distance [astronomical units].
+    """
 
     zenith_deg: float
     azimuth_deg: float
@@ -95,10 +135,19 @@ class SolarPosition:
 
 
 def solar_position(latitude_deg, longitude_deg, time: datetime):
-    """Calculate true solar zenith and azimuth clockwise from north.
+    """Calculate geometric solar position and Earth–Sun distance at an instant.
 
-    Supply geodetic latitude [-90,90], east-positive longitude [-180,180]
-    and a timezone-aware instant. No refraction or terrain horizon is applied.
+    Args:
+        latitude_deg (float): Geodetic latitude [degrees north], in [-90, 90].
+        longitude_deg (float): Longitude [degrees east], in [-180, 180].
+        time: Timezone-aware datetime, converted to UTC for the ephemeris.
+
+    Returns:
+        (SolarPosition): Zenith and azimuth angles [degrees] and distance [au].
+            The horizon is horizontal and atmospheric refraction is omitted.
+
+    Raises:
+        ValueError: Coordinates lie outside their domains or time is naive.
     """
     if not -90 <= latitude_deg <= 90 or not -180 <= longitude_deg <= 180:
         raise ValueError("Invalid Earth latitude or longitude")
@@ -164,7 +213,20 @@ def _extraterrestrial():
 
 
 def solar_irradiance(wavelength_m):
-    """TSIS-1 irradiance density [W m⁻² m⁻¹] at 1 au over 280–4000 nm."""
+    """Sample the bundled TSIS-1 extraterrestrial solar spectrum at 1 au.
+
+    Args:
+        wavelength_m (ArrayLike): Increasing vacuum wavelengths [m] within
+            280–4000 nm.
+
+    Returns:
+        (ndarray): Spectral direct-normal irradiance density [W m⁻² m⁻¹], with
+            one value per wavelength, linearly interpolated from the 1 nm
+            reference bins.
+
+    Raises:
+        ValueError: The wavelength grid is invalid or exceeds the reference.
+    """
     wave = wavelengths(wavelength_m)
     nm, flux = _extraterrestrial()
     if wave.min() < 280e-9 - 1e-18 or wave.max() > 4000e-9 + 1e-18:
@@ -174,11 +236,19 @@ def solar_irradiance(wavelength_m):
 
 @dataclass(frozen=True)
 class EarthReference:
-    """Ideal clear atmosphere, solar position and upper illumination.
+    """Clear reference column and extraterrestrial illumination at a location.
 
-    The wavelength quadrature and bounds are available for interpreting
-    band averages. Field sources describe user coordinates, prescribed
-    profiles and reference approximations.
+    Attributes:
+        column: Molecular optical properties on the requested height grid.
+        sun: Spectral incident sunlight at the uppermost interface.
+        position: Geometric solar zenith, azimuth and Earth–Sun distance.
+        band_bounds_m: Containing REPTRAN band edges [m], shape
+            (wavelength, 2). On a custom grid these identify the gas
+            approximation used for each sampled wavelength.
+        sources: Provenance of the grid, atmosphere and illumination.
+        latitude_deg: Geodetic latitude [degrees north].
+        longitude_deg: Longitude [degrees east].
+        time: Timezone-aware instant specified by the caller.
     """
 
     column: SpectralColumn
@@ -273,15 +343,34 @@ def profile_gas_optical_depth(
     mole_fraction,
     absorption_cross_section_m2,
 ):
-    """Compute layer absorption depths from a local sounding and cross sections.
+    """Calculate vertical gas absorption from a sounding and cross sections.
 
-    Pressure [Pa], temperature [K], and gas mole fractions [mol/mol] refer
-    to top-first interfaces. Fractions have axes (interface, gas). Supply
-    layer-effective cross sections [m² molecule⁻¹] with axes
-    (layer, wavelength, gas) in the same species order. Trapezoidally
-    integrate absorber number density assuming a linear vertical profile
-    per layer. Supply cross sections at the appropriate temperature,
-    pressure and spectroscopic resolution for the application.
+    Gas number density follows the ideal gas law at each interface. The
+    trapezoidal integral assumes density varies linearly with height between
+    adjacent interfaces. The caller supplies cross sections appropriate to
+    the pressure, temperature and spectral resolution of each layer.
+
+    Args:
+        interface_height_m (ArrayLike): Strictly descending interface altitudes
+            [m].
+        pressure_pa (ArrayLike): Nonnegative interface pressures [Pa],
+            increasing downward.
+        temperature_k (ArrayLike): Positive temperatures [K] at the same
+            interfaces.
+        mole_fraction (ArrayLike): Nonnegative species mole fractions
+            [mol/mol], shape (interface, gas). Included fractions sum to at
+            most one.
+        absorption_cross_section_m2 (ArrayLike): Nonnegative layer-effective
+            absorption cross sections [m² molecule⁻¹], shape (layer,
+            wavelength, gas), in the same species order as mole_fraction.
+
+    Returns:
+        (ndarray): Dimensionless absorption optical depths, shape (layer,
+            wavelength), summed over the supplied gases in top-first layer
+            order.
+
+    Raises:
+        ValueError: Coordinates, array shapes or physical values are invalid.
     """
     height = interfaces(interface_height_m)
     pressure = finite_array(pressure_pa, "Interface pressures")
@@ -327,11 +416,27 @@ def molecular_column(
     *,
     source="user profile",
 ):
-    """Combine pressure-derived Rayleigh scattering and gas absorption.
+    """Combine Rayleigh scattering and prescribed gas absorption in each layer.
 
-    Supply interface pressures in Pa (increasing downward) and gas
-    absorption optical depth per layer and wavelength. Use this with local
-    sounding/reanalysis profiles or a band-resolved external gas model.
+    The Hansen–Travis sea-level Rayleigh depth is scaled by the layer
+    pressure difference divided by 101325 Pa. The scalar Rayleigh phase
+    function uses normalized Legendre moments (1, 0, 0.1).
+
+    Args:
+        wavelength_m (ArrayLike): Increasing positive vacuum wavelengths [m].
+        interface_height_m (ArrayLike): Strictly descending interface altitudes
+            [m].
+        pressure_pa (ArrayLike): Nonnegative interface pressures [Pa],
+            increasing downward.
+        gas_optical_depth (ArrayLike): Nonnegative vertical absorption optical
+            depth [dimensionless], shape (layer, wavelength).
+        source (str): Provenance of the pressure profile and gas absorption.
+
+    Returns:
+        (SpectralColumn): Total extinction, scattering albedo and moments.
+
+    Raises:
+        ValueError: Coordinates or optical depths are invalid or incompatible.
     """
     wave = wavelengths(wavelength_m)
     height = interfaces(interface_height_m)
@@ -381,16 +486,42 @@ def earth_reference(
     gas_optical_depth=None,
     profile_name="user profile",
 ):
-    """Build an offline AFGL US standard column illuminated by TSIS-1.
+    """Build an offline Earth reference atmosphere and its solar illumination.
 
-    Elevation is the lowest interface. The upper interface receives
-    extraterrestrial sunlight, so include the overlying atmosphere when
-    interpreting a surface or TOA flux. Native reduced/full REPTRAN grids
-    use positive band quadrature. User wavelength grids use containing-band
-    effective gas depth, sampled Rayleigh scattering and TSIS illumination.
-    Override interface pressure (Pa) or layer gas depths independently.
-    Their provenance is recorded under profile_name. The lowest reference
-    layer extends hydrostatically to land surfaces down to −500 m.
+    The highest interface receives extraterrestrial TSIS-1 sunlight corrected
+    for Earth–Sun distance. Include the overlying atmosphere when interpreting
+    surface or top-of-atmosphere flux. Geographic location sets solar geometry.
+    The default molecular profile is the AFGL US standard atmosphere.
+
+    Args:
+        latitude_deg (float): Geodetic latitude [degrees north], in [-90, 90].
+        longitude_deg (float): Longitude [degrees east], in [-180, 180].
+        time (datetime): Timezone-aware instant of illumination.
+        interface_height_m (ArrayLike): Descending interface altitudes above
+            sea level [m], from −500 to 120000 m. The lowest interface sets
+            surface elevation.
+        wavelength_m (ArrayLike | None): Optional increasing wavelengths [m]
+            within the gas table. Its first band starts at approximately
+            280.033604 nm and the last ends at 4000 nm. A custom grid uses the
+            containing band's effective gas depth, matched to vertical direct
+            transmission. Native nodes use quadrature that conserves the TSIS-1
+            energy in each band.
+        grid (str): Native REPTRAN gas quadrature, "reduced" or "full". Custom
+            wavelengths use the full table to derive their band depths.
+        pressure_pa (ArrayLike | None): Optional replacement pressures [Pa],
+            one per interface, increasing downward. They determine Rayleigh
+            optical depth.
+        gas_optical_depth (ArrayLike | None): Optional replacement vertical
+            absorption depths [dimensionless], shape (layer, wavelength).
+        profile_name (str): Source label for supplied pressures or gas depths.
+
+    Returns:
+        (EarthReference): Molecular optics, Sun position, incident spectrum and
+            field provenance. Incident diffuse irradiance is zero.
+
+    Raises:
+        ValueError: Location, time, physical fields or grids are invalid or
+            exceed the coverage of the reference data.
     """
     if grid not in ("full", "reduced"):
         raise ValueError("Choose a full or reduced gas reference grid")

@@ -113,11 +113,25 @@ def get_mass_specific_opacity(
 
 @dataclass(frozen=True)
 class SpectralColumn:
-    """Top-first layer optical properties for scalar shortwave transport.
+    """Vertical extinction, scattering and phase function of homogeneous layers.
 
-    Optical depth and single scattering albedo have shape (layer, wavelength).
-    Normalized Legendre moments have a final order axis, starting at beta_0=1
-    where scattering is nonzero. Wavelengths and altitudes are in metres.
+    Attributes:
+        wavelength_m: Strictly increasing positive vacuum wavelengths [m].
+        interface_height_m: Interface heights [m] in strictly descending
+            order, including both the top and bottom of the column.
+        optical_depth: Nonnegative vertical extinction optical depth
+            [dimensionless], shape (layer, wavelength).
+        single_scattering_albedo: Scattering fraction of extinction in [0, 1]
+            with the same axes as optical_depth.
+        phase_moments: Normalized Legendre coefficients of the phase function,
+            shape (layer, wavelength, order). Each lies in [-1, 1]. Order zero
+            equals one wherever scattering depth is positive. Order one is the
+            mean cosine of the scattering angle.
+        sources: Provenance of the optical properties and vertical grid.
+
+    Raises:
+        ValueError: Input arrays are nonfinite, the axes disagree, or a
+            coordinate or optical property violates its physical domain.
     """
 
     wavelength_m: NDArray
@@ -169,11 +183,33 @@ class SpectralColumn:
         *,
         hg_order=32,
     ):
-        """Map bulk (box, wavelength) optics to layers with an HG phase law.
+        """Convert homogeneous population optics to vertical layer optics.
 
-        Each layer needs its homogeneous box index and geometrical thickness.
-        The Henyey–Greenstein approximation uses beta_l = g**l. Supply a
-        SpectralColumn directly to use measured or calculated phase moments.
+        Extinction times geometrical thickness gives vertical optical depth.
+        The Henyey–Greenstein closure sets the moment of order l to g**l, where
+        g is the population asymmetry parameter.
+
+        Args:
+            wavelength_m (ArrayLike): Increasing vacuum wavelengths [m] of the
+                population optics, shape (wavelength,).
+            interface_height_m (ArrayLike): Strictly descending interface
+                heights [m].
+            population (PopulationOptics): Bulk optics with extinction [m⁻¹],
+                single scattering albedo and asymmetry (both dimensionless),
+                each with axes (box, wavelength).
+            box_indices (ArrayLike | None): Integer box index for each layer,
+                in top-first order. If omitted, each row of population optics
+                supplies one layer.
+            hg_order (int): Highest phase moment to retain, an integer from 1
+                to 255.
+
+        Returns:
+            (SpectralColumn): One layer per adjacent pair of interfaces and
+                hg_order + 1 phase moments per layer and wavelength.
+
+        Raises:
+            ValueError: The grids, extinction, optical properties, box mapping
+                or requested phase order are invalid.
         """
         wave = wavelengths(wavelength_m)
         height = interfaces(interface_height_m)
@@ -215,7 +251,20 @@ class SpectralColumn:
         )
 
     def scaled(self, factor):
-        """Scale the extinction and scattering depth by the same factor."""
+        """Multiply all layer optical depths by a common factor.
+
+        Args:
+            factor (float): Finite nonnegative dimensionless extinction
+                multiplier.
+
+        Returns:
+            (SpectralColumn): New column with the same albedos and phase
+                functions. Multiplying by zero gives a transparent column on
+                the original grid.
+
+        Raises:
+            ValueError: The multiplier is nonscalar, nonfinite or negative.
+        """
         if np.ndim(factor) != 0 or not np.isfinite(factor) or factor < 0:
             raise ValueError("Column scale must be finite and nonnegative")
         return replace(
@@ -225,7 +274,21 @@ class SpectralColumn:
         )
 
     def plus(self, other):
-        """Combine independent scatterers using scattering-depth weights."""
+        """Combine independent optical constituents in the same layers.
+
+        Args:
+            other (SpectralColumn): Another SpectralColumn on exactly the same
+                wavelength and interface-height grids.
+
+        Returns:
+            (SpectralColumn): New column with summed extinction and scattering
+                depths. The phase moments are weighted by scattering optical
+                depth. Missing higher orders contribute zero. Transparent
+                layers receive albedo zero.
+
+        Raises:
+            ValueError: The two columns have different coordinates.
+        """
         require_same_grid(self.wavelength_m, other.wavelength_m, "Wavelengths")
         require_same_grid(
             self.interface_height_m, other.interface_height_m, "Heights"
