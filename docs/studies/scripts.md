@@ -119,6 +119,7 @@ The catalog lists each registered Python script once. Each entry leads to its so
 - [Radial relative velocity of droplet pairs](validation/cloud-droplet-collisions/dns-radial-relative-velocity-comparison.py)
 - [Record aerosol extinction at 10 Hz during hygroscopic growth](validation/material-properties/optical-recording/dense_optical_history.py)
 - [Recorded GPU benchmark viewer](benchmarks/historical-coagulation/gpu_benchmarks.py)
+- [Recover the half-second large-droplet shortfall](literature/reach-droplets/burst.py)
 - [Recovering initial particle sizes after condensation](validation/condensation/initial-size/infer_initial_radius.py)
 - [Repeated source pulses in a cooling and warming aerosol](examples/coupled-populations/chambers/gpu_prepared_cyclic_chamber.py)
 - [Replay the measured sulfur response in a cooling flue gas](literature/straw-combustion/straw_combustion.py)

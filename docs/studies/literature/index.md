@@ -107,6 +107,9 @@ A cloud activation fit predicts 49% more water than BAT at 95% humidity for one 
 
 <div class="study-figures">
 
+[![The measured concentration of 50–65 µm droplets rises above two calculations during the fan-off burst. A dashed beam marks a proposed second view above the camera.](../../images/reach-droplets/toc.svg)\
+Where did the large droplets in the REACh cloud chamber come from?](reach-droplets/index.md)
+
 [![Jeju Island Chamber. A tube samples a cloud inside K-CPEC. The measured and simulated run-1 spectra share a peak, with fewer simulated particles on its smaller-diameter side.](../../images/jeju-chamber/toc.svg)\
 Reconstructing particle growth in the Jeju Island cloud chamber](jeju-chamber/index.md)
 
@@ -195,6 +198,7 @@ Adding settling and diffusion lowers predicted one-hour survival of 1 µm partic
 
 **Cloud droplets and precipitation**
 
+- [Where did the large droplets in the REACh cloud chamber come from?](reach-droplets/index.md)
 - [Reconstructing particle growth in the Jeju Island cloud chamber](jeju-chamber/index.md)
 - [Fresh aerosol can form ice while entrainment reduces freezing across the cloud](lund-freezing/index.md)
 - [One droplet, two reported sizes: Simulating the Pallas cloud probes](pallas-cloud-probes/index.md)

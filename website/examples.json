@@ -2290,5 +2290,18 @@
       "docs/data/xiong-sea-spray/growth-time.csv",
       "docs/data/xiong-sea-spray/ion-time.csv"
     ]
+  },
+  "reach-droplet-burst": {
+    "title": "Recover the half-second large-droplet shortfall",
+    "source": "docs/studies/literature/reach-droplets/burst.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 90,
+    "inputs": [
+      "website/public/study-data/reach-droplets/figure-data.zip"
+    ],
+    "input_destinations": {
+      "website/public/study-data/reach-droplets/figure-data.zip": "figure-data.zip"
+    }
   }
 }

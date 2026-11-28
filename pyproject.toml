@@ -167,6 +167,7 @@ include = [
     "studies/mt-soledad/figures/optical-spectrum.csv",
     "studies/mt-soledad/figures/optical-summary.csv",
     "website/public/study-data/bai-limonene/monthly.csv",
+    "website/public/study-data/reach-droplets/figure-data.zip",
     "website/examples.json", "scripts/", "examples_tests/", "conda/", "conftest.py",
 ]
 exclude = [
