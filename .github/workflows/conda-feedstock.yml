@@ -14,6 +14,7 @@ on:
       - scripts/**
       - website/examples.json
       - website/public/study-data/bai-limonene/monthly.csv
+      - website/public/study-data/reach-droplets/figure-data.zip
       - studies/aiomfac-mixing-state/*.py
       - studies/liu-terpene/uncertainty/estimate.py
       - studies/cloud-1833/full-transfer/stage-scores.csv
