@@ -43,7 +43,7 @@ def cloud(slots):
     ]
     particles = ParticleData(
         masses=(4 * np.pi / 3 * 1000 * radii**3)[None, :, None],
-        concentration=np.ones((1, slots)),
+        population=np.ones((1, slots)),
         charge=np.zeros((1, slots)),
         density=np.array([1000.0]),
         volume=np.array([slots / 2e9]),
@@ -131,15 +131,15 @@ def simulate():
                 )
             final = sim.snapshot().particles
             np.testing.assert_array_equal(
-                final.concentration.sum(),
+                final.population.sum(),
                 slots - sum(e["collisions"] for e in events),
             )
             np.testing.assert_array_equal(
-                final.concentration[final.concentration > 0], 1.0
+                final.population[final.population > 0], 1.0
             )
             np.testing.assert_array_equal(final.charge, 0.0)
             relative_drift = (
-                np.sum(final.masses * final.concentration[..., None])
+                np.sum(final.masses * final.population[..., None])
                 / np.sum(initial.particles.masses)
                 - 1
             )

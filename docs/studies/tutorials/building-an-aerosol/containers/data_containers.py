@@ -53,7 +53,7 @@ def _build_particle_data() -> ParticleData:
     """
     return ParticleData(
         masses=np.array([[[1.0e-18, 2.5e-18], [3.5e-18, 0.5e-18]]]),
-        concentration=np.array([[1.0, 0.25]]),  # represented counts
+        population=np.array([[1.0, 0.25]]),  # represented counts
         charge=np.array([[0.0, 1.0]]),
         density=np.array([1000.0, 1200.0]),
         volume=np.array([1.0e-6]),
@@ -102,7 +102,7 @@ def run_example() -> list[str]:
         (
             "ParticleData constructed: "
             f"masses={particle_data.masses.shape}, "
-            f"concentration={particle_data.concentration.shape}, "
+            f"population={particle_data.population.shape}, "
             f"charge={particle_data.charge.shape}, "
             f"density={particle_data.density.shape}, "
             f"volume={particle_data.volume.shape}"
@@ -127,7 +127,7 @@ def run_example() -> list[str]:
     output.append(
         "Warp particle round trip: "
         f"restored_masses={restored_particle_data.masses.shape}, "
-        f"restored_concentration={restored_particle_data.concentration.shape}"
+        f"restored_population={restored_particle_data.population.shape}"
     )
 
     gpu_gas_data = to_warp_gas_data(

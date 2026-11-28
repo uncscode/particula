@@ -341,7 +341,7 @@ def _particle_data(fixture: ParityFixture) -> ParticleData:
     """Build non-aliasing particle data with species-aligned mass columns."""
     return ParticleData(
         masses=fixture.masses.copy(),
-        concentration=fixture.concentration * fixture.volume[:, None],
+        population=fixture.concentration * fixture.volume[:, None],
         charge=fixture.charge.copy(),
         density=fixture.density.copy(),
         volume=fixture.volume.copy(),
@@ -378,7 +378,7 @@ def _copy_oracle_input(source: OracleInput) -> OracleInput:
     return OracleInput(
         particles=ParticleData(
             masses=source.particles.masses.copy(),
-            concentration=source.particles.concentration.copy(),
+            population=source.particles.population.copy(),
             charge=source.particles.charge.copy(),
             density=source.particles.density.copy(),
             volume=source.particles.volume.copy(),
@@ -441,7 +441,7 @@ def _proposal(state: OracleInput) -> np.ndarray:  # noqa: C901
             viscosity,
         )
         for particle in range(2):
-            if state.particles.concentration[box, particle] == 0.0:
+            if state.particles.population[box, particle] == 0.0:
                 continue
             particle_masses = masses[box, particle]
             total_volume = np.sum(particle_masses / fixture.density)
@@ -519,7 +519,7 @@ def _finalize_transfer(state: OracleInput, proposal: np.ndarray) -> np.ndarray:
             for particle in range(2):
                 weighted = (
                     bounded[box, particle, species]
-                    * state.particles.concentration[box, particle]
+                    * state.particles.population[box, particle]
                     / state.particles.volume[box]
                 )
                 if weighted > 0.0:
@@ -574,13 +574,13 @@ def run_oracle(source: OracleInput | None = None) -> OracleResult:
         )
         state.particles.masses += applied
         state.gas.concentration -= (
-            np.sum(applied * state.particles.concentration[:, :, None], axis=1)
+            np.sum(applied * state.particles.population[:, :, None], axis=1)
             / state.particles.volume[:, None]
         )
         np.maximum(state.gas.concentration, 0.0, out=state.gas.concentration)
         total += applied
     energy = (
-        np.sum(total * state.particles.concentration[:, :, None], axis=1)
+        np.sum(total * state.particles.population[:, :, None], axis=1)
         * state.fixture.latent_heat[None, :]
     )
     return OracleResult(

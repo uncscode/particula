@@ -56,7 +56,7 @@ particle = par.particles.create_lognormal_binned_particle_data(
 )
 
 print("Radius shape:", particle.radii[0].shape)
-print("Concentration shape:", particle.concentration[0].shape)
+print("Population shape:", particle.population[0].shape)
 print(
     "Total concentration (initial):",
     f"{particle.number_density[0]:.3e} 1/m^3",
@@ -126,7 +126,7 @@ print("Internal substeps per output interval:", sub_steps)
 times = np.arange(n_steps + 1) * dt
 total_concentration = np.zeros_like(times, dtype=float)
 
-initial_counts = particle.concentration.copy()
+initial_counts = particle.population.copy()
 initial_masses = particle.masses.copy()
 loss_coefficients = wall_loss.loss_coefficient(
     particle, temperature=T, pressure=P
@@ -147,14 +147,14 @@ for i in range(1, n_steps + 1):
 
 # Fixed radii give an independent repeated-Euler decay prediction.
 np.testing.assert_allclose(
-    particle.concentration,
+    particle.population,
     initial_counts
     * (1 - loss_coefficients * dt / sub_steps) ** (n_steps * sub_steps),
     rtol=1e-12,
     atol=1e-30,
 )
 np.testing.assert_array_equal(particle.masses, initial_masses)
-assert np.all(particle.concentration >= 0)
+assert np.all(particle.population >= 0)
 
 print(
     "Total concentration (final):",
@@ -200,12 +200,12 @@ fig, ax = plotting.subplots(size="wide")
 
 ax.plot(
     initial_particle.radii[0],
-    initial_particle.concentration[0],
+    initial_particle.slot_concentration_density[0],
     label="Initial",
 )
 ax.plot(
     particle.radii[0],
-    particle.concentration[0],
+    particle.slot_concentration_density[0],
     label="After wall loss",
 )
 

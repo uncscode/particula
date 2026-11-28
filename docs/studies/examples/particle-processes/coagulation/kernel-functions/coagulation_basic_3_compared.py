@@ -42,7 +42,7 @@ plt.style.use("particula.default")
 # Both representations use 140 radius nodes from 10 nm–1 µm, lognormal radius
 # scale 120 nm, geometric standard deviation 1.5, and target number density
 # 8×10⁸ m⁻³. Density is 1000 kg m⁻³ at 298.15 K and 101325 Pa.
-# The PMF stores bin totals (m⁻³); the PDF stores density per radius (m⁻⁴).
+# The PMF reports bin densities (m⁻³). The PDF reports density per radius (m⁻⁴).
 # Independent copies of gas and environment isolate the two trajectories.
 
 # %%
@@ -149,18 +149,18 @@ time_step = 200  # seconds
 sub_steps = 10
 
 # PMF run
-pmf_before = aerosol_pmf.particles.concentration[0].copy()
+pmf_before = aerosol_pmf.particles.slot_concentration_density[0].copy()
 aerosol_pmf_after = coagulation_pmf.execute(
     aerosol_pmf, time_step=time_step, sub_steps=sub_steps
 )
-pmf_after = aerosol_pmf_after.particles.concentration[0].copy()
+pmf_after = aerosol_pmf_after.particles.slot_concentration_density[0].copy()
 
 # PDF run
-pdf_before = aerosol_pdf.particles.concentration[0].copy()
+pdf_before = aerosol_pdf.particles.slot_concentration_density[0].copy()
 aerosol_pdf_after = coagulation_pdf.execute(
     aerosol_pdf, time_step=time_step, sub_steps=sub_steps
 )
-pdf_after = aerosol_pdf_after.particles.concentration[0].copy()
+pdf_after = aerosol_pdf_after.particles.slot_concentration_density[0].copy()
 
 # %% [markdown]
 # ## Convert before judging agreement

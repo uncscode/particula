@@ -315,7 +315,8 @@
     "device": "cpu",
     "timeout": 1800,
     "inputs": [],
-    "full_canvas": true
+    "full_canvas": true,
+    "data_expression": "dict(time_s=times.tolist(), pmf_m3=np.asarray(number_pmf).tolist(), pdf_m3=np.asarray(number_pdf).tolist(), resolved_m3=np.asarray(number_resolved).tolist())"
   },
   "examples-processes-coagulation-functional-coagulation-basic-1-pmf": {
     "title": "A compact PMF coagulation calculation",
@@ -2308,5 +2309,21 @@
     "input_destinations": {
       "website/public/study-data/reach-droplets/figure-data.zip": "figure-data.zip"
     }
+  },
+  "represented-population": {
+    "title": "Count particles in a represented air volume",
+    "source": "docs/studies/tutorials/building-an-aerosol/particles/represented_population.py",
+    "policy": "cpu",
+    "device": "cpu",
+    "timeout": 300,
+    "inputs": [],
+    "invoke": "report = run_example()",
+    "data_expression": "report",
+    "replot_invoke": "report = plot_results(saved_data)",
+    "render_functions": [
+      "plot_results"
+    ],
+    "plot_inputs": [],
+    "full_canvas": true
   }
 }
