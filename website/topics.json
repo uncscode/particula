@@ -7104,6 +7104,124 @@
         ],
         "order": 2
       }
+    },
+    {
+      "source": "docs/theory/optics/spectral-transport.md",
+      "title": "Spectral transport in parcels and columns",
+      "topic": "optics",
+      "also": [
+        "atmosphere"
+      ],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "docs/theory/optics/surface-and-sensor.md",
+      "title": "Surface reflection and satellite observables",
+      "topic": "optics",
+      "also": [
+        "atmosphere"
+      ],
+      "role": "Theory",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/examples/coupled-populations/radiation/parcel_surfaces.py",
+      "title": "How does the ground change the sunlight reflected by an aerosol layer?",
+      "topic": "optics",
+      "also": [
+        "parcels",
+        "atmosphere"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "shortwave-parcel-surfaces",
+        "runs": [
+          "shortwave-parcel-surfaces"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/optics/surface-and-sensor.md",
+            "label": "Surface reflection and satellite observables"
+          },
+          {
+            "target": "docs/guide/optics/index.md",
+            "label": "Set up a spectral column calculation"
+          }
+        ]
+      }
+    },
+    {
+      "source": "docs/studies/examples/coupled-populations/radiation/layer_altitude.py",
+      "title": "Does moving an absorbing layer change where sunlight is lost?",
+      "topic": "optics",
+      "also": [
+        "parcels",
+        "atmosphere"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "shortwave-layer-altitude",
+        "runs": [
+          "shortwave-layer-altitude"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/optics/spectral-transport.md",
+            "label": "Spectral transport in parcels and columns"
+          },
+          {
+            "target": "docs/guide/optics/index.md",
+            "label": "Set up a spectral column calculation"
+          }
+        ]
+      }
+    },
+    {
+      "source": "docs/studies/validation/spectral-radiation/benchmark.md",
+      "title": "Shortwave transfer solver benchmarks",
+      "topic": "optics",
+      "also": [
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "spectral-radiation-benchmark",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/optics/spectral-transport.md",
+            "label": "Inspect the radiation equations and assumptions"
+          }
+        ]
+      }
+    },
+    {
+      "source": "docs/studies/validation/spectral-radiation/observations.md",
+      "title": "Shortwave satellite observations over ocean and dry land",
+      "topic": "optics",
+      "also": [
+        "verification-scientific"
+      ],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "spectral-radiation-observations",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/theory/optics/surface-and-sensor.md",
+            "label": "Inspect the radiation equations and assumptions"
+          }
+        ]
+      }
     }
   ],
   "supporting": [
@@ -7390,6 +7508,14 @@
     {
       "source": "docs/studies/explorations/index.md",
       "reason": "Browsing directory for exploratory aerosol modeling studies."
+    },
+    {
+      "source": "docs/studies/examples/coupled-populations/radiation/index.md",
+      "reason": "Browsing directory for the published shortwave radiation studies."
+    },
+    {
+      "source": "docs/studies/validation/spectral-radiation/index.md",
+      "reason": "Browsing directory for the published shortwave radiation studies."
     }
   ],
   "study_group_exceptions": {
