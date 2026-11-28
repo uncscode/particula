@@ -107,6 +107,9 @@ from particula.particles.properties.friction_factor_module import (
 from particula.particles.properties.inertia_time import (
     get_particle_inertia_time,
 )
+from particula.particles.properties.kappa_kohler import (
+    get_kappa_kohler_critical_dry_diameter,
+)
 from particula.particles.properties.kelvin_effect_module import (
     get_kelvin_radius,
     get_kelvin_term,

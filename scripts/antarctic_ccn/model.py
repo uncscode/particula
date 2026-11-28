@@ -5,7 +5,10 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from particula.particles import get_kelvin_radius
+from particula.particles import (
+    get_kappa_kohler_critical_dry_diameter,
+    get_kelvin_radius,
+)
 from scipy.interpolate import PchipInterpolator
 from scipy.optimize import brentq
 
@@ -144,22 +147,12 @@ def integrate_spectrum(data, mass, cutoffs, band=(20.0, 1000.0)):
 
 
 def critical_k(k, ss, kelvin):
-    """Invert the κ-Köhler barrier for critical dry diameter at each setting."""
-    log_s = np.log1p(ss / 100)
-    ks = k[..., None]
-    lo = np.full((*k.shape, len(ss)), 1e-10)
-    hi = np.full_like(lo, 10.0)
-
-    def diameter(x):
-        return kelvin / (np.exp(x) * (log_s + np.log1p(ks / np.expm1(3 * x))))
-
-    for _ in range(70):
-        x = (2 * lo + hi) / 3
-        y = (lo + 2 * hi) / 3
-        increasing = diameter(x) < diameter(y)
-        lo = np.where(increasing, x, lo)
-        hi = np.where(increasing, hi, y)
-    return np.where(ks > 0, diameter((lo + hi) / 2), kelvin / log_s)
+    """Return dry diameter in nm, appending the percent-setting axis."""
+    return 1e9 * get_kappa_kohler_critical_dry_diameter(
+        kappa=k[..., None],
+        saturation_ratio=1 + ss / 100,
+        kelvin_diameter=kelvin * 1e-9,
+    )
 
 
 def _match_fraction(film, growth, diameter, rh, active):

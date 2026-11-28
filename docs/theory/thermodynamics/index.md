@@ -20,6 +20,13 @@ Activity calculations determine how chemical species behave in mixtures, account
     Derive the water budget of a rising parcel and follow gas and particles
     across a shared face.
 
+-   __[κ-Köhler activation](kappa-kohler-activation.md)__
+
+    ---
+
+    Find the critical dry diameter for a prescribed water supersaturation and
+    derive the equilibrium CCN number concentration of a mixed population.
+
 -   __[Activity Theory](activity-theory.md)__
 
     ---

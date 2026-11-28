@@ -214,23 +214,43 @@ def _observation_times(output_times, end_time):
     return set(times) | {end_time}
 
 
-def _optical_schedule(simulation, observer, times, initial, start, end):
-    if observer is None:
-        if times is not None or initial:
-            raise ValueError("An optical schedule requires an optical observer")
-        return False, set()
+def _analysis_schedules(
+    simulation,
+    start,
+    end,
+    optics,
+    optical_times,
+    optical_initial,
+    ccn,
+    ccn_times,
+    ccn_initial,
+):
+    """Bind passive observers and their independent accepted-state schedules."""
+    from particula.execution.ccn_recording import CCNObserver
     from particula.execution.optical_recording import OpticalObserver
 
-    if (
-        not isinstance(observer, OpticalObserver)
-        or observer.simulation is not simulation
+    schedules = []
+    for name, observer, times, initial, expected in (
+        ("optical", optics, optical_times, optical_initial, OpticalObserver),
+        ("CCN", ccn, ccn_times, ccn_initial, CCNObserver),
     ):
-        raise ValueError("optical observer belongs to a different owner")
-    observer._check_start(start)
-    targets = set() if times is None else _observation_times(times, end)
-    if initial:
-        targets.add(start)
-    return times is None, targets
+        if observer is None:
+            if times is not None or initial:
+                raise ValueError(
+                    f"A {name} schedule requires a {name} observer"
+                )
+            continue
+        if (
+            not isinstance(observer, expected)
+            or observer.simulation is not simulation
+        ):
+            raise ValueError(f"{name} observer belongs to a different owner")
+        observer._check_start(start)
+        targets = set() if times is None else _observation_times(times, end)
+        if initial:
+            targets.add(start)
+        schedules.append((observer, times is None, targets))
+    return schedules
 
 
 def run_until(  # noqa: C901
@@ -242,6 +262,9 @@ def run_until(  # noqa: C901
     optics=None,
     optical_output_times=None,
     optical_initial=False,
+    ccn=None,
+    ccn_output_times=None,
+    ccn_initial=False,
 ):
     """Advance an owner and observe requested times plus final time.
 
@@ -250,6 +273,7 @@ def run_until(  # noqa: C901
     schedule observes every accepted step without taking snapshots. Explicit
     optical_output_times may shorten CPU steps to reach those times. Set
     optical_initial=True to observe the starting state on the dense schedule.
+    CCNObserver accepts an independent ccn_output_times grid and ccn_initial.
     Fixed prepared owners instead use run_prepared.
     """
     end_time = _cpu_batch.duration(end_time, 1)
@@ -257,15 +281,18 @@ def run_until(  # noqa: C901
     if end_time < start:
         raise ValueError("end_time precedes accepted simulation time")
     targets = _observation_times(output_times, end_time)
-    dense, optical_targets = _optical_schedule(
+    schedules = _analysis_schedules(
         simulation,
+        start,
+        end_time,
         optics,
         optical_output_times,
         optical_initial,
-        start,
-        end_time,
+        ccn,
+        ccn_output_times,
+        ccn_initial,
     )
-    for target in sorted(targets | optical_targets):
+    for target in sorted(targets.union(*(times for _, _, times in schedules))):
         if target < start:
             continue
         while simulation.time < target:
@@ -275,16 +302,18 @@ def run_until(  # noqa: C901
                 raise RuntimeError(
                     "owner failed to advance to an accepted bounded time"
                 )
-            if dense:
-                optics.record()
-        if target in optical_targets:
-            optics.record()
+            for sampler, dense, _ in schedules:
+                if dense:
+                    sampler.record()
+        for sampler, _, times in schedules:
+            if target in times:
+                sampler.record()
         if target in targets and recorder is not None:
             if isinstance(recorder, Recorder) and (
                 recorder.last_time == simulation.time
             ):
                 continue
             recorder.record(simulation.time, simulation.snapshot())
-    if optics is not None:
-        optics.flush()
+    for sampler, _, _ in schedules:
+        sampler.flush()
     return simulation
