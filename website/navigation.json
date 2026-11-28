@@ -266,6 +266,10 @@
         "collapsed": true,
         "items": [
           {
+            "label": "Particle populations in v0.4.0",
+            "slug": "guide/migration/v0.4.0"
+          },
+          {
             "label": "v0.3.0",
             "collapsed": true,
             "items": [

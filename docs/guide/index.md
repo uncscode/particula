@@ -25,7 +25,7 @@ to connect a research question with explanations, examples, and model choices.
 | Use explicit Warp transfers and device execution | [GPU selection](gpu/backend-selection.md), then [resident checkpoints](gpu/resident/checkpoints.md) |
 | Capture a resident loop on native CUDA | [Graph-capture runbook](gpu/resident/graph-capture.md) |
 | Calculate spectra, polarization and cloud optical depth | [Optics](optics/index.md) |
-| Upgrade legacy scripts | [v0.3.0 migration](migration/v0.3.0/index.md) |
+| Upgrade an existing study | [Particle populations in 0.4.0](migration/v0.4.0/index.md) or [native aerosol containers in 0.3.0](migration/v0.3.0/index.md) |
 
 CPU process examples are the first-use path. Direct Warp examples require
 explicit transfers; resident execution has additional lifecycle rules. Native

@@ -46,6 +46,24 @@ records. To measure forcing error, thin the records with `trace.sample_every(2)`
 before assigning interval sources. To measure integration error, keep the
 records and reduce `max_step`. [Adaptive ascent comparison](../../studies/examples/thermodynamics/adaptive_moist_parcel.py) · [100-second replay and cadence study](../../studies/examples/thermodynamics/parcel-experiments/parcel_replay.py)
 
+Use each sample's own air volume to check a native export. The parcel's dry
+class counts stay fixed through this ascent, while its volume and wet mass
+evolve. The recovered gas kg equal vapor mixing ratio times dry-air mass.
+
+```python
+for i in (0, -1):
+    snapshot = direct.aerosol_at(i, dry_density=1500.0)
+    p = snapshot.particles
+    volume = direct.volume[i]
+    np.testing.assert_allclose(p.population[0], initial.number)
+    np.testing.assert_allclose(p.number_density[0] * volume, initial.number.sum())
+    np.testing.assert_allclose(
+        p.species_mass_inventory[0], (p.masses[0] * initial.number[:, None]).sum(axis=0),
+    )
+    np.testing.assert_allclose(snapshot.gas.concentration[0, 0] * volume,
+                               direct.vapor[i] * initial.dry_air_mass)
+```
+
 ### Read or supply a trace
 
 Each CSV contains one parcel ID and strictly increasing times. Its header is
@@ -181,8 +199,13 @@ uniform one-dimensional advection its added variance is
 $|U|\,\Delta x\,(1-|U|\Delta t/\Delta x)t$, using the actual substep.
 
 `InventoryLayout` maps named gases, bins and materials to extensive lanes.
-For neutral native discrete boxes, `pack` converts gas and number densities
-using the physical cell volume, and `unpack` returns detached native copies.
+For neutral native discrete boxes, `pack` multiplies each sample's bin
+counts by physical cell volume divided by represented sample volume. This
+gives counts in the physical cell. Per-particle masses times those counts
+give kg per cell, while gas density times cell volume gives kg per gas lane.
+`unpack` scales cell counts to the target sample volume, divides occupied-bin
+mass by cell counts, and retains the template mass coordinates in empty bins.
+[Air volumes in particle studies](../migration/v0.4.0/index.md)
 Supply `Uptake` for first-order transfer of a named gas into an occupied bin.
 Prescribed humidity belongs to the flow. For resolved grains, `Release`
 takes a native particle record, a terminal slip speed in m/s, and a launch

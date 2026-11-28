@@ -19,15 +19,15 @@ preparation. Full-gas partitioning remains live device state.
 | Activity kappas, reference molar masses and surface tension | Full material order; ideal and κ references match mapped gas species, BAT references define binary composition |
 | Thermodynamics, accommodation, diffusion and latent/thermal arrays | Full gas order, including unused/nonpartitioning gas species |
 | Demand/release/scale scratch and energy output | Full gas width, `(boxes, gas_species)` |
-| Gas inventory coupling | kg/m³: transfer weighted by N/V for resolved counts, stored density for PMF |
+| Gas inventory coupling | kg/m³, transfer weighted by represented count divided by box volume for both resolved and discrete data |
 | Native energy output | Extensive J: applied transfer weighted by counts and mapped latent heat |
 
 The direct and private prepared routes use the same four equal substeps. Each
 refreshes full-gas vapor pressure, evaluates full particle composition, gates
 mapped proposals, bounds evaporation and gas-limits uptake, then couples the
 representable particle change to gas. Whole-call transfer and energy outputs
-are cleared at entry and accumulated from the applied substeps. PMF requires
-V=1; resolved volumes need not be one. PDF execution rejects explicitly.
+are cleared at entry and accumulated from the applied substeps. Discrete and resolved boxes can have any supported positive air volume.
+Native radius-PDF microphysics runs on the CPU.
 
 Resolved N/V must be finite at admission. Evaporation contributes only its
 representable release to the uptake budget. Before either inventory update,

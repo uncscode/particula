@@ -15,7 +15,8 @@ are extensive bin counts and resolved multiplicities, with independently declare
 Schema-v6 `legacy_untagged` records and missing population meaning reject before
 setup or upload without inferred migration. PDF
 remains unsupported on Warp. Native inspection carriers retain their population
-tag; canonical bytes remain restart authority.
+tag; canonical bytes remain restart authority. For observations from a 0.3.6
+run, use the [analysis-file migration](../../getting-started/recording-restart.md#read-a-036-particle-history).
 
 Resident communication is a concrete-only closed-map barrier. Communication
 runs before optional physical volume evolution; both invalidate saturation

@@ -7011,6 +7011,54 @@
       ],
       "role": "Studies",
       "start_here": false
+    },
+    {
+      "source": "docs/guide/migration/v0.4.0/index.md",
+      "title": "Migrate particle populations to 0.4.0",
+      "topic": "representations-ownership",
+      "also": [],
+      "role": "Guide",
+      "start_here": false
+    },
+    {
+      "source": "docs/studies/tutorials/building-an-aerosol/particles/represented_population.py",
+      "title": "Count particles in a represented air volume",
+      "topic": "representations-construction",
+      "also": [],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "represented-population",
+        "runs": [
+          "represented-population"
+        ],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/migration/v0.4.0/index.md",
+            "label": "Migration guide"
+          }
+        ]
+      }
+    },
+    {
+      "source": "docs/studies/validation/workflows-and-releases/population-v0.4.0.md",
+      "title": "Particle population migration checks for 0.4.0",
+      "topic": "verification-qualification",
+      "also": [],
+      "role": "Studies",
+      "start_here": false,
+      "study": {
+        "id": "population-v040-qualification",
+        "runs": [],
+        "companions": [],
+        "relations": [
+          {
+            "target": "docs/guide/migration/v0.4.0/index.md",
+            "label": "Migration guide"
+          }
+        ]
+      }
     }
   ],
   "supporting": [

@@ -384,7 +384,7 @@ def test_enabled_lifecycle_retires_and_closes_without_cuda(
             SimpleNamespace(
                 volume=np.ones(1, dtype=np.float64),
                 masses=np.ones((1, 1, 1), dtype=np.float64),
-                concentration=np.ones((1, 1), dtype=np.float64),
+                population=np.ones((1, 1), dtype=np.float64),
             ),
             SimpleNamespace(concentration=np.ones((1, 1), dtype=np.float64)),
             object(),
@@ -594,7 +594,7 @@ def test_operation_failure_remains_primary_when_teardown_fails(
             SimpleNamespace(
                 volume=np.ones(1),
                 masses=np.ones((1, 1, 1)),
-                concentration=np.ones((1, 1)),
+                population=np.ones((1, 1)),
             ),
             SimpleNamespace(concentration=np.ones((1, 1))),
             object(),
