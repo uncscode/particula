@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 
 import numpy as np
+from particula.particles import get_binned_number_spectrum
 from coupled_events import KT, MFP_AIR, MU_AIR, pair_rates
 from vapor_properties import Materials, materials
 
@@ -238,9 +239,13 @@ def collision_kernel(mass, z, spec, kind, i, j):
 def observables(box):
     """Measure number, phases, wet-size occupancy and signed charge."""
     radius = wet_radius(box.mass, box.spec)
-    # Extensive counts in fixed wet-radius classes as well as bulk quantities.
+    # Number and signed charge densities on the same wet-radius classes.
     bins = np.array([0.0, 50e-9, 90e-9, 150e-9, np.inf])
-    count = np.histogram(radius, bins)[0] / box.volume
+    interior, low, high = get_binned_number_spectrum(
+        2 * radius, np.full(radius.shape, 1 / box.volume), 2 * bins[1:-1],
+        include_upper_edge=False,
+    )
+    count = np.r_[low, interior, high]
     charge = np.histogram(radius, bins, weights=box.charge)[0] / box.volume
     return np.r_[
         box.concentration,

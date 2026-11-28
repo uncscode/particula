@@ -1,10 +1,9 @@
 # %% [markdown]
 # # A million-particle source, collision and loss lifecycle
 #
-# The figure uses a new CUDA run with the archived scientific code. Its
-# library, example source and input files matched the original publication
-# by SHA-256. With the same one-second interval, current Particula requests
-# 564 collision trials in box zero and has capacity for 193.
+# The collision sampler can divide each one-second observation interval into
+# shorter passes. Each pass schedules the full trial demand for its duration.
+# All boxes reach the same observation time.
 #
 # Can a multi-process run explain why particles disappear while also preserving
 # its exact continuation after a restart? Follow the first-cycle process ledger

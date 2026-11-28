@@ -342,6 +342,31 @@ environment = EnvironmentData(
 )
 ```
 
+### Diameter spectra
+
+To compare discrete or resolved populations on a measurement grid, pass
+diameter edges in metres to `particula.particles.get_particle_number_spectrum`.
+The result holds the integrated density in each bin and the densities below
+and above the range, all in m⁻³. Sum all three contributions per box to recover
+`particles.number_density`. Each interior boundary belongs to the bin on its
+right. The final bin includes its upper boundary.
+
+```python
+from particula.particles import get_number_per_decade, get_particle_number_spectrum
+
+edges = [0.1e-6, 0.2e-6, 0.5e-6, 1e-6]
+spectrum = get_particle_number_spectrum(particle_data, edges)
+per_decade = get_number_per_decade(spectrum.bin_number_density, edges)
+```
+
+The native adapter uses volume-equivalent diameters. For measured sizes or a
+different diameter definition, supply diameters and number-density weights to
+`get_binned_number_spectrum`. Leading axes are preserved and the last axis
+holds particles. For pre-binned data, `get_bin_number_density` converts from
+number per decade on the same edges. `get_rebinned_number_spectrum` maps
+integrated densities to a new grid under the assumption of constant dN/dlog₁₀D
+inside each source interval. Continuous radius PDFs require radius quadrature.
+
 ## Guidance for current users
 
 - Use package-level imports for public containers and helpers.

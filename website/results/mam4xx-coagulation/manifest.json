@@ -1,28 +1,28 @@
 {
   "schema": 1,
   "figure_dpi": 300,
-  "elapsed_seconds": 756.3662800109014,
-  "package_source_sha256": "de9c4fa23fbd4833d9eeae22e97ffd8e2496acae8432510149eed8ada42f4ee3",
-  "scientific_source_sha256": "1ac66c614e80ae7a0f6aae70e885469d5f8609ca95421966dfcd08ebcf41597f",
+  "elapsed_seconds": 1232.5610021220054,
+  "package_source_sha256": "fb62539e446aa9348489ec67f4eff6f98c534f6e668d75293727a4745fd40ef8",
+  "scientific_source_sha256": "de1b8e4f7828cd58d808601b3cb92b4ade18fbab99ba3c0a9792edc190f53c50",
   "input_sha256": {
     "scripts/mam4xx_coagulation/campaign.py": "ac2f488f33fca6e5617f213c7283ebe457c922820edcbe337b34d0c6948b1adb",
     "scripts/mam4xx_coagulation/compare.py": "4ec88cf8b783d81ca0c384de0013c804ec59153dd96006e2c13a1add88a4c185",
-    "scripts/mam4xx_coagulation/particles.py": "18f75c4c5567f1028c52b5a1d66ed0c5d7cbde174c5ea0eb8f0edaba012ed618",
-    "scripts/mam4xx_coagulation/plots.py": "daf3c12db6e41a7a0d4b2133f0247d638a697147b5a0e31505677cebf47eafe1",
+    "scripts/mam4xx_coagulation/particles.py": "b183a4d69ade5e1d988f1aee32a2604399eb66094f5b4b90ff9410e3ec97c0df",
+    "scripts/mam4xx_coagulation/plots.py": "3639d967d3eac4258640fef4cf3596085d15d65044e9a4f37d1928361a808c73",
     "scripts/mam4xx_coagulation/build_reference.py": "8d8c341b0e695c90bf2a28952ebb9cade62f1026303974fb342cf5e0131b9860",
     "scripts/mam4xx_coagulation/reference_driver.cpp": "32388e90fa67b2f3204aeca4cd00290019e1e4c4d1f72642e893758fce900b92",
     "docs/data/mam4xx-coagulation/modal.csv": "dd609292b60baddcf6708f6664c664ce15bf21b0338f9b605093b42dd55df849"
   },
   "example": "mam4xx-coagulation",
-  "fingerprint": "f84f48bed3fe3c946430cac4bb95d240ebbbcbac806aae2f999a59c3723e49c8",
+  "fingerprint": "f82e2f3a1e6f230722e94c0858a25bc6dcd43b823cbbf99270b1f177f3624aeb",
   "source": "docs/studies/literature/mam4xx-coagulation/mam4xx_coagulation.py",
-  "revision": "e51ed2b15f9bf790bf8b152b2c54176b6105b73f",
+  "revision": "20c50dad56aa7bd95d503cb76cf58bc84ad6e997",
   "package_dirty": false,
-  "executed_at": "2026-11-21T02:27:45.666162+00:00",
+  "executed_at": "2026-11-27T23:31:47.980839+00:00",
   "device": "cuda:0: NVIDIA GeForce RTX 5060",
   "python": "3.12.12",
   "versions": {
-    "particula": "0.3.3",
+    "particula": "0.3.6",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -32,7 +32,41 @@
     "particula-distribution": "0.2.14"
   },
   "outputs": [
-    [],
+    [
+      {
+        "text": "Warp 1.11.1 initialized:\n   CUDA Toolkit 12.9, Driver 13.4\n   Devices:\n     \"cpu\"      : \"CPU\"\n     \"cuda:0\"   : \"NVIDIA GeForce RTX 5060\" (8 GiB, sm_120, mempool enabled)\n   Kernel cache:\n     ~/.cache/warp/1.11.1\nModule particula.gpu.kernels.environment e11375e load on device 'cuda:0' took 2.96 ms  (cached)\nModule particula.gpu.kernels.coagulation 84ae354 load on device 'cuda:0' took 2.11 ms  (cached)\nModule particula.gpu.kernels._coagulation_native f93a244 load on device 'cuda:0' took 2.21 ms  (cached)\n"
+      },
+      {
+        "text": "Module particula.execution.prepared_guards 5366864 load on device 'cuda:0' took 0.74 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel 5433dfc load on device 'cuda:0' took 4.41 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel f84feee load on device 'cuda:0' took 3.34 ms  (cached)\nModule particula.gpu.kernels._coagulation_subcycling 93efbd4 load on device 'cuda:0' took 0.64 ms  (cached)\nModule particula.gpu.kernels._coagulation_budget b4a3978 load on device 'cuda:0' took 2.19 ms  (cached)\nModule particula.gpu.kernels._brownian_parallel c0acfec load on device 'cuda:0' took 5.41 ms  (cached)\nModule particula.gpu.kernels.coagulation fd5b5c9 load on device 'cuda:0' took 1.38 ms  (cached)\nModule particula.gpu.kernels.coagulation 79e9aa8 load on device 'cuda:0' took 0.71 ms  (cached)\nModule particula.gpu.kernels._coagulation_subcycling ca6b3ba load on device 'cuda:0' took 1.43 ms  (cached)\nModule particula.gpu.kernels._coagulation_subcycling a49d377 load on device 'cuda:0' took 1.82 ms  (cached)\n"
+      },
+      {
+        "text": "Finished 60 nm, Aitken/accumulation 0.25\n"
+      },
+      {
+        "text": "Finished 60 nm, Aitken/accumulation 1\n"
+      },
+      {
+        "text": "Finished 60 nm, Aitken/accumulation 4\n"
+      },
+      {
+        "text": "Finished 110 nm, Aitken/accumulation 0.25\n"
+      },
+      {
+        "text": "Finished 110 nm, Aitken/accumulation 1\n"
+      },
+      {
+        "text": "Finished 110 nm, Aitken/accumulation 4\n"
+      },
+      {
+        "text": "Finished 220 nm, Aitken/accumulation 0.25\n"
+      },
+      {
+        "text": "Finished 220 nm, Aitken/accumulation 1\n"
+      },
+      {
+        "text": "Finished 220 nm, Aitken/accumulation 4\n"
+      }
+    ],
     [
       {
         "image": "figure-2-1.png"
@@ -45,34 +79,10 @@
     ]
   ],
   "files": {
-    "figure-3-1.png": "b9cdc5d61efbc45de6304be74e9563b64cf86df8f10f1659b887ac745e2c245b",
+    "source.py": "a19f92a6a5599a08481b4f8a0a505e09b1a727670a995116e06a24c8df0ed845",
+    "data.json": "01d95dcc1329257427b0ca81e333c4b5444ecff7f6f7130eee8f7581fd7cb806",
     "figure-2-1.png": "aba1fae77824eb47dd2763d8bd305eda467e6caeac015362dd44eea99b55f0c3",
-    "executed_source.py": "23d2292eb4b6a4b4b73d7d4c2e05c023318efebb19a03f134b7d5ff3c0e4b58f",
-    "data.json": "56c5bad0affe38c0ce64ec086139b868d164f57c9b24efe84f84cd41042795ad",
-    "source.py": "a19f92a6a5599a08481b4f8a0a505e09b1a727670a995116e06a24c8df0ed845"
+    "figure-3-1.png": "b9cdc5d61efbc45de6304be74e9563b64cf86df8f10f1659b887ac745e2c245b"
   },
-  "simulation_fingerprint": "dcfe1de643f4807a948c8fa3155b8fdc447114670e865918abf72ff8dc6e0c18",
-  "render_versions": {
-    "particula": "0.3.3",
-    "numpy": "2.3.4",
-    "scipy": "1.16.2",
-    "matplotlib": "3.10.7",
-    "nbclient": "0.10.2",
-    "jupytext": "1.17.3",
-    "warp-lang": "1.11.1",
-    "particula-distribution": "0.2.14"
-  },
-  "render_device": "CPU",
-  "execution_input_sha256": {
-    "scripts/mam4xx_coagulation/campaign.py": "ac2f488f33fca6e5617f213c7283ebe457c922820edcbe337b34d0c6948b1adb",
-    "scripts/mam4xx_coagulation/compare.py": "4ec88cf8b783d81ca0c384de0013c804ec59153dd96006e2c13a1add88a4c185",
-    "scripts/mam4xx_coagulation/particles.py": "18f75c4c5567f1028c52b5a1d66ed0c5d7cbde174c5ea0eb8f0edaba012ed618",
-    "scripts/mam4xx_coagulation/plots.py": "daf3c12db6e41a7a0d4b2133f0247d638a697147b5a0e31505677cebf47eafe1",
-    "scripts/mam4xx_coagulation/build_reference.py": "8d8c341b0e695c90bf2a28952ebb9cade62f1026303974fb342cf5e0131b9860",
-    "scripts/mam4xx_coagulation/reference_driver.cpp": "32388e90fa67b2f3204aeca4cd00290019e1e4c4d1f72642e893758fce900b92",
-    "docs/data/mam4xx-coagulation/modal.csv": "dd609292b60baddcf6708f6664c664ce15bf21b0338f9b605093b42dd55df849"
-  },
-  "rendered_at": "2026-11-21T02:29:37.978531+00:00",
-  "render_revision": "e51ed2b15f9bf790bf8b152b2c54176b6105b73f",
-  "render_elapsed_seconds": 2.1306005739606917
+  "simulation_fingerprint": "a0314f744ec92e96c9122d28aa9b33adcb856d87df79f6e563bec9e25b2a6e94"
 }

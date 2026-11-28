@@ -1,15 +1,18 @@
-"""Fine diameter-window differences in absolute number, preserving count per bin."""
+"""Seasonal differences in absolute particle number per diameter bin."""
 
-from pathlib import Path
 import os
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
+from particula.particles import get_binned_number_spectrum
 from summarize import SEASONS
 
 ROOT = Path(__file__).resolve().parent
 
 
 def main():
+    """Write seasonal sun-minus-dark spectra from time-weighted monthly bins."""
     scratch = Path(os.environ["SEASONAL_TMP"])
     edges = np.arange(3.5, 40.01, 0.25)
     cols = [f"b{i}" for i in range(len(edges) - 1)]
@@ -18,17 +21,22 @@ def main():
         if "_ranked_" not in p.name and "_dark_" not in p.name:
             continue
         with np.load(p) as a:
-            d = a["wet_radius_m"][:, -1].astype(float) * 2e6
-            n = a["number_m3"][:, -1].astype(float) * 1e-6
+            d = a["wet_radius_m"][:, -1].astype(float) * 2
+            n = a["number_m3"][:, -1].astype(float)
+            counts = (
+                get_binned_number_spectrum(
+                    d, n, edges * 1e-6
+                ).bin_number_density
+                * 1e-6
+            )
             for j, h in enumerate(a["hour_in_week"]):
-                hist = np.histogram(d[j], edges, weights=n[j])[0]
                 records.append(
                     dict(
                         month=a["month"][j],
                         hour=h,
                         profile=a["profile"][j],
                         w=a["w"][j],
-                        **dict(zip(cols, hist)),
+                        **dict(zip(cols, counts[j], strict=True)),
                     )
                 )
     df = pd.DataFrame(records)
@@ -44,11 +52,12 @@ def main():
                 season=SEASONS.get(m, "dark"),
                 profile=p,
                 w=w,
-                **dict(zip(cols, hist)),
+                **dict(zip(cols, hist, strict=True)),
             )
         )
     x = pd.DataFrame(month)
-    assert len(x) == 52
+    if len(x) != 52:
+        raise ValueError(f"Expected 52 monthly spectra, found {len(x)}")
     coarse = x.groupby(["season", "profile", "w"], as_index=False)[cols].mean()
     rows = []
     for (p, w), g in coarse.groupby(["profile", "w"]):

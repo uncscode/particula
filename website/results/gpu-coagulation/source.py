@@ -291,6 +291,7 @@ def run_publication():
     import matplotlib.pyplot as plt
     import warp as wp
     from particula import plotting
+    from particula.particles import get_binned_number_spectrum
 
     if not _warp_enabled() or not wp.is_cuda_available():
         raise RuntimeError("This publication run requires CUDA")
@@ -303,13 +304,11 @@ def run_publication():
         fig, axes = plotting.subplots(1, 2)
         edges = np.geomspace(1, 30, 16)
         for data, label in ((initial, "Initial"), (final, "After two calls")):
-            volume = np.sum(data.masses / data.density, axis=2)[0]
-            radius = np.cbrt(3 * volume / (4 * np.pi)) * 1e9
-            histogram, _ = np.histogram(
-                radius,
-                bins=edges,
-                weights=data.concentration[0] / data.volume[0],
-            )
+            histogram = get_binned_number_spectrum(
+                2 * data.radii[0],
+                data.slot_concentration_density[0],
+                edges * 2e-9,
+            ).bin_number_density
             axes[0].stairs(histogram, edges, label=label, linewidth=2)
         axes[0].set(
             xscale="log",

@@ -651,6 +651,9 @@
     "policy": "cuda",
     "device": "cuda",
     "timeout": 7200,
+    "science_inputs": [
+      "particula/particles/properties/number_spectrum.py"
+    ],
     "inputs": [
       "scripts/docs_gpu_figures.py",
       "scripts/gpu_studies/__init__.py",
@@ -678,6 +681,9 @@
     "policy": "cuda",
     "device": "cuda",
     "timeout": 7200,
+    "science_inputs": [
+      "particula/particles/properties/number_spectrum.py"
+    ],
     "inputs": [
       "scripts/docs_gpu_figures.py",
       "scripts/gpu_studies/__init__.py",
@@ -708,6 +714,9 @@
     "policy": "cuda",
     "device": "cuda",
     "timeout": 7200,
+    "science_inputs": [
+      "particula/particles/properties/number_spectrum.py"
+    ],
     "inputs": [
       "scripts/docs_gpu_figures.py",
       "scripts/gpu_studies/__init__.py",
@@ -738,6 +747,9 @@
     "policy": "cuda",
     "device": "cuda",
     "timeout": 14400,
+    "science_inputs": [
+      "particula/particles/properties/number_spectrum.py"
+    ],
     "inputs": [
       "scripts/gpu_studies/__init__.py",
       "scripts/gpu_studies/cases.py",
@@ -1450,6 +1462,7 @@
     "inputs": [
       "scripts/mam4xx_coagulation/regimes.py",
       "scripts/mam4xx_coagulation/regime_plots.py",
+      "scripts/mam4xx_coagulation/plots.py",
       "scripts/mam4xx_coagulation/regime_rates.py",
       "scripts/mam4xx_coagulation/regime_box.py",
       "scripts/mam4xx_coagulation/matched.py",
@@ -1474,7 +1487,8 @@
     "data_expression": "report",
     "render_functions": [],
     "plot_inputs": [
-      "scripts/mam4xx_coagulation/regime_plots.py"
+      "scripts/mam4xx_coagulation/regime_plots.py",
+      "scripts/mam4xx_coagulation/plots.py"
     ],
     "full_canvas": true
   },
@@ -1488,6 +1502,7 @@
       "scripts/mam4xx_coagulation/attraction_campaign.py",
       "scripts/mam4xx_coagulation/attraction_particles.py",
       "scripts/mam4xx_coagulation/attraction_plots.py",
+      "scripts/mam4xx_coagulation/plots.py",
       "scripts/mam4xx_coagulation/modal_attraction.py",
       "scripts/mam4xx_coagulation/neutral_geometry.py",
       "scripts/mam4xx_coagulation/regime_box.py",
@@ -1496,7 +1511,8 @@
     "data_expression": "report",
     "render_functions": [],
     "plot_inputs": [
-      "scripts/mam4xx_coagulation/attraction_plots.py"
+      "scripts/mam4xx_coagulation/attraction_plots.py",
+      "scripts/mam4xx_coagulation/plots.py"
     ],
     "full_canvas": true
   },

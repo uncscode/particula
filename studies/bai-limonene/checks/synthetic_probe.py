@@ -4,6 +4,7 @@ import argparse
 from pathlib import Path
 
 import numpy as np
+from particula.particles import get_binned_number_spectrum
 import pandas as pd
 from probes import CHECKSUMS, median_diameter, read_probe
 
@@ -20,16 +21,14 @@ def sampled(states, bounds):
             weights = np.r_[0, dz] + np.r_[dz, 0]
             weights /= weights.sum()
             for j, hour in enumerate(data["hour_in_week"]):
-                diameter = data["wet_radius_m"][j].astype(float) * 2e6
-                number = data["number_m3"][j].astype(float) / 1e6
+                diameter = data["wet_radius_m"][j].astype(float) * 2
+                number = data["number_m3"][j].astype(float)
                 for instrument, edges in bounds.items():
-                    by_height = np.array(
-                        [
-                            np.histogram(sizes, edges, weights=counts)[0]
-                            for sizes, counts in zip(
-                                diameter, number, strict=True
-                            )
-                        ]
+                    by_height = (
+                        get_binned_number_spectrum(
+                            diameter, number, edges * 1e-6
+                        ).bin_number_density
+                        * 1e-6
                     )
                     for window, counts in [
                         ("cloud_top", by_height[-1]),

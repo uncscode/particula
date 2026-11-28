@@ -15,6 +15,8 @@
 # %% [markdown]
 # # How do collision models change a water-grown mixed aerosol?
 #
+# ![One water-grown organic and soot population supplies four copies: condensation alone, or continued condensation with Brownian collisions, Brownian plus differential settling, or turbulent shear. Branches depict the comparison design.](../../../../images/coupled-populations/biomass-collision-branches.svg)
+#
 # A mixed aerosol can change size through water exchange and through collisions.
 # How can we compare collision assumptions without confusing them with different
 # starting populations? This example gives four scenarios copies of the same
@@ -24,8 +26,8 @@
 # The organics–soot–water mixture is inspired by biomass-burning aerosol, but its
 # properties and concentrations are illustrative. It is not a validated smoke
 # plume or cloud parcel: temperature stays fixed, and there is no spatial flow,
-# chemical aging, or wall removal. Use [resolved coagulation](../processes/coagulation/coagulation_3_particle_resolved_pattern.py)
-# and [condensation](../processes/condensation/condensation_3_massresolved.py)
+# chemical aging, or wall removal. Use [resolved coagulation](../../../tutorials/coagulation-populations/coagulation_3_particle_resolved_pattern.py)
+# and [condensation](../../../tutorials/condensation/condensation_3_massresolved.py)
 # first if the separate process contracts are unfamiliar.
 
 # %%
@@ -243,7 +245,7 @@ aerosol_activated = copy.deepcopy(aerosol)
 time_step = 600  # total simulation time in seconds
 time = np.arange(time_step + 1)  # include the full 600 s endpoint
 bins_lognormal = np.logspace(-8, -2, 200)  # radius bins from 10⁻⁸ to 10⁻² m
-distribution_counts = np.zeros((len(time), len(bins_lognormal) - 1))
+concentrations = np.zeros((len(time), len(bins_lognormal) - 1))
 
 # CUDA preparation retains its device-owned controller between observations.
 preparation = GPUResidentCondensation(
@@ -265,9 +267,9 @@ for i, _t in enumerate(tqdm(time, desc="Condensing")):
         preparation.step(bound)
     aerosol_activated = preparation.snapshot()
     # Record the size distribution at this time
-    distribution_counts[i, :], edges = np.histogram(
-        aerosol_activated.particles.radii[0].copy(), bins=bins_lognormal
-    )
+    concentrations[i, :] = par.particles.get_particle_number_spectrum(
+        aerosol_activated.particles, 2 * bins_lognormal
+    ).bin_number_density[0]
 
 # Print final state and water saturation
 print(
@@ -285,12 +287,10 @@ np.testing.assert_allclose(
     atol=1e-30,
 )
 
-# Convert counts → number concentration (#/m³)
-concentrations = distribution_counts / simulation_volume
 
 # Contour plot of log10(number concentration)
 fig, ax = plotting.subplots(size="wide")
-X, Y = np.meshgrid(time, edges[:-1])
+X, Y = np.meshgrid(time, bins_lognormal[:-1])
 log_conc = np.log10(
     concentrations,
     where=concentrations > 0,
@@ -451,8 +451,8 @@ for name, collision in [
 # ## Convert counts into a comparable diameter spectrum
 #
 # Exclude empty slots, double radius to obtain wet diameter, and bin particles
-# between 0.01 and 100 µm. Divide counts by sample volume in cm³ and convert the
-# bin totals into dN/dlogDp. This coordinate differs from the initial count
+# between 0.01 and 100 µm. The spectrum uses the represented count per m³
+# and each bin’s measured log width. Convert the result to cm⁻³ per decade. This coordinate differs from the initial count
 # histogram and the radius-bin contour, so compare integrated number with the
 # appropriate measure rather than comparing raw vertical magnitudes.
 #
@@ -472,30 +472,21 @@ def get_wet_diameters(aero_obj):
     return diameters_um
 
 
-def compute_dndlogdp(diameters, volume_m3):
-    """Convert diameter samples into dN/dlogDp (#/cm³)."""
-    counts, _ = np.histogram(diameters, bins=BIN_EDGES)
-    m3_to_cm3 = par.util.get_unit_conversion("m^3", "cm^3")
-    dn_number = counts / (volume_m3 * m3_to_cm3)
-    centers = (BIN_EDGES[:-1] + BIN_EDGES[1:]) / 2
-    strategy = par.particles.get_distribution_conversion_strategy(
-        "dN/dlogDp", "pmf"
-    )
-    dndlogdp = strategy.convert(centers, dn_number, inverse=True)
-    return centers, dndlogdp
-
-
-# Compute distributions for all cases
+# Use the native represented counts and each scenario's sampling volume.
+diameter_edges = BIN_EDGES * 1e-6
+centers = (BIN_EDGES[:-1] + BIN_EDGES[1:]) / 2
 distributions = {}
 cases = [("Initial", aerosol), ("Start", aerosol_activated)] + list(
     results.items()
 )
-
 for label, aero_obj in cases:
-    diameters = get_wet_diameters(aero_obj)
-    volume = aero_obj.particles.volume[0]
-    centers, dnd = compute_dndlogdp(diameters, volume)
-    distributions[label] = (centers, dnd)
+    spectrum = par.particles.get_particle_number_spectrum(
+        aero_obj.particles, diameter_edges
+    )
+    density = par.particles.get_number_per_decade(
+        spectrum.bin_number_density[0], diameter_edges
+    )
+    distributions[label] = (centers, density * 1e-6)
 
 # %% [markdown]
 # ## Read the scenario overlay as a controlled model comparison
@@ -605,6 +596,13 @@ plt.show()
 
 # %% [markdown]
 # ## Keep the comparison's evidence boundary in view
+#
+# In this seeded run, Brownian coagulation plus settling needed two collision
+# passes in 179 of the 10,000 intervals and merged 9,319 particle pairs.
+# Brownian alone and turbulent shear each finished every interval in one pass,
+# with 240 and 448 mergers respectively. The settling branch ended with 681
+# occupied slots. All four branches conserved the three species inventories.
+# [Comparison with the archived run](biomass-evidence.md#biomass-rerun-with-adaptive-gpu-coagulation)
 #
 # All branches share their initial material inventory and retain the same
 # condensation model. Their differing spectra therefore motivate a collision-model

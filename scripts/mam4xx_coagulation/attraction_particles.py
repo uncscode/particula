@@ -1,6 +1,7 @@
 """Continuous-time Monte Carlo sampling of size-dependent collision tables."""
 
 import numpy as np
+from particula.particles import get_binned_number_spectrum
 from scipy.special import ndtri
 from scripts.mam4xx_coagulation.modal_attraction import HIST_EDGES, HOURS
 
@@ -45,8 +46,17 @@ def trajectory(modes, edges, kernel, box_cm3, seed):
         d = 1e3 * np.cbrt(v)
         high = d >= 100
         np.testing.assert_allclose(v.sum(), start_volume, rtol=5e-13)
-        hist = np.histogram(d, bins=np.r_[0, HIST_EDGES, np.inf])[0]
-        np.testing.assert_equal(hist.sum(), counts.sum())
+        bins_in_range, low, overflow = get_binned_number_spectrum(
+            d * 1e-9,
+            np.full(d.shape, 1e6 / box_cm3),
+            HIST_EDGES * 1e-9,
+            include_upper_edge=False,
+        )
+        hist = np.r_[low, bins_in_range, overflow] * 1e-6
+        np.testing.assert_allclose(
+            hist.sum() * box_cm3, counts.sum(), rtol=1e-12
+        )
+        np.testing.assert_equal(np.rint(hist * box_cm3).sum(), counts.sum())
         obs.append(
             [
                 (~high).sum() / box_cm3,
@@ -54,7 +64,7 @@ def trajectory(modes, edges, kernel, box_cm3, seed):
                 v[high].sum() * np.pi / (6 * box_cm3),
             ]
         )
-        spectra.append(hist / box_cm3)
+        spectra.append(hist)
 
     def remove(bucket, uniform):
         pos = int(uniform * len(bucket))

@@ -420,7 +420,7 @@ time_len = len(time_array)
 
 # 📊 Initialize arrays for tracking outputs
 bins_lognormal = np.logspace(-8, -4, 100)
-distribution_counts = np.zeros((time_len, len(bins_lognormal) - 1))
+concentrations = np.zeros((time_len, len(bins_lognormal) - 1))
 species_mass = np.zeros((time_len, len(list_of_chemicals)))
 vapor_saturation = np.zeros((time_len, len(list_of_chemicals)))
 
@@ -446,11 +446,9 @@ for step, _t in enumerate(
         aerosol_process = simulation.snapshot()
 
     # Record size distribution
-    distribution_counts[step, :], edges = np.histogram(
-        aerosol_process.particles.radii[0].copy(),
-        bins=bins_lognormal,
-        density=False,
-    )
+    concentrations[step] = par.particles.get_particle_number_spectrum(
+        aerosol_process.particles, 2 * bins_lognormal
+    ).bin_number_density[0]
 
     # Record species mass in particles
     species_temp = aerosol_process.particles.masses[0].copy()
@@ -476,8 +474,6 @@ for step, _t in enumerate(
         ]
     )
 
-# Normalize counts to number concentration (#/m³)
-concentrations = distribution_counts / simulation_volume
 
 # Final system state and actual adaptive work
 print("Final gas concentration (kg/m^3):", aerosol_process.gas.concentration)
@@ -498,22 +494,15 @@ print("Adaptive condensation work:", simulation.statistics)
 
 fig, ax = plotting.subplots(size="wide")
 
-# Get radii before and after simulation
-initial_distribution = aerosol.particles.radii[0].copy()
-final_distribution = aerosol_process.particles.radii[0].copy()
-
-# Compute binned counts
-counts_initial, _ = np.histogram(
-    initial_distribution, bins=bins_lognormal, density=False
-)
-counts_final, _ = np.histogram(
-    final_distribution, bins=bins_lognormal, density=False
-)
+initial_density = par.particles.get_particle_number_spectrum(
+    aerosol.particles, 2 * bins_lognormal
+).bin_number_density[0]
+final_density = concentrations[-1]
 
 # Plot initial distribution
 ax.plot(
     bins_lognormal[:-1],
-    counts_initial / simulation_volume,
+    initial_density,
     label="Initial Size Distribution",
     color=TAILWIND["sky"]["800"],
     linestyle="--",
@@ -522,7 +511,7 @@ ax.plot(
 # Plot final distribution
 ax.plot(
     bins_lognormal[:-1],
-    counts_final / simulation_volume,
+    final_density,
     label="Final Size Distribution",
     color=TAILWIND["rose"]["400"],
     linestyle="-",
@@ -639,7 +628,7 @@ plt.show()
 fig, ax = plotting.subplots(size="wide")
 
 # Create 2D mesh grid for time and particle radius
-X, Y = np.meshgrid(time_array, edges[:-1])
+X, Y = np.meshgrid(time_array, bins_lognormal[:-1])
 
 # Convert number concentration to log10 scale (avoid log(0) issues)
 log_conc = np.log10(

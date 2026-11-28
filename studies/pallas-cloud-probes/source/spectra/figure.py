@@ -3,6 +3,7 @@
 import sys
 from pathlib import Path
 import numpy as np
+from particula.particles import get_number_per_decade
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FixedLocator, FixedFormatter, NullLocator
@@ -79,9 +80,39 @@ def run(out):
         handlelength=2,
         columnspacing=1.3,
     )
+    maximum = 0.0
     for j, (day, g) in enumerate(frame.groupby("day")):
         e = np.r_[g.low_um, g.high_um.iloc[-1]]
-        width = np.diff(np.log10(e))
+        columns = [
+            "CDA",
+            "FSSP",
+            "ICEMET",
+            "FSSP_p025",
+            "FSSP_p975",
+            "ICEMET_p025",
+            "ICEMET_p975",
+            "model_FSSP",
+            "model_ICEMET",
+        ]
+        spectra = pd.DataFrame(
+            get_number_per_decade(g[columns].to_numpy().T * 1e6, e * 1e-6).T
+            * 1e-6,
+            columns=columns,
+        )
+        maximum = max(
+            maximum,
+            spectra[
+                [
+                    "CDA",
+                    "FSSP_p975",
+                    "ICEMET_p975",
+                    "model_ICEMET",
+                    "model_FSSP",
+                ]
+            ]
+            .to_numpy()
+            .max(),
+        )
         a, b, c = axes[:, j]
         a.set_title(
             f"{day} September 2022  ·  {int(g.minutes.iloc[0]):,} paired minutes",
@@ -94,18 +125,18 @@ def run(out):
             style(ax)
         for ax in [a, b]:
             ax.set_ylim(bottom=0)
-            ax.stairs(g.CDA / width, e, color=C, ls=":", lw=1.8)
+            ax.stairs(spectra.CDA, e, color=C, ls=":", lw=1.8)
         for name, color in [("FSSP", F), ("ICEMET", I)]:
             a.stairs(
-                g[name + "_p975"] / width,
+                spectra[name + "_p975"],
                 e,
-                baseline=g[name + "_p025"] / width,
+                baseline=spectra[name + "_p025"],
                 fill=True,
                 color=color,
                 alpha=0.13,
             )
-            a.stairs(g[name] / width, e, color=color, lw=2)
-            b.stairs(g["model_" + name] / width, e, color=color, lw=2)
+            a.stairs(spectra[name], e, color=color, lw=2)
+            b.stairs(spectra["model_" + name], e, color=color, lw=2)
         c.axhline(0, color="#69737b", lw=0.8)
         c.stairs(
             g.percent_p975,
@@ -125,17 +156,7 @@ def run(out):
     for ax in axes[:2].flat:
         ax.set_ylim(
             0,
-            max(
-                frame[n].div(np.log10(frame.high_um / frame.low_um)).max()
-                for n in [
-                    "FSSP_p975",
-                    "ICEMET_p975",
-                    "CDA",
-                    "model_ICEMET",
-                    "model_FSSP",
-                ]
-            )
-            * 1.045,
+            maximum * 1.045,
         )
     for ax, label in zip(
         axes[:, 0],

@@ -11,6 +11,7 @@ import particula
 import warp
 from particula.dynamics import BrownianCoagulationStrategy, Coagulation
 from particula.gpu.kernels.coagulation import CoagulationSubcyclingConfig
+from particula.particles import get_binned_number_spectrum
 from scipy.special import ndtri
 from scipy.stats import t as student
 from scripts.mam4xx_coagulation.matched import matched
@@ -69,11 +70,13 @@ def ensemble(modes, slots, dt, seeds, max_subcycles=4096):
                 metrics.append(
                     [count[~big].sum(), count[big].sum(), v[big] @ count[big]]
                 )
-                hist.append(
-                    np.histogram(
-                        size, bins=np.r_[0, edges, np.inf], weights=count
-                    )[0]
+                bins, low, high = get_binned_number_spectrum(
+                    size * 1e-9,
+                    count * 1e6,
+                    edges * 1e-9,
+                    include_upper_edge=False,
                 )
+                hist.append(np.r_[low, bins, high] * 1e-6)
         traces.append(metrics)
         spectra.append(hist)
 

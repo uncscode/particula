@@ -9,6 +9,9 @@ from scipy.optimize import least_squares
 from particula.optics.humidity import hydrate_index, subsaturated_growth
 from particula.optics.mie import get_mie_efficiencies
 from particula.optics.state import mix_refractive_index
+from particula.particles.properties.number_spectrum import (
+    get_bin_number_density,
+)
 
 CHANNELS = ("extinction", "scattering", "absorption")
 
@@ -95,7 +98,7 @@ class OpticalGrid:
             raise ValueError("Diameter edges and size-bin values do not match")
         log_edges = np.log10(edges)
         if measure == "dN_dlog10D":
-            values = values * np.diff(log_edges)
+            values = get_bin_number_density(values, edges)
         elif measure != "bin_density":
             raise ValueError("Unknown size spectrum measure")
         centres = 10 ** ((log_edges[:-1] + log_edges[1:]) / 2)

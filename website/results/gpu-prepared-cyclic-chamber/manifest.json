@@ -6,12 +6,13 @@
   "scientific_source_sha256": "cab2ecf96c60a0d1d005885793a221697dc3037bb3be50d8438b4de458423cbc",
   "input_sha256": {
     "scripts/gpu_studies/__init__.py": "530c51f7c7f432a895623c9ba4548b7cf3e053a1a0f328a36ae8ae9e50cec9c4",
-    "scripts/gpu_studies/cases.py": "8728bdc1bb583d849d7228055c5bbc27606c021e1564f2d531b8c9a9e93787ec",
-    "scripts/gpu_studies/validation.py": "816f83d10024feef14daa05112688ea7d26faa3ddde8e05ba12e8dc29f6a4a45"
+    "scripts/gpu_studies/cases.py": "740fc35b2df1dc913bde4e03c91859d3406e0da14b85e9f23804a02c3b0d133e",
+    "scripts/gpu_studies/validation.py": "e87d518878ce2f985209197e888d200d7d6e7dd67723b801f2a8905eccaee3c3",
+    "particula/particles/properties/number_spectrum.py": "9be9dd1fbc1eb354a44b71dbddcc3687bb179a2cb798ec7a73772394f315100b"
   },
   "example": "gpu-prepared-cyclic-chamber",
-  "fingerprint": "4bbc4b1c7e538ba8b078f32b16972d13e6aeb0ea69b612cd594e9cb153f03c36",
-  "source": "docs/examples/gpu/prepared/gpu_prepared_cyclic_chamber.py",
+  "fingerprint": "5630b3e55e0872e0fde1c14594f2b77c6647854d0eff27b532ca2c9d6ea0afc7",
+  "source": "docs/studies/examples/coupled-populations/chambers/gpu_prepared_cyclic_chamber.py",
   "revision": "3d3753d2be9973c94b4064047fa8452e717f1311",
   "package_dirty": false,
   "executed_at": "2026-11-16T18:52:43.436066+00:00",
@@ -38,10 +39,10 @@
     ]
   ],
   "files": {
-    "figure-4-1.png": "67b5ffb389ba61689bce67ca8e678369f4b4255e5f5652332328ec1baf5d77ec",
-    "executed_source.py": "d5ad43e1d7d28ae24a5bc8ab65749e175de5bcda4d4372d44b9d0fbc5f307089",
+    "source.py": "30f2a32f81c2f1bc1ff2c58937f6d58e13a0aa9a210644f2c25f390bc945f378",
     "data.json": "3bb6c13e674f95c5f5ee38b0e4eb5ce27a39f4437359edf4d1cdea0e8e8f4883",
-    "source.py": "934eb659bb8c7f58b6c37e4b810ce9a537bbde0450bf9111b1a317ce8f6b9916"
+    "executed_source.py": "d5ad43e1d7d28ae24a5bc8ab65749e175de5bcda4d4372d44b9d0fbc5f307089",
+    "figure-4-1.png": "67b5ffb389ba61689bce67ca8e678369f4b4255e5f5652332328ec1baf5d77ec"
   },
   "simulation_fingerprint": "eedd8c327de95c03589f34946c21bfe34c26863795c194e2442344da34dd9156",
   "historical_run": {
@@ -50,7 +51,7 @@
     "package_source_sha256": "cab2ecf96c60a0d1d005885793a221697dc3037bb3be50d8438b4de458423cbc"
   },
   "render_versions": {
-    "particula": "0.3.2",
+    "particula": "0.3.6",
     "numpy": "2.3.4",
     "scipy": "1.16.2",
     "matplotlib": "3.10.7",
@@ -65,7 +66,7 @@
     "scripts/gpu_studies/cases.py": "8728bdc1bb583d849d7228055c5bbc27606c021e1564f2d531b8c9a9e93787ec",
     "scripts/gpu_studies/validation.py": "816f83d10024feef14daa05112688ea7d26faa3ddde8e05ba12e8dc29f6a4a45"
   },
-  "rendered_at": "2026-11-19T19:37:37.747949+00:00",
-  "render_revision": "f5be504b2ecb3d768eb5a41a2be1be19b0d2d96d",
-  "render_elapsed_seconds": 4.736303271027282
+  "rendered_at": "2026-11-27T23:20:55.096304+00:00",
+  "render_revision": "383665bd1dfbad87632f809299e1b754b726960d",
+  "render_elapsed_seconds": 6.509210112039
 }

@@ -3,6 +3,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import t as student
+from scripts.mam4xx_coagulation.plots import number_per_decade
 
 
 def case(rows, **attrs):
@@ -91,7 +92,6 @@ def particles(data):
         height_ratios=[1, 1.4, 0.8],
     )
     edges = np.array(data["edges_nm"])
-    width = np.diff(np.log10(edges))
     for col, reg in enumerate(("polluted", "marine")):
         initial, final, spread = axes[:, col]
         keys = dict(regime=reg, widths="host", coarse=True, resolution=48)
@@ -104,7 +104,7 @@ def particles(data):
             lo, hi = (np.array(row[k])[-1, 1:-1] for k in ("p16", "p84"))
             if law == "bare":
                 initial.stairs(
-                    np.array(row["mean"])[0, 1:-1] / width,
+                    number_per_decade(np.array(row["mean"])[0, 1:-1], edges),
                     edges,
                     color="#52575c",
                 )
@@ -118,7 +118,9 @@ def particles(data):
                 law=law,
             )
             final.stairs(
-                np.array(modal["spectrum_cm3"])[-1, 1:-1] / width,
+                number_per_decade(
+                    np.array(modal["spectrum_cm3"])[-1, 1:-1], edges
+                ),
                 edges,
                 color=color,
                 ls="--",
@@ -126,12 +128,15 @@ def particles(data):
                 label=lab + " · modal",
             )
             final.stairs(
-                mean / width, edges, color=color, label=lab + " · particles"
+                number_per_decade(mean, edges),
+                edges,
+                color=color,
+                label=lab + " · particles",
             )
             final.stairs(
-                hi / width,
+                number_per_decade(hi, edges),
                 edges,
-                baseline=lo / width,
+                baseline=number_per_decade(lo, edges),
                 fill=True,
                 color=color,
                 alpha=0.35,

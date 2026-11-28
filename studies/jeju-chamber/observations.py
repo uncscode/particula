@@ -8,6 +8,7 @@ from tempfile import NamedTemporaryFile
 from pathlib import Path
 
 import numpy as np
+from particula.particles import get_bin_number_density
 import pandas as pd
 import particula as par
 
@@ -78,7 +79,7 @@ def extract():
         ]
         edge = np.exp(log_edge)
         widths = np.diff(log_edge) / np.log(10)
-        rows = opc.to_numpy() * widths
+        rows = get_bin_number_density(opc.to_numpy() * 1e6, edge * 1e-6) * 1e-6
         assert np.isfinite(rows).all() and rows.min() >= 0
         temp.index = (temp.index - origin).total_seconds().astype(int)
         nmin = int(sec.max() // 60 + 1)

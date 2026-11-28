@@ -28,6 +28,7 @@ CONFIG = ROOT / "website/examples.json"
 RESULTS = ROOT / "website/results"
 FIGURE_DPI = 300
 STYLE_INPUTS = ("particula/default.mplstyle", "particula/plotting/__init__.py")
+SPECTRUM_INPUT = "particula/particles/properties/number_spectrum.py"
 MAX_PLOT_DATA_BYTES = 10 * 1024 * 1024
 
 
@@ -129,7 +130,7 @@ def result_state(config, manifest, root=ROOT):
     )
 
 
-def use_historical_package(science_root, renderer_root):
+def use_historical_package(science_root, renderer_root, *, spectrum=False):
     """Load the pinned science package and its separately versioned renderer."""
     from importlib.util import module_from_spec, spec_from_file_location
 
@@ -152,6 +153,20 @@ def use_historical_package(science_root, renderer_root):
             "The kernel imported a different scientific checkout"
         )
     root = Path(renderer_root)
+    if spectrum:
+        # These archived engines predate the host-side reporting functions.
+        # The study declares the current diagnostic as a hashed science input.
+        spec = spec_from_file_location(
+            "study_number_spectrum", root / SPECTRUM_INPUT
+        )
+        diagnostic = module_from_spec(spec)
+        spec.loader.exec_module(diagnostic)
+        particula.particles.get_particle_number_spectrum = (
+            diagnostic.get_particle_number_spectrum
+        )
+        particula.particles.get_number_per_decade = (
+            diagnostic.get_number_per_decade
+        )
     spec = spec_from_file_location("particula.plotting", root / STYLE_INPUTS[1])
     module = module_from_spec(spec)
     sys.modules[spec.name] = module
@@ -204,7 +219,8 @@ def execute(config, root=ROOT, *, saved_data=None, science_root=None):
             "import runpy\n"
             f"tool = runpy.run_path({__file__!r})\n"
             "tool['use_historical_package']("
-            f"{str(science_root)!r}, {str(root)!r})\n"
+            f"{str(science_root)!r}, {str(root)!r}, "
+            f"spectrum={SPECTRUM_INPUT in scientific_inputs(config)!r})\n"
         )
     notebook = nbformat.v4.new_notebook(
         cells=[nbformat.v4.new_code_cell(bootstrap), *cells]
